@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <script src="https://payments.worldpay.com/resources/hpp/integrations/embedded/js/hpp-embedded-integration-library.js" src_type="url"/>
+        <css src="https://payments.worldpay.com/resources/hpp/integrations/embedded/css/hpp-embedded-integration-library.css" src_type="url"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+             <block class="Sapient\Worldpay\Block\Checkout\Hpp\Iframe" name="worldpay.checkout.hpp.iframe"/>
+            <block class="Magento\Framework\View\Element\Template" name="worldpay.checkout.hpp.application"
+                   template="Sapient_Worldpay::checkout/hpp/application.phtml" cacheable="false">
+                 <block class="Sapient\Worldpay\Block\Checkout\Hpp\Json\Config" name="worldpay.checkout.hpp.configuration" /> 
+            </block>
+        </referenceContainer>
+    </body>
+</page>

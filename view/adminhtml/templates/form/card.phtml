@@ -1,0 +1,152 @@
+<?php
+$clientKey = $block->escapeHtml($block->getClientKey());
+
+
+$saveCardEnabled = $block->saveCardEnabled();
+if ($saveCardEnabled) {
+    $savedCards = $block->getSavedCards();
+} else {
+    $savedCards = [];
+}
+$wpData = [
+    "clientKey" => $clientKey,
+];
+$serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($wpData);
+?>
+<fieldset class="admin__fieldset payment-method" id="payment_form_<?php echo $block->escapeHtml($block->getMethodCode()) ?>" style="display: none"  data-mage-init='{"worldpayForm":<?php /* @noEscape */ echo $serializedFormData; ?>}'>
+   <div class="admin__field _required">
+       <label for="worldpay_cc_type" class="admin__field-label">
+       <span>Credit Card Type</span>
+       </label>
+       <div class="admin__field-control">
+          <?php $cctypes = $block->getCCtypes(); ?>
+          <select id="worldpay_cc_type" name="payment[cc_type]" class="required-entry validate-cc-type-select admin__control-select">
+              <option value="" selected="selected">
+                Card type
+              </option>
+              <?php
+                  $options = '';
+                  foreach($cctypes as $k => $v){
+                      $options .='<option value="'.$k.'">'.$v.'</option>';
+                  }
+                  echo $options;
+              ?>
+          </select>
+       </div>
+    </div>
+     <?php 
+        if($block->isDirectIntegration()){
+     ?>
+    <div class="admin__field _required directform">
+       <label for="worldpay_cc_name" class="admin__field-label">
+       <span>Card Holder name</span>
+       </label>
+       <div class="admin__field-control">
+          <input type="text" id="worldpay_cc_name" name="payment[cc_name]" class="input-text required-entry admin__control-text" value="">
+       </div>
+    </div>
+    <div class="admin__field _required directform">
+       <label for="worldpay_cc_number" class="admin__field-label">
+       <span>Credit Card Number</span>
+       </label>
+       <div class="admin__field-control">
+          <input type="number" id="worldpay_cc_number" name="payment[cc_number]" class="input-text required-entry validate-cc-number admin__control-text" value="">
+       </div>
+    </div>
+    <div class="admin__field _required directform">
+       <label for="worldpay_card_expiration" class="admin__field-label">
+       <span>Expiration Date</span>
+       </label>
+       <div class="admin__field-control">
+         <?php 
+                $months = $block->getMonths();
+              ?>
+          <select id="worldpay_card_expiration_month" name="payment[cc_exp_month]" class="validate-cc-exp required-entry admin__control-select admin__control-select-month">
+             <option value="0" selected="selected">
+                Month
+             </option>
+             <?php foreach($months as $k=>$v){ ?>
+             <option value="<?php echo $k ?>">
+                <?php echo $k.' - '.$v; ?>
+             </option>
+             <?php } ?>
+          </select>
+           <?php 
+                $years = $block->getYears();
+              ?>
+          <select id="worldpay_card_expiration_yr" name="payment[cc_exp_year]" class="required-entry admin__control-select admin__control-select-year">
+             <option value="" selected="selected">
+                Year                    
+             </option>
+              <?php foreach($years as $k=>$v){ ?>
+                 <option value="<?php echo $k ?>">
+                    <?php echo $v; ?>
+                 </option>
+             <?php } ?>
+          </select>
+       </div>
+    </div>
+
+    <?php if ($block->requireCvcEnabled()): ?>
+    <div class="admin__field field required _required directform" id="wp_cvv" >
+        <label for="worldpay_card_expiration" class="admin__field-label">
+            <span>CVV</span>
+       </label>
+        <div class="admin__field-control control" id="wp_cvc_container">
+         <input type="number" autocomplete="off"
+                   class="input-text cvv saved-cvv-number required-entry"
+                   name="payment[cc_cid]"
+                   value="" />
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <input type="hidden"
+       name="payment[cse_enabled]"
+       id="worldpay_cse_enabled"
+       value=""/>
+   <?php } ?>
+ 
+    <?php if ($saveCardEnabled): ?>
+    <div class="admin__field field directform">
+      <div class="admin__field-control field-tooltip-content">
+          <input type="checkbox" id="worldpay_savecard" name="payment[save_my_card]" class="admin__control-checkbox">
+          <label class="label" for="worldpay_savecard">
+              <span class="admin__field-label" style="padding-left:10px;">Save card</span>
+          </label>
+      </div>
+    </div>
+    <?php endif; ?>
+  
+  <div class="admin__field _required saved_card_form">
+     <input type="hidden"
+       name="payment[paymentToken]"
+       id="wp_token"
+       value=""/>
+        <?php if (count($savedCards) && $saveCardEnabled): ?>
+            <label class="label admin__field-label">
+                    <span>Saved cards</span>
+                  </label>
+        <?php endif; ?>
+       <?php foreach ($savedCards as $savedCard):?>
+        <div class="admin__field-control admin__field-option">
+            <input id="saved_card_<?php echo $savedCard['id'];?>" value="<?php echo $savedCard['token_code']; ?>" type="radio" name="payment[tokenCode]" class="admin__control-radio saved_tokens">
+            <label class="admin__field-label" for="saved_card_<?php echo $savedCard['id'];?>"><?php echo $savedCard['method']; ?> <?php echo $savedCard['card_number']; ?></label>
+        </div>
+       <?php endforeach; ?>
+       <?php if (count($savedCards) && $block->requireCvcEnabled()): ?>
+            <p>&nbsp;</p>
+            
+                <label class="label admin__field-label">
+                    <span>CVV</span>
+                  </label>
+                <div class="admin__field-control control" id="wp_cvc_container">
+                 <input type="number" autocomplete="off"
+                           class="input-text cvv saved-cvv-number required-entry"
+                           name="payment[saved_cc_cid]"
+                           value="" />
+                </div>
+          
+        <?php endif; ?>
+  </div>
+</fieldset>

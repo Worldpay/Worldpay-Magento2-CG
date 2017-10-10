@@ -1,0 +1,21 @@
+{
+   "name":"sapient/module-worldpay",
+   "description":"Sapient WorldPay Payment Module",
+   "type":"magento2-module",
+   "require":{
+      "php":"~5.5.0|~5.6.0|~7.0.0",
+      "magento/magento-composer-installer": "*",
+      "magento/module-sales": "*",
+      "magento/module-payment": "*",
+      "magento/module-quote": "*"
+   },
+   "license":"proprietary",
+   "autoload":{
+      "files":[
+         "registration.php"
+      ],
+      "psr-4":{
+         "Sapient\\Worldpay\\":""
+      }
+   }
+}

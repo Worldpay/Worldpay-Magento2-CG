@@ -1,0 +1,177 @@
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<form class="form" data-bind="attr: {'id': getCode() + '-form'}">
+<fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
+    <!-- ko if: (isShowLegend())-->
+    <legend class="legend">
+        <span><!-- ko i18n: 'Credit Card Information'--><!-- /ko --></span>
+    </legend><br />
+    <!-- /ko -->
+    <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
+        <label data-bind="attr: {for: getCode() + '_cc_type'}" class="label">
+            <span><!-- ko i18n: 'Credit Card Type'--><!-- /ko --></span>
+        </label>
+        <div class="control">
+            <!-- ko if: (paymentMethodSelection()=='dropdown')-->
+                <select name="payment[cc_type]" class="select select-ccytpe"
+                data-bind="attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type', 'data-validate': JSON.stringify({required:true})},
+               options: availableCCTypes(), optionsText: 'ccLabel',
+               value: selectedCCType, optionsValue: 'ccValue',
+               optionsCaption: 'Select Your Credit Card', event:{ change: loadEventAction }"></select>
+            <!-- /ko -->
+            <!-- ko if: (paymentMethodSelection()=='radio')-->
+
+                <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
+                    <input type="radio" name="payment[cc_type]"
+                            data-bind="event:{ change: $parent.loadEventAction }, attr: {'value': item.value,
+                            'data-validate': JSON.stringify({ 'validate-one-required-by-name':true })}"/>
+                    <label> <!-- ko text: item.type --><!-- /ko --></label>
+
+                <!--/ko-->
+            <!-- /ko -->
+        </div>
+    </div>
+    <div data-bind="visible: false" id="cc-Visibility-Enabled">
+    <div class="field name required">
+        <label data-bind="attr: {for: getCode() + '_cc_name'}" class="label">
+            <span><!-- ko i18n: 'Card Holder Name'--><!-- /ko --></span>
+        </label>
+        <div class="control">
+            <input type="text" name="payment[cc_name]" class="input-text" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_cc_name',
+                                    title: $t('Card Holder Name'),
+                                    'data-container': getCode() + '-cc-Name',
+                                    'data-validate': JSON.stringify({
+                                      'required':true
+                                    })},
+                                    value: cardHolderName,
+                                    "/>
+        </div>
+    </div>
+    <div class="field number required">
+        <label data-bind="attr: {for: getCode() + '_cc_number'}" class="label">
+            <span><!-- ko i18n: 'Credit Card Number'--><!-- /ko --></span>
+        </label>
+        <div class="control">
+            <input type="number" name="payment[cc_number]" class="input-text" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_cc_number',
+                                    title: $t('Credit Card Number'),
+                                    'data-container': getCode() + '-cc-number',
+                                    'data-validate': JSON.stringify({
+                                      'required-number':true,
+                                      'worldpay-validate-number': true,
+                                      'worldpay-cardnumber-valid':true
+                                    })},
+                                    enable: isActive($parents),
+                                    value: creditCardNumber,
+                                    valueUpdate: 'keyup'
+                                    "/>
+        </div>
+    </div>
+    <div class="field date required" data-bind="attr: {id: getCode() + '_cc_type_exp_div'}">
+        <label data-bind="attr: {for: getCode() + '_expiration'}" class="label">
+            <span><!-- ko i18n: 'Expiration Date'--><!-- /ko --></span>
+        </label>
+        <div class="control">
+            <div class="fields group group-2">
+                <div class="field no-label month">
+                    <div class="control">
+                        <select  name="payment[cc_exp_month]"
+                                 class="select select-month"
+                                 data-bind="attr: {id: getCode() + '_expiration', 'data-container': getCode() + '-cc-month', 'data-validate': JSON.stringify({required:true, 'validate-cc-exp':'#' + getCode() + '_expiration_yr'})},
+                                            enable: isActive($parents),
+                                            options: getCcMonthsValues(),
+                                            optionsValue: 'value',
+                                            optionsText: 'month',
+                                            optionsCaption: $t('Month'),
+                                            value: creditCardExpMonth">
+                        </select>
+                    </div>
+                </div>
+                <div class="field no-label year">
+                    <div class="control">
+                        <select name="payment[cc_exp_year]"
+                                class="select select-year"
+                                data-bind="attr: {id: getCode() + '_expiration_yr', 'data-container': getCode() + '-cc-year', 'data-validate': JSON.stringify({required:true})},
+                                           enable: isActive($parents),
+                                           options: getCcYearsValues(),
+                                           optionsValue: 'value',
+                                           optionsText: 'year',
+                                           optionsCaption: $t('Year'),
+                                           value: creditCardExpYear">
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ko if: (hasVerification())-->
+    <div class="field cvv required" data-bind="attr: {id: getCode() + '_cc_type_cvv_div'}">
+        <label data-bind="attr: {for: getCode() + '_cc_cid'}" class="label">
+            <span><!-- ko i18n: 'Card Verification Number'--><!-- /ko --></span>
+        </label>
+        <div class="control _with-tooltip">
+            <input type="number"
+                   autocomplete="off"
+                   class="input-text cvv"
+                   name="payment[cc_cid]"
+                   value=""
+                   data-bind="attr: {id: getCode() + '_cc_cid',
+                        title: $t('Card Verification Number'),
+                        'data-container': getCode() + '-cc-cvv',
+                        'data-validate': JSON.stringify({'required-number':true, 'validate-card-cvv':'#' + getCode() + '_cc_type'})},
+                        enable: isActive($parents),
+                        value: creditCardVerificationNumber" />
+            <div class="field-tooltip toggle">
+                <span class="field-tooltip-action action-cvv"
+                      tabindex="0"
+                      data-toggle="dropdown"
+                      data-bind="attr: {title: $t('What is this?')}, mageInit: {'dropdown':{'activeClass': '_active'}}">
+                    <span><!-- ko i18n: 'What is this?'--><!-- /ko --></span>
+                </span>
+                <div class="field-tooltip-content"
+                     data-target="dropdown"
+                     data-bind="html: getCvvImageHtml()"></div>
+            </div>
+        </div>
+    </div>
+    <!-- /ko -->
+    <!-- ko if: (getSaveCardAllowed())-->
+    <div class="field savecc" data-bind="attr: {id: getCode() + '_save-card_div'}">
+        <div class="control">
+            <input type="checkbox" class="input-check savecard"  name="save-card"  data-bind="attr: {
+                    id: getCode() + '_save_card', title: $t('Save This Card'),
+                    'data-container': getCode() + '-save-card'}, value: saveMyCard">
+             <label data-bind="attr: {for: getCode() + 'save-card'}" class="label">
+                <span><!-- ko i18n: 'Save This Card'--><!-- /ko --></span>
+            </label>
+        </div>
+    </div>
+    <!-- /ko -->
+    </div>
+    </fieldset>
+</form>
+
+<form class="form" data-bind="attr: {'id': getCode() + '-savedcard-form'}">
+    <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
+    <fieldset>
+        <!-- ko if: (getSavedCardsList().length > 0)-->
+            <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
+            <!-- ko template: 'Sapient_Worldpay/payment/saved-card-form' --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko ifnot: (getSavedCardsList().length > 0)-->
+            <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
+            <span><!-- ko i18n: 'You have no Saved Card.'--><!-- /ko --></span>
+        <!-- /ko -->
+    </fieldset>
+    </div>
+ </form>

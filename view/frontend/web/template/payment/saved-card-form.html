@@ -1,0 +1,54 @@
+    <!-- ko foreach: getSavedCardsList() -->
+        <div class="field savecc">
+            <div class="control">
+                <input type="radio"
+                   name="payment[token_to_use]"
+                   id=""
+                   value=""
+                   class="checkbox"
+                   data-bind="value: token_code,
+                   checked: $parent.paymentToken,
+                   attr: {id: 'saved_card_' + id,
+                   'data-validate': JSON.stringify({'required':true})}
+                   "/>
+                <input type="hidden" name="card-type" id="card-type" data-bind="value: card_brand">
+                <label class="label" for="wp_save_card" data-bind='attr: {for: "saved_card_" + id}'>
+                <span data-bind="text: card_brand"></span> <span data-bind="text: card_number"></span> <span data-bind="text: card_expiry_month"></span><span data-bind="i18n: '/'"></span><span data-bind="text: card_expiry_year"></span>
+                </label>
+            </div>
+       </div>
+
+    <!--/ko-->
+    <!-- ko if: (hasVerification())-->
+     <div class="field cvv required" data-bind="attr: {id: getCode() + '_cc_type_cvv_div'}">
+          <label class="label" data-bind="attr: {for: getCode() + '_cc_cid'}">
+              <span><!-- ko i18n: 'Card Verification Number'--><!-- /ko --></span>
+          </label>
+           <div class="control _with-tooltip">
+              <input type="number"
+                     autocomplete="off"
+                     class="input-text cvv saved-cvv-number"
+                     name="payment[cc_cid]"
+                     value=""
+                       data-bind="attr: {id: getCode() + '_cc_cid',
+                          title: $t('Card Verification Number'),
+                          'data-container': getCode() + '-cc-cvv',
+                          enable: isActive($parents),
+                          value: SavedcreditCardVerificationNumber"
+                           />
+              <div class="field-tooltip toggle">
+                  <span class="field-tooltip-action action-cvv"
+                        tabindex="0"
+                        data-toggle="dropdown"
+                        data-bind="attr: {title: $t('What is this?')}, mageInit: {'dropdown':{'activeClass': '_active'}}">
+                      <span><!-- ko i18n: 'What is this?'--><!-- /ko --></span>
+                  </span>
+                  <div class="field-tooltip-content"
+                       data-target="dropdown"
+                       data-bind="html: getCvvImageHtml()"></div>
+              </div>
+          </div>
+           <div class="mage-error" generated="true"  id="saved-cvv-error"></div>
+      </div>
+    <!-- /ko -->
+ 
