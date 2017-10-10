@@ -1,0 +1,8 @@
+<body>
+    <referenceBlock name="order_create_billing_form">
+        <action method="setMethodFormTemplate">
+            <argument name="method" xsi:type="string">worldpay_moto</argument>
+            <argument name="template" xsi:type="string">Sapient_Worldpay::form/card.phtml</argument>
+        </action>
+    </referenceBlock>
+</body>

@@ -1,0 +1,77 @@
+<?php
+/**
+ * @copyright 2017 Sapient
+ */
+namespace Sapient\Worldpay\Model\PaymentMethods;
+/**
+ * WorldPay CreditCards class extended from WorldPay Abstract Payment Method.
+ */
+class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
+{
+    /**
+     * Payment code
+     * @var string
+     */
+    protected $_code = 'worldpay_cc';
+    protected $_isGateway = true;
+    protected $_canAuthorize = true;
+    protected $_canUseInternal = false;
+    protected $_canUseCheckout = true;
+    /**
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     */
+
+    /**
+     * Authorize payment abstract method
+     *
+     * @param \Magento\Framework\DataObject|InfoInterface $payment
+     * @param float $amount
+     * @return $this
+     */
+    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
+        $this->_wplogger->info('WorldPay Payment CreditCards Authorise Method Executed:');
+        parent::authorize($payment, $amount);
+        return $this;
+    }
+
+    public function getAuthorisationService($storeId)
+    {
+         $checkoutpaymentdata = $this->paymentdetailsdata;
+
+         if (!empty($checkoutpaymentdata['additional_data']['isSavedCardPayment']) && !empty($checkoutpaymentdata['additional_data']['tokenCode'])) {
+            return $this->tokenservice;
+        }
+        if ($this->_isRedirectIntegrationModeEnabled($storeId)) {
+            if ($this->_isEmbeddedIntegrationModeEnabled($storeId)) {
+                return $this->hostedpaymentpageservice;
+            }
+
+            return $this->redirectservice;
+        }
+        return $this->directservice;
+    }
+
+    private function _isRedirectIntegrationModeEnabled($storeId)
+    {
+        $integrationModel = $this->worlpayhelper->getCcIntegrationMode($storeId);
+
+        return $integrationModel === 'redirect';
+    }
+
+    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null){
+
+       if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isCreditCardEnabled()) {
+         return true;
+       }
+       return false;
+
+    }
+
+    private function _isEmbeddedIntegrationModeEnabled($storeId)
+    {
+        return $this->worlpayhelper->isIframeIntegration($storeId);
+    }
+
+
+}

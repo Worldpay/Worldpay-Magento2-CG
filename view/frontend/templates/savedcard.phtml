@@ -1,0 +1,45 @@
+
+<?php  $_savecards=$block->getSavedCard(); ?>
+
+<?php echo $block->getChildHtml('info');?>
+<?php if ($_savecards && count($_savecards)): ?>
+    <div class="table-wrapper saved-cards">
+        <table class="data table table-savedcard-items history" id="my-savecards-table">
+            <caption class="table-caption"><?php  echo __('Saved Cards') ?></caption>
+            <thead>
+                <tr>
+                    <th scope="col" class="col id"><?php /* @escapeNotVerified */ echo __('Card Brand #') ?></th>
+                   	<th scope="col" class="col date"><?php /* @escapeNotVerified */ echo __('Card Number') ?></th>
+                   	<th scope="col" class="col shipping"><?php /* @escapeNotVerified */ echo __('Card Holder Name') ?></th>
+                    <th scope="col" class="col total"><?php /* @escapeNotVerified */ echo __('Card Expiry Month') ?></th>
+                    <th scope="col" class="col status"><?php /* @escapeNotVerified */ echo __('Card Expiry Year') ?></th>
+                    <th scope="col" class="col actions">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($_savecards as $_savecard): ?>
+                	<tr>
+                        <td data-th="<?php echo $block->escapeHtml(__('Card Brand #')) ?>" class="col id"><?php /* @escapeNotVerified */ echo $_savecard->getCardBrand() ?></td>
+                       	<td data-th="<?php echo $block->escapeHtml(__('Card Number')) ?>" class="col date"><?php /* @escapeNotVerified */ echo $_savecard->getCardNumber() ?></td>
+                        <td data-th="<?php echo $block->escapeHtml(__('Card Holder Name')) ?>" class="col shipping">
+                        <?php echo $_savecard->getCardholderName() ?></td>
+                        <td data-th="<?php echo $block->escapeHtml(__('Card Expiry Month')) ?>" class="col total"><?php /* @escapeNotVerified */ echo $_savecard->getCardExpiryMonth() ?></td>
+                        <td data-th="<?php echo $block->escapeHtml(__('Card Expiry Year')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_savecard->getCardExpiryYear() ?></td>
+                        <td data-th="<?php echo $block->escapeHtml(__('Actions')) ?>" class="col actions">
+                            <a href="<?php /* @escapeNotVerified */ echo $block->getEditUrl($_savecard) ?>" class="action view">
+                                <span><?php /* @escapeNotVerified */ echo __('Update') ?></span>
+                            </a>
+                        </td>
+                        <td data-th="<?php echo $block->escapeHtml(__('Actions')) ?>" class="col actions">
+                            <a href="<?php /* @escapeNotVerified */ echo $block->getDeleteUrl($_savecard) ?>" class="action view">
+                                <span><?php /* @escapeNotVerified */ echo __('Delete') ?></span>
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+<?php else: ?>
+    <div class="message info empty"><span><?php /* @escapeNotVerified */ echo __('You have no Saved Card.'); ?></span></div>
+<?php endif ?>

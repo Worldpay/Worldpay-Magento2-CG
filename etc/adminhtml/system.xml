@@ -1,0 +1,356 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="worldpay" translate="label" type="text" sortOrder="401" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Worldpay</label>
+            <tab>sales</tab>
+            <resource>Sapient_Worldpay::config_worldpay</resource>
+            <!--general configuration-->
+            <group id="general_config" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Configuration</label>
+                <field id="enable_worldpay" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Worldpay</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="environment_mode" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Environment Mode</label>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\EnvironmentMode</source_model>
+                </field>
+                <field id="test_url" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Test URL</label>
+                </field>
+                <field id="live_url" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Live URL</label>
+                </field>
+                <field id="merchant_code" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Code</label>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="xml_username" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>XML Username</label>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="xml_password" translate="label" type="password" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>XML Password</label>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="enable_dynamic3DS" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Dynamic 3D Secure Override</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="do_3Dsecure" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Do 3D Secure authentication</label>
+                    <depends><field id="enable_dynamic3DS">1</field></depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_logging" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled Logging</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="capture_automatically" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Capture Invoice Automatically</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="payment_method_selection" translate="label" type="select" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment Method Selection</label>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethodSelection</source_model>
+                </field>
+            </group>
+            <!--Credit Card-->
+            <group id="cc_config" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Credit Cards</label>
+                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="paymentmethods" translate="label" type="multiselect" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment Methods</label>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethodsCC</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                </field>
+                <field id="cse_enabled" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Client Side Encryption Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="cse_public_key" translate="label" type="textarea" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Public Key</label>
+                </field>
+                <field id="require_cvc" translate="label" type="select" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Require CVC</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="integration_mode" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Integration Mode</label>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\IntegrationMode</source_model>
+                </field>
+                <field id="hpp_integration" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Hosted Payment page Integration</label>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\HppIntegration</source_model>
+                </field>
+                <field id="saved_card" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Save Card</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <!--APM-->
+            <group id="apm_config" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Alternative Payment Method</label>
+                <!--Apm enabled-->
+                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="paymentmethods" translate="label" type="multiselect" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment Methods</label>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethodsApm</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                </field>
+            </group>
+            <!-- MOTO -->
+            <group id="moto_config" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>MOTO</label>
+                <!--Apm enabled-->
+                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="paymentmethods" translate="label" type="multiselect" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment Methods</label>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethodsCC</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                </field>
+            </group>
+            <group id="merchant_config" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Merchant Profile Override Configration</label>
+                <field id="AMEX" translate="label comment" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>AMEX-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+
+                <field id="VISA" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>VISA-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+
+                <field id="ECMC" translate="label comment" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>ECMC-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+
+                <field id="CB" translate="label comment" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>CB-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+
+                <field id="CARTEBLEUE" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>CARTEBLEUE-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+
+                <field id="DANKORT" translate="label comment" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>DANKORT-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+
+                <field id="DINERS" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>DINERS-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+
+                <field id="DISCOVER" translate="label comment" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>DISCOVER-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+
+                <field id="JCB" translate="label comment" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>JCB-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+
+                <field id="SOLOGB" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SOLO_GB-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+
+                <field id="MAESTRO" translate="label comment" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>MAESTRO-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="CHINAUNIONPAY" translate="label comment" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>CHINAUNIONPAY-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="IDEAL" translate="label comment" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>IDEAL-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="QIWI" translate="label comment" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>QIWI-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="YANDEXMONEY" translate="label comment" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>YANDEXMONEY-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="PAYPALEXPRESS" translate="label comment" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>PAYPAL-EXPRESS</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="SOFORT" translate="label comment" type="text" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SOFORT-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="GIROPAY" translate="label comment" type="text" sortOrder="18" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>GIROPAY-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="BOLETO" translate="label comment" type="text" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>BOLETO-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="ALIPAY" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>ALIPAY-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="SEPA_DIRECT_DEBIT" translate="label comment" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SEPA_DIRECT_DEBIT-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="PRZELEWY" translate="label comment" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>PRZELEWY-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="MISTERCASH" translate="label comment" type="text" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>MISTERCASH-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+            </group>
+            <group id="custom_paymentpages" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Custom Payment Pages</label>
+                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="installation_id" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Installation Id</label>
+                </field>
+                <field id="hideaddress" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Hide address</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="order_cleanup" translate="label" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Order Cleanup</label>
+                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="clean_order_status" translate="label" type="multiselect" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Clean Order With Status</label>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\OrderStatus</source_model>
+                </field>
+                <field id="CHINAUNIONPAY_SSL_payment_method" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Union pay</label>
+                </field>
+                <field id="IDEAL_SSL_payment_method" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Ideal</label>
+                </field>
+                <field id="PAYPAL_EXPRESS_payment_method" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Paypal express</label>
+                </field>
+                <field id="YANDEXMONEY_SSL_payment_method" translate="label" type="text" sortOrder="7" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Yandex</label>
+                </field>
+                <field id="SOFORT_SSL_payment_method" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Sofort</label>
+                </field>
+                <field id="GIROPAY_SSL_payment_method" translate="label" type="text" sortOrder="9" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Giropay</label>
+                </field>
+                <field id="BOLETO_SSL_payment_method" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Boleto</label>
+                </field>
+                <field id="ALIPAY_SSL_payment_method" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Alipay</label>
+                </field>
+                <field id="QIWI_SSL_payment_method" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Qiwi</label>
+                </field>
+                <field id="SEPA_DIRECT_DEBIT_SSL_payment_method" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Sepa</label>
+                </field>
+                <field id="KlARNA_SSL_payment_method" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Klarna</label>
+                </field>
+                <field id="PRZELEWY_SSL_payment_method" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>P24</label>
+                </field>
+                <field id="MISTERCASH_SSL_payment_method" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Mistercash</label>
+                </field>
+                <field id="AMEX_SSL_payment_method" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Amex</label>
+                </field>
+                <field id="VISA_SSL_payment_method" translate="label" type="text" sortOrder="18" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Visa</label>
+                </field>
+                <field id="ECMC_SSL_payment_method" translate="label" type="text" sortOrder="19" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Master card</label>
+                </field>
+                <field id="CB_SSL_payment_method" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Carte Bancaire</label>
+                </field>
+                <field id="CARTEBLEUE_SSL_payment_method" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Carte Bleue</label>
+                </field>
+                <field id="DANKORT_SSL_payment_method" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Dankort</label>
+                </field>
+                <field id="DINERS_SSL_payment_method" translate="label" type="text" sortOrder="23" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Diners</label>
+                </field>
+                <field id="DISCOVER_SSL_payment_method" translate="label" type="text" sortOrder="24" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Discover</label>
+                </field>
+                <field id="JCB_SSL_payment_method" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Japanese Credit Bank</label>
+                </field>
+                <field id="SOLO_SSL_payment_method" translate="label" type="text" sortOrder="26" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Solo</label>
+                </field>
+                <field id="MAESTRO_SSL_payment_method" translate="label" type="text" sortOrder="27" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Maestro</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
