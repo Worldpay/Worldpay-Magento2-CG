@@ -30,7 +30,8 @@ Documentation is coming shortly
     Boleto
     P24
     SEPA
-  
+    
+    If you require additional payment methods please get in touch at plugins[at]worldpay.com or use the existing payment methods as a template and customise to suit your needs  
 # Integration Types
 
     Client Side Encryption (CSE)
