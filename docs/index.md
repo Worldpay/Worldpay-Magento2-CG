@@ -1,5 +1,3 @@
-Documentation is coming shortly
-
 # Introduction
     Worldpay develop and maintain a Magento plugin. We target regular updates, supporting the latest payment and Magento features. If there is a feature you would like added please get in touch with us at: plugins [at] worldpay.com
 
