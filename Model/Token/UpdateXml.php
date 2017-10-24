@@ -5,7 +5,9 @@
 namespace Sapient\Worldpay\Model\Token;
 
 use Sapient\Worldpay\Model\SavedToken;
-
+/**
+ * read from WP's token update response
+ */
 class UpdateXml implements UpdateInterface
 {
     /**

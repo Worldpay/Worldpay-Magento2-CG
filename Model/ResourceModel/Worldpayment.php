@@ -4,10 +4,14 @@
  */
 namespace Sapient\Worldpay\Model\ResourceModel;
 
+/**
+ * Worldpayment resource
+ */
 class Worldpayment extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
+    
     /**
-     * Define main table
+     * Model initialization
      *
      * @return void
      */
@@ -16,6 +20,12 @@ class Worldpayment extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $this->_init('worldpay_payment', 'id');
     }
 
+    /**
+     * Load worldpayment detail by order_id
+     *
+     * @param int $orderId        
+     * @return int $id
+     */
     public function loadByPaymentId($orderId)
     {
         $table = $this->getMainTable();
@@ -25,6 +35,12 @@ class Worldpayment extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         return $id;
     }
 
+    /**
+     * Load worldpayment detail by worldpay_order_id
+     *
+     * @param string $order_id        
+     * @return int $id
+     */
     public function loadByWorldpayOrderId($order_id)
     {
         $table = $this->getMainTable();

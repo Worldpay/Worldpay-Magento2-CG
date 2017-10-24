@@ -17,9 +17,9 @@ class Service
      * @param \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
      * @param \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory
      * @param \Magento\Sales\Model\Order\Invoice $Invoice
-     * @param \Magento\Sales\Model\Service\CreditmemoService $CreditmemoService 
+     * @param \Magento\Sales\Model\Service\CreditmemoService $CreditmemoService
      * @param \Magento\Sales\Model\Order\Creditmemo $creditmemo
-     * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository   
+     * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
      */
     public function __construct(\Magento\Sales\Model\Order $mageOrder,
         \Magento\Checkout\Model\Session $checkoutsession,
@@ -48,12 +48,12 @@ class Service
     }
 
     /**
-     * @param int $orderId     
+     * @param int $orderId
      * @return \Sapient\Worldpay\Model\Order
      */
     public function getById($orderId)
     {
-        
+
          return new \Sapient\Worldpay\Model\Order(array(
                 'order' => $this->mageorder->load($orderId)
             ),$this->_invoiceService, $this->_transaction,$this->worldpaypaymentmodel,$this->creditmemoFactory,$this->Invoice,$this->CreditmemoService,$this->ordercreditmemo,$this->creditmemoRepository);
@@ -65,7 +65,7 @@ class Service
      */
     public function getByIncrementId($incrementId)
     {
-       
+
         return new \Sapient\Worldpay\Model\Order(array(
                 'order' => $this->mageorder->loadByIncrementId($incrementId)
             ), $this->_invoiceService, $this->_transaction,$this->worldpaypaymentmodel,$this->creditmemoFactory,$this->Invoice,$this->CreditmemoService,$this->ordercreditmemo,$this->creditmemoRepository);
@@ -79,10 +79,9 @@ class Service
         $order = $this->getAuthorisedOrder();
         $magentoorder = $order->getOrder();
         $this->emailsender->send($magentoorder);
-        $order->setOrderAsProcessing();
     }
-    
-    /** 
+
+    /**
      * @return Increament Id
      */
     public function getAuthorisedOrder()

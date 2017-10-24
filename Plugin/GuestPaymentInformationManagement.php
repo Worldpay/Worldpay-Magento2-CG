@@ -8,7 +8,7 @@ use Magento\Checkout\Model\GuestPaymentInformationManagement as CheckoutGuestPay
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\GuestCartManagementInterface;
-use Psr\Log\LoggerInterface;
+use \Sapient\Worldpay\Logger\WorldpayLogger;
 use Sapient\Worldpay\Model\MethodList;
 /**
  * Class GuestPaymentInformationManagement
@@ -40,7 +40,7 @@ class GuestPaymentInformationManagement
      */
     public function __construct(
         GuestCartManagementInterface $cartManagement,
-        LoggerInterface $logger,
+        WorldpayLogger $logger,
         MethodList $methodList,
         $checkMethods = true
     ) {
@@ -74,9 +74,10 @@ class GuestPaymentInformationManagement
         try {
             $orderId = $this->cartManagement->placeOrder($cartId);
         } catch (LocalizedException $exception) {
+            $this->logger->error($exception->getMessage());
             throw new CouldNotSaveException(__($exception->getMessage()));
         } catch (\Exception $exception) {
-            $this->logger->critical($exception);
+            $this->logger->error($exception->getMessage());
             throw new CouldNotSaveException(
                 __('An error occurred on the server. Please try to place the order again.'),
                 $exception

@@ -3,9 +3,13 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\XmlBuilder;
+
 use Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecureConfig;
 use \Sapient\Worldpay\Logger\WorldpayLogger;
 
+/**
+ * Build xml for delete token request
+ */
 class TokenDelete
 {
     const TOKEN_SCOPE = 'shopper';
@@ -44,6 +48,10 @@ EOD;
         }
     }
 
+    /**
+     * Build xml for processing Request
+     * @return SimpleXMLElement $xml
+     */
     public function build()
     {
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
@@ -56,11 +64,19 @@ EOD;
         return $xml;
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
     private function _addModifyElement($xml)
     {
         return $xml->addChild('modify');
     }
 
+    /**
+     * @param SimpleXMLElement $modify
+     * @return SimpleXMLElement
+     */
     private function _addTokenUpdateElement($modify)
     {
         $tokenDelete = $modify->addChild('paymentTokenDelete');

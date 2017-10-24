@@ -6,10 +6,15 @@ namespace Sapient\Worldpay\Model\ResourceModel\SavedToken;
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
+/**
+ * SavedToken collection   
+ */
 class Collection extends AbstractCollection
 {
     /**
-     * Define model & resource model
+     * Initialize resource model
+     *
+     * @return void
      */
     protected function _construct()
     {

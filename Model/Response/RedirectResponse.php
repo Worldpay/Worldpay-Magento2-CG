@@ -4,13 +4,25 @@
  */
 namespace Sapient\Worldpay\Model\Response;
 
+/**
+ * help to build redirect url
+ */
 class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
 {
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     */
 	public function __construct(\Magento\Framework\UrlInterface $urlBuilder)
     {
 		$this->_urlBuilder = $urlBuilder;
 	}
     
+    /**          
+     * @param SimpleXmlElement $xml
+     * @return string $url
+     */
     public function getRedirectLocation($xml)
     {
         $url = $this->getRedirectUrl($xml);
@@ -23,6 +35,10 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
         return $url;
     }
 
+    /**          
+     * @param SimpleXmlElement $xml
+     * @return string $url
+     */
     public function getRedirectUrl($xml)
     {
         $this->setResponse($xml);

@@ -6,16 +6,27 @@ namespace Sapient\Worldpay\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
+/**
+ * SavedToken resource
+ */
 class SavedToken extends AbstractDb
 {
     /**
-     * Define main table
+     * Initialize resource model
+     *
+     * @return void
      */
     protected function _construct()
     {
         $this->_init('worldpay_token', 'id');
     }
 
+    /**
+     * Load token detail by tokencode
+     *
+     * @param int $tokencode        
+     * @return int $id
+     */
     public function loadByTokenCode($tokencode){
         $table = $this->getMainTable();
         $where = $this->getConnection()->quoteInto("token_code = ?", $tokencode);

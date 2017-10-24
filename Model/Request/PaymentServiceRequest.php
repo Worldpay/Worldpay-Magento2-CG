@@ -1,26 +1,43 @@
 <?php
 namespace Sapient\Worldpay\Model\Request;
+/**
+ * @copyright 2017 Sapient
+ */
 use Exception;
 use Sapient\Worldpay\Model\SavedToken;
-class PaymentServiceRequest  extends \Magento\Framework\DataObject {
-
+/**
+ * Prepare the request and process them
+ */
+class PaymentServiceRequest  extends \Magento\Framework\DataObject
+{
+    /**
+     * @var \Sapient\Worldpay\Model\Request $request
+     */
     protected $_request;
-    protected $_xml;
-    protected $_logger;
-    protected $_model;
 
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Request $request
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
-        \Psr\Log\LoggerInterface $logger,
         \Sapient\Worldpay\Model\Request $request,
         \Sapient\Worldpay\Helper\Data $worldpayhelper
     ) {
         $this->_wplogger = $wplogger;
-        $this->logger = $logger;
         $this->_request = $request;
         $this->worldpayhelper = $worldpayhelper;
     }
 
+    /**
+     * Send 3d direct order XML to Worldpay server
+     *
+     * @param array $directOrderParams
+     * @return mixed
+     */
     public function order3DSecure($directOrderParams)
     {
         $this->_wplogger->info('########## Submitting direct 3DSecure order request. OrderCode: ' . $directOrderParams['orderCode'] . ' ##########');
@@ -56,6 +73,12 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject {
         );
     }
 
+    /**
+     * Send direct order XML to Worldpay server
+     *
+     * @param array $directOrderParams
+     * @return mixed
+     */
     public function order($directOrderParams)
     {
         $this->_wplogger->info('########## Submitting direct order request. OrderCode: ' . $directOrderParams['orderCode'] . ' ##########');
@@ -86,6 +109,13 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject {
         );
     }
 
+
+    /**
+     * Send a payment request using tokenised saved card to the WorldPay server based on the order parameters.
+     *
+     * @param array $tokenOrderParams
+     * @return mixed
+     */
     public function orderToken($tokenOrderParams)
     {
         $this->_wplogger->info('########## Submitting direct token order request. OrderCode: ' . $tokenOrderParams['orderCode'] . ' ##########');
@@ -117,6 +147,12 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject {
         );
     }
 
+    /**
+     * Send redirect order XML to Worldpay server
+     *
+     * @param array $redirectOrderParams
+     * @return mixed
+     */
     public function redirectOrder($redirectOrderParams)
     {
         $this->_wplogger->info('########## Submitting redirect order request. OrderCode: ' . $redirectOrderParams['orderCode'] . ' ##########');
@@ -151,6 +187,54 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject {
         );
     }
 
+    /**
+     * Send Klarna Order request to Worldpay server
+     *
+     * @param array redirectOrderParams
+     * @return mixed
+     */
+    public function redirectKlarnaOrder($redirectOrderParams)
+    {
+        $this->_wplogger->info('########## Submitting klarna redirect order request. OrderCode: ' . $redirectOrderParams['orderCode'] . ' ##########');
+
+        $requestConfiguration = array(
+            'threeDSecureConfig' => $redirectOrderParams['threeDSecureConfig'],
+            'tokenRequestConfig' => $redirectOrderParams['tokenRequestConfig']
+        );
+        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectKlarnaOrder($requestConfiguration);
+        $redirectSimpleXml = $this->xmlredirectorder->build(
+            $redirectOrderParams['merchantCode'],
+            $redirectOrderParams['orderCode'],
+            $redirectOrderParams['orderDescription'],
+            $redirectOrderParams['currencyCode'],
+            $redirectOrderParams['amount'],
+            $redirectOrderParams['paymentType'],
+            $redirectOrderParams['shopperEmail'],
+            $redirectOrderParams['acceptHeader'],
+            $redirectOrderParams['userAgentHeader'],
+            $redirectOrderParams['shippingAddress'],
+            $redirectOrderParams['billingAddress'],
+            $redirectOrderParams['paymentPagesEnabled'],
+            $redirectOrderParams['installationId'],
+            $redirectOrderParams['hideAddress'],
+            $redirectOrderParams['orderLineItems']
+        );
+
+        return $this->_sendRequest(
+            dom_import_simplexml($redirectSimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($redirectOrderParams['paymentType']),
+            $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentType'])
+        );
+    }
+
+    /**
+     * Send capture XML to Worldpay server
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Framework\DataObject $wp
+     * @param string $paymentMethodCode
+     * @return mixed
+     */
     public function capture(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode)
     {
         $orderCode = $wp->getWorldpayOrderId();
@@ -170,8 +254,14 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject {
         );
     }
 
-
-
+    /**
+     * process the request
+     *
+     * @param SimpleXmlElement $xml
+     * @param string $username
+     * @param string $password
+     * @return SimpleXmlElement $response
+     */
     protected function _sendRequest($xml, $username, $password)
     {
         $response = $this->_request->sendRequest($xml, $username, $password);
@@ -180,9 +270,19 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject {
         return $response;
     }
 
+    /**
+     * check error
+     *
+     * @param SimpleXmlElement $response
+     * @throw Exception
+     */
     protected function _checkForError($response)
     {
         $paymentService = new \SimpleXmlElement($response);
+        $lastEvent = $paymentService->xpath('//lastEvent');
+        if ($lastEvent && $lastEvent[0] =='REFUSED') {
+            return;
+        }
         $error = $paymentService->xpath('//error');
 
         if ($error) {
@@ -192,14 +292,23 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject {
         }
     }
 
+    /**
+     * Send refund XML to Worldpay server
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Framework\DataObject $wp
+     * @param string $paymentMethodCode
+     * @param float $amount
+     * @param  $reference
+     * @return mixed
+     */
     public function refund(
         \Magento\Sales\Model\Order $order,
         $wp,
         $paymentMethodCode,
         $amount,
         $reference
-    )
-    {
+    ) {
         $orderCode = $wp->getWorldpayOrderId();
         $this->_wplogger->info('########## Submitting refund request. OrderCode: ' . $orderCode . ' ##########');
         $this->xmlrefund = new \Sapient\Worldpay\Model\XmlBuilder\Refund();
@@ -218,6 +327,16 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject {
         );
     }
 
+    /**
+     * Send order inquery XML to Worldpay server
+     *
+     * @param string $merchantCode
+     * @param string $orderCode
+     * @param int $storeId
+     * @param string $paymentMethodCode
+     * @param string $paymenttype
+     * @return mixed
+     */
     public function inquiry($merchantCode, $orderCode, $storeId, $paymentMethodCode, $paymenttype)
     {
         $this->_wplogger->info('########## Submitting order inquiry. OrderCode: (' . $orderCode . ') ##########');
@@ -233,6 +352,15 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject {
             $this->worldpayhelper->getXmlPassword($paymenttype)
         );
     }
+
+    /**
+     * Send token update XML to Worldpay server
+     *
+     * @param SavedToken $tokenModel
+     * @param \Magento\Customer\Model\Customer $customer
+     * @param int $storeId
+     * @return mixed
+     */
     public function tokenUpdate(
         SavedToken $tokenModel,
         \Magento\Customer\Model\Customer $customer,
@@ -254,6 +382,15 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject {
             $this->worldpayhelper->getXmlPassword($tokenModel->getMethod())
         );
     }
+
+    /**
+     * Send token delete XML to Worldpay server
+     *
+     * @param SavedToken $tokenModel
+     * @param \Magento\Customer\Model\Customer $customer
+     * @param int $storeId
+     * @return mixed
+     */
     public function tokenDelete(
         SavedToken $tokenModel,
         \Magento\Customer\Model\Customer $customer,

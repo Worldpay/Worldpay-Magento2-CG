@@ -56,6 +56,7 @@ class MotoRedirectService extends \Magento\Framework\DataObject
 
         $successUrl = $this->_buildRedirectUrl($responseXml, $redirectOrderParams['paymentType'], $this->_getCountryForQuote($quote));
 
+        $payment->setIsTransactionPending(1);
         $this->checkoutsession->setAdminWpRedirecturl($successUrl);
 
     }

@@ -1,31 +1,82 @@
 <?php
 namespace Sapient\Worldpay\Model\PaymentMethods;
 use Exception;
+use Magento\Sales\Model\Order\Payment\Transaction;
 
 /**
  * WorldPay Abstract class extended from Magento Abstract Payment class.
  */
 abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 {
-    /**
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-     */
+
     protected $_canCapture = true;
     protected $_canRefund = true;
     protected $_canRefundInvoicePartial = true;
     protected $_canVoid = true;
 
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
     protected $_wplogger;
+    /**
+     * @var \Sapient\Worldpay\Model\Authorisation\DirectService
+     */
     protected $directservice;
+    /**
+     * @var array
+     */
     protected static $paymentDetails;
+    /**
+     * @var \Sapient\Worldpay\Model\WorldpaymentFactory
+     */
     protected $worldpaypayment;
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
     protected $worlpayhelper;
+    /**
+     * @var array
+     */
     protected $paymentdetailsdata;
+    protected $_isInitializeNeeded = true;
 
     const REDIRECT_MODEL = 'redirect';
     const RECURRING_MODEL = 'recurring';
     const DIRECT_MODEL = 'direct';
 
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory
+     * @param \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory
+     * @param \Magento\Payment\Helper\Data $paymentData
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Payment\Model\Method\Logger $logger
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+     * @param \Magento\Backend\Model\Session\Quote $adminsessionquote
+     * @param \Sapient\Worldpay\Model\Authorisation\DirectService $directservice
+     * @param \Sapient\Worldpay\Model\Authorisation\RedirectService $redirectservice
+     * @param \Sapient\Worldpay\Model\Authorisation\TokenService $tokenservice
+     * @param \Sapient\Worldpay\Model\Authorisation\MotoRedirectService $motoredirectservice
+     * @param \Sapient\Worldpay\Model\Authorisation\HostedPaymentPageService $hostedpaymentpageservice
+     * @param \Sapient\Worldpay\Helper\Registry $registryhelper
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param \Psr\Log\LoggerInterface $magelogger
+     * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
+     * @param \Sapient\Worldpay\Model\SavedTokenFactory $savecard
+     * @param \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
+     * @param \Magento\Framework\Pricing\Helper\Data $pricinghelper
+     * @param \Sapient\Worldpay\Model\Response\AdminhtmlResponse $adminhtmlresponse
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentutils
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
+     * @param array $data
+     */
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
@@ -56,8 +107,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
-    )
-    {
+    ) {
         parent::__construct(
             $context,
             $registry,
@@ -91,6 +141,26 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->motoredirectservice = $motoredirectservice;
 
     }
+    public function initialize($paymentAction, $stateObject)
+    {
+        $payment = $this->getInfoInstance();
+        $order = $payment->getOrder();
+        $amount = $payment->formatAmount($order->getBaseTotalDue(), true);
+        $payment->setBaseAmountAuthorized($amount);
+        $payment->setAmountAuthorized($order->getTotalDue());
+        $data = $payment->getMethodInstance()->getCode();
+        $payment->getMethodInstance()->authorize($payment, $amount);
+        $this->_addtransaction($payment, $amount);
+        $stateObject->setStatus('pending');
+        $stateObject->setState(\Magento\Sales\Model\Order::STATE_NEW);
+        $stateObject->setIsNotified(false);
+    }
+
+    private function _formatAmount($amount, $asFloat = false)
+    {
+        $amount = round($amount);
+        return !$asFloat ? (string) $amount : $amount;
+    }
     /**
      * Authorize payment abstract method
      *
@@ -108,7 +178,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         $adminquote = $this->adminsessionquote->getQuote();
-
         if(empty($quote->getReservedOrderId()) && !empty($adminquote->getReservedOrderId())){
             $quote = $adminquote;
         }
@@ -117,7 +186,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->paymentdetailsdata = self::$paymentDetails;
 
         try {
+            $this->validatePaymentData(self::$paymentDetails);
             $this->_checkpaymentapplicable($quote);
+            $this->_checkShippingApplicable($quote);
             $this->_createWorldPayPayment($payment,$orderCode,$quote->getStoreId(),$quote->getReservedOrderId());
             $authorisationService = $this->getAuthorisationService($quote->getStoreId());
             $authorisationService->authorizePayment(
@@ -139,6 +210,38 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
 
     }
+    public function validatePaymentData($paymentData){
+        $mode = $this->worlpayhelper->getCcIntegrationMode();
+        $method = $paymentData['method'];
+        if ($method == 'worldpay_cc' || $method == 'worldpay_moto') {
+            if (isset($paymentData['additional_data'])) {
+                $data = $paymentData['additional_data'];
+                if ($mode == 'redirect' && !isset($data['cc_type'])) {
+                    throw new Exception(__("Invalid Payment Type. Please Refresh and check again"), 1);
+                } elseif($mode == 'direct') {
+                    if (!isset($data['cc_type'])) {
+                        throw new Exception(__("Invalid Payment Type. Please Refresh and check again"), 1);
+                    }
+                    if ($data['cc_type'] != 'savedcard' && !isset($data['cc_exp_year'])) {
+                        throw new Exception(__("Invalid Expiry Year. Please Refresh and check again"), 1);
+                    }
+                    if ($data['cc_type'] != 'savedcard' && !isset($data['cc_exp_month'])) {
+                        throw new Exception(__("Invalid Expiry Month. Please Refresh and check again"), 1);
+                    }
+                    if ($data['cc_type'] != 'savedcard' && !isset($data['cc_number'])) {
+                        throw new Exception(__('Invalid Card Number. Please Refresh and check again'), 1);
+                    }
+                    if ($data['cc_type'] != 'savedcard' && !isset($data['cc_name'])) {
+                        throw new Exception(__('Invalid Card Holder Name. Please Refresh and check again'), 1);
+                    }
+                }
+            } else {
+                throw new Exception(__("Invalid Payment Details. Please Refresh and check again"), 1);
+            }
+        } elseif ($method == 'worldpay_apm' && !isset($paymentData['additional_data']['cc_type'])) {
+             throw new Exception(__("Invalid Payment Type. Please Refresh and check again"), 1);
+        }
+    }
 
     public function assignData(\Magento\Framework\DataObject $data)
     {
@@ -147,14 +250,21 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         return $this;
     }
 
+    /**
+     * @return string
+     */
     private function _generateOrderCode($quote)
     {
         return $quote->getReservedOrderId() . '-' . time();
     }
 
+    /**
+     * Save Risk gardian
+     */
     private function _createWorldPayPayment(\Magento\Payment\Model\InfoInterface $payment, $orderCode, $storeId,$orderId,$interactionType='ECOM')
     {
         $paymentdetails = self::$paymentDetails;
+        $integrationType = $this->worlpayhelper->getIntegrationModelByPaymentMethodCode($payment->getMethod(),$storeId);
         $wpp = $this->worldpaypayment->create();
         $wpp->setData('order_id',$orderId);
         $wpp->setData('payment_status',\Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION);
@@ -162,14 +272,17 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $wpp->setData('store_id',$storeId);
         $wpp->setData('merchant_id',$this->worlpayhelper->getMerchantCode($paymentdetails['additional_data']['cc_type']));
         $wpp->setData('3d_verified',$this->worlpayhelper->isDynamic3DEnabled());
-        $wpp->setData('payment_model',$this->worlpayhelper->getIntegrationModelByPaymentMethodCode($payment->getMethod(),$storeId));
-        if($paymentdetails && !empty($paymentdetails['additional_data']['cc_type']) && empty($paymentdetails['additional_data']['tokenCode'])){
+        $wpp->setData('payment_model',$integrationType);
+        if ($paymentdetails && !empty($paymentdetails['additional_data']['cc_type']) && empty($paymentdetails['additional_data']['tokenCode'])) {
             $wpp->setData('payment_type',$paymentdetails['additional_data']['cc_type']);
         } else {
             $wpp->setData('payment_type',$this->_getpaymentType());
         }
-        if($paymentdetails['method'] == 'worldpay_moto'){
+        if ($paymentdetails['method'] == 'worldpay_moto') {
             $interactionType='MOTO';
+        }
+        if ($integrationType == 'direct' && $this->worlpayhelper->isCseEnabled()) {
+            $wpp->setData('client_side_encryption', true);
         }
         $wpp->setData('interaction_type',$interactionType);
         $wpp->save();
@@ -182,7 +295,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
         $paymenttype = $worldPayPayment->getPaymentType();
-        if($this->paymentutils->CheckCaptureRequest($payment->getMethod(), $paymenttype)){
+        if ($this->paymentutils->CheckCaptureRequest($payment->getMethod(), $paymenttype)) {
             $this->paymentservicerequest->capture(
                 $payment->getOrder(),
                 $worldPayPayment,
@@ -234,6 +347,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         return parent::canRefund();
     }
 
+    /**
+     * @return bool
+     */
     private function _isRefundAllowed($state)
     {
         $allowed = in_array(
@@ -251,24 +367,50 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         return $allowed;
     }
 
+    /**
+     * check paymentmethod is available for billing country
+     *
+     * @param $quote
+     * @return bool
+     * @throw Exception
+     */
     protected function _checkpaymentapplicable($quote){
         $type = $this->_getpaymentType();
         $paymentmethod = $quote->getPayment()->getMethod();
-        $applicabletypes = $this->paymentutils->loadEnabledByType($paymentmethod);
-        if($paymentmethod == 'worldpay_apm' || $paymentmethod == 'worldpay_cc'){
-            if (array_key_exists($type, $applicabletypes)) {
+        if ($paymentmethod == 'worldpay_apm' || $paymentmethod == 'worldpay_cc' || $paymentmethod == 'worldpay_moto') {
+            if ($this->paymentutils->loadEnabledByType($paymentmethod, $type)) {
                 return true;
-            }else{
+            } else {
                 throw new Exception('Payment Type not valid for the billing country');
             }
         }
     }
 
-    protected function _getpaymentType(){
-        if(empty($this->paymentdetailsdata['additional_data']['tokenCode'])){
-            return  $this->paymentdetailsdata['additional_data']['cc_type'];
+    /**
+     * check paymentmethod is available for shipping country
+     * No shipping country was mentioned in config it will be applicable for all shipping country
+     *
+     * @param $quote
+     * @return bool
+     * @throw Exception
+     */
+    protected function _checkShippingApplicable($quote){
+        $type = $this->_getpaymentType();
+        $paymentmethod = $quote->getPayment()->getMethod();
+        if (!$this->paymentutils->CheckShipping($paymentmethod,$type)) {
+             throw new Exception('Payment Type not valid for the shipping country');
         }
-        else{
+    }
+
+    /**
+     * payment method
+     *
+     * @return bool
+     */
+    protected function _getpaymentType(){
+        if (empty($this->paymentdetailsdata['additional_data']['tokenCode'])) {
+            return  $this->paymentdetailsdata['additional_data']['cc_type'];
+        } else {
 
             $savedCard= $this->_savecard->create()->getCollection()
                 ->addFieldToSelect(array('method'))
@@ -278,6 +420,25 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             return $savedCard[0]['method'];
 
         }
+
+    }
+
+    protected function _addtransaction($payment, $amount)
+    {
+        $order = $payment->getOrder();
+        $formattedAmount = $order->getBaseCurrency()->formatTxt($amount);
+
+        if ($payment->getIsTransactionPending()) {
+            $message = 'Sent for authorization %1.';
+        } else {
+            $message = 'Authorized amount of %1.';
+        }
+
+        $message = __($message, $formattedAmount);
+
+        $transaction = $payment->addTransaction(Transaction::TYPE_AUTH);
+        $message = $payment->prependMessage($message);
+        $payment->addTransactionCommentsToOrder($transaction, $message);
 
     }
 

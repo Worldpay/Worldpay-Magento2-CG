@@ -1,12 +1,31 @@
 <?php
+/**
+ * @copyright 2017 Sapient
+ */
 namespace Sapient\Worldpay\Cron;
 use \Magento\Framework\App\ObjectManager;
 use \Magento\Sales\Model\ResourceModel\Order\CollectionFactoryInterface;
+/**
+ * Model for cancel the order based on configuration set by admin
+ */
 class OrderCleanup {
 
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
     protected $_logger;
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
+     */
     private $orderCollectionFactory;
 
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper     
+     */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
@@ -18,7 +37,9 @@ class OrderCleanup {
 
     }
 
-
+    /**
+     * Get the list of orders to be Cleanup and cancel the order
+     */
     public function execute()
     {
         if (!$this->worldpayhelper->isOrderCleanUp()) {
@@ -26,15 +47,15 @@ class OrderCleanup {
         }
         $this->_logger->info('clean up executed on - '.date('Y-m-d H:i:s'));
         $cleanupids = $this->getCleanupOrderIds();
-        if(!empty($cleanupids)){
+        if (!empty($cleanupids)) {
             $implodeorder = implode(",", $cleanupids);
             $orders = $this->getOrderCollectionFactory()->create();
             $orders->distinct(true);
             $orders->addFieldToFilter('main_table.entity_id', array('in' => $implodeorder));
-            foreach($orders as $order){
-                if($order->canCancel()){
+            foreach ($orders as $order) {
+                if ($order->canCancel()) {
                     $order->cancel();
-                }else{
+                } else {
                     $this->_logger->info($order->getIncrementId().' cannot be canncelled');
                 }
             }
@@ -43,7 +64,11 @@ class OrderCleanup {
         return $this;
     }
 
-
+    /**
+     * Get the list of orders to be Cleanup
+     *
+     * @return array List of order IDs
+     */
     public function getCleanupOrderIds()
     {
         $orders = $this->getOrderCollectionFactory()->create();
@@ -57,7 +82,9 @@ class OrderCleanup {
         return $orderIds;
     }
 
-
+    /**
+     * @return CollectionFactoryInterface
+     */
     private function getOrderCollectionFactory()
     {
         if ($this->orderCollectionFactory === null) {
@@ -67,8 +94,14 @@ class OrderCleanup {
         return $this->orderCollectionFactory;
     }
 
-
-
+    /**
+     * Returns orders have creation date exceeded the allowed limit
+     *
+     * @param array $carry Result of previous filter call
+     * @param \Magento\Sales\Model\Order
+     *
+     * @return array List of order IDs
+     */       
     protected function _filterOrder($carry, \Magento\Sales\Model\Order $order)
     {
 
@@ -96,11 +129,16 @@ class OrderCleanup {
         return $date;
     }
 
-
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     *
+     * @return float|mixed
+     */
     protected function getCreationDate(\Magento\Sales\Model\Order $order)
     {
         return \DateTime::createFromFormat('Y-m-d H:i:s', $order->getData('created_at'));
     }
+
     /**
      * Computes the latest valid date
      *@return DateTime

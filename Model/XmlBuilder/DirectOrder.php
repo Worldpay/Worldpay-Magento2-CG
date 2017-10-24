@@ -7,6 +7,9 @@ namespace Sapient\Worldpay\Model\XmlBuilder;
 use Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecureConfig;
 use \Sapient\Worldpay\Logger\WorldpayLogger;
 
+/**
+ * Build xml for Direct Order request
+ */
 class DirectOrder
 {
 
@@ -35,15 +38,46 @@ EOD;
     protected $paResponse = null;
     private $echoData = null;
     private $shopperId;
+
+    /** 
+     * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
+     */
     protected $threeDSecureConfig;
+
+    /** 
+     * @var Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration
+     */
     protected $tokenRequestConfig;
 
+    /**
+     * Constructor
+     *
+     * @param array $args
+     */
     public function __construct(array $args = array())
     {
         $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure($args['threeDSecureConfig']['isDynamic3D'], $args['threeDSecureConfig']['is3DSecure']);
         $this->tokenRequestConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration($args['tokenRequestConfig']);
     }
 
+    /**
+     * Build xml for processing Request
+     *
+     * @param string $merchantCode
+     * @param string $orderCode
+     * @param string $orderDescription
+     * @param string $currencyCode
+     * @param float $amount
+     * @param array $paymentDetails
+     * @param array $cardAddress
+     * @param string $shopperEmail
+     * @param string $acceptHeader
+     * @param string $userAgentHeader
+     * @param string $shippingAddress
+     * @param float $billingAddress
+     * @param string $shopperId
+     * @return SimpleXMLElement $xml
+     */
     public function build(
         $merchantCode,
         $orderCode,
@@ -83,6 +117,26 @@ EOD;
         return $xml;
     }
 
+    /**
+     * Build xml for 3dsecure processing Request
+     *
+     * @param string $merchantCode
+     * @param string $orderCode
+     * @param string $orderDescription
+     * @param string $currencyCode
+     * @param float $amount
+     * @param array $paymentDetails
+     * @param array $cardAddress
+     * @param string $shopperEmail
+     * @param string $acceptHeader
+     * @param string $userAgentHeader
+     * @param string $shippingAddress
+     * @param float $billingAddress
+     * @param string $shopperId
+     * @param $paResponse,
+     * @param $echoData
+     * @return SimpleXMLElement $xml
+     */
     public function build3DSecure(
         $merchantCode,
         $orderCode,
@@ -114,11 +168,23 @@ EOD;
         return $xml;
     }
 
+    /**
+     * Add submit tag to xml
+     *
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
     private function _addSubmitElement($xml)
     {
         return $xml->addChild('submit');
     }
 
+    /**
+     * Add order and its child tag to xml
+     *
+     * @param SimpleXMLElement $submit
+     * @return SimpleXMLElement $order
+     */
     private function _addOrderElement($submit)
     {
         $order = $submit->addChild('order');
@@ -149,12 +215,22 @@ EOD;
        return $order;
     }
 
+    /**
+     * Add description  tag to xml
+     *
+     * @param SimpleXMLElement $order     
+     */
     private function _addDescriptionElement($order)
     {
         $description = $order->addChild('description');
         $this->_addCDATA($description, $this->orderDescription);
     }
 
+    /**
+     * Add amount and its child tag to xml
+     *
+     * @param SimpleXMLElement $order     
+     */
     private function _addAmountElement($order)
     {
         $amountElement = $order->addChild('amount');
@@ -163,14 +239,24 @@ EOD;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
     }
 
+    /**
+     * Add dynamicInteractionType and its child tag to xml
+     *
+     * @param SimpleXMLElement $order     
+     */
     private function _addDynamicInteractionTypeElement($order)
     {
-        if(self::ALLOW_INTERACTION_TYPE == $this->paymentDetails['dynamicInteractionType']){
-        $interactionElement = $order->addChild('dynamicInteractionType');
-        $interactionElement['type'] = $this->paymentDetails['dynamicInteractionType'];
+        if (self::ALLOW_INTERACTION_TYPE == $this->paymentDetails['dynamicInteractionType']) {
+            $interactionElement = $order->addChild('dynamicInteractionType');
+            $interactionElement['type'] = $this->paymentDetails['dynamicInteractionType'];
         }
     }
 
+    /**
+     * Add dynamicInteractionType and its attribute tag to xml
+     *
+     * @param SimpleXMLElement $order     
+     */
     private function _addDynamic3DSElement($order)
     {
         if (! $this->threeDSecureConfig->isDynamic3DEnabled()) {
@@ -185,6 +271,11 @@ EOD;
         }
     }
 
+    /**
+     * Add createToken and its child tag to xml
+     *
+     * @param SimpleXMLElement $order     
+     */
     private function _addCreateTokenElement($order)
     {
         if (! $this->tokenRequestConfig->istokenizationIsEnabled()) {
@@ -194,15 +285,19 @@ EOD;
        $createTokenElement = $order->addChild('createToken');
        $createTokenElement['tokenScope'] = self::TOKEN_SCOPE;
 
-        if ($this->tokenRequestConfig->getTokenReason()) {
+        if ($this->tokenRequestConfig->getTokenReason($this->orderCode)) {
             $createTokenElement->addChild(
                 'tokenReason',
-                $this->tokenRequestConfig->getTokenReason()
+                $this->tokenRequestConfig->getTokenReason($this->orderCode)
             );
         }
     }
 
-
+    /**
+     * Add encryptedData and its child tag to xml
+     *
+     * @param SimpleXMLElement $paymentDetailsElement     
+     */
     protected function _addPaymentDetailsForTokenOrder($paymentDetailsElement)
     {
         if (isset($this->paymentDetails['encryptedData'])) {
@@ -221,6 +316,11 @@ EOD;
         }
     }
 
+    /**
+     * Add paymentDetailsElement and its child tag to xml
+     *
+     * @param SimpleXMLElement $paymentDetailsElement     
+     */
     protected function _addPaymentDetailsForCreditCardOrder($paymentDetailsElement)
     {
         if ($this->paymentDetails['cseEnabled']) {
@@ -242,6 +342,11 @@ EOD;
         );
     }
 
+    /**
+     * Add paymentDetails and its child tag to xml
+     *
+     * @param SimpleXMLElement $order     
+     */
     protected function _addPaymentDetailsElement($order)
     {
         $paymentDetailsElement = $order->addChild('paymentDetails');
@@ -260,6 +365,12 @@ EOD;
         }
     }
 
+    /**
+     * Add CSE-DATA and its child tag to xml
+     *
+     * @param SimpleXMLElement $paymentDetailsElement
+     * @return SimpleXMLElement cseElement     
+     */
     protected function _addCseElement($paymentDetailsElement)
     {
         $cseElement = $paymentDetailsElement->addChild('CSE-DATA');
@@ -268,6 +379,12 @@ EOD;
         return $cseElement;
     }
 
+    /**
+     * Add paymentType and its child tag to xml
+     *
+     * @param SimpleXMLElement $paymentDetailsElement
+     * @return SimpleXMLElement $paymentTypeElement     
+     */
     protected function _addPaymentTypeElement($paymentDetailsElement)
     {
         $paymentTypeElement = $paymentDetailsElement->addChild($this->paymentDetails['paymentType']);
@@ -288,8 +405,9 @@ EOD;
     }
 
     /**
-     * @param $order
-     * @return SimpleXMLElement
+     * Add shopper and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
      */
     protected function _addShopperElement($order)
     {
@@ -314,6 +432,11 @@ EOD;
         return $shopper;
     }
 
+    /**
+     * Add shippingAddress and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addShippingElement($order)
     {
         $shippingAddress = $order->addChild('shippingAddress');
@@ -328,6 +451,11 @@ EOD;
         );
     }
 
+    /**
+     * Add billing and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addBillingElement($order)
     {
         $billingAddress = $order->addChild('billingAddress');
@@ -342,6 +470,17 @@ EOD;
         );
     }
 
+    /**
+     * Add address and its child tag to xml
+     *
+     * @param SimpleXMLElement $parentElement
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $street
+     * @param string $postalCode
+     * @param string $city
+     * @param string $countryCode     
+     */
     private function _addAddressElement($parentElement, $firstName, $lastName, $street, $postalCode, $city, $countryCode)
     {
         $address = $parentElement->addChild('address');
@@ -365,6 +504,10 @@ EOD;
         $this->_addCDATA($countryCodeElement, $countryCode);
     }
 
+    /**
+     * @param SimpleXMLElement $element
+     * @param string $content
+     */
     protected function _addCDATA($element, $content)
     {
         $node = dom_import_simplexml($element);
@@ -372,6 +515,10 @@ EOD;
         $node->appendChild($no->createCDATASection($content));
     }
 
+    /**
+     * @param float $amount
+     * @return int
+     */
     private function _amountAsInt($amount)
     {
         return round($amount, self::EXPONENT, PHP_ROUND_HALF_EVEN) * pow(10, self::EXPONENT);

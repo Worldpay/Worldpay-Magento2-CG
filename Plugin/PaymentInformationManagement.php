@@ -9,7 +9,7 @@ use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartManagementInterface;
 use Sapient\Worldpay\Model\MethodList;
-use Psr\Log\LoggerInterface;
+use \Sapient\Worldpay\Logger\WorldpayLogger;
 
 /**
  * Class PaymentInformationManagement
@@ -41,7 +41,7 @@ class PaymentInformationManagement
      */
     public function __construct(
         CartManagementInterface $cartManagement,
-        LoggerInterface $logger,
+        WorldpayLogger $logger,
         MethodList $methodList,
         $checkMethods = true
     ) {
@@ -73,9 +73,10 @@ class PaymentInformationManagement
         try {
             $orderId = $this->cartManagement->placeOrder($cartId);
         } catch (LocalizedException $exception) {
+            $this->logger->error($exception->getMessage());
             throw new CouldNotSaveException(__($exception->getMessage()));
         } catch (\Exception $exception) {
-            $this->logger->critical($exception);
+            $this->logger->error($exception->getMessage());
             throw new CouldNotSaveException(
                 __('An error occurred on the server. Please try to place the order again.'),
                 $exception

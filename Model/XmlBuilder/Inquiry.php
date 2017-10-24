@@ -4,6 +4,9 @@
  */
 namespace Sapient\Worldpay\Model\XmlBuilder;
 
+/**
+ * Build xml for Inquiry request
+ */
 class Inquiry
 {  
     const ROOT_ELEMENT = <<<EOD
@@ -14,6 +17,13 @@ EOD;
     private $merchantCode;
     private $orderCode;
 
+    /**
+     * Build xml for processing Request
+     *
+     * @param string $merchantCode
+     * @param string $orderCode    
+     * @return SimpleXMLElement $xml
+     */
     public function build($merchantCode, $orderCode)
     {
         $this->merchantCode = $merchantCode;
@@ -29,11 +39,23 @@ EOD;
         return $xml;
     }
 
+    /**
+     * Add inquiry tag to xml
+     *
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
     private function _addInquiryElement($xml)
     {
         return $xml->addChild('inquiry');
     }
 
+    /**
+     * Add orderInquiry tag to xml
+     *
+     * @param SimpleXMLElement $modify
+     * @return SimpleXMLElement
+     */
     private function _addOrderInquiryElement($modify)
     {
         $orderInquiry = $modify->addChild('orderInquiry');

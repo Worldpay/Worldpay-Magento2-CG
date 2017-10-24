@@ -8,8 +8,14 @@ class DirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
 {
     const PAYMENT_AUTHORISED = 'AUTHORISED';
 
+    /**          
+     * @param SimpleXmlElement
+     */
     protected $_responseXml;
 
+    /**
+     * @return \Magento\Framework\DataObject
+     */
     public function get3dSecureParams()
     {
         $xml = $this->getXml();

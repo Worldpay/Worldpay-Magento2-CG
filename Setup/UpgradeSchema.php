@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright 2017 Sapient
- */ 
+ */
 namespace Sapient\Worldpay\Setup;
 
 use Magento\Framework\Setup\UpgradeSchemaInterface;
@@ -10,7 +10,7 @@ use Magento\Framework\Setup\ModuleContextInterface;
 
 class UpgradeSchema implements UpgradeSchemaInterface {
 
-    public function upgrade( SchemaSetupInterface $setup, ModuleContextInterface $context ) 
+    public function upgrade( SchemaSetupInterface $setup, ModuleContextInterface $context )
     {
         $installer = $setup;
         $installer->startSetup();
@@ -47,7 +47,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
             )
             ->addColumn(
                     'created_at',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,            
+                    \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
                     null,
                     ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
                     'Created At'
@@ -72,11 +72,30 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                 'comment' => 'Worldpay order id'
             ]
         );
-
-        $installer->endSetup();                
         if (version_compare($context->getVersion(), '1.2.0', '<')) {
             $this->addColumnWP($installer);
         }
+        if (version_compare($context->getVersion(), '1.2.2', '<')) {
+            $this->addColumnCse($installer);
+        }
+        $installer->endSetup();
+    }
+    /**
+     * @param SchemaSetupInterface $installer
+     * @return void
+     */
+    private function addColumnCse(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable('worldpay_payment'),
+            'client_side_encryption',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+                'nullable' => false,
+                'comment' => 'Client side encryption',
+            ]
+        );
     }
 
     /**
@@ -158,5 +177,5 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         );
     }
 
-   
+
 }

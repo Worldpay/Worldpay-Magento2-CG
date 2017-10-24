@@ -127,7 +127,7 @@
                 </field>
             </group>
             <group id="merchant_config" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Merchant Profile Override Configration</label>
+                <label>Merchant Profile Override Configuration</label>
                 <field id="AMEX" translate="label comment" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>AMEX-SSL</label>
                     <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
@@ -178,12 +178,6 @@
 
                 <field id="JCB" translate="label comment" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>JCB-SSL</label>
-                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
-                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
-                </field>
-
-                <field id="SOLOGB" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>SOLO_GB-SSL</label>
                     <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
                     <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
                 </field>
@@ -250,6 +244,11 @@
                 </field>
                 <field id="MISTERCASH" translate="label comment" type="text" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>MISTERCASH-SSL</label>
+                    <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
+                </field>
+                <field id="KlARNA" translate="label comment" type="text" sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>KLARNA-SSL</label>
                     <comment>Please enter Merchande code, XML Usename, XML Password respectively.</comment>
                     <frontend_model>Sapient\Worldpay\Block\Adminhtml\Renderer\Config\ProfileFields</frontend_model>
                 </field>
@@ -343,9 +342,6 @@
                 </field>
                 <field id="JCB_SSL_payment_method" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Japanese Credit Bank</label>
-                </field>
-                <field id="SOLO_SSL_payment_method" translate="label" type="text" sortOrder="26" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Solo</label>
                 </field>
                 <field id="MAESTRO_SSL_payment_method" translate="label" type="text" sortOrder="27" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Maestro</label>

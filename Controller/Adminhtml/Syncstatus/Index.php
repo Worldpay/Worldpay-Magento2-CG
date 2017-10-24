@@ -5,10 +5,13 @@
 namespace Sapient\Worldpay\Controller\Adminhtml\Syncstatus;
 
 use Magento\Framework\View\Result\PageFactory;
-use Magento\Framework\App\Action\Context;
+use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Exception;
- 
+
+/**
+ * Sync payment details in worldpay
+ */
 class Index extends \Magento\Backend\App\Action
 {
     protected $pageFactory;
@@ -23,7 +26,16 @@ class Index extends \Magento\Backend\App\Action
     private $_paymentService;
     private $_tokenService;
 
-
+    /**
+     * Constructor
+     *
+     * @param Context $context
+     * @param JsonFactory $resultJsonFactory
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice,
+     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,    
+     * @param \Sapient\Worldpay\Model\Order\Service $orderservice
+     */
     public function __construct(Context $context,  JsonFactory $resultJsonFactory,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
@@ -88,6 +100,7 @@ class Index extends \Magento\Backend\App\Action
         try {
             $this->_paymentUpdate->apply($this->_order->getPayment(),$this->_order);
         } catch (Exception $e) {
+            $this->wplogger->error($e->getMessage());
             throw new Exception($e->getMessage());   
         }
     }

@@ -4,14 +4,27 @@
  */
 namespace Sapient\Worldpay\Model\Payment;
 
+/** 
+ * Updating Risk gardian
+ */
 class WorldPayPayment 
-{
+{   
+    /** 
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment 
+     */
     public function __construct(			 
-         \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment                
+        \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment                
     ) {    	
         $this->worldpaypayment = $worldpaypayment;         
     }
 
+    /** 
+     * Updating Risk gardian
+     *
+     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
+     */
     public function updateWorldpayPayment(\Sapient\Worldpay\Model\Payment\State $paymentState)
     {
      	$wpp = $this->worldpaypayment->create();
@@ -30,6 +43,11 @@ class WorldPayPayment
         $wpp->setData('risk_provider_final', $paymentState->getAdvancedRiskProviderFinalScore());
         $wpp->setData('refusal_code', $paymentState->getPaymentRefusalCode());
         $wpp->setData('refusal_description', $paymentState->getPaymentRefusalDescription());
+        $wpp->setData('aav_address_result_code', $paymentState->getAAVAddressResultCode());
+        $wpp->setData('avv_postcode_result_code', $paymentState->getAAVPostcodeResultCode());
+        $wpp->setData('aav_cardholder_name_result_code', $paymentState->getAAVCardholderNameResultCode());
+        $wpp->setData('aav_telephone_result_code', $paymentState->getAAVTelephoneResultCode());
+        $wpp->setData('aav_email_result_code', $paymentState->getAAVEmailResultCode());
 		
 		$wpp->save();
     }

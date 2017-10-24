@@ -4,6 +4,9 @@
  */
 namespace Sapient\Worldpay\Model\XmlBuilder\Config;
 
+/**
+ * Get ThreeDSecure Configuration
+ */
 class ThreeDSecure
 {
     private $isDynamic3D = false;

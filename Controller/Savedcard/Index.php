@@ -6,10 +6,26 @@ namespace Sapient\Worldpay\Controller\Savedcard;
 
 use Magento\Framework\App\Action\Context;
 
-class Index extends \Magento\Framework\App\Action\Action {
-
+/**
+ *Controller for List Customer saved credit cards
+ */
+class Index extends \Magento\Framework\App\Action\Action 
+{
+	/**
+	 * @var \Magento\Framework\View\Result\PageFactory
+	 */
 	protected $_resultPageFactory;
-	protected $customerSession;	 
+	/**
+	 * @var \Magento\Customer\Model\Session
+	 */
+	protected $customerSession;
+	/**
+     * Constructor
+     *
+     * @param Context $context     
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Customer\Model\Session $customerSession
+     */	 
 	public function __construct(
 		Context $context,
 		\Magento\Framework\View\Result\PageFactory $resultPageFactory,
@@ -21,14 +37,20 @@ class Index extends \Magento\Framework\App\Action\Action {
         $this->customerSession = $customerSession;        
     }
 
-	public function execute() {	 		
+    /**
+     * List Saved credit Card 
+     *
+     * @return \Magento\Framework\View\Result\Page
+     */
+	public function execute()
+	{	 		
 		if (!$this->customerSession->isLoggedIn()) {
 			$this->_redirect('customer/account/login');
-		return;
+			return;
 		}
 	    $resultPage = $this->_resultPageFactory->create();
 	    $resultPage->getConfig()->getTitle()->set(__('My Saved Card'));
         return $resultPage;
-	 }
+	}
 
 }

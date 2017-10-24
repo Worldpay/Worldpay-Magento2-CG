@@ -4,6 +4,9 @@
  */
 namespace Sapient\Worldpay\Model\Payment;
 
+/**
+ * Reading xml
+ */
 class StateXml implements \Sapient\Worldpay\Model\Payment\State
 {
     private $_xml;

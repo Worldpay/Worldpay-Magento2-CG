@@ -16,11 +16,17 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
 
     protected $_formBlockType = 'Sapient\Worldpay\Block\Form\Card';
 
+    /**
+     * @return string
+     */
     public function getPaymentMethodsType()
     {
         return 'worldpay_cc';
     }
 
+    /**
+     * @return string
+     */
     public function getTitle()
     {
         return  $this->_scopeConfig->getValue('worldpay/moto_config/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
@@ -43,6 +49,9 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
         return $this->directservice;
     }
 
+    /**
+     * @return bool
+     */
     private function _isRedirectIntegrationModeEnabled($storeId)
     {
         $integrationModel = $this->worlpayhelper->getCcIntegrationMode($storeId);

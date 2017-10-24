@@ -84,7 +84,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	}
 	public function isLoggerEnable()
 	{
-		return $this->_scopeConfig->getValue('worldpay/general_config/enable_logging', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+		return (bool) $this->_scopeConfig->getValue('worldpay/general_config/enable_logging', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 	}
 	public function isCreditCardEnabled()
 	{
@@ -99,8 +99,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		$allCcMethods =  array(
 			'AMEX-SSL'=>'American Express','VISA-SSL'=>'Visa',
 			'ECMC-SSL'=>'MasterCard','DISCOVER-SSL'=>'Discover',
-			'SOLO_GB-SSL'=>'Solo','DINERS-SSL'=>'Diners',
-			'MAESTRO-SSL'=>'Maestro','AIRPLUS-SSL'=>'AirPlus',
+			'DINERS-SSL'=>'Diners','MAESTRO-SSL'=>'Maestro','AIRPLUS-SSL'=>'AirPlus',
 			'AURORE-SSL'=>'Aurore','CB-SSL'=>'Carte Bancaire',
 			'CARTEBLEUE-SSL'=>'Carte Bleue','DANKORT-SSL'=>'Dankort',
 			'GECAPITAL-SSL'=>'GE Capital','JCB-SSL'=>'Japanese Credit Bank',
@@ -126,14 +125,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 			'BOLETO-SSL' => 'Boleto Bancairo',
 			'ALIPAY-SSL' => 'AliPay',
 			'SEPA_DIRECT_DEBIT-SSL' => 'SEPA (One off transactions)',
-			'KlARNA-SSL' => 'Klarna (Redirect)',
+			'KlARNA-SSL' => 'Klarna',
 			'PRZELEWY-SSL' => 'P24',
 			'MISTERCASH-SSL' => 'Mistercash/Bancontact'
 		);
 		$configMethods =   explode(',', $this->_scopeConfig->getValue('worldpay/apm_config/paymentmethods', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
 		$activeMethods = [];
 		foreach ($configMethods as  $method ) {
-			$activeMethods[$method] = $allApmMethods[$method];
+			if ($this->paymentlist->CheckCurrency($code, $method)) {
+				$activeMethods[$method] = $allApmMethods[$method];
+			}
 		}
 		return $activeMethods;
 	}
@@ -240,10 +241,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 			'Gateway error' => 'An unexpected error occurred, Please try to place the order again.',
 			'Token does not exist' => 'There appears to be an issue with your stored data, please review in your account and update details as applicable.'
 		);
-		if(array_key_exists($message, $updatemessage)){
+		if (array_key_exists($message, $updatemessage)) {
 			return $updatemessage[$message];
 		}
-		if(empty($message)){
+
+		if (empty($message)) {
+
 			$message = 'An error occurred on the server. Please try to place the order again.';
 		}
 		return $message;
@@ -270,4 +273,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		 return $this->localecurrency->getCurrency($currencycode)->getSymbol();
 	}
 
+	 public function getQuantityUnit($product)
+	 {
+	    	return 'product';
+	 }
+
 }
+	 
+

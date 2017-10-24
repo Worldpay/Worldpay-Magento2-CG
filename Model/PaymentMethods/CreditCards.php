@@ -17,9 +17,6 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
     protected $_canAuthorize = true;
     protected $_canUseInternal = false;
     protected $_canUseCheckout = true;
-    /**
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-     */
 
     /**
      * Authorize payment abstract method
@@ -52,6 +49,11 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return $this->directservice;
     }
 
+    
+    /**
+     * @param int storeId 
+     * @return bool
+     */
     private function _isRedirectIntegrationModeEnabled($storeId)
     {
         $integrationModel = $this->worlpayhelper->getCcIntegrationMode($storeId);
@@ -59,6 +61,9 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return $integrationModel === 'redirect';
     }
 
+    /**    
+     * @return bool
+     */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null){
 
        if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isCreditCardEnabled()) {
@@ -68,6 +73,10 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
 
     }
 
+    /**
+     * @param int storeId 
+     * @return bool
+     */
     private function _isEmbeddedIntegrationModeEnabled($storeId)
     {
         return $this->worlpayhelper->isIframeIntegration($storeId);

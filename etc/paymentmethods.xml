@@ -153,6 +153,21 @@
                     <area>SE</area>
                     <area>GB</area>
                 </areas>
+                <shippingareas>
+                    <ship>AT</ship>
+                    <ship>DE</ship>
+                    <ship>FI</ship>
+                    <ship>NL</ship>
+                    <ship>NO</ship>
+                    <ship>SE</ship>
+                    <ship>GB</ship>
+                </shippingareas>
+                <currencies>
+                    <currency>GBP</currency>
+                    <currency>EUR</currency>
+                    <currency>NOK</currency>
+                    <currency>SEK</currency>
+                </currencies>
                 <capture_request>1</capture_request>
             </KlARNA-SSL>
              <PRZELEWY-SSL>
@@ -211,7 +226,7 @@
             <DANKORT-SSL>
                 <title>Dankort</title>
                 <areas>
-                    <area>GLOBAL</area>
+                    <area>DK</area>
                 </areas>
                 <capture_request>1</capture_request>
             </DANKORT-SSL>
@@ -236,13 +251,6 @@
                 </areas>
                 <capture_request>1</capture_request>
             </JCB-SSL>
-            <SOLO_GB-SSL>
-                <title>Solo</title>
-                <areas>
-                    <area>GLOBAL</area>
-                </areas>
-                <capture_request>1</capture_request>
-            </SOLO_GB-SSL>
             <MAESTRO-SSL>
                 <title>Maestro</title>
                 <areas>
@@ -252,4 +260,78 @@
             </MAESTRO-SSL>
         </types>
     </worldpay_cc>
+    <worldpay_moto>
+        <types>
+            <AMEX-SSL>
+                <title>American Express</title>
+                <areas>
+                    <area>GLOBAL</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </AMEX-SSL>
+            <VISA-SSL>
+                <title>Visa</title>
+                <areas>
+                    <area>GLOBAL</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </VISA-SSL>
+            <ECMC-SSL>
+                <title>MasterCard</title>
+                <areas>
+                    <area>GLOBAL</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </ECMC-SSL>
+            <CB-SSL>
+                <title>Carte Bancaire</title>
+                <areas>
+                    <area>FR</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </CB-SSL>
+            <CARTEBLEUE-SSL>
+                <title>Carte Bleue</title>
+                <areas>
+                    <area>FR</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </CARTEBLEUE-SSL>
+            <DANKORT-SSL>
+                <title>Dankort</title>
+                <areas>
+                    <area>DK</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </DANKORT-SSL>
+            <DINERS-SSL>
+                <title>Diners</title>
+                <areas>
+                    <area>GLOBAL</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </DINERS-SSL>
+            <DISCOVER-SSL>
+                <title>Discover</title>
+                <areas>
+                    <area>GLOBAL</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </DISCOVER-SSL>
+            <JCB-SSL>
+                <title>Japanese Credit Bank</title>
+                <areas>
+                    <area>GLOBAL</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </JCB-SSL>
+            <MAESTRO-SSL>
+                <title>Maestro</title>
+                <areas>
+                    <area>GLOBAL</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </MAESTRO-SSL>
+        </types>
+    </worldpay_moto>
 </paymentMethods>

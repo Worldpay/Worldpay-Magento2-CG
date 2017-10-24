@@ -80,7 +80,7 @@ class Card extends \Magento\Payment\Block\Form
 
     public function getMonths()
     {
-         $currentMonth = (int)date('m');
+        $currentMonth = (int)date('m');
         for ($x = $currentMonth; $x < $currentMonth + 12; $x++) {
             $monthnumber = ($x <= 12) ? $x : $x-12;
             $months[$monthnumber] = date('F', mktime(0, 0, 0, $x, 1));

@@ -4,6 +4,9 @@
  */
 namespace Sapient\Worldpay\Model\XmlBuilder\Config;
 
+/**
+ * Get token Configuration
+ */
 class TokenConfiguration
 {
     private $createTokenBeforeAuth = false;
@@ -27,10 +30,16 @@ class TokenConfiguration
         return true;
     }
 
-    public function getTokenReason(){
-        return 'ClothesDepartment';
+    /**
+     * @return string
+     */
+    public function getTokenReason($orderCode = null){
+        return 'To Save Card '.$orderCode;
     }
     
+    /**
+     * @return bool
+     */
     public function istokenizationIsEnabled(){
         return $this->createTokenEnabled;
     }

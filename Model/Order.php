@@ -10,6 +10,19 @@ class Order
 {
     private $_order;
 
+    /**
+     * Constructor
+     *
+     * @param array $args
+     * @param \Magento\Sales\Model\Service\InvoiceService $invoiceService
+     * @param \Magento\Framework\DB\Transaction $transaction
+     * @param \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
+     * @param \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory
+     * @param \Magento\Sales\Model\Order\Invoice $Invoice
+     * @param \Magento\Sales\Model\Service\CreditmemoService $CreditmemoService
+     * @param \Magento\Sales\Model\Order\Creditmemo $creditmemo
+     * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
+     */
     public function __construct(array $args,  
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
         \Magento\Framework\DB\Transaction $transaction,
@@ -36,16 +49,29 @@ class Order
         return $this->_order;
     }
 
+    /**
+     * Retrieve Store Id
+     *
+     * @return int
+     */
     public function getStoreId()
     {
         return $this->getOrder()->getPayment()->getStoreId();
     }
 
+    /**
+     * Retrieve payment Method
+     *
+     * @return string
+     */
     public function getPaymentMethodCode()
     {
         return $this->getOrder()->getPayment()->getMethod();
     }
 
+    /**
+     * Set order status as processing    
+     */
     public function setOrderAsProcessing()
     {
         $mageOrder = $this->getOrder();
@@ -67,6 +93,9 @@ class Order
         $this->_invoiceOrder();
     }
 
+     /**
+      * Cancel order
+      */
     public function cancel()
     {
         $mageOrder = $this->getOrder();
@@ -76,11 +105,17 @@ class Order
         } 
     }
 
+    /**     
+     * @return Magento\Sales\Model\Order\Payment
+     */
     public function getPayment()
     {
         return $this->getOrder()->getPayment();
     }
 
+    /**     
+     * @return string
+     */
     public function getPaymentStatus()
     {
         return $this->getWorldPayPayment()->getPaymentStatus();
@@ -125,6 +160,9 @@ class Order
         return $this->getWorldPayPayment()->getId() !== null;
     }
 
+    /**
+     * @return Sapient/Worldpay/Model/Worldpayment 
+     */
     public function getWorldPayPayment()
     {
         if ($this->getOrder()->isObjectNew()) {
@@ -134,6 +172,9 @@ class Order
         return $this->worldpaypaymentmodel->loadByPaymentId($this->getOrder()->getIncrementId());
     }
 
+    /**
+     * Set order status as pending    
+     */
     public function pendingPayment()
     {
         $mageOrder = $this->getOrder();
@@ -146,7 +187,9 @@ class Order
         $mageOrder->save();
     }
 
-
+    /**
+     * Mark Credit Memo as refunded
+     */
     public function refund($reference, $comment)
     {
         if (!$reference) {
@@ -166,6 +209,14 @@ class Order
         }
     }
 
+    /**
+     * Handle the refund request, usually issued from WorldPay panel and triggered by notification.
+     * Create Credit Memo, register and mark it as refunded.
+     * Deals with the full order or remainder refund only.
+     *
+     * @param $amount
+     * @param $comment
+     */
     public function refundFull($amount, $comment)
     {
         if (!$amount) {
@@ -186,6 +237,9 @@ class Order
         ) < 0.001;
     }
 
+    /**
+     * @return boolean
+     */
     private function _canRefundFull()
     {
         $invoiceCollection = $this->getOrder()->getInvoiceCollection();

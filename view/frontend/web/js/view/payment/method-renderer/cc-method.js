@@ -88,30 +88,30 @@ define(
                 if ((data.value)) {
                     if (data.value=="savedcard") {
                         $("#saved-Card-Visibility-Enabled").show();
-                        $("#cc-Visibility-Enabled").children().prop('disabled',true);
+                        $(".cc-Visibility-Enabled").children().prop('disabled',true);
                         $("#saved-Card-Visibility-Enabled").children().prop('disabled',false);
-                        $("#cc-Visibility-Enabled").hide();
+                        $(".cc-Visibility-Enabled").hide();
                         $("#worldpay_cc_save-card_div").hide();
                     }else{
                         $("#worldpay_cc_save-card_div").show();
-                        $("#cc-Visibility-Enabled").children().prop('disabled',false);
+                        $(".cc-Visibility-Enabled").children().prop('disabled',false);
                         $("#saved-Card-Visibility-Enabled").children().prop('disabled',true);
                         $("#saved-Card-Visibility-Enabled").hide();
-                        $("#cc-Visibility-Enabled").show();
+                        $(".cc-Visibility-Enabled").show();
                     }
                 } else {
                     if (data.selectedCCType() =="savedcard") {
                         $("#saved-Card-Visibility-Enabled").show();
-                        $("#cc-Visibility-Enabled").children().prop('disabled',true);
+                        $(".cc-Visibility-Enabled").children().prop('disabled',true);
                         $("#saved-Card-Visibility-Enabled").children().prop('disabled',false);
-                        $("#cc-Visibility-Enabled").hide();
+                        $(".cc-Visibility-Enabled").hide();
                         $("#worldpay_cc_save-card_div").hide();
                     }else{
                         $("#worldpay_cc_save-card_div").show();
-                        $("#cc-Visibility-Enabled").children().prop('disabled',false);
+                        $(".cc-Visibility-Enabled").children().prop('disabled',false);
                         $("#saved-Card-Visibility-Enabled").children().prop('disabled',true);
                         $("#saved-Card-Visibility-Enabled").hide();
-                        $("#cc-Visibility-Enabled").show();
+                        $(".cc-Visibility-Enabled").show();
                     }
                 }
             },

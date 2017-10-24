@@ -72,6 +72,7 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
             ->reset()
             ->init($this->_getRedirectResponseModel()->getRedirectUrl($response));
 
+        $payment->setIsTransactionPending(1);
         $this->registryhelper->setworldpayRedirectUrl($this->_urlInterface->getUrl('worldpay/hostedpaymentpage/pay'));
 
         $this->checkoutsession->setWpRedirecturl($this->_urlInterface->getUrl('worldpay/hostedpaymentpage/pay'));

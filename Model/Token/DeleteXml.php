@@ -5,7 +5,9 @@
 namespace Sapient\Worldpay\Model\Token;
 
 use Sapient\Worldpay\Model\SavedToken;
-
+/**
+ * Represents the token delete xml response from WP server
+ */
 class DeleteXml implements UpdateInterface
 {
     /**

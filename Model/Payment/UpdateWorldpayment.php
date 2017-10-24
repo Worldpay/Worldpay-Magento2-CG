@@ -6,13 +6,19 @@ namespace Sapient\Worldpay\Model\Payment;
 
 use Sapient\Worldpay\Model\SavedTokenFactory;
 
+/**
+ * Updating Risk gardian
+ */
 class UpdateWorldpayment
 {
-	/** @var \Sapient\Worldpay\Model\WorldpaymentFactory */
+	/**
+	 * @var \Sapient\Worldpay\Model\WorldpaymentFactory
+	 */
 	protected $worldpaypayment;
 
 	/**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param SavedTokenFactory $savedTokenFactory
      * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
@@ -33,6 +39,12 @@ class UpdateWorldpayment
         $this->_messageManager = $messageManager;
         $this->customerSession = $customerSession;
     }
+
+    /**
+     * Updating Risk gardian
+     *
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     */
 	public function updateWorldpayPayment(\Sapient\Worldpay\Model\Response\DirectResponse $directResponse)
 	{
 	 	$responseXml=$directResponse->getXml();
@@ -78,12 +90,21 @@ class UpdateWorldpayment
 		$wpp->setData('aav_email_result_code',$payment->AAVEmailResultCode['description']);
 		$wpp->save();
 		if ($this->customerSession->getIsSavedCardRequested()) {
-            $tokenElement=$orderStatus->token;
             $this->customerSession->unsIsSavedCardRequested();
-			$this->saveTokenData($tokenElement, $payment, $merchantCode);
+            $tokenNodeWithError = $orderStatus->token->xpath('//error');
+            if (!$tokenNodeWithError) {
+                $tokenElement=$orderStatus->token;
+                $this->saveTokenData($tokenElement, $payment, $merchantCode);
+            }
 		}
     }
 
+    /**
+     * Saved token data
+     * @param $tokenElement
+     * @param $payment
+     * @param $merchantCode
+     */
     public function saveTokenData($tokenElement, $payment, $merchantCode)
     {
     	$savedTokenFactory = $this->savedTokenFactory->create();
@@ -111,9 +132,11 @@ class UpdateWorldpayment
 	        $savedTokenFactory->setCustomerId($tokenElement[0]->authenticatedShopperID[0]);
 	        $savedTokenFactory->setAuthenticatedShopperID($tokenElement[0]->authenticatedShopperID[0]);
             $savedTokenFactory->save();
-        }else{
+        } else {
         	  $this->_messageManager->addNotice(__("You already appear to have this card number stored, if your card details have changed, you can update these via the 'my cards' section"));
+        	  return;
         }
+
     }
 
 }

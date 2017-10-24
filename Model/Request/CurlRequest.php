@@ -3,7 +3,9 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Request;
-
+/**
+ * set curl param request
+ */
 class CurlRequest
 {
     private $_handle;

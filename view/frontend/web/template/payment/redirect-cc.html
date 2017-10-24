@@ -24,7 +24,8 @@
                 <!-- ko if: (paymentMethodSelection()=='dropdown')-->
                         <select name="payment[cc_type]" class="select select-ccytpe"
                         data-bind="
-                       attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type', 'data-validate': JSON.stringify({required:true})},
+                       attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type',
+                       'data-validate': JSON.stringify({required:true})}, 
                        options: availableCCTypes(),
                        optionsText: 'ccLabel',
                        value: selectedCCType,

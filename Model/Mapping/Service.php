@@ -12,6 +12,7 @@ class Service {
         \Sapient\Worldpay\Helper\Data $worldpayHelper,
         SavedTokenFactory $savedTokenFactory,
         \Sapient\Worldpay\Model\SavedToken $savedtoken,
+        \Magento\Framework\UrlInterface $urlBuilder,
         \Magento\Customer\Model\Session $customerSession
     ) {
         $this->wplogger = $wplogger;
@@ -19,6 +20,7 @@ class Service {
         $this->worldpayHelper = $worldpayHelper;
         $this->customerSession = $customerSession;
         $this->savedtoken = $savedtoken;
+        $this->_urlBuilder = $urlBuilder;
     }
 
     public function collectDirectOrderParameters(
@@ -83,7 +85,7 @@ class Service {
         );
     }
 
-    public function collectTokenOrderParameters(
+       public function collectKlarnaOrderParameters(
         $orderCode,
         $quote,
         $orderStoreId,
@@ -93,12 +95,44 @@ class Service {
         $reservedOrderId = $quote->getReservedOrderId();
 
         return array(
+            'orderCode'           => $orderCode,
+            'merchantCode'        => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
+            'orderDescription'    => $this->_getOrderDescription($reservedOrderId),
+            'currencyCode'        => $quote->getQuoteCurrencyCode(),
+            'amount'              => $quote->getGrandTotal(),
+            'paymentType'         => $this->_getRedirectPaymentType($paymentDetails),
+            'shopperEmail'        => $quote->getCustomerEmail(),
+            'threeDSecureConfig'  => $this->_getThreeDSecureConfig($orderStoreId),
+            'tokenRequestConfig'  => $this->_getTokenRequestConfig($paymentDetails),
+            'acceptHeader'        => php_sapi_name() !== "cli" ? $_SERVER['HTTP_ACCEPT'] : '',
+            'userAgentHeader'     => php_sapi_name() !== "cli" ? $_SERVER['HTTP_USER_AGENT'] : '',
+            'shippingAddress'     => $this->_getShippingAddress($quote),
+            'billingAddress'      => $this->_getBillingAddress($quote),
+            'method'              => $paymentDetails['method'],
+            'paymentPagesEnabled' => $this->worldpayHelper->getCustomPaymentEnabled(),
+            'installationId'      => $this->worldpayHelper->getInstallationId(),
+            'hideAddress'         => $this->worldpayHelper->getHideAddress(),
+            'orderLineItems'      => $this->_getOrderLineItems($quote),
+            'orderStoreId'        => $orderStoreId
+        );
+    }
+
+    public function collectTokenOrderParameters(
+        $orderCode,
+        $quote,
+        $orderStoreId,
+        $paymentDetails
+    )
+    {
+        $reservedOrderId = $quote->getReservedOrderId();
+        $updatedPaymentDetails = $this->_getPaymentDetailsUsingToken($paymentDetails, $quote);
+        return array(
             'orderCode'        => $orderCode,
-            'merchantCode'       => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
+            'merchantCode'       => $this->worldpayHelper->getMerchantCode($updatedPaymentDetails['brand']),
             'orderDescription'   => $this->_getOrderDescription($reservedOrderId),
             'currencyCode'       => $quote->getQuoteCurrencyCode(),
             'amount'             => $quote->getGrandTotal(),
-            'paymentDetails'     => $this->_getPaymentDetailsUsingToken($paymentDetails, $quote),
+            'paymentDetails'     => $updatedPaymentDetails,
             'cardAddress'        => $this->_getCardAddress($quote),
             'shopperEmail'       => $quote->getCustomerEmail(),
             'threeDSecureConfig' => $this->_getThreeDSecureConfig($orderStoreId, $paymentDetails['method']),
@@ -126,7 +160,7 @@ class Service {
             'is3DSecure' => (bool)$this->worldpayHelper->is3DSecureEnabled()
         );
 
-        if($method == 'worldpay_moto'){
+        if ($method == 'worldpay_moto') {
              $threedarray =  array(
                 'isDynamic3D'=> false,
                 'is3DSecure' => false
@@ -137,7 +171,11 @@ class Service {
     }
     private function _getShippingAddress($quote)
     {
-        return $this->_getAddress($quote->getShippingAddress());
+        $shippingaddress = $this->_getAddress($quote->getShippingAddress());
+        if(!array_filter($shippingaddress)){
+            $shippingaddress = $this->_getAddress($quote->getBillingAddress());
+        }
+        return $shippingaddress;
     }
 
     private function _getBillingAddress($quote)
@@ -145,9 +183,57 @@ class Service {
         return $this->_getAddress($quote->getBillingAddress());
     }
 
-    private function _getCardAddress($quote)
+    private function _getOrderLineItems($quote)
     {
-        return $this->_getAddress($quote->getBillingAddress());
+         $orderitems = array();
+         $orderitems['orderTaxAmount'] = $quote->getShippingAddress()->getData('tax_amount');
+         $orderitems['termsURL'] = $this->_urlBuilder->getUrl(); 
+         $lineitem = array();
+           $orderItems = $quote->getItemsCollection(); 
+          foreach ($orderItems as $_item) {
+            $lineitem = array();
+            if ($_item->getParentItem()){ 
+                continue; 
+            }else{
+                $rowtotal = $_item->getRowTotal();
+                $totalamount = $rowtotal - $_item->getDiscountAmount();
+                $totaltax = $_item->getTaxAmount() + $_item->getHiddenTaxAmount() + $_item->getWeeeTaxAppliedRowAmount();
+                $discountamount = $_item->getDiscountAmount();
+
+                $lineitem['reference'] = $_item->getProductId();
+                $lineitem['name'] = $_item->getName();
+                $lineitem['quantity'] = (int)$_item->getQty();
+                $lineitem['quantityUnit'] = $this->worldpayHelper->getQuantityUnit($_item->getProduct());
+                $lineitem['unitPrice'] = $rowtotal / $_item->getQty();
+                $lineitem['taxRate'] =  (int)$_item->getTaxPercent();     
+                $lineitem['totalAmount'] = $totalamount;
+                $lineitem['totalTaxAmount'] =$totaltax;
+                if($discountamount > 0){
+                     $lineitem['totalDiscountAmount'] = $discountamount;
+                }
+                $orderitems['lineItem'][] = $lineitem;
+            }
+          }
+
+          $lineitem = array();
+          $address = $quote->getShippingAddress();
+           if($address->getShippingAmount() > 0){
+                $lineitem['reference'] = 'Shipid';
+                $lineitem['name'] = 'Shipping amount';
+                $lineitem['quantity'] = 1;
+                $lineitem['quantityUnit'] = 'shipping';
+                $lineitem['unitPrice'] = $address->getShippingAmount();
+                $lineitem['totalAmount'] = $address->getShippingAmount() - $address->getShippingDiscountAmount();
+                $totaltax = $address->getShippingTaxAmount() + $address->getShippingHiddenTaxAmount();
+                $lineitem['totalTaxAmount'] = $totaltax;
+                $lineitem['taxRate'] =  (int)(($totaltax * 100)/$address->getShippingAmount());
+                if($address->getShippingDiscountAmount() > 0){
+                    $lineitem['totalDiscountAmount'] = $address->getShippingDiscountAmount();
+                }
+                $orderitems['lineItem'][] = $lineitem;
+           }
+
+          return $orderitems;
     }
 
 
@@ -163,7 +249,16 @@ class Service {
         );
     }
 
-    private function _getPaymentDetails($paymentDetails)
+
+
+      private function _getCardAddress($quote)
+    {
+        return $this->_getAddress($quote->getBillingAddress());
+    }
+
+
+
+     private function _getPaymentDetails($paymentDetails)
     {
         $method = $paymentDetails['method'];
 

@@ -57,15 +57,25 @@ class RedirectService extends \Magento\Framework\DataObject
         $payment
     ) {      
         $this->checkoutsession->setauthenticatedOrderId($mageOrder->getIncrementId());
+        if($paymentDetails['additional_data']['cc_type'] == 'KlARNA-SSL'){
+             $redirectOrderParams = $this->mappingservice->collectKlarnaOrderParameters(
+                $orderCode,
+                $quote,
+                $orderStoreId,
+                $paymentDetails
+            );
 
-        $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
-            $orderCode,
-            $quote,
-            $orderStoreId,
-            $paymentDetails
-        );
+            $response = $this->paymentservicerequest->redirectKlarnaOrder($redirectOrderParams);
+       }else{
+            $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
+                $orderCode,
+                $quote,
+                $orderStoreId,
+                $paymentDetails
+            );
 
-        $response = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
+            $response = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
+        }
         $successUrl = $this->_buildRedirectUrl(
             $this->_getRedirectResponseModel()->getRedirectLocation($response),
             $redirectOrderParams['paymentType'],

@@ -15,16 +15,15 @@ class PaymentMethodsCC extends \Magento\Framework\App\Config\Value
         return [
             ['value' => 'AMEX-SSL', 'label' => __('American Express')],
             ['value' => 'VISA-SSL', 'label' => __('Visa')],
-            ['value' => 'ECMC-SSL', 'label' => __('MasterCard')],                    
+            ['value' => 'ECMC-SSL', 'label' => __('MasterCard')],
             ['value' => 'CB-SSL', 'label' => __('Carte Bancaire')],
             ['value' => 'CARTEBLEUE-SSL', 'label' => __('Carte Bleue')],
             ['value' => 'DANKORT-SSL', 'label' => __('Dankort')],
             ['value' => 'DINERS-SSL', 'label' => __('Diners')],
             ['value' => 'DISCOVER-SSL', 'label' => __('Discover')],
             ['value' => 'JCB-SSL', 'label' => __('Japanese Credit Bank')],
-            ['value' => 'SOLO_GB-SSL', 'label' => __('Solo')],
-            ['value' => 'MAESTRO-SSL', 'label' => __('Maestro')]                 
+            ['value' => 'MAESTRO-SSL', 'label' => __('Maestro')]
         ];
     }
- 
+
 }

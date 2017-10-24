@@ -10,6 +10,7 @@ class Authorised
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
+    
     /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
@@ -46,7 +47,7 @@ class Authorised
     {
         $payment->setTransactionId(time());
         $payment->setIsTransactionClosed(0);
-        if(!empty($order) && ($order->getPaymentStatus() == \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION)){
+        if (!empty($order) && ($order->getPaymentStatus() == \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION)) {
             $currencycode = $this->_paymentState->getCurrency();
             $currencysymbol = $this->_configHelper->getCurrencySymbol($currencycode);
             $amount = $this->_amountAsInt($this->_paymentState->getAmount());
@@ -78,6 +79,7 @@ class Authorised
      * Do not capture if integration mode is "direct" and an async notification comes in
      * as it could end up double capture
      *
+     * @param \Sapient\Worldpay\Model\Order $order
      */
     private function _captureOrderIfAutoCaptureEnabled(\Sapient\Worldpay\Model\Order $order)
     {

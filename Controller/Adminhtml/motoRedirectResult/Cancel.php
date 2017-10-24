@@ -6,10 +6,13 @@ namespace Sapient\Worldpay\Controller\Adminhtml\motoRedirectResult;
 
 use Sapient\Worldpay\Model\Payment\StateResponse as PaymentStateResponse;
 use Magento\Framework\View\Result\PageFactory;
-use Magento\Framework\App\Action\Context;
+use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Exception;
- 
+
+/**
+ * if payment is canceled redirect to admin create order page
+ */ 
 class Cancel extends \Magento\Backend\App\Action
 {
     protected $pageFactory;
@@ -24,7 +27,17 @@ class Cancel extends \Magento\Backend\App\Action
     private $_paymentService;
     private $_tokenService;
 
-
+    /**
+     * Constructor
+     *
+     * @param Context $context
+     * @param JsonFactory $resultJsonFactory
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice
+     * @param \Sapient\Worldpay\Model\Adminhtml\Order\Service $adminorderservice
+     * @param \Sapient\Worldpay\Model\Order\Service $orderservice
+     */
     public function __construct(Context $context,  JsonFactory $resultJsonFactory,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
@@ -42,10 +55,12 @@ class Cancel extends \Magento\Backend\App\Action
         $this->authenticatinservice = $authenticatinservice;
 
     }
- 
+    /**
+     * Execute if payment is canceled
+     */
     public function execute()
     {
-         $this->wplogger->info('worldpay returned admin cancel url');
+        $this->wplogger->info('worldpay returned admin cancel url');
         $worldPayOrder = $this->_getWorldPayOrder();
 
         $notice = $this->_getCancellationNoticeForOrder($worldPayOrder->getOrder());
@@ -61,12 +76,17 @@ class Cancel extends \Magento\Backend\App\Action
         return $this->_redirectToCreateOrderPage();
     }
 
-
+    /**
+     * @return \Sapient\Worldpay\Model\Order
+     */
     private function _getWorldPayOrder()
     {
         return $this->orderservice->getByIncrementId($this->_getOrderIncrementId());
     }
 
+    /**
+     * @return string
+     */
     private function _getCancellationNoticeForOrder($order)
     {
 
@@ -79,6 +99,9 @@ class Cancel extends \Magento\Backend\App\Action
         return $message;
     }
 
+    /**
+     * @return string
+     */
     private function _getOrderIncrementId()
     {
         $params = $this->getRequest()->getParams();
@@ -97,6 +120,10 @@ class Cancel extends \Magento\Backend\App\Action
         }
     }
 
+
+    /**
+     * @return string
+     */
     private function _redirectToCreateOrderPage()
     {
         $resultRedirect = $this->resultRedirectFactory->create();

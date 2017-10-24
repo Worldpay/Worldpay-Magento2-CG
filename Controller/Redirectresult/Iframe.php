@@ -6,12 +6,34 @@ namespace Sapient\Worldpay\Controller\Redirectresult;
 
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\Context;
- 
+
+/**
+ * Display page in iframe
+ */
 class Iframe extends \Magento\Framework\App\Action\Action
 {
+    /**
+     * @var Magento\Framework\View\Result\PageFactory
+     */
     protected $pageFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Checkout\Hpp\State
+     */
     protected $_status;
-    public function __construct(Context $context, PageFactory $pageFactory,
+
+    /**
+     * Constructor
+     *
+     * @param Context $context
+     * @param PageFactory $pageFactory
+     * @param \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate
+     * @param \Magento\Framework\UrlInterface $urlInterface     
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     */
+    public function __construct(
+        Context $context,
+        PageFactory $pageFactory,
         \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate,
         \Magento\Framework\UrlInterface $urlInterface, 
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger

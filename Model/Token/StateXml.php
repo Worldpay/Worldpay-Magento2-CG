@@ -3,7 +3,9 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Token;
-
+/**
+ * read from WP's token update response
+ */
 class StateXml implements \Sapient\Worldpay\Model\Token\StateInterface
 {
     private $_xml;

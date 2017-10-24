@@ -4,6 +4,9 @@
  */
 namespace Sapient\Worldpay\Model\XmlBuilder;
 
+/**
+ * Build xml for Capture request
+ */
 class Capture
 {
     const EXPONENT = 2;
@@ -17,6 +20,15 @@ EOD;
     private $currencyCode;
     private $amount;
 
+    /**
+     * Build xml for processing Request
+     *
+     * @param string $merchantCode
+     * @param string $orderCode     
+     * @param string $currencyCode
+     * @param float $amount    
+     * @return SimpleXMLElement $xml
+     */
     public function build($merchantCode, $orderCode, $currencyCode, $amount)
     {
         $this->merchantCode = $merchantCode;
@@ -35,11 +47,23 @@ EOD;
         return $xml;
     }
 
+    /**
+     * Add tag modify to xml 
+     *
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
     private function _addModifyElement($xml)
     {
         return $xml->addChild('modify');
     }
 
+    /**
+     * Add tag orderModification to xml 
+     *
+     * @param SimpleXMLElement $modify
+     * @return SimpleXMLElement $orderModification
+     */
     private function _addOrderModificationElement($modify)
     {
         $orderModification = $modify->addChild('orderModification');
@@ -48,6 +72,11 @@ EOD;
         return $orderModification;
     }
 
+    /**
+     * Add tag capture to xml 
+     *
+     * @param SimpleXMLElement $orderModification     
+     */
     private function _addCaptureElement($orderModification)
     {
         $capture = $orderModification->addChild('capture');
@@ -65,6 +94,10 @@ EOD;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
     }
 
+    /**
+     * @param float $amount
+     * @return int
+     */
     private function _amountAsInt($amount)
     {
         return round($amount, self::EXPONENT, PHP_ROUND_HALF_EVEN) * pow(10, self::EXPONENT);

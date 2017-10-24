@@ -6,10 +6,15 @@ namespace Sapient\Worldpay\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
+/**
+ * HistoryNotification resource
+ */
 class HistoryNotification extends AbstractDb
 {
     /**
-     * Define main table
+     * Initialize resource model
+     *
+     * @return void
      */
     protected function _construct()
     {

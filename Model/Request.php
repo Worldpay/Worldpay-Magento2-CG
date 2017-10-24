@@ -5,12 +5,20 @@
 namespace Sapient\Worldpay\Model;
 
 use Exception;
-
+/** 
+ * Used for processing the Request
+ */
 class Request
 {
+    /**
+     * @var \Sapient\Worldpay\Model\Request\CurlRequest
+     */
     protected $_request;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
     protected $_logger;
-    protected $_configHelper;
 
     const CURL_POST = true;
     const CURL_RETURNTRANSFER = true;
@@ -19,14 +27,31 @@ class Request
     const CURL_VERBOSE = true;
     const SUCCESS = 200;
 
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Request\CurlRequest $curlrequest
+     * @param \Sapient\Worldpay\Helper\Data $helper   
+     */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
-        \Sapient\Worldpay\Model\Request\CurlRequest $curlrequest
-        ) {
+        \Sapient\Worldpay\Model\Request\CurlRequest $curlrequest,
+        \Sapient\Worldpay\Helper\Data $helper
+    ) {
         $this->_wplogger = $wplogger;
         $this->curlrequest = $curlrequest;
+        $this->helper = $helper;
     }
-
+     /**
+      * Process the request
+      *
+      * @param $quote
+      * @param $username
+      * @param $password
+      * @return SimpleXMLElement body
+      * @throws Exception  
+      */
     public function sendRequest($quote, $username, $password)
     {
         $request = $this->_getRequest();
@@ -91,11 +116,20 @@ class Request
         return $_xml->saveXML();
     }
 
+    /**
+     * Get URL of merchant site based on environment mode
+     */
     private function _getUrl()
     {
-        return 'https://secure-test.worldpay.com/jsp/merchant/xml/paymentService.jsp';
+        if ($this->helper->getEnvironmentMode()=='Live Mode')
+            return $this->helper->getLiveUrl();
+
+        return $this->helper->getTestUrl();
     }
 
+    /**
+     * @return object
+     */
     private function _getRequest()
     {
         if ($this->_request === null) {

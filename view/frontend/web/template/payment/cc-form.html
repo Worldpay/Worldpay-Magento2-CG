@@ -4,7 +4,10 @@
  * See COPYING.txt for license details.
  */
 -->
-
+<style type="text/css">
+    .checkout-payment-method .ccard .name .input-text{ width: 225px; }
+    .checkout-payment-method .ccard .type .select { width: 225px; }
+</style>
 <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
 <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
     <!-- ko if: (isShowLegend())-->
@@ -36,8 +39,8 @@
             <!-- /ko -->
         </div>
     </div>
-    <div data-bind="visible: false" id="cc-Visibility-Enabled">
-    <div class="field name required">
+    <!--<div data-bind="visible: false" class="cc-Visibility-Enabled">-->
+    <div class="field name required cc-Visibility-Enabled" data-bind="visible: false">
         <label data-bind="attr: {for: getCode() + '_cc_name'}" class="label">
             <span><!-- ko i18n: 'Card Holder Name'--><!-- /ko --></span>
         </label>
@@ -55,7 +58,7 @@
                                     "/>
         </div>
     </div>
-    <div class="field number required">
+    <div class="field number required cc-Visibility-Enabled" data-bind="visible: false">
         <label data-bind="attr: {for: getCode() + '_cc_number'}" class="label">
             <span><!-- ko i18n: 'Credit Card Number'--><!-- /ko --></span>
         </label>
@@ -77,7 +80,7 @@
                                     "/>
         </div>
     </div>
-    <div class="field date required" data-bind="attr: {id: getCode() + '_cc_type_exp_div'}">
+    <div class="field date required cc-Visibility-Enabled" data-bind="attr: {id: getCode() + '_cc_type_exp_div'},visible: false">
         <label data-bind="attr: {for: getCode() + '_expiration'}" class="label">
             <span><!-- ko i18n: 'Expiration Date'--><!-- /ko --></span>
         </label>
@@ -115,7 +118,7 @@
         </div>
     </div>
     <!-- ko if: (hasVerification())-->
-    <div class="field cvv required" data-bind="attr: {id: getCode() + '_cc_type_cvv_div'}">
+    <div class="field cvv required cc-Visibility-Enabled" data-bind="attr: {id: getCode() + '_cc_type_cvv_div'},visible: false">
         <label data-bind="attr: {for: getCode() + '_cc_cid'}" class="label">
             <span><!-- ko i18n: 'Card Verification Number'--><!-- /ko --></span>
         </label>
@@ -146,7 +149,7 @@
     </div>
     <!-- /ko -->
     <!-- ko if: (getSaveCardAllowed())-->
-    <div class="field savecc" data-bind="attr: {id: getCode() + '_save-card_div'}">
+    <div class="field savecc cc-Visibility-Enabled" data-bind="attr: {id: getCode() + '_save-card_div'}, visible: false">
         <div class="control">
             <input type="checkbox" class="input-check savecard"  name="save-card"  data-bind="attr: {
                     id: getCode() + '_save_card', title: $t('Save This Card'),
@@ -157,13 +160,13 @@
         </div>
     </div>
     <!-- /ko -->
-    </div>
+    <!--</div>-->
     </fieldset>
 </form>
 
 <form class="form" data-bind="attr: {'id': getCode() + '-savedcard-form'}">
     <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
-    <fieldset>
+    <fieldset class="fieldset">
         <!-- ko if: (getSavedCardsList().length > 0)-->
             <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
             <!-- ko template: 'Sapient_Worldpay/payment/saved-card-form' --><!-- /ko -->

@@ -6,6 +6,17 @@ namespace Sapient\Worldpay\Controller\ThreeDSecure;
 
 class AuthResponse extends \Magento\Framework\App\Action\Action
 {
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     * @param \Magento\Sales\Model\OrderFactory $orderFactory
+     * @param \Magento\Checkout\Model\Session $checkoutSession     
+     * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender     
+     * @param \Sapient\Worldpay\Model\Authorisation\ThreeDSecureService $threedsredirectresponse
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger     
+     */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
@@ -25,6 +36,10 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         parent::__construct($context);
     }
 
+    /**
+     * Accepts callback from worldpay's 3D Secure page. If payment has been
+     * authorised, update order and redirect to the checkout success page.
+     */
     public function execute()
     {
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();

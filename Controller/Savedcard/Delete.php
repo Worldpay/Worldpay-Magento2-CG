@@ -9,12 +9,33 @@ use \Magento\Framework\View\Result\PageFactory;
 use \Sapient\Worldpay\Model\SavedTokenFactory;
 use \Magento\Customer\Model\Session;
 use Magento\Store\Model\StoreManagerInterface;
-
+/**
+ * Perform delete card 
+ */
 class Delete extends \Magento\Framework\App\Action\Action 
 {
-
+    /**
+     * @var \Magento\Framework\View\Result\PageFactory
+     */
 	protected $_resultPageFactory;
+
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
 	protected $customerSession;
+
+    /**
+     * Constructor
+     *
+     * @param StoreManagerInterface $storeManager     
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     * @param SavedTokenFactory $savecard
+     * @param Session $customerSession
+     * @param \Sapient\Worldpay\Model\Token\Service $tokenService
+     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     */
 	public function __construct(
         StoreManagerInterface $storeManager,
         Context $context,
@@ -22,7 +43,8 @@ class Delete extends \Magento\Framework\App\Action\Action
         SavedTokenFactory $savecard,
         Session $customerSession,
         \Sapient\Worldpay\Model\Token\Service $tokenService,
-        \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken
+        \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken,
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
     ) {
         parent::__construct($context);
         $this->_storeManager = $storeManager;
@@ -31,13 +53,22 @@ class Delete extends \Magento\Framework\App\Action\Action
         $this->customerSession = $customerSession;
         $this->_tokenService = $tokenService;
         $this->_worldpayToken = $worldpayToken;
+        $this->wplogger = $wplogger;
     }
 
+    /**
+     * Retrive store Id
+     *
+     * @return int
+     */
     public function getStoreId()
     {
         return $this->_storeManager->getStore()->getId();
     }
-
+    
+    /**
+     * perform card deletion 
+     */
 	public function execute()
 	{
         $id = $this->getRequest()->getParam('id');
@@ -58,18 +89,22 @@ class Delete extends \Magento\Framework\App\Action\Action
 	        	} else {
 	        		$this->messageManager->addErrorMessage(__('Please try after some time'));
 	        	}
-	           } catch (\Exception $e) {
+	        } catch (\Exception $e) {
+                $this->wplogger->error($e->getMessage());
                 if ($this->_tokenNotExistOnWorldpay($e->getMessage())) {
                     $this->_applyTokenDelete($model, $this->customerSession->getCustomer());
                     $this->messageManager->addSuccess(__('Item is deleted successfully'));
-                }else{
+                } else {
                     $this->messageManager->addException($e, __('Error: ').$e->getMessage());
                 }
             }
     	}
         $this->_redirect('worldpay/savedcard/index');
 	}
-
+    
+    /**
+     * @return bool
+     */
     protected function _tokenNotExistOnWorldpay($error)
     {
         $message = "Token does not exist";
@@ -78,7 +113,10 @@ class Delete extends \Magento\Framework\App\Action\Action
         }
         return false;
     }
-
+    
+    /**
+     * Delete card of customer 
+     */
     protected function _applyTokenDelete($tokenModel, $customer)
     {
         $this->_worldpayToken->deleteTokenByCustomer(

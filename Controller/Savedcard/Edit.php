@@ -8,12 +8,29 @@ use Magento\Framework\App\Action\Context;
 use \Magento\Framework\View\Result\PageFactory;
 use \Sapient\Worldpay\Model\SavedTokenFactory;
 use \Magento\Customer\Model\Session;
-
+/**
+ *  Display Saved card form
+ */
 class Edit extends \Magento\Framework\App\Action\Action 
 {
-
+    /**
+     * @var \Magento\Framework\View\Result\PageFactory 
+     */
     protected $_resultPageFactory;
+    
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
     protected $customerSession;
+
+    /**
+     * Constructor
+     *
+     * @param Context $context     
+     * @param PageFactory $resultPageFactory
+     * @param SavedTokenFactory $savecard
+     * @param Session $customerSession         
+     */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,

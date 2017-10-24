@@ -3,7 +3,11 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Token;
-
+/**
+ * Interface Sapient\WorldPay\Model\Token\StateInterface
+ *
+ * Describe what can be read from WP's response
+ */
 interface StateInterface
 {
     const TOKEN_EVENT_NEW = 'NEW';

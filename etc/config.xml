@@ -10,14 +10,17 @@
                 <xml_password>Sapient@123</xml_password>
                 <enable_dynamic3DS>1</enable_dynamic3DS>
                 <enable_logging>1</enable_logging>
+                <payment_method_selection>radio</payment_method_selection>
             </general_config>
             <cc_config>
                 <enabled>1</enabled>
                 <title>Credit Cards</title>
                 <paymentmethods>AMEX-SSL,VISA-SSL,ECMC-SSL</paymentmethods>
-                <cse_enabled>1</cse_enabled>
+                <cse_enabled>0</cse_enabled>
                 <require_cvc>1</require_cvc>
-                <cc_integration_mode>direct</cc_integration_mode>
+                <integration_mode>direct</integration_mode>
+                <hpp_integration>full_page</hpp_integration>
+                <saved_card>0</saved_card>
             </cc_config>
             <apm_config>
                 <enabled>1</enabled>
@@ -58,7 +61,6 @@
                 <DINERS_SSL_payment_method>24</DINERS_SSL_payment_method>
                 <DISCOVER_SSL_payment_method>24</DISCOVER_SSL_payment_method>
                 <JCB_SSL_payment_method>24</JCB_SSL_payment_method>
-                <SOLO_SSL_payment_method>24</SOLO_SSL_payment_method>
                 <MAESTRO_SSL_payment_method>24</MAESTRO_SSL_payment_method>
             </order_cleanup>
         </worldpay>
@@ -70,7 +72,7 @@
                 <allow_specific>0</allow_specific>
                 <payment_action>authorize</payment_action>
                 <sort_order>10</sort_order>
-                <require_cvc>1</require_cvc>                
+                <require_cvc>1</require_cvc>
             </worldpay_cc>
              <worldpay_apm>
                 <title>Alternative Payment methods</title>

@@ -10,6 +10,9 @@ use Sapient\Worldpay\Model\PaymentMethods\CreditCards as WorldPayCCPayment;
 use Magento\Checkout\Model\Cart;
 use Sapient\Worldpay\Model\SavedTokenFactory;
 
+/**
+ * Configuration provider for worldpayment rendering payment page.
+ */
 class WorldpayConfigProvider implements ConfigProviderInterface
 {
     /**
@@ -19,6 +22,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         'worldpay_cc',
         'worldpay_apm'
     ];
+
     /**
      * @var \Magento\Payment\Model\Method\AbstractMethod[]
      */
@@ -31,7 +35,13 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @var \Sapient\Worldpay\Helper\Data
      */
     protected $worldpayHelper;
+    /**
+     * @var Magento\Checkout\Model\Cart
+     */
     protected $cart;
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
     protected $wplogger;
 
     /**
@@ -39,6 +49,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @param \Sapient\Worldpay\Helper\Data $helper
      * @param PaymentHelper $paymentHelper
      * @param WorldPayCCPayment $payment
+     * @param Cart $cart
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Backend\Model\Session\Quote $adminquotesession
+     * @param SavedTokenFactory $savedTokenFactory
+     * @param \Magento\Backend\Model\Auth\Session $backendAuthSession
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -95,8 +110,6 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 }
 
                 $config['payment']['ccform']['is3DSecureEnabled'] = $this->worldpayHelper->is3DSecureEnabled();
-
-
                 $config['payment']['ccform']['savedCardList'] = $this->getSaveCardList();
                 $config['payment']['ccform']['saveCardAllowed'] = $this->worldpayHelper->getSaveCard();
                 $config['payment']['ccform']['apmtitle'] = $this->getApmtitle();
@@ -105,7 +118,10 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
         return $config;
     }
-
+     
+    /**
+     * Get Saved card List of customer
+     */
     public function getSaveCardList()
     {
         $savedCardsList = array();
@@ -116,6 +132,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $savedCardsList;
     }
 
+    /**
+     * @return boolean
+     */
     public function getIsSaveCardAllowed()
     {
         if ($this->worldpayHelper->getSaveCard()) {
@@ -124,11 +143,17 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return false;
     }
 
+    /**
+     * @return String
+     */
     public function getIntigrationMode()
     {
         return $this->worldpayHelper->getCcIntegrationMode();
     }
 
+    /**
+     * @return Array
+     */
     public function getCcTypes()
     {
         $options = $this->worldpayHelper->getCcTypes();
@@ -138,6 +163,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $options;
      }
 
+    /**
+     * @return Array
+     */
     public function getApmTypes($code)
     {
         return $this->worldpayHelper->getApmTypes($code);
@@ -161,6 +189,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         );
     }
 
+    /**
+     * @return Array
+     */
     public function getYears()
     {
         $years = array();
@@ -171,6 +202,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $years;
     }
 
+    /**
+     * @return Array
+     */
     public function getStartYears()
     {
         $years = array();
@@ -181,26 +215,41 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $years;
     }
 
+    /**
+     * @return String
+     */
     public function getCCtitle()
     {
         return $this->worldpayHelper->getCcTitle();
     }
 
+    /**     
+     * @return String
+     */
     public function getApmtitle()
     {
         return $this->worldpayHelper->getApmTitle();
     }
 
+    /**     
+     * @return boolean
+     */
     public function getCvcRequired()
     {
         return $this->worldpayHelper->isCcRequireCVC();
     }
 
+    /**     
+     * @return string
+     */
     public function getPaymentMethodSelection()
     {
         return $this->worldpayHelper->getPaymentMethodSelection();
     }
 
+    /**     
+     * @return string
+     */
     public function getSaveCardListForAdminOrder($customer)
     {
         $savedCardsList = array();

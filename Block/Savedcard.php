@@ -44,8 +44,8 @@ class Savedcard extends \Magento\Framework\View\Element\Template
             return false;
         }
    		return $savedCardCollection = $this->_savecard->create()->getCollection()
-   	 							                  ->addFieldToSelect(array('card_brand','card_number','cardholder_name','card_expiry_month','card_expiry_year'))
-   	 						  	                ->addFieldToFilter('customer_id', array('eq' => $customerId)); ;
+   	 							      ->addFieldToSelect(array('card_brand','card_number','cardholder_name','card_expiry_month','card_expiry_year'))
+   	 						  	      ->addFieldToFilter('customer_id', array('eq' => $customerId)); ;
    }
 
    /**

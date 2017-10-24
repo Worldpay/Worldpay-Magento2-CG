@@ -12,10 +12,34 @@ use Magento\Store\Model\StoreManagerInterface;
 
 use Exception;
 
+/**
+ *Controller for Updating Saved card
+ */
 class EditPost extends \Magento\Customer\Controller\AbstractAccount
 {
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
     protected $customerSession;
+    
+    /**
+     * @var Magento\Framework\Data\Form\FormKey\Validator
+     */
     protected $formKeyValidator;
+
+    /**
+     * Constructor
+     *
+     * @param Context $context     
+     * @param SavedTokenFactory $savecard
+     * @param Session $customerSession
+     * @param Validator $formKeyValidator
+     * @param StoreManagerInterface $storeManager
+     * @param \Sapient\Worldpay\Model\Token\Service $tokenService
+     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger     
+     */
     public function __construct(
         Context $context,
         SavedTokenFactory $savecard,
@@ -24,7 +48,8 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         StoreManagerInterface $storeManager,
         \Sapient\Worldpay\Model\Token\Service $tokenService,
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken,
-        \Magento\Framework\Message\ManagerInterface $messageManager
+        \Magento\Framework\Message\ManagerInterface $messageManager,
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
     ) {
         parent::__construct($context);
         $this->_storeManager = $storeManager;
@@ -34,13 +59,22 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         $this->_tokenService = $tokenService;
         $this->_worldpayToken = $worldpayToken;
         $this->_messageManager = $messageManager;
+        $this->wplogger = $wplogger;
     }
 
+    /**
+     * Retrive store Id
+     *
+     * @return int
+     */
     public function getStoreId()
     {
         return $this->_storeManager->getStore()->getId();
     }
 
+    /**
+     * Receive http post request to update saved card details
+     */
     public function execute()
     {
         if (!$this->customerSession->isLoggedIn()) {
@@ -55,6 +89,7 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
                     $this->customerSession->getCustomer(),
                     $this->getStoreId());
             } catch (Exception $e) {
+                $this->wplogger->error($e->getMessage());
                 $this->messageManager->addException($e, __('Error: ').$e->getMessage());
                 $this->_redirect('*/savedcard/edit', array('id' => $this->_getTokenModel()->getId()));
                 return;
@@ -72,6 +107,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         }
     }
 
+    /** 
+     * Update Saved Card Detail 
+     */
     protected function _applyTokenUpdate()
     {
         $this->_worldpayToken->updateTokenByCustomer(
@@ -80,6 +118,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         );
     }
     
+    /**
+     * @return Sapient/WorldPay/Model/Token
+     */
     protected function _getTokenModel()
     {
         if (! $tokenId = $this->getRequest()->getParam('token_id')) {

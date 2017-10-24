@@ -57,6 +57,7 @@ class DirectService extends \Magento\Framework\DataObject
         if ($threeDSecureParams) {
             // Handles success response with 3DS & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
+            $payment->setIsTransactionPending(1);
             $this->_handle3DSecure($threeDSecureParams, $directOrderParams, $orderCode);
         } else {
             if ($threeDsEnabled) {

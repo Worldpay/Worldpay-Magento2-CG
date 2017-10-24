@@ -11,14 +11,33 @@ use Exception;
  
 class Index extends \Magento\Framework\App\Action\Action
 {
+    /**
+     * @var Magento\Framework\View\Result\PageFactory
+     */
     protected $pageFactory;
+    
     protected $_rawBody;
+    /**
+     * @var \Sapient\Worldpay\Model\HistoryNotificationFactory
+     */
     protected $historyNotification;
 
     const RESPONSE_OK = '[OK]';
     const RESPONSE_FAILED = '[FAILED]';
 
-    public function __construct(Context $context,  JsonFactory $resultJsonFactory,
+    /**
+     * Constructor
+     *
+     * @param Context $context
+     * @param JsonFactory $resultJsonFactory
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
+     * @param \Sapient\Worldpay\Model\Order\Service $orderservice
+     * @param \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
+     */
+    public function __construct(Context $context,
+        JsonFactory $resultJsonFactory,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
@@ -50,7 +69,8 @@ class Index extends \Magento\Framework\App\Action\Action
                 $this->_applyTokenUpdate($xmlRequest);
                 return $this->_returnOk();
             } else {
-                throw new Exception('Not a valid xml');
+
+                $this->wplogger->error('Not a valid xml');
             }
         } catch (Exception $e) {
             $this->wplogger->error($e->getMessage());
@@ -77,7 +97,6 @@ class Index extends \Magento\Framework\App\Action\Action
         return $this->_rawBody;
     }  
 
-
     /**
      * @param $xmlRequest SimpleXMLElement
      */
@@ -96,6 +115,9 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->wplogger->info('########## Payment update of type: ' . get_class($this->_paymentUpdate). ' created ##########');
     }
 
+    /**
+     * Get order code
+     */
     private function _loadOrder()
     {
         $orderCode = $this->_paymentUpdate->getTargetOrderCode();
@@ -109,10 +131,14 @@ class Index extends \Magento\Framework\App\Action\Action
         try {
             $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
         } catch (Exception $e) {
+            $this->wplogger->error($e->getMessage());
             throw new Exception($e->getMessage());
         }
     }
 
+    /**
+     * @param $xmlRequest SimpleXMLElement
+     */
     private function _applyTokenUpdate($xmlRequest)
     {
         $tokenService = $this->worldpaytoken;
@@ -137,6 +163,9 @@ class Index extends \Magento\Framework\App\Action\Action
         return $resultJson;
     }
 
+    /**
+     * Save Notification
+     */
     private function updateNotification($xml)
     {       
         $statusNode=$xml->notify->orderStatusEvent;

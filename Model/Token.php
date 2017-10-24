@@ -4,10 +4,28 @@
  */
 namespace Sapient\Worldpay\Model;
 
+/** 
+ *  processing the Request of saved card
+ */
 class Token
 {
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
     protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Request
+     */
     protected $_request;
+
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param \Sapient\Worldpay\Model\Request $request   
+     */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
@@ -18,6 +36,13 @@ class Token
         $this->worldpayhelper = $worldpayhelper;
     }
 
+     /**
+      * Process the request for Saved Card
+      *
+      * @param array $customerData
+      * @param array $paymentData   
+      * @return SimpleXMLElement 
+      */
     public function getPaymentToken($customerData, $paymentData)
     {
         $this->wplogger->info("*** TOKEN Method called [befor order place]");
@@ -57,6 +82,10 @@ class Token
         );
     }
 
+    /**
+     * @param array $paymentDetails
+     * @return array $details
+     */
     private function _getPaymentDetails($paymentDetails)
     {
         $method = $paymentDetails['method'];
@@ -80,6 +109,14 @@ class Token
         return $details;
     }
 
+    /**
+     * call api to process send request
+     *
+     * @param SimpleXMLElement $xml
+     * @param string  $username
+     * @param string  $password
+     * @return SimpleXMLElement $response
+     */
     protected function _sendRequest($xml, $username, $password)
     {
         $response = $this->_request->sendRequest($xml, $username, $password);
@@ -87,6 +124,12 @@ class Token
         return $response;
     }
     
+    /**
+     * Check error while processing the request
+     *
+     * @param SimpleXMLElement $xml
+     * @throws Exception 
+     */
     protected function _checkForError($response)
     {
         $paymentService = new \SimpleXmlElement($response);

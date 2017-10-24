@@ -5,7 +5,9 @@
 namespace Sapient\Worldpay\Model\Response;
 
 use Exception;
-
+/**
+ * Abstract class used for reading the xml
+ */
 abstract class ResponseAbstract
 {
     const INTERNAL_ERROR = 1;
@@ -22,11 +24,18 @@ abstract class ResponseAbstract
     protected $_errorMessage;
     protected $_wpOrderId;
 
+    /**
+     * @return SimpleXMLElement
+     */
     public function getXml()
     {
         return $this->_responseXml;
     }
 
+    /**
+     * @param $response
+     * @return  $this
+     */
     public function setResponse($response)
     {
         try {
