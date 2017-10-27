@@ -84,15 +84,16 @@ class Authorised
     private function _captureOrderIfAutoCaptureEnabled(\Sapient\Worldpay\Model\Order $order)
     {
         // Capture only if auto-capture enabled
-        if (! $this->_configHelper->isAutoCaptureEnabled($order->getStoreId())) {
+        if ($this->_configHelper->isAutoCaptureEnabled($order->getStoreId()) && !$this->_configHelper->CheckStopAutoInvoice($order->getPaymentMethodCode(), $order->getPaymentType())) {
+               if (($this->_paymentState->isAsyncNotification() && $this->_isRedirectIntegrationMode($order))
+                || ($this->_paymentState->isAsyncNotification() && $this->_isDirectIntegrationMode($order))
+            ){
+                $order->capture();
+            }else{
+                return;
+            }
+        }else{
             return;
-        }
-
-        // current XML response is align with the integration mode
-        if (($this->_paymentState->isAsyncNotification() && $this->_isRedirectIntegrationMode($order))
-            || ($this->_paymentState->isAsyncNotification() && $this->_isDirectIntegrationMode($order))
-        ) {
-            $order->capture();
         }
     }
 

@@ -40,7 +40,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	{
 		$type = str_replace('-', '', str_replace('-SSL', '', $paymentType));
 		$merchantCodeValue = explode(',', $this->_scopeConfig->getValue('worldpay/merchant_config/'.$type, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
-		if (is_array($merchantCodeValue) && $merchantCodeValue[0]) {
+		if (is_array($merchantCodeValue) && !empty($merchantCodeValue[0])) {
 			return $merchantCodeValue[0];
 		}
 		return  $this->_scopeConfig->getValue('worldpay/general_config/merchant_code', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
@@ -49,7 +49,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	{
 		$type = str_replace('-', '', str_replace('-SSL', '', $paymentType));
 		$merchantCodeValue = explode(',', $this->_scopeConfig->getValue('worldpay/merchant_config/'.$type, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
-		if (is_array($merchantCodeValue) && $merchantCodeValue[1]) {
+		if (is_array($merchantCodeValue) && !empty($merchantCodeValue[1])) {
 			return $merchantCodeValue[1];
 
 		}
@@ -59,7 +59,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	{
 		$type = str_replace('-', '', str_replace('-SSL', '', $paymentType));
 		$merchantCodeValue = explode(',', $this->_scopeConfig->getValue('worldpay/merchant_config/'.$type, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
-		if (is_array($merchantCodeValue) && $merchantCodeValue[2]) {
+		if (is_array($merchantCodeValue) && !empty($merchantCodeValue[2])) {
 			return $merchantCodeValue[2];
 		}
 		return  $this->_scopeConfig->getValue('worldpay/general_config/xml_password', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
@@ -276,6 +276,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	 public function getQuantityUnit($product)
 	 {
 	    	return 'product';
+	 }
+
+	 public function CheckStopAutoInvoice($code, $type)
+	 {
+	 	return $this->paymentlist->CheckStopAutoInvoice($code, $type);
 	 }
 
 }

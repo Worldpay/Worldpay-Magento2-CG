@@ -34,11 +34,13 @@ class Pay extends \Magento\Framework\App\Action\Action
         Context $context, 
         PageFactory $pageFactory,
         \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate,
+        \Sapient\Worldpay\Helper\Data $worldpayhelper,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
     ) { 
         $this->pageFactory = $pageFactory;
         $this->wplogger = $wplogger;
         $this->hppstate = $hppstate;
+        $this->worldpayhelper = $worldpayhelper;
         return parent::__construct($context);
 
     }
@@ -46,7 +48,7 @@ class Pay extends \Magento\Framework\App\Action\Action
     public function execute()
     {
 
-        if (!$this->_getStatus()->isInitialised()) { 
+        if (!$this->_getStatus()->isInitialised() || !$this->worldpayhelper->isIframeIntegration()) { 
             return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
         } 
         return $this->pageFactory->create(); 

@@ -86,7 +86,10 @@ class Service
      */
     public function getAuthorisedOrder()
     {
-        return $this->getByIncrementId($this->checkoutsession->getauthenticatedOrderId());
+        if ($this->checkoutsession->getauthenticatedOrderId()) {
+            return $this->getByIncrementId($this->checkoutsession->getauthenticatedOrderId());
+        }
+        return false;
     }
 
     /**

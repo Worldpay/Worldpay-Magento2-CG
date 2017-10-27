@@ -95,6 +95,10 @@ class DirectService extends \Magento\Framework\DataObject
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
             throw new Exception(sprintf('Payment CANCELLED'));
         }
+
+        if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Error) {
+            throw new Exception(sprintf('Payment ERROR'));
+        }
     }
 
 }

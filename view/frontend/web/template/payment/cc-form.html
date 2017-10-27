@@ -166,7 +166,7 @@
 
 <form class="form" data-bind="attr: {'id': getCode() + '-savedcard-form'}">
     <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
-    <fieldset class="fieldset">
+    <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
         <!-- ko if: (getSavedCardsList().length > 0)-->
             <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
             <!-- ko template: 'Sapient_Worldpay/payment/saved-card-form' --><!-- /ko -->

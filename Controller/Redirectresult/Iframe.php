@@ -34,14 +34,12 @@ class Iframe extends \Magento\Framework\App\Action\Action
     public function __construct(
         Context $context,
         PageFactory $pageFactory,
-        \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate,
-        \Magento\Framework\UrlInterface $urlInterface, 
+        \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate,        
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
     ) { 
         $this->pageFactory = $pageFactory;
         $this->wplogger = $wplogger;
-        $this->hppstate = $hppstate;
-        $this->_urlInterface = $urlInterface;
+        $this->hppstate = $hppstate;       
         return parent::__construct($context);
     }
  
@@ -51,10 +49,10 @@ class Iframe extends \Magento\Framework\App\Action\Action
 
         $params = $this->getRequest()->getParams();
 
-        $redirecturl = $this->_urlInterface->getBaseUrl();
+        $redirecturl = $this->_url->getBaseUrl();
 
         if (isset($params['status'])) {
-            $currenturl = $this->_urlInterface->getCurrentUrl();
+            $currenturl = $this->_url->getCurrentUrl();
             $redirecturl = str_replace("iframe/status/", "", $currenturl);
         }
 

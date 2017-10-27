@@ -89,7 +89,7 @@ class UpdateWorldpayment
 		$wpp->setData('aav_telephone_result_code',$payment->AAVTelephoneResultCode['description']);
 		$wpp->setData('aav_email_result_code',$payment->AAVEmailResultCode['description']);
 		$wpp->save();
-		if ($this->customerSession->getIsSavedCardRequested()) {
+		if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
             $this->customerSession->unsIsSavedCardRequested();
             $tokenNodeWithError = $orderStatus->token->xpath('//error');
             if (!$tokenNodeWithError) {

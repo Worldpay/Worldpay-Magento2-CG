@@ -42,6 +42,7 @@ class Captured
     {
         return array(
             \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION,
+            \Sapient\Worldpay\Model\Payment\State::STATUS_PENDING_PAYMENT,
             \Sapient\Worldpay\Model\Payment\State::STATUS_AUTHORISED
         );
     }

@@ -65,7 +65,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @param \Sapient\Worldpay\Helper\Registry $registryhelper
      * @param \Magento\Framework\UrlInterface $urlBuilder
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
-     * @param \Psr\Log\LoggerInterface $magelogger
      * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
      * @param \Sapient\Worldpay\Model\SavedTokenFactory $savecard
      * @param \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
@@ -96,7 +95,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         \Sapient\Worldpay\Helper\Registry $registryhelper,
         \Magento\Framework\UrlInterface $urlBuilder,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
-        \Psr\Log\LoggerInterface $magelogger,
         \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment,
         \Sapient\Worldpay\Model\SavedTokenFactory $savecard,
         \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
@@ -121,7 +119,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             $data
         );
         $this->_wplogger = $wplogger;
-        $this->magelogger = $magelogger;
         $this->directservice = $directservice;
         $this->paymentservicerequest = $paymentservicerequest;
         $this->redirectservice = $redirectservice;
@@ -216,8 +213,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         if ($method == 'worldpay_cc' || $method == 'worldpay_moto') {
             if (isset($paymentData['additional_data'])) {
                 $data = $paymentData['additional_data'];
-                if ($mode == 'redirect' && !isset($data['cc_type'])) {
-                    throw new Exception(__("Invalid Payment Type. Please Refresh and check again"), 1);
+                if ($mode == 'redirect') {
+                    if (!isset($data['cc_type'])) {
+                        throw new Exception(__("Invalid Payment Type. Please Refresh and check again"), 1);
+                    }
+                    if (isset($data['cc_number']) && $data['cc_number'] != null) {
+                        throw new Exception(__("Invalid Configuration. Please Refresh and check again"), 1);
+                    }
                 } elseif($mode == 'direct') {
                     if (!isset($data['cc_type'])) {
                         throw new Exception(__("Invalid Payment Type. Please Refresh and check again"), 1);

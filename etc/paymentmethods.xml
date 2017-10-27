@@ -17,6 +17,7 @@
                     <area>TH</area>
                 </areas>
                 <capture_request>0</capture_request>
+                <stop_auto_invoice>1</stop_auto_invoice>
             </CHINAUNIONPAY-SSL>
             <IDEAL-SSL>
                 <title>IDEAL</title>
@@ -112,6 +113,7 @@
                     <area>BR</area>
                 </areas>
                 <capture_request>0</capture_request>
+                <stop_auto_invoice>1</stop_auto_invoice>
             </BOLETO-SSL>
             <ALIPAY-SSL>
                 <title>AliPay</title>
@@ -141,6 +143,7 @@
                     <area>ES</area>
                 </areas>
                 <capture_request>0</capture_request>
+                <stop_auto_invoice>1</stop_auto_invoice>
             </SEPA_DIRECT_DEBIT-SSL>
              <KlARNA-SSL>
                 <title>Klarna (Redirect)</title>
@@ -168,7 +171,8 @@
                     <currency>NOK</currency>
                     <currency>SEK</currency>
                 </currencies>
-                <capture_request>1</capture_request>
+                <capture_request>0</capture_request>
+                <stop_auto_invoice>1</stop_auto_invoice>
             </KlARNA-SSL>
              <PRZELEWY-SSL>
                 <title>P24</title>

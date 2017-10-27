@@ -48,7 +48,7 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         StoreManagerInterface $storeManager,
         \Sapient\Worldpay\Model\Token\Service $tokenService,
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken,
-        \Magento\Framework\Message\ManagerInterface $messageManager,
+        //\Magento\Framework\Message\ManagerInterface $messageManager,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
     ) {
         parent::__construct($context);
@@ -58,7 +58,7 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         $this->customerSession = $customerSession;
         $this->_tokenService = $tokenService;
         $this->_worldpayToken = $worldpayToken;
-        $this->_messageManager = $messageManager;
+       // $this->_messageManager = $messageManager;
         $this->wplogger = $wplogger;
     }
 
@@ -97,11 +97,11 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
             if ($tokenUpdateResponse->isSuccess()) {
                 $this->_applyTokenUpdate();
             } else {
-                $this->_messageManager->addError(__('Error: the card has not been updated.'));
+                $this->messageManager->addError(__('Error: the card has not been updated.'));
                 $this->_redirect('*/savedcard/edit', array('id' => $this->_getTokenModel()->getId()));
                 return;
             }
-            $this->_messageManager->addSuccess(__('The card has been updated.'));
+            $this->messageManager->addSuccess(__('The card has been updated.'));
             $this->_redirect('*/savedcard');
             return;
         }

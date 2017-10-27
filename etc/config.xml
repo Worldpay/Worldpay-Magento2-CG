@@ -2,12 +2,9 @@
     <default>
         <worldpay>
              <general_config>
-                <enable_worldpay>1</enable_worldpay>
+                <enable_worldpay>0</enable_worldpay>
                 <environment_mode>Test Mode</environment_mode>
-                <test_url>https://secure-test.worldpay.com/jsp/merchant/xml/paymentService.jsp</test_url>
-                <merchant_code>SAPIENTNITROECOMMERCE</merchant_code>
-                <xml_username>PO2NVX4AEKN97YG42W0V</xml_username>
-                <xml_password>Sapient@123</xml_password>
+                <test_url>https://secure-test.worldpay.com/jsp/merchant/xml/paymentService.jsp</test_url>                
                 <enable_dynamic3DS>1</enable_dynamic3DS>
                 <enable_logging>1</enable_logging>
                 <payment_method_selection>radio</payment_method_selection>

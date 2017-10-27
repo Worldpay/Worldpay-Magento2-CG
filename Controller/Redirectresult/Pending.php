@@ -10,11 +10,11 @@ use Sapient\Worldpay\Model\Payment\StateResponse as PaymentStateResponse;
 
 /**
  * after deleting the card redirect to the pending page
- */ 
+ */
 class Pending extends \Magento\Framework\App\Action\Action
 {
-    /** 
-     * @var Magento\Framework\View\Result\PageFactory 
+    /**
+     * @var Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;
 
@@ -35,7 +35,7 @@ class Pending extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Checkout\Service $checkoutservice,
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-    ) { 
+    ) {
         $this->pageFactory = $pageFactory;
         $this->wplogger = $wplogger;
         $this->orderservice = $orderservice;
@@ -44,10 +44,13 @@ class Pending extends \Magento\Framework\App\Action\Action
         return parent::__construct($context);
 
     }
- 
+
     public function execute()
     {
         $this->wplogger->info('worldpay returned pending url');
+        if (!$this->orderservice->getAuthorisedOrder()) {
+            return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
+        }
         $order = $this->orderservice->getAuthorisedOrder();
         $magentoorder = $order->getOrder();
         $params = $this->getRequest()->getParams();
@@ -68,9 +71,9 @@ class Pending extends \Magento\Framework\App\Action\Action
         }
         $this->checkoutservice->clearSession();
         $this->orderservice->removeAuthorisedOrder();
-        return $this->pageFactory->create(); 
+        return $this->pageFactory->create();
     }
-    
+
     private function _applyPaymentUpdate($paymentState, $order)
     {
         try {

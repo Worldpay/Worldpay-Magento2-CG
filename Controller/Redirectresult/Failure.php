@@ -9,7 +9,7 @@ use Magento\Framework\App\Action\Context;
 
 /**
  * Redirect to the cart Page if order is failed
- */ 
+ */
 class Failure extends \Magento\Framework\App\Action\Action
 {
     /**
@@ -22,7 +22,7 @@ class Failure extends \Magento\Framework\App\Action\Action
      *
      * @param Context $context
      * @param PageFactory $pageFactory
-     * @param \Sapient\Worldpay\Model\Order\Service $orderservice   
+     * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      */
     public function __construct(
@@ -30,17 +30,20 @@ class Failure extends \Magento\Framework\App\Action\Action
         PageFactory $pageFactory,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-    ) { 
+    ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
         $this->wplogger = $wplogger;
         return parent::__construct($context);
 
     }
- 
+
     public function execute()
     {
         $this->wplogger->info('worldpay returned failure url');
+        if (!$this->orderservice->getAuthorisedOrder()) {
+            return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
+        }
         $order = $this->orderservice->getAuthorisedOrder();
         $magentoorder = $order->getOrder();
         $notice = $this->_getFailureNoticeForOrder($magentoorder);
@@ -51,5 +54,5 @@ class Failure extends \Magento\Framework\App\Action\Action
     private function _getFailureNoticeForOrder($order)
     {
         return __('Order #'.$order->getIncrementId().' Failed');
-    }    
+    }
 }

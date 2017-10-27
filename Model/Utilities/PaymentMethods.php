@@ -318,4 +318,31 @@ class PaymentMethods
 
         return !empty($matchingCountries);
     }
+
+
+     public function CheckStopAutoInvoice($code, $type)
+    {
+        if ($xml = $this->_readXML()) {
+             $node = $xml->xpath('/paymentMethods/' . $code . '/types/' . $type .'/stop_auto_invoice');
+             if($this->_autoInvoiceNodeExists($node) && $this->_getStopAutoInvoice($node[0]) == 1){
+                return true;
+             }else{
+                return false;
+             }
+
+        }
+        return false;
+    }
+
+     private function _autoInvoiceNodeExists($node)
+    {
+        return $node && sizeof($node);
+    }
+
+    private function _getStopAutoInvoice(\SimpleXMLElement $node)
+    {
+        $stopautoinvoice = (string) $node;
+        return $stopautoinvoice;
+    }
+
 }

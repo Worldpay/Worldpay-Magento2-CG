@@ -8,9 +8,9 @@ use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\Context;
 use Sapient\Worldpay\Model\Payment\StateResponse as PaymentStateResponse;
 
-/** 
+/**
  * if got notification to get cancel order from worldpay then redirect to  cart page and display the notice
- */ 
+ */
 
 class Cancel extends \Magento\Framework\App\Action\Action
 {
@@ -27,7 +27,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Model\Checkout\Service $checkoutservice
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
-     * @param \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice   
+     * @param \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      */
     public function __construct(
@@ -38,7 +38,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
         \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-    ) { 
+    ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
         $this->wplogger = $wplogger;
@@ -48,11 +48,14 @@ class Cancel extends \Magento\Framework\App\Action\Action
         return parent::__construct($context);
 
     }
- 
+
     public function execute()
     {
 
         $this->wplogger->info('worldpay returned cancel url');
+        if (!$this->orderservice->getAuthorisedOrder()) {
+            return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
+        }
         $order = $this->orderservice->getAuthorisedOrder();
         $magentoorder = $order->getOrder();
         $notice = $this->_getCancellationNoticeForOrder($magentoorder);
@@ -86,5 +89,5 @@ class Cancel extends \Magento\Framework\App\Action\Action
             $this->wplogger->error($e->getMessage());
         }
     }
-    
+
 }

@@ -1,5 +1,5 @@
 <style type="text/css">
-    .checkout-payment-method .cvv .saved-cvv-number {width: 55px;}    
+    .checkout-payment-method .cvv .control .saved-cvv-number {width: 55px;}
 </style>
     <!-- ko foreach: getSavedCardsList() -->
         <div class="field savecc">
@@ -27,7 +27,7 @@
           <label class="label" data-bind="attr: {for: getCode() + '_cc_cid'}">
               <span><!-- ko i18n: 'Card Verification Number'--><!-- /ko --></span>
           </label>
-           <div class="control">
+           <div class="control _with-tooltip">
               <input type="number"
                      autocomplete="off"
                      class="input-text cvv saved-cvv-number"
@@ -54,4 +54,4 @@
            <div class="mage-error" generated="true"  id="saved-cvv-error"></div>
       </div>
     <!-- /ko -->
- 
+

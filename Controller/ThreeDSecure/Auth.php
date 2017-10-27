@@ -19,21 +19,15 @@ class Auth extends \Magento\Framework\App\Action\Action
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Checkout\Model\Session $checkoutSession     
-     * @param \Magento\Framework\UrlInterface $urlBuilder     
-     * @param \Magento\Framework\Message\ManagerInterface $messageManager          
+     * @param \Magento\Checkout\Model\Session $checkoutSession                 
      */
     public function __construct(Context $context,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Framework\UrlInterface $urlBuilder,
-        \Magento\Framework\Message\ManagerInterface $messageManager
+        \Magento\Checkout\Model\Session $checkoutSession
     ) {
         $this->wplogger = $wplogger;
-        $this->urlBuilders    = $urlBuilder;
-        $this->checkoutSession = $checkoutSession;
-        $this->_messageManager = $messageManager;
+        $this->checkoutSession = $checkoutSession;      
         $this->_resultPageFactory = $resultPageFactory;
         parent::__construct($context);
     }
@@ -48,7 +42,7 @@ class Auth extends \Magento\Framework\App\Action\Action
             echo '
                 <form name="theForm" id="form" method="POST" action='.$redirectData->getUrl().'>
                     <input type="hidden" name="PaReq" value='.$redirectData->getPaRequest().' />
-                    <input type="hidden" name="TermUrl" value='.$this->urlBuilders->getUrl('worldpay/threedsecure/authresponse', ['_secure' => true]).' />
+                    <input type="hidden" name="TermUrl" value='.$this->_url->getUrl('worldpay/threedsecure/authresponse', ['_secure' => true]).' />
                 </form>';
             echo '
                 <script language="Javascript">
@@ -58,8 +52,8 @@ class Auth extends \Magento\Framework\App\Action\Action
             $this->checkoutSession->unsThreeDSEnabledWithError();
             return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success', ['_current' => true]);
         } else {
-            $this->_messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));
-            $this->getResponse()->setRedirect($this->urlBuilders->getUrl('checkout/cart', ['_secure' => true]));
+            $this->messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));
+            $this->getResponse()->setRedirect($this->_url->getUrl('checkout/cart', ['_secure' => true]));
         }
     }
 }

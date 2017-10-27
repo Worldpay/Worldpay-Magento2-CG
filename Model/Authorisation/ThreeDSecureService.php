@@ -112,7 +112,9 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
             $tokenData = $xmlResponseData->reply->orderStatus->token;
             $paymentData = $xmlResponseData->reply->orderStatus->payment;
             $merchantCode = $xmlResponseData['merchantCode'];
-            $this->updateWorldPayPayment->create()->saveTokenData($tokenData, $paymentData, $merchantCode);
+            if ($tokenData) {
+                $this->updateWorldPayPayment->create()->saveTokenData($tokenData, $paymentData, $merchantCode);
+            }
             $this->customerSession->unsIsSavedCardRequested();
         }
     }

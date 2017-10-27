@@ -69,6 +69,11 @@ class Order
         return $this->getOrder()->getPayment()->getMethod();
     }
 
+    public function getPaymentType()
+    {
+        return $this->getWorldPayPayment()->getPaymentType();
+    }
+
     /**
      * Set order status as processing    
      */
@@ -179,11 +184,11 @@ class Order
     {
         $mageOrder = $this->getOrder();
         $mageOrder->setState(
-            \Magento\Sales\Model\Order::STATE_PENDING_PAYMENT,
+            \Magento\Sales\Model\Order::STATE_NEW,
             true,
             'Customer authentication successful. Pending funds transfer confirmation from the gateway.'
         );
-        $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
+        $mageOrder->setStatus('pending');
         $mageOrder->save();
     }
 
