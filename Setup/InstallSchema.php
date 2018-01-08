@@ -11,14 +11,18 @@ use Magento\Framework\DB\Ddl\Table;
 
 class InstallSchema implements InstallSchemaInterface {
 
+    const WORLDPAY_PAYMENT = 'worldpay_payment';
+    const WORLDPAY_TOKEN = 'worldpay_token';
+    const WORLDPAY_RECURRING = 'worldpay_recurring';
+
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $installer = $setup;
         $installer->startSetup();
 
-        if (!$installer->tableExists('worldpay_payment')) {
+        if (!$installer->tableExists(self::WORLDPAY_PAYMENT)) {
             $table = $installer->getConnection()->newTable(
-                $installer->getTable('worldpay_payment')
+                $installer->getTable(self::WORLDPAY_PAYMENT)
             )
             ->addColumn(
                 'id',
@@ -166,11 +170,11 @@ class InstallSchema implements InstallSchemaInterface {
                 'Risk Provider Final'
             )
             ->addIndex(
-                $installer->getIdxName('worldpay_payment', ['order_id']),
+                $installer->getIdxName(self::WORLDPAY_PAYMENT, ['order_id']),
                 ['order_id']
             )
             ->addIndex(
-                $installer->getIdxName('worldpay_payment', ['worldpay_order_id']),
+                $installer->getIdxName(self::WORLDPAY_PAYMENT, ['worldpay_order_id']),
                 ['worldpay_order_id']
             )
 
@@ -181,9 +185,9 @@ class InstallSchema implements InstallSchemaInterface {
             $installer->getConnection()->createTable($table);
         }
 
-        if (!$installer->tableExists('worldpay_recurring')) {
+        if (!$installer->tableExists(self::WORLDPAY_RECURRING)) {
             $table = $installer->getConnection()->newTable(
-                $installer->getTable('worldpay_recurring')
+                $installer->getTable(self::WORLDPAY_RECURRING)
             )
             ->addColumn(
                 'id',
@@ -236,9 +240,9 @@ class InstallSchema implements InstallSchemaInterface {
         /*
         *Token store
         */
-        if (!$installer->tableExists('worldpay_token')) {
+        if (!$installer->tableExists(self::WORLDPAY_TOKEN)) {
             $table = $installer->getConnection()->newTable(
-                $installer->getTable('worldpay_token')
+                $installer->getTable(self::WORLDPAY_TOKEN)
             )
             ->addColumn(
                 'id',
@@ -364,12 +368,12 @@ class InstallSchema implements InstallSchemaInterface {
                 'Created At'
                 )
             ->addIndex(
-                $installer->getIdxName('worldpay_token', ['token_code']),
+                $installer->getIdxName(self::WORLDPAY_TOKEN, ['token_code']),
                 ['token_code'],
                  \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
                 )
             ->addIndex(
-                $installer->getIdxName('worldpay_token', ['customer_id']),
+                $installer->getIdxName(self::WORLDPAY_TOKEN, ['customer_id']),
                 ['customer_id'],
                  \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
                 )

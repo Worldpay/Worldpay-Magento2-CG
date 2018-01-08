@@ -48,7 +48,6 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         StoreManagerInterface $storeManager,
         \Sapient\Worldpay\Model\Token\Service $tokenService,
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken,
-        //\Magento\Framework\Message\ManagerInterface $messageManager,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
     ) {
         parent::__construct($context);
@@ -58,7 +57,6 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         $this->customerSession = $customerSession;
         $this->_tokenService = $tokenService;
         $this->_worldpayToken = $worldpayToken;
-       // $this->_messageManager = $messageManager;
         $this->wplogger = $wplogger;
     }
 

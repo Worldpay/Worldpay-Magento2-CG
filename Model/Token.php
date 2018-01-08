@@ -4,7 +4,7 @@
  */
 namespace Sapient\Worldpay\Model;
 
-/** 
+/**
  *  processing the Request of saved card
  */
 class Token
@@ -24,7 +24,7 @@ class Token
      *
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
-     * @param \Sapient\Worldpay\Model\Request $request   
+     * @param \Sapient\Worldpay\Model\Request $request
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -40,8 +40,8 @@ class Token
       * Process the request for Saved Card
       *
       * @param array $customerData
-      * @param array $paymentData   
-      * @return SimpleXMLElement 
+      * @param array $paymentData
+      * @return SimpleXMLElement
       */
     public function getPaymentToken($customerData, $paymentData)
     {
@@ -88,7 +88,6 @@ class Token
      */
     private function _getPaymentDetails($paymentDetails)
     {
-        $method = $paymentDetails['method'];
         if (isset($paymentDetails['encryptedData'])) {
             $details = array(
                 'encryptedData' => $paymentDetails['encryptedData']
@@ -123,12 +122,12 @@ class Token
         $this->_checkForError($response);
         return $response;
     }
-    
+
     /**
      * Check error while processing the request
      *
      * @param SimpleXMLElement $xml
-     * @throws Exception 
+     * @throws Exception
      */
     protected function _checkForError($response)
     {

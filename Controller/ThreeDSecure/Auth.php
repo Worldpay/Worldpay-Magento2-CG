@@ -19,7 +19,7 @@ class Auth extends \Magento\Framework\App\Action\Action
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
-     * @param \Magento\Checkout\Model\Session $checkoutSession                 
+     * @param \Magento\Checkout\Model\Session $checkoutSession
      */
     public function __construct(Context $context,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -27,7 +27,7 @@ class Auth extends \Magento\Framework\App\Action\Action
         \Magento\Checkout\Model\Session $checkoutSession
     ) {
         $this->wplogger = $wplogger;
-        $this->checkoutSession = $checkoutSession;      
+        $this->checkoutSession = $checkoutSession;
         $this->_resultPageFactory = $resultPageFactory;
         parent::__construct($context);
     }
@@ -48,12 +48,8 @@ class Auth extends \Magento\Framework\App\Action\Action
                 <script language="Javascript">
                     document.getElementById("form").submit();
                 </script>';
-        } else if ($this->checkoutSession->getThreeDSEnabledWithError()) {
-            $this->checkoutSession->unsThreeDSEnabledWithError();
-            return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success', ['_current' => true]);
         } else {
-            $this->messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));
-            $this->getResponse()->setRedirect($this->_url->getUrl('checkout/cart', ['_secure' => true]));
+            return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success', ['_current' => true]);
         }
     }
 }

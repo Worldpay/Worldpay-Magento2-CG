@@ -7,17 +7,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
 	protected $_scopeConfig;
 	protected $wplogger;
+	const MERCHANT_CONFIG = 'worldpay/merchant_config/';
+	const INTEGRATION_MODE = 'worldpay/cc_config/integration_mode';
+
 	public function __construct(
 		\Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
 		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
 		\Magento\Framework\Locale\CurrencyInterface $localeCurrency,
-		\Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist
+		\Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist,
+		\Sapient\Worldpay\Helper\Merchantprofile $merchantprofile
 	)
 	{
 		$this->_scopeConfig = $scopeConfig;
 		$this->wplogger = $wplogger;
 		$this->paymentlist = $paymentlist;
 		$this->localecurrency = $localeCurrency;
+		$this->merchantprofile = $merchantprofile;
 	}
 	public function isWorldPayEnable()
 	{
@@ -38,29 +43,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	}
 	public function getMerchantCode($paymentType)
 	{
-		$type = str_replace('-', '', str_replace('-SSL', '', $paymentType));
-		$merchantCodeValue = explode(',', $this->_scopeConfig->getValue('worldpay/merchant_config/'.$type, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
-		if (is_array($merchantCodeValue) && !empty($merchantCodeValue[0])) {
-			return $merchantCodeValue[0];
+		$merchat_detail=$this->merchantprofile->getConfigValue($paymentType);
+		$merchantCodeValue = $merchat_detail['merchant_code'];
+		if (!empty($merchantCodeValue)) {
+			return $merchantCodeValue;
 		}
 		return  $this->_scopeConfig->getValue('worldpay/general_config/merchant_code', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 	}
 	public function getXmlUsername($paymentType)
 	{
-		$type = str_replace('-', '', str_replace('-SSL', '', $paymentType));
-		$merchantCodeValue = explode(',', $this->_scopeConfig->getValue('worldpay/merchant_config/'.$type, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
-		if (is_array($merchantCodeValue) && !empty($merchantCodeValue[1])) {
-			return $merchantCodeValue[1];
-
+		$merchat_detail=$this->merchantprofile->getConfigValue($paymentType);
+		$merchantCodeValue = $merchat_detail['merchant_username'];
+		if (!empty($merchantCodeValue)) {
+			return $merchantCodeValue;
 		}
 		return  $this->_scopeConfig->getValue('worldpay/general_config/xml_username', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 	}
 	public function getXmlPassword($paymentType)
 	{
-		$type = str_replace('-', '', str_replace('-SSL', '', $paymentType));
-		$merchantCodeValue = explode(',', $this->_scopeConfig->getValue('worldpay/merchant_config/'.$type, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
-		if (is_array($merchantCodeValue) && !empty($merchantCodeValue[2])) {
-			return $merchantCodeValue[2];
+		$merchat_detail=$this->merchantprofile->getConfigValue($paymentType);
+		$merchantCodeValue = $merchat_detail['merchant_password'];
+		if (!empty($merchantCodeValue)) {
+			return $merchantCodeValue;
 		}
 		return  $this->_scopeConfig->getValue('worldpay/general_config/xml_password', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 	}
@@ -86,6 +90,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	{
 		return (bool) $this->_scopeConfig->getValue('worldpay/general_config/enable_logging', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 	}
+	public function isMotoEnabled()
+	{
+		return (bool) $this->_scopeConfig->getValue('worldpay/moto_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+	}
 	public function isCreditCardEnabled()
 	{
 		return (bool) $this->_scopeConfig->getValue('worldpay/cc_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
@@ -94,7 +102,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	{
 		return  $this->_scopeConfig->getValue('worldpay/cc_config/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 	}
-	public function getCcTypes()
+	public function getCcTypes($paymentconfig = "cc_config")
 	{
 		$allCcMethods =  array(
 			'AMEX-SSL'=>'American Express','VISA-SSL'=>'Visa',
@@ -105,7 +113,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 			'GECAPITAL-SSL'=>'GE Capital','JCB-SSL'=>'Japanese Credit Bank',
 			'LASER-SSL'=>'Laser Card','UATP-SSL'=>'UATP',
 		);
-		$configMethods =   explode(',', $this->_scopeConfig->getValue('worldpay/cc_config/paymentmethods', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+		$configMethods =   explode(',', $this->_scopeConfig->getValue('worldpay/'.$paymentconfig.'/paymentmethods', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
 		$activeMethods = [];
 		foreach ($configMethods as  $method ) {
 			$activeMethods[$method] = $allCcMethods[$method];
@@ -151,7 +159,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	}
 	public function getCcIntegrationMode()
 	{
-		return  $this->_scopeConfig->getValue('worldpay/cc_config/integration_mode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+		return  $this->_scopeConfig->getValue(self::INTEGRATION_MODE, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 	}
 	public function getSaveCard()
 	{
@@ -182,14 +190,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
 	public function getIntegrationModelByPaymentMethodCode($paymentMethodCode, $storeId)
 	{
-		switch ($paymentMethodCode) {
-			case 'worldpay_cc':
-				return $this->_scopeConfig->getValue('worldpay/cc_config/integration_mode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-			case 'worldpay_moto':
-				return $this->_scopeConfig->getValue('worldpay/cc_config/integration_mode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-			default:
-				return 'redirect';
+
+		if($paymentMethodCode == 'worldpay_cc' || $paymentMethodCode == 'worldpay_moto'){
+			return $this->_scopeConfig->getValue(self::INTEGRATION_MODE, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+		}else{
+			return 'redirect';
 		}
+
 	}
 
 	public function isIframeIntegration($storeId = null)
@@ -284,5 +291,5 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	 }
 
 }
-	 
+
 

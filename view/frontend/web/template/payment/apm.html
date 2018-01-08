@@ -10,19 +10,30 @@
     <div class="payment-method-content">
 
         <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
+            <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
             <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
                 <!-- ko if: (paymentMethodSelection()=='radio')-->
-
+                
                     <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
-
-                        <input type="radio"  data-bind="attr: {'value': item.value, 'data-validate': JSON.stringify({
+                    
+                        <input type="radio"  data-bind="event:{ change: $parent.checkPaymentTypes },attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
                                         'validate-one-required-by-name':true
-                                                })}" name="apm_type" />
-                        <label><!-- ko text: item.type --><!-- /ko --></label>
-
-                    <!--/ko-->
-
+                                                }),id: 'apm_' + item.ccValue}" name="apm_type" />
+                       <!--ko if: $parent.getIcons(item.ccValue) -->
+                            <label data-bind="attr: {for: 'apm_' + item.ccValue}"><img data-bind="attr: {
+                                        'src': $parent.getIcons(item.ccValue).url,
+                                        'alt': item.ccLabel,
+                                        'width': $parent.getIcons(item.ccValue).width,
+                                        'height': $parent.getIcons(item.ccValue).height
+                                        }"></label>
+                        <!--/ko-->
+                        <!--ko ifnot: $parent.getIcons(item.ccValue) -->
+                            <label data-bind="attr: {for: 'apm_' + item.ccValue}"><!-- ko text: item.ccLabel --><!-- /ko --></label>
+                        <!--/ko-->
+                    
                 <!--/ko-->
+                
+            <!-- /ko -->
                 <!-- ko if: (paymentMethodSelection()=='dropdown')-->
                     <select name="apm_type" class="select select-ccytpe"
                                             data-bind="
@@ -31,10 +42,23 @@
                                            optionsText: 'ccLabel',
                                            value: selectedCCType,
                                             optionsValue: 'ccValue',
-                                           optionsCaption: 'Select Your Payment Method'"></select>
+                                           optionsCaption: 'Select Your Payment Method',
+                                           event:{ change: checkPaymentTypes }"></select>
                 <!--/ko-->
 
             </div>
+            <div class="field type required ideal-block" data-bind="visible: false">
+            <select name="ideal_bank" class="select select-ccytpe" disabled
+                    data-bind="attr: {id: 'ideal_bank', 'data-validate': JSON.stringify({required:true})},
+                               options: getIdealBankList(),
+                               optionsText: 'bankText',
+                               value: selectedIdealBank,
+                               optionsValue: 'bankCode',
+                               optionsCaption: 'Select Your Bank'">
+            </select>
+        </div>
+        <div class="field"></div>
+        </fieldset>
         </form>
 
         <!-- ko foreach: getRegion('messages') -->

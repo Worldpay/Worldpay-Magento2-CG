@@ -1,6 +1,3 @@
-<style type="text/css">
-    .checkout-payment-method .cvv .control .saved-cvv-number {width: 55px;}
-</style>
     <!-- ko foreach: getSavedCardsList() -->
         <div class="field savecc">
             <div class="control">
@@ -16,7 +13,15 @@
                    "/>
                 <input type="hidden" name="card-type" id="card-type" data-bind="value: card_brand">
                 <label class="label" for="wp_save_card" data-bind='attr: {for: "saved_card_" + id}'>
-                <span data-bind="text: card_brand"></span> <span data-bind="text: card_number"></span> <span data-bind="text: card_expiry_month"></span><span data-bind="i18n: '/'"></span><span data-bind="text: card_expiry_year"></span>
+                <!--ko if: $parent.getIcons(method) -->
+                        <img data-bind="attr: {
+                                    'src': $parent.getIcons(method).url,
+                                    'alt': method,
+                                    'width': $parent.getIcons(method).width,
+                                    'height': $parent.getIcons(method).height
+                                    }">
+                  <!--/ko-->
+                  <span data-bind="text: card_number"></span>, <span data-bind="text: card_expiry_month"></span><span data-bind="i18n: '/'"></span><span data-bind="text: card_expiry_year"></span>
                 </label>
             </div>
        </div>

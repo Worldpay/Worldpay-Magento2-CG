@@ -34,6 +34,8 @@ class Factory
         RequestInterface $request,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
+        \Magento\Sales\Model\Order $mageOrder,
         $services = array()
     ) {
         $this->scopeConfig = $scopeConfig;
@@ -41,6 +43,8 @@ class Factory
         $this->request = $request;
         $this->wplogger = $wplogger;
         $this->worldpayhelper = $worldpayhelper;
+        $this->quoteRepository = $quoteRepository;
+        $this->mageorder = $mageOrder;
         if (isset($services['store']) && $services['store'] instanceof StoreManagerInterface) {
             $this->store = $services['store'];
         } else {
@@ -58,16 +62,25 @@ class Factory
      */
     public function create($javascriptObjectVariable, $containerId)
     {
-        list($language, $country) = explode('_', $this->scopeConfig->getValue('general/locale/code'));
+        $parts = parse_url($this->state->getRedirectUrl());
+        parse_str($parts['query'], $orderparams);
+        $orderkey = $orderparams['OrderKey'];
+        $magentoincrementid = $this->_extractOrderId($orderkey);
+        $mageOrder = $this->mageorder->loadByIncrementId($magentoincrementid);
+        $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
+        
+        $country = $this->_getCountryForQuote($quote);
+        $language = $this->_getLanguageForLocale();
 
         $params = array('_secure' => $this->request->isSecure());
         $helperhtml = $this->assetRepo->getUrlWithParams('Sapient_Worldpay::helper.html', $params);
+        $iframeurl = 'worldpay/redirectresult/iframe';
         $urlConfig = new UrlConfig(
-            $this->store->getUrl('worldpay/redirectresult/iframe', array('status' => 'success')),
-            $this->store->getUrl('worldpay/redirectresult/iframe', array('status' => 'cancel')),
-            $this->store->getUrl('worldpay/redirectresult/iframe', array('status' => 'pending')),
-            $this->store->getUrl('worldpay/redirectresult/iframe', array('status' => 'error')),
-            $this->store->getUrl('worldpay/redirectresult/iframe', array('status' => 'failure'))
+            $this->store->getUrl($iframeurl, array('status' => 'success')),
+            $this->store->getUrl($iframeurl, array('status' => 'cancel')),
+            $this->store->getUrl($iframeurl, array('status' => 'pending')),
+            $this->store->getUrl($iframeurl, array('status' => 'error')),
+            $this->store->getUrl($iframeurl, array('status' => 'failure'))
         );
       
         return new Config(
@@ -82,5 +95,35 @@ class Factory
             strtolower($country)
         );
     }
+
+    private function _getCountryForQuote($quote)
+    {
+        $address = $quote->getBillingAddress();
+        if ($address->getId()) {
+            return $address->getCountry();
+        }
+
+        return $this->worldpayhelper->getDefaultCountry();
+    }
+
+    private function _getLanguageForLocale()
+    {
+        $locale = $this->worldpayhelper->getLocaleDefault();
+        if (substr($locale, 3, 2) == 'NO') {
+            return 'no';
+        }
+        return substr($locale, 0, 2); 
+    
+    }
+
+     private static function _extractOrderId($orderKey)
+    {
+        $array = explode('^', $orderKey);
+        $ordercode = end($array);
+        $ordercodearray = explode('-', $ordercode);
+        return reset($ordercodearray);
+    }
+
+ 
 
 }

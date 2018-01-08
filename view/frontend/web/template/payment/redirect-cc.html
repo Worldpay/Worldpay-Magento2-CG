@@ -10,22 +10,35 @@
     <div class="payment-method-content">
 
         <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
-           <div class="payment-method-cc-form">
+           <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
             <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
                 <!-- ko if: (paymentMethodSelection()=='radio')-->
+               
                     <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
-
-                        <input type="radio"  data-bind="event:{ change: $parent.loadEventAction }, attr: {'value': item.value, 'data-validate': JSON.stringify({
+                   
+                        <input type="radio"  data-bind="event:{ change: $parent.loadEventAction }, attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
                                         'validate-one-required-by-name':true
-                                                })}" name="payment[cc_type]" />
-                        <label><!-- ko text: item.type --><!-- /ko --></label>
+                                                }),id: 'redirect_cc_' + item.ccValue}" name="payment[cc_type]" />
+                        <!--ko if: $parent.getIcons(item.ccValue) -->
+                            <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}"><img data-bind="attr: {
+                                    'src': $parent.getIcons(item.ccValue).url,
+                                    'alt': item.ccLabel,
+                                    'width': $parent.getIcons(item.ccValue).width,
+                                    'height': $parent.getIcons(item.ccValue).height
+                                    }"></label>
+                        <!--/ko-->
+                    <!--ko if: item.ccValue=='savedcard' -->
+                        <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}"><!-- ko i18n: 'Saved Cards'--><!-- /ko --></label>
                     <!--/ko-->
+                   
                 <!--/ko-->
+               
+            <!-- /ko -->
                 <!-- ko if: (paymentMethodSelection()=='dropdown')-->
                         <select name="payment[cc_type]" class="select select-ccytpe"
                         data-bind="
                        attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type',
-                       'data-validate': JSON.stringify({required:true})}, 
+                       'data-validate': JSON.stringify({required:true})},
                        options: availableCCTypes(),
                        optionsText: 'ccLabel',
                        value: selectedCCType,
@@ -47,7 +60,7 @@
                 </div>
              <!-- /ko -->
                  <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
-             <!-- ko if: (getSavedCardsList().length > 0)-->
+             <!-- ko if: (getSavedCardsCount() > 0)-->
                 <fieldset class="fieldset payment items ccard worldpay_cc" id="payment_form_worldpay_cc">
                 <hr>
                     <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
@@ -55,7 +68,7 @@
                 </fieldset>
             <!-- /ko -->
             </div>
-            </div>
+            </fieldset>
         </form>
 
         <!-- ko foreach: getRegion('messages') -->

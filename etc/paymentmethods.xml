@@ -24,6 +24,35 @@
                 <areas>
                     <area>NL</area>
                 </areas>
+                <banks>
+                    <bank>
+                        <code>ING</code><value>ING</value>
+                    </bank>
+                    <bank>
+                        <code>ABN_AMRO</code><value>ABN AMRO</value>
+                    </bank>
+                    <bank>
+                        <code>ASN</code><value>ASN</value>
+                    </bank>
+                    <bank>
+                        <code>RABOBANK</code><value>Rabo Bank</value>
+                    </bank>
+                    <bank>
+                        <code>SNS</code><value>SNS</value>
+                    </bank>
+                    <bank>
+                        <code>SNS_REGIO</code><value>SNS Regio</value>
+                    </bank>
+                    <bank>
+                        <code>TRIODOS</code><value>Triodos</value>
+                    </bank>
+                    <bank>
+                        <code>VAN_LANSCHOT</code><value>Van Lanschot</value>
+                    </bank>
+                    <bank>
+                        <code>KNAB</code><value>Knab</value>
+                    </bank>
+                </banks>
                 <capture_request>0</capture_request>
             </IDEAL-SSL>
             <PAYPAL-EXPRESS>

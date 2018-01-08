@@ -53,9 +53,6 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         } catch (Exception $e) {
             $this->wplogger->error($e->getMessage());
             $this->wplogger->error('3DS Failed');
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __($e->getMessage())
-            );
             $this->_messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));
             $this->getResponse()->setRedirect($this->urlBuilders->getUrl('checkout/cart', ['_secure' => true]));
         }

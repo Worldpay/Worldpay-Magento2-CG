@@ -30,8 +30,9 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     
     public static function createFromCancelledResponse($params)
     {
-        $orderCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractOrderCode($params['orderKey']);
-        $merchantCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractMerchantCode($params['orderKey']);
+        $orderkey = $params['orderKey'];
+        $orderCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractOrderCode($orderkey);
+        $merchantCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractMerchantCode($orderkey);
 
         return new self(
             $orderCode,
@@ -43,8 +44,9 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
 
     public static function createFromPendingResponse($params)
     {
-        $orderCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractOrderCode($params['orderKey']);
-        $merchantCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractMerchantCode($params['orderKey']);
+        $orderkey = $params['orderKey'];
+        $orderCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractOrderCode($orderkey);
+        $merchantCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractMerchantCode($orderkey);
 
         return new self(
             $orderCode,

@@ -66,7 +66,20 @@ class RedirectService extends \Magento\Framework\DataObject
             );
 
             $response = $this->paymentservicerequest->redirectKlarnaOrder($redirectOrderParams);
-       }else{
+       }else if(!empty($paymentDetails['additional_data']['cc_bank']) && $paymentDetails['additional_data']['cc_type'] == 'IDEAL-SSL'){
+                $callbackurl = $this->redirectresponse->getCallBackUrl();
+                $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
+                $orderCode,
+                $quote,
+                $orderStoreId,
+                $paymentDetails
+            );
+                $redirectOrderParams['cc_bank'] = $paymentDetails['additional_data']['cc_bank'];
+                $redirectOrderParams['callbackurl'] = $callbackurl;
+
+            $response = $this->paymentservicerequest->DirectIdealOrder($redirectOrderParams);
+       }
+       else{
             $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
                 $orderCode,
                 $quote,

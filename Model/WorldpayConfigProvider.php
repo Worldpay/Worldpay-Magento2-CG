@@ -9,6 +9,9 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Sapient\Worldpay\Model\PaymentMethods\CreditCards as WorldPayCCPayment;
 use Magento\Checkout\Model\Cart;
 use Sapient\Worldpay\Model\SavedTokenFactory;
+use Magento\Framework\View\Asset\Repository;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\View\Asset\Source;
 
 /**
  * Configuration provider for worldpayment rendering payment page.
@@ -22,6 +25,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         'worldpay_cc',
         'worldpay_apm'
     ];
+
+    /**
+     * @var array
+     */
+    private $icons = [];
 
     /**
      * @var \Magento\Payment\Model\Method\AbstractMethod[]
@@ -64,7 +72,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Backend\Model\Session\Quote $adminquotesession,
         SavedTokenFactory $savedTokenFactory,
-        \Magento\Backend\Model\Auth\Session $backendAuthSession
+        \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentmethodutils,
+        \Magento\Backend\Model\Auth\Session $backendAuthSession,
+        Repository $assetRepo,
+        RequestInterface $request,
+        Source $assetSource
         ) {
             foreach ($this->methodCodes as $code) {
                 $this->methods[$code] = $paymentHelper->getMethodInstance($code);
@@ -76,7 +88,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
             $this->customerSession = $customerSession;
             $this->backendAuthSession = $backendAuthSession;
             $this->adminquotesession = $adminquotesession;
+            $this->paymentmethodutils = $paymentmethodutils;
             $this->savedTokenFactory = $savedTokenFactory;
+            $this->assetRepo = $assetRepo;
+            $this->request = $request;
+            $this->assetSource = $assetSource;
     }
 
     /**
@@ -85,6 +101,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     public function getConfig()
     {
         $config = [];
+        $params = array('_secure' => $this->request->isSecure());
         foreach ($this->methodCodes as $code) {
             if ($this->methods[$code]->isAvailable()) {
                 $config['payment']['total'] = $this->cart->getQuote()->getGrandTotal();
@@ -98,7 +115,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']["hasSsCardType"][$code] = false;
                 $config['payment']['ccform']["months"][$code] = $this->getMonths();
                 $config['payment']['ccform']["years"][$code] = $this->getYears();
-                $config['payment']['ccform']["cvvImageUrl"][$code] = "http://".$_SERVER['SERVER_NAME']."/pub/static/frontend/Magento/luma/es_MX/Magento_Checkout/cvv.png";
+                $config['payment']['ccform']["cvvImageUrl"][$code] = $this->assetRepo->getUrlWithParams('Sapient_Worldpay::images/cc/cvv.png', $params);
                 $config['payment']['ccform']["ssStartYears"][$code] = $this->getStartYears();
                 $config['payment']['ccform']['intigrationmode'] = $this->getIntigrationMode();
                 $config['payment']['ccform']['cctitle'] = $this->getCCtitle();
@@ -114,11 +131,15 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['saveCardAllowed'] = $this->worldpayHelper->getSaveCard();
                 $config['payment']['ccform']['apmtitle'] = $this->getApmtitle();
                 $config['payment']['ccform']['paymentMethodSelection'] = $this->getPaymentMethodSelection();
+                $config['payment']['ccform']['paymentTypeCountries'] = $this->paymentmethodutils->getPaymentTypeCountries();
+                $config['payment']['ccform']['savedCardCount'] = count($this->getSaveCardList());
+                $config['payment']['ccform']['apmIdealBanks'] = $this->getApmIdealBankList();
+                $config['payment']['ccform']['wpicons'] = $this->getIcons();
             }
         }
         return $config;
     }
-     
+
     /**
      * Get Saved card List of customer
      */
@@ -154,9 +175,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     /**
      * @return Array
      */
-    public function getCcTypes()
+    public function getCcTypes($paymentconfig = "cc_config")
     {
-        $options = $this->worldpayHelper->getCcTypes();
+        $options = $this->worldpayHelper->getCcTypes($paymentconfig);
         if (!empty($this->getSaveCardList()) || !empty($this->getSaveCardListForAdminOrder($this->adminquotesession->getCustomerId()))) {
              $options['savedcard'] = 'Use Saved Card';
         }
@@ -223,7 +244,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $this->worldpayHelper->getCcTitle();
     }
 
-    /**     
+    /**
      * @return String
      */
     public function getApmtitle()
@@ -231,7 +252,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $this->worldpayHelper->getApmTitle();
     }
 
-    /**     
+    /**
      * @return boolean
      */
     public function getCvcRequired()
@@ -239,7 +260,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $this->worldpayHelper->isCcRequireCVC();
     }
 
-    /**     
+    /**
      * @return string
      */
     public function getPaymentMethodSelection()
@@ -247,7 +268,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $this->worldpayHelper->getPaymentMethodSelection();
     }
 
-    /**     
+    /**
      * @return string
      */
     public function getSaveCardListForAdminOrder($customer)
@@ -258,6 +279,52 @@ class WorldpayConfigProvider implements ConfigProviderInterface
            ->addFieldToFilter('customer_id', $customer)->getData();
         }
         return $savedCardsList;
+    }
+    public function getApmIdealBankList(){
+        $apmPaymentTypes = $this->getApmTypes('worldpay_apm');
+        if (array_key_exists("IDEAL-SSL",$apmPaymentTypes)) {
+            $data = $this->paymentmethodutils->idealBanks();
+            return $data;
+        }
+        return array();
+    }
+
+    public function getIcons()
+    {
+        if (!empty($this->icons)) {
+            return $this->icons;
+        }
+
+        $types = $this->worldpayHelper->getCcTypes();
+        $apmTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
+        $allTypePayments = array_unique (array_merge ($types, $apmTypes));
+        foreach (array_keys($allTypePayments) as $code) {
+            if (!array_key_exists($code, $this->icons)) {
+                $asset = $this->createAsset('Sapient_Worldpay::images/cc/' . strtolower($code) . '.png');
+                $placeholder = $this->assetSource->findSource($asset);
+                if ($placeholder) {
+                    list($width, $height) = getimagesize($asset->getSourceFile());
+                    $this->icons[$code] = [
+                        'url' => $asset->getUrl(),
+                        'width' => $width,
+                        'height' => $height
+                    ];
+                }
+            }
+        }
+        return $this->icons;
+    }
+    /**
+     * Create a file asset that's subject of fallback system
+     *
+     * @param string $fileId
+     * @param array $params
+     * @return \Magento\Framework\View\Asset\File
+     */
+    public function createAsset($fileId, array $params = [])
+    {
+        $params = array_merge(['_secure' => $this->request->isSecure()], $params);
+        return $this->assetRepo->createAsset($fileId, $params);
     }
 
 }

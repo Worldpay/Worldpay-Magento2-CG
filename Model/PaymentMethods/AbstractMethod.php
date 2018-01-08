@@ -43,7 +43,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     const REDIRECT_MODEL = 'redirect';
     const RECURRING_MODEL = 'recurring';
     const DIRECT_MODEL = 'direct';
-
+    const WORLDPAY_CC_TYPE = 'worldpay_cc';
+    const WORLDPAY_APM_TYPE = 'worldpay_apm';
+    const WORLDPAY_MOTO_TYPE = 'worldpay_moto';
     /**
      * Constructor
      *
@@ -72,6 +74,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @param \Sapient\Worldpay\Model\Response\AdminhtmlResponse $adminhtmlresponse
      * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
      * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentutils
+     * @param \Magento\Backend\Model\Auth\Session $authSession
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
@@ -102,6 +105,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         \Sapient\Worldpay\Model\Response\AdminhtmlResponse $adminhtmlresponse,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
         \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentutils,
+        \Sapient\Worldpay\Model\Payment\PaymentTypes $paymenttypes,
+        \Magento\Backend\Model\Auth\Session $authSession,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
@@ -135,7 +140,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->paymentutils = $paymentutils;
         $this->adminsessionquote = $adminsessionquote;
         $this->_savecard = $savecard;
+        $this->authSession = $authSession;
         $this->motoredirectservice = $motoredirectservice;
+        $this->paymenttypes = $paymenttypes;
 
     }
     public function initialize($paymentAction, $stateObject)
@@ -153,11 +160,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $stateObject->setIsNotified(false);
     }
 
-    private function _formatAmount($amount, $asFloat = false)
-    {
-        $amount = round($amount);
-        return !$asFloat ? (string) $amount : $amount;
-    }
     /**
      * Authorize payment abstract method
      *
@@ -174,9 +176,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
 
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
-        $adminquote = $this->adminsessionquote->getQuote();
-        if(empty($quote->getReservedOrderId()) && !empty($adminquote->getReservedOrderId())){
-            $quote = $adminquote;
+        if($this->authSession->isLoggedIn()) {
+            $adminquote = $this->adminsessionquote->getQuote();
+            if(empty($quote->getReservedOrderId()) && !empty($adminquote->getReservedOrderId())){
+                $quote = $adminquote;
+            }
         }
 
         $orderCode = $this->_generateOrderCode($quote);
@@ -210,38 +214,41 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     public function validatePaymentData($paymentData){
         $mode = $this->worlpayhelper->getCcIntegrationMode();
         $method = $paymentData['method'];
-        if ($method == 'worldpay_cc' || $method == 'worldpay_moto') {
+        $generalErrorMessage = __('Invalid Payment Type. Please Refresh and check again');
+        if ($method == self::WORLDPAY_CC_TYPE || $method == self::WORLDPAY_MOTO_TYPE) {
             if (isset($paymentData['additional_data'])) {
                 $data = $paymentData['additional_data'];
                 if ($mode == 'redirect') {
                     if (!isset($data['cc_type'])) {
-                        throw new Exception(__("Invalid Payment Type. Please Refresh and check again"), 1);
+                        throw new Exception($generalErrorMessage, 1);
                     }
                     if (isset($data['cc_number']) && $data['cc_number'] != null) {
                         throw new Exception(__("Invalid Configuration. Please Refresh and check again"), 1);
                     }
-                } elseif($mode == 'direct') {
+                } elseif($mode == self::DIRECT_MODEL) {
                     if (!isset($data['cc_type'])) {
-                        throw new Exception(__("Invalid Payment Type. Please Refresh and check again"), 1);
+                        throw new Exception($generalErrorMessage, 1);
                     }
-                    if ($data['cc_type'] != 'savedcard' && !isset($data['cc_exp_year'])) {
-                        throw new Exception(__("Invalid Expiry Year. Please Refresh and check again"), 1);
-                    }
-                    if ($data['cc_type'] != 'savedcard' && !isset($data['cc_exp_month'])) {
-                        throw new Exception(__("Invalid Expiry Month. Please Refresh and check again"), 1);
-                    }
-                    if ($data['cc_type'] != 'savedcard' && !isset($data['cc_number'])) {
-                        throw new Exception(__('Invalid Card Number. Please Refresh and check again'), 1);
-                    }
-                    if ($data['cc_type'] != 'savedcard' && !isset($data['cc_name'])) {
-                        throw new Exception(__('Invalid Card Holder Name. Please Refresh and check again'), 1);
+                    if ($data['cc_type'] != 'savedcard') {
+                        if (!isset($data['cc_exp_year'])) {
+                            throw new Exception(__("Invalid Expiry Year. Please Refresh and check again"), 1);
+                        }
+                        if (!isset($data['cc_exp_month'])) {
+                            throw new Exception(__("Invalid Expiry Month. Please Refresh and check again"), 1);
+                        }
+                        if (!isset($data['cc_number'])) {
+                            throw new Exception(__('Invalid Card Number. Please Refresh and check again'), 1);
+                        }
+                        if (!isset($data['cc_name'])) {
+                            throw new Exception(__('Invalid Card Holder Name. Please Refresh and check again'), 1);
+                        }
                     }
                 }
             } else {
                 throw new Exception(__("Invalid Payment Details. Please Refresh and check again"), 1);
             }
-        } elseif ($method == 'worldpay_apm' && !isset($paymentData['additional_data']['cc_type'])) {
-             throw new Exception(__("Invalid Payment Type. Please Refresh and check again"), 1);
+        } elseif ($method == self::WORLDPAY_APM_TYPE && !isset($paymentData['additional_data']['cc_type'])) {
+             throw new Exception($generalErrorMessage, 1);
         }
     }
 
@@ -280,10 +287,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         } else {
             $wpp->setData('payment_type',$this->_getpaymentType());
         }
-        if ($paymentdetails['method'] == 'worldpay_moto') {
+        if ($paymentdetails['method'] == self::WORLDPAY_MOTO_TYPE) {
             $interactionType='MOTO';
         }
-        if ($integrationType == 'direct' && $this->worlpayhelper->isCseEnabled()) {
+        if ($integrationType == self::DIRECT_MODEL && $this->worlpayhelper->isCseEnabled()) {
             $wpp->setData('client_side_encryption', true);
         }
         $wpp->setData('interaction_type',$interactionType);
@@ -377,14 +384,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @throw Exception
      */
     protected function _checkpaymentapplicable($quote){
-        $type = $this->_getpaymentType();
-        $paymentmethod = $quote->getPayment()->getMethod();
-        if ($paymentmethod == 'worldpay_apm' || $paymentmethod == 'worldpay_cc' || $paymentmethod == 'worldpay_moto') {
-            if ($this->paymentutils->loadEnabledByType($paymentmethod, $type)) {
-                return true;
-            } else {
-                throw new Exception('Payment Type not valid for the billing country');
-            }
+        $type = strtoupper($this->_getpaymentType());
+        $billingaddress = $quote->getBillingAddress();
+        $countryId = $billingaddress->getCountryId();
+        $paymenttypes = json_decode($this->paymenttypes->getPaymentType($countryId));
+        if(!in_array($type, $paymenttypes)){
+             throw new Exception('Payment Type not valid for the billing country');
         }
     }
 
@@ -397,10 +402,14 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @throw Exception
      */
     protected function _checkShippingApplicable($quote){
-        $type = $this->_getpaymentType();
-        $paymentmethod = $quote->getPayment()->getMethod();
-        if (!$this->paymentutils->CheckShipping($paymentmethod,$type)) {
-             throw new Exception('Payment Type not valid for the shipping country');
+        $type = strtoupper($this->_getpaymentType());
+        if($type == 'KLARNA-SSL'){
+            $shippingaddress = $quote->getShippingAddress();
+            $countryId = $shippingaddress->getCountryId();
+            $paymenttypes = json_decode($this->paymenttypes->getPaymentType($countryId));
+            if(!in_array($type, $paymenttypes)){
+                 throw new Exception('Payment Type not valid for the shipping country');
+            }
         }
     }
 

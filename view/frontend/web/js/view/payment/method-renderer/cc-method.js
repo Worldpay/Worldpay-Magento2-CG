@@ -12,12 +12,17 @@ define(
         'Magento_Checkout/js/action/redirect-on-success',
         'ko',
         'Magento_Checkout/js/action/set-payment-information',
+        'Magento_Checkout/js/model/error-processor',
+        'Magento_Checkout/js/model/url-builder',
+        'mage/storage',
+        'Magento_Checkout/js/model/full-screen-loader',
         'worldpay'
     ],
-    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction,wp) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, wp) {
         'use strict';
-
         //Valid card number or not.
+        var ccTypesArr = ko.observableArray([]);
+        var filtersavedcardLists = ko.observableArray([]);
         $.validator.addMethod('worldpay-validate-number', function (value) {
             if (value) {
                 return evaluateRegex(value, "^[0-9]{12,20}$");
@@ -68,14 +73,98 @@ define(
                 saveMyCard:false,
                 cseData:null
             },
+
+            initialize: function () {
+                this._super();
+                this.selectedCCType(null);
+                this.filtercardajax();
+            },
+
+              filtercardajax: function(){
+                var ccavailabletypes = this.getCcAvailableTypes();
+                var savedcardlists = window.checkoutConfig.payment.ccform.savedCardList;
+                var filtercclist = {};
+                var filtercards = [];
+                var cckey,ccvalue;
+                var serviceUrl = urlBuilder.createUrl('/worldpay/payment/types', {});
+                 var payload = {
+                    countryId: quote.billingAddress._latestValue.countryId
+                };
+            
+                 fullScreenLoader.startLoader();
+
+                 storage.post(
+                    serviceUrl, JSON.stringify(payload)
+                ).done(
+                    function (apiresponse) {
+                           var response = JSON.parse(apiresponse);
+                            if(response.length){
+                                for (var key in savedcardlists) { 
+                                    var method = savedcardlists[key]['method'];
+                                    var found = false;
+                                    for (var responsekey in response) { 
+                                        if(method.toUpperCase() == response[responsekey]){
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if(found){
+                                        filtercards.push(savedcardlists[key]);
+                                    }
+                                }
+
+                               for (var responsekey in response) { 
+                                       var found = false;
+                                      for(var key in ccavailabletypes) {
+                                            if(key != 'savedcard'){
+                                                if(response[responsekey] == key.toUpperCase()){
+                                                    found = true;
+                                                    cckey = key;
+                                                    ccvalue = ccavailabletypes[key];
+                                                    break;
+                                                }
+                                            }
+                                      }
+
+                                      if(found){
+                                        filtercclist[cckey] = ccvalue;
+                                      }
+                                }
+                                if(filtercards.length){
+                                    filtercclist['savedcard'] = ccavailabletypes['savedcard'];
+                                }
+                             }else{
+                               filtercclist = ccavailabletypes;
+                               filtercards = savedcardlists;
+                             }
+                        
+                             var ccTypesArr1 = _.map(filtercclist, function (value, key) {
+                               return {
+                                'ccValue': key,
+                                'ccLabel': value
+                            }; 
+                         });
+                       
+                         fullScreenLoader.stopLoader();
+                         ccTypesArr(ccTypesArr1);
+                         filtersavedcardLists(filtercards);
+                    }
+                ).fail(
+                    function (response) {
+                        errorProcessor.process(response);
+                        fullScreenLoader.stopLoader();
+                    }
+                ); 
+            },
+
+          
+            getCcAvailableTypesValues : function(){
+                   return ccTypesArr;
+            },
+
             availableCCTypes : function(){
-                var ccTypesArr = _.map(this.getCcAvailableTypes(), function (value, key) {
-                                       return {
-                                        'ccValue': key,
-                                        'ccLabel': value
-                                    };
-                                });
-                return ko.observableArray(ccTypesArr);
+               return ccTypesArr;
             },
             selectedCCType : ko.observable(),
             paymentToken:ko.observable(),
@@ -85,8 +174,8 @@ define(
             },
 
             loadEventAction: function(data, event){
-                if ((data.value)) {
-                    if (data.value=="savedcard") {
+                if ((data.ccValue)) {
+                    if (data.ccValue=="savedcard") {
                         $("#saved-Card-Visibility-Enabled").show();
                         $(".cc-Visibility-Enabled").children().prop('disabled',true);
                         $("#saved-Card-Visibility-Enabled").children().prop('disabled',false);
@@ -127,7 +216,21 @@ define(
             },
 
             getSavedCardsList:function(){
-                return window.checkoutConfig.payment.ccform.savedCardList;
+                return filtersavedcardLists;
+            },
+
+            getSavedCardsCount: function(){
+                return window.checkoutConfig.payment.ccform.savedCardCount;
+            },
+             /**
+             * Get payment icons
+             * @param {String} type
+             * @returns {Boolean}
+             */
+            getIcons: function (type) {
+                return window.checkoutConfig.payment.ccform.wpicons.hasOwnProperty(type) ?
+                    window.checkoutConfig.payment.ccform.wpicons[type]
+                    : false;
             },
 
             getTitle: function() {
@@ -195,9 +298,7 @@ define(
             },
             preparePayment:function() {
                 var self = this;
-                if (this.threeDSEnabled()) {
-                    this.redirectAfterPlaceOrder = false;
-                }
+                this.redirectAfterPlaceOrder = false;
                 this.isSavedCardPayment=false;
                 this.paymentToken = null;
                  var $form = $('#' + this.getCode() + '-form');
@@ -248,7 +349,7 @@ define(
                     window.location.replace(url.build('worldpay/savedcard/redirect'));
                 }else if(this.intigrationmode == 'redirect' && !this.isSavedCardPayment){
                     window.location.replace(url.build('worldpay/redirectresult/redirect'));
-                }else if(this.intigrationmode == 'direct' && this.threeDSEnabled() && !this.isSavedCardPayment){
+                }else if(this.intigrationmode == 'direct' && !this.isSavedCardPayment){
                     window.location.replace(url.build('worldpay/threedsecure/auth'));
                 }
             }

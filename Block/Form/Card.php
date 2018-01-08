@@ -8,6 +8,7 @@ use Magento\Customer\Controller\RegistryConstants;
 
 class Card extends \Magento\Payment\Block\Form
 {
+    const MOTO_CONFIG = 'moto_config';
    
     private $worldpayPaymentsMoto;
     /**
@@ -28,6 +29,9 @@ class Card extends \Magento\Payment\Block\Form
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
         \Magento\Framework\Registry $registry,
         \Magento\Backend\Model\Session\Quote $session,
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        \Sapient\Worldpay\Model\Payment\PaymentTypes $paymenttypes,
+        \Magento\Backend\Model\Session\Quote $adminsessionquote,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -35,6 +39,9 @@ class Card extends \Magento\Payment\Block\Form
         $this->_coreRegistry = $registry;
         $this->adminquotesession = $session;
         $this->worldpayhelper = $worldpayhelper;
+        $this->wplogger = $wplogger;
+        $this->paymenttypes = $paymenttypes;
+        $this->adminsessionquote = $adminsessionquote;
         $this->worldpayPaymentsMoto = $paymentHelper->getMethodInstance('worldpay_moto');
     }
     
@@ -55,7 +62,15 @@ class Card extends \Magento\Payment\Block\Form
 
     public function getSavedCards()
     {
-        return $this->configProvider->getSaveCardListForAdminOrder($this->getCustomerId());
+        $savedcardlists = $this->configProvider->getSaveCardListForAdminOrder($this->getCustomerId());
+        $lookuppaymenttypes = $this->getLookUpPaymentTypes();
+        $filterccards =  array();
+        foreach($savedcardlists as $savedcardlist){
+            if(in_array($savedcardlist['method'], $lookuppaymenttypes)){
+                $filterccards[] = $savedcardlist;
+            }
+        }
+        return $filterccards;
     }
     public function getCustomerId()
     {
@@ -64,7 +79,23 @@ class Card extends \Magento\Payment\Block\Form
     
     public function getCCtypes()
     {
-        return $this->configProvider->getCcTypes();
+        $cctypes = $this->configProvider->getCcTypes(self::MOTO_CONFIG);
+        $lookuppaymenttypes = $this->getLookUpPaymentTypes();
+        $filtercctypes =  array();
+        if(!empty($lookuppaymenttypes)){
+            foreach($cctypes as $k => $cctype){
+                if($k != 'savedcard'){
+                    if(in_array($k, $lookuppaymenttypes)){
+                        $filtercctypes[$k] = $cctype;
+                    }
+                }else{
+                    $filtercctypes[$k] = $cctype;
+                }
+            }
+        }else{
+            $filtercctypes = $lookuppaymenttypes;
+        }
+        return $filtercctypes;
     }
 
     public function getIntegrationMode()
@@ -91,5 +122,14 @@ class Card extends \Magento\Payment\Block\Form
     public function getYears()
     {
         return $this->configProvider->getYears();
+    }
+
+    public function getLookUpPaymentTypes()
+    {
+        $adminQuote = $this->adminsessionquote->getQuote();
+        $address = $adminQuote->getBillingAddress();
+        $countryId = $address->getCountryId();
+        $paymenttypes = $this->paymenttypes->getPaymentType($countryId);
+        return json_decode($paymenttypes);
     }
 }

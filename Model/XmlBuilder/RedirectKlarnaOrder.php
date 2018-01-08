@@ -33,7 +33,7 @@ EOD;
 
     private $tokenRequestConfig;
 
-   public function __construct(array $args = array())
+   public function __construct()
     {
          $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure();
 
@@ -115,7 +115,6 @@ EOD;
         $this->_addBillingElement($order);
         $this->_addOrderLineItemElement($order);
         $this->_addDynamic3DSElement($order);
-        $this->_addCreateTokenElement($order);
 
         return $order;
     }
@@ -146,11 +145,6 @@ EOD;
         } else {
             $threeDSElement['overrideAdvice'] = self::DYNAMIC3DS_NO3DS;
         }
-    }
-
-    private function _addCreateTokenElement($order)
-    { 
-        return;
     }
 
     private function _addPaymentMethodMaskElement($order)
@@ -204,15 +198,6 @@ EOD;
         );
     }
 
-    private function _addPaymentMethodAttributeElement($order)
-    {
-        $paymentMethodAttribute = $order->addChild('paymentMethodAttribute');
-
-        $paymentMethodAttribute->addChild('paymentMethod', 'PAYPAL-EXPRESS');
-        $paymentMethodAttribute->addChild('attrName', 'firstInBillingRun');
-        $paymentMethodAttribute->addChild('attrValue', 'true');
-    }
-
     private function _addAddressElement($parentElement, $firstName, $lastName, $street, $postalCode, $city, $countryCode)
     {
         $address = $parentElement->addChild('address');
@@ -254,10 +239,10 @@ EOD;
         }
     }
 
-    private function _addLineItemElement($parentElement, $reference, $name, $quantity, $quantityUnit, $unitPrice, 
+    private function _addLineItemElement($parentElement, $reference, $name, $quantity, $quantityUnit, $unitPrice,
         $taxRate, $totalAmount, $totalTaxAmount, $totalDiscountAmount = 0)
     {
-         $lineitem = $parentElement->addChild('lineItem');  
+         $lineitem = $parentElement->addChild('lineItem');
 
           $lineitem->addChild('physical');
 
