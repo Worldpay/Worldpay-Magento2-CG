@@ -10,13 +10,16 @@ use Magento\Framework\Setup\ModuleContextInterface;
 
 class UpgradeSchema implements UpgradeSchemaInterface {
 
+    const WORLDPAY_NOTIFICATION_HISTORY = 'worldpay_notification_history';
+    const WORLDPAY_PAYMENT = 'worldpay_payment';
+
     public function upgrade( SchemaSetupInterface $setup, ModuleContextInterface $context )
     {
         $installer = $setup;
         $installer->startSetup();
         if (version_compare($context->getVersion(), '1.1.0', '<')) {
             $table = $installer->getConnection()->newTable(
-                $installer->getTable('worldpay_notification_history')
+                $installer->getTable(self::WORLDPAY_NOTIFICATION_HISTORY)
             )
             ->addColumn(
                     'id',
@@ -53,7 +56,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                     'Created At'
             )
             ->addIndex(
-                    $installer->getIdxName('worldpay_notification_history', ['order_id']),
+                    $installer->getIdxName(self::WORLDPAY_NOTIFICATION_HISTORY, ['order_id']),
                     ['order_id']
             )
             ->setComment('Worldpay Notification History')
@@ -63,7 +66,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         }
 
         $setup->getConnection()->changeColumn(
-            $setup->getTable('worldpay_notification_history'),
+            $setup->getTable(self::WORLDPAY_NOTIFICATION_HISTORY),
             'order_id',
             'order_id',
             [
@@ -88,7 +91,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
     {
         $connection = $installer->getConnection();
         $connection->addColumn(
-            $installer->getTable('worldpay_payment'),
+            $installer->getTable(self::WORLDPAY_PAYMENT),
             'client_side_encryption',
             [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
@@ -106,7 +109,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
     {
         $connection = $installer->getConnection();
         $connection->addColumn(
-            $installer->getTable('worldpay_payment'),
+            $installer->getTable(self::WORLDPAY_PAYMENT),
             'aav_address_result_code',
             [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
@@ -118,7 +121,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         );
 
         $connection->addColumn(
-            $installer->getTable('worldpay_payment'),
+            $installer->getTable(self::WORLDPAY_PAYMENT),
             'avv_postcode_result_code',
             [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
@@ -130,7 +133,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         );
 
         $connection->addColumn(
-            $installer->getTable('worldpay_payment'),
+            $installer->getTable(self::WORLDPAY_PAYMENT),
             'aav_cardholder_name_result_code',
             [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
@@ -142,7 +145,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         );
 
         $connection->addColumn(
-            $installer->getTable('worldpay_payment'),
+            $installer->getTable(self::WORLDPAY_PAYMENT),
             'aav_telephone_result_code',
             [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
@@ -153,7 +156,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
             ]
         );
         $connection->addColumn(
-            $installer->getTable('worldpay_payment'),
+            $installer->getTable(self::WORLDPAY_PAYMENT),
             'aav_email_result_code',
             [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
@@ -165,7 +168,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         );
 
         $connection->addColumn(
-            $installer->getTable('worldpay_payment'),
+            $installer->getTable(self::WORLDPAY_PAYMENT),
             'interaction_type',
             [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,

@@ -60,10 +60,6 @@ class DirectService extends \Magento\Framework\DataObject
             $payment->setIsTransactionPending(1);
             $this->_handle3DSecure($threeDSecureParams, $directOrderParams, $orderCode);
         } else {
-            if ($threeDsEnabled) {
-                // Set flag to handles success response without 3DS & consider as normal order.
-                $this->checkoutSession->setThreeDSEnabledWithError(true);
-            }
             // Normal order goes here.(without 3DS).
             $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse);
             $this->_applyPaymentUpdate($directResponse, $payment);

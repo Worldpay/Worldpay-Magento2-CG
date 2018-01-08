@@ -5,7 +5,7 @@
 namespace Sapient\Worldpay\Model;
 
 use Exception;
-/** 
+/**
  * Used for processing the Request
  */
 class Request
@@ -32,7 +32,7 @@ class Request
      *
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Model\Request\CurlRequest $curlrequest
-     * @param \Sapient\Worldpay\Helper\Data $helper   
+     * @param \Sapient\Worldpay\Helper\Data $helper
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -50,7 +50,7 @@ class Request
       * @param $username
       * @param $password
       * @return SimpleXMLElement body
-      * @throws Exception  
+      * @throws Exception
       */
     public function sendRequest($quote, $username, $password)
     {
@@ -83,7 +83,7 @@ class Request
             $logger->info($result);
             $logger->info('########### END OF REQUEST - FAILURE WHILST TRYING TO SEND REQUEST ###########');
 
-            throw new Exception();
+            throw new Exception('Worldpay api service not available');
         }
 
         $request->close();
@@ -121,9 +121,9 @@ class Request
      */
     private function _getUrl()
     {
-        if ($this->helper->getEnvironmentMode()=='Live Mode')
+        if ($this->helper->getEnvironmentMode()=='Live Mode'){
             return $this->helper->getLiveUrl();
-
+        }
         return $this->helper->getTestUrl();
     }
 

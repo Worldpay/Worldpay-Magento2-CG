@@ -130,7 +130,7 @@ EOD;
     }
 
     /**
-     * Add order tag to xml 
+     * Add order tag to xml
      *
      * @param SimpleXMLElement $submit
      * @return SimpleXMLElement $order
@@ -209,7 +209,7 @@ EOD;
      * @param SimpleXMLElement $order
      */
     private function _addCreateTokenElement($order)
-    { 
+    {
         if (! $this->tokenRequestConfig->istokenizationIsEnabled()) {
             return;
         }
@@ -222,7 +222,7 @@ EOD;
                 'tokenReason',
                 $this->tokenRequestConfig->getTokenReason($this->orderCode)
             );
-        } 
+        }
     }
 
     /**
@@ -251,7 +251,7 @@ EOD;
 
         if ($this->tokenRequestConfig->istokenizationIsEnabled()) {
             $shopper->addChild('authenticatedShopperID', $this->shopperId);
-        } 
+        }
 
         $browser = $shopper->addChild('browser');
 
@@ -301,20 +301,6 @@ EOD;
     }
 
     /**
-     * Add paymentMethodAttribute and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addPaymentMethodAttributeElement($order)
-    {
-        $paymentMethodAttribute = $order->addChild('paymentMethodAttribute');
-
-        $paymentMethodAttribute->addChild('paymentMethod', 'PAYPAL-EXPRESS');
-        $paymentMethodAttribute->addChild('attrName', 'firstInBillingRun');
-        $paymentMethodAttribute->addChild('attrValue', 'true');
-    }
-
-    /**
      * Add address and its child tag to xml
      *
      * @param SimpleXMLElement $parentElement
@@ -323,7 +309,7 @@ EOD;
      * @param string $street
      * @param string $postalCode
      * @param string $city
-     * @param string $countryCode     
+     * @param string $countryCode
      */
     private function _addAddressElement($parentElement, $firstName, $lastName, $street, $postalCode, $city, $countryCode)
     {

@@ -6,7 +6,7 @@ namespace Sapient\Worldpay\Model;
 /**
  * Resource Model
  */
-class HistoryNotification extends \Magento\Framework\Model\AbstractModel 
+class HistoryNotification extends \Magento\Framework\Model\AbstractModel
 {
 	/**
      * Initialize resource model

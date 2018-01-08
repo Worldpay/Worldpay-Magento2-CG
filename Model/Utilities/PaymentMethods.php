@@ -18,12 +18,19 @@ class PaymentMethods
      */
     protected $_xmlLocation;
 
+    const PAYMENT_METHOD_PATH = '/paymentMethods/';
+    const TYPE_PATH = '/types/';
+
     /**
      * Constructor
      *
      * @param \Magento\Framework\Module\Dir\Reader $moduleReader
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Checkout\Model\Session $checkoutsession
+     * @param \Magento\Backend\Model\Session\Quote $adminsessionquote
+     * @param \Magento\Backend\Model\Auth\Session $authSession
      */
     public function __construct(
         \Magento\Framework\Module\Dir\Reader $moduleReader,
@@ -31,7 +38,8 @@ class PaymentMethods
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Checkout\Model\Session $checkoutsession,
-        \Magento\Backend\Model\Session\Quote $adminsessionquote
+        \Magento\Backend\Model\Session\Quote $adminsessionquote,
+        \Magento\Backend\Model\Auth\Session $authSession
     ) {
         $etcDir = $moduleReader->getModuleDir(
             \Magento\Framework\Module\Dir::MODULE_ETC_DIR,
@@ -43,6 +51,7 @@ class PaymentMethods
         $this->wplogger = $wplogger;
         $this->checkoutsession = $checkoutsession;
         $this->adminsessionquote = $adminsessionquote;
+        $this->authSession = $authSession;
     }
 
     /**
@@ -85,7 +94,7 @@ class PaymentMethods
     {
         $methods = array();
         if ($xml = $this->_readXML()) {
-            $node = $xml->xpath('/paymentMethods/' . $type . '/types/' . $paymentType);
+            $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $type . self::TYPE_PATH . $paymentType);
             if ($this->_paymentMethodExists($node) && $this->_methodAllowedForCountry($type, $node[0])) {
                 return true;
             }
@@ -120,12 +129,9 @@ class PaymentMethods
      */
     protected function _readXML()
     {
-        if (!self::$_xml) {
-            if (file_exists($this->_xmlLocation)) {
-                self::$_xml = simplexml_load_file($this->_xmlLocation);
-            }
+        if (!self::$_xml && file_exists($this->_xmlLocation)) {
+            self::$_xml = simplexml_load_file($this->_xmlLocation);
         }
-
         return self::$_xml;
     }
 
@@ -160,9 +166,11 @@ class PaymentMethods
     private function _getAllowedCountryIds()
     {
         $quote = $this->checkoutsession->getQuote();
-        $adminQuote = $this->adminsessionquote->getQuote();
-        if (empty($quote->getReservedOrderId()) && !empty($adminQuote->getReservedOrderId())) {
-            $quote = $adminQuote;
+        if($this->authSession->isLoggedIn()) {
+            $adminQuote = $this->adminsessionquote->getQuote();
+            if (empty($quote->getReservedOrderId()) && !empty($adminQuote->getReservedOrderId())) {
+                $quote = $adminQuote;
+            }
         }
         $address = $quote->getBillingAddress();
         $countryid = $address->getCountryId();
@@ -197,7 +205,7 @@ class PaymentMethods
     {
 
         if ($xml = $this->_readXML()) {
-            $node = $xml->xpath('/paymentMethods/' . $type . '/types/' . $method );
+            $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $type . self::TYPE_PATH . $method );
             if ($node) {
                 $capture_request = $this->_getCaptureRequest($node[0]);
                 if ($capture_request==1) {
@@ -222,8 +230,8 @@ class PaymentMethods
     public function CheckCurrency($code, $type)
     {
         if ($xml = $this->_readXML()) {
-             $node = $xml->xpath('/paymentMethods/' . $code . '/types/' . $type .'/currencies');
-             if(!$this->_currencyNodeExists($node) || $this->_typeAllowedForCurrency($type, $node[0])){
+             $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $code . self::TYPE_PATH . $type .'/currencies');
+             if(!$this->_currencyNodeExists($node) || $this->_typeAllowedForCurrency($node[0])){
                 return true;
              }else{
                 return false;
@@ -238,7 +246,7 @@ class PaymentMethods
         return $node && sizeof($node);
     }
 
-    private function _typeAllowedForCurrency($type, \SimpleXMLElement $node)
+    private function _typeAllowedForCurrency(\SimpleXMLElement $node)
     {
         return $this->_isCurrencyAllowed(
             $this->_getAllowedCurrencies(),
@@ -271,8 +279,8 @@ class PaymentMethods
     public function CheckShipping($code, $type)
     {
         if ($xml = $this->_readXML()) {
-             $node = $xml->xpath('/paymentMethods/' . $code . '/types/' . $type .'/shippingareas');
-             if(!$this->_shippingNodeExists($node) || $this->_typeAllowedForShipping($type, $node[0])){
+             $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $code . self::TYPE_PATH . $type .'/shippingareas');
+             if(!$this->_shippingNodeExists($node) || $this->_typeAllowedForShipping($node[0])){
                 return true;
              }else{
                 return false;
@@ -287,7 +295,7 @@ class PaymentMethods
         return $node && sizeof($node);
     }
 
-    private function _typeAllowedForShipping($type, \SimpleXMLElement $node)
+    private function _typeAllowedForShipping(\SimpleXMLElement $node)
     {
         return $this->_isShippingAllowed(
             $this->_getAllowedShippingCountries(),
@@ -299,7 +307,7 @@ class PaymentMethods
     private function _getAllowedShippingCountries()
     {
         $quote = $this->checkoutsession->getQuote();
-        $address = $quote->getShippingAddress(); 
+        $address = $quote->getShippingAddress();
         $countryid = $address->getCountryId();
 
         return array($countryid,'GLOBAL');
@@ -323,7 +331,7 @@ class PaymentMethods
      public function CheckStopAutoInvoice($code, $type)
     {
         if ($xml = $this->_readXML()) {
-             $node = $xml->xpath('/paymentMethods/' . $code . '/types/' . $type .'/stop_auto_invoice');
+             $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $code . self::TYPE_PATH . $type .'/stop_auto_invoice');
              if($this->_autoInvoiceNodeExists($node) && $this->_getStopAutoInvoice($node[0]) == 1){
                 return true;
              }else{
@@ -343,6 +351,41 @@ class PaymentMethods
     {
         $stopautoinvoice = (string) $node;
         return $stopautoinvoice;
+    }
+    public function idealBanks(){
+        $banks = array();
+        if ($xml = $this->_readXML()) {
+            $node = $xml->xpath('/paymentMethods/' . 'worldpay_apm' . '/types/' . 'IDEAL-SSL'. '/banks');
+            if ($this->_paymentMethodExists($node)) {
+                 $bankinfos = $node[0];
+                $bankdetails = array();
+                foreach($bankinfos->bank as $bankinfo){
+                    $bankcode = (string) $bankinfo->code;
+                    $bankvalue = (string) $bankinfo->value;
+                    $bankdetails[$bankcode] = $bankvalue;
+                }
+                return $bankdetails;
+            }
+        }
+    }
+
+    public function getPaymentTypeCountries()
+    {
+        $codes = array('worldpay_cc','worldpay_apm','worldpay_moto');
+        $paymenttypecountries = array();
+        foreach($codes as $code){
+            if ($xml = $this->_readXML()) {
+                 $nodes = $xml->xpath('/paymentMethods/' . $code . '/types');
+             }
+             $typearray =  array();
+             foreach($nodes[0] as $key => $value){
+                $key = (string) $key;
+                $area =  (array) $value->areas[0]->area;
+                $typearray[$key] = $area;
+             }
+             $paymenttypecountries[$code] = $typearray;
+        }
+        return json_encode($paymenttypecountries);
     }
 
 }

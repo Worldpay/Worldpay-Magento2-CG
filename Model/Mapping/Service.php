@@ -41,7 +41,7 @@ class Service {
             'paymentDetails'   => $this->_getPaymentDetails($paymentDetails),
             'cardAddress'      => $this->_getCardAddress($quote),
             'shopperEmail'     => $quote->getCustomerEmail(),
-            'threeDSecureConfig' => $this->_getThreeDSecureConfig($orderStoreId,$paymentDetails['method']),
+            'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
             'tokenRequestConfig' => $this->_getTokenRequestConfig($paymentDetails),
             'acceptHeader'     => php_sapi_name() !== "cli" ? $_SERVER['HTTP_ACCEPT'] : '',
             'userAgentHeader'  => php_sapi_name() !== "cli" ? $_SERVER['HTTP_USER_AGENT'] : '',
@@ -70,7 +70,7 @@ class Service {
             'amount'              => $quote->getGrandTotal(),
             'paymentType'         => $this->_getRedirectPaymentType($paymentDetails),
             'shopperEmail'        => $quote->getCustomerEmail(),
-            'threeDSecureConfig'  => $this->_getThreeDSecureConfig($orderStoreId),
+            'threeDSecureConfig'  => $this->_getThreeDSecureConfig(),
             'tokenRequestConfig'  => $this->_getTokenRequestConfig($paymentDetails),
             'acceptHeader'        => php_sapi_name() !== "cli" ? $_SERVER['HTTP_ACCEPT'] : '',
             'userAgentHeader'     => php_sapi_name() !== "cli" ? $_SERVER['HTTP_USER_AGENT'] : '',
@@ -102,7 +102,7 @@ class Service {
             'amount'              => $quote->getGrandTotal(),
             'paymentType'         => $this->_getRedirectPaymentType($paymentDetails),
             'shopperEmail'        => $quote->getCustomerEmail(),
-            'threeDSecureConfig'  => $this->_getThreeDSecureConfig($orderStoreId),
+            'threeDSecureConfig'  => $this->_getThreeDSecureConfig(),
             'tokenRequestConfig'  => $this->_getTokenRequestConfig($paymentDetails),
             'acceptHeader'        => php_sapi_name() !== "cli" ? $_SERVER['HTTP_ACCEPT'] : '',
             'userAgentHeader'     => php_sapi_name() !== "cli" ? $_SERVER['HTTP_USER_AGENT'] : '',
@@ -135,7 +135,7 @@ class Service {
             'paymentDetails'     => $updatedPaymentDetails,
             'cardAddress'        => $this->_getCardAddress($quote),
             'shopperEmail'       => $quote->getCustomerEmail(),
-            'threeDSecureConfig' => $this->_getThreeDSecureConfig($orderStoreId, $paymentDetails['method']),
+            'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
             'tokenRequestConfig' =>  $this->_getTokenRequestConfig($paymentDetails),
             'acceptHeader'       => $_SERVER['HTTP_ACCEPT'],
             'userAgentHeader'    => $_SERVER['HTTP_USER_AGENT'],
@@ -147,13 +147,27 @@ class Service {
         );
     }
 
-    private function _getTokenRequestConfig($paymentDetails)
-    {
-        if(isset($paymentDetails['additional_data']['save_my_card']))
-            return $paymentDetails['additional_data']['save_my_card'];
+    public function collectPaymentOptionsParameters(
+        $countryId,
+        $paymenttype
+        ){
+
+         return array(
+                'merchantCode'  => $this->worldpayHelper->getMerchantCode($paymenttype),
+                'countryCode'   => $countryId,
+                'paymentType'   => $paymenttype
+            );
+
     }
 
-    private function _getThreeDSecureConfig($orderStoreId, $method = null)
+    private function _getTokenRequestConfig($paymentDetails)
+    {
+        if(isset($paymentDetails['additional_data']['save_my_card'])){
+            return $paymentDetails['additional_data']['save_my_card'];
+        }
+    }
+
+    private function _getThreeDSecureConfig($method = null)
     {
         $threedarray =  array(
             'isDynamic3D'=> (bool)$this->worldpayHelper->isDynamic3DEnabled(),
@@ -187,13 +201,13 @@ class Service {
     {
          $orderitems = array();
          $orderitems['orderTaxAmount'] = $quote->getShippingAddress()->getData('tax_amount');
-         $orderitems['termsURL'] = $this->_urlBuilder->getUrl(); 
+         $orderitems['termsURL'] = $this->_urlBuilder->getUrl();
          $lineitem = array();
-           $orderItems = $quote->getItemsCollection(); 
+           $orderItems = $quote->getItemsCollection();
           foreach ($orderItems as $_item) {
             $lineitem = array();
-            if ($_item->getParentItem()){ 
-                continue; 
+            if ($_item->getParentItem()){
+                continue;
             }else{
                 $rowtotal = $_item->getRowTotal();
                 $totalamount = $rowtotal - $_item->getDiscountAmount();
@@ -205,7 +219,7 @@ class Service {
                 $lineitem['quantity'] = (int)$_item->getQty();
                 $lineitem['quantityUnit'] = $this->worldpayHelper->getQuantityUnit($_item->getProduct());
                 $lineitem['unitPrice'] = $rowtotal / $_item->getQty();
-                $lineitem['taxRate'] =  (int)$_item->getTaxPercent();     
+                $lineitem['taxRate'] =  (int)$_item->getTaxPercent();
                 $lineitem['totalAmount'] = $totalamount;
                 $lineitem['totalTaxAmount'] =$totaltax;
                 if($discountamount > 0){

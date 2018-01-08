@@ -10,6 +10,8 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
     /** @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory */
     protected $updateWorldPayPayment;
 
+    const CART_URL = 'checkout/cart';
+
     /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
@@ -62,7 +64,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
             $this->wplogger->info($e->getMessage());
             $this->_messageManager->addError(__($e->getMessage()));
             $this->checkoutSession->setWpResponseForwardUrl(
-                  $this->urlBuilders->getUrl('checkout/cart', ['_secure' => true])
+                  $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );
             return;
         }
@@ -88,12 +90,12 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Refused) {
           $this->_messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));
              $this->checkoutSession->setWpResponseForwardUrl(
-              $this->urlBuilders->getUrl('checkout/cart', ['_secure' => true])
+              $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );
         } elseif ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
             $this->_messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));
             $this->checkoutSession->setWpResponseForwardUrl(
-              $this->urlBuilders->getUrl('checkout/cart', ['_secure' => true])
+              $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );
         } else {
             $this->orderservice->removeAuthorisedOrder();

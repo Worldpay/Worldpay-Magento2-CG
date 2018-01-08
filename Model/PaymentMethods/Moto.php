@@ -48,6 +48,17 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
         }
         return $this->directservice;
     }
+    /**
+     * @return bool
+     */
+    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null){
+
+       if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isMotoEnabled()) {
+         return true;
+       }
+       return false;
+
+    }
 
     /**
      * @return bool

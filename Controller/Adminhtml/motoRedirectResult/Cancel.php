@@ -18,14 +18,8 @@ class Cancel extends \Magento\Backend\App\Action
     protected $pageFactory;
     protected $_rawBody;
 
-    private $_orderId;
-    private $_order;
     private $_paymentUpdate;
-    private $_tokenState;
 
-    private $_orderService;
-    private $_paymentService;
-    private $_tokenService;
 
     /**
      * Constructor

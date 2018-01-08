@@ -23,7 +23,7 @@ class Order
      * @param \Magento\Sales\Model\Order\Creditmemo $creditmemo
      * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
      */
-    public function __construct(array $args,  
+    public function __construct(array $args,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
         \Magento\Framework\DB\Transaction $transaction,
         \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
@@ -75,7 +75,7 @@ class Order
     }
 
     /**
-     * Set order status as processing    
+     * Set order status as processing
      */
     public function setOrderAsProcessing()
     {
@@ -107,10 +107,10 @@ class Order
 
         if ($mageOrder->canCancel()) {
             $mageOrder->cancel()->save();
-        } 
+        }
     }
 
-    /**     
+    /**
      * @return Magento\Sales\Model\Order\Payment
      */
     public function getPayment()
@@ -118,7 +118,7 @@ class Order
         return $this->getOrder()->getPayment();
     }
 
-    /**     
+    /**
      * @return string
      */
     public function getPaymentStatus()
@@ -166,7 +166,7 @@ class Order
     }
 
     /**
-     * @return Sapient/Worldpay/Model/Worldpayment 
+     * @return Sapient/Worldpay/Model/Worldpayment
      */
     public function getWorldPayPayment()
     {
@@ -178,7 +178,7 @@ class Order
     }
 
     /**
-     * Set order status as pending    
+     * Set order status as pending
      */
     public function pendingPayment()
     {
@@ -206,7 +206,6 @@ class Order
 
         if ($creditmemo->getOrder()->getId() != $this->getOrder()->getId()) {
             throw new Exception('WorldPay refund ERROR: Credit Memo does not match Order. Reference:' . $reference);
-            return;
         }
 
         if ($creditmemo->getState() == \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN) {
@@ -272,10 +271,10 @@ class Order
             $invoiceobj =  $this->Invoice->loadByIncrementId($invoiceincrementid);
             $creditmemo = $this->creditmemoFactory->createByOrder($order);
             $creditmemo->setInvoice($invoiceobj);
-             $this->CreditmemoService->refund($creditmemo); 
+             $this->CreditmemoService->refund($creditmemo);
              $this->_markRefunded($creditmemo, $comment);
         }
- 
+
     }
 
     private function _markRefunded($creditmemo, $comment)
@@ -303,16 +302,15 @@ class Order
 
         if ($creditmemo->getOrder()->getId() != $this->getOrder()->getId()) {
             throw new Exception('WorldPay refund ERROR: Credit Memo does not match Order. Reference:' . $reference);
-            return;
         }
 
         if ($creditmemo->getState() == \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN) {
-            $this->_cancelCreditmemo($creditmemo, $comment,$reference);
+            $this->_cancelCreditmemo($creditmemo, $comment);
         }
     }
 
 
-    private function _cancelCreditmemo($creditmemo, $comment = null, $reference)
+    private function _cancelCreditmemo($creditmemo, $comment = null)
     {
         if ($creditmemo && $creditmemo->canCancel()) {
              $creditmemo->setState(\Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED);
@@ -336,10 +334,10 @@ class Order
         try {
             $creditmemo = $this->creditmemoRepository->get($id);
             $creditmemo->setState(\Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED);
-            $creditmemo->setStatus(\Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED); 
+            $creditmemo->setStatus(\Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED);
             foreach ($creditmemo->getAllItems() as $item) {
                 $item->cancel();
-            } 
+            }
             $this->creditmemoRepository->save($creditmemo);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -349,7 +347,7 @@ class Order
 
     private function _deductOrderTotals($order, $creditmemo)
     {
-     
+
         if (!$order->dataHasChangedFor('total_refunded')) {
             $order->setTotalRefunded($order->getTotalRefunded() - $creditmemo->getGrandTotal());
             foreach ($creditmemo->getAllItems() as $item) {

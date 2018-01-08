@@ -51,17 +51,7 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         $orderSimpleXml = $this->xmldirectorder->build3DSecure(
             $directOrderParams['merchantCode'],
             $directOrderParams['orderCode'],
-            $directOrderParams['orderDescription'],
-            $directOrderParams['currencyCode'],
-            $directOrderParams['amount'],
             $directOrderParams['paymentDetails'],
-            $directOrderParams['cardAddress'],
-            $directOrderParams['shopperEmail'],
-            $directOrderParams['acceptHeader'],
-            $directOrderParams['userAgentHeader'],
-            $directOrderParams['shippingAddress'],
-            $directOrderParams['billingAddress'],
-            $directOrderParams['shopperId'],
             $directOrderParams['paResponse'],
             $directOrderParams['echoData']
         );
@@ -197,11 +187,7 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
     {
         $this->_wplogger->info('########## Submitting klarna redirect order request. OrderCode: ' . $redirectOrderParams['orderCode'] . ' ##########');
 
-        $requestConfiguration = array(
-            'threeDSecureConfig' => $redirectOrderParams['threeDSecureConfig'],
-            'tokenRequestConfig' => $redirectOrderParams['tokenRequestConfig']
-        );
-        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectKlarnaOrder($requestConfiguration);
+        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectKlarnaOrder();
         $redirectSimpleXml = $this->xmlredirectorder->build(
             $redirectOrderParams['merchantCode'],
             $redirectOrderParams['orderCode'],
@@ -226,6 +212,49 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentType'])
         );
     }
+
+    /**
+     * Send direct ideal order XML to Worldpay server
+     *
+     * @param array $redirectOrderParams
+     * @return mixed
+     */
+    public function DirectIdealOrder($redirectOrderParams)
+    {
+        $this->_wplogger->info('########## Submitting direct Ideal order request. OrderCode: ' . $redirectOrderParams['orderCode'] . ' ##########');
+
+        $requestConfiguration = array(
+            'threeDSecureConfig' => $redirectOrderParams['threeDSecureConfig'],
+            'tokenRequestConfig' => $redirectOrderParams['tokenRequestConfig'],
+            'shopperId' => $redirectOrderParams['shopperId']
+        );
+        $this->xmldirectidealorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectIdealOrder($requestConfiguration);
+        $redirectSimpleXml = $this->xmldirectidealorder->build(
+            $redirectOrderParams['merchantCode'],
+            $redirectOrderParams['orderCode'],
+            $redirectOrderParams['orderDescription'],
+            $redirectOrderParams['currencyCode'],
+            $redirectOrderParams['amount'],
+            $redirectOrderParams['paymentType'],
+            $redirectOrderParams['shopperEmail'],
+            $redirectOrderParams['acceptHeader'],
+            $redirectOrderParams['userAgentHeader'],
+            $redirectOrderParams['shippingAddress'],
+            $redirectOrderParams['billingAddress'],
+            $redirectOrderParams['paymentPagesEnabled'],
+            $redirectOrderParams['installationId'],
+            $redirectOrderParams['hideAddress'],
+            $redirectOrderParams['callbackurl'],
+            $redirectOrderParams['cc_bank']
+        );
+
+        return $this->_sendRequest(
+            dom_import_simplexml($redirectSimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($redirectOrderParams['paymentType']),
+            $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentType'])
+        );
+    }
+
 
     /**
      * Send capture XML to Worldpay server
@@ -412,6 +441,22 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             dom_import_simplexml($tokenDeleteSimpleXml)->ownerDocument,
             $this->worldpayhelper->getXmlUsername($tokenModel->getMethod()),
             $this->worldpayhelper->getXmlPassword($tokenModel->getMethod())
+        );
+    }
+
+    public function paymentOptionsByCountry($paymentOptionsParams)
+    {
+         $this->_wplogger->info('########## Submitting payment otions request ##########');
+         $this->xmlpaymentoptions = new \Sapient\Worldpay\Model\XmlBuilder\PaymentOptions();
+        $paymentOptionsXml = $this->xmlpaymentoptions->build(
+            $paymentOptionsParams['merchantCode'],
+            $paymentOptionsParams['countryCode']
+        );
+
+        return $this->_sendRequest(
+            dom_import_simplexml($paymentOptionsXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($paymentOptionsParams['paymentType']),
+            $this->worldpayhelper->getXmlPassword($paymentOptionsParams['paymentType'])
         );
     }
 }

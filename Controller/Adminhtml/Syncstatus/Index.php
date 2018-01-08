@@ -22,10 +22,6 @@ class Index extends \Magento\Backend\App\Action
     private $_paymentUpdate;
     private $_tokenState;
 
-    private $_orderService;
-    private $_paymentService;
-    private $_tokenService;
-
     /**
      * Constructor
      *

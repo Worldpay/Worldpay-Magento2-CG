@@ -10,26 +10,91 @@ define(
         'mage/url',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/action/redirect-on-success',
+         'Magento_Checkout/js/model/error-processor',
+        'Magento_Checkout/js/model/url-builder',
+        'mage/storage',
+        'Magento_Checkout/js/model/full-screen-loader',
         'ko'
     ],
-    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,errorProcessor, urlBuilder, storage, fullScreenLoader, ko) {
         'use strict';
-
+        var ccTypesArr = ko.observableArray([]);
         return Component.extend({
             defaults: {
                 redirectAfterPlaceOrder: false,
-                redirectTemplate: 'Sapient_Worldpay/payment/apm'
+                redirectTemplate: 'Sapient_Worldpay/payment/apm',
+                idealBankType:null
             },
+
+            initialize: function () {
+                this._super();
+                this.selectedCCType(null);
+                this.filterajax();
+            },
+
+            filterajax: function(){
+                var ccavailabletypes = this.getCcAvailableTypes();
+                var filtercclist = {};
+                var cckey,ccvalue;
+                var serviceUrl = urlBuilder.createUrl('/worldpay/payment/types', {});
+                 var payload = {
+                    countryId: quote.billingAddress._latestValue.countryId
+                };
+
+                 fullScreenLoader.startLoader();
+
+                 storage.post(
+                    serviceUrl, JSON.stringify(payload)
+                ).done(
+                    function (apiresponse) {
+                           var response = JSON.parse(apiresponse);
+                            if(response.length){
+                               for (var responsekey in response) {
+                                       var found = false;
+                                      for(var key in ccavailabletypes) {
+                                            if(response[responsekey] == key.toUpperCase()){
+                                                found = true;
+                                                cckey = key;
+                                                ccvalue = ccavailabletypes[key];
+                                                break;
+                                            }
+                                      }
+
+                                      if(found){
+                                        filtercclist[cckey] = ccvalue;
+                                      }
+                                }
+                             }else{
+                               filtercclist = ccavailabletypes;
+                             }
+
+                             var ccTypesArr1 = _.map(filtercclist, function (value, key) {
+                               return {
+                                'ccValue': key,
+                                'ccLabel': value
+                            };
+                         });
+
+                         fullScreenLoader.stopLoader();
+                        ccTypesArr(ccTypesArr1);
+                    }
+                ).fail(
+                    function (response) {
+                        errorProcessor.process(response);
+                        fullScreenLoader.stopLoader();
+                    }
+                );
+            },
+
+            getCcAvailableTypesValues : function(){
+                 return ccTypesArr;
+            },
+
              availableCCTypes : function(){
-                var ccTypesArr = _.map(this.getCcAvailableTypes(), function (value, key) {
-                                       return {
-                                        'ccValue': key,
-                                        'ccLabel': value
-                                    };
-                                });
-                return ko.observableArray(ccTypesArr);
+               return ccTypesArr;
             },
             selectedCCType : ko.observable(),
+            selectedIdealBank:ko.observable(),
             getTemplate: function(){
                     return this.redirectTemplate;
             },
@@ -52,15 +117,25 @@ define(
                     'method': "worldpay_apm",
                     'additional_data': {
                         'cc_type': this.getselectedCCType(),
+                        'cc_bank': this.idealBankType
                     }
                 };
             },
-             getselectedCCType : function(){                
-                if(this.paymentMethodSelection()=='radio'){                                 
+             getselectedCCType : function(){
+                if(this.paymentMethodSelection()=='radio'){
                      return $("input[name='apm_type']:checked").val();
-                    } else{                                         
+                    } else{
                       return  this.selectedCCType();
                 }
+            },
+            getIdealBankList: function() {
+                 var bankList = _.map(window.checkoutConfig.payment.ccform.apmIdealBanks, function (value, key) {
+                                       return {
+                                        'bankCode': key,
+                                        'bankText': value
+                                    };
+                                });
+                return ko.observableArray(bankList);
             },
             paymentMethodSelection: function() {
                 return window.checkoutConfig.payment.ccform.paymentMethodSelection;
@@ -69,17 +144,42 @@ define(
                 var self = this;
                 var $form = $('#' + this.getCode() + '-form');
                 if($form.validation() && $form.validation('isValid')){
+                    if (this.getselectedCCType() =='IDEAL-SSL') {
+                        this.idealBankType = this.selectedIdealBank();
+                    }
                     self.placeOrder();
                 } else {
                     return $form.validation() && $form.validation('isValid');
                 }
             },
+            getIcons: function (type) {
+                return window.checkoutConfig.payment.ccform.wpicons.hasOwnProperty(type) ?
+                    window.checkoutConfig.payment.ccform.wpicons[type]
+                    : false;
+            },
 
             afterPlaceOrder: function (data, event) {
                 window.location.replace(url.build('worldpay/redirectresult/redirect'));
+            },
+            checkPaymentTypes: function (data, event){
+                if (data.ccValue) {
+                    if (data.ccValue=='IDEAL-SSL') {
+                        $(".ideal-block").show();
+                        $("#ideal_bank").prop('disabled',false);
+                    }else{
+                        $("#ideal_bank").prop('disabled',true);
+                        $(".ideal-block").hide();
+                    }
+                }else{
+                    if (data.selectedCCType() && data.selectedCCType() == 'IDEAL-SSL') {
+                        $(".ideal-block").show();
+                        $("#ideal_bank").prop('disabled',false);
+                    }else{
+                        $("#ideal_bank").prop('disabled',true);
+                        $(".ideal-block").hide();
+                    }
+                }
             }
-
-          
         });
     }
 );

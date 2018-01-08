@@ -59,21 +59,11 @@ class TokenService extends \Magento\Framework\DataObject
             $payment->setIsTransactionPending(1);
             $this->_handle3DSecure($threeDSecureParams, $tokenOrderParams, $orderCode);
         }else{
-            if ($threeDsEnabled) {
-                // Set flag to handles success response without 3DS & consider as normal order.
-                $this->checkoutSession->setThreeDSEnabledWithError(true);
-            }
             // Normal order goes here.(without 3DS).
             $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse);
             $this->_applyPaymentUpdate($directResponse, $payment);
         }
-
-//        $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse);
-
-        // $paymentUpdate = $this->_createPaymentUpdateFromResponse($directResponse);
-        // $paymentUpdate->apply($payment);
-        // $this->_abortIfPaymentError($paymentUpdate);
-         $quote->setActive(false);
+        $quote->setActive(false);
     }
     private function _handle3DSecure($threeDSecureParams, $directOrderParams, $mageOrderId)
     {
@@ -102,10 +92,4 @@ class TokenService extends \Magento\Framework\DataObject
             throw new Exception(sprintf('Payment CANCELLED'));
         }
     }
-
-    private function _createPaymentUpdateFromResponse($directResponse)
-    {
-        return $this->paymentservice->createPaymentUpdateFromWorldPayXml($directResponse->getXml());
-    }
-
 }

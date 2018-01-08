@@ -1,13 +1,3 @@
-<!--
-/**
- * Copyright © 2013-2017 Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
-<style type="text/css">
-    .checkout-payment-method .ccard .name .input-text{ width: 225px; }
-    .checkout-payment-method .ccard .type .select { width: 225px; }
-</style>
 <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
 <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
     <!-- ko if: (isShowLegend())-->
@@ -28,14 +18,26 @@
                optionsCaption: 'Select Your Credit Card', event:{ change: loadEventAction }"></select>
             <!-- /ko -->
             <!-- ko if: (paymentMethodSelection()=='radio')-->
-
+            
                 <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
+                
                     <input type="radio" name="payment[cc_type]"
-                            data-bind="event:{ change: $parent.loadEventAction }, attr: {'value': item.value,
-                            'data-validate': JSON.stringify({ 'validate-one-required-by-name':true })}"/>
-                    <label> <!-- ko text: item.type --><!-- /ko --></label>
-
+                            data-bind="event:{ change: $parent.loadEventAction }, attr: {'value': item.ccValue,
+                            'data-validate': JSON.stringify({ 'validate-one-required-by-name':true }),id: 'direct_cc_' + item.ccValue}"/>
+                    <!--ko if: $parent.getIcons(item.ccValue) -->
+                        <label data-bind="attr: {for: 'direct_cc_' + item.ccValue}"><img data-bind="attr: {
+                                    'src': $parent.getIcons(item.ccValue).url,
+                                    'alt': item.ccLabel,
+                                    'width': $parent.getIcons(item.ccValue).width,
+                                    'height': $parent.getIcons(item.ccValue).height
+                                    }"></label>
+                    <!--/ko-->
+                    <!--ko ifnot: $parent.getIcons(item.ccValue) -->
+                            <label data-bind="attr: {for: 'direct_cc_' + item.ccValue}"><!-- ko text: item.ccLabel --><!-- /ko --></label>
+                    <!--/ko-->
+                    
                 <!--/ko-->
+                
             <!-- /ko -->
         </div>
     </div>
@@ -167,11 +169,11 @@
 <form class="form" data-bind="attr: {'id': getCode() + '-savedcard-form'}">
     <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
     <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
-        <!-- ko if: (getSavedCardsList().length > 0)-->
+        <!-- ko if: (getSavedCardsCount() > 0)-->
             <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
             <!-- ko template: 'Sapient_Worldpay/payment/saved-card-form' --><!-- /ko -->
         <!-- /ko -->
-        <!-- ko ifnot: (getSavedCardsList().length > 0)-->
+        <!-- ko ifnot: (getSavedCardsCount() > 0)-->
             <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
             <span><!-- ko i18n: 'You have no Saved Card.'--><!-- /ko --></span>
         <!-- /ko -->

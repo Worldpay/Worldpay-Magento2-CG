@@ -1,0 +1,5 @@
+.checkout-payment-method .ccard .type .select,.checkout-payment-method .ccard .name .input-text { width: 225px; }
+.checkout-payment-method .cvv .control .saved-cvv-number {width: 55px;} 
+ul{
+    list-style-type: none;
+}

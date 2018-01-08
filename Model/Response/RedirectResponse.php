@@ -30,7 +30,7 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
         $url .= '&successURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/success');
         $url .= '&pendingURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/pending');
         $url .= '&cancelURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/cancel');
-        $url .= '&failureURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/failure');
+        $url .= '&failureURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/failure'); 
 
         return $url;
     }
@@ -45,6 +45,16 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
 
         $url = $this->_responseXml->xpath('reply/orderStatus/reference');
         return trim($url[0]);
+    }
+
+    public function getCallBackUrl()
+    {
+        $callbackurl = array();
+        $callbackurl['successURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/success');
+        $callbackurl['pendingURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/pending');
+        $callbackurl['cancelURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/cancel');
+        $callbackurl['failureURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/failure');
+        return $callbackurl;
     }
 
 }

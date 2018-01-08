@@ -62,7 +62,9 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $this->messageManager->addNotice($notice);
         $params = $this->getRequest()->getParams();
         if ($this->authenticatinservice->requestAuthenticated($params)) {
-            $this->_applyPaymentUpdate(PaymentStateResponse::createFromCancelledResponse($params), $order);
+            if (isset($params['orderKey'])) {
+                $this->_applyPaymentUpdate(PaymentStateResponse::createFromCancelledResponse($params), $order);
+            }
         }
         return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
     }
