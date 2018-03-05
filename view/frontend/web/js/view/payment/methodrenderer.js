@@ -16,7 +16,6 @@ define(
         rendererList
     ) {
         'use strict';
-        window.checkoutConfig.reloadOnBillingAddress = true;
         var CCcomponent = 'Sapient_Worldpay/js/view/payment/method-renderer/cc-method';
         var APMcomponent = 'Sapient_Worldpay/js/view/payment/method-renderer/apm-method';
 
@@ -28,7 +27,7 @@ define(
          $.each(methods, function (k, method) {
             rendererList.push(method);
         });
-        
+
         return Component.extend({});
     }
 );

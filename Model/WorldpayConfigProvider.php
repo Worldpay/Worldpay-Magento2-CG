@@ -78,13 +78,14 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         RequestInterface $request,
         Source $assetSource
         ) {
+
+            $this->wplogger = $wplogger;
             foreach ($this->methodCodes as $code) {
                 $this->methods[$code] = $paymentHelper->getMethodInstance($code);
             }
             $this->cart = $cart;
             $this->payment = $payment;
             $this->worldpayHelper = $helper;
-            $this->wplogger = $wplogger;
             $this->customerSession = $customerSession;
             $this->backendAuthSession = $backendAuthSession;
             $this->adminquotesession = $adminquotesession;

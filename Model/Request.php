@@ -72,22 +72,35 @@ class Request
         $request->setOption(CURLOPT_SSL_VERIFYPEER, false);
         $request->setOption(CURLOPT_POSTFIELDS, $quote->saveXML());
         $request->setOption(CURLOPT_USERPWD, $username.':'.$password);
+        // Cookie Set to 2nd 3DS request only.
+        $cookie = $this->helper->getWorldpayAuthCookie();
+        // Check Cookie Exist.
+        if ($this->helper->IsThreeDSRequest() && $cookie != "") {              // Check is 3DS request
+            $request->setOption(CURLOPT_COOKIE, $cookie);
+        }
         $request->setOption(CURLOPT_HEADER, true);
         $request->setOption(CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
         $logger->info('Sending XML as: ' . $this->_getObfuscatedXmlLog($quote));
 
+        $request->setOption(CURLINFO_HEADER_OUT, true);
+
         $result = $request->execute();
+
+        // logging Headder for 3DS request to check Cookie.
+        if ($this->helper->IsThreeDSRequest()) {
+            $information = $request->getInfo(CURLINFO_HEADER_OUT);
+            $logger->info("**REQUEST HEADER START**");
+            $logger->info($information);
+            $logger->info("**REQUEST HEADER ENDS**");
+        }
 
         if (!$result || ($code = $request->getInfo(CURLINFO_HTTP_CODE)) != self::SUCCESS) {
             $logger->info('Request could not be sent.');
             $logger->info($result);
             $logger->info('########### END OF REQUEST - FAILURE WHILST TRYING TO SEND REQUEST ###########');
-
             throw new Exception('Worldpay api service not available');
         }
-
         $request->close();
-
         $logger->info('Request successfully sent');
         $logger->info($result);
 
@@ -96,6 +109,13 @@ class Request
         $body = array_pop($bits);
         $headers = implode("\r\n\r\n", $bits);
 
+        // Extracting Cookie from Response Header.
+        if (preg_match("/Set-Cookie: (.+?)([\r\n]|$)/", $headers, $match)) {
+            // Keep a hold of the cookie returned incase we need to send a
+            // second order message after 3dSecure check
+                $logger->info('Cookie Get: ' . $match[1]);
+                $this->helper->setWorldpayAuthCookie($match[1]);
+        }
         return $body;
     }
 

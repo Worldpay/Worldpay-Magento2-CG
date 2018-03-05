@@ -8,14 +8,14 @@ use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Exception;
- 
+
 class Index extends \Magento\Framework\App\Action\Action
 {
     /**
      * @var Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;
-    
+
     protected $_rawBody;
     /**
      * @var \Sapient\Worldpay\Model\HistoryNotificationFactory
@@ -43,8 +43,7 @@ class Index extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
-    ) { 
-       
+    ) {
         parent::__construct($context);
         $this->wplogger = $wplogger;
         $this->paymentservice = $paymentservice;
@@ -53,14 +52,13 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->historyNotification = $historyNotification;
         $this->worldpaytoken = $worldpaytoken;
     }
- 
+
     public function execute()
     {
-       
         $this->wplogger->info('notification index url hit');
         try {
             $xmlRequest = simplexml_load_string($this->_getRawBody());
-            
+
             if ($xmlRequest instanceof \SimpleXMLElement) {
                 $this->updateNotification($xmlRequest);
                 $this->_createPaymentUpdate($xmlRequest);
@@ -79,7 +77,6 @@ class Index extends \Magento\Framework\App\Action\Action
             } else {
                 return $this->_returnFailure();
             }
-            
         }
     }
 
@@ -95,7 +92,7 @@ class Index extends \Magento\Framework\App\Action\Action
             }
         }
         return $this->_rawBody;
-    }  
+    }
 
     /**
      * @param $xmlRequest SimpleXMLElement
@@ -156,7 +153,7 @@ class Index extends \Magento\Framework\App\Action\Action
     }
 
     public function _returnFailure()
-    { 
+    {
         $resultJson = $this->resultJsonFactory->create();
         $resultJson->setHttpResponseCode(500);
         $resultJson->setData(self::RESPONSE_FAILED);
@@ -167,7 +164,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * Save Notification
      */
     private function updateNotification($xml)
-    {       
+    {
         $statusNode=$xml->notify->orderStatusEvent;
         $orderCode="";
         $paymentStatus="";
@@ -177,10 +174,9 @@ class Index extends \Magento\Framework\App\Action\Action
         if (isset($statusNode->payment->lastEvent)) {
                 $paymentStatus=$statusNode->payment->lastEvent;
         }
-        $hn = $this->historyNotification->create();             
+        $hn = $this->historyNotification->create();
         $hn->setData('status',$paymentStatus);
-        $hn->setData('order_id',trim($orderCode));  
+        $hn->setData('order_id',trim($orderCode));
         $hn->save();
     }
- 
 }

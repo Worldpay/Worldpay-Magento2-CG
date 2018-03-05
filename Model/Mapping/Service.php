@@ -31,7 +31,6 @@ class Service {
     )
     {
         $reservedOrderId = $quote->getReservedOrderId();
-
         return array(
             'orderCode'        => $orderCode,
             'merchantCode'     => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -61,7 +60,6 @@ class Service {
     )
     {
         $reservedOrderId = $quote->getReservedOrderId();
-
         return array(
             'orderCode'           => $orderCode,
             'merchantCode'        => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -93,7 +91,6 @@ class Service {
     )
     {
         $reservedOrderId = $quote->getReservedOrderId();
-
         return array(
             'orderCode'           => $orderCode,
             'merchantCode'        => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -151,13 +148,11 @@ class Service {
         $countryId,
         $paymenttype
         ){
-
          return array(
                 'merchantCode'  => $this->worldpayHelper->getMerchantCode($paymenttype),
                 'countryCode'   => $countryId,
                 'paymentType'   => $paymenttype
             );
-
     }
 
     private function _getTokenRequestConfig($paymentDetails)
@@ -180,9 +175,9 @@ class Service {
                 'is3DSecure' => false
             );
         }
-
         return $threedarray;
     }
+
     private function _getShippingAddress($quote)
     {
         $shippingaddress = $this->_getAddress($quote->getShippingAddress());
@@ -246,7 +241,6 @@ class Service {
                 }
                 $orderitems['lineItem'][] = $lineitem;
            }
-
           return $orderitems;
     }
 
@@ -263,14 +257,10 @@ class Service {
         );
     }
 
-
-
-      private function _getCardAddress($quote)
+    private function _getCardAddress($quote)
     {
         return $this->_getAddress($quote->getBillingAddress());
     }
-
-
 
      private function _getPaymentDetails($paymentDetails)
     {
@@ -308,6 +298,9 @@ class Service {
     }
     private function _getRedirectPaymentType($paymentDetails)
     {
+        if ('CARTEBLEUE-SSL' == $paymentDetails['additional_data']['cc_type']) {
+            return 'ECMC-SSL';
+        }
         return $paymentDetails['additional_data']['cc_type'];
     }
 
@@ -341,6 +334,7 @@ class Service {
         $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($paymentDetails['method']);
         return $details;
     }
+
     private function _getClientIPAddress()
     {
         $remoteAddresses = explode(',', $_SERVER['REMOTE_ADDR']);

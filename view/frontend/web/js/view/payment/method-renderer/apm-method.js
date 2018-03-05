@@ -32,7 +32,22 @@ define(
                 this.filterajax();
             },
 
+            initObservable: function () {
+                var that = this;
+                this._super();
+                quote.billingAddress.subscribe(function (newAddress) {
+                if (quote.billingAddress._latestValue != null && quote.billingAddress._latestValue.countryId != 'TO') {
+                    that.filterajax();
+                    that.checkPaymentTypes();
+                }
+               });
+            return this;
+            },
+
             filterajax: function(){
+                if (quote.billingAddress._latestValue == null) {
+                    return;
+                }
                 var ccavailabletypes = this.getCcAvailableTypes();
                 var filtercclist = {};
                 var cckey,ccvalue;
@@ -162,7 +177,7 @@ define(
                 window.location.replace(url.build('worldpay/redirectresult/redirect'));
             },
             checkPaymentTypes: function (data, event){
-                if (data.ccValue) {
+                if (data && data.ccValue) {
                     if (data.ccValue=='IDEAL-SSL') {
                         $(".ideal-block").show();
                         $("#ideal_bank").prop('disabled',false);
@@ -170,7 +185,7 @@ define(
                         $("#ideal_bank").prop('disabled',true);
                         $(".ideal-block").hide();
                     }
-                }else{
+                }else if(data){
                     if (data.selectedCCType() && data.selectedCCType() == 'IDEAL-SSL') {
                         $(".ideal-block").show();
                         $("#ideal_bank").prop('disabled',false);
@@ -178,6 +193,9 @@ define(
                         $("#ideal_bank").prop('disabled',true);
                         $(".ideal-block").hide();
                     }
+                } else {
+                    $("#ideal_bank").prop('disabled',true);
+                    $(".ideal-block").hide();
                 }
             }
         });

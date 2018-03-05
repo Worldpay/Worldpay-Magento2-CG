@@ -29,7 +29,7 @@ class Index extends \Magento\Backend\App\Action
      * @param JsonFactory $resultJsonFactory
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice,
-     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,    
+     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      */
     public function __construct(Context $context,  JsonFactory $resultJsonFactory,
@@ -37,8 +37,8 @@ class Index extends \Magento\Backend\App\Action
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
         \Sapient\Worldpay\Model\Order\Service $orderservice
-    ) { 
-       
+    ) {
+
         parent::__construct($context);
         $this->wplogger = $wplogger;
         $this->paymentservice = $paymentservice;
@@ -47,18 +47,16 @@ class Index extends \Magento\Backend\App\Action
         $this->worldpaytoken = $worldpaytoken;
 
     }
- 
+
     public function execute()
     {
-    
-         $this->_loadOrder();
-
+        $this->_loadOrder();
         try {
             $this->_fetchPaymentUpdate();
             $this->_registerWorldPayModel();
             $this->_applyPaymentUpdate();
             $this->_applyTokenUpdate();
-            
+
         } catch (Exception $e) {
             $this->wplogger->error($e->getMessage());
              if ($e->getMessage() == 'same state') {
@@ -97,7 +95,7 @@ class Index extends \Magento\Backend\App\Action
             $this->_paymentUpdate->apply($this->_order->getPayment(),$this->_order);
         } catch (Exception $e) {
             $this->wplogger->error($e->getMessage());
-            throw new Exception($e->getMessage());   
+            throw new Exception($e->getMessage());
         }
     }
 
@@ -110,11 +108,7 @@ class Index extends \Magento\Backend\App\Action
     {
         $resultRedirect = $this->resultRedirectFactory->create();
         $resultRedirect->setPath($this->_redirect->getRefererUrl());
-        return $resultRedirect; 
+        return $resultRedirect;
     }
 
-
-
- 
- 
 }

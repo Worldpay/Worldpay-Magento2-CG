@@ -15,7 +15,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
 		\Magento\Framework\Locale\CurrencyInterface $localeCurrency,
 		\Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist,
-		\Sapient\Worldpay\Helper\Merchantprofile $merchantprofile
+		\Sapient\Worldpay\Helper\Merchantprofile $merchantprofile,
+		\Magento\Checkout\Model\Session $checkoutSession
 	)
 	{
 		$this->_scopeConfig = $scopeConfig;
@@ -23,6 +24,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		$this->paymentlist = $paymentlist;
 		$this->localecurrency = $localeCurrency;
 		$this->merchantprofile = $merchantprofile;
+		$this->_checkoutSession = $checkoutSession;
 	}
 	public function isWorldPayEnable()
 	{
@@ -84,7 +86,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		if ($this->isDynamic3DEnabled()) {
 			return (bool) $this->_scopeConfig->getValue('worldpay/general_config/do_3Dsecure', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 		}
-		return false;
+		return (bool) false;
 	}
 	public function isLoggerEnable()
 	{
@@ -280,15 +282,30 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		 return $this->localecurrency->getCurrency($currencycode)->getSymbol();
 	}
 
-	 public function getQuantityUnit($product)
-	 {
-	    	return 'product';
-	 }
+	public function getQuantityUnit($product)
+	{
+		return 'product';
+	}
 
-	 public function CheckStopAutoInvoice($code, $type)
-	 {
-	 	return $this->paymentlist->CheckStopAutoInvoice($code, $type);
-	 }
+	public function CheckStopAutoInvoice($code, $type)
+	{
+		return $this->paymentlist->CheckStopAutoInvoice($code, $type);
+	}
+
+	public function getWorldpayAuthCookie()
+	{
+		return $this->_checkoutSession->getWorldpayAuthCookie();
+	}
+
+	public function setWorldpayAuthCookie($value)
+	{
+	 	return $this->_checkoutSession->setWorldpayAuthCookie($value);
+	}
+
+	public function IsThreeDSRequest()
+	{
+	 	return $this->_checkoutSession->getIs3DSRequest();
+	}
 
 }
 

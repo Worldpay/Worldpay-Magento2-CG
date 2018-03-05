@@ -49,9 +49,9 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return $this->directservice;
     }
 
-    
+
     /**
-     * @param int storeId 
+     * @param int storeId
      * @return bool
      */
     private function _isRedirectIntegrationModeEnabled($storeId)
@@ -61,7 +61,7 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return $integrationModel === 'redirect';
     }
 
-    /**    
+    /**
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null){
@@ -74,7 +74,7 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
     }
 
     /**
-     * @param int storeId 
+     * @param int storeId
      * @return bool
      */
     private function _isEmbeddedIntegrationModeEnabled($storeId)
