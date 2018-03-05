@@ -9,14 +9,13 @@ use Sapient\Worldpay\Model\Token\StateInterface as TokenStateInterface;
 /**
  * Worldpay token
  */
-class WorldpayToken 
+class WorldpayToken
 {
-
     /**
      * Constructor
      *
      * @param SavedToken $savedtoken
-     * @param Sapient\Worldpay\Logger\WorldpayLogger $wplogger     
+     * @param Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      */
     public function __construct(
         SavedToken $savedtoken,
@@ -88,7 +87,6 @@ class WorldpayToken
      */
     public function updateOrInsertToken(TokenStateInterface $tokenState)
     {
-
         if (!$tokenState->getTokenCode()) {
             return;
         }
@@ -103,7 +101,6 @@ class WorldpayToken
             $tokenModel->setTokenExpiryDate($tokenState->getTokenExpiryDate()->format('Y-m-d'));
             $tokenModel->setCardNumber($tokenState->getObfuscatedCardNumber());
             $tokenModel->setCardholderName($tokenState->getCardholderName());
-            
             $tokenModel->setMethod(str_replace("_CREDIT", "", $tokenState->getPaymentMethod()));
             $tokenModel->setCardBrand($tokenState->getCardBrand());
             $tokenModel->setCardSubBrand($tokenState->getCardSubBrand());
@@ -113,7 +110,6 @@ class WorldpayToken
             $tokenModel->setMerchantCode($tokenState->getMerchantCode());
             $tokenModel->setAuthenticatedShopperId($tokenState->getAuthenticatedShopperId());
             $tokenModel->setCustomerId($tokenState->getAuthenticatedShopperId());
-            
             $tokenModel->save();
             $tokenModel->getResource()->commit();
         } catch (Exception $e) {
@@ -122,5 +118,4 @@ class WorldpayToken
             throw $e;
         }
     }
-
 }

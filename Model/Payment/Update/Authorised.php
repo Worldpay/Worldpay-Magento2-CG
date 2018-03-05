@@ -10,12 +10,12 @@ class Authorised
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
-    
+
     /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
-     * @param \Sapient\Worldpay\Helper\Data $configHelper     
+     * @param \Sapient\Worldpay\Helper\Data $configHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Payment\State $paymentState,
@@ -97,9 +97,9 @@ class Authorised
         }
     }
 
-    /** 
+    /**
      * check if integration mode is direct
-     * @return bool 
+     * @return bool
      */
     private function _isDirectIntegrationMode(\Sapient\Worldpay\Model\Order $order)
     {
@@ -107,9 +107,9 @@ class Authorised
             === \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::DIRECT_MODEL;
     }
 
-    /** 
+    /**
      * check if integration mode is redirect
-     * @return bool 
+     * @return bool
      */
     private function _isRedirectIntegrationMode(\Sapient\Worldpay\Model\Order $order)
     {
@@ -117,6 +117,6 @@ class Authorised
             === \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::REDIRECT_MODEL;
     }
 
-   
+
 
 }

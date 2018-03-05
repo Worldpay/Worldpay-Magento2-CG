@@ -25,17 +25,17 @@ class Merchantprofile
 
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Framework\Math\Random $mathRandom     
+     * @param \Magento\Framework\Math\Random $mathRandom
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Math\Random $mathRandom        
+        \Magento\Framework\Math\Random $mathRandom
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->mathRandom = $mathRandom;
-        
+
     }
-    
+
     /**
      * Generate a storable representation of a value
      *
@@ -44,7 +44,7 @@ class Merchantprofile
      */
     protected function serializeValue($value)
     {
-        
+
         if (is_array($value)) {
             $data = [];
             foreach ($value as $payment_type => $merchant_detail) {
@@ -52,7 +52,7 @@ class Merchantprofile
                     $data[$payment_type] =$merchant_detail;
                 }
             }
-          
+
             return serialize($data);
         } else {
             return '';
@@ -89,7 +89,7 @@ class Merchantprofile
         foreach ($value as $row) {
             if (!is_array($row)
                 || !array_key_exists('worldpay_payment_method', $row)
-                || !array_key_exists('merchant_code', $row)              
+                || !array_key_exists('merchant_code', $row)
             ) {
                 return false;
             }
@@ -125,7 +125,7 @@ class Merchantprofile
      */
     protected function decodeArrayFieldValue(array $value)
     {
-        $result = "";
+        $result = array();
         unset($value['__empty']);
         foreach ($value as $row) {
             if (!is_array($row)
@@ -136,9 +136,9 @@ class Merchantprofile
             ) {
                 continue;
             }
-            if (!empty($row['worldpay_payment_method']) 
+            if (!empty($row['worldpay_payment_method'])
                && !empty($row['merchant_code'])
-               && !empty($row['merchant_username']) 
+               && !empty($row['merchant_username'])
                || !empty($row['merchant_password'])
            ) {
                 $payment_type = $row['worldpay_payment_method'];
@@ -146,12 +146,12 @@ class Merchantprofile
                 $rs['merchant_username'] = $row['merchant_username'];
                 $rs['merchant_password'] = $row['merchant_password'];
                 $result[$payment_type] = $rs;
-            }            
+            }
         }
         return $result;
     }
 
-    
+
 
     /**
      * Make value readable by \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray
@@ -176,12 +176,12 @@ class Merchantprofile
      */
     public function makeStorableArrayFieldValue($value)
     {
-         
+
         if ($this->isEncodedArrayFieldValue($value)) {
             $value = $this->decodeArrayFieldValue($value);
         }
         $value = $this->serializeValue($value);
-                 
+
         return $value;
     }
 
@@ -209,5 +209,5 @@ class Merchantprofile
 
         return;
     }
-    
+
 }

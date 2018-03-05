@@ -79,8 +79,20 @@ define(
                 this.selectedCCType(null);
                 this.filtercardajax();
             },
-
-              filtercardajax: function(){
+            initObservable: function () {
+                var that = this;
+                this._super();
+                quote.billingAddress.subscribe(function (newAddress) {
+                if (quote.billingAddress._latestValue != null  && quote.billingAddress._latestValue.countryId != 'TO') {
+                    that.filtercardajax();
+                }
+               });
+            return this;
+            },
+            filtercardajax: function(){
+                if (quote.billingAddress._latestValue == null) {
+                    return;
+                }
                 var ccavailabletypes = this.getCcAvailableTypes();
                 var savedcardlists = window.checkoutConfig.payment.ccform.savedCardList;
                 var filtercclist = {};
@@ -90,7 +102,7 @@ define(
                  var payload = {
                     countryId: quote.billingAddress._latestValue.countryId
                 };
-            
+
                  fullScreenLoader.startLoader();
 
                  storage.post(
@@ -99,10 +111,10 @@ define(
                     function (apiresponse) {
                            var response = JSON.parse(apiresponse);
                             if(response.length){
-                                for (var key in savedcardlists) { 
+                                for (var key in savedcardlists) {
                                     var method = savedcardlists[key]['method'];
                                     var found = false;
-                                    for (var responsekey in response) { 
+                                    for (var responsekey in response) {
                                         if(method.toUpperCase() == response[responsekey]){
                                             found = true;
                                             break;
@@ -114,7 +126,7 @@ define(
                                     }
                                 }
 
-                               for (var responsekey in response) { 
+                               for (var responsekey in response) {
                                        var found = false;
                                       for(var key in ccavailabletypes) {
                                             if(key != 'savedcard'){
@@ -138,14 +150,13 @@ define(
                                filtercclist = ccavailabletypes;
                                filtercards = savedcardlists;
                              }
-                        
+
                              var ccTypesArr1 = _.map(filtercclist, function (value, key) {
                                return {
                                 'ccValue': key,
                                 'ccLabel': value
-                            }; 
+                            };
                          });
-                       
                          fullScreenLoader.stopLoader();
                          ccTypesArr(ccTypesArr1);
                          filtersavedcardLists(filtercards);
@@ -155,10 +166,9 @@ define(
                         errorProcessor.process(response);
                         fullScreenLoader.stopLoader();
                     }
-                ); 
+                );
             },
 
-          
             getCcAvailableTypesValues : function(){
                    return ccTypesArr;
             },

@@ -24,17 +24,17 @@
                 </field>
                 <field id="merchant_code" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Merchant Code</label>
-                    <validate>required-entry</validate> 
+                    <validate>required-entry</validate>
                     <depends><field id="enabled">1</field></depends>
                 </field>
                 <field id="xml_username" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>XML Username</label>
-                    <validate>required-entry</validate> 
+                    <validate>required-entry</validate>
                     <depends><field id="enabled">1</field></depends>
                 </field>
                 <field id="xml_password" translate="label" type="password" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>XML Password</label>
-                    <validate>required-entry</validate> 
+                    <validate>required-entry</validate>
                     <depends><field id="enabled">1</field></depends>
                 </field>
                 <field id="enable_dynamic3DS" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -135,7 +135,7 @@
                     <label>Merchant Profile Configuration</label>
                     <frontend_model>Sapient\Worldpay\Block\Adminhtml\Form\Field\MerchantProfile</frontend_model>
                     <backend_model>Sapient\Worldpay\Model\System\Config\Backend\Merchantprofile</backend_model>
-                </field>                
+                </field>
             </group>
             <group id="custom_paymentpages" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Custom Payment Pages</label>

@@ -52,9 +52,14 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
     {
         $directOrderParams['paResponse'] = $paResponse;
         $directOrderParams['echoData'] = $threeDSecureParams->getEchoData();
+        // @setIs3DSRequest flag set to ensure whether it is 3DS request or not.
+        // To add cookie for 3DS second request.
+        $this->checkoutSession->setIs3DSRequest(true);
         try {
             $response = $this->paymentservicerequest->order3DSecure($directOrderParams);
             $this->response = $this->directResponse->setResponse($response);
+            // @setIs3DSRequest flag is unset from checkout session.
+            $this->checkoutSession->unsIs3DSRequest();
             $orderIncrementId = current(explode('-', $directOrderParams['orderCode']));
             $this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
             $this->_paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml($this->response->getXml());

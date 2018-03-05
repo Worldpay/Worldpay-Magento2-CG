@@ -4,8 +4,8 @@
              <general_config>
                 <enable_worldpay>0</enable_worldpay>
                 <environment_mode>Test Mode</environment_mode>
-                <test_url>https://secure-test.worldpay.com/jsp/merchant/xml/paymentService.jsp</test_url>                
-                <enable_dynamic3DS>1</enable_dynamic3DS>
+                <test_url>https://secure-test.worldpay.com/jsp/merchant/xml/paymentService.jsp</test_url>
+                <enable_dynamic3DS>0</enable_dynamic3DS>
                 <enable_logging>0</enable_logging>
                 <payment_method_selection>radio</payment_method_selection>
             </general_config>
@@ -71,7 +71,7 @@
                 <sort_order>10</sort_order>
                 <require_cvc>1</require_cvc>
             </worldpay_cc>
-             <worldpay_apm>
+            <worldpay_apm>
                 <title>Alternative Payment methods</title>
                 <model>Sapient\Worldpay\Model\PaymentMethods\AlternativePaymentMethods</model>
                 <active>1</active>

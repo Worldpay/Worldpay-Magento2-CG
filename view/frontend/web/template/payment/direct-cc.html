@@ -7,20 +7,19 @@
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
     <div class="payment-method-content">
+        <!-- Credit Card Form-->
+        <div class="payment-method-cc-form">
+            <!-- ko template: 'Sapient_Worldpay/payment/cc-form' --><!-- /ko -->
+        </div>
         <!-- ko foreach: getRegion('messages') -->
-        <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-
-            <!-- Credit Card Form-->
-            <div class="payment-method-cc-form">
-                <!-- ko template: 'Sapient_Worldpay/payment/cc-form' --><!-- /ko -->
-            </div>
-        </form>
+    </form>
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
             <!-- ko template: getTemplate() --><!-- /ko -->

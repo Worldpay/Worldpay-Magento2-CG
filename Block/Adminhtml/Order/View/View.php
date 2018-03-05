@@ -12,9 +12,9 @@ class View extends \Magento\Backend\Block\Template
     protected $registry;
     /**
      * @var \Sapient\Worldpay\Model\WorldpaymentFactory
-     */   
+     */
     protected $_worldpaymentFactory;
-    
+
     /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
@@ -25,10 +25,10 @@ class View extends \Magento\Backend\Block\Template
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\Registry $registry,
         \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory,
-        array $data = []          
+        array $data = []
     ) {
         $this->registry = $registry;
-        $this->_worldpaymentFactory= $worldpaymentFactory;     
+        $this->_worldpaymentFactory= $worldpaymentFactory;
         parent::__construct($context, $data);
     }
      /**
@@ -44,26 +44,26 @@ class View extends \Magento\Backend\Block\Template
     }
 
     /**
-     * Retrieve Worldpay Payment Detail 
+     * Retrieve Worldpay Payment Detail
      *
      * @return object
     */
     public function getWorldPaymentsDetails()
-    {        
+    {
         $order=$this->_getOrder();
         $order_id=$order->getIncrementId();
         $wpp = $this->_worldpaymentFactory->create();
-        $item = $wpp->loadByPaymentId($order_id);      
+        $item = $wpp->loadByPaymentId($order_id);
         return $item;
     }
 
     /**
-     * Retrieve payment method from order 
+     * Retrieve payment method from order
      *
      * @return String
     */
     public function getPaymentMethod()
-    {       
+    {
        return  $this->_getOrder()->getPayment()->getMethod();
     }
 
@@ -84,6 +84,6 @@ class View extends \Magento\Backend\Block\Template
     }
 
 
-  
+
 
 }
