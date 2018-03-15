@@ -26,9 +26,50 @@
                 <item name="worldpay_cc" xsi:type="string">worldpay_cc</item>
                 <item name="worldpay_apm" xsi:type="string">worldpay_apm</item>
                 <item name="worldpay_moto" xsi:type="string">worldpay_moto</item>
+                <item name="worldpay_cc_vault" xsi:type="string">worldpay_cc_vault</item>
             </argument>
         </arguments>
     </type>
     <preference for="Sapient\Worldpay\Api\HistoryInterface" type="Sapient\Worldpay\Model\Notification\History" />
     <preference for="Sapient\Worldpay\Api\PaymentTypeInterface" type="Sapient\Worldpay\Model\Payment\PaymentTypes" />
+    <preference for="Magento\Vault\Model\Method\Vault" type="Sapient\Worldpay\Model\PaymentMethods\CcVault" />
+    <type name="Sapient\Worldpay\Model\PaymentMethods\CcVault">
+        <arguments>
+            <argument name="logger" xsi:type="object">Sapient\Worldpay\Logger\WorldpayLogger</argument>
+            <argument name="directservice" xsi:type="object">Sapient\Worldpay\Model\Authorisation\DirectService</argument>
+            <argument name="quoteRepository" xsi:type="object">Magento\Quote\Api\CartRepositoryInterface</argument>
+            <argument name="worldpayhelper" xsi:type="object">Sapient\Worldpay\Helper\Data</argument>
+            <argument name="worldpaypayment" xsi:type="object">Sapient\Worldpay\Model\WorldpaymentFactory</argument>
+            <argument name="worldpaypaymentmodel" xsi:type="object">Sapient\Worldpay\Model\Worldpayment</argument>
+            <argument name="paymentutils" xsi:type="object">Sapient\Worldpay\Model\Utilities\PaymentMethods</argument>
+            <argument name="paymentservicerequest" xsi:type="object">Sapient\Worldpay\Model\Request\PaymentServiceRequest</argument>
+            <argument name="adminhtmlresponse" xsi:type="object">Sapient\Worldpay\Model\Response\AdminhtmlResponse</argument>
+        </arguments>
+    </type>
+    <!-- Payment Method configuration -->
+    <virtualType name="WorldpayVaultPaymentConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Sapient\Worldpay\Model\WorldpayConfigProvider::CC_VAULT_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="WorldpayVaultPaymentValueHandler" type="VaultPaymentDefaultValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">WorldpayVaultPaymentConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="WorldpayVaultPaymentValueHandlerPool" type="VaultPaymentValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">WorldpayVaultPaymentValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="WorldpayCreditCardVaultFacade" type="Sapient\Worldpay\Model\PaymentMethods\CcVault">
+        <arguments>
+            <argument name="config" xsi:type="object">WorldpayVaultPaymentConfig</argument>
+            <argument name="valueHandlerPool" xsi:type="object">WorldpayVaultPaymentValueHandlerPool</argument>
+            <argument name="vaultProvider" xsi:type="object">Sapient\Worldpay\Model\PaymentMethods\CreditCards</argument>
+            <argument name="code" xsi:type="const">Sapient\Worldpay\Model\WorldpayConfigProvider::CC_VAULT_CODE</argument>
+        </arguments>
+    </virtualType>
 </config>

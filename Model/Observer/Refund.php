@@ -31,7 +31,7 @@ class Refund implements ObserverInterface {
     {
         $payment = $observer->getEvent()->getPayment();
         $creditmemo = $observer->getEvent()->getCreditmemo();
-        if ($payment->getMethod()=='worldpay_cc' || $payment->getMethod()=='worldpay_apm') {
+        if ($payment->getMethod()=='worldpay_cc' || $payment->getMethod()=='worldpay_apm' || $payment->getMethod()=='worldpay_cc_vault') {
              $amount = $this->pricinghelper->currency($creditmemo->getGrandTotal(), true, false);
              $creditmemo->setState(\Magento\Sales\Model\Order\Creditmemo::STATE_OPEN);
              $creditmemo->setStatus(\Magento\Sales\Model\Order\Creditmemo::STATE_OPEN);

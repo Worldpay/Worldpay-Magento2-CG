@@ -5,6 +5,10 @@
 namespace Sapient\Worldpay\Model\Payment;
 
 use Sapient\Worldpay\Model\SavedTokenFactory;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
+use Magento\Payment\Model\InfoInterface;
+use Magento\Vault\Model\CreditCardTokenFactory;
+use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
 /**
  * Updating Risk gardian
  */
@@ -14,6 +18,7 @@ class UpdateWorldpayment
      * @var \Sapient\Worldpay\Model\WorldpaymentFactory
      */
     protected $worldpaypayment;
+    protected $paymentMethodType;
     /**
      * Constructor
      *
@@ -28,7 +33,9 @@ class UpdateWorldpayment
         \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment,
         \Sapient\Worldpay\Helper\Data $worldpayHelper,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Customer\Model\Session $customerSession,
+        OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
+        CreditCardTokenFactory $paymentTokenFactory
     ) {
         $this->wplogger = $wplogger;
         $this->savedTokenFactory = $savedTokenFactory;
@@ -36,6 +43,8 @@ class UpdateWorldpayment
         $this->worldpayHelper = $worldpayHelper;
         $this->_messageManager = $messageManager;
         $this->customerSession = $customerSession;
+        $this->paymentTokenFactory = $paymentTokenFactory;
+        $this->paymentExtensionFactory = $paymentExtensionFactory;
     }
 
     /**
@@ -43,7 +52,7 @@ class UpdateWorldpayment
      *
      * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
      */
-    public function updateWorldpayPayment(\Sapient\Worldpay\Model\Response\DirectResponse $directResponse)
+    public function updateWorldpayPayment(\Sapient\Worldpay\Model\Response\DirectResponse $directResponse, \Magento\Payment\Model\InfoInterface $paymentObject)
     {
         $responseXml=$directResponse->getXml();
         $merchantCode = $responseXml['merchantCode'];
@@ -68,8 +77,8 @@ class UpdateWorldpayment
         $wpp->setData('card_number',$cardNumber);
         $wpp->setData('payment_status',$paymentStatus);
         if($payment->paymentMethod[0]){
-            $paymenttype = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
-            $wpp->setData('payment_type',str_replace("_CREDIT", "", $paymenttype));
+            $this->paymentMethodType = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
+            $wpp->setData('payment_type',str_replace("_CREDIT", "", $this->paymentMethodType));
         }
         $wpp->setData('avs_result',$avsnumber);
         $wpp->setData('cvc_result', $cvcnumber);
@@ -93,6 +102,12 @@ class UpdateWorldpayment
             if (!$tokenNodeWithError) {
                 $tokenElement=$orderStatus->token;
                 $this->saveTokenData($tokenElement, $payment, $merchantCode);
+                // vault and instant purchase configuration goes here
+                $paymentToken = $this->getVaultPaymentToken($tokenElement);
+                if (null !== $paymentToken) {
+                    $extensionAttributes = $this->getExtensionAttributes($paymentObject);
+                    $extensionAttributes->setVaultPaymentToken($paymentToken);
+                }
             }
         }
     }
@@ -134,6 +149,71 @@ class UpdateWorldpayment
               $this->_messageManager->addNotice(__("You already appear to have this card number stored, if your card details have changed, you can update these via the 'my cards' section"));
               return;
         }
+
     }
 
+    protected function getVaultPaymentToken($tokenElement)
+    {
+        // Check token existing in gateway response
+        $token = $tokenElement[0]->tokenDetails[0]->paymentTokenID[0];
+        if (empty($token)) {
+            return null;
+        }
+
+        /** @var PaymentTokenInterface $paymentToken */
+        $paymentToken = $this->paymentTokenFactory->create();
+        $paymentToken->setGatewayToken($token);
+        $paymentToken->setExpiresAt($this->getExpirationDate($tokenElement));
+        $paymentToken->setIsVisible(true);
+        $paymentToken->setTokenDetails($this->convertDetailsToJSON([
+            'type' => $this->paymentMethodType,
+            'maskedCC' => $this->getLastFourNumbers($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->obfuscatedPAN[0]),
+            'expirationDate'=> $this->getExpirationMonthAndYear($tokenElement)
+        ]));
+
+        return $paymentToken;
+    }
+    public function getExpirationMonthAndYear($tokenElement)
+    {
+        $dateNode = $tokenElement[0]->tokenDetails->paymentTokenExpiry->date;
+        return $dateNode['month'].'/'.$dateNode['year'];
+    }
+
+    public function getLastFourNumbers($number)
+    {
+        return substr ($number, -4);
+    }
+
+    private function getExpirationDate($tokenElement)
+    {
+        $dateNode = $tokenElement[0]->tokenDetails->paymentTokenExpiry->date;
+        $expDate = new \DateTime(
+            (int)$dateNode['year']
+            . '-'
+            . (int)$dateNode['month']
+            . '-'
+            . (int)$dateNode['dayOfMonth']
+            . ' '
+            . '00:00:00',
+            new \DateTimeZone('UTC')
+        );
+        $expDate->add(new \DateInterval('P1M'));
+        return $expDate->format('Y-m-d 00:00:00');
+    }
+
+    private function convertDetailsToJSON($details)
+    {
+        $json = \Zend_Json::encode($details);
+        return $json ? $json : '{}';
+    }
+
+    private function getExtensionAttributes(InfoInterface $payment)
+    {
+        $extensionAttributes = $payment->getExtensionAttributes();
+        if (null === $extensionAttributes) {
+            $extensionAttributes = $this->paymentExtensionFactory->create();
+            $payment->setExtensionAttributes($extensionAttributes);
+        }
+        return $extensionAttributes;
+    }
 }

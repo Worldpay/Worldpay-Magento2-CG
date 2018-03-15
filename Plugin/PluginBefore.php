@@ -35,7 +35,8 @@ class PluginBefore
             $order = $this->order->load($orderId);
             if($order->getPayment()->getMethod()=='worldpay_cc'
                 || $order->getPayment()->getMethod()=='worldpay_apm'
-                || $order->getPayment()->getMethod()=='worldpay_moto') {
+                || $order->getPayment()->getMethod()=='worldpay_moto'
+                || $order->getPayment()->getMethod()=='worldpay_cc_vault') {
                 $buttonList->add(
                     'sync_status',
                     ['label' => __('Sync Status'), 'onclick' => 'setLocation("'.$syncurl.'")', 'class' => 'reset'],

@@ -140,7 +140,7 @@ class Index extends \Magento\Framework\App\Action\Action
     {
         $tokenService = $this->worldpaytoken;
         $tokenService->updateOrInsertToken(
-             new \Sapient\Worldpay\Model\Token\StateXml($xmlRequest)
+             new \Sapient\Worldpay\Model\Token\StateXml($xmlRequest), $this->_order->getPayment()
         );
     }
 

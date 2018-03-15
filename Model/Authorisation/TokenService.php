@@ -60,7 +60,7 @@ class TokenService extends \Magento\Framework\DataObject
             $this->_handle3DSecure($threeDSecureParams, $tokenOrderParams, $orderCode);
         }else{
             // Normal order goes here.(without 3DS).
-            $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse);
+            $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment);
             $this->_applyPaymentUpdate($directResponse, $payment);
         }
         $quote->setActive(false);

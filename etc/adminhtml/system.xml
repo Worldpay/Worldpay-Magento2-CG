@@ -58,6 +58,9 @@
                     <label>Payment Method Selection</label>
                     <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethodSelection</source_model>
                 </field>
+                <field id="order_description" translate="label" type="textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Description</label>                                        
+                </field>
             </group>
             <!--Credit Card-->
             <group id="cc_config" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -94,6 +97,10 @@
                 </field>
                 <field id="saved_card" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Save Card</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="instant_purchase" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Instant Purchase</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>

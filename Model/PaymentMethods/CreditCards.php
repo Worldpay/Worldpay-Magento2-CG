@@ -82,5 +82,8 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return $this->worlpayhelper->isIframeIntegration($storeId);
     }
 
-
+    public function getTitle()
+    {
+        return $this->worlpayhelper->getCcTitle();
+    }
 }

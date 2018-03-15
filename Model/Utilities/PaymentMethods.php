@@ -156,7 +156,7 @@ class PaymentMethods
      */
     private function _paymentMethodFiltersByCountry($type)
     {
-        return $type === 'worldpay_apm' || $type === 'worldpay_cc' || $type === 'worldpay_moto';
+        return $type === 'worldpay_apm' || $type === 'worldpay_cc' || $type === 'worldpay_moto' || $type === 'worldpay_cc_vault';
     }
 
     /**
@@ -371,7 +371,7 @@ class PaymentMethods
 
     public function getPaymentTypeCountries()
     {
-        $codes = array('worldpay_cc','worldpay_apm','worldpay_moto');
+        $codes = array('worldpay_cc','worldpay_apm','worldpay_moto', 'worldpay_cc_vault');
         $paymenttypecountries = array();
         foreach($codes as $code){
             if ($xml = $this->_readXML()) {

@@ -8,6 +8,7 @@
                 <enable_dynamic3DS>0</enable_dynamic3DS>
                 <enable_logging>0</enable_logging>
                 <payment_method_selection>radio</payment_method_selection>
+                <order_description>WorldPay Order</order_description>
             </general_config>
             <cc_config>
                 <enabled>1</enabled>
@@ -70,8 +71,22 @@
                 <payment_action>authorize</payment_action>
                 <sort_order>10</sort_order>
                 <require_cvc>1</require_cvc>
+                <can_authorize_vault>1</can_authorize_vault>
+                <can_capture_vault>1</can_capture_vault>
             </worldpay_cc>
-            <worldpay_apm>
+            <worldpay_cc_vault>
+                <title>Credit Cards vault</title>
+                <active>1</active>
+                <sort_order>30</sort_order>
+                <payment_action>authorize</payment_action>
+                <model>WorldpayCreditCardVaultFacade</model>
+                <instant_purchase>
+                    <available>Sapient\Worldpay\Model\InstantPurchase\CreditCard\AvailabilityChecker</available>
+                    <tokenFormat>Sapient\Worldpay\Model\InstantPurchase\CreditCard\TokenFormatter</tokenFormat>
+                    <additionalInformation>Sapient\Worldpay\Model\InstantPurchase\PaymentAdditionalInformationProvider</additionalInformation>
+                </instant_purchase>
+            </worldpay_cc_vault>
+             <worldpay_apm>
                 <title>Alternative Payment methods</title>
                 <model>Sapient\Worldpay\Model\PaymentMethods\AlternativePaymentMethods</model>
                 <active>1</active>

@@ -7,7 +7,8 @@
       "magento/magento-composer-installer": "*",
       "magento/module-sales": "*",
       "magento/module-payment": "*",
-      "magento/module-quote": "*"
+      "magento/module-quote": "*",
+      "magento/module-vault": "*"
    },
    "license":"proprietary",
    "autoload":{

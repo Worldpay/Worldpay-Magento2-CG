@@ -101,7 +101,7 @@ class Index extends \Magento\Backend\App\Action
 
     private function _applyTokenUpdate()
     {
-        $this->worldpaytoken->updateOrInsertToken($this->_tokenState);
+        $this->worldpaytoken->updateOrInsertToken($this->_tokenState, $this->_order->getPayment());
     }
 
     private function _redirectBackToOrderView()
