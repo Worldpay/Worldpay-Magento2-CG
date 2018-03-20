@@ -35,7 +35,8 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment,
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Customer\Model\Session $customerSession,
+        \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
     ) {
         $this->paymentservicerequest = $paymentservicerequest;
         $this->wplogger = $wplogger;
@@ -47,6 +48,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
         $this->_messageManager = $messageManager;
         $this->updateWorldPayPayment = $updateWorldPayPayment;
         $this->customerSession = $customerSession;
+        $this->worldpaytoken = $worldpaytoken;
     }
     public function continuePost3dSecureAuthorizationProcess($paResponse, $directOrderParams, $threeDSecureParams)
     {
@@ -120,9 +122,17 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
             $paymentData = $xmlResponseData->reply->orderStatus->payment;
             $merchantCode = $xmlResponseData['merchantCode'];
             if ($tokenData) {
-                $this->updateWorldPayPayment->create()->saveTokenData($tokenData, $paymentData, $merchantCode);
+                $this->_applyTokenUpdate($xmlResponseData);
             }
             $this->customerSession->unsIsSavedCardRequested();
         }
+    }
+
+    private function _applyTokenUpdate($xmlRequest)
+    {
+        $tokenService = $this->worldpaytoken;
+        $tokenService->updateOrInsertToken(
+             new \Sapient\Worldpay\Model\Token\StateXml($xmlRequest), $this->_order->getPayment()
+        );
     }
 }

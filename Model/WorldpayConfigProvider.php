@@ -18,6 +18,7 @@ use Magento\Framework\View\Asset\Source;
  */
 class WorldpayConfigProvider implements ConfigProviderInterface
 {
+    const CC_VAULT_CODE = "worldpay_cc_vault";
     /**
      * @var string[]
      */

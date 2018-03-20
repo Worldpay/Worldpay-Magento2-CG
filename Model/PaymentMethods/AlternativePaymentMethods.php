@@ -17,7 +17,7 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
     protected $_canAuthorize = true;
     protected $_canUseInternal = false;
     protected $_canUseCheckout = true;
-       
+
     /**
      * Authorize payment abstract method
      *
@@ -38,16 +38,19 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
     }
 
     /**
-     * check if apm is enabled   
+     * check if apm is enabled
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-
        if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isApmEnabled()) {
          return true;
-       } 
+       }
        return false;
-         
+    }
+
+    public function getTitle()
+    {
+        return $this->worlpayhelper->getApmTitle();
     }
 }

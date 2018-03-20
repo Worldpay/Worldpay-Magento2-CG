@@ -9,10 +9,12 @@ use \Magento\Framework\View\Result\PageFactory;
 use \Sapient\Worldpay\Model\SavedTokenFactory;
 use \Magento\Customer\Model\Session;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Vault\Api\PaymentTokenRepositoryInterface;
+use Magento\Vault\Model\PaymentTokenManagement;
 /**
- * Perform delete card 
+ * Perform delete card
  */
-class Delete extends \Magento\Framework\App\Action\Action 
+class Delete extends \Magento\Framework\App\Action\Action
 {
     /**
      * @var \Magento\Framework\View\Result\PageFactory
@@ -27,7 +29,7 @@ class Delete extends \Magento\Framework\App\Action\Action
     /**
      * Constructor
      *
-     * @param StoreManagerInterface $storeManager     
+     * @param StoreManagerInterface $storeManager
      * @param Context $context
      * @param PageFactory $resultPageFactory
      * @param SavedTokenFactory $savecard
@@ -44,7 +46,9 @@ class Delete extends \Magento\Framework\App\Action\Action
         Session $customerSession,
         \Sapient\Worldpay\Model\Token\Service $tokenService,
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken,
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        PaymentTokenRepositoryInterface $tokenRepository,
+        PaymentTokenManagement $paymentTokenManagement
     ) {
         parent::__construct($context);
         $this->_storeManager = $storeManager;
@@ -54,6 +58,8 @@ class Delete extends \Magento\Framework\App\Action\Action
         $this->_tokenService = $tokenService;
         $this->_worldpayToken = $worldpayToken;
         $this->wplogger = $wplogger;
+        $this->tokenRepository = $tokenRepository;
+        $this->paymentTokenManagement = $paymentTokenManagement;
     }
 
     /**
@@ -65,9 +71,9 @@ class Delete extends \Magento\Framework\App\Action\Action
     {
         return $this->_storeManager->getStore()->getId();
     }
-    
+
     /**
-     * perform card deletion 
+     * perform card deletion
      */
 	public function execute()
 	{
@@ -83,7 +89,10 @@ class Delete extends \Magento\Framework\App\Action\Action
                     $this->getStoreId());
 
                     if ($tokenDeleteResponse->isSuccess()) {
+                        // Delete Worldpay Token.
                         $this->_applyTokenDelete($model, $this->customerSession->getCustomer());
+                        // Delete Vault Token.
+                        $this->_applyVaultTokenDelete($model, $this->customerSession->getCustomer());
                     }
 	            	$this->messageManager->addSuccess(__('Item is deleted successfully'));
 	        	} else {
@@ -93,6 +102,8 @@ class Delete extends \Magento\Framework\App\Action\Action
                 $this->wplogger->error($e->getMessage());
                 if ($this->_tokenNotExistOnWorldpay($e->getMessage())) {
                     $this->_applyTokenDelete($model, $this->customerSession->getCustomer());
+                    $this->_applyVaultTokenDelete($model, $this->customerSession->getCustomer());
+
                     $this->messageManager->addSuccess(__('Item is deleted successfully'));
                 } else {
                     $this->messageManager->addException($e, __('Error: ').$e->getMessage());
@@ -101,7 +112,7 @@ class Delete extends \Magento\Framework\App\Action\Action
     	}
         $this->_redirect('worldpay/savedcard/index');
 	}
-    
+
     /**
      * @return bool
      */
@@ -113,9 +124,9 @@ class Delete extends \Magento\Framework\App\Action\Action
         }
         return false;
     }
-    
+
     /**
-     * Delete card of customer 
+     * Delete card of customer
      */
     protected function _applyTokenDelete($tokenModel, $customer)
     {
@@ -123,5 +134,21 @@ class Delete extends \Magento\Framework\App\Action\Action
             $tokenModel,
             $customer
         );
+    }
+
+    /**
+     * Delete vault card of customer
+     */
+    protected function _applyVaultTokenDelete($tokenModel, $customer)
+    {
+        $paymentToken = $this->paymentTokenManagement->getByGatewayToken($tokenModel->getTokenCode(), 'worldpay_cc', $customer->getId());
+        if ($paymentToken === null) {
+            return;
+        }
+        try {
+            $this->tokenRepository->delete($paymentToken);
+        } catch (\Exception $e) {
+            $this->messageManager->addErrorMessage(__('Please try after some time'));
+        }
     }
 }

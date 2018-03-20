@@ -23,6 +23,35 @@ class Service {
         $this->_urlBuilder = $urlBuilder;
     }
 
+    public function collectVaultOrderParameters(
+        $orderCode,
+        $quote,
+        $orderStoreId,
+        $paymentDetails
+    )
+    {
+        $reservedOrderId = $quote->getReservedOrderId();
+        return array(
+            'orderCode'        => $orderCode,
+            'merchantCode'     => $this->worldpayHelper->getMerchantCode($paymentDetails['cc_type']),
+            'orderDescription' => $this->_getOrderDescription($reservedOrderId),
+            'currencyCode'     => $quote->getQuoteCurrencyCode(),
+            'amount'           => $quote->getGrandTotal(),
+            'paymentDetails'   => $this->_getVaultPaymentDetails($paymentDetails),
+            'cardAddress'      => $this->_getCardAddress($quote),
+            'shopperEmail'     => $quote->getCustomerEmail(),
+            'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
+            'tokenRequestConfig' => $this->_getTokenRequestConfig($paymentDetails),
+            'acceptHeader'     => php_sapi_name() !== "cli" ? $_SERVER['HTTP_ACCEPT'] : '',
+            'userAgentHeader'  => php_sapi_name() !== "cli" ? $_SERVER['HTTP_USER_AGENT'] : '',
+            'shippingAddress'  => $this->_getShippingAddress($quote),
+            'billingAddress'   => $this->_getBillingAddress($quote),
+            'method'           => $paymentDetails['method'],
+            'orderStoreId'     => $orderStoreId,
+            'shopperId'     => $quote->getCustomerId()
+        );
+    }
+
     public function collectDirectOrderParameters(
         $orderCode,
         $quote,
@@ -164,18 +193,22 @@ class Service {
 
     private function _getThreeDSecureConfig($method = null)
     {
-        $threedarray =  array(
-            'isDynamic3D'=> (bool)$this->worldpayHelper->isDynamic3DEnabled(),
-            'is3DSecure' => (bool)$this->worldpayHelper->is3DSecureEnabled()
-        );
-
         if ($method == 'worldpay_moto') {
-             $threedarray =  array(
+             return  array(
                 'isDynamic3D'=> false,
                 'is3DSecure' => false
             );
+        } elseif($method == 'worldpay_cc_vault'){
+            return  array(
+                'isDynamic3D'=> true,
+                'is3DSecure' => false
+            );
+        } else {
+            return  array(
+            'isDynamic3D'=> (bool)$this->worldpayHelper->isDynamic3DEnabled(),
+            'is3DSecure' => (bool)$this->worldpayHelper->is3DSecureEnabled()
+        );
         }
-        return $threedarray;
     }
 
     private function _getShippingAddress($quote)
@@ -306,7 +339,7 @@ class Service {
 
     private function _getOrderDescription($reservedOrderId)
     {
-        return 'Magento 2 Order for ' . $reservedOrderId;
+        return $this->worldpayHelper->getOrderDescription();
     }
 
     private function _getPaymentDetailsUsingToken($paymentDetails,$quote)
@@ -329,6 +362,19 @@ class Service {
             }
         }
 
+        $details['sessionId'] = session_id();
+        $details['shopperIpAddress'] = $this->_getClientIPAddress();
+        $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($paymentDetails['method']);
+        return $details;
+    }
+
+    private function _getVaultPaymentDetails($paymentDetails){
+        $details = array(
+                'brand' => $paymentDetails['card_brand'],
+                'paymentType' => 'TOKEN-SSL',
+                'customerId' => $paymentDetails['customer_id'],
+                'tokenCode' => $paymentDetails['token'],
+            );
         $details['sessionId'] = session_id();
         $details['shopperIpAddress'] = $this->_getClientIPAddress();
         $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($paymentDetails['method']);

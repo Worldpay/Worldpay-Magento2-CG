@@ -75,7 +75,7 @@ class View extends \Magento\Backend\Block\Template
     public function isWorldpayPayment(){
 
         $paymentMethod= $this->getPaymentMethod();
-        if ($paymentMethod=='worldpay_cc' || $paymentMethod=='worldpay_apm' || $paymentMethod=='worldpay_moto')
+        if ($paymentMethod=='worldpay_cc' || $paymentMethod=='worldpay_apm' || $paymentMethod=='worldpay_moto' || $paymentMethod=='worldpay_cc_vault')
         {
             return true;
         }

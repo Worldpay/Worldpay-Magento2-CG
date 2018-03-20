@@ -193,7 +193,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	public function getIntegrationModelByPaymentMethodCode($paymentMethodCode, $storeId)
 	{
 
-		if($paymentMethodCode == 'worldpay_cc' || $paymentMethodCode == 'worldpay_moto'){
+		if($paymentMethodCode == 'worldpay_cc' || $paymentMethodCode == 'worldpay_moto' || $paymentMethodCode == 'worldpay_cc_vault'){
 			return $this->_scopeConfig->getValue(self::INTEGRATION_MODE, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 		}else{
 			return 'redirect';
@@ -292,6 +292,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		return $this->paymentlist->CheckStopAutoInvoice($code, $type);
 	}
 
+	public function instantPurchaseEnabled()
+	{
+		return  (bool) $this->_scopeConfig->getValue('worldpay/cc_config/instant_purchase', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+	}
+
 	public function getWorldpayAuthCookie()
 	{
 		return $this->_checkoutSession->getWorldpayAuthCookie();
@@ -305,6 +310,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	public function IsThreeDSRequest()
 	{
 	 	return $this->_checkoutSession->getIs3DSRequest();
+	}
+
+	public function getOrderDescription()
+	{
+		return $this->_scopeConfig->getValue('worldpay/general_config/order_description', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 	}
 
 }
