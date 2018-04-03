@@ -3,7 +3,7 @@
 
 # Magento Versions
 
-    2.1.8
+    2.1.8 & above
     Magento Enterprise
     Magento Community
 
@@ -33,6 +33,7 @@
 # Integration Types
 
     Client Side Encryption (CSE)
+    Instant Purchase Checkout
     iFrame
     Hosted Payment Page
     Tokenisation (Creating, Storing, Using & Deleting Tokens)
