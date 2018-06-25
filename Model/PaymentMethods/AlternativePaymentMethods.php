@@ -51,6 +51,16 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
 
     public function getTitle()
     {
-        return $this->worlpayhelper->getApmTitle();
+        if($order = $this->registry->registry('current_order')) {
+            return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
+        }else if($invoice = $this->registry->registry('current_invoice')){
+            $order = $this->worlpayhelper->getOrderByOrderId($invoice->getOrderId());
+            return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
+        }else if($creditMemo = $this->registry->registry('current_creditmemo')){
+            $order = $this->worlpayhelper->getOrderByOrderId($creditMemo->getOrderId());
+            return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
+        }else{
+            return $this->worlpayhelper->getApmTitle();
+        }
     }
 }

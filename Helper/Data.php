@@ -16,7 +16,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		\Magento\Framework\Locale\CurrencyInterface $localeCurrency,
 		\Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist,
 		\Sapient\Worldpay\Helper\Merchantprofile $merchantprofile,
-		\Magento\Checkout\Model\Session $checkoutSession
+		\Magento\Checkout\Model\Session $checkoutSession,
+		\Magento\Sales\Model\OrderFactory $orderFactory
 	)
 	{
 		$this->_scopeConfig = $scopeConfig;
@@ -25,6 +26,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		$this->localecurrency = $localeCurrency;
 		$this->merchantprofile = $merchantprofile;
 		$this->_checkoutSession = $checkoutSession;
+		$this->orderFactory = $orderFactory;
 	}
 	public function isWorldPayEnable()
 	{
@@ -135,7 +137,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 			'BOLETO-SSL' => 'Boleto Bancairo',
 			'ALIPAY-SSL' => 'AliPay',
 			'SEPA_DIRECT_DEBIT-SSL' => 'SEPA (One off transactions)',
-			'KlARNA-SSL' => 'Klarna',
+			'KLARNA-SSL' => 'Klarna',
 			'PRZELEWY-SSL' => 'P24',
 			'MISTERCASH-SSL' => 'Mistercash/Bancontact'
 		);
@@ -316,6 +318,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	{
 		return $this->_scopeConfig->getValue('worldpay/general_config/order_description', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 	}
+	public function getMotoTitle(){
+		return $this->_scopeConfig->getValue('worldpay/moto_config/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+	}
+
+	public function getPaymentTitleForOrders($order, $paymentCode, \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment){
+		$order_id = $order->getIncrementId();
+		$wpp = $worldpaypayment->create();
+		$item = $wpp->loadByPaymentId($order_id);
+		if ($paymentCode == 'worldpay_cc' || $paymentCode == 'worldpay_cc_vault') {
+			return $this->getCcTitle()."\n".$item->getPaymentType();
+		} else if($paymentCode == 'worldpay_apm') {
+			return $this->getApmTitle()."\n".$item->getPaymentType();
+		}else if($paymentCode == 'worldpay_moto') {
+			return $this->getMotoTitle()."\n".$item->getPaymentType();
+		}
+	}
+
+	public function getOrderByOrderId($orderId){
+        return $this->orderFactory->create()->load($orderId);
+    }
 
 }
 

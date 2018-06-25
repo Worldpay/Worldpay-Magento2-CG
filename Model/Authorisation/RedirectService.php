@@ -7,7 +7,7 @@ use Exception;
 
 class RedirectService extends \Magento\Framework\DataObject
 {
-   
+
     /** @var \Sapient\Worldpay\Model\Response\RedirectResponse */
     protected $_redirectResponseModel;
 
@@ -21,7 +21,7 @@ class RedirectService extends \Magento\Framework\DataObject
      * @param \Sapient\Worldpay\Helper\Registry $registryhelper
      * @param \Magento\Checkout\Model\Session $checkoutsession
      * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist
-     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper   
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
@@ -46,7 +46,7 @@ class RedirectService extends \Magento\Framework\DataObject
     }
     /**
      * handles provides authorization data for redirect
-     * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl 
+     * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
      */
     public function authorizePayment(
         $mageOrder,
@@ -55,9 +55,9 @@ class RedirectService extends \Magento\Framework\DataObject
         $orderStoreId,
         $paymentDetails,
         $payment
-    ) {      
+    ) {
         $this->checkoutsession->setauthenticatedOrderId($mageOrder->getIncrementId());
-        if($paymentDetails['additional_data']['cc_type'] == 'KlARNA-SSL'){
+        if($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL'){
              $redirectOrderParams = $this->mappingservice->collectKlarnaOrderParameters(
                 $orderCode,
                 $quote,
@@ -97,7 +97,7 @@ class RedirectService extends \Magento\Framework\DataObject
         );
 
         $payment->setIsTransactionPending(1);
-        
+
         $this->registryhelper->setworldpayRedirectUrl($successUrl);
         $this->checkoutsession->setWpRedirecturl($successUrl);
 
@@ -121,9 +121,9 @@ class RedirectService extends \Magento\Framework\DataObject
         $address = $quote->getBillingAddress();
         if ($address->getId()) {
             return $address->getCountry();
-        }        
+        }
         return $this->worldpayhelper->getDefaultCountry();
-        
+
     }
 
     /**
@@ -131,14 +131,14 @@ class RedirectService extends \Magento\Framework\DataObject
      * @return string
      */
     protected function _getLanguageForLocale()
-    {        
+    {
         $locale = $this->worldpayhelper->getLocaleDefault();
         if (substr($locale, 3, 2) == 'NO') {
             return 'no';
-        }         
+        }
         return substr($locale, 0, 2);
     }
-    
+
     /**
      * @return \Sapient\Worldpay\Model\Response\RedirectResponse
      */
@@ -150,5 +150,5 @@ class RedirectService extends \Magento\Framework\DataObject
         return $this->_redirectResponseModel;
     }
 
-    
+
 }

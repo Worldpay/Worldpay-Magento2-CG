@@ -174,7 +174,7 @@
                 <capture_request>0</capture_request>
                 <stop_auto_invoice>1</stop_auto_invoice>
             </SEPA_DIRECT_DEBIT-SSL>
-             <KlARNA-SSL>
+             <KLARNA-SSL>
                 <title>Klarna (Redirect)</title>
                 <areas>
                     <area>AT</area>
@@ -202,7 +202,7 @@
                 </currencies>
                 <capture_request>0</capture_request>
                 <stop_auto_invoice>1</stop_auto_invoice>
-            </KlARNA-SSL>
+            </KLARNA-SSL>
              <PRZELEWY-SSL>
                 <title>P24</title>
                <areas>

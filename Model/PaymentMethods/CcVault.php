@@ -61,7 +61,8 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
         \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentutils,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
-        \Sapient\Worldpay\Model\Response\AdminhtmlResponse $adminhtmlresponse
+        \Sapient\Worldpay\Model\Response\AdminhtmlResponse $adminhtmlresponse,
+        \Magento\Framework\Registry $registry
      ) {
          parent::__construct(
             $config,
@@ -84,6 +85,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $this->paymentutils = $paymentutils;
         $this->paymentservicerequest = $paymentservicerequest;
         $this->adminhtmlresponse = $adminhtmlresponse;
+        $this->registry = $registry;
      }
 
     public function initialize($paymentAction, $stateObject)
@@ -145,10 +147,10 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
                 $payment
             );
         } catch (Exception $e) {
-            $this->_wplogger->error($e->getMessage());
-            $this->_wplogger->error('Authorising payment failed.');
+            $this->logger->error($e->getMessage());
+            $this->logger->error('Authorising payment failed.');
             $errormessage = $this->worlpayhelper->updateErrorMessage($e->getMessage(),$quote->getReservedOrderId());
-            $this->_wplogger->error($errormessage);
+            $this->logger->error($errormessage);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __($errormessage)
             );
@@ -253,6 +255,16 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
 
     public function getTitle()
     {
-        return $this->worlpayhelper->getCcTitle();
+        if($order = $this->registry->registry('current_order')) {
+            return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
+        }else if($invoice = $this->registry->registry('current_invoice')){
+            $order = $this->worlpayhelper->getOrderByOrderId($invoice->getOrderId());
+            return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
+        }else if($creditMemo = $this->registry->registry('current_creditmemo')){
+            $order = $this->worlpayhelper->getOrderByOrderId($creditMemo->getOrderId());
+            return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
+        }else{
+            return $this->worlpayhelper->getCcTitle();
+        }
     }
 }

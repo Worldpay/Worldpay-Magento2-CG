@@ -29,7 +29,17 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
      */
     public function getTitle()
     {
-        return  $this->_scopeConfig->getValue('worldpay/moto_config/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        if($order = $this->registry->registry('current_order')) {
+            return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
+        }else if($invoice = $this->registry->registry('current_invoice')){
+            $order = $this->worlpayhelper->getOrderByOrderId($invoice->getOrderId());
+            return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
+        }else if($creditMemo = $this->registry->registry('current_creditmemo')){
+            $order = $this->worlpayhelper->getOrderByOrderId($creditMemo->getOrderId());
+            return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
+        }else{
+            return $this->worlpayhelper->getMotoTitle();
+        }
     }
 
     public function getAuthorisationService($storeId)

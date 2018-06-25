@@ -143,7 +143,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->authSession = $authSession;
         $this->motoredirectservice = $motoredirectservice;
         $this->paymenttypes = $paymenttypes;
-
+        $this->registry = $registry;
     }
     public function initialize($paymentAction, $stateObject)
     {

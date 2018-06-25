@@ -246,9 +246,9 @@ class Service {
                 $lineitem['name'] = $_item->getName();
                 $lineitem['quantity'] = (int)$_item->getQty();
                 $lineitem['quantityUnit'] = $this->worldpayHelper->getQuantityUnit($_item->getProduct());
-                $lineitem['unitPrice'] = $rowtotal / $_item->getQty();
+                $lineitem['unitPrice'] = ($rowtotal / $_item->getQty()) + ($totaltax / $_item->getQty());
                 $lineitem['taxRate'] =  (int)$_item->getTaxPercent();
-                $lineitem['totalAmount'] = $totalamount;
+                $lineitem['totalAmount'] = $totalamount + $totaltax;
                 $lineitem['totalTaxAmount'] =$totaltax;
                 if($discountamount > 0){
                      $lineitem['totalDiscountAmount'] = $discountamount;
@@ -260,13 +260,14 @@ class Service {
           $lineitem = array();
           $address = $quote->getShippingAddress();
            if($address->getShippingAmount() > 0){
+                $totalAmount = $address->getShippingAmount() - $address->getShippingDiscountAmount();
+                $totaltax = $address->getShippingTaxAmount() + $address->getShippingHiddenTaxAmount();
                 $lineitem['reference'] = 'Shipid';
                 $lineitem['name'] = 'Shipping amount';
                 $lineitem['quantity'] = 1;
                 $lineitem['quantityUnit'] = 'shipping';
-                $lineitem['unitPrice'] = $address->getShippingAmount();
-                $lineitem['totalAmount'] = $address->getShippingAmount() - $address->getShippingDiscountAmount();
-                $totaltax = $address->getShippingTaxAmount() + $address->getShippingHiddenTaxAmount();
+                $lineitem['unitPrice'] = $address->getShippingAmount() + $totaltax;
+                $lineitem['totalAmount'] =  $totalAmount + $totaltax;
                 $lineitem['totalTaxAmount'] = $totaltax;
                 $lineitem['taxRate'] =  (int)(($totaltax * 100)/$address->getShippingAmount());
                 if($address->getShippingDiscountAmount() > 0){

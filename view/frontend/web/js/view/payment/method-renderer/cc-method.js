@@ -15,10 +15,9 @@ define(
         'Magento_Checkout/js/model/error-processor',
         'Magento_Checkout/js/model/url-builder',
         'mage/storage',
-        'Magento_Checkout/js/model/full-screen-loader',
-        'worldpay'
+        'Magento_Checkout/js/model/full-screen-loader'
     ],
-    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, wp) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader) {
         'use strict';
         //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
@@ -335,21 +334,28 @@ define(
                             }
                       }
                  }else if($form.validation() && $form.validation('isValid')){
-                        //Direct form handle
-                        this.saveMyCard = $('#' + this.getCode() + '_save_card').is(":checked");
-                        if (this.isClientSideEncryptionEnabled() && this.intigrationmode == 'direct') {
-                            Worldpay.setPublicKey(this.getCsePublicKey());
+                    //Direct form handle
+                    this.saveMyCard = $('#' + this.getCode() + '_save_card').is(":checked");
+                    if (this.isClientSideEncryptionEnabled() && this.intigrationmode == 'direct') {
+                        var that = this;
+                        require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.1.min.js"], function(worldpay){
+                            worldpay.setPublicKey(that.getCsePublicKey());
                             var cseData = {
-                                cvc: this.creditCardVerificationNumber(),
-                                cardHolderName: $('#' + this.getCode() + '_cc_name').val(),
-                                cardNumber: this.creditCardNumber(),
-                                expiryMonth: this.creditCardExpMonth(),
-                                expiryYear: this.creditCardExpYear()
+                                cvc: that.creditCardVerificationNumber(),
+                                cardHolderName: $('#' + that.getCode() + '_cc_name').val(),
+                                cardNumber: that.creditCardNumber(),
+                                expiryMonth: that.creditCardExpMonth(),
+                                expiryYear: that.creditCardExpYear()
                             };
-                            var encryptedData = Worldpay.encrypt(cseData);
-                            this.cseData = encryptedData;
+                            var encryptedData = worldpay.encrypt(cseData);
+                            that.cseData = encryptedData;
+                            //place order with direct CSE method
+                            self.placeOrder();
+                        });
+                    } else if(this.intigrationmode == 'redirect'){
+                        //place order with Redirect CSE Method
+                        self.placeOrder();
                     }
-                    self.placeOrder();
                 }else {
                     return $form.validation() && $form.validation('isValid');
                 }
