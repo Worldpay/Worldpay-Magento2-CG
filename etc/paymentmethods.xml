@@ -200,7 +200,7 @@
                     <currency>NOK</currency>
                     <currency>SEK</currency>
                 </currencies>
-                <capture_request>0</capture_request>
+                <capture_request>1</capture_request>
                 <stop_auto_invoice>1</stop_auto_invoice>
             </KLARNA-SSL>
              <PRZELEWY-SSL>

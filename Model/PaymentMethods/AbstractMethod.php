@@ -405,7 +405,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $type = strtoupper($this->_getpaymentType());
         if($type == 'KLARNA-SSL'){
             $shippingaddress = $quote->getShippingAddress();
-            $countryId = $shippingaddress->getCountryId();
+            $billingaddress = $quote->getBillingAddress();
+            $shippingCountryId = $shippingaddress->getCountryId();
+            $countryId = isset($shippingCountryId)?$shippingCountryId:$billingaddress->getCountryId();
             $paymenttypes = json_decode($this->paymenttypes->getPaymentType($countryId));
             if(!in_array($type, $paymenttypes)){
                  throw new Exception('Payment Type not valid for the shipping country');

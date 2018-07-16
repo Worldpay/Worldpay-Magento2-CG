@@ -273,7 +273,8 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
             $orderCode,
             $order->getOrderCurrencyCode(),
-            $order->getGrandTotal()
+            $order->getGrandTotal(),
+            $wp->getPaymentType()
         );
 
         return $this->_sendRequest(

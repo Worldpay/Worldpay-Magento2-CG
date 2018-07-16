@@ -47,6 +47,7 @@ class Pending extends \Magento\Framework\App\Action\Action
 
     public function execute()
     {
+        $paymentType = '';
         $this->wplogger->info('worldpay returned pending url');
         if (!$this->orderservice->getAuthorisedOrder()) {
             return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
@@ -56,7 +57,9 @@ class Pending extends \Magento\Framework\App\Action\Action
         $params = $this->getRequest()->getParams();
         try {
             if ($params) {
-                $this->_applyPaymentUpdate(PaymentStateResponse::createFromPendingResponse($params), $order);
+                $worldPayPayment = $order->getWorldPayPayment();
+                $paymentType = $worldPayPayment->getPaymentType();
+                $this->_applyPaymentUpdate(PaymentStateResponse::createFromPendingResponse($params, $paymentType), $order);
             }
         } catch (Exception $e) {
             $this->wplogger->error($e->getMessage());

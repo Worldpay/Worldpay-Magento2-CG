@@ -29,7 +29,7 @@ EOD;
      * @param float $amount    
      * @return SimpleXMLElement $xml
      */
-    public function build($merchantCode, $orderCode, $currencyCode, $amount)
+    public function build($merchantCode, $orderCode, $currencyCode, $amount, $paymentType = null)
     {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -42,7 +42,11 @@ EOD;
 
         $modify = $this->_addModifyElement($xml);
         $orderModification = $this->_addOrderModificationElement($modify);
-        $this->_addCaptureElement($orderModification);
+        $capture = $this->_addCapture($orderModification);
+        $this->_addCaptureElement($capture);
+        if(!empty($paymentType) && $paymentType == "KLARNA-SSL"){
+            $this->_addShippingElement($capture);
+        }
 
         return $xml;
     }
@@ -75,12 +79,22 @@ EOD;
     /**
      * Add tag capture to xml 
      *
-     * @param SimpleXMLElement $orderModification     
+     * @param SimpleXMLElement $orderModification
+     * @return SimpleXMLElement $capture
      */
-    private function _addCaptureElement($orderModification)
+    private function _addCapture($orderModification)
     {
         $capture = $orderModification->addChild('capture');
+        return $capture;
+    }
 
+    /**
+     * Add tag date, amount to xml 
+     *
+     * @param SimpleXMLElement $capture     
+     */
+    private function _addCaptureElement($capture)
+    {
         // data
         $today = new \DateTime();
         $date = $capture->addChild('date');
@@ -101,5 +115,20 @@ EOD;
     private function _amountAsInt($amount)
     {
         return round($amount, self::EXPONENT, PHP_ROUND_HALF_EVEN) * pow(10, self::EXPONENT);
+    }
+
+    /**
+     * Add tag Shipping to xml 
+     *
+     * @param SimpleXMLElement $capture
+     *
+     * Descrition : Adding additional shipping tag for Klarna
+     */
+    private function _addShippingElement($capture)
+    {
+        // data
+        $shippingElement = $capture->addChild('shipping');
+        $shippingInfoElement = $shippingElement->addChild('shippingInfo');
+        $shippingInfoElement['trackingId'] = "";
     }
 }

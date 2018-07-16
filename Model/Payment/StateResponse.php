@@ -42,18 +42,26 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
         );
     }
 
-    public static function createFromPendingResponse($params)
+    public static function createFromPendingResponse($params, $paymentType = null)
     {
         $orderkey = $params['orderKey'];
         $orderCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractOrderCode($orderkey);
         $merchantCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractMerchantCode($orderkey);
-
-        return new self(
-            $orderCode,
-            $merchantCode,
-            \Sapient\Worldpay\Model\Payment\State::STATUS_PENDING_PAYMENT,
-            null
-        );
+        if(!empty($paymentType) && $paymentType == "KLARNA-SSL"){
+            return new self(
+                $orderCode,
+                $merchantCode,
+                \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION,
+                null
+            );
+        }else{
+            return new self(
+                $orderCode,
+                $merchantCode,
+                \Sapient\Worldpay\Model\Payment\State::STATUS_PENDING_PAYMENT,
+                null
+            );
+        }
     }
 
     
