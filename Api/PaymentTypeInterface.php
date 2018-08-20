@@ -11,7 +11,7 @@ interface PaymentTypeInterface
      *
      * @api
      * @param string $countryId.
-     * @return json 
+     * @return null|string 
      */
     public function getPaymentType($countryId);
 }

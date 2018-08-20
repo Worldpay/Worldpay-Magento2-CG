@@ -10,8 +10,8 @@ interface HistoryInterface
      * Retrive order Notification
      *
      * @api
-     * @param Integer $order OrderId.
-     * @return json 
+     * @param integer $order OrderId.
+     * @return string
      */
     public function getHistory($order);
 }

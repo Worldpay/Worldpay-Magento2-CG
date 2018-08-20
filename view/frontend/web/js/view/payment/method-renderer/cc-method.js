@@ -22,6 +22,8 @@ define(
         //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
         var filtersavedcardLists = ko.observableArray([]);
+        var paymentService = false;
+        var billingAddressCountryId = quote.billingAddress._latestValue.countryId;
         $.validator.addMethod('worldpay-validate-number', function (value) {
             if (value) {
                 return evaluateRegex(value, "^[0-9]{12,20}$");
@@ -76,19 +78,25 @@ define(
             initialize: function () {
                 this._super();
                 this.selectedCCType(null);
-                this.filtercardajax();
+                if(paymentService == false){
+                    this.filtercardajax(1);
+                }
             },
             initObservable: function () {
                 var that = this;
                 this._super();
                 quote.billingAddress.subscribe(function (newAddress) {
-                if (quote.billingAddress._latestValue != null  && quote.billingAddress._latestValue.countryId != 'TO') {
-                    that.filtercardajax();
+                if (quote.billingAddress._latestValue != null  && quote.billingAddress._latestValue.countryId != billingAddressCountryId) {
+                    that.filtercardajax(1);
+                    paymentService = true;
                 }
                });
             return this;
             },
-            filtercardajax: function(){
+            filtercardajax: function(statusCheck = null){
+                if(!statusCheck){
+                    return;
+                }
                 if (quote.billingAddress._latestValue == null) {
                     return;
                 }

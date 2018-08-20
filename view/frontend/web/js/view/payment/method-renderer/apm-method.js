@@ -19,6 +19,8 @@ define(
     function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,errorProcessor, urlBuilder, storage, fullScreenLoader, ko) {
         'use strict';
         var ccTypesArr = ko.observableArray([]);
+        var paymentService = false;
+        var billingAddressCountryId = quote.billingAddress._latestValue.countryId;
         return Component.extend({
             defaults: {
                 redirectAfterPlaceOrder: false,
@@ -29,22 +31,28 @@ define(
             initialize: function () {
                 this._super();
                 this.selectedCCType(null);
-                this.filterajax();
+                if(paymentService == false){
+                    this.filterajax(1);
+                }
             },
 
             initObservable: function () {
                 var that = this;
                 this._super();
                 quote.billingAddress.subscribe(function (newAddress) {
-                if (quote.billingAddress._latestValue != null && quote.billingAddress._latestValue.countryId != 'TO') {
-                    that.filterajax();
                     that.checkPaymentTypes();
+                if (quote.billingAddress._latestValue != null && quote.billingAddress._latestValue.countryId != billingAddressCountryId) {
+                    that.filterajax(1);
+                    paymentService = true;                 
                 }
                });
             return this;
             },
 
-            filterajax: function(){
+            filterajax: function(statusCheck = null){
+                if(!statusCheck){
+                    return;
+                }
                 if (quote.billingAddress._latestValue == null) {
                     return;
                 }
