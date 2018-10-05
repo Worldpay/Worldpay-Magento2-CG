@@ -130,7 +130,8 @@ EOD;
         $amountElement = $order->addChild('amount');
         $amountElement['currencyCode'] = $this->currencyCode;
         $amountElement['exponent'] = self::EXPONENT;
-        $amountElement['value'] = $this->_amountAsInt($this->amount);
+        //$amountElement['value'] = $this->_amountAsInt($this->amount);
+        $amountElement['value'] = $this->_amountAsInt($this->_roundOfTotal($order));
     }
 
     private function _addDynamic3DSElement($order)
@@ -227,7 +228,7 @@ EOD;
 
         $orderlineitems = $this->orderlineitems;
 
-         $orderTaxAmountElement = $orderLinesElement->addChild('orderTaxAmount');
+        $orderTaxAmountElement = $orderLinesElement->addChild('orderTaxAmount');
         $this->_addCDATA($orderTaxAmountElement, $this->_amountAsInt($orderlineitems['orderTaxAmount']));
 
          $termsURLElement = $orderLinesElement->addChild('termsURL');
@@ -242,11 +243,14 @@ EOD;
     private function _addLineItemElement($parentElement, $reference, $name, $quantity, $quantityUnit, $unitPrice,
         $taxRate, $totalAmount, $totalTaxAmount, $totalDiscountAmount = 0)
     {
-         $lineitem = $parentElement->addChild('lineItem');
+        $unitPrice = sprintf('%0.2f', $unitPrice);
+        $totalAmount = $quantity * $unitPrice;
 
-          $lineitem->addChild('physical');
+        $lineitem = $parentElement->addChild('lineItem');
 
-         $referenceElement = $lineitem->addChild('reference');
+        $lineitem->addChild('physical');
+
+        $referenceElement = $lineitem->addChild('reference');
         $this->_addCDATA($referenceElement, $reference);
 
           $nameElement = $lineitem->addChild('name');
@@ -286,5 +290,17 @@ EOD;
     private function _amountAsInt($amount)
     {
         return round($amount, self::EXPONENT, PHP_ROUND_HALF_EVEN) * pow(10, self::EXPONENT);
+    }
+
+    private function _roundOfTotal($order){
+        $accTotalAmt = 0;
+
+        $orderlineitems = $this->orderlineitems;
+        foreach($orderlineitems['lineItem'] as $lineitem){
+            $totaldiscountamount = (isset($lineitem['totalDiscountAmount'])) ? sprintf('%0.2f',$lineitem['totalDiscountAmount']) : 0;
+            $unitPrice = sprintf('%0.2f', $lineitem['unitPrice']);
+            $accTotalAmt = $accTotalAmt + ($lineitem['quantity'] * $unitPrice) - $totaldiscountamount;
+        }
+        return $accTotalAmt;
     }
 }

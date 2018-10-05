@@ -61,7 +61,7 @@ class Pending extends \Magento\Framework\App\Action\Action
                 $paymentType = $worldPayPayment->getPaymentType();
                 $this->_applyPaymentUpdate(PaymentStateResponse::createFromPendingResponse($params, $paymentType), $order);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->wplogger->error($e->getMessage());
             $this->checkoutservice->clearSession();
             $this->orderservice->removeAuthorisedOrder();
@@ -83,9 +83,9 @@ class Pending extends \Magento\Framework\App\Action\Action
             $this->_paymentUpdate = $this->paymentservice
                                     ->createPaymentUpdateFromWorldPayResponse($paymentState);
             $this->_paymentUpdate->apply($order->getPayment(), $order);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->wplogger->error($e->getMessage());
-            throw new Exception($e->getMessage());
+            throw new \Exception($e->getMessage());
         }
     }
 }

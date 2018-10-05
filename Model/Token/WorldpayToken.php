@@ -63,7 +63,7 @@ class WorldpayToken
     private function _assertAccessForToken(SavedToken $token, \Magento\Customer\Model\Customer $customer)
     {
         if (!$this->hasCustomerAccessForToken($token, $customer)) {
-            throw new AccessDeniedException(
+            throw new \AccessDeniedException(
                 sprintf('Access denied: token "%s" is not owned by customer "%d"', $token->getTokenCode(), $customer->getId())
             );
         }
@@ -133,7 +133,7 @@ class WorldpayToken
                 // vault and instant purchase configuration goes here
                 $this->_updateToVault($tokenState, $paymentObject);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->wplogger->error($e->getMessage());
             $tokenModel->getResource()->rollBack();
             throw $e;

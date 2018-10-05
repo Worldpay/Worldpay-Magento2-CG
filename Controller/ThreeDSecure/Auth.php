@@ -39,15 +39,15 @@ class Auth extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
-            echo '
+            print_r('
                 <form name="theForm" id="form" method="POST" action='.$redirectData->getUrl().'>
                     <input type="hidden" name="PaReq" value='.$redirectData->getPaRequest().' />
                     <input type="hidden" name="TermUrl" value='.$this->_url->getUrl('worldpay/threedsecure/authresponse', ['_secure' => true]).' />
-                </form>';
-            echo '
+                </form>');
+            print_r('
                 <script language="Javascript">
                     document.getElementById("form").submit();
-                </script>';
+                </script>');
         } else {
             return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success', ['_current' => true]);
         }

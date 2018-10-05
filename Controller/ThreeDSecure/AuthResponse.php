@@ -50,7 +50,7 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
             $this->threedsredirectresponse->continuePost3dSecureAuthorizationProcess(
                 $this->getRequest()->getParam('PaRes'), $directOrderParams, $threeDSecureParams
             );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->wplogger->error($e->getMessage());
             $this->wplogger->error('3DS Failed');
             $this->_messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));

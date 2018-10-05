@@ -23,7 +23,10 @@ define(
         var ccTypesArr = ko.observableArray([]);
         var filtersavedcardLists = ko.observableArray([]);
         var paymentService = false;
-        var billingAddressCountryId = quote.billingAddress._latestValue.countryId;
+        var billingAddressCountryId = "";
+        if (quote.billingAddress()) {
+            billingAddressCountryId = quote.billingAddress._latestValue.countryId;
+        }
         $.validator.addMethod('worldpay-validate-number', function (value) {
             if (value) {
                 return evaluateRegex(value, "^[0-9]{12,20}$");
@@ -86,11 +89,12 @@ define(
                 var that = this;
                 this._super();
                 quote.billingAddress.subscribe(function (newAddress) {
-                if (quote.billingAddress._latestValue != null  && quote.billingAddress._latestValue.countryId != billingAddressCountryId) {
-                    that.filtercardajax(1);
-                    paymentService = true;
-                }
-               });
+                    if (quote.billingAddress._latestValue != null  && quote.billingAddress._latestValue.countryId != billingAddressCountryId) {
+                        billingAddressCountryId = quote.billingAddress._latestValue.countryId;
+                        that.filtercardajax(1);
+                        paymentService = true;
+                    }
+                });
             return this;
             },
             filtercardajax: function(statusCheck = null){

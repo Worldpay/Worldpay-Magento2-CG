@@ -20,7 +20,10 @@ define(
         'use strict';
         var ccTypesArr = ko.observableArray([]);
         var paymentService = false;
-        var billingAddressCountryId = quote.billingAddress._latestValue.countryId;
+        var billingAddressCountryId = "";
+        if (quote.billingAddress()) {
+            billingAddressCountryId = quote.billingAddress._latestValue.countryId;
+        }
         return Component.extend({
             defaults: {
                 redirectAfterPlaceOrder: false,
@@ -41,10 +44,11 @@ define(
                 this._super();
                 quote.billingAddress.subscribe(function (newAddress) {
                     that.checkPaymentTypes();
-                if (quote.billingAddress._latestValue != null && quote.billingAddress._latestValue.countryId != billingAddressCountryId) {
-                    that.filterajax(1);
-                    paymentService = true;                 
-                }
+                    if (quote.billingAddress._latestValue != null && quote.billingAddress._latestValue.countryId != billingAddressCountryId) {
+                        billingAddressCountryId = quote.billingAddress._latestValue.countryId;
+                        that.filterajax(1);
+                        paymentService = true;                 
+                    }
                });
             return this;
             },

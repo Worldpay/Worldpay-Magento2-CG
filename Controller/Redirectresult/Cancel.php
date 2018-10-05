@@ -87,7 +87,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
             $this->_paymentUpdate = $this->paymentservice
                         ->createPaymentUpdateFromWorldPayResponse($paymentState);
             $this->_paymentUpdate->apply($order->getPayment(), $order);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->wplogger->error($e->getMessage());
         }
     }

@@ -138,7 +138,7 @@ class Service {
             'paymentPagesEnabled' => $this->worldpayHelper->getCustomPaymentEnabled(),
             'installationId'      => $this->worldpayHelper->getInstallationId(),
             'hideAddress'         => $this->worldpayHelper->getHideAddress(),
-            'orderLineItems'      => $this->_getOrderLineItems($quote),
+            'orderLineItems'      => $this->_getOrderLineItems($quote, 'KLARNA-SSL'),
             'orderStoreId'        => $orderStoreId
         );
     }
@@ -225,14 +225,14 @@ class Service {
         return $this->_getAddress($quote->getBillingAddress());
     }
 
-    private function _getOrderLineItems($quote)
+    private function _getOrderLineItems($quote, $paymentType = null)
     {
-         $orderitems = array();
-         $orderitems['orderTaxAmount'] = $quote->getShippingAddress()->getData('tax_amount');
-         $orderitems['termsURL'] = $this->_urlBuilder->getUrl();
-         $lineitem = array();
-           $orderItems = $quote->getItemsCollection();
-          foreach ($orderItems as $_item) {
+        $orderitems = array();
+        $orderitems['orderTaxAmount'] = $quote->getShippingAddress()->getData('tax_amount');
+        $orderitems['termsURL'] = $this->_urlBuilder->getUrl();
+        $lineitem = array();
+        $orderItems = $quote->getItemsCollection();
+        foreach ($orderItems as $_item) {
             $lineitem = array();
             if ($_item->getParentItem()){
                 continue;
@@ -255,29 +255,31 @@ class Service {
                 }
                 $orderitems['lineItem'][] = $lineitem;
             }
-          }
+        }
 
-          $lineitem = array();
-          $address = $quote->getShippingAddress();
-           if($address->getShippingAmount() > 0){
-                $totalAmount = $address->getShippingAmount() - $address->getShippingDiscountAmount();
-                $totaltax = $address->getShippingTaxAmount() + $address->getShippingHiddenTaxAmount();
-                $lineitem['reference'] = 'Shipid';
-                $lineitem['name'] = 'Shipping amount';
-                $lineitem['quantity'] = 1;
-                $lineitem['quantityUnit'] = 'shipping';
-                $lineitem['unitPrice'] = $address->getShippingAmount() + $totaltax;
-                $lineitem['totalAmount'] =  $totalAmount + $totaltax;
-                $lineitem['totalTaxAmount'] = $totaltax;
-                $lineitem['taxRate'] =  (int)(($totaltax * 100)/$address->getShippingAmount());
-                if($address->getShippingDiscountAmount() > 0){
-                    $lineitem['totalDiscountAmount'] = $address->getShippingDiscountAmount();
-                }
-                $orderitems['lineItem'][] = $lineitem;
-           }
-          return $orderitems;
+        $lineitem = array();
+        $address = $quote->getShippingAddress();
+        if($address->getShippingAmount() > 0){
+            $totalAmount = $address->getShippingAmount() - $address->getShippingDiscountAmount();
+            $totaltax = $address->getShippingTaxAmount() + $address->getShippingHiddenTaxAmount();
+            $lineitem['reference'] = 'Shipid';
+            $lineitem['name'] = 'Shipping amount';
+            $lineitem['quantity'] = 1;
+            $lineitem['quantityUnit'] = 'shipping';
+            $lineitem['unitPrice'] = $address->getShippingAmount() + $totaltax;
+            $lineitem['totalAmount'] =  $totalAmount + $totaltax;
+            $lineitem['totalTaxAmount'] = $totaltax;
+            $lineitem['taxRate'] =  (int)(($totaltax * 100)/$address->getShippingAmount());
+            if($address->getShippingDiscountAmount() > 0){
+                $lineitem['totalDiscountAmount'] = $address->getShippingDiscountAmount();
+            }
+            $orderitems['lineItem'][] = $lineitem;
+        }
+        if(!empty($paymentType) && $paymentType == "KLARNA-SSL" && $orderitems['orderTaxAmount'] == 0){
+            $orderitems['orderTaxAmount'] = $totaltax;
+        }
+        return $orderitems;
     }
-
 
     private function _getAddress($address)
     {

@@ -136,7 +136,7 @@ class Token
         if ($error) {
             $this->_wplogger->error('An error occurred while sending the request');
             $this->_wplogger->error('Error (code ' . $error[0]['code'] . '): ' . $error[0]);
-            throw new Exception();
+            throw new \Exception();
         }
     }
 }
