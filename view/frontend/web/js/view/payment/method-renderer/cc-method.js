@@ -122,6 +122,7 @@ define(
                     function (apiresponse) {
                            var response = JSON.parse(apiresponse);
                             if(response.length){
+                                if(savedcardlists.length > 0){
                                 for (var key in savedcardlists) {
                                     var method = savedcardlists[key]['method'];
                                     var found = false;
@@ -136,6 +137,7 @@ define(
                                         filtercards.push(savedcardlists[key]);
                                     }
                                 }
+                            }
 
                                for (var responsekey in response) {
                                        var found = false;

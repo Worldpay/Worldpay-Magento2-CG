@@ -303,6 +303,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
+        $orderId = '';
+        if($quote->getReservedOrderId()){
+            $orderId = $quote->getReservedOrderId();
+        }else{
+            $orderId = $mageOrder->getIncrementId();
+        }
+        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($orderId);
         $paymenttype = $worldPayPayment->getPaymentType();
         if ($this->paymentutils->CheckCaptureRequest($payment->getMethod(), $paymenttype)) {
             $this->paymentservicerequest->capture(
