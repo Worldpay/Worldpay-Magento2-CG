@@ -79,6 +79,8 @@ class PaymentMethods
                 return 'cc_config';
             case 'worldpay_apm':
                 return 'apm_config';
+            case 'worldpay_wallets':
+                return 'wallets_config';
             default:
                 return 'apm_config';
         }

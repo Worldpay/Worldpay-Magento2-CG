@@ -301,7 +301,10 @@ class Service {
      private function _getPaymentDetails($paymentDetails)
     {
         $method = $paymentDetails['method'];
-
+        if ($paymentDetails['additional_data']['cc_type'] == "PAYWITHGOOGLE-SSL") {
+            return $paymentDetails['additional_data']['cc_type'];
+        }
+        
         if ($paymentDetails['additional_data']['cse_enabled']) {
             $details = array(
                 'cseEnabled' => $paymentDetails['additional_data']['cse_enabled'],
@@ -389,5 +392,34 @@ class Service {
         $remoteAddresses = explode(',', $_SERVER['REMOTE_ADDR']);
         return trim($remoteAddresses[0]);
     }
+    public function collectWalletOrderParameters(
+        $orderCode,
+        $quote,
+        $orderStoreId,
+        $paymentDetails
+    )
+    {
+        $reservedOrderId = $quote->getReservedOrderId();
+        if($paymentDetails['additional_data']['walletResponse']){
+            $walletResponse = (array)json_decode($paymentDetails['additional_data']['walletResponse']);
+            $paymentMethodData = (array)$walletResponse['paymentMethodData'];
+            $tokenizationData = (array)$paymentMethodData['tokenizationData'];
+            $token = (array)json_decode($tokenizationData['token']);
 
+            return array(
+                'orderCode'           => $orderCode,
+                'merchantCode'        => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
+                'orderDescription'    => $this->_getOrderDescription($reservedOrderId),
+                'currencyCode'        => $quote->getQuoteCurrencyCode(),
+                'amount'              => $quote->getGrandTotal(),
+                'paymentType'         => $this->_getRedirectPaymentType($paymentDetails),
+                'shopperEmail'        => $quote->getCustomerEmail(),
+                'method'              => $paymentDetails['method'],
+                'orderStoreId'        => $orderStoreId,
+                'protocolVersion'     => $token['protocolVersion'],
+                'signature'           => $token['signature'],
+                'signedMessage'       => $token['signedMessage']
+            );
+        }        
+    }
 }

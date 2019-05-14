@@ -26,6 +26,7 @@ class Redirect implements ObserverInterface {
             $redirecturl = $this->checkoutsession->getAdminWpRedirecturl();
             $this->checkoutsession->unsAdminWpRedirecturl();
             $this->_responseFactory->create()->setRedirect($redirecturl)->sendResponse();
+            die();
             return;
         }
     }

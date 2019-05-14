@@ -14,6 +14,12 @@
             </argument>
         </arguments>
     </type>
+    
+    <type name="Magento\Framework\App\Request\CsrfValidator">
+        <plugin name="csrf_validator_disable" type="Sapient\Worldpay\Plugin\CsrfValidatorDisable" />
+    </type>
+
+
     <type name="Magento\Checkout\Model\GuestPaymentInformationManagement">
         <plugin name="WorldpayPaymentMessagesGuestPaymentInformationManagement" type="Sapient\Worldpay\Plugin\GuestPaymentInformationManagement" />
     </type>
@@ -27,6 +33,7 @@
                 <item name="worldpay_apm" xsi:type="string">worldpay_apm</item>
                 <item name="worldpay_moto" xsi:type="string">worldpay_moto</item>
                 <item name="worldpay_cc_vault" xsi:type="string">worldpay_cc_vault</item>
+                <item name="worldpay_wallets" xsi:type="string">worldpay_wallets</item>
             </argument>
         </arguments>
     </type>

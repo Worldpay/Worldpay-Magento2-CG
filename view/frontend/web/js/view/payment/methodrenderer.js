@@ -18,10 +18,12 @@ define(
         'use strict';
         var CCcomponent = 'Sapient_Worldpay/js/view/payment/method-renderer/cc-method';
         var APMcomponent = 'Sapient_Worldpay/js/view/payment/method-renderer/apm-method';
+        var Walletscomponent = 'Sapient_Worldpay/js/view/payment/method-renderer/wallets-method';
 
         var methods = [
             {type: 'worldpay_cc', component: CCcomponent},
-            {type: 'worldpay_apm', component: APMcomponent}
+            {type: 'worldpay_apm', component: APMcomponent},
+            {type: 'worldpay_wallets', component: Walletscomponent}
         ];
 
          $.each(methods, function (k, method) {

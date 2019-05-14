@@ -19,12 +19,21 @@
                 <integration_mode>direct</integration_mode>
                 <hpp_integration>full_page</hpp_integration>
                 <saved_card>0</saved_card>
+                <chromepay_enabled>1</chromepay_enabled>
             </cc_config>
             <apm_config>
                 <enabled>1</enabled>
                 <title>Alternative Payment Methods</title>
                 <paymentmethods>PAYPAL-EXPRESS,GIROPAY-SSL</paymentmethods>
             </apm_config>
+            <wallets_config>
+                <title>Wallets</title>
+                <google_pay_wallets_config>
+                    <enabled>1</enabled>
+                    <paymentmethods>AMEX,VISA,DISCOVER,JCB,MASTERCARD</paymentmethods>
+                    <authmethods>PAN_ONLY,CRYPTOGRAM_3DS</authmethods>
+                </google_pay_wallets_config>
+            </wallets_config>
             <moto_config>
                 <enabled>1</enabled>
                 <title>Moto</title>
@@ -94,6 +103,14 @@
                 <payment_action>authorize</payment_action>
                 <sort_order>11</sort_order>
             </worldpay_apm>
+            <worldpay_wallets>
+                <title>Wallets</title>
+                <model>Sapient\Worldpay\Model\PaymentMethods\Wallets</model>
+                <active>1</active>
+                <allow_specific>0</allow_specific>
+                <payment_action>authorize</payment_action>
+                <sort_order>11</sort_order>
+            </worldpay_wallets>
             <worldpay_moto>
                 <title>MOTO</title>
                 <model>Sapient\Worldpay\Model\PaymentMethods\Moto</model>

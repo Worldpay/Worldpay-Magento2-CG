@@ -45,6 +45,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     const DIRECT_MODEL = 'direct';
     const WORLDPAY_CC_TYPE = 'worldpay_cc';
     const WORLDPAY_APM_TYPE = 'worldpay_apm';
+    const WORLDPAY_WALLETS_TYPE = 'worldpay_wallets';
     const WORLDPAY_MOTO_TYPE = 'worldpay_moto';
     /**
      * Constructor
@@ -64,6 +65,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @param \Sapient\Worldpay\Model\Authorisation\TokenService $tokenservice
      * @param \Sapient\Worldpay\Model\Authorisation\MotoRedirectService $motoredirectservice
      * @param \Sapient\Worldpay\Model\Authorisation\HostedPaymentPageService $hostedpaymentpageservice
+     * @param \Sapient\Worldpay\Model\Authorisation\WalletService $walletService
      * @param \Sapient\Worldpay\Helper\Registry $registryhelper
      * @param \Magento\Framework\UrlInterface $urlBuilder
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
@@ -95,6 +97,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         \Sapient\Worldpay\Model\Authorisation\TokenService $tokenservice,
         \Sapient\Worldpay\Model\Authorisation\MotoRedirectService $motoredirectservice,
         \Sapient\Worldpay\Model\Authorisation\HostedPaymentPageService $hostedpaymentpageservice,
+        \Sapient\Worldpay\Model\Authorisation\WalletService $walletService,
         \Sapient\Worldpay\Helper\Registry $registryhelper,
         \Magento\Framework\UrlInterface $urlBuilder,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
@@ -129,6 +132,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->redirectservice = $redirectservice;
         $this->tokenservice = $tokenservice;
         $this->hostedpaymentpageservice = $hostedpaymentpageservice;
+        $this->walletService = $walletService;
         $this->quoteRepository = $quoteRepository;
         $this->registryhelper = $registryhelper;
         $this->urlbuilder = $urlBuilder;
@@ -174,6 +178,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
 
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount){
 
+        
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         if($this->authSession->isLoggedIn()) {
@@ -184,11 +189,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
 
         $orderCode = $this->_generateOrderCode($quote);
+        $this->authSession->setCurrencyCode($quote->getQuoteCurrencyCode());
         $this->paymentdetailsdata = self::$paymentDetails;
-
         try {
             $this->validatePaymentData(self::$paymentDetails);
-            $this->_checkpaymentapplicable($quote);
+            if(self::$paymentDetails['method'] != self::WORLDPAY_WALLETS_TYPE){
+                $this->_checkpaymentapplicable($quote);
+            }
             $this->_checkShippingApplicable($quote);
             $this->_createWorldPayPayment($payment,$orderCode,$quote->getStoreId(),$quote->getReservedOrderId());
             $authorisationService = $this->getAuthorisationService($quote->getStoreId());
@@ -200,6 +207,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 self::$paymentDetails,
                 $payment
             );
+            $this->authSession->setOrderCode($orderCode);
         } catch (Exception $e) {
             $this->_wplogger->error($e->getMessage());
             $this->_wplogger->error('Authorising payment failed.');
@@ -208,6 +216,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             throw new \Magento\Framework\Exception\LocalizedException(
                 __($errormessage)
             );
+            $this->authSession->setOrderCode(false);
         }
 
     }
@@ -249,6 +258,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             }
         } elseif ($method == self::WORLDPAY_APM_TYPE && !isset($paymentData['additional_data']['cc_type'])) {
              throw new Exception($generalErrorMessage, 1);
+        } elseif ($method == self::WORLDPAY_WALLETS_TYPE && !isset($paymentData['additional_data']['cc_type'])) {
+            throw new Exception($generalErrorMessage, 1);
         }
     }
 
@@ -274,6 +285,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     {
         $paymentdetails = self::$paymentDetails;
         $integrationType = $this->worlpayhelper->getIntegrationModelByPaymentMethodCode($payment->getMethod(),$storeId);
+        if ($paymentdetails['method'] == self::WORLDPAY_WALLETS_TYPE) {
+            $integrationType = 'direct';
+        }
         $wpp = $this->worldpaypayment->create();
         $wpp->setData('order_id',$orderId);
         $wpp->setData('payment_status',\Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION);
@@ -395,9 +409,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $billingaddress = $quote->getBillingAddress();
         $countryId = $billingaddress->getCountryId();
         $paymenttypes = json_decode($this->paymenttypes->getPaymentType($countryId));
-        if(!in_array($type, $paymenttypes)){
-             throw new Exception('Payment Type not valid for the billing country');
-        }
+//        if(!in_array($type, $paymenttypes)){
+//             throw new Exception('Payment Type not valid for the billing country');
+//        }
     }
 
     /**

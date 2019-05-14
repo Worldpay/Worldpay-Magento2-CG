@@ -74,35 +74,34 @@ define(
                     serviceUrl, JSON.stringify(payload)
                 ).done(
                     function (apiresponse) {
-                           var response = JSON.parse(apiresponse);
-                            if(response.length){
-                               for (var responsekey in response) {
-                                       var found = false;
-                                      for(var key in ccavailabletypes) {
-                                            if(response[responsekey] == key.toUpperCase()){
-                                                found = true;
-                                                cckey = key;
-                                                ccvalue = ccavailabletypes[key];
-                                                break;
-                                            }
-                                      }
-
-                                      if(found){
-                                        filtercclist[cckey] = ccvalue;
-                                      }
+                        var response = JSON.parse(apiresponse);
+                        if(response.length){
+                            $.each(response, function(responsekey, value){
+                                var found = false;
+                                $.each(ccavailabletypes, function(key, value){
+                                    if(response[responsekey] == key.toUpperCase()){
+                                        found = true;
+                                        cckey = key;
+                                        ccvalue = ccavailabletypes[key];
+                                        return false;
+                                    }
+                                });
+                                if(found){
+                                    filtercclist[cckey] = ccvalue;
                                 }
-                             }else{
-                               filtercclist = ccavailabletypes;
-                             }
+                            });
+                        }else{
+                            filtercclist = ccavailabletypes;
+                        }
 
-                             var ccTypesArr1 = _.map(filtercclist, function (value, key) {
-                               return {
-                                'ccValue': key,
-                                'ccLabel': value
+                        var ccTypesArr1 = _.map(filtercclist, function (value, key) {
+                            return {
+                             'ccValue': key,
+                             'ccLabel': value
                             };
-                         });
+                        });
 
-                         fullScreenLoader.stopLoader();
+                        fullScreenLoader.stopLoader();
                         ccTypesArr(ccTypesArr1);
                     }
                 ).fail(
@@ -213,5 +212,3 @@ define(
         });
     }
 );
-
-

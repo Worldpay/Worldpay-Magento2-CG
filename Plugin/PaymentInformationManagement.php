@@ -74,8 +74,8 @@ class PaymentInformationManagement
             $orderId = $this->cartManagement->placeOrder($cartId);
         } catch (LocalizedException $exception) {
             $this->logger->error($exception->getMessage());
-            //throw new CouldNotSaveException(__($exception->getMessage()));
-            throw new CouldNotSaveException(__('Mentioned card details are already saved, try with other card!'),$exception);
+            throw new CouldNotSaveException(__($exception->getMessage()));
+            //throw new CouldNotSaveException(__('Mentioned card details are already saved, try with other card!'),$exception);
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
             throw new CouldNotSaveException(

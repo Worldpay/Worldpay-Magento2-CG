@@ -122,24 +122,27 @@ define(
                     function (apiresponse) {
                            var response = JSON.parse(apiresponse);
                             if(response.length){
-                                if(savedcardlists.length > 0){
-                                for (var key in savedcardlists) {
-                                    var method = savedcardlists[key]['method'];
-                                    var found = false;
-                                    for (var responsekey in response) {
-                                        if(method.toUpperCase() == response[responsekey]){
-                                            found = true;
-                                            break;
+                                if (savedcardlists.length) {
+                                    $.each(savedcardlists, function(key, value){
+                                        var method = savedcardlists[key]['method'];
+                                        if (typeof method == 'undefined') {
+                                            return true;
                                         }
-                                    }
-
-                                    if(found){
-                                        filtercards.push(savedcardlists[key]);
-                                    }
+                                        // commented for saved debit card access
+//                                        var found = false;
+//                                        $.each(response, function(responsekey, value){
+//                                            if(method.toUpperCase() == response[responsekey]){
+//                                                found = true;
+//                                                return false;
+//                                            }
+//                                        });
+//                                        if(found){
+                                            filtercards.push(savedcardlists[key]);
+                                        //}
+                                    });
                                 }
-                            }
 
-                               for (var responsekey in response) {
+                                for (var responsekey in response) {
                                        var found = false;
                                       for(var key in ccavailabletypes) {
                                             if(key != 'savedcard'){
@@ -350,23 +353,27 @@ define(
                  }else if($form.validation() && $form.validation('isValid')){
                     //Direct form handle
                     this.saveMyCard = $('#' + this.getCode() + '_save_card').is(":checked");
-                    if (this.isClientSideEncryptionEnabled() && this.intigrationmode == 'direct') {
-                        var that = this;
-                        require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.1.min.js"], function(worldpay){
-                            worldpay.setPublicKey(that.getCsePublicKey());
-                            var cseData = {
-                                cvc: that.creditCardVerificationNumber(),
-                                cardHolderName: $('#' + that.getCode() + '_cc_name').val(),
-                                cardNumber: that.creditCardNumber(),
-                                expiryMonth: that.creditCardExpMonth(),
-                                expiryYear: that.creditCardExpYear()
-                            };
-                            var encryptedData = worldpay.encrypt(cseData);
-                            that.cseData = encryptedData;
-                            //place order with direct CSE method
-                            self.placeOrder();
-                        });
-                    } else if(this.intigrationmode == 'redirect'){
+                     if (this.intigrationmode == 'direct') {
+                            var that = this;
+                            if(this.isClientSideEncryptionEnabled()){
+                                require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.1.min.js"], function (worldpay) {
+                                    worldpay.setPublicKey(that.getCsePublicKey());
+                                    var cseData = {
+                                        cvc: that.creditCardVerificationNumber(),
+                                        cardHolderName: $('#' + that.getCode() + '_cc_name').val(),
+                                        cardNumber: that.creditCardNumber(),
+                                        expiryMonth: that.creditCardExpMonth(),
+                                        expiryYear: that.creditCardExpYear()
+                                    };
+                                    var encryptedData = worldpay.encrypt(cseData);
+                                    that.cseData = encryptedData;
+                                    //place order with direct CSE method
+                                    self.placeOrder();
+                                });
+                            } else{
+                                self.placeOrder();
+                            }
+                        }else if(this.intigrationmode == 'redirect'){
                         //place order with Redirect CSE Method
                         self.placeOrder();
                     }

@@ -5,4 +5,9 @@
             <schedule>* * * * *</schedule>
         </job>
     </group>
+    <group id="worldpay_orders">
+        <job name="order_sync_status" instance="Sapient\Worldpay\Cron\OrderSyncStatus" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+    </group>
 </config>

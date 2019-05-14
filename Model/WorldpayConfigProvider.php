@@ -24,7 +24,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      */
     protected $methodCodes = [
         'worldpay_cc',
-        'worldpay_apm'
+        'worldpay_apm',
+        'worldpay_wallets'
     ];
 
     /**
@@ -110,7 +111,10 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['minimum_amount'] = $this->payment->getMinimumAmount();
                 if ($code=='worldpay_cc') {
                     $config['payment']['ccform']["availableTypes"][$code] = $this->getCcTypes();
-                } else {
+                } else if ($code=='worldpay_wallets') {
+                    $config['payment']['ccform']["availableTypes"][$code] = $this->getWalletsTypes($code);
+                } 
+                else {
                     $config['payment']['ccform']["availableTypes"][$code] = $this->getApmTypes($code);
                 }
                 $config['payment']['ccform']["hasVerification"][$code] = true;
@@ -132,11 +136,25 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['savedCardList'] = $this->getSaveCardList();
                 $config['payment']['ccform']['saveCardAllowed'] = $this->worldpayHelper->getSaveCard();
                 $config['payment']['ccform']['apmtitle'] = $this->getApmtitle();
+                $config['payment']['ccform']['walletstitle'] = $this->getWalletstitle();
                 $config['payment']['ccform']['paymentMethodSelection'] = $this->getPaymentMethodSelection();
                 $config['payment']['ccform']['paymentTypeCountries'] = $this->paymentmethodutils->getPaymentTypeCountries();
                 $config['payment']['ccform']['savedCardCount'] = count($this->getSaveCardList());
                 $config['payment']['ccform']['apmIdealBanks'] = $this->getApmIdealBankList();
                 $config['payment']['ccform']['wpicons'] = $this->getIcons();
+
+                $config['payment']['ccform']['isGooglePayEnable'] = $this->worldpayHelper->isGooglePayEnable();
+                $config['payment']['ccform']['googlePaymentMethods'] = $this->worldpayHelper->googlePaymentMethods();
+                $config['payment']['ccform']['googleAuthMethods'] = $this->worldpayHelper->googleAuthMethods();
+                $config['payment']['ccform']['googleGatewayMerchantname'] = $this->worldpayHelper->googleGatewayMerchantname();
+                $config['payment']['ccform']['googleGatewayMerchantid'] = $this->worldpayHelper->googleGatewayMerchantid();
+                $config['payment']['ccform']['googleMerchantname'] = $this->worldpayHelper->googleMerchantname();
+                $config['payment']['ccform']['googleMerchantid'] = $this->worldpayHelper->googleMerchantid();
+                if ($this->worldpayHelper->getEnvironmentMode()=='Live Mode'){
+                   $config['payment']['general']['environmentMode'] = "PRODUCTION";
+                }else{
+                    $config['payment']['general']['environmentMode'] = "TEST";
+                }
             }
         }
         return $config;
@@ -192,6 +210,14 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     public function getApmTypes($code)
     {
         return $this->worldpayHelper->getApmTypes($code);
+    }
+    
+    /**
+     * @return Array
+     */
+    public function getWalletsTypes($code)
+    {
+        return $this->worldpayHelper->getWalletsTypes($code);
     }
 
     public function getMonths()
@@ -253,6 +279,14 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     {
         return $this->worldpayHelper->getApmTitle();
     }
+    
+    /**
+     * @return String
+     */
+    public function getWalletstitle()
+    {
+        return $this->worldpayHelper->getWalletstitle();
+    }
 
     /**
      * @return boolean
@@ -298,7 +332,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
 
         $types = $this->worldpayHelper->getCcTypes();
+        $types['VISA_DEBIT-SSL'] = 'Visa debit';
         $apmTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
+        $walletsTypes = $this->worldpayHelper->getWalletsTypes('worldpay_wallets');
         $allTypePayments = array_unique (array_merge ($types, $apmTypes));
         foreach (array_keys($allTypePayments) as $code) {
             if (!array_key_exists($code, $this->icons)) {

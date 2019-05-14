@@ -150,6 +150,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 		}
 		return $activeMethods;
 	}
+        public function getWalletsTypes($code)
+	{
+            $activeMethods =  array();
+            if($this->isGooglePayEnable()){
+                $activeMethods['PAYWITHGOOGLE-SSL'] = 'Google Pay';
+            }
+            if($this->isSamsungPayEnable()){
+                $activeMethods['SAMSUNGPAY-SSL'] = 'Samsung Pay';
+            }
+            if($this->isApplePayEnable()){
+                $activeMethods['APPLEPAY-SSL'] = 'Apple Pay';
+            }
+            return $activeMethods;
+	}
 	public function getCsePublicKey(){
 		return trim($this->_scopeConfig->getValue('worldpay/cc_config/cse_public_key', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
 	}
@@ -330,6 +344,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 			return $this->getCcTitle()."\n".$item->getPaymentType();
 		} else if($paymentCode == 'worldpay_apm') {
 			return $this->getApmTitle()."\n".$item->getPaymentType();
+                }else if($paymentCode == 'worldpay_wallets') {
+			return $this->getWalletsTitle()."\n".$item->getPaymentType();
 		}else if($paymentCode == 'worldpay_moto') {
 			return $this->getMotoTitle()."\n".$item->getPaymentType();
 		}
@@ -338,7 +354,56 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	public function getOrderByOrderId($orderId){
         return $this->orderFactory->create()->load($orderId);
     }
+    
+    public function getWalletsTitle()
+    {
+        return  $this->_scopeConfig->getValue('worldpay/wallets_config/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+    
+    public function isGooglePayEnable()
+    {
+        return (bool) $this->_scopeConfig->getValue('worldpay/wallets_config/google_pay_wallets_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+    
+    public function googlePaymentMethods()
+    {
+        return $this->_scopeConfig->getValue('worldpay/wallets_config/google_pay_wallets_config/paymentmethods', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
 
+    public function googleAuthMethods()
+    {
+        return $this->_scopeConfig->getValue('worldpay/wallets_config/google_pay_wallets_config/authmethods', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+    
+    public function googleGatewayMerchantname()
+    {
+        return $this->_scopeConfig->getValue('worldpay/wallets_config/google_pay_wallets_config/gateway_merchantname', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+    
+    public function googleGatewayMerchantid()
+    {
+        return $this->_scopeConfig->getValue('worldpay/wallets_config/google_pay_wallets_config/gateway_merchantid', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+    
+    public function googleMerchantname()
+    {
+        return $this->_scopeConfig->getValue('worldpay/wallets_config/google_pay_wallets_config/merchant_name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+    
+    public function googleMerchantid()
+    {
+        return $this->_scopeConfig->getValue('worldpay/wallets_config/google_pay_wallets_config/merchant_id', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+    
+    public function isApplePayEnable()
+    {
+        return (bool) $this->_scopeConfig->getValue('worldpay/wallets_config/apple_pay_wallets_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+    
+    public function isSamsungPayEnable()
+    {
+        return (bool) $this->_scopeConfig->getValue('worldpay/wallets_config/samsung_pay_wallets_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
 }
 
 

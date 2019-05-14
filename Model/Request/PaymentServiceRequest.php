@@ -460,4 +460,66 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $this->worldpayhelper->getXmlPassword($paymentOptionsParams['paymentType'])
         );
     }
+
+    /**
+     * Send wallet order XML to Worldpay server
+     *
+     * @param array $walletOrderParams
+     * @return mixed
+     */
+    public function walletsOrder($walletOrderParams)
+    {
+        $this->_wplogger->info('########## Submitting wallet order request. OrderCode: ' . $walletOrderParams['orderCode'] . ' ##########');
+
+        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\WalletOrder();
+        $walletSimpleXml = $this->xmlredirectorder->build(
+            $walletOrderParams['merchantCode'],
+            $walletOrderParams['orderCode'],
+            $walletOrderParams['orderDescription'],
+            $walletOrderParams['currencyCode'],
+            $walletOrderParams['amount'],
+            $walletOrderParams['paymentType'],
+            $walletOrderParams['shopperEmail'],
+            $walletOrderParams['protocolVersion'],
+            $walletOrderParams['signature'],
+            $walletOrderParams['signedMessage']
+        );
+
+        return $this->_sendRequest(
+            dom_import_simplexml($walletSimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($walletOrderParams['paymentType']),
+            $this->worldpayhelper->getXmlPassword($walletOrderParams['paymentType'])
+        );
+    }
+    
+     /**
+     * Send chromepay order XML to Worldpay server
+     *
+     * @param array $chromepayOrderParams
+     * @return mixed
+     */
+    public function chromepayOrder($chromeOrderParams)
+    {
+        $this->_wplogger->info('########## Submitting chromepay order request. OrderCode: ' . $chromeOrderParams['orderCode'] . ' ##########');
+        $paymentType = 'worldpay_cc';
+        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\ChromePayOrder();
+        $chromepaySimpleXml = $this->xmlredirectorder->build(
+            $chromeOrderParams['merchantCode'],
+            $chromeOrderParams['orderCode'],
+            $chromeOrderParams['orderDescription'],
+            $chromeOrderParams['currencyCode'],
+            $chromeOrderParams['amount'],
+            $chromeOrderParams['paymentType'],
+            $chromeOrderParams['paymentDetails'],
+            $chromeOrderParams['shippingAddress'],
+            $chromeOrderParams['billingAddress'],
+            $chromeOrderParams['shopperEmail']
+        );
+        //echo $this->worldpayhelper->getXmlUsername($paymentType);exit;
+        return $this->_sendRequest(
+            dom_import_simplexml($chromepaySimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($paymentType),
+            $this->worldpayhelper->getXmlPassword($paymentType)
+        );
+    }
 }

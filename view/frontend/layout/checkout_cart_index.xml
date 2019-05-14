@@ -3,6 +3,13 @@
 	<body>
     	<referenceContainer name="additional.product.info">
        		 <block class="Magento\Framework\View\Element\Template" name="minicart.refresh" template="Sapient_Worldpay::checkout/cart/minicartrefresh.phtml"/>
-   		 </referenceContainer>
+   	</referenceContainer>
+        
+         <referenceBlock name="checkout.cart.methods.onepage.bottom">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Sapient_Worldpay::onepage/link.phtml</argument>
+            </action>
+         </referenceBlock>
+    
 	</body>
 </page>

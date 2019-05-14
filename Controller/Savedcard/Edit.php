@@ -50,7 +50,19 @@ class Edit extends \Magento\Framework\App\Action\Action
             return;
         }
         $resultPage = $this->_resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->set(__('Update Saved Card'));
-        return $resultPage;
+        $id = $this->getRequest()->getParam('id');
+        $customerId = $this->customerSession->getCustomer()->getId();
+        if($id){      
+            $cardDetails = $this->savecard->create()->load($id);
+            if($cardDetails->getCustomerId() != $customerId){               
+                $this->_redirect('404notfound');
+                return;
+            }
+            $resultPage->getConfig()->getTitle()->set(__('Update Saved Card'));
+            return $resultPage;
+        } else{
+            $this->_redirect('404notfound');
+            return;
+        }   
     }
 }
