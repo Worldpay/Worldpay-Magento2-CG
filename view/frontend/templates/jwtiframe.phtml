@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * @var \Sapient\Worldpay\Block\Jwt $block
+ */
+$params = $this->getRequest()->getParams();
+$ccNumber = '';
+if($params){
+    $ccNumber = $params['cardNumber'];
+}
+$jwtIssuer = $block->getJwtIssuer();
+$organisationalUnitId = $block->getOrganisationalUnitId();
+$ddcUrl = $block->getDdcUrl();
+$environmentMode = $block->getEnvironmentMode();
+?>
+
+<form method="post" action="<?php echo $ddcUrl;?>" id="collectionForm" name="collectionForm"> 
+    <input type="text" name="Bin" id="first_bin" value="<?php echo $ccNumber;?>" />
+    <input type="text" name="JWT" id="first_jwt" value="" />
+</form>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js"></script>
+<script language="Javascript">
+    var header = {
+        "typ": "JWT",
+        "alg": "HS256"
+    };
+            
+    var iat = Math.floor(new Date().getTime()/1000);
+    var jti = uuidv4();
+    var data = {
+        "jti": jti,
+        "iat": iat,
+        "iss": "<?php echo $jwtIssuer;?>",
+        "OrgUnitId": "<?php echo $organisationalUnitId;?>"			  
+    };
+    var secret = "fa2daee2-1fbb-45ff-4444-52805d5cd9e0";
+
+    var stringifiedHeader = CryptoJS.enc.Utf8.parse(JSON.stringify(header));
+    var encodedHeader = base64url(stringifiedHeader);
+
+    var stringifiedData = CryptoJS.enc.Utf8.parse(JSON.stringify(data));
+    var encodedData = base64url(stringifiedData);
+
+    var signature = encodedHeader + "." + encodedData;
+    signature = CryptoJS.HmacSHA256(signature, secret);
+    signature = base64url(signature);
+    var encodedJWT = encodedHeader + "." + encodedData + "." + signature;
+    
+    document.getElementById("first_jwt").value = encodedJWT;
+    function uuidv4() {
+        return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        );
+    }
+        
+    function base64url(source) {
+        // Encode in classical base64
+        var encodedSource = CryptoJS.enc.Base64.stringify(source);
+
+        // Remove padding equal characters
+        encodedSource = encodedSource.replace(/=+$/, "");
+
+        // Replace characters according to base64url specifications
+        encodedSource = encodedSource.replace(/\+/g, "-");
+        encodedSource = encodedSource.replace(/\//g, "_");
+
+        return encodedSource;
+    }
+    window.onload = function()
+    {
+      // Auto submit form on page load
+      document.getElementById("collectionForm").submit();
+    }
+
+</script>

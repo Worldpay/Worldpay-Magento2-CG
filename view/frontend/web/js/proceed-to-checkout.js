@@ -24,10 +24,7 @@ define([
                 onBuyClicked(request);
                 request = initPaymentRequest();
                 
-                console.log('got it 111');
-                
                 console.log(request);
-                //window.location = "http://worldpay.localhost:81/webpayment";
             } else {
                 location.href = this.options.url.checkout;
             }

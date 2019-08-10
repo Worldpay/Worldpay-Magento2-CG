@@ -404,6 +404,81 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue('worldpay/wallets_config/samsung_pay_wallets_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
+    
+    public function isDynamic3DS2Enabled()
+    {
+        return (bool) $this->_scopeConfig->getValue('worldpay/general_config/enable_dynamic3DS2', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+    
+    public function isJwtIssuer() {
+        if ($this->isDynamic3DS2Enabled()) {
+                return $this->_scopeConfig->getValue('worldpay/general_config/jwt_issuer', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function isOrganisationalUnitId() {
+        if ($this->isDynamic3DS2Enabled()) {
+                return $this->_scopeConfig->getValue('worldpay/general_config/organisational_unit_id', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function isTestDdcUrl() {
+        if ($this->isDynamic3DS2Enabled()) {
+                return $this->_scopeConfig->getValue('worldpay/general_config/test_ddc_url', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function isProductionDdcUrl() {
+        if ($this->isDynamic3DS2Enabled()) {
+                return $this->_scopeConfig->getValue('worldpay/general_config/production_ddc_url', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function isRiskData() {
+        if ($this->isDynamic3DS2Enabled()) {
+                return (bool) $this->_scopeConfig->getValue('worldpay/general_config/risk_data', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function isAuthenticationMethod() {
+        if ($this->isDynamic3DS2Enabled()) {
+                return $this->_scopeConfig->getValue('worldpay/general_config/authentication_method', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function isTestChallengeUrl() {
+        if ($this->isDynamic3DS2Enabled()) {
+                return $this->_scopeConfig->getValue('worldpay/general_config/test_challenge_url', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function isProductionChallengeUrl() {
+        if ($this->isDynamic3DS2Enabled()) {
+                return $this->_scopeConfig->getValue('worldpay/general_config/production_challenge_url', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function isChallengePreference() {
+        if ($this->isDynamic3DS2Enabled()) {
+                return $this->_scopeConfig->getValue('worldpay/general_config/challenge_preference', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function isChallengeWindowSize() {
+        if ($this->isDynamic3DS2Enabled()) {
+                return $this->_scopeConfig->getValue('worldpay/general_config/challenge_window_size', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
 }
 
 

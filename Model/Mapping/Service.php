@@ -333,6 +333,10 @@ class Service {
         $details['shopperIpAddress'] = $this->_getClientIPAddress();
         $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($method);
 
+        // 3DS2 value
+        if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
+            $details['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
+        }
         return $details;
     }
     private function _getRedirectPaymentType($paymentDetails)
@@ -371,6 +375,10 @@ class Service {
         $details['sessionId'] = session_id();
         $details['shopperIpAddress'] = $this->_getClientIPAddress();
         $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($paymentDetails['method']);
+        // 3DS2 value
+        if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
+            $details['dfReferenceId'] = isset($paymentDetails['additional_data']['dfReferenceId']) ? $paymentDetails['additional_data']['dfReferenceId'] : '' ;
+        }
         return $details;
     }
 

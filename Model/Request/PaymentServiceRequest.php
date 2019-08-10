@@ -318,6 +318,9 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         if ($error) {
             $this->_wplogger->error('An error occurred while sending the request');
             $this->_wplogger->error('Error (code ' . $error[0]['code'] . '): ' . $error[0]);
+            if($error[0]['code'] == 6){
+                $error[0] = '3DS2 services are disabled, please contact system administrator.';
+            }
             throw new Exception($error[0]);
         }
     }
@@ -518,6 +521,36 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         //echo $this->worldpayhelper->getXmlUsername($paymentType);exit;
         return $this->_sendRequest(
             dom_import_simplexml($chromepaySimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($paymentType),
+            $this->worldpayhelper->getXmlPassword($paymentType)
+        );
+    }
+    
+    /**
+     * Send 3d direct order XML to Worldpay server
+     *
+     * @param array $directOrderParams
+     * @return mixed
+     */
+    public function order3Ds2Secure($directOrderParams)
+    {
+        $this->_wplogger->info('########## Submitting direct 3Ds2Secure order request. OrderCode: ' . $directOrderParams['orderCode'] . ' ##########');
+        $requestConfiguration = array(
+            'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
+            'tokenRequestConfig' => $directOrderParams['tokenRequestConfig']
+        );
+
+        $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
+        $paymentType = isset($directOrderParams['paymentDetails']['brand']) ? $directOrderParams['paymentDetails']['brand']: $directOrderParams['paymentDetails']['paymentType'];
+        $orderSimpleXml = $this->xmldirectorder->build3Ds2Secure(
+            $directOrderParams['merchantCode'],
+            $directOrderParams['orderCode'],
+            $directOrderParams['paymentDetails'],
+            $directOrderParams['paymentDetails']['dfReferenceId']
+        );
+
+        return $this->_sendRequest(
+            dom_import_simplexml($orderSimpleXml)->ownerDocument,
             $this->worldpayhelper->getXmlUsername($paymentType),
             $this->worldpayhelper->getXmlPassword($paymentType)
         );

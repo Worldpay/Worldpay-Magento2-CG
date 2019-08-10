@@ -34,7 +34,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var baseUrl = '<?= $block->getBaseUrl() ?>';
     var baseCurrency = '<?= $block->getCurrency() ?>';
     var orderCode;
-    var reqShipping = <?= $block->getshippingRequired() ?>;
+    var reqShipping = '<?= $block->getshippingRequired() ?>';
     function initPaymentRequest() {
 
     const networks = [
@@ -399,7 +399,6 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     xhttp.setRequestHeader("Authorization", token);
     xhttp.send(jsonPaymentDetails);
     var orderResponse = JSON.parse(xhttp.responseText);
-    console.log('got it');
     console.log(orderResponse);
    
    if(isNaN(orderResponse)){

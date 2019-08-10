@@ -50,15 +50,21 @@ class TokenService extends \Magento\Framework\DataObject
 
         $response = $this->paymentservicerequest->orderToken($tokenOrderParams);
         $directResponse = $this->directResponse->setResponse($response);
-
         $threeDSecureParams = $directResponse->get3dSecureParams();
         $threeDsEnabled = $this->worldpayHelper->is3DSecureEnabled();
+        $threeDSecureChallengeParams = $directResponse->get3ds2Params();
         if ($threeDSecureParams) {
             // Handles success response with 3DS & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
             $payment->setIsTransactionPending(1);
             $this->_handle3DSecure($threeDSecureParams, $tokenOrderParams, $orderCode);
-        }else{
+        } else if ($threeDSecureChallengeParams) {
+            // Handles success response with 3DS & redirect for varification.
+            $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
+            $payment->setIsTransactionPending(1);
+            $this->_handle3Ds2($threeDSecureChallengeParams, $tokenOrderParams, $orderCode);
+        } else{
+            
             // Normal order goes here.(without 3DS).
             $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment);
             $this->_applyPaymentUpdate($directResponse, $payment);
@@ -73,6 +79,16 @@ class TokenService extends \Magento\Framework\DataObject
         $this->checkoutSession->setDirectOrderParams($directOrderParams);
         $this->checkoutSession->setAuthOrderId($mageOrderId);
     }
+    
+    private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId)
+    {
+        $this->wplogger->info('HANDLING 3DS2');
+        $this->registryhelper->setworldpayRedirectUrl($threeDSecureChallengeParams);
+        $this->checkoutSession->set3Ds2Params($threeDSecureChallengeParams);
+        $this->checkoutSession->setDirectOrderParams($directOrderParams);
+        $this->checkoutSession->setAuthOrderId($mageOrderId);
+    }
+    
     private function _applyPaymentUpdate(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
         $payment)

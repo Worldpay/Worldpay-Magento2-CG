@@ -155,6 +155,19 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 }else{
                     $config['payment']['general']['environmentMode'] = "TEST";
                 }
+                
+                // 3DS2 Configurations
+                $config['payment']['ccform']['isDynamic3DS2Enabled'] = $this->worldpayHelper->isDynamic3DS2Enabled();
+                $config['payment']['ccform']['isJwtIssuer'] = $this->worldpayHelper->isJwtIssuer();
+                $config['payment']['ccform']['isOrganisationalUnitId'] = $this->worldpayHelper->isOrganisationalUnitId();
+                $config['payment']['ccform']['isTestDdcUrl'] = $this->worldpayHelper->isTestDdcUrl();
+                $config['payment']['ccform']['isProductionDdcUrl'] = $this->worldpayHelper->isProductionDdcUrl();
+                $config['payment']['ccform']['isRiskData'] = $this->worldpayHelper->isRiskData();
+                $config['payment']['ccform']['isAuthenticationMethod'] = $this->worldpayHelper->isAuthenticationMethod();
+                $config['payment']['ccform']['isTestChallengeUrl'] = $this->worldpayHelper->isTestChallengeUrl();
+                $config['payment']['ccform']['isProductionChallengeUrl'] = $this->worldpayHelper->isProductionChallengeUrl();
+                $config['payment']['ccform']['isChallengePreference'] = $this->worldpayHelper->isChallengePreference();
+                $config['payment']['ccform']['isChallengeWindowSize'] = $this->worldpayHelper->isChallengeWindowSize();
             }
         }
         return $config;

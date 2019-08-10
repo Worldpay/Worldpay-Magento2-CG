@@ -26,4 +26,18 @@ class DirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
             return new \Magento\Framework\DataObject(array('url' => "$request->issuerURL", 'pa_request' => "$request->paRequest", 'echo_data' => (string) $echoData[0]));
         }
     }
+    
+    /**
+     * @return \Magento\Framework\DataObject
+     */
+    public function get3ds2Params()
+    {
+        $xml = $this->getXml();
+
+        if ($xml && ($request = $xml->xpath('reply/orderStatus/challengeRequired/threeDSChallengeDetails'))) {
+            $request = $request[0];
+            $payLoad = $xml->xpath('reply/orderStatus/challengeRequired/threeDSChallengeDetails/payload');
+            return new \Magento\Framework\DataObject(array('threeDSVersion' => "$request->threeDSVersion", 'transactionId3DS' => "$request->transactionId3DS", 'acsURL' => "$request->acsURL", 'payload' => (string) $payLoad[0]));
+        }
+    }
 }

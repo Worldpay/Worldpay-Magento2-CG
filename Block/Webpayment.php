@@ -128,7 +128,7 @@ class Webpayment extends Template
     public function getshippingRequired()
     {
         // Disable shipping for downloadable and virtual products
-        $shippingReq = 'true';
+        $shippingReq = true;
         $allItems = $this->_cart->getQuote()->getAllItems();
         if($allItems) {
         $productType = array();
@@ -150,7 +150,7 @@ class Webpayment extends Template
 
         // Now check if any other product types are still there in array, if no disable shipping
         if( sizeof($productType) == 0 ) {
-             $shippingReq = 'false';  
+             $shippingReq = false;  
         }
         }
        

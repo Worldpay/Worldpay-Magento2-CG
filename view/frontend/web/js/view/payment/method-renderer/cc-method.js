@@ -15,15 +15,18 @@ define(
         'Magento_Checkout/js/model/error-processor',
         'Magento_Checkout/js/model/url-builder',
         'mage/storage',
-        'Magento_Checkout/js/model/full-screen-loader'
+        'Magento_Checkout/js/model/full-screen-loader',
+        'hmacSha256',
+        'encBase64'
     ],
-    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64) {
         'use strict';
         //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
         var filtersavedcardLists = ko.observableArray([]);
         var paymentService = false;
         var billingAddressCountryId = "";
+        var dfReferenceId = "";
         if (quote.billingAddress()) {
             billingAddressCountryId = quote.billingAddress._latestValue.countryId;
         }
@@ -66,6 +69,18 @@ define(
 
             return (nCheck % 10) === 0;
         }
+        
+        // 3DS2 part Start
+        
+        var jwtUrl = url.build('worldpay/hostedpaymentpage/jwt');
+        
+        function createJwt(cardNumber){
+            var bin = cardNumber;
+            $('body').append('<iframe src="'+jwtUrl+'?cardNumber='+bin+'" name="jwt_frm" id="jwt_frm" style="display: none"></iframe>');
+        }
+        
+        // 3DS2 part End
+        
         return Component.extend({
             defaults: {
                 intigrationmode: window.checkoutConfig.payment.ccform.intigrationmode,
@@ -302,7 +317,8 @@ define(
                         'encryptedData': this.cseData,
                         'tokenCode': this.paymentToken,
                         'saved_cc_cid': $('.saved-cvv-number').val(),
-                        'isSavedCardPayment': this.isSavedCardPayment
+                        'isSavedCardPayment': this.isSavedCardPayment,
+                        'dfReferenceId': this.dfReferenceId
                     }
                 };
             },
@@ -327,11 +343,17 @@ define(
                 this.redirectAfterPlaceOrder = false;
                 this.isSavedCardPayment=false;
                 this.paymentToken = null;
-                 var $form = $('#' + this.getCode() + '-form');
-                 var $savedCardForm = $('#' + this.getCode() + '-savedcard-form');
-                 var selectedSavedCardToken = $("input[name='payment[token_to_use]']:checked").val();
+                var $form = $('#' + this.getCode() + '-form');
+                var $savedCardForm = $('#' + this.getCode() + '-savedcard-form');
+                var selectedSavedCardToken = $("input[name='payment[token_to_use]']:checked").val();
 
-                 var cc_type_selected = this.getselectedCCType('payment[cc_type]');
+                var cc_type_selected = this.getselectedCCType('payment[cc_type]');
+                // 3DS2 JWT create function 
+                if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
+                    createJwt(this.creditCardNumber());
+                }
+                
+                this.dfReferenceId = null;
 
                  if(cc_type_selected == 'savedcard'){
                       //Saved card handle
@@ -347,7 +369,28 @@ define(
                                 $('#saved-cvv-error').html('Please, enter valid Card Verification Number');
                             }else{
                                 this.redirectAfterPlaceOrder = false;
-                                self.placeOrder();
+                                if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
+                                    window.addEventListener("message", function(event) {
+                                    var data = JSON.parse(event.data);
+                                    if (event.origin === "https://secure-test.worldpay.com") {
+                                    var data = JSON.parse(event.data);
+                                        console.warn('Merchant received a message:', data);
+                                        if (data !== undefined && data.Status) {
+                                            window.sessionId = data.SessionId;
+
+                                            var sessionId = data.SessionId;
+
+                                            if(sessionId){
+                                                that.dfReferenceId = sessionId;
+                                            }
+                                                //place order with direct CSE method
+                                                self.placeOrder();
+                                            }
+                                        }
+                                    }, false);
+                                } else {
+                                    self.placeOrder();
+                                }
                             }
                       }
                  }else if($form.validation() && $form.validation('isValid')){
@@ -355,6 +398,11 @@ define(
                     this.saveMyCard = $('#' + this.getCode() + '_save_card').is(":checked");
                      if (this.intigrationmode == 'direct') {
                             var that = this;
+                            // Need to check for 3ds2 enable or not
+                            //jwtCreate(that.creditCardNumber());
+                            var sessionId = window.sessionId;
+                            that.dfReferenceId = sessionId;
+                            
                             if(this.isClientSideEncryptionEnabled()){
                                 require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.1.min.js"], function (worldpay) {
                                     worldpay.setPublicKey(that.getCsePublicKey());
@@ -368,10 +416,51 @@ define(
                                     var encryptedData = worldpay.encrypt(cseData);
                                     that.cseData = encryptedData;
                                     //place order with direct CSE method
-                                    self.placeOrder();
+                                    that.dfReferenceId = null;
+                                    if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
+                                        window.addEventListener("message", function(event) {
+                                        var data = JSON.parse(event.data);
+                                        if (event.origin === "https://secure-test.worldpay.com") {
+                                        var data = JSON.parse(event.data);
+                                            console.warn('Merchant received a message:', data);
+                                            if (data !== undefined && data.Status) {
+                                                window.sessionId = data.SessionId;
+                                                var sessionId = data.SessionId;
+
+                                                if(sessionId){
+                                                    that.dfReferenceId = sessionId;
+                                                }
+                                                    self.placeOrder();
+                                                }
+                                            }
+                                        }, false);
+                                    } else {
+                                        self.placeOrder();
+                                    }                                    
                                 });
                             } else{
-                                self.placeOrder();
+                                if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){  
+                                    window.addEventListener("message", function(event) {
+                                        var data = JSON.parse(event.data);
+                                        if (event.origin === "https://secure-test.worldpay.com") {
+                                        var data = JSON.parse(event.data);
+                                        console.warn('Merchant received a message:', data);
+                                        if (data !== undefined && data.Status) {
+                                            window.sessionId = data.SessionId;
+
+                                            var sessionId = data.SessionId;
+
+                                            if(sessionId){
+                                                that.dfReferenceId = sessionId;
+                                            }
+                                                //place order with direct CSE method
+                                                self.placeOrder();
+                                            }
+                                        }
+                                    }, false);
+                                } else {
+                                    self.placeOrder();
+                                }  
                             }
                         }else if(this.intigrationmode == 'redirect'){
                         //place order with Redirect CSE Method
@@ -389,7 +478,19 @@ define(
                 }else if(this.intigrationmode == 'direct' && !this.isSavedCardPayment){
                     window.location.replace(url.build('worldpay/threedsecure/auth'));
                 }
-            }
+            },
+            threeDS2Enabled: function(){
+                return window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled;
+            },
+            jwtIssuer: function(){
+                return window.checkoutConfig.payment.ccform.isJwtIssuer;
+            },
+            organisationalUnitId: function(){
+                return window.checkoutConfig.payment.ccform.isOrganisationalUnitId;
+            },
+            testDdcUrl: function(){
+                return window.checkoutConfig.payment.ccform.isTestDdcUrl;
+            },
         });
     }
 );

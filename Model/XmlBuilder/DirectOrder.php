@@ -38,6 +38,7 @@ EOD;
     protected $paResponse = null;
     private $echoData = null;
     private $shopperId;
+    protected $dfReferenceId = null;
 
     /**
      * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
@@ -147,6 +148,34 @@ EOD;
         $this->_addOrderElement($submit);
         return $xml;
     }
+    
+    /**
+     * Build xml for 3ds2 processing Request
+     *
+     * @param string $merchantCode
+     * @param string $orderCode
+     * @param array $paymentDetails
+     * @param $dfReferenceId
+     * @return SimpleXMLElement $xml
+     */
+    public function build3Ds2Secure(
+        $merchantCode,
+        $orderCode,
+        $paymentDetails,
+        $dfReferenceId
+    ) {
+        $this->merchantCode = $merchantCode;
+        $this->dfReferenceId = $dfReferenceId;
+        $this->orderCode = $orderCode;
+        $this->paymentDetails = $paymentDetails;
+        $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
+        $xml['merchantCode'] = $this->merchantCode;
+        $xml['version'] = '1.4';
+
+        $submit = $this->_addSubmitElement($xml);
+        $this->_addOrderElement($submit);
+        return $xml;
+    }
 
     /**
      * Add submit tag to xml
@@ -176,22 +205,26 @@ EOD;
             $session['id'] = $this->paymentDetails['sessionId'];
             return $order;
         }
+        if ($this->dfReferenceId) {
+            $info3DSecure = $order->addChild('info3DSecure');
+            $info3DSecure->addChild('completedAuthentication');
+            $session = $order->addChild('session');
+            $session['id'] = $this->paymentDetails['sessionId'];
+            return $order;
+        }
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
         $this->_addPaymentDetailsElement($order);
         $this->_addShopperElement($order);
         $this->_addShippingElement($order);
         $this->_addBillingElement($order);
-
-
         if ($this->echoData) {
             $order->addChild('echoData', $this->echoData);
         }
-
         $this->_addDynamic3DSElement($order);
         $this->_addCreateTokenElement($order);
         $this->_addDynamicInteractionTypeElement($order);
-
+        $this->_addAdditional3DsElement($order);
        return $order;
     }
 
@@ -482,6 +515,22 @@ EOD;
 
         $countryCodeElement = $address->addChild('countryCode');
         $this->_addCDATA($countryCodeElement, $countryCode);
+    }
+    
+    /**
+     * Add Additional3Ds data and its child tag to xml
+     * @param SimpleXMLElement $order 
+     */
+    protected function _addAdditional3DsElement($order)
+    {
+        $dfReferenceId = isset($this->paymentDetails['dfReferenceId']) ? $this->paymentDetails['dfReferenceId'] : '';
+        if($dfReferenceId){
+            $addisional3DsElement = $order->addChild('additional3DSData');
+            $addisional3DsElement['dfReferenceId'] = $this->paymentDetails['dfReferenceId'];
+            $addisional3DsElement['challengeWindowSize'] = "390x400";
+            $addisional3DsElement['challengePreference'] = "challengeMandated";
+            return $addisional3DsElement;
+        }
     }
 
     /**
