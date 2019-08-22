@@ -12,6 +12,7 @@
                    'data-validate': JSON.stringify({'required':true})}
                    "/>
                 <input type="hidden" name="card-type" id="card-type" data-bind="value: card_brand">
+                <input type="hidden" name="bin_number" id="bin_number" data-bind="value: bin_number">
                 <label class="label" for="wp_save_card" data-bind='attr: {for: "saved_card_" + id}'>
                 <!--ko if: $parent.getIcons(method) -->
                         <img data-bind="attr: {

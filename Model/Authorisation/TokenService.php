@@ -53,16 +53,18 @@ class TokenService extends \Magento\Framework\DataObject
         $threeDSecureParams = $directResponse->get3dSecureParams();
         $threeDsEnabled = $this->worldpayHelper->is3DSecureEnabled();
         $threeDSecureChallengeParams = $directResponse->get3ds2Params();
+        $threeDSecureConfig = array();
         if ($threeDSecureParams) {
             // Handles success response with 3DS & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
             $payment->setIsTransactionPending(1);
             $this->_handle3DSecure($threeDSecureParams, $tokenOrderParams, $orderCode);
         } else if ($threeDSecureChallengeParams) {
-            // Handles success response with 3DS & redirect for varification.
+            // Handles success response with 3DS2 & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
             $payment->setIsTransactionPending(1);
-            $this->_handle3Ds2($threeDSecureChallengeParams, $tokenOrderParams, $orderCode);
+            $threeDSecureConfig = $this->get3DS2ConfigValues();
+            $this->_handle3Ds2($threeDSecureChallengeParams, $tokenOrderParams, $orderCode, $threeDSecureConfig);
         } else{
             
             // Normal order goes here.(without 3DS).
@@ -80,13 +82,14 @@ class TokenService extends \Magento\Framework\DataObject
         $this->checkoutSession->setAuthOrderId($mageOrderId);
     }
     
-    private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId)
+    private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)
     {
         $this->wplogger->info('HANDLING 3DS2');
         $this->registryhelper->setworldpayRedirectUrl($threeDSecureChallengeParams);
         $this->checkoutSession->set3Ds2Params($threeDSecureChallengeParams);
         $this->checkoutSession->setDirectOrderParams($directOrderParams);
         $this->checkoutSession->setAuthOrderId($mageOrderId);
+        $this->checkoutSession->set3DS2Config($threeDSecureConfig);
     }
     
     private function _applyPaymentUpdate(
@@ -107,5 +110,22 @@ class TokenService extends \Magento\Framework\DataObject
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
             throw new Exception(sprintf('Payment CANCELLED'));
         }
+    }
+    
+    // get 3ds2 params from the configuration and set to checkout session
+    public function get3DS2ConfigValues(){
+        $data = array();
+        $data['jwtIssuer'] =  $this->worldpayHelper->isJwtIssuer();
+    
+        $data['organisationalUnitId'] = $this->worldpayHelper->isOrganisationalUnitId();
+    
+        $mode = $this->worldpayHelper->getEnvironmentMode();
+        if($mode == 'Test Mode'){
+            $data['challengeurl'] =  $this->worldpayHelper->isTestChallengeUrl();
+        } else {
+            $data['challengeurl'] =  $this->worldpayHelper->isProductionChallengeUrl();
+        }
+        
+        return $data;
     }
 }

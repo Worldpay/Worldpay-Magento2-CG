@@ -12,6 +12,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
 
     const WORLDPAY_NOTIFICATION_HISTORY = 'worldpay_notification_history';
     const WORLDPAY_PAYMENT = 'worldpay_payment';
+    const WORLDPAY_TOKEN = 'worldpay_token';
 
     public function upgrade( SchemaSetupInterface $setup, ModuleContextInterface $context )
     {
@@ -80,6 +81,9 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         }
         if (version_compare($context->getVersion(), '1.2.2', '<')) {
             $this->addColumnCse($installer);
+        }
+        if (version_compare($context->getVersion(), '1.2.3', '<')) {
+            $this->addColumnBin($installer);
         }
         $installer->endSetup();
     }
@@ -180,5 +184,23 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         );
     }
 
-
+    /**
+     * @param SchemaSetupInterface $installer
+     * @return void
+     */
+    private function addColumnBin(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_TOKEN),
+            'bin_number',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                'nullable' => true,
+                'length' => '25',
+                'comment' => 'Bin Number',
+                'before' => 'created_at'
+            ]
+        );
+    }
 }

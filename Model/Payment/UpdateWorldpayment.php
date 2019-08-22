@@ -127,6 +127,7 @@ class UpdateWorldpayment
                 ->getFirstItem()->getData();
 
         if (empty($tokenDataExist)) {
+            $binNumber = $tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->bin[0];
             $savedTokenFactory->setTokenCode($tokenElement[0]->tokenDetails[0]->paymentTokenID[0]);
             $dateNode = $tokenElement[0]->tokenDetails->paymentTokenExpiry->date;
             $tokenexpirydate = (int)$dateNode['year'].'-'.(int)$dateNode['month'].'-'.(int)$dateNode['dayOfMonth'];
@@ -144,6 +145,9 @@ class UpdateWorldpayment
             $savedTokenFactory->setMerchantCode($merchantCode[0]);
             $savedTokenFactory->setCustomerId($tokenElement[0]->authenticatedShopperID[0]);
             $savedTokenFactory->setAuthenticatedShopperID($tokenElement[0]->authenticatedShopperID[0]);
+            if($binNumber){
+                $savedTokenFactory->setBinNumber($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->bin[0]);
+            }
             $savedTokenFactory->save();
         } else {
               $this->_messageManager->addNotice(__("You already appear to have this card number stored, if your card details have changed, you can update these via the 'my cards' section"));

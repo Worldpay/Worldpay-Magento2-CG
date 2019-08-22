@@ -62,7 +62,7 @@ class DirectService extends \Magento\Framework\DataObject
             $payment->setIsTransactionPending(1);
             $this->_handle3DSecure($threeDSecureParams, $directOrderParams, $orderCode);
         } else if ($threeDSecureChallengeParams) {
-            // Handles success response with 3DS & redirect for varification.
+            // Handles success response with 3DS2 & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
             $payment->setIsTransactionPending(1);
             $threeDSecureConfig = $this->get3DS2ConfigValues();
@@ -84,7 +84,7 @@ class DirectService extends \Magento\Framework\DataObject
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)
     {
         $this->registryhelper->setworldpayRedirectUrl($threeDSecureChallengeParams);
-        $this->checkoutSession->set3DS2Params($threeDSecureChallengeParams);
+        $this->checkoutSession->set3Ds2Params($threeDSecureChallengeParams);
         $this->checkoutSession->setDirectOrderParams($directOrderParams);
         $this->checkoutSession->setAuthOrderId($mageOrderId);
         $this->checkoutSession->set3DS2Config($threeDSecureConfig);

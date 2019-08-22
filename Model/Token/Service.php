@@ -71,4 +71,22 @@ class Service
         $xml = simplexml_load_string($rawXml);
         return new DeleteXml($xml);
     }
+    
+    /**
+     * Send token inquiry request to WP server and gives back the answer
+     *
+     * @param Sapient\Worldpay\Model\Token $tokenModel
+     * @param \Magento\Customer\Model\Customer $customer
+     * @param $storeId
+     * @return Sapient\Worldpay\Model\Token\InquiryXml
+     */
+    public function getTokenInquiry(
+        SavedToken $tokenModel,
+        \Magento\Customer\Model\Customer $customer,
+        $storeId
+    ) {
+        $rawXml = $this->_paymentServiceRequest->tokenInquiry($tokenModel, $customer, $storeId);
+        $xml = simplexml_load_string($rawXml);
+        return new InquiryXml($xml);
+    }
 }

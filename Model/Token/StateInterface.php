@@ -93,4 +93,9 @@ interface StateInterface
      * @return string
      */
     public function getTokenEvent();
+    
+    /**
+     * @return string
+     */
+    public function getBin();
 }

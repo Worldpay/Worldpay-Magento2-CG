@@ -68,8 +68,12 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
             $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
             $this->_abortIfPaymentError($this->_paymentUpdate);
         } catch (Exception $e) {
-            $this->wplogger->info($e->getMessage());
-            $this->_messageManager->addError(__($e->getMessage()));
+            $this->wplogger->info($e->getMessage());            
+            if($e->getMessage() === 'Asymmetric transaction rollback.'){
+                $this->_messageManager->addError(__('Duplicate Entry, This card number is already saved.'));
+            } else {
+                $this->_messageManager->addError(__($e->getMessage()));
+            }            
             $this->checkoutSession->setWpResponseForwardUrl(
                   $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );

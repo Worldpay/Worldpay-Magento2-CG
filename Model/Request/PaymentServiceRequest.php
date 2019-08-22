@@ -90,7 +90,8 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $directOrderParams['userAgentHeader'],
             $directOrderParams['shippingAddress'],
             $directOrderParams['billingAddress'],
-            $directOrderParams['shopperId']
+            $directOrderParams['shopperId'],
+            $directOrderParams['cusDetails']
         );
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
@@ -128,7 +129,8 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $tokenOrderParams['userAgentHeader'],
             $tokenOrderParams['shippingAddress'],
             $tokenOrderParams['billingAddress'],
-            $tokenOrderParams['shopperId']
+            $tokenOrderParams['shopperId'],
+            $tokenOrderParams['cusDetails']
         );
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
@@ -553,6 +555,36 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
             $this->worldpayhelper->getXmlUsername($paymentType),
             $this->worldpayhelper->getXmlPassword($paymentType)
+        );
+    }
+    
+    /**
+     * Send token inquiry XML to Worldpay server
+     *
+     * @param SavedToken $tokenModel
+     * @param \Magento\Customer\Model\Customer $customer
+     * @param int $storeId
+     * @return mixed
+     */
+    public function tokenInquiry(
+        SavedToken $tokenModel,
+        \Magento\Customer\Model\Customer $customer,
+        $storeId
+    ) {
+        $this->_wplogger->info('########## Submitting token inquiry. TokenId: ' . $tokenModel->getId() . ' ##########');
+        $requestParameters = array(
+            'tokenModel'   => $tokenModel,
+            'customer'     => $customer,
+            'merchantCode' => $this->worldpayhelper->getMerchantCode($tokenModel->getMethod()),
+        );
+        /** @var SimpleXMLElement $simpleXml */
+        $this->tokenInquiryXml = new \Sapient\Worldpay\Model\XmlBuilder\TokenInquiry($requestParameters);
+        $tokenInquirySimpleXml = $this->tokenInquiryXml->build();
+
+        return $this->_sendRequest(
+            dom_import_simplexml($tokenInquirySimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($tokenModel->getMethod()),
+            $this->worldpayhelper->getXmlPassword($tokenModel->getMethod())
         );
     }
 }

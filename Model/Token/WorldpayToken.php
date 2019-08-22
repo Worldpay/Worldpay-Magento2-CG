@@ -113,6 +113,7 @@ class WorldpayToken
         $tokenModel->getResource()->beginTransaction();
 
         try {
+            $binNumber = $tokenState->getBin();
             $tokenModel->setTokenCode($tokenState->getTokenCode());
             $tokenModel->setTokenReason($tokenState->getTokenReason());
             $tokenModel->setTokenExpiryDate($tokenState->getTokenExpiryDate()->format('Y-m-d'));
@@ -127,6 +128,9 @@ class WorldpayToken
             $tokenModel->setMerchantCode($tokenState->getMerchantCode());
             $tokenModel->setAuthenticatedShopperId($tokenState->getAuthenticatedShopperId());
             $tokenModel->setCustomerId($tokenState->getAuthenticatedShopperId());
+            if($binNumber){
+                $tokenModel->setBinNumber($tokenState->getBin());
+            }
             $tokenModel->save();
             $tokenModel->getResource()->commit();
             if ('worldpay_cc' == $paymentObject->getMethod()) {
@@ -134,7 +138,12 @@ class WorldpayToken
                 $this->_updateToVault($tokenState, $paymentObject);
             }
         } catch (\Exception $e) {
-            $this->wplogger->error($e->getMessage());
+            $tokenEvent = $tokenState->getTokenEvent();
+            if($tokenEvent == 'CONFLICT'){
+                $this->wplogger->error('Duplicate Entry, This card number is already saved.');
+            } else {
+                $this->wplogger->error($e->getMessage());
+            }
             $tokenModel->getResource()->rollBack();
             throw $e;
         }

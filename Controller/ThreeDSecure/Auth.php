@@ -38,7 +38,7 @@ class Auth extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {        
-        $threeDSecureChallengeParams = $this->checkoutSession->get3DS2Params();
+        $threeDSecureChallengeParams = $this->checkoutSession->get3Ds2Params();
         $threeDSecureChallengeConfig = $this->checkoutSession->get3DS2Config();
         $orderId = $this->checkoutSession->getAuthOrderId();
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
@@ -125,6 +125,10 @@ class Auth extends \Magento\Framework\App\Action\Action
             }
                     
             </script>');
+            
+        $this->checkoutSession->uns3DS2Params();
+        //$this->checkoutSession->uns3DS2Config();  
+        
         } else {
             return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success', ['_current' => true]);
         }

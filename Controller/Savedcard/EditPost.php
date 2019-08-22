@@ -92,6 +92,10 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
                     $this->_getTokenModel(),
                     $this->customerSession->getCustomer(),
                     $this->getStoreId());
+                $tokenInquiryResponse = $this->_tokenService->getTokenInquiry(
+                    $this->_getTokenModel(),
+                    $this->customerSession->getCustomer(),
+                    $this->getStoreId());
             } catch (Exception $e) {
                 $this->wplogger->error($e->getMessage());
                 $this->messageManager->addException($e, __('Error: ').$e->getMessage());
@@ -100,6 +104,14 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
             }
             if ($tokenUpdateResponse->isSuccess()) {
                 $this->_applyTokenUpdate();
+                $this->_applyVaultTokenUpdate();
+            } else {
+                $this->messageManager->addError(__('Error: the card has not been updated.'));
+                $this->_redirect('*/savedcard/edit', array('id' => $this->_getTokenModel()->getId()));
+                return;
+            }
+            if ($tokenInquiryResponse->getTokenCode()) {                
+                $this->_applyTokenInquiry($tokenInquiryResponse);
                 $this->_applyVaultTokenUpdate();
             } else {
                 $this->messageManager->addError(__('Error: the card has not been updated.'));
@@ -181,5 +193,33 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
     {
         $json = \Zend_Json::encode($details);
         return $json ? $json : '{}';
+    }
+    
+    /**
+     * Update Saved Card Detail
+     */
+    protected function _applyTokenInquiry($tokenInquiryResponse)
+    {
+        $this->_worldpayToken->updateTokenByCustomer(
+            $this->_getTokenModelInquiry($tokenInquiryResponse),
+            $this->customerSession->getCustomer()
+        );
+    }
+    
+    /**
+     * @return Sapient/WorldPay/Model/Token
+     */
+    protected function _getTokenModelInquiry($tokenInquiryResponse)
+    {
+        if (! $tokenId = $this->getRequest()->getParam('token_id')) {
+            $tokenData = $this->getRequest()->getParam('token');
+            $tokenId = $tokenData['id'];
+        }
+        $token = $this->savecard->create()->loadByTokenCode($tokenId);
+        $tokenUpdateData = $this->getRequest()->getParam('token');
+        if (! empty($tokenUpdateData) && ! empty($tokenInquiryResponse->isSuccess())) {
+            $token->setBinNumber(trim($tokenInquiryResponse->isSuccess()));
+        }
+        return $token;
     }
 }

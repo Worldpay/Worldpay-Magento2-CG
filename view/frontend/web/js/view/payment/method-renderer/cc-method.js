@@ -303,6 +303,7 @@ define(
              * @override
              */
             getData: function () {
+                
                 return {
                     'method': "worldpay_cc",
                     'additional_data': {
@@ -318,7 +319,7 @@ define(
                         'tokenCode': this.paymentToken,
                         'saved_cc_cid': $('.saved-cvv-number').val(),
                         'isSavedCardPayment': this.isSavedCardPayment,
-                        'dfReferenceId': this.dfReferenceId
+                        'dfReferenceId': window.sessionId
                     }
                 };
             },
@@ -350,7 +351,17 @@ define(
                 var cc_type_selected = this.getselectedCCType('payment[cc_type]');
                 // 3DS2 JWT create function 
                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
-                    createJwt(this.creditCardNumber());
+                    var bin = this.creditCardNumber();
+                    if(cc_type_selected == 'savedcard'){
+                        bin = $("input[name='payment[token_to_use]']:checked").next().next().val();     
+                    }
+                    if(bin) {
+                    createJwt(bin);
+                }else {
+                    alert('This card number cannot be used to place 3DS2 order now, please go and update this from My account first.');
+                    return;
+                }
+                    
                 }
                 
                 this.dfReferenceId = null;
@@ -372,17 +383,28 @@ define(
                                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                                     window.addEventListener("message", function(event) {
                                     var data = JSON.parse(event.data);
-                                    if (event.origin === "https://secure-test.worldpay.com") {
+                                    
+                                    var envUrl;
+                                    if(window.checkoutConfig.payment.general.environmentMode == 'TEST') {
+                                        var envUrl = "https://secure-test.worldpay.com";
+                                    }else {
+                                        var envUrl = "https://secure.worldpay.com";
+                                    }
+                                    if (event.origin === envUrl) {
                                     var data = JSON.parse(event.data);
                                         console.warn('Merchant received a message:', data);
                                         if (data !== undefined && data.Status) {
-                                            window.sessionId = data.SessionId;
+                                            //window.sessionId = data.SessionId;
 
                                             var sessionId = data.SessionId;
 
                                             if(sessionId){
-                                                that.dfReferenceId = sessionId;
+                                                this.dfReferenceId = sessionId;
                                             }
+                                            
+                                            
+                                            
+                                            window.sessionId = this.dfReferenceId;
                                                 //place order with direct CSE method
                                                 self.placeOrder();
                                             }
@@ -420,16 +442,21 @@ define(
                                     if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                                         window.addEventListener("message", function(event) {
                                         var data = JSON.parse(event.data);
-                                        if (event.origin === "https://secure-test.worldpay.com") {
+                                        
+                                        var envUrl;
+                                    if(window.checkoutConfig.payment.general.environmentMode == 'TEST') {
+                                        var envUrl = "https://secure-test.worldpay.com";
+                                    }else {
+                                        var envUrl = "https://secure.worldpay.com";
+                                    }
+                                    if (event.origin === envUrl) {
                                         var data = JSON.parse(event.data);
                                             console.warn('Merchant received a message:', data);
                                             if (data !== undefined && data.Status) {
-                                                window.sessionId = data.SessionId;
-                                                var sessionId = data.SessionId;
+                                               // window.sessionId = data.SessionId;
+                                                 window.sessionId = data.SessionId;
 
-                                                if(sessionId){
-                                                    that.dfReferenceId = sessionId;
-                                                }
+                                               
                                                     self.placeOrder();
                                                 }
                                             }
@@ -442,17 +469,22 @@ define(
                                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){  
                                     window.addEventListener("message", function(event) {
                                         var data = JSON.parse(event.data);
-                                        if (event.origin === "https://secure-test.worldpay.com") {
+                                        
+                                        var envUrl;
+                                    if(window.checkoutConfig.payment.general.environmentMode == 'TEST') {
+                                        var envUrl = "https://secure-test.worldpay.com";
+                                    }else {
+                                        var envUrl = "https://secure.worldpay.com";
+                                    }
+                                    if (event.origin === envUrl) {
                                         var data = JSON.parse(event.data);
                                         console.warn('Merchant received a message:', data);
                                         if (data !== undefined && data.Status) {
+                                            //window.sessionId = data.SessionId;
+
                                             window.sessionId = data.SessionId;
 
-                                            var sessionId = data.SessionId;
-
-                                            if(sessionId){
-                                                that.dfReferenceId = sessionId;
-                                            }
+                                           
                                                 //place order with direct CSE method
                                                 self.placeOrder();
                                             }
@@ -467,8 +499,11 @@ define(
                         self.placeOrder();
                     }
                 }else {
-                    return $form.validation() && $form.validation('isValid');
+                    return $form.validation() && $form.validation('isValid');      
                 }
+                
+                
+               
             },
             afterPlaceOrder: function (data, event) {
                 if (this.isSavedCardPayment) {

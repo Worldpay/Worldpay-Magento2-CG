@@ -6,6 +6,7 @@ class Service {
 
     protected $_logger;
     protected $savedTokenFactory;
+    protected $_scopeConfig;
 
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -13,7 +14,8 @@ class Service {
         SavedTokenFactory $savedTokenFactory,
         \Sapient\Worldpay\Model\SavedToken $savedtoken,
         \Magento\Framework\UrlInterface $urlBuilder,
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Customer\Model\Session $customerSession,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->wplogger = $wplogger;
         $this->savedTokenFactory = $savedTokenFactory;
@@ -21,6 +23,7 @@ class Service {
         $this->customerSession = $customerSession;
         $this->savedtoken = $savedtoken;
         $this->_urlBuilder = $urlBuilder;
+        $this->_scopeConfig = $scopeConfig;
     }
 
     public function collectVaultOrderParameters(
@@ -48,7 +51,7 @@ class Service {
             'billingAddress'   => $this->_getBillingAddress($quote),
             'method'           => $paymentDetails['method'],
             'orderStoreId'     => $orderStoreId,
-            'shopperId'     => $quote->getCustomerId()
+            'shopperId'        => $quote->getCustomerId()
         );
     }
 
@@ -77,8 +80,21 @@ class Service {
             'billingAddress'   => $this->_getBillingAddress($quote),
             'method'           => $paymentDetails['method'],
             'orderStoreId'     => $orderStoreId,
-            'shopperId'     => $quote->getCustomerId()
+            'shopperId'     => $quote->getCustomerId(),
+            'cusDetails'    => $this->getCustomerDetailkfor3DS2()
         );
+    }
+    
+    public function getCustomerDetailkfor3DS2 () {
+        $cusDetails = array();
+        $cusDetails['created_at'] = $this->customerSession->getCustomer()->getCreatedAt();
+        $cusDetails['updated_at'] = $this->customerSession->getCustomer()->getUpdatedAt();
+        
+        //check risk data is enabled
+        
+        $cusDetails['is_risk_data_enabled'] = $this->_scopeConfig->getValue('worldpay/general_config/risk_data', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        
+        return $cusDetails;
     }
 
     public function collectRedirectOrderParameters(
@@ -169,7 +185,8 @@ class Service {
             'billingAddress'     => $this->_getBillingAddress($quote),
             'method'             => $paymentDetails['method'],
             'orderStoreId'       => $orderStoreId,
-            'shopperId'          => $quote->getCustomerId()
+            'shopperId'          => $quote->getCustomerId(),
+            'cusDetails'         => $this->getCustomerDetailkfor3DS2()
         );
     }
 
@@ -377,7 +394,7 @@ class Service {
         $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($paymentDetails['method']);
         // 3DS2 value
         if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
-            $details['dfReferenceId'] = isset($paymentDetails['additional_data']['dfReferenceId']) ? $paymentDetails['additional_data']['dfReferenceId'] : '' ;
+            $details['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
         }
         return $details;
     }
