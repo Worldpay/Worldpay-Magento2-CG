@@ -65,11 +65,15 @@
                     <label>Enable Dynamic 3DS2 Secure Override</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="jwt_issuer" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="jwt_api_key" translate="label" type="text" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>JWT Api key</label>
+                    <depends><field id="enable_dynamic3DS2">1</field></depends>
+                </field>
+                <field id="jwt_issuer" translate="label" type="text" sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>JWT Issuer</label>
                     <depends><field id="enable_dynamic3DS2">1</field></depends>
                 </field>
-                <field id="organisational_unit_id" translate="label" type="text" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="organisational_unit_id" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Organisational Unit Id</label>
                     <depends><field id="enable_dynamic3DS2">1</field></depends>
                 </field>
@@ -77,34 +81,34 @@
                     <label>Test DDC URL</label>
                     <depends><field id="enable_dynamic3DS2">1</field></depends>
                 </field>
-                <field id="production_ddc_url" translate="label" type="text" sortOrder="26" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="production_ddc_url" translate="label" type="text" sortOrder="27" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Production DDC URL</label>
                     <depends><field id="enable_dynamic3DS2">1</field></depends>
                 </field>
-                <field id="risk_data" translate="label" type="select" sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="risk_data" translate="label" type="select" sortOrder="28" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Risk Data</label>
                     <depends><field id="enable_dynamic3DS2">1</field></depends>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="authentication_method" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="authentication_method" translate="label" type="select" sortOrder="29" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Authentication Method</label>
                     <depends><field id="enable_dynamic3DS2">1</field></depends>
                     <source_model>Sapient\Worldpay\Model\Config\Source\AuthenticationMethods</source_model>
                 </field>
-                <field id="test_challenge_url" translate="label" type="text" sortOrder="26" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="test_challenge_url" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Test Challenge URL</label>
                     <depends><field id="enable_dynamic3DS2">1</field></depends>
                 </field>
-                <field id="production_challenge_url" translate="label" type="text" sortOrder="26" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="production_challenge_url" translate="label" type="text" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Production Challenge URL</label>
                     <depends><field id="enable_dynamic3DS2">1</field></depends>
                 </field>
-                <field id="challenge_preference" translate="label" type="select" sortOrder="27" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="challenge_preference" translate="label" type="select" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Challenge Preference</label>
                     <depends><field id="enable_dynamic3DS2">1</field></depends>
                     <source_model>Sapient\Worldpay\Model\Config\Source\ChallengePreference</source_model>
                 </field>
-                <field id="challenge_window_size" translate="label" type="select" sortOrder="28" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="challenge_window_size" translate="label" type="select" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Challenge Window Size</label>
                     <depends><field id="enable_dynamic3DS2">1</field></depends>
                     <source_model>Sapient\Worldpay\Model\Config\Source\ChallengeWindowSize</source_model>

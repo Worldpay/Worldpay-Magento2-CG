@@ -170,6 +170,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 
                 // 3DS2 Configurations
                 $config['payment']['ccform']['isDynamic3DS2Enabled'] = $this->worldpayHelper->isDynamic3DS2Enabled();
+                $config['payment']['ccform']['isJwtApiKey'] = $this->worldpayHelper->isJwtApiKey();
                 $config['payment']['ccform']['isJwtIssuer'] = $this->worldpayHelper->isJwtIssuer();
                 $config['payment']['ccform']['isOrganisationalUnitId'] = $this->worldpayHelper->isOrganisationalUnitId();
                 $config['payment']['ccform']['isTestDdcUrl'] = $this->worldpayHelper->isTestDdcUrl();

@@ -25,6 +25,11 @@ class Jwt extends \Magento\Framework\View\Element\Template
         parent::__construct($context);
     }
 
+    public function getJwtApiKey()
+    {
+        return $this->_helper->isJwtApiKey();
+    }
+    
     public function getJwtIssuer()
     {
         return $this->_helper->isJwtIssuer();

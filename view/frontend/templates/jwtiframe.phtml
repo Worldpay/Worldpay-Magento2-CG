@@ -8,6 +8,7 @@ $ccNumber = '';
 if($params){
     $ccNumber = $params['cardNumber'];
 }
+$jwtApiKey = $block->getJwtApiKey();
 $jwtIssuer = $block->getJwtIssuer();
 $organisationalUnitId = $block->getOrganisationalUnitId();
 $ddcUrl = $block->getDdcUrl();
@@ -35,7 +36,7 @@ $environmentMode = $block->getEnvironmentMode();
         "iss": "<?php echo $jwtIssuer;?>",
         "OrgUnitId": "<?php echo $organisationalUnitId;?>"			  
     };
-    var secret = "fa2daee2-1fbb-45ff-4444-52805d5cd9e0";
+    var secret = "<?php echo $jwtApiKey;?>";
 
     var stringifiedHeader = CryptoJS.enc.Utf8.parse(JSON.stringify(header));
     var encodedHeader = base64url(stringifiedHeader);

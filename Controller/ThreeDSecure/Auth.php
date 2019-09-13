@@ -86,7 +86,7 @@ class Auth extends \Magento\Framework\App\Action\Action
 				},
 				"ObjectifyPayload": true
             };
-            var secret = "fa2daee2-1fbb-45ff-4444-52805d5cd9e0";
+            var secret = "'.$threeDSecureChallengeConfig["jwtApiKey"].'";
 
             var stringifiedHeader = CryptoJS.enc.Utf8.parse(JSON.stringify(header));
             var encodedHeader = base64url(stringifiedHeader);

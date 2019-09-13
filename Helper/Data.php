@@ -415,6 +415,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return (bool) $this->_scopeConfig->getValue('worldpay/general_config/enable_dynamic3DS2', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
     
+    public function isJwtApiKey() {
+        if ($this->isDynamic3DS2Enabled()) {
+                return $this->_scopeConfig->getValue('worldpay/general_config/jwt_api_key', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
     public function isJwtIssuer() {
         if ($this->isDynamic3DS2Enabled()) {
                 return $this->_scopeConfig->getValue('worldpay/general_config/jwt_issuer', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);

@@ -115,8 +115,8 @@ class TokenService extends \Magento\Framework\DataObject
     // get 3ds2 params from the configuration and set to checkout session
     public function get3DS2ConfigValues(){
         $data = array();
-        $data['jwtIssuer'] =  $this->worldpayHelper->isJwtIssuer();
-    
+        $data['jwtApiKey'] =  $this->worldpayHelper->isJwtApiKey();
+        $data['jwtIssuer'] =  $this->worldpayHelper->isJwtIssuer();    
         $data['organisationalUnitId'] = $this->worldpayHelper->isOrganisationalUnitId();
     
         $mode = $this->worldpayHelper->getEnvironmentMode();
