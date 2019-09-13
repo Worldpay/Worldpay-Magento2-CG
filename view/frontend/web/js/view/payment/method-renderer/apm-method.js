@@ -53,7 +53,7 @@ define(
             return this;
             },
 
-            filterajax: function(statusCheck = null){
+            filterajax: function(statusCheck){
                 if(!statusCheck){
                     return;
                 }

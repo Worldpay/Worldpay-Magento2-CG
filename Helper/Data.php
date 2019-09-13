@@ -355,6 +355,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->orderFactory->create()->load($orderId);
     }
     
+    public function isWalletsEnabled()
+    {
+        return (bool) $this->_scopeConfig->getValue('worldpay/wallets_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+
     public function getWalletsTitle()
     {
         return  $this->_scopeConfig->getValue('worldpay/wallets_config/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);

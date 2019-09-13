@@ -112,7 +112,7 @@ define(
                 });
             return this;
             },
-            filtercardajax: function(statusCheck = null){
+            filtercardajax: function(statusCheck){
                 if(!statusCheck){
                     return;
                 }
@@ -355,13 +355,30 @@ define(
                     if(cc_type_selected == 'savedcard'){
                         bin = $("input[name='payment[token_to_use]']:checked").next().next().val();     
                     }
-                    if(bin) {
-                    createJwt(bin);
-                }else {
-                    alert('This card number cannot be used to place 3DS2 order now, please go and update this from My account first.');
-                    return;
-                }
                     
+                   
+                    
+                if(this.intigrationmode == 'direct') {
+                    
+                    if(cc_type_selected == 'savedcard'){
+                        if($savedCardForm.validation() && $savedCardForm.validation('isValid')) {
+                           if(bin) {
+                            createJwt(bin);
+                            }else{
+                                alert('This card number cannot be used to place 3DS2 order now, please go and update this from My account first.');
+                                return; 
+                            }
+                        }
+                       
+                    }else {
+                        if($form.validation() && $form.validation('isValid')) {
+                            //var bin = this.creditCardNumber();
+                           createJwt(bin); 
+                        }
+                    }
+                    
+                }
+                
                 }
                 
                 this.dfReferenceId = null;
@@ -428,11 +445,15 @@ define(
                             if(this.isClientSideEncryptionEnabled()){
                                 require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.1.min.js"], function (worldpay) {
                                     worldpay.setPublicKey(that.getCsePublicKey());
+                                    var expiryMonth = that.creditCardExpMonth();
+                                    if(expiryMonth < 10){
+                                        expiryMonth = '0'+expiryMonth;
+                                    }
                                     var cseData = {
                                         cvc: that.creditCardVerificationNumber(),
                                         cardHolderName: $('#' + that.getCode() + '_cc_name').val(),
                                         cardNumber: that.creditCardNumber(),
-                                        expiryMonth: that.creditCardExpMonth(),
+                                        expiryMonth: expiryMonth,
                                         expiryYear: that.creditCardExpYear()
                                     };
                                     var encryptedData = worldpay.encrypt(cseData);

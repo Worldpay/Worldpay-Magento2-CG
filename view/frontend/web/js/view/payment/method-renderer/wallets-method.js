@@ -117,7 +117,7 @@ define(
                 });
             return this;
             },
-            filterwalletajax: function(statusCheck = null){
+            filterwalletajax: function(statusCheck){
                 if(!statusCheck){
                     return;
                 }

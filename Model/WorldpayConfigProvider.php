@@ -12,6 +12,7 @@ use Sapient\Worldpay\Model\SavedTokenFactory;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Asset\Source;
+use Magento\Framework\Locale\Bundle\DataBundle;
 
 /**
  * Configuration provider for worldpayment rendering payment page.
@@ -53,6 +54,14 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
     protected $wplogger;
+    
+    /**
+     * Locale model
+     *
+     * @var \Magento\Framework\Locale\ResolverInterface
+     */
+    protected $localeResolver;
+
 
     /**
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
@@ -64,6 +73,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @param \Magento\Backend\Model\Session\Quote $adminquotesession
      * @param SavedTokenFactory $savedTokenFactory
      * @param \Magento\Backend\Model\Auth\Session $backendAuthSession
+     * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -78,7 +88,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         \Magento\Backend\Model\Auth\Session $backendAuthSession,
         Repository $assetRepo,
         RequestInterface $request,
-        Source $assetSource
+        Source $assetSource,
+        \Magento\Framework\Locale\ResolverInterface $localeResolver
         ) {
 
             $this->wplogger = $wplogger;
@@ -96,6 +107,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
             $this->assetRepo = $assetRepo;
             $this->request = $request;
             $this->assetSource = $assetSource;
+            $this->localeResolver = $localeResolver;
     }
 
     /**
@@ -233,22 +245,23 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $this->worldpayHelper->getWalletsTypes($code);
     }
 
+    /**
+     * Retrieve list of months translation
+     *
+     * @return array
+     * @api
+     */
     public function getMonths()
     {
-        return array(
-            "01" => "01 - January",
-            "02" => "02 - February",
-            "03" => "03 - March",
-            "04" => "04 - April",
-            "05" => "05 - May",
-            "06" => "06 - June",
-            "07" => "07 - July",
-            "08" => "08 - August",
-            "09" => "09 - September",
-            "10"=> "10 - October",
-            "11"=> "11 - November",
-            "12"=> "12 - December"
-        );
+        $data = [];
+        $months = (new DataBundle())->get(
+            $this->localeResolver->getLocale()
+        )['calendar']['gregorian']['monthNames']['format']['wide'];
+        foreach ($months as $key => $value) {
+            $monthNum = ++$key < 10 ? '0' . $key : $key;
+            $data[$key] = $monthNum . ' - ' . $value;
+        }
+        return $data;
     }
 
     /**

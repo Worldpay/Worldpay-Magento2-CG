@@ -43,7 +43,7 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-       if ($this->worlpayhelper->isWorldPayEnable()) {
+       if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isWalletsEnabled()) {
          return true;
        }
        return false;
@@ -63,11 +63,4 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
             return $this->worlpayhelper->getWalletsTitle();
         }
     }
-    
-    
-    
-//    public function getTitle()
-//    {
-//        return 'worldpay_wallets';
-//    }
 }

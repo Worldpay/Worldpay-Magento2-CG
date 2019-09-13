@@ -100,9 +100,10 @@ class Auth extends \Magento\Framework\App\Action\Action
             var encodedJWT = encodedHeader + "." + encodedData + "." + signature;
             document.getElementById("second_jwt").value = encodedJWT;
             function uuidv4() {
-                return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-                  (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-                );
+                return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, function(c){
+                    var crypto = window.crypto || window.msCrypto;
+                    return (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+                });
             }
         
             function base64url(source) {
