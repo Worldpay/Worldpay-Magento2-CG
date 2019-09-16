@@ -372,8 +372,9 @@ define(
                        
                     }else {
                         if($form.validation() && $form.validation('isValid')) {
-                            //var bin = this.creditCardNumber();
-                           createJwt(bin); 
+                            var binNew = bin.substring(0,6);
+                           
+                           createJwt(binNew); 
                         }
                     }
                     

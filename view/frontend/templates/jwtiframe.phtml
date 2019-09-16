@@ -16,8 +16,8 @@ $environmentMode = $block->getEnvironmentMode();
 ?>
 
 <form method="post" action="<?php echo $ddcUrl;?>" id="collectionForm" name="collectionForm"> 
-    <input type="text" name="Bin" id="first_bin" value="<?php echo $ccNumber;?>" />
-    <input type="text" name="JWT" id="first_jwt" value="" />
+    <input type="hidden" name="Bin" id="first_bin" value="<?php echo $ccNumber;?>" />
+    <input type="hidden" name="JWT" id="first_jwt" value="" />
 </form>
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js"></script>
