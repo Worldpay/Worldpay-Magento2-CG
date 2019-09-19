@@ -17,9 +17,10 @@ define(
         'mage/storage',
         'Magento_Checkout/js/model/full-screen-loader',
         'hmacSha256',
-        'encBase64'
+        'encBase64',
+        'aes'
     ],
-    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64, aes) {
         'use strict';
         //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
@@ -76,7 +77,8 @@ define(
         
         function createJwt(cardNumber){
             var bin = cardNumber;
-            $('body').append('<iframe src="'+jwtUrl+'?cardNumber='+bin+'" name="jwt_frm" id="jwt_frm" style="display: none"></iframe>');
+            var encryptedBin = CryptoJS.AES.encrypt(bin, "123456");
+            $('body').append('<iframe src="'+jwtUrl+'?instrument='+encryptedBin+'" name="jwt_frm" id="jwt_frm" style="display: none"></iframe>');
         }
         
         // 3DS2 part End
@@ -410,7 +412,7 @@ define(
                                     }
                                     if (event.origin === envUrl) {
                                     var data = JSON.parse(event.data);
-                                        console.warn('Merchant received a message:', data);
+                                        //console.warn('Merchant received a message:', data);
                                         if (data !== undefined && data.Status) {
                                             //window.sessionId = data.SessionId;
 
@@ -473,7 +475,7 @@ define(
                                     }
                                     if (event.origin === envUrl) {
                                         var data = JSON.parse(event.data);
-                                            console.warn('Merchant received a message:', data);
+                                            //console.warn('Merchant received a message:', data);
                                             if (data !== undefined && data.Status) {
                                                // window.sessionId = data.SessionId;
                                                  window.sessionId = data.SessionId;
@@ -500,7 +502,7 @@ define(
                                     }
                                     if (event.origin === envUrl) {
                                         var data = JSON.parse(event.data);
-                                        console.warn('Merchant received a message:', data);
+                                        //console.warn('Merchant received a message:', data);
                                         if (data !== undefined && data.Status) {
                                             //window.sessionId = data.SessionId;
 
@@ -522,10 +524,7 @@ define(
                     }
                 }else {
                     return $form.validation() && $form.validation('isValid');      
-                }
-                
-                
-               
+                }               
             },
             afterPlaceOrder: function (data, event) {
                 if (this.isSavedCardPayment) {
@@ -535,18 +534,6 @@ define(
                 }else if(this.intigrationmode == 'direct' && !this.isSavedCardPayment){
                     window.location.replace(url.build('worldpay/threedsecure/auth'));
                 }
-            },
-            threeDS2Enabled: function(){
-                return window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled;
-            },
-            jwtIssuer: function(){
-                return window.checkoutConfig.payment.ccform.isJwtIssuer;
-            },
-            organisationalUnitId: function(){
-                return window.checkoutConfig.payment.ccform.isOrganisationalUnitId;
-            },
-            testDdcUrl: function(){
-                return window.checkoutConfig.payment.ccform.isTestDdcUrl;
             },
         });
     }

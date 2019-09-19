@@ -24,7 +24,7 @@ define([
                 onBuyClicked(request);
                 request = initPaymentRequest();
                 
-                console.log(request);
+                //console.log(request);
             } else {
                 location.href = this.options.url.checkout;
             }

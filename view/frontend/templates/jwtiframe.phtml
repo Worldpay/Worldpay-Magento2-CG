@@ -6,7 +6,7 @@
 $params = $this->getRequest()->getParams();
 $ccNumber = '';
 if($params){
-    $ccNumber = $params['cardNumber'];
+    $ccNumber = str_replace(' ', '+',$params['instrument']);
 }
 $jwtApiKey = $block->getJwtApiKey();
 $jwtIssuer = $block->getJwtIssuer();
@@ -16,13 +16,20 @@ $environmentMode = $block->getEnvironmentMode();
 ?>
 
 <form method="post" action="<?php echo $ddcUrl;?>" id="collectionForm" name="collectionForm"> 
-    <input type="hidden" name="Bin" id="first_bin" value="<?php echo $ccNumber;?>" />
+    <input type="hidden" name="Bin" id="first_bin" value="" />
     <input type="hidden" name="JWT" id="first_jwt" value="" />
 </form>
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <script language="Javascript">
+    //Decrypt bin number
+    var cNum = "<?php echo $ccNumber?>";
+    var decrypted = CryptoJS.AES.decrypt(cNum, "123456");
+    var decodedBin = decrypted.toString(CryptoJS.enc.Utf8);
+    document.getElementById("first_bin").value = decodedBin;
+    
     var header = {
         "typ": "JWT",
         "alg": "HS256"

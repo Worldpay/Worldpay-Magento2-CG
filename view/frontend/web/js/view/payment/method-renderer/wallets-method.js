@@ -223,7 +223,7 @@ define(
                     })
                     .catch(function(err) {
                         // show error in developer console for debugging
-                        console.log('payment client resposnse else condition');
+                        //console.log('payment client resposnse else condition');
                         console.error(err);
                         return false;
                     });

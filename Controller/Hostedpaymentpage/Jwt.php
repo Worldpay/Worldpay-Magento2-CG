@@ -14,7 +14,6 @@ class Jwt extends \Magento\Framework\App\Action\Action
 
 	public function execute()
 	{
-		//echo 'sanju';exit;
-		return $this->_pageFactory->create();
+            return $this->_pageFactory->create();
 	}
 }

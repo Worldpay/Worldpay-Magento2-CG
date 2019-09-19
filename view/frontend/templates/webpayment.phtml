@@ -233,9 +233,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
 
     request.show().then(function(instrumentResponse) {
         orderCode = createOrder(instrumentResponse);
-        console.log('order created');
-        console.log(orderCode);
-        console.log('REDIRECTING');
+        //console.log('order created');
+        //console.log(orderCode);
+        //console.log('REDIRECTING');
         if (instrumentResponse && orderCode){
            // window.location.href = baseUrl + 'checkout/onepage/success';
             window.location.href = baseUrl + 'worldpay/threedsecure/auth';
@@ -399,7 +399,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     xhttp.setRequestHeader("Authorization", token);
     xhttp.send(jsonPaymentDetails);
     var orderResponse = JSON.parse(xhttp.responseText);
-    console.log(orderResponse);
+    //console.log(orderResponse);
    
    if(isNaN(orderResponse)){
         window.location.href = baseUrl + 'checkout/cart?error=true';
