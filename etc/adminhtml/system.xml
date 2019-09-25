@@ -65,6 +65,11 @@
                     <label>Enable Dynamic 3DS2 Secure Override</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="jwt_event_url" translate="label" type="text" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>JWT Event URL</label>
+                    <comment>For Live Use Cardinal Commerce URL, For Test Use  https://secure-test.worldpay.com</comment>
+                    <depends><field id="enable_dynamic3DS2">1</field></depends>
+                </field>
                 <field id="jwt_api_key" translate="label" type="text" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>JWT Api key</label>
                     <depends><field id="enable_dynamic3DS2">1</field></depends>

@@ -17,10 +17,9 @@ define(
         'mage/storage',
         'Magento_Checkout/js/model/full-screen-loader',
         'hmacSha256',
-        'encBase64',
-        'aes'
+        'encBase64'
     ],
-    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64, aes) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64) {
         'use strict';
         //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
@@ -77,7 +76,7 @@ define(
         
         function createJwt(cardNumber){
             var bin = cardNumber;
-            var encryptedBin = CryptoJS.AES.encrypt(bin, "123456");
+            var encryptedBin = btoa(bin);
             $('body').append('<iframe src="'+jwtUrl+'?instrument='+encryptedBin+'" name="jwt_frm" id="jwt_frm" style="display: none"></iframe>');
         }
         
@@ -402,29 +401,22 @@ define(
                                 this.redirectAfterPlaceOrder = false;
                                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                                     window.addEventListener("message", function(event) {
-                                    var data = JSON.parse(event.data);
-                                    
-                                    var envUrl;
-                                    if(window.checkoutConfig.payment.general.environmentMode == 'TEST') {
-                                        var envUrl = "https://secure-test.worldpay.com";
-                                    }else {
-                                        var envUrl = "https://secure.worldpay.com";
-                                    }
-                                    if (event.origin === envUrl) {
-                                    var data = JSON.parse(event.data);
-                                        //console.warn('Merchant received a message:', data);
-                                        if (data !== undefined && data.Status) {
-                                            //window.sessionId = data.SessionId;
+                                        var data = JSON.parse(event.data);
 
-                                            var sessionId = data.SessionId;
-
-                                            if(sessionId){
-                                                this.dfReferenceId = sessionId;
-                                            }
-                                            
-                                            
-                                            
-                                            window.sessionId = this.dfReferenceId;
+                                        var envUrl;
+                                        if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
+                                            envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
+                                        }
+                                        if (event.origin === envUrl) {
+                                            var data = JSON.parse(event.data);
+                                            //console.warn('Merchant received a message:', data);
+                                            if (data !== undefined && data.Status) {
+                                                //window.sessionId = data.SessionId;
+                                                var sessionId = data.SessionId;
+                                                if(sessionId){
+                                                    this.dfReferenceId = sessionId;
+                                                }
+                                                window.sessionId = this.dfReferenceId;
                                                 //place order with direct CSE method
                                                 self.placeOrder();
                                             }
@@ -465,22 +457,18 @@ define(
                                     that.dfReferenceId = null;
                                     if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                                         window.addEventListener("message", function(event) {
-                                        var data = JSON.parse(event.data);
-                                        
-                                        var envUrl;
-                                    if(window.checkoutConfig.payment.general.environmentMode == 'TEST') {
-                                        var envUrl = "https://secure-test.worldpay.com";
-                                    }else {
-                                        var envUrl = "https://secure.worldpay.com";
-                                    }
-                                    if (event.origin === envUrl) {
-                                        var data = JSON.parse(event.data);
-                                            //console.warn('Merchant received a message:', data);
-                                            if (data !== undefined && data.Status) {
-                                               // window.sessionId = data.SessionId;
-                                                 window.sessionId = data.SessionId;
+                                            var data = JSON.parse(event.data);
 
-                                               
+                                            var envUrl;
+                                            if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
+                                                envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
+                                            }
+                                            if (event.origin === envUrl) {
+                                                var data = JSON.parse(event.data);
+                                                //console.warn('Merchant received a message:', data);
+                                                if (data !== undefined && data.Status) {
+                                                   // window.sessionId = data.SessionId;
+                                                    window.sessionId = data.SessionId;
                                                     self.placeOrder();
                                                 }
                                             }
@@ -495,24 +483,19 @@ define(
                                         var data = JSON.parse(event.data);
                                         
                                         var envUrl;
-                                    if(window.checkoutConfig.payment.general.environmentMode == 'TEST') {
-                                        var envUrl = "https://secure-test.worldpay.com";
-                                    }else {
-                                        var envUrl = "https://secure.worldpay.com";
-                                    }
-                                    if (event.origin === envUrl) {
-                                        var data = JSON.parse(event.data);
-                                        //console.warn('Merchant received a message:', data);
-                                        if (data !== undefined && data.Status) {
-                                            //window.sessionId = data.SessionId;
-
-                                            window.sessionId = data.SessionId;
-
-                                           
-                                                //place order with direct CSE method
-                                                self.placeOrder();
-                                            }
+                                        if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
+                                            envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
                                         }
+                                        if (event.origin === envUrl) {
+                                            var data = JSON.parse(event.data);
+                                            console.warn('Merchant received a message:', data);
+                                            if (data !== undefined && data.Status) {
+                                                //window.sessionId = data.SessionId;
+                                                window.sessionId = data.SessionId;
+                                                //place order with direct CSE method
+                                                    self.placeOrder();
+                                            } 
+                                        } 
                                     }, false);
                                 } else {
                                     self.placeOrder();

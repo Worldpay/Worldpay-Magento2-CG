@@ -22,12 +22,10 @@ $environmentMode = $block->getEnvironmentMode();
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 <script language="Javascript">
     //Decrypt bin number
     var cNum = "<?php echo $ccNumber?>";
-    var decrypted = CryptoJS.AES.decrypt(cNum, "123456");
-    var decodedBin = decrypted.toString(CryptoJS.enc.Utf8);
+    var decodedBin = atob(cNum);
     document.getElementById("first_bin").value = decodedBin;
     
     var header = {
