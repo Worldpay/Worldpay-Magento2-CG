@@ -1,5 +1,13 @@
 <config>
     <default>
+        <dev>
+            <js>
+            <minify_exclude>
+                <hmacsha256>https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js</hmacsha256>
+                <encbase64>https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js</encbase64>
+            </minify_exclude>
+            </js>
+        </dev>
         <worldpay>
              <general_config>
                 <enable_worldpay>0</enable_worldpay>
