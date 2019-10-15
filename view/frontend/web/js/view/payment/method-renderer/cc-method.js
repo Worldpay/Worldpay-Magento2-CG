@@ -438,7 +438,7 @@ define(
                             that.dfReferenceId = sessionId;
                             
                             if(this.isClientSideEncryptionEnabled()){
-                                require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.1.min.js"], function (worldpay) {
+                                require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.2.min.js"], function (worldpay) {
                                     worldpay.setPublicKey(that.getCsePublicKey());
                                     var expiryMonth = that.creditCardExpMonth();
                                     if(expiryMonth < 10){

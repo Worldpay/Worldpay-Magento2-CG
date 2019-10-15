@@ -5,7 +5,7 @@
 var config = {
     map: {
         '*': {
-            worldpay: 'https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.1.min.js',
+            worldpay: 'https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.2.min.js',
             googlePay: 'https://pay.google.com/gp/p/js/pay.js',
             hmacSha256: 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js',
             encBase64: 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js',
