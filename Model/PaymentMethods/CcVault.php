@@ -38,6 +38,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
      protected $_canRefund = true;
      protected $_canRefundInvoicePartial = true;
      protected $_canVoid = true;
+     protected $_canCapturePartial = true;
 
      const DIRECT_MODEL = 'direct';
      protected static $paymentDetails;

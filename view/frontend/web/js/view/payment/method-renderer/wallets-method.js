@@ -68,7 +68,7 @@ define(
                 // @todo a merchant ID is available for a production environment after approval by Google
                 // See {@link https://developers.google.com/pay/api/web/guides/test-and-deploy/integration-checklist|Integration checklist}
                 
-                merchantId: 'b21b1d14ba43077',
+                merchantId: window.checkoutConfig.payment.ccform.googleGatewayMerchantid,
                 merchantName: window.checkoutConfig.payment.ccform.googleGatewayMerchantname
             };
             return paymentDataRequest;

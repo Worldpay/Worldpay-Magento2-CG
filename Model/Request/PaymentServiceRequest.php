@@ -25,11 +25,13 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Request $request,
-        \Sapient\Worldpay\Helper\Data $worldpayhelper
+        \Sapient\Worldpay\Helper\Data $worldpayhelper,
+         \Magento\Sales\Model\Service\InvoiceService $invoiceService
     ) {
         $this->_wplogger = $wplogger;
         $this->_request = $request;
         $this->worldpayhelper = $worldpayhelper;
+        $this->_invoiceService = $invoiceService;
     }
 
     /**
@@ -91,6 +93,9 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $directOrderParams['shippingAddress'],
             $directOrderParams['billingAddress'],
             $directOrderParams['shopperId'],
+            $directOrderParams['saveCardEnabled'],
+            $directOrderParams['tokenizationEnabled'],
+            $directOrderParams['storedCredentialsEnabled'],
             $directOrderParams['cusDetails']
         );
         return $this->_sendRequest(
@@ -130,6 +135,9 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $tokenOrderParams['shippingAddress'],
             $tokenOrderParams['billingAddress'],
             $tokenOrderParams['shopperId'],
+            $tokenOrderParams['saveCardEnabled'],
+            $tokenOrderParams['tokenizationEnabled'],
+            $tokenOrderParams['storedCredentialsEnabled'],
             $tokenOrderParams['cusDetails']
         );
         return $this->_sendRequest(
@@ -271,6 +279,9 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         $orderCode = $wp->getWorldpayOrderId();
         $this->_wplogger->info('########## Submitting capture request. Order: ' . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
         $this->xmlcapture = new \Sapient\Worldpay\Model\XmlBuilder\Capture();
+        
+        
+        
         $captureSimpleXml = $this->xmlcapture->build(
             $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
             $orderCode,
@@ -285,6 +296,40 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
         );
     }
+    
+    
+    
+    /**
+     * Send Partial capture XML to Worldpay server
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Framework\DataObject $wp
+     * @param string $paymentMethodCode
+     * @return mixed
+     */
+    public function partialCapture(\Magento\Sales\Model\Order $order, $wp, $grandTotal)
+    {
+        $orderCode = $wp->getWorldpayOrderId();
+        $this->_wplogger->info('########## Submitting Partial capture request. Order: ' . $orderCode . ' Amount:' . $grandTotal . ' ##########');
+        $this->xmlcapture = new \Sapient\Worldpay\Model\XmlBuilder\Capture();
+       
+        
+        $captureSimpleXml = $this->xmlcapture->build(
+            $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
+            $orderCode,
+            $order->getOrderCurrencyCode(),
+            $grandTotal,
+            $wp->getPaymentType()
+        );
+
+        return $this->_sendRequest(
+            dom_import_simplexml($captureSimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
+            $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
+        );
+    }
+    
+    
 
     /**
      * process the request

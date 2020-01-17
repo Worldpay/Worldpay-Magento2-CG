@@ -35,7 +35,8 @@ class UpdateWorldpayment
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Customer\Model\Session $customerSession,
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
-        CreditCardTokenFactory $paymentTokenFactory
+        CreditCardTokenFactory $paymentTokenFactory,
+        \Magento\Backend\Model\Session\Quote $session
     ) {
         $this->wplogger = $wplogger;
         $this->savedTokenFactory = $savedTokenFactory;
@@ -45,6 +46,7 @@ class UpdateWorldpayment
         $this->customerSession = $customerSession;
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->paymentExtensionFactory = $paymentExtensionFactory;
+        $this->quotesession = $session;
     }
 
     /**
@@ -53,7 +55,7 @@ class UpdateWorldpayment
      * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
      */
     public function updateWorldpayPayment(\Sapient\Worldpay\Model\Response\DirectResponse $directResponse, \Magento\Payment\Model\InfoInterface $paymentObject)
-    {
+    {        
         $responseXml=$directResponse->getXml();
         $merchantCode = $responseXml['merchantCode'];
         $orderStatus = $responseXml->reply->orderStatus;
@@ -97,20 +99,20 @@ class UpdateWorldpayment
         $wpp->setData('aav_email_result_code',$payment->AAVEmailResultCode['description']);
         $wpp->save();
         if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
-            $this->customerSession->unsIsSavedCardRequested();
-            $tokenNodeWithError = $orderStatus->token->xpath('//error');
-            if (!$tokenNodeWithError) {
-                $tokenElement=$orderStatus->token;
-                $this->saveTokenData($tokenElement, $payment, $merchantCode);
-                // vault and instant purchase configuration goes here
-                $paymentToken = $this->getVaultPaymentToken($tokenElement);
-                if (null !== $paymentToken) {
-                    $extensionAttributes = $this->getExtensionAttributes($paymentObject);
-                    $extensionAttributes->setVaultPaymentToken($paymentToken);
+                $this->customerSession->unsIsSavedCardRequested();
+                $tokenNodeWithError = $orderStatus->token->xpath('//error');
+                if (!$tokenNodeWithError) {
+                    $tokenElement = $orderStatus->token;
+                    $this->saveTokenData($tokenElement, $payment, $merchantCode);
+                    // vault and instant purchase configuration goes here
+                    $paymentToken = $this->getVaultPaymentToken($tokenElement);
+                    if (null !== $paymentToken) {
+                        $extensionAttributes = $this->getExtensionAttributes($paymentObject);
+                        $extensionAttributes->setVaultPaymentToken($paymentToken);
+                    }
                 }
             }
         }
-    }
 
     /**
      * Saved token data
@@ -121,23 +123,33 @@ class UpdateWorldpayment
     public function saveTokenData($tokenElement, $payment, $merchantCode)
     {
         $savedTokenFactory = $this->savedTokenFactory->create();
-        $tokenDataExist = $savedTokenFactory->getCollection()
+        // checking tokenization exist or not
+            $tokenDataExist = $savedTokenFactory->getCollection()
                 ->addFieldToFilter('customer_id', $tokenElement[0]->authenticatedShopperID[0])
                 ->addFieldToFilter('token_code', $tokenElement[0]->tokenDetails[0]->paymentTokenID[0])
                 ->getFirstItem()->getData();
-
+        // checking storedcredentials exist or not
+//        if($storedCredentialsElement){
+//            $storedCredentialsDataExist = $savedTokenFactory->getCollection()
+//                ->addFieldToFilter('customer_id', $customerId)
+//                ->addFieldToFilter('transaction_identifier', $storedCredentialsElement[0]->transactionIdentifier[0])
+//                ->getFirstItem()->getData();
+//        }
         if (empty($tokenDataExist)) {
+            if($payment->schemeResponse){
+                $savedTokenFactory->setTransactionIdentifier($payment->schemeResponse[0]->transactionIdentifier[0]);
+            }
             $binNumber = $tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->bin[0];
             $savedTokenFactory->setTokenCode($tokenElement[0]->tokenDetails[0]->paymentTokenID[0]);
             $dateNode = $tokenElement[0]->tokenDetails->paymentTokenExpiry->date;
             $tokenexpirydate = (int)$dateNode['year'].'-'.(int)$dateNode['month'].'-'.(int)$dateNode['dayOfMonth'];
             $savedTokenFactory->setTokenExpiryDate($tokenexpirydate);
-            $savedTokenFactory->setTokenReason($tokenElement[0]->tokenReason[0]);
+            $savedTokenFactory->setTokenReason($tokenElement[0]->tokenReason[0]);                
             $savedTokenFactory->setCardNumber($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->obfuscatedPAN[0]);
             $savedTokenFactory->setCardholderName($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->cardHolderName[0]);
             $savedTokenFactory->setCardExpiryMonth((int)$tokenElement[0]->paymentInstrument->cardDetails->expiryDate->date['month']);
             $savedTokenFactory->setCardExpiryYear((int)$tokenElement[0]->paymentInstrument->cardDetails->expiryDate->date['year']);
-            $paymentmethodmethod = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
+            $paymentmethodmethod = str_replace(array("_CREDIT","_DEBIT"), "", $payment->paymentMethod[0]);
             $savedTokenFactory->setMethod($paymentmethodmethod);
             $savedTokenFactory->setCardBrand($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->cardBrand[0]);
             $savedTokenFactory->setCardSubBrand($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->cardSubBrand[0]);
@@ -150,8 +162,8 @@ class UpdateWorldpayment
             }
             $savedTokenFactory->save();
         } else {
-              $this->_messageManager->addNotice(__("You already appear to have this card number stored, if your card details have changed, you can update these via the 'my cards' section"));
-              return;
+            $this->_messageManager->addNotice(__("You already appear to have this card number stored, if your card details have changed, you can update these via the 'my cards' section"));
+            return;
         }
 
     }

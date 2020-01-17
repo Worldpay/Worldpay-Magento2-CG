@@ -85,6 +85,20 @@ EOD;
     private function _addCapture($orderModification)
     {
         $capture = $orderModification->addChild('capture');
+        
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
+        
+        $autoInvoice = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue('worldpay/general_config/capture_automatically',$storeScope);
+        $partialCapture = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue('worldpay/cc_config/partial_capture',$storeScope);
+       
+        //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
+       if($partialCapture && !$autoInvoice) {
+            $capture['reference']= 'Partial Capture';
+        }
+
+           
+       
         return $capture;
     }
 
@@ -106,6 +120,19 @@ EOD;
         $amountElement['currencyCode'] = $this->currencyCode;
         $amountElement['exponent'] = self::EXPONENT;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
+        
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
+        
+        $autoInvoice = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue('worldpay/general_config/capture_automatically',$storeScope);
+        $partialCapture = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface')->getValue('worldpay/cc_config/partial_capture',$storeScope);
+       
+        //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
+       if($partialCapture && !$autoInvoice) {
+            $amountElement['debitCreditIndicator'] = 'credit';
+        }
+        
+     
     }
 
     /**

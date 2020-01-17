@@ -34,10 +34,10 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
 
     public function getAuthorisationService($storeId)
     {
-         $checkoutpaymentdata = $this->paymentdetailsdata;
+        $checkoutpaymentdata = $this->paymentdetailsdata;
 
          if (!empty($checkoutpaymentdata['additional_data']['isSavedCardPayment']) && !empty($checkoutpaymentdata['additional_data']['tokenCode'])) {
-            return $this->tokenservice;
+             return $this->tokenservice;
         }
         if ($this->_isRedirectIntegrationModeEnabled($storeId)) {
             if ($this->_isEmbeddedIntegrationModeEnabled($storeId)) {

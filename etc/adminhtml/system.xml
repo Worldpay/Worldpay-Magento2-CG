@@ -156,17 +156,34 @@
                     <label>Save Card</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="instant_purchase" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="save_tokenization" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Tokenization</label>
+                    <depends><field id="saved_card">1</field></depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="save_stored_credentials" translate="label" type="select" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Stored Credentials</label>
+                    <depends><field id="saved_card">1</field></depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="instant_purchase" translate="label" type="select" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Instant Purchase</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 
-                <field id="chromepay" translate="label" type="select" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="chromepay" translate="label" type="select" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Chrome Pay</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="chromepay_button_name" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="chromepay_button_name" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Chrome Pay Button Name</label>
+                </field>
+                
+                 
+                <field id="partial_capture" translate="label" type="select" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Partial Capture</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Note: "Capture Invoice Automatically" option in above, should be disabled to enable this feature.</comment>
                 </field>
             </group>
             <!--APM-->

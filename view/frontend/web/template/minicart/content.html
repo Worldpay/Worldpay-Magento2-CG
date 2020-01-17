@@ -39,17 +39,19 @@
 
         <div class="actions" if="getCartParam('possible_onepage_checkout')">
             <div class="primary">
-				
-				<a class="action viewcart" data-bind="attr: {href: proceedToCheckoutUrl}">
-                 <button 
-                        id="top-cart-btn-checkout-new"
-                        type="button"
-                        class="action primary checkout"
-                        data-action="close"
-                        data-bind="attr: {href: proceedToCheckoutUrl}"
-                        translate="'Proceed to Checkout'"
+                <button
+                    id="top-cart-btn-checkout"
+                    type="button"
+                    class="action primary checkout"
+                    data-action="close"
+                    data-bind="
+                        attr: {
+                            title: $t('Proceed to Checkout')
+                        },
+                        click: closeMinicart()
+                    "
+                    translate="'Proceed to Checkout'"
                 />
-                </a>
                 
                 <if args="chromepayEnabled == 1">
                     <if args="chromePaymentMode == 'direct'">

@@ -13,6 +13,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     protected $_canRefund = true;
     protected $_canRefundInvoicePartial = true;
     protected $_canVoid = true;
+    protected $_canCapturePartial = true;
 
     /**
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
@@ -313,7 +314,20 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
 
 
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
-        $this->_wplogger->info('capture function executed');
+        
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+
+        $autoInvoice = $this->_scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
+        $partialCapture = $this->_scopeConfig->getValue('worldpay/cc_config/partial_capture', $storeScope);
+
+        
+         
+        //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
+       if($partialCapture && !$autoInvoice) {
+           return $this;
+        }
+         
+       
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
@@ -324,6 +338,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             $orderId = $mageOrder->getIncrementId();
         }
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($orderId);
+        
+        
         $paymenttype = $worldPayPayment->getPaymentType();
         if ($this->paymentutils->CheckCaptureRequest($payment->getMethod(), $paymenttype)) {
             $this->paymentservicerequest->capture(
@@ -445,7 +461,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         if (empty($this->paymentdetailsdata['additional_data']['tokenCode'])) {
             return  $this->paymentdetailsdata['additional_data']['cc_type'];
         } else {
-
             $savedCard= $this->_savecard->create()->getCollection()
                 ->addFieldToSelect(array('method'))
                 ->addFieldToFilter('token_code', array('eq' => $this->paymentdetailsdata['additional_data']['tokenCode']))

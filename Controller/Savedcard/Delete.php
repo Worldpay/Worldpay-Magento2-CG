@@ -78,27 +78,30 @@ class Delete extends \Magento\Framework\App\Action\Action
 	public function execute()
 	{
         $id = $this->getRequest()->getParam('id');
-	 	if ($id) {
-			try {
+	if ($id) {
+            try {
                 $model = $this->savecard->create();
-	            $model->load($id);
-	            if ($this->customerSession->getId()==$model->getCustomerId()) {
-                    $tokenDeleteResponse = $this->_tokenService->getTokenDelete(
-                    $model,
-                    $this->customerSession->getCustomer(),
-                    $this->getStoreId());
-
-                    if ($tokenDeleteResponse->isSuccess()) {
-                        // Delete Worldpay Token.
-                        $this->_applyTokenDelete($model, $this->customerSession->getCustomer());
-                        // Delete Vault Token.
-                        $this->_applyVaultTokenDelete($model, $this->customerSession->getCustomer());
+                $model->load($id);
+                if ($this->customerSession->getId() == $model->getCustomerId()) {
+                    if($model->getTokenCode()){
+                        $tokenDeleteResponse = $this->_tokenService->getTokenDelete(
+                        $model,
+                        $this->customerSession->getCustomer(),
+                        $this->getStoreId());
+                        if ($tokenDeleteResponse->isSuccess()) {
+                            // Delete Worldpay Token.
+                            $this->_applyTokenDelete($model, $this->customerSession->getCustomer());
+                            // Delete Vault Token.
+                            $this->_applyVaultTokenDelete($model, $this->customerSession->getCustomer());
+                        }
+                    } else{
+                        $model->delete($id);
                     }
-	            	$this->messageManager->addSuccess(__('Item is deleted successfully'));
-	        	} else {
-	        		$this->messageManager->addErrorMessage(__('Please try after some time'));
-	        	}
-	        } catch (\Exception $e) {
+                    $this->messageManager->addSuccess(__('Item is deleted successfully'));
+                } else {
+                    $this->messageManager->addErrorMessage(__('Please try after some time'));
+                }
+            } catch (\Exception $e) {
                 $this->wplogger->error($e->getMessage());
                 if ($this->_tokenNotExistOnWorldpay($e->getMessage())) {
                     $this->_applyTokenDelete($model, $this->customerSession->getCustomer());
@@ -111,7 +114,7 @@ class Delete extends \Magento\Framework\App\Action\Action
             }
     	}
         $this->_redirect('worldpay/savedcard/index');
-	}
+    }
 
     /**
      * @return bool

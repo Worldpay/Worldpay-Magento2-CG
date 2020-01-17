@@ -63,6 +63,9 @@ class Service {
     )
     {
         $reservedOrderId = $quote->getReservedOrderId();
+        $savemyCard = isset($paymentDetails['additional_data']['save_my_card']) ? $paymentDetails['additional_data']['save_my_card'] : '';
+        $tokenizationEnabled = isset($paymentDetails['additional_data']['tokenization_enabled']) ? $paymentDetails['additional_data']['tokenization_enabled'] : '';
+        $storedCredentialsEnabled = isset($paymentDetails['additional_data']['stored_credentials_enabled']) ? $paymentDetails['additional_data']['stored_credentials_enabled'] : '';
         return array(
             'orderCode'        => $orderCode,
             'merchantCode'     => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -80,7 +83,10 @@ class Service {
             'billingAddress'   => $this->_getBillingAddress($quote),
             'method'           => $paymentDetails['method'],
             'orderStoreId'     => $orderStoreId,
-            'shopperId'     => $quote->getCustomerId(),
+            'shopperId'        => $quote->getCustomerId(),
+            'saveCardEnabled'        => $savemyCard,
+            'tokenizationEnabled'     => $tokenizationEnabled,
+            'storedCredentialsEnabled' => $storedCredentialsEnabled,
             'cusDetails'    => $this->getCustomerDetailkfor3DS2()
         );
     }
@@ -168,6 +174,9 @@ class Service {
     {
         $reservedOrderId = $quote->getReservedOrderId();
         $updatedPaymentDetails = $this->_getPaymentDetailsUsingToken($paymentDetails, $quote);
+        $savemyCard = isset($paymentDetails['additional_data']['save_my_card']) ? $paymentDetails['additional_data']['save_my_card'] : '';
+        $tokenizationEnabled = isset($paymentDetails['additional_data']['tokenization_enabled']) ? $paymentDetails['additional_data']['tokenization_enabled'] : '';
+        $storedCredentialsEnabled = isset($paymentDetails['additional_data']['stored_credentials_enabled']) ? $paymentDetails['additional_data']['stored_credentials_enabled'] : '';
         return array(
             'orderCode'        => $orderCode,
             'merchantCode'       => $this->worldpayHelper->getMerchantCode($updatedPaymentDetails['brand']),
@@ -186,6 +195,9 @@ class Service {
             'method'             => $paymentDetails['method'],
             'orderStoreId'       => $orderStoreId,
             'shopperId'          => $quote->getCustomerId(),
+            'saveCardEnabled'        => $savemyCard,
+            'tokenizationEnabled'     => $tokenizationEnabled,
+            'storedCredentialsEnabled' => $storedCredentialsEnabled,
             'cusDetails'         => $this->getCustomerDetailkfor3DS2()
         );
     }
@@ -371,17 +383,20 @@ class Service {
 
     private function _getPaymentDetailsUsingToken($paymentDetails,$quote)
     {
+        $savedCardData = $this->savedtoken->loadByTokenCode($paymentDetails['additional_data']['tokenCode']);
         if (isset($paymentDetails['encryptedData'])) {
             $details = array(
-                'encryptedData' => $paymentDetails['encryptedData']
+                'encryptedData' => $paymentDetails['encryptedData'],
+                'transactionIdentifier' => $savedCardData->getTransactionIdentifier()
             );
         } else {
-            $savedCardData = $this->savedtoken->loadByTokenCode($paymentDetails['additional_data']['tokenCode']);
+                
             $details = array(
                 'brand' => $savedCardData->getCardBrand(),
                 'paymentType' => 'TOKEN-SSL',
                 'customerId' => $quote->getCustomerId(),
                 'tokenCode' => $savedCardData->getTokenCode(),
+                'transactionIdentifier' => $savedCardData->getTransactionIdentifier()
             );
 
             if (isset($paymentDetails['additional_data']['saved_cc_cid']) && !empty($paymentDetails['additional_data']['saved_cc_cid'])) {

@@ -98,4 +98,9 @@ interface StateInterface
      * @return string
      */
     public function getBin();
+    
+    /**
+     * @return string
+     */
+    public function getTransactionIdentifier();
 }

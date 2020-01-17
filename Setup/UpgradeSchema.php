@@ -83,7 +83,13 @@ class UpgradeSchema implements UpgradeSchemaInterface {
             $this->addColumnCse($installer);
         }
         if (version_compare($context->getVersion(), '1.2.3', '<')) {
+            $this->addColumnToken($installer);
+        }
+        if (version_compare($context->getVersion(), '1.2.4', '<')) {
             $this->addColumnBin($installer);
+        }
+        if (version_compare($context->getVersion(), '1.2.5', '<')) {
+            $this->modifyColumnOrderId($installer);
         }
         $installer->endSetup();
     }
@@ -188,6 +194,25 @@ class UpgradeSchema implements UpgradeSchemaInterface {
      * @param SchemaSetupInterface $installer
      * @return void
      */
+    private function addColumnToken(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_TOKEN),
+            'transaction_identifier',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                'length' => 255,
+                'comment' => 'Transaction Indentifier',
+                'after' => 'authenticated_shopper_id'
+            ]
+        );
+    }
+
+    /**
+     * @param SchemaSetupInterface $installer
+     * @return void
+     */
     private function addColumnBin(SchemaSetupInterface $installer)
     {
         $connection = $installer->getConnection();
@@ -200,6 +225,26 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                 'length' => '25',
                 'comment' => 'Bin Number',
                 'before' => 'created_at'
+            ]
+        );
+    }
+    
+    /**
+     * @param SchemaSetupInterface $installer
+     * @return void
+     */
+    private function modifyColumnOrderId(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->modifyColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'order_id',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                'length' => 25,
+                'nullable' => false,
+                'unsigned' => true,
+                'comment' => 'Order Id'
             ]
         );
     }

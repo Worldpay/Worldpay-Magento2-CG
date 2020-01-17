@@ -286,6 +286,16 @@ define(
                     return window.checkoutConfig.payment.ccform.saveCardAllowed;
                 }
             },
+            isTokenizationEnabled: function(){
+                if(customer.isLoggedIn()){
+                    return window.checkoutConfig.payment.ccform.tokenizationAllowed;
+                }
+            },
+            isStoredCredentialsEnabled: function(){
+                if(customer.isLoggedIn()){
+                    return window.checkoutConfig.payment.ccform.storedCredentialsAllowed;
+                }
+            },
             isActive: function() {
                 return true;
             },
@@ -320,6 +330,8 @@ define(
                         'tokenCode': this.paymentToken,
                         'saved_cc_cid': $('.saved-cvv-number').val(),
                         'isSavedCardPayment': this.isSavedCardPayment,
+                        'tokenization_enabled': this.isTokenizationEnabled(),
+                        'stored_credentials_enabled': this.isStoredCredentialsEnabled(),
                         'dfReferenceId': window.sessionId
                     }
                 };
@@ -348,7 +360,6 @@ define(
                 var $form = $('#' + this.getCode() + '-form');
                 var $savedCardForm = $('#' + this.getCode() + '-savedcard-form');
                 var selectedSavedCardToken = $("input[name='payment[token_to_use]']:checked").val();
-
                 var cc_type_selected = this.getselectedCCType('payment[cc_type]');
                 // 3DS2 JWT create function 
                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
@@ -385,7 +396,7 @@ define(
                 
                 this.dfReferenceId = null;
 
-                 if(cc_type_selected == 'savedcard'){
+                if(cc_type_selected == 'savedcard'){
                       //Saved card handle
                       if((this.intigrationmode == 'direct' && $savedCardForm.validation() && $savedCardForm.validation('isValid') && selectedSavedCardToken) ||
                         (this.intigrationmode == 'redirect' && $form.validation() && $form.validation('isValid') && selectedSavedCardToken)){
@@ -399,7 +410,7 @@ define(
                                 $('#saved-cvv-error').html('Please, enter valid Card Verification Number');
                             }else{
                                 this.redirectAfterPlaceOrder = false;
-                                if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
+                                if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled && this.intigrationmode == 'direct'){
                                     window.addEventListener("message", function(event) {
                                         var data = JSON.parse(event.data);
 

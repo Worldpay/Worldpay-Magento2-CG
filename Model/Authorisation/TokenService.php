@@ -118,6 +118,7 @@ class TokenService extends \Magento\Framework\DataObject
         $data['jwtApiKey'] =  $this->worldpayHelper->isJwtApiKey();
         $data['jwtIssuer'] =  $this->worldpayHelper->isJwtIssuer();    
         $data['organisationalUnitId'] = $this->worldpayHelper->isOrganisationalUnitId();
+        $data['challengeWindowType'] = $this->worldpayHelper->getChallengeWindowSize();
     
         $mode = $this->worldpayHelper->getEnvironmentMode();
         if($mode == 'Test Mode'){

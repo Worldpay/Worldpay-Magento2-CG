@@ -111,9 +111,10 @@ class WorldpayToken
         $tokenModel = $this->savedtoken;
         $tokenModel->loadByTokenCode($tokenState->getTokenCode());
         $tokenModel->getResource()->beginTransaction();
-
+        
         try {
             $binNumber = $tokenState->getBin();
+            $transactionIdentifier = $tokenState->getTransactionIdentifier();
             $tokenModel->setTokenCode($tokenState->getTokenCode());
             $tokenModel->setTokenReason($tokenState->getTokenReason());
             $tokenModel->setTokenExpiryDate($tokenState->getTokenExpiryDate()->format('Y-m-d'));
@@ -128,6 +129,9 @@ class WorldpayToken
             $tokenModel->setMerchantCode($tokenState->getMerchantCode());
             $tokenModel->setAuthenticatedShopperId($tokenState->getAuthenticatedShopperId());
             $tokenModel->setCustomerId($tokenState->getAuthenticatedShopperId());
+            if($transactionIdentifier){
+                $tokenModel->setTransactionIdentifier($tokenState->getTransactionIdentifier());
+            }
             if($binNumber){
                 $tokenModel->setBinNumber($tokenState->getBin());
             }

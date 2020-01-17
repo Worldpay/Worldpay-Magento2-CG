@@ -147,6 +147,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['is3DSecureEnabled'] = $this->worldpayHelper->is3DSecureEnabled();
                 $config['payment']['ccform']['savedCardList'] = $this->getSaveCardList();
                 $config['payment']['ccform']['saveCardAllowed'] = $this->worldpayHelper->getSaveCard();
+                $config['payment']['ccform']['tokenizationAllowed'] = $this->worldpayHelper->getTokenization();
+                $config['payment']['ccform']['storedCredentialsAllowed'] = $this->worldpayHelper->getStoredCredentials();
                 $config['payment']['ccform']['apmtitle'] = $this->getApmtitle();
                 $config['payment']['ccform']['walletstitle'] = $this->getWalletstitle();
                 $config['payment']['ccform']['paymentMethodSelection'] = $this->getPaymentMethodSelection();
@@ -181,7 +183,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['isTestChallengeUrl'] = $this->worldpayHelper->isTestChallengeUrl();
                 $config['payment']['ccform']['isProductionChallengeUrl'] = $this->worldpayHelper->isProductionChallengeUrl();
                 $config['payment']['ccform']['isChallengePreference'] = $this->worldpayHelper->isChallengePreference();
-                $config['payment']['ccform']['isChallengeWindowSize'] = $this->worldpayHelper->isChallengeWindowSize();
+                $config['payment']['ccform']['isChallengeWindowSize'] = $this->worldpayHelper->getChallengeWindowSize();
             }
         }
         return $config;
@@ -196,7 +198,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         if ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn()) {
             $savedCardsList = $this->savedTokenFactory->create()->getCollection()
            ->addFieldToFilter('customer_id', $this->customerSession->getCustomerId())->getData();
-        }
+        }        
         return $savedCardsList;
     }
 

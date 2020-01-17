@@ -18,6 +18,9 @@
             </thead>
             <tbody>
                 <?php foreach ($_savecards as $_savecard): ?>
+                
+               
+               
                 	<tr>
                         <td data-th="<?php echo $block->escapeHtml(__('Card Brand #')) ?>" class="col id"><?php /* @escapeNotVerified */ echo $_savecard->getCardBrand() ?></td>
                        	<td data-th="<?php echo $block->escapeHtml(__('Card Number')) ?>" class="col date"><?php /* @escapeNotVerified */ echo $_savecard->getCardNumber() ?></td>
@@ -26,9 +29,17 @@
                         <td data-th="<?php echo $block->escapeHtml(__('Card Expiry Month')) ?>" class="col total"><?php /* @escapeNotVerified */ echo $_savecard->getCardExpiryMonth() ?></td>
                         <td data-th="<?php echo $block->escapeHtml(__('Card Expiry Year')) ?>" class="col status"><?php /* @escapeNotVerified */ echo $_savecard->getCardExpiryYear() ?></td>
                         <td data-th="<?php echo $block->escapeHtml(__('Actions')) ?>" class="col actions">
+                           
+                              <?php  
+                            if($_savecard->getTokenCode() != '') {
+                            ?>
                             <a href="<?php /* @escapeNotVerified */ echo $block->getEditUrl($_savecard) ?>" class="action view">
                                 <span><?php /* @escapeNotVerified */ echo __('Update') ?></span>
                             </a>
+                            <?php
+                            }
+                            ?>
+                            
                         </td>
                         <td data-th="<?php echo $block->escapeHtml(__('Actions')) ?>" class="col actions">
                             <a href="<?php /* @escapeNotVerified */ echo $block->getDeleteUrl($_savecard) ?>" class="action view">

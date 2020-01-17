@@ -7,23 +7,25 @@
 // @codingStandardsIgnoreFile
 ?>
 <?php if ($block->isPossibleOnepageCheckout()):?>
-    <button type="button" onclick="location.href='<?php echo $block->getCheckoutUrl() ?>'"
-            title="Proceed to Checkout"
-            class="action primary checkout"
-          
+    <button type="button"
+            data-role="proceed-to-checkout"
+            title="<?= /* @escapeNotVerified */ __('Proceed to Checkout') ?>"
+            data-mage-init='{"Magento_Checkout/js/proceed-to-checkout":{"checkoutUrl":"<?= /* @escapeNotVerified */ $block->getCheckoutUrl() ?>"}}'
+            class="action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
+            <?php if ($block->isDisabled()):?>disabled="disabled"<?php endif; ?>>
         <span><?= /* @escapeNotVerified */ __('Proceed to Checkout') ?></span>
     </button>
 <?php endif?>
 
 <br> <br>
 <button type="button" id='checkout-now-bottom'
-            data-role="proceed-to-checkout"
-            title="<?= /* @escapeNotVerified */ __('Checkout Now') ?>"
-            data-mage-init='{"Magento_Checkout/js/proceed-to-checkout":{"checkoutUrl":"<?= /* @escapeNotVerified */ $block->getCheckoutUrl() ?>"}}'
-            class="action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
-            <?php if ($block->isDisabled()):?>disabled="disabled"<?php endif; ?>>
-        <span><?= /* @escapeNotVerified */ __('Checkout Now') ?></span>
-    </button>
+    title="<?= /* @escapeNotVerified */ __('Checkout Now') ?>"    
+    data-mage-init='{"Magento_Checkout/js/proceed-to-checkout":{"checkoutNowUrl":"<?= /* @escapeNotVerified */ $block->getCheckoutUrl() ?>"}}'
+    class="action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
+    <?php if ($block->isDisabled()):?>disabled="disabled"<?php endif; ?>>
+    <span><?= /* @escapeNotVerified */ __('Checkout Now') ?></span>
+</button>
+    
 
 <script type="text/javascript">
  if(window.ChromepayEnabled == 1 && window.ChromePaymentMode == 'direct') {

@@ -34,4 +34,18 @@ class SavedToken extends AbstractDb
         $id = $this->getConnection()->fetchOne($sql);
         return $id;
     }
+    
+    /**
+     * Load token detail by tokencode
+     *
+     * @param int $transactionIdentifier        
+     * @return int $id
+     */
+    public function loadByStoredCredentials($transactionIdentifier){
+        $table = $this->getMainTable();
+        $where = $this->getConnection()->quoteInto("transaction_identifier = ?", $transactionIdentifier);
+        $sql = $this->getConnection()->select()->from($table,array('id'))->where($where);
+        $id = $this->getConnection()->fetchOne($sql);
+        return $id;
+    }
 }

@@ -10,25 +10,25 @@ define([
         $(element).click(function (event) {
             var cart = customerData.get('cart'),
                 customer = customerData.get('customer');
+            var target = event.target.id;
 
             event.preventDefault();
-            //
-            // if (!customer().firstname && cart().isGuestCheckoutAllowed === false) {
-            //     authenticationPopup.showModal();
-            //
-            //     return false;
-            // }
-
-             if(window.PaymentRequest && window.ChromepayEnabled == 1 && window.ChromePaymentMode == 'direct') {
-                var request = initPaymentRequest();
-                onBuyClicked(request);
-                request = initPaymentRequest();
-                
-                //console.log(request);
+            if(!target){
+                if (!customer().firstname && cart().isGuestCheckoutAllowed === false) {
+                    authenticationPopup.showModal();
+                    return false;
+                }
+                location.href = config.checkoutUrl;
             } else {
-                location.href = this.options.url.checkout;
+
+                if(window.PaymentRequest && window.ChromepayEnabled == 1 && window.ChromePaymentMode == 'direct') {
+                    var request = initPaymentRequest();
+                    onBuyClicked(request);
+                    request = initPaymentRequest();                
+                } else {
+                    location.href = this.options.url.checkout;
+                }
             }
         });
-
     };
 });

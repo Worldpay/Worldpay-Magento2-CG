@@ -183,6 +183,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	{
 		return (bool) $this->_scopeConfig->getValue('worldpay/cc_config/saved_card', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 	}
+        public function getTokenization()
+	{
+		return (bool) $this->_scopeConfig->getValue('worldpay/cc_config/save_tokenization', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+	}
+        public function getStoredCredentials()
+	{
+		return (bool) $this->_scopeConfig->getValue('worldpay/cc_config/save_stored_credentials', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+	}
 	public function isApmEnabled()
 	{
 		return (bool) $this->_scopeConfig->getValue('worldpay/apm_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
@@ -492,7 +500,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return (bool) false;
     }
     
-    public function isChallengeWindowSize() {
+    public function getChallengeWindowSize() {
         if ($this->isDynamic3DS2Enabled()) {
                 return $this->_scopeConfig->getValue('worldpay/general_config/challenge_window_size', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         }

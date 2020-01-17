@@ -47,14 +47,14 @@
                 <!-- /ko -->
             </div>
 
-             <!-- ko if: (getSaveCardAllowed())-->
+             <!-- ko if: (getSaveCardAllowed() && (isTokenizationEnabled() || isStoredCredentialsEnabled()))-->
                 <div class="field savecc" data-bind="attr: {id: getCode() + '_save-card_div'}">
                     <div class="control">
                         <input type="checkbox" class="input-check savecard"  name="save-card"  data-bind="attr: {
                                 id: getCode() + '_save_card', title: $t('Save This Card'),
                                 'data-container': getCode() + '-save-card'}, value: saveMyCard">
                          <label data-bind="attr: {for: getCode() + 'save-card'}" class="label">
-                            <span><!-- ko i18n: 'Save This Card'--><!-- /ko --></span>
+                            <span><!-- ko i18n: 'Save This Card'--><!-- /ko --></span> <span>(<a href="http://offers.worldpayglobal.com/Stored_Credential_Transactions.html" target="_blank">Important Disclaimer!</a>)</span>
                         </label>
                     </div>
                 </div>

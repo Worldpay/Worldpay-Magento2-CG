@@ -34,4 +34,18 @@ class SavedToken extends AbstractModel
         $id = $this->getResource()->loadByTokenCode($order_id);
         return $this->load($id);  
     }
+    
+    /**
+     * Load worldpay Storedcredentials Details
+     *
+     * @return Sapient\Worldpay\Model\SavedToken
+     */
+    public function loadByStoredCredentials($transactionIdentifier)
+    {
+       if (!$transactionIdentifier) {
+           return;         
+        }
+        $id = $this->getResource()->loadByStoredCredentials($transactionIdentifier);
+        return $this->load($id);  
+    }
 }

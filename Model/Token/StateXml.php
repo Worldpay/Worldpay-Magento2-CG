@@ -190,4 +190,12 @@ class StateXml implements \Sapient\Worldpay\Model\Token\StateInterface
     {
         return (string)$this->_derivedNode->bin;
     }
+    
+    /**
+     * @return string
+     */
+    public function getTransactionIdentifier()
+    {
+        return (string)$this->_paymentNode->schemeResponse->transactionIdentifier;
+    }
 }

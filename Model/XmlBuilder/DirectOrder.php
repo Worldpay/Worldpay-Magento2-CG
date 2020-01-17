@@ -38,6 +38,9 @@ EOD;
     protected $paResponse = null;
     private $echoData = null;
     private $shopperId;
+    private $saveCardEnabled;
+    private $tokenizationEnabled;
+    private $storedCredentialsEnabled;
     protected $dfReferenceId = null;
     private $cusDetails;
 
@@ -78,6 +81,9 @@ EOD;
      * @param string $shippingAddress
      * @param float $billingAddress
      * @param string $shopperId
+     * @param string $saveCardEnabled
+     * @param string $tokenizationEnabled
+     * @param string $storedCredentialsEnabled
      * @param string $cusDetails
      * @return SimpleXMLElement $xml
      */
@@ -95,6 +101,9 @@ EOD;
         $shippingAddress,
         $billingAddress,
         $shopperId,
+        $saveCardEnabled,
+        $tokenizationEnabled,
+        $storedCredentialsEnabled,
         $cusDetails
     ) {
         $this->merchantCode = $merchantCode;
@@ -110,6 +119,9 @@ EOD;
         $this->shippingAddress = $shippingAddress;
         $this->billingAddress = $billingAddress;
         $this->shopperId = $shopperId;
+        $this->saveCardEnabled = $saveCardEnabled;
+        $this->tokenizationEnabled = $tokenizationEnabled;
+        $this->storedCredentialsEnabled = $storedCredentialsEnabled;
         $this->cusDetails = $cusDetails;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
@@ -307,6 +319,9 @@ EOD;
         if (! $this->tokenRequestConfig->istokenizationIsEnabled()) {
             return;
         }
+        if (!$this->tokenizationEnabled && !$this->storedCredentialsEnabled) {
+            return;
+        }
 
        $createTokenElement = $order->addChild('createToken');
        $createTokenElement['tokenScope'] = self::TOKEN_SCOPE;
@@ -378,8 +393,14 @@ EOD;
         $paymentDetailsElement = $order->addChild('paymentDetails');
          if (isset($this->paymentDetails['tokenCode'])) {
             $this->_addPaymentDetailsForTokenOrder($paymentDetailsElement);
+            if (isset($this->paymentDetails['transactionIdentifier']) && !empty($this->paymentDetails['transactionIdentifier'])) {
+                $this->_addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement);
+            }
         } else {
             $this->_addPaymentDetailsForCreditCardOrder($paymentDetailsElement);
+        }
+        if($this->saveCardEnabled && $this->storedCredentialsEnabled){
+            $this->_addStoredCredentials($paymentDetailsElement);
         }
         $session = $paymentDetailsElement->addChild('session');
         $session['id'] = $this->paymentDetails['sessionId'];
@@ -530,8 +551,6 @@ EOD;
         $this->_addCDATA($countryCodeElement, $countryCode);
     }
     
-    
-    
     /**
      * Add Customer Risk Data  and its child tag to xml
      * @param SimpleXMLElement $order 
@@ -579,9 +598,6 @@ EOD;
         
         return $riskData;
     }
-    
-    
-    
     
     /**
      * Add  Risk Data  and its child tag to xml
@@ -641,5 +657,28 @@ EOD;
     private function _amountAsInt($amount)
     {
         return round($amount, self::EXPONENT, PHP_ROUND_HALF_EVEN) * pow(10, self::EXPONENT);
+    }
+    
+    /**
+     * @param element $paymentDetailsElement
+     * 
+     * @return string
+     */
+    private function _addStoredCredentials($paymentDetailsElement){
+        $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
+        $storedCredentials['usage'] = "FIRST";
+        return $storedCredentials;
+    }
+    
+    /**
+     * @param element $paymentDetailsElement
+     * 
+     * @return string
+     */
+    private function _addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement){
+        $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
+        $storedCredentials['usage'] = "USED";
+        $storedCredentials->addChild('schemeTransactionIdentifier', $this->paymentDetails['transactionIdentifier']);
+        return $storedCredentials;
     }
 }

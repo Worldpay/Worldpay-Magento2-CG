@@ -54,6 +54,16 @@ class Card extends \Magento\Payment\Block\Form
     {
         return $this->configProvider->getIsSaveCardAllowed();
     }
+    
+    public function tokenizationEnabled()
+    {
+        return $this->worldpayhelper->getTokenization();
+    }
+    
+    public function storedCredentialsEnabled()
+    {
+        return $this->worldpayhelper->getStoredCredentials();
+    }
 
     public function requireCvcEnabled()
     {

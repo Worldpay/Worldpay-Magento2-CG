@@ -3,6 +3,8 @@ $clientKey = $block->escapeHtml($block->getClientKey());
 
 
 $saveCardEnabled = $block->saveCardEnabled();
+$tokenizationEnabled = $block->tokenizationEnabled();
+$storedCredentialsEnabled = $block->storedCredentialsEnabled();
 if ($saveCardEnabled) {
     $savedCards = $block->getSavedCards();
 } else {
@@ -107,13 +109,15 @@ $serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonE
        value=""/>
    <?php } ?>
  
-    <?php if ($saveCardEnabled): ?>
+    <?php if ($saveCardEnabled && ($tokenizationEnabled || $storedCredentialsEnabled)): ?>
     <div class="admin__field field directform">
       <div class="admin__field-control field-tooltip-content">
           <input type="checkbox" id="worldpay_savecard" name="payment[save_my_card]" class="admin__control-checkbox">
           <label class="label" for="worldpay_savecard">
               <span class="admin__field-label" style="padding-left:10px;">Save card</span>
           </label>
+          <input type="hidden" id="savecard_tokenization" name="payment[tokenization_enabled]" value="<?php echo $tokenizationEnabled;?>">
+          <input type="hidden" id="savecard_stored_credentials" name="payment[stored_credentials_enabled]" value="<?php echo $storedCredentialsEnabled;?>">
       </div>
     </div>
     <?php endif; ?>
@@ -132,6 +136,7 @@ $serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonE
         <div class="admin__field-control admin__field-option">
             <input id="saved_card_<?php echo $savedCard['id'];?>" value="<?php echo $savedCard['token_code']; ?>" type="radio" name="payment[tokenCode]" class="admin__control-radio saved_tokens">
             <label class="admin__field-label" for="saved_card_<?php echo $savedCard['id'];?>"><?php echo $savedCard['method']; ?> <?php echo $savedCard['card_number']; ?></label>
+            <input id="stored_credentials_<?php echo $savedCard['id'];?>" value="<?php echo $savedCard['transaction_identifier']; ?>" type="hidden" name="payment[transactionIdentifier]">
         </div>
        <?php endforeach; ?>
        <?php if (count($savedCards) && $block->requireCvcEnabled()): ?>
