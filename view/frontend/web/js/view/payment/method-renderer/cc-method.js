@@ -27,6 +27,8 @@ define(
         var paymentService = false;
         var billingAddressCountryId = "";
         var dfReferenceId = "";
+        var disclaimerFlag = null;
+        window.disclaimerDialogue = null;
         if (quote.billingAddress()) {
             billingAddressCountryId = quote.billingAddress._latestValue.countryId;
         }
@@ -296,6 +298,21 @@ define(
                     return window.checkoutConfig.payment.ccform.storedCredentialsAllowed;
                 }
             },
+            disclaimerMessage: function(){
+                if(customer.isLoggedIn()){
+                    return window.checkoutConfig.payment.ccform.disclaimerMessage;
+                }
+            },
+            isDisclaimerMessageEnabled: function(){
+                if(customer.isLoggedIn()){
+                    return window.checkoutConfig.payment.ccform.isDisclaimerMessageEnabled;
+                }
+            },
+            isDisclaimerMessageMandatory: function(){
+                if(customer.isLoggedIn()){
+                    return window.checkoutConfig.payment.ccform.isDisclaimerMessageMandatory;
+                }
+            },
             isActive: function() {
                 return true;
             },
@@ -332,7 +349,8 @@ define(
                         'isSavedCardPayment': this.isSavedCardPayment,
                         'tokenization_enabled': this.isTokenizationEnabled(),
                         'stored_credentials_enabled': this.isStoredCredentialsEnabled(),
-                        'dfReferenceId': window.sessionId
+                        'dfReferenceId': window.sessionId,
+                        'disclaimerFlag': this.disclaimerFlag
                     }
                 };
             },
@@ -366,81 +384,81 @@ define(
                     var bin = this.creditCardNumber();
                     if(cc_type_selected == 'savedcard'){
                         bin = $("input[name='payment[token_to_use]']:checked").next().next().val();     
-                    }
-                    
-                   
-                    
-                if(this.intigrationmode == 'direct') {
-                    
-                    if(cc_type_selected == 'savedcard'){
-                        if($savedCardForm.validation() && $savedCardForm.validation('isValid')) {
-                           if(bin) {
-                            createJwt(bin);
-                            }else{
-                                alert('This card number cannot be used to place 3DS2 order now, please go and update this from My account first.');
-                                return; 
+                    } 
+                    if(this.intigrationmode == 'direct') {
+                        if(cc_type_selected == 'savedcard'){
+                            if($savedCardForm.validation() && $savedCardForm.validation('isValid')) {
+                               if(bin) {
+                                createJwt(bin);
+                                }else{
+                                    alert('This card number cannot be used to place 3DS2 order now, please go and update this from My account first.');
+                                    return; 
+                                }
+                            }
+                        }else {
+                            if($form.validation() && $form.validation('isValid')) {
+                                var binNew = bin.substring(0,6);
+
+                               createJwt(binNew); 
                             }
                         }
-                       
-                    }else {
-                        if($form.validation() && $form.validation('isValid')) {
-                            var binNew = bin.substring(0,6);
-                           
-                           createJwt(binNew); 
-                        }
                     }
-                    
                 }
-                
-                }
-                
                 this.dfReferenceId = null;
 
                 if(cc_type_selected == 'savedcard'){
-                      //Saved card handle
-                      if((this.intigrationmode == 'direct' && $savedCardForm.validation() && $savedCardForm.validation('isValid') && selectedSavedCardToken) ||
+                    //Saved card handle
+                    if((this.intigrationmode == 'direct' && $savedCardForm.validation() && $savedCardForm.validation('isValid') && selectedSavedCardToken) ||
                         (this.intigrationmode == 'redirect' && $form.validation() && $form.validation('isValid') && selectedSavedCardToken)){
-                            var cardType = $("input[name='payment[token_to_use]']:checked").next().val();
-                            this.isSavedCardPayment=true;
-                            this.paymentToken = selectedSavedCardToken;
-                            var savedcvv = $('.saved-cvv-number').val();
-                            var res = this.getRegexCode(cardType).exec(savedcvv);
-                            if(savedcvv != res){
-                                $('#saved-cvv-error').css('display', 'block');
-                                $('#saved-cvv-error').html('Please, enter valid Card Verification Number');
-                            }else{
-                                this.redirectAfterPlaceOrder = false;
-                                if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled && this.intigrationmode == 'direct'){
-                                    window.addEventListener("message", function(event) {
-                                        var data = JSON.parse(event.data);
+                        var cardType = $("input[name='payment[token_to_use]']:checked").next().val();
+                        this.isSavedCardPayment=true;
+                        this.paymentToken = selectedSavedCardToken;
+                        var savedcvv = $('.saved-cvv-number').val();
+                        var res = this.getRegexCode(cardType).exec(savedcvv);
+                        if(savedcvv != res){
+                            $('#saved-cvv-error').css('display', 'block');
+                            $('#saved-cvv-error').html('Please, enter valid Card Verification Number');
+                        }else{
+                            this.redirectAfterPlaceOrder = false;
+                            if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled && this.intigrationmode == 'direct'){
+                                window.addEventListener("message", function(event) {
+                                    var data = JSON.parse(event.data);
 
-                                        var envUrl;
-                                        if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
-                                            envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
-                                        }
-                                        if (event.origin === envUrl) {
-                                            var data = JSON.parse(event.data);
-                                            //console.warn('Merchant received a message:', data);
-                                            if (data !== undefined && data.Status) {
-                                                //window.sessionId = data.SessionId;
-                                                var sessionId = data.SessionId;
-                                                if(sessionId){
-                                                    this.dfReferenceId = sessionId;
-                                                }
-                                                window.sessionId = this.dfReferenceId;
-                                                //place order with direct CSE method
-                                                self.placeOrder();
+                                    var envUrl;
+                                    if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
+                                        envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
+                                    }
+                                    if (event.origin === envUrl) {
+                                        var data = JSON.parse(event.data);
+                                        //console.warn('Merchant received a message:', data);
+                                        if (data !== undefined && data.Status) {
+                                            //window.sessionId = data.SessionId;
+                                            var sessionId = data.SessionId;
+                                            if(sessionId){
+                                                this.dfReferenceId = sessionId;
                                             }
+                                            window.sessionId = this.dfReferenceId;
+                                            //place order with direct CSE method
+                                            self.placeOrder();
                                         }
-                                    }, false);
-                                } else {
-                                    self.placeOrder();
-                                }
+                                    }
+                                }, false);
+                            } else {
+                                self.placeOrder();
                             }
+                        }
                       }
                  }else if($form.validation() && $form.validation('isValid')){
                     //Direct form handle
                     this.saveMyCard = $('#' + this.getCode() + '_save_card').is(":checked");
+                    if(this.saveMyCard && this.isDisclaimerMessageMandatory() && this.isDisclaimerMessageEnabled() && window.disclaimerDialogue === null){
+                        $('#disclaimer-error').css('display', 'block');
+                        $('#disclaimer-error').html('Please, Verify the disclaimer! before saving the card');
+			return false;
+                    } else if(this.saveMyCard && this.isStoredCredentialsEnabled() && this.isDisclaimerMessageEnabled() && window.disclaimerDialogue === null){
+                        this.saveMyCard = '';
+                        $('#' + this.getCode() + '_save_card').prop( "checked", false );
+                    }
                      if (this.intigrationmode == 'direct') {
                             var that = this;
                             // Need to check for 3ds2 enable or not
@@ -521,14 +539,53 @@ define(
                 }               
             },
             afterPlaceOrder: function (data, event) {
-                if (this.isSavedCardPayment) {
-                    window.location.replace(url.build('worldpay/savedcard/redirect'));
-                }else if(this.intigrationmode == 'redirect' && !this.isSavedCardPayment){
+                if(this.intigrationmode === 'redirect'){
                     window.location.replace(url.build('worldpay/redirectresult/redirect'));
-                }else if(this.intigrationmode == 'direct' && !this.isSavedCardPayment){
+                }else if (this.isSavedCardPayment) {
+                    window.location.replace(url.build('worldpay/savedcard/redirect'));
+                }else if(this.intigrationmode === 'redirect' && !this.isSavedCardPayment){
+                    window.location.replace(url.build('worldpay/redirectresult/redirect'));
+                }else if(this.intigrationmode === 'direct' && !this.isSavedCardPayment){
                     window.location.replace(url.build('worldpay/threedsecure/auth'));
                 }
             },
+            disclaimerPopup: function(){
+                var that = this;
+                $("#dialog").dialog({
+                    autoResize: true,
+                    show: "clip",
+                    hide: "clip",
+                    height: 350,
+                    width: 450,
+                    autoOpen: false,
+                    modal: true,
+                    position: 'center',
+                    draggable: false,
+                    buttons: {
+                        Agree: function() { 
+                            $( this ).dialog( "close" );
+                            that.disclaimerFlag = true;
+                            window.disclaimerDialogue = true;
+                        },
+                        Disagree: function() { 
+                            $( this ).dialog( "close" );
+                            that.disclaimerFlag = false;
+                            window.disclaimerDialogue = false;
+                            if(that.isStoredCredentialsEnabled() && that.isDisclaimerMessageEnabled()){
+                                that.saveMyCard = '';
+                                $('#' + that.getCode() + '_save_card').prop( "checked", false );
+                            }
+                        }
+                    },
+                    open: function (type, data) {
+                        $(this).parent().appendTo("#disclaimer");
+                    }
+                });
+                $('#dialog').dialog('open');            
+            },
+            getIntigrationMode: function(){
+                return window.checkoutConfig.payment.ccform.intigrationmode;
+            }
         });
     }
 );

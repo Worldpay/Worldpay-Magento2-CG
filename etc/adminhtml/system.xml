@@ -118,6 +118,10 @@
                     <depends><field id="enable_dynamic3DS2">1</field></depends>
                     <source_model>Sapient\Worldpay\Model\Config\Source\ChallengeWindowSize</source_model>
                 </field>
+                <field id="country_code_spoof" translate="label" type="text" sortOrder="34" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Country Codes</label>
+                    <comment>Note: Map the refused country code with accepted country code. e.g. JE-GB, JE (Jersey) is refused country code by worldpay and it is mapped to GB (Great Britain).</comment>
+                </field>
             </group>
             <!--Credit Card-->
             <group id="cc_config" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -166,21 +170,33 @@
                     <depends><field id="saved_card">1</field></depends>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="instant_purchase" translate="label" type="select" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="stored_credentials_disclaimer_message" translate="label comment" sortOrder="15" type="editor" showInStore="1" showInDefault="1" showInWebsite="1" >
+                    <label>Disclaimer Message</label>
+                    <depends><field id="save_stored_credentials">1</field></depends>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\System\Config\Editor</frontend_model>
+                </field>
+                <field id="stored_credentials_message_enable" translate="label" type="select" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Disclaimer in Store Front</label>
+                    <depends><field id="save_stored_credentials">1</field></depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="stored_credentials_flag" translate="label" type="select" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Important Disclaimer Mandatory</label>
+                    <depends><field id="save_stored_credentials">1</field></depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="instant_purchase" translate="label" type="select" sortOrder="18" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Instant Purchase</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                
-                <field id="chromepay" translate="label" type="select" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="chromepay" translate="label" type="select" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Chrome Pay</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="chromepay_button_name" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="chromepay_button_name" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Chrome Pay Button Name</label>
-                </field>
-                
-                 
-                <field id="partial_capture" translate="label" type="select" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
+                </field> 
+                <field id="partial_capture" translate="label" type="select" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Partial Capture</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Note: "Capture Invoice Automatically" option in above, should be disabled to enable this feature.</comment>
@@ -228,12 +244,60 @@
                         <source_model>Sapient\Worldpay\Model\Config\Source\AuthMethods</source_model>
                     </field>
                     <field id="gateway_merchantname" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Merchant Name</label>
+                        <label>Gateway Name</label>
                     </field> 
                     <field id="gateway_merchantid" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>MerchantId</label>
-                    </field>             
+                        <label>Gateway MerchantId</label>
+                    </field> 
+                    
+                     <field id="google_merchantid" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Google MerchantId</label>
+                        <comment>This field only required for production mode. This can be generated from merchant's Google account</comment>
+                    </field> 
+                     <field id="google_merchantname" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Google MerchantName</label>
+                    </field> 
+                                
                 </group>
+                
+                
+                <group id="apple_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="10">
+
+                    <label>Apple Pay</label>
+                    <!--Apple Pay  enabled-->
+                    <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    
+                     <field id="certification_key" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Certifification Key</label>
+                        <comment>Location of the ApplePay.key.pem. eg. /var/www/html/cert/.  Files should be have read access by the webserver</comment>
+                    </field> 
+                    
+                     <field id="certification_crt" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Certifification Path</label>
+                        <comment>Location of the ApplePay.crt.pem. eg. /var/www/html/cert/.  Files should be have read access by the webserver</comment>
+                    </field> 
+                    
+                    <field id="certification_password" translate="label" type="password" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Certification Password</label>
+                    </field> 
+                    
+                    <field id="merchant_name" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Merchant Name</label>
+                        <comment>eg. merchant.com.myshop</comment>
+                    </field> 
+                    
+                    <field id="domain_name" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Domain Name</label>
+                        <comment>eg. mydomain.com</comment>
+                    </field> 
+                   
+                </group>
+                
+                
+                
             </group>
             <!-- MOTO -->
             <group id="moto_config" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">

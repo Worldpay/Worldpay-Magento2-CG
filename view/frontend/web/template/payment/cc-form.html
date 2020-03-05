@@ -157,10 +157,19 @@
                     id: getCode() + '_save_card', title: $t('Save This Card'),
                     'data-container': getCode() + '-save-card'}, value: saveMyCard">
              <label data-bind="attr: {for: getCode() + 'save-card'}" class="label">
-                 <span><!-- ko i18n: 'Save This Card'--><!-- /ko --></span> <span>(<a href="http://offers.worldpayglobal.com/Stored_Credential_Transactions.html" target="_blank">Important Disclaimer!</a>)</span>
+                <span><!-- ko i18n: 'Save This Card'--><!-- /ko --></span> 
+                <!-- ko if: (isStoredCredentialsEnabled() && isDisclaimerMessageEnabled())-->
+                    <span>(<a data-bind="click: disclaimerPopup">Important Disclaimer!</a>)</span>
+                <!-- /ko -->
             </label>
         </div>
     </div>
+    <div id="dialog" style="display: none" align = "center" title="Disclaimer!">
+        <form id="disclaimer" name="disclaimer">
+            <div data-bind="html: disclaimerMessage()"></div>
+        </form>
+    </div>
+    <div class="mage-error" generated="true"  id="disclaimer-error"></div>
     <!-- /ko -->
     <!--</div>-->
     </fieldset>

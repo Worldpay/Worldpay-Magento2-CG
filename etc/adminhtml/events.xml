@@ -11,7 +11,5 @@
 		<observer instance="Sapient\Worldpay\Observer\Backend\Sales\OrderInvoicePay" name="sapient_worldpay_observer_backend_sales_orderinvoicepay_sales_order_invoice_pay"/>
 	</event>
         
-        <event name="controller_action_postdispatch_sales_order_invoice_save">
-		<observer instance="Sapient\Worldpay\Observer\Backend\Controller\ActionPostdispatchSalesOrderInvoiceSave" name="sapient_worldpay_observer_backend_controller_actionpostdispatchsalesorderinvoicesave_controller_action_postdispatch_sales_order_invoice_save"/>
-	</event>
+        
 </config>

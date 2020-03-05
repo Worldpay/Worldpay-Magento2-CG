@@ -9,6 +9,7 @@
                 <enable_logging>0</enable_logging>
                 <payment_method_selection>radio</payment_method_selection>
                 <order_description>WorldPay Order</order_description>
+                <country_code_spoof>JE-GB,IM-GB</country_code_spoof>
             </general_config>
             <cc_config>
                 <enabled>1</enabled>
@@ -19,6 +20,8 @@
                 <integration_mode>direct</integration_mode>
                 <hpp_integration>full_page</hpp_integration>
                 <saved_card>0</saved_card>
+                <stored_credentials_message_enable>1</stored_credentials_message_enable>
+                <stored_credentials_flag>1</stored_credentials_flag>
                 <chromepay_enabled>1</chromepay_enabled>
             </cc_config>
             <apm_config>

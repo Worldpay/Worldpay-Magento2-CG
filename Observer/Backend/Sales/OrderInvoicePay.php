@@ -58,33 +58,6 @@ class OrderInvoicePay implements \Magento\Framework\Event\ObserverInterface
         
          
          
-          $rawXml = $this->paymentServiceReq->inquiry(
-            $wp->getMerchantId(),
-            $wp->getWorldpayOrderId(),
-            $wp->getStoreId(),
-            $order->getPaymentMethodCode(),
-            $wp->getPaymentType()
-        );
-          
-          
-          
-        $paymentService = new \SimpleXmlElement($rawXml);
-        $lastEvent = $paymentService->xpath('//lastEvent');
-        
-       
-        
-       //Check for partial capture
-        if(floatval($invoice->getGrandTotal()) !=floatval($order->getGrandTotal())) {
-            if ($lastEvent && $lastEvent[0] =='CAPTURED') {
-            
-            throw new \Magento\Framework\Exception\CouldNotDeleteException(__("Partial Capture is not possible. The Payment is already Captured."));       
-                
-        }
-            
-        }
-        
-       
-         
        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
         $autoInvoice = $this->scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);

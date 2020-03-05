@@ -66,6 +66,42 @@ class Service
             $order->getPaymentMethodCode(),
             $worldPayPayment->getPaymentType()
         );
+        
+        $paymentService = new \SimpleXmlElement($rawXml);
+        $lastEvent = $paymentService->xpath('//lastEvent');
+        $partialCaptureReference = $paymentService->xpath('//reference');
+        
+        
+       // $paymentTag = $paymentService->xpath('//payment/balance');
+        
+        $nodes = $paymentService->xpath('//payment/balance');
+        $getNodeValue ='';
+        $getAttibute = '';
+        
+       if($nodes && $lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture') {
+        $getAttibute = (array) $nodes[0]->attributes()['accountType'];
+        
+        $getNodeValue = $getAttibute[0];
+        
+       }
+        
+        /*
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/worldpay.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('got it in service........');
+        
+        
+        $logger->info(print_r($getAttibute, true));
+        //$logger->info(print_r($partialCaptureReference, true));
+         
+         
+         //$logger->info(print_r($paymentTag, true));
+        */
+        
+        if($lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture' && $getNodeValue == 'IN_PROCESS_AUTHORISED') {
+             throw new \Magento\Framework\Exception\CouldNotDeleteException(__("Sync status action not possible for this Partial Captutre Order"));  
+        }
 
         return simplexml_load_string($rawXml);
     }

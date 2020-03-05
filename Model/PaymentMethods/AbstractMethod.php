@@ -465,9 +465,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 ->addFieldToSelect(array('method'))
                 ->addFieldToFilter('token_code', array('eq' => $this->paymentdetailsdata['additional_data']['tokenCode']))
                 ->getData();
-
-            return $savedCard[0]['method'];
-
+            if($savedCard){
+                return $savedCard[0]['method'];
+            } else {
+                throw new Exception('Inavalid Card deatils. Please Refresh and check again');
+            }
         }
 
     }

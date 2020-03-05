@@ -91,6 +91,10 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         if (version_compare($context->getVersion(), '1.2.5', '<')) {
             $this->modifyColumnOrderId($installer);
         }
+        if (version_compare($context->getVersion(), '1.2.6', '<')) {
+            $this->addColumnDisclaimer($installer);
+        }
+        
         $installer->endSetup();
     }
     /**
@@ -245,6 +249,25 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                 'nullable' => false,
                 'unsigned' => true,
                 'comment' => 'Order Id'
+            ]
+        );
+    }
+    
+    /**
+     * @param SchemaSetupInterface $installer
+     * @return void
+     */
+    private function addColumnDisclaimer(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_TOKEN),
+            'disclaimer_flag',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+                'nullable' => false,
+                'comment' => 'Disclaimer Flag',
+                'before' => 'created_at'
             ]
         );
     }

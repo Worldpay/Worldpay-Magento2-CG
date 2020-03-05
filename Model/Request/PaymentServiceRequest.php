@@ -177,7 +177,8 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $redirectOrderParams['billingAddress'],
             $redirectOrderParams['paymentPagesEnabled'],
             $redirectOrderParams['installationId'],
-            $redirectOrderParams['hideAddress']
+            $redirectOrderParams['hideAddress'],
+            $redirectOrderParams['paymentDetails']    
         );
 
         return $this->_sendRequest(
@@ -497,11 +498,17 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
 
     public function paymentOptionsByCountry($paymentOptionsParams)
     {
-         $this->_wplogger->info('########## Submitting payment otions request ##########');
-         $this->xmlpaymentoptions = new \Sapient\Worldpay\Model\XmlBuilder\PaymentOptions();
+        $spoofCountryId = '';
+        $countryCodeSpoofs = $this->worldpayhelper->getCountryCodeSpoofs();
+        if($countryCodeSpoofs){
+            $spoofCountryId = $this->getCountryCodeSpoof($countryCodeSpoofs,$paymentOptionsParams['countryCode']);
+        }
+        $countryId = ($spoofCountryId)? $spoofCountryId : $paymentOptionsParams['countryCode'];
+        $this->_wplogger->info('########## Submitting payment otions request ##########');
+        $this->xmlpaymentoptions = new \Sapient\Worldpay\Model\XmlBuilder\PaymentOptions();
         $paymentOptionsXml = $this->xmlpaymentoptions->build(
             $paymentOptionsParams['merchantCode'],
-            $paymentOptionsParams['countryCode']
+            $countryId
         );
 
         return $this->_sendRequest(
@@ -522,7 +529,7 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         $this->_wplogger->info('########## Submitting wallet order request. OrderCode: ' . $walletOrderParams['orderCode'] . ' ##########');
 
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\WalletOrder();
-        $walletSimpleXml = $this->xmlredirectorder->build(
+            $walletSimpleXml = $this->xmlredirectorder->build(
             $walletOrderParams['merchantCode'],
             $walletOrderParams['orderCode'],
             $walletOrderParams['orderDescription'],
@@ -534,13 +541,57 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $walletOrderParams['signature'],
             $walletOrderParams['signedMessage']
         );
-
+            
         return $this->_sendRequest(
             dom_import_simplexml($walletSimpleXml)->ownerDocument,
             $this->worldpayhelper->getXmlUsername($walletOrderParams['paymentType']),
             $this->worldpayhelper->getXmlPassword($walletOrderParams['paymentType'])
         );
     }
+    
+    
+    
+     /**
+     * Send Apple Pay order XML to Worldpay server
+     *
+     * @param array $walletOrderParams
+     * @return mixed
+     */
+    public function applePayOrder($applePayOrderParams)
+    {
+        $this->_wplogger->info('########## Submitting apple pay order request. OrderCode: ' . $applePayOrderParams['orderCode'] . ' ##########');
+
+        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\ApplePayOrder();
+        
+            
+            $appleSimpleXml = $this->xmlredirectorder->build(
+            $applePayOrderParams['merchantCode'],
+            $applePayOrderParams['orderCode'],
+            $applePayOrderParams['orderDescription'],
+            $applePayOrderParams['currencyCode'],
+            $applePayOrderParams['amount'],
+            $applePayOrderParams['paymentType'],
+            $applePayOrderParams['shopperEmail'],
+            $applePayOrderParams['protocolVersion'],
+            $applePayOrderParams['signature'],
+            $applePayOrderParams['data'],
+            $applePayOrderParams['ephemeralPublicKey'],        
+            $applePayOrderParams['publicKeyHash'],
+            $applePayOrderParams['transactionId']
+              
+        );
+        
+        
+        
+        return $this->_sendRequest(
+            dom_import_simplexml($appleSimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($applePayOrderParams['paymentType']),
+            $this->worldpayhelper->getXmlPassword($applePayOrderParams['paymentType'])
+        );
+    }
+    
+    
+    
     
      /**
      * Send chromepay order XML to Worldpay server
@@ -631,5 +682,18 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $this->worldpayhelper->getXmlUsername($tokenModel->getMethod()),
             $this->worldpayhelper->getXmlPassword($tokenModel->getMethod())
         );
+    }
+    
+    private function getCountryCodeSpoof($cntrs,$cntryId){
+        if($cntrs){
+            $countryList = explode(',',$cntrs);
+            foreach($countryList as $contry){
+                list($k, $v) = explode('-', $contry);
+                if($k === $cntryId){
+                    return $v;
+                }
+            }            
+        }
+        return false;
     }
 }

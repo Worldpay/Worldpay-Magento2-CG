@@ -75,6 +75,7 @@ EOD;
      * @param float $paymentPagesEnabled
      * @param string $installationId
      * @param $hideAddress
+     * @param array $paymentDetails
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -91,7 +92,8 @@ EOD;
         $billingAddress,
         $paymentPagesEnabled,
         $installationId,
-        $hideAddress
+        $hideAddress,
+        $paymentDetails
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -107,6 +109,7 @@ EOD;
         $this->paymentPagesEnabled = $paymentPagesEnabled;
         $this->installationId = $installationId;
         $this->hideAddress = $hideAddress;
+        $this->paymentDetails = $paymentDetails;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -154,7 +157,11 @@ EOD;
 
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
-        $this->_addPaymentMethodMaskElement($order);
+        if(isset($this->paymentDetails['paymentType']) && $this->paymentDetails['paymentType'] == "TOKEN-SSL"){            
+            $this->_addPaymentDetailsElement($order);
+        } else {
+            $this->_addPaymentMethodMaskElement($order);
+        }
         $this->_addShopperElement($order);
         $this->_addShippingElement($order);
         $this->_addBillingElement($order);
@@ -246,11 +253,14 @@ EOD;
     private function _addShopperElement($order)
     {
         $shopper = $order->addChild('shopper');
+        
 
         $shopper->addChild('shopperEmailAddress', $this->shopperEmail);
 
         if ($this->tokenRequestConfig->istokenizationIsEnabled()) {
             $shopper->addChild('authenticatedShopperID', $this->shopperId);
+        } elseif (isset($this->paymentDetails['tokenCode'])) {
+            $shopper->addChild('authenticatedShopperID', $this->paymentDetails['customerId']);
         }
 
         $browser = $shopper->addChild('browser');
@@ -353,4 +363,41 @@ EOD;
     {
         return round($amount, self::EXPONENT, PHP_ROUND_HALF_EVEN) * pow(10, self::EXPONENT);
     }
+    
+    /**
+     * Add paymentDetails and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
+    protected function _addPaymentDetailsElement($order)
+    {
+        $paymentDetailsElement = $order->addChild('paymentDetails');
+        $this->_addPaymentDetailsForTokenOrder($paymentDetailsElement);
+        
+        $session = $paymentDetailsElement->addChild('session');
+        $session['id'] = $this->paymentDetails['sessionId'];
+        $session['shopperIPAddress'] = $this->paymentDetails['shopperIpAddress'];
+    }
+    
+    /**
+     * Add encryptedData and its child tag to xml
+     *
+     * @param SimpleXMLElement $paymentDetailsElement
+     */
+    protected function _addPaymentDetailsForTokenOrder($paymentDetailsElement)
+    {
+        if (isset($this->paymentDetails['encryptedData'])) {
+            $cseElement = $this->_addCseElement($paymentDetailsElement);
+        }
+
+        $tokenNode = $paymentDetailsElement->addChild($this->paymentDetails['paymentType']);
+        $tokenNode['tokenScope'] = self::TOKEN_SCOPE;
+        if(isset($this->paymentDetails['ccIntegrationMode']) && $this->paymentDetails['ccIntegrationMode'] == "redirect" && $this->paymentDetails['paymentPagesEnabled']){
+            $tokenNode['captureCvc'] = "true";
+        }
+        
+        $tokenNode->addChild('paymentTokenID', $this->paymentDetails['tokenCode']);
+    }
+    
+    
 }

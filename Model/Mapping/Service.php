@@ -66,6 +66,8 @@ class Service {
         $savemyCard = isset($paymentDetails['additional_data']['save_my_card']) ? $paymentDetails['additional_data']['save_my_card'] : '';
         $tokenizationEnabled = isset($paymentDetails['additional_data']['tokenization_enabled']) ? $paymentDetails['additional_data']['tokenization_enabled'] : '';
         $storedCredentialsEnabled = isset($paymentDetails['additional_data']['stored_credentials_enabled']) ? $paymentDetails['additional_data']['stored_credentials_enabled'] : '';
+        $paymentDetails['additional_data']['disclaimerFlag'] = isset($paymentDetails['additional_data']['disclaimerFlag']) ? $paymentDetails['additional_data']['disclaimerFlag'] : 0;
+        
         return array(
             'orderCode'        => $orderCode,
             'merchantCode'     => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -109,15 +111,22 @@ class Service {
         $orderStoreId,
         $paymentDetails
     )
-    {
+    {    
+        $updatedPaymentDetails = '';
         $reservedOrderId = $quote->getReservedOrderId();
+        if($paymentDetails['additional_data']['cc_type'] == 'savedcard'){
+            $updatedPaymentDetails = $this->_getPaymentDetailsUsingToken($paymentDetails, $quote);
+            $paymentType = $updatedPaymentDetails['cardMethod'];
+        } else {
+            $paymentType = $this->_getRedirectPaymentType($paymentDetails);
+        }
         return array(
             'orderCode'           => $orderCode,
             'merchantCode'        => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
             'orderDescription'    => $this->_getOrderDescription($reservedOrderId),
             'currencyCode'        => $quote->getQuoteCurrencyCode(),
             'amount'              => $quote->getGrandTotal(),
-            'paymentType'         => $this->_getRedirectPaymentType($paymentDetails),
+            'paymentType'         => $paymentType,
             'shopperEmail'        => $quote->getCustomerEmail(),
             'threeDSecureConfig'  => $this->_getThreeDSecureConfig(),
             'tokenRequestConfig'  => $this->_getTokenRequestConfig($paymentDetails),
@@ -130,7 +139,8 @@ class Service {
             'installationId'      => $this->worldpayHelper->getInstallationId(),
             'hideAddress'         => $this->worldpayHelper->getHideAddress(),
             'shopperId'           => $quote->getCustomerId(),
-            'orderStoreId'        => $orderStoreId
+            'orderStoreId'        => $orderStoreId,
+            'paymentDetails'      => $updatedPaymentDetails
         );
     }
 
@@ -174,6 +184,7 @@ class Service {
     {
         $reservedOrderId = $quote->getReservedOrderId();
         $updatedPaymentDetails = $this->_getPaymentDetailsUsingToken($paymentDetails, $quote);
+        
         $savemyCard = isset($paymentDetails['additional_data']['save_my_card']) ? $paymentDetails['additional_data']['save_my_card'] : '';
         $tokenizationEnabled = isset($paymentDetails['additional_data']['tokenization_enabled']) ? $paymentDetails['additional_data']['tokenization_enabled'] : '';
         $storedCredentialsEnabled = isset($paymentDetails['additional_data']['stored_credentials_enabled']) ? $paymentDetails['additional_data']['stored_credentials_enabled'] : '';
@@ -389,21 +400,19 @@ class Service {
                 'encryptedData' => $paymentDetails['encryptedData'],
                 'transactionIdentifier' => $savedCardData->getTransactionIdentifier()
             );
-        } else {
-                
+        } else {                
             $details = array(
                 'brand' => $savedCardData->getCardBrand(),
                 'paymentType' => 'TOKEN-SSL',
                 'customerId' => $quote->getCustomerId(),
                 'tokenCode' => $savedCardData->getTokenCode(),
-                'transactionIdentifier' => $savedCardData->getTransactionIdentifier()
+                'transactionIdentifier' => $savedCardData->getTransactionIdentifier(),
+                'cardMethod' => $savedCardData->getMethod()
             );
-
             if (isset($paymentDetails['additional_data']['saved_cc_cid']) && !empty($paymentDetails['additional_data']['saved_cc_cid'])) {
                 $details['cvc'] = $paymentDetails['additional_data']['saved_cc_cid'];
             }
         }
-
         $details['sessionId'] = session_id();
         $details['shopperIpAddress'] = $this->_getClientIPAddress();
         $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($paymentDetails['method']);
@@ -411,6 +420,10 @@ class Service {
         if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
             $details['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
         }
+        // CVV through HPP
+        $details['installationId'] = $this->worldpayHelper->getInstallationId();
+        $details['ccIntegrationMode'] = $this->worldpayHelper->getCcIntegrationMode();
+        $details['paymentPagesEnabled'] = $this->worldpayHelper->getCustomPaymentEnabled();
         return $details;
     }
 
@@ -440,6 +453,9 @@ class Service {
     )
     {
         $reservedOrderId = $quote->getReservedOrderId();
+        
+        //Google Pay
+        if($paymentDetails['additional_data']['cc_type'] == 'PAYWITHGOOGLE-SSL'){
         if($paymentDetails['additional_data']['walletResponse']){
             $walletResponse = (array)json_decode($paymentDetails['additional_data']['walletResponse']);
             $paymentMethodData = (array)$walletResponse['paymentMethodData'];
@@ -460,6 +476,45 @@ class Service {
                 'signature'           => $token['signature'],
                 'signedMessage'       => $token['signedMessage']
             );
-        }        
+        } 
+         }
+         
+         //Apple Pay
+        if($paymentDetails['additional_data']['cc_type'] == 'APPLEPAY-SSL'){
+        if($paymentDetails['additional_data']['appleResponse']){
+            $appleResponse = (array)json_decode($paymentDetails['additional_data']['appleResponse']);
+            $paymentMethodData = (array)$appleResponse['paymentData'];
+        
+            $version = $paymentMethodData['version'];
+            
+            $data = $paymentMethodData['data'];
+            $signature = $paymentMethodData['signature'];
+            
+            $headerObject = $paymentMethodData['header'];
+            
+            $ephemeralPublicKey = $headerObject->ephemeralPublicKey;
+            $publicKeyHash = $headerObject->publicKeyHash;
+            $transactionId = $headerObject->transactionId;
+            
+            return array(
+                'orderCode'           => $orderCode,
+                'merchantCode'        => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
+                'orderDescription'    => $this->_getOrderDescription($reservedOrderId),
+                'currencyCode'        => $quote->getQuoteCurrencyCode(),
+                'amount'              => $quote->getGrandTotal(),
+                'paymentType'         => $this->_getRedirectPaymentType($paymentDetails),
+                'shopperEmail'        => $quote->getCustomerEmail(),
+                'method'              => $paymentDetails['method'],
+                'orderStoreId'        => $orderStoreId,
+                'protocolVersion'     => $version,
+                'signature'           => $signature,
+                'data'                => $data,
+                'ephemeralPublicKey'  => $ephemeralPublicKey,
+                'publicKeyHash'       => $publicKeyHash,
+                'transactionId'       => $transactionId
+            );
+        } 
+         }
+        
     }
 }

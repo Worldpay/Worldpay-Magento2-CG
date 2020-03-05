@@ -54,8 +54,8 @@ class UpdateWorldpayment
      *
      * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
      */
-    public function updateWorldpayPayment(\Sapient\Worldpay\Model\Response\DirectResponse $directResponse, \Magento\Payment\Model\InfoInterface $paymentObject)
-    {        
+    public function updateWorldpayPayment(\Sapient\Worldpay\Model\Response\DirectResponse $directResponse, \Magento\Payment\Model\InfoInterface $paymentObject, $disclaimerFlag = null)
+    {  
         $responseXml=$directResponse->getXml();
         $merchantCode = $responseXml['merchantCode'];
         $orderStatus = $responseXml->reply->orderStatus;
@@ -98,12 +98,13 @@ class UpdateWorldpayment
         $wpp->setData('aav_telephone_result_code',$payment->AAVTelephoneResultCode['description']);
         $wpp->setData('aav_email_result_code',$payment->AAVEmailResultCode['description']);
         $wpp->save();
+        
         if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
                 $this->customerSession->unsIsSavedCardRequested();
                 $tokenNodeWithError = $orderStatus->token->xpath('//error');
                 if (!$tokenNodeWithError) {
                     $tokenElement = $orderStatus->token;
-                    $this->saveTokenData($tokenElement, $payment, $merchantCode);
+                    $this->saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag);
                     // vault and instant purchase configuration goes here
                     $paymentToken = $this->getVaultPaymentToken($tokenElement);
                     if (null !== $paymentToken) {
@@ -120,7 +121,7 @@ class UpdateWorldpayment
      * @param $payment
      * @param $merchantCode
      */
-    public function saveTokenData($tokenElement, $payment, $merchantCode)
+    public function saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag=null)
     {
         $savedTokenFactory = $this->savedTokenFactory->create();
         // checking tokenization exist or not
@@ -159,6 +160,9 @@ class UpdateWorldpayment
             $savedTokenFactory->setAuthenticatedShopperID($tokenElement[0]->authenticatedShopperID[0]);
             if($binNumber){
                 $savedTokenFactory->setBinNumber($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->bin[0]);
+            }
+            if($disclaimerFlag){
+                $savedTokenFactory->setDisclaimerFlag($disclaimerFlag);
             }
             $savedTokenFactory->save();
         } else {

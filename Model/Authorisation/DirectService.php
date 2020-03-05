@@ -49,13 +49,17 @@ class DirectService extends \Magento\Framework\DataObject
             $orderStoreId,
             $paymentDetails
         );
-
         $response = $this->paymentservicerequest->order($directOrderParams);
+
         $directResponse = $this->directResponse->setResponse($response);
         $threeDSecureParams = $directResponse->get3dSecureParams();
         $threeDsEnabled = $this->worldpayHelper->is3DSecureEnabled();
         $threeDSecureChallengeParams = $directResponse->get3ds2Params();
         $threeDSecureConfig = array();
+        $disclaimerFlag = '';
+        if(isset($paymentDetails['additional_data']['disclaimerFlag'])){
+            $disclaimerFlag = $paymentDetails['additional_data']['disclaimerFlag'];
+        }
         if ($threeDSecureParams) {
             // Handles success response with 3DS & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
@@ -69,7 +73,7 @@ class DirectService extends \Magento\Framework\DataObject
             $this->_handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $orderCode, $threeDSecureConfig);
         } else {
             // Normal order goes here.(without 3DS).
-            $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment);
+            $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment, $disclaimerFlag);
             $this->_applyPaymentUpdate($directResponse, $payment);
         }
     }

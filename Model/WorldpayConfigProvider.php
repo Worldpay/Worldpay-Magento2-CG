@@ -149,6 +149,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['saveCardAllowed'] = $this->worldpayHelper->getSaveCard();
                 $config['payment']['ccform']['tokenizationAllowed'] = $this->worldpayHelper->getTokenization();
                 $config['payment']['ccform']['storedCredentialsAllowed'] = $this->worldpayHelper->getStoredCredentials();
+                $config['payment']['ccform']['disclaimerMessage'] = $this->worldpayHelper->getDisclaimerMessage();
+                $config['payment']['ccform']['isDisclaimerMessageEnabled'] = $this->worldpayHelper->isDisclaimerMessageEnable();
+                $config['payment']['ccform']['isDisclaimerMessageMandatory'] = $this->worldpayHelper->isDisclaimerMessageMandatory();
                 $config['payment']['ccform']['apmtitle'] = $this->getApmtitle();
                 $config['payment']['ccform']['walletstitle'] = $this->getWalletstitle();
                 $config['payment']['ccform']['paymentMethodSelection'] = $this->getPaymentMethodSelection();
@@ -164,6 +167,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['googleGatewayMerchantid'] = $this->worldpayHelper->googleGatewayMerchantid();
                 $config['payment']['ccform']['googleMerchantname'] = $this->worldpayHelper->googleMerchantname();
                 $config['payment']['ccform']['googleMerchantid'] = $this->worldpayHelper->googleMerchantid();
+                $config['payment']['ccform']['appleMerchantid'] = $this->worldpayHelper->appleMerchantId();
+                
                 if ($this->worldpayHelper->getEnvironmentMode()=='Live Mode'){
                    $config['payment']['general']['environmentMode'] = "PRODUCTION";
                 }else{
@@ -365,7 +370,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         $types['VISA_DEBIT-SSL'] = 'Visa debit';
         $apmTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
         $walletsTypes = $this->worldpayHelper->getWalletsTypes('worldpay_wallets');
+        
         $allTypePayments = array_unique (array_merge ($types, $apmTypes));
+        
+        $allTypePayments = array_unique (array_merge ($allTypePayments, $walletsTypes));
+        
         foreach (array_keys($allTypePayments) as $code) {
             if (!array_key_exists($code, $this->icons)) {
                 $asset = $this->createAsset('Sapient_Worldpay::images/cc/' . strtolower($code) . '.png');

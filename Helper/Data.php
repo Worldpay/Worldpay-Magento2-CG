@@ -400,17 +400,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     
     public function googleMerchantname()
     {
-        return $this->_scopeConfig->getValue('worldpay/wallets_config/google_pay_wallets_config/merchant_name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return $this->_scopeConfig->getValue('worldpay/wallets_config/google_pay_wallets_config/google_merchantname', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
     
     public function googleMerchantid()
     {
-        return $this->_scopeConfig->getValue('worldpay/wallets_config/google_pay_wallets_config/merchant_id', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return $this->_scopeConfig->getValue('worldpay/wallets_config/google_pay_wallets_config/google_merchantid', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
     
     public function isApplePayEnable()
     {
         return (bool) $this->_scopeConfig->getValue('worldpay/wallets_config/apple_pay_wallets_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    }
+    
+    public function appleMerchantId()
+    {
+        return $this->_scopeConfig->getValue('worldpay/wallets_config/apple_pay_wallets_config/merchant_name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
     
     public function isSamsungPayEnable()
@@ -505,6 +510,31 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 return $this->_scopeConfig->getValue('worldpay/general_config/challenge_window_size', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         }
         return (bool) false;
+    }
+    
+    public function getDisclaimerMessage() {
+        if ($this->getStoredCredentials()) {
+                return $this->_scopeConfig->getValue('worldpay/cc_config/stored_credentials_disclaimer_message', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function isDisclaimerMessageEnable() {
+        if ($this->getStoredCredentials()) {
+                return (bool) $this->_scopeConfig->getValue('worldpay/cc_config/stored_credentials_message_enable', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function isDisclaimerMessageMandatory() {
+        if ($this->getStoredCredentials()) {
+                return (bool) $this->_scopeConfig->getValue('worldpay/cc_config/stored_credentials_flag', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        return (bool) false;
+    }
+    
+    public function getCountryCodeSpoofs() {
+        return $this->_scopeConfig->getValue('worldpay/general_config/country_code_spoof', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
 }
 

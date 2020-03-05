@@ -21,9 +21,44 @@ define(
     function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, googlePay) {
         'use strict';
         var ccTypesArr = ko.observableArray([]);
+        
+        
         var paymentService = false;
         var billingAddressCountryId = "";
         var googleResponse = "";
+        var appleResponse = "";
+        var paymentToken = "";
+        
+        //apple pay validation
+        var debug = true;
+        if (window.ApplePaySession) {
+        //var merchantIdentifier = '<?=PRODUCTION_MERCHANTIDENTIFIER?>';
+        var merchantIdentifier = window.checkoutConfig.payment.ccform.appleMerchantid;
+        var promise = ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
+        promise.then(function (canMakePayments) {
+               if (canMakePayments) {
+                   var wallets_APPLEPAY = document.getElementById("wallets_APPLEPAY-SSL");
+                   var wallets_image_APPLEPAY = document.getElementById("wallets_image_APPLEPAY-SSL");
+                   var wallets_label_APPLEPAY = document.getElementById("wallets_label_APPLEPAY-SSL");
+                   
+                   if(wallets_APPLEPAY) {
+                       //document.getElementById("wallets_APPLEPAY-SSL").style.display = "block";
+                       document.getElementById("wallets_APPLEPAY-SSL").style.display = "inline";
+                   }
+                   if(wallets_image_APPLEPAY) {
+                       document.getElementById("wallets_image_APPLEPAY-SSL").style.display = "inline";
+                   }
+                   if(wallets_label_APPLEPAY) {
+                       document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "inline";
+                   }
+                  
+               } 
+             }); 
+     } 
+
+ 
+        
+
         
         /***** Google pay Elements Started  */
         const baseRequest = {apiVersion: 2, apiVersionMinor: 0 };
@@ -59,6 +94,9 @@ define(
         if (quote.billingAddress()) {
             billingAddressCountryId = quote.billingAddress._latestValue.countryId;
         }
+        
+                
+                
 
         function getGooglePaymentDataRequest(){
             const paymentDataRequest = Object.assign({}, baseRequest);
@@ -68,8 +106,8 @@ define(
                 // @todo a merchant ID is available for a production environment after approval by Google
                 // See {@link https://developers.google.com/pay/api/web/guides/test-and-deploy/integration-checklist|Integration checklist}
                 
-                merchantId: window.checkoutConfig.payment.ccform.googleGatewayMerchantid,
-                merchantName: window.checkoutConfig.payment.ccform.googleGatewayMerchantname
+                merchantId: window.checkoutConfig.payment.ccform.googleMerchantid,
+                merchantName: window.checkoutConfig.payment.ccform.googleMerchantname
             };
             return paymentDataRequest;
         }
@@ -88,7 +126,7 @@ define(
             return paymentsClient;
         }
 
-        return Component.extend({
+        return Component.extend({         
             defaults: {
                 redirectAfterPlaceOrder: false,
                 direcTemplate: 'Sapient_Worldpay/payment/wallets',
@@ -114,7 +152,7 @@ define(
                         that.filterwalletajax(1);
                         paymentService = true;
                     }
-                });
+                }); 
             return this;
             },
             filterwalletajax: function(statusCheck){
@@ -196,10 +234,12 @@ define(
                     'method': "worldpay_wallets",
                     'additional_data': {
                         'cc_type': this.getselectedCCType(),
-                        'walletResponse' : googleResponse
+                        'walletResponse' : googleResponse,
+                        'appleResponse' : appleResponse
                     }
                 };
             },
+           
             preparePayment:function() {
                 var self = this;
                 var $form = $('#' + this.getCode() + '-form');
@@ -223,17 +263,169 @@ define(
                     })
                     .catch(function(err) {
                         // show error in developer console for debugging
-                        //console.log('payment client resposnse else condition');
                         console.error(err);
                         return false;
                     });
-                }
+                    
+                } else if (this.getselectedCCType()=='APPLEPAY-SSL') {
+                    
+            //---------------------------------- Apple Pay starts -----------------------
+
+             
+             var baseGrandTotal 	= window.checkoutConfig.totalsData.base_subtotal;
+             var runningAmount = (Math.round(baseGrandTotal * 100) / 100).toFixed(2);
+
+
+             var subTotal	= window.checkoutConfig.quoteData.base_grand_total;
+             var runningTotal = (Math.round(subTotal * 100) / 100).toFixed(2);            
+
+             var subTotalDescr	= "Cart Subtotal";
+
+             var currencyCode = window.checkoutConfig.quoteData.quote_currency_code;
+             var countryCode = window.checkoutConfig.defaultCountryId;
+             var paymentRequest = {
+                currencyCode: currencyCode,
+                countryCode: countryCode,
+                lineItems: [{label: subTotalDescr, amount: runningAmount }
+               ],
+                total: {
+                      label: 'Order Total',
+                      amount: runningAmount
+               },
+               supportedNetworks: ['amex', 'masterCard', 'visa' ],
+               merchantCapabilities: [ 'supports3DS', 'supportsEMV', 'supportsCredit', 'supportsDebit' ]
+            };
+
+            var session = new ApplePaySession(1, paymentRequest);
+
+            // Merchant Validation
+            session.onvalidatemerchant = function (event) {
+                    var promise = performValidation(event.validationURL);
+                    promise.then(function (merchantSession) {
+                            session.completeMerchantValidation(merchantSession);
+                    }); 
+            }
+
+            session.onpaymentmethodselected = function(event) {                    
+                    
+                    var linkUrl = url.build('worldpay/applepay/index?u=getTotal');
+            
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.open("GET", linkUrl, false);
+                    xhttp.setRequestHeader("Content-type", "application/json");
+
+                    xhttp.send();
+        
+                     var finalTotal = xhttp.responseText;
+                     
+                    
+
+                     var runningTotal = (Math.round(finalTotal * 100) / 100).toFixed(2);
+
+
+
+
+                    var newTotal = { type: 'final', label: 'Order Total', amount: runningTotal };
+                    var newLineItems =[{type: 'final',label: subTotalDescr, amount: runningAmount } 
+                        ];
+
+                    session.completePaymentMethodSelection( newTotal, newLineItems );
+
+
+            }
+
+            session.onpaymentauthorized = function (event) {
+
+                    var promise = sendPaymentToken(event.payment.token);
+                    
+                    promise.then(function (success) {	
+                            var status;
+                            if (success){
+                                    status = ApplePaySession.STATUS_SUCCESS;
+                            } else {
+                                    status = ApplePaySession.STATUS_FAILURE;
+                            }
+
+                            session.completePayment(status);
+
+                    });
+                    
+                    appleResponse = JSON.stringify(event.payment.token);
+                    
+                        
+                        
+                            self.placeOrder();
+                       
+            }
+
+            session.oncancel = function(event) {
+            }
+
+            session.begin();
+
+
+                    } //esle end
+
+
+              
                 
             },
             afterPlaceOrder: function (data, event) {
                 window.location.replace(url.build('worldpay/wallets/success'));
             }
+            
+         
+           
 
-        });
+        }); //return ends
+        
+        
+	function performValidation(valURL) {
+		return new Promise(function(resolve, reject) {
+			var xhr = new XMLHttpRequest();
+			xhr.onload = function() {
+                            
+                                
+                                 
+				var data = JSON.parse(this.responseText);
+				resolve(data);
+			};
+			xhr.onerror = reject;
+                        var linkUrl = url.build('worldpay/applepay/index?u=');
+                        
+			xhr.open('GET', linkUrl + valURL);
+			xhr.send();
+		});
+	}
+
+
+        function getRealTotal() {
+            
+        var linkUrl = url.build('worldpay/applepay/index?u=getTotal');
+            
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", linkUrl, false);
+        xhttp.setRequestHeader("Content-type", "application/json");
+       
+        xhttp.send();
+        
+        var finalTotal = xhttp.responseText;
+                        
+                }
+
+
+	function sendPaymentToken(paymentToken) {
+		return new Promise(function(resolve, reject) {
+                        
+                        var appleResponse = paymentToken;
+			
+			if ( debug == true )
+			resolve(true);
+			else
+			reject;
+		});
+	}
+        
+        
     }
 );
