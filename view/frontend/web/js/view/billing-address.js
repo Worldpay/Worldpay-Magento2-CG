@@ -57,7 +57,10 @@ function (
 
     return Component.extend({
         defaults: {
-            template: 'Magento_Checkout/billing-address'
+            template: 'Magento_Checkout/billing-address',
+            actionsTemplate: 'Magento_Checkout/billing-address/actions',
+            formTemplate: 'Magento_Checkout/billing-address/form',
+            detailsTemplate: 'Magento_Checkout/billing-address/details'
         },
         currentBillingAddress: quote.billingAddress,
         addressOptions: addressOptions,
@@ -118,6 +121,13 @@ function (
         addressOptionsText: function (address) {
             return address.getAddressInline();
         },
+
+        /**
+         * Manage cancel button visibility
+         */
+        canUseCancelBillingAddress: ko.computed(function () {
+            return quote.billingAddress() || lastSelectedBillingAddress;
+        }),
 
         /**
          * @return {Boolean}
