@@ -1,0 +1,72 @@
+<?php
+/**
+ * Copyright © 2020 Worldpay, LLC. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+/** @var Sapient\Worldpay\Block\Catalog\Product\SubscriptionPlans $block */
+?>
+
+<div class="field worldpay-subscriptions">
+    <label class="label"><span><?php echo $block->escapeHtml(__('Buy one time or select a Payment Plan')) ?></span></label>
+    <div>
+        <input type="checkbox" id="worldpay-add-plan" name="worldpay_add_plan">
+        <label for="worldpay-add-plan"><span><?php echo $block->escapeHtml(__('Subscribe this product and save')) ?></span></label>
+    </div>
+    <div class="control" id="worldpay-subscription-plans-list" style="display: none;" data-mage-init='{"worldpayPriceSubscription":{
+             "addPlanElement":"#worldpay-add-plan",
+             "planElement":"input:radio[value]",
+             "startDateContainerElement":"#product-options-wrapper .worldpay-subscriptions-start-date-container",
+             "config":<?php /* @noEscape */ echo $block->getJsonConfig() ?>}}'>
+        <?php foreach ($this->getPlans() as $plan): ?>
+            <div class="field choice">
+                <input type="radio"
+                       name="worldpay_subscription_plan"
+                       id="worldpay_subscription_plan_<?php echo $block->escapeHtml($plan->getId()) ?>"
+                       value="<?php echo $block->escapeHtml($plan->getId()) ?>" <?php if ($block->isPlanSelected($plan)): ?>checked<?php endif; ?>/>
+                <label class="label" for="worldpay_subscription_plan_<?php echo $block->escapeHtml($plan->getId()) ?>">
+                    <span><?php /* @noEscape */ echo $block->getPlanTitle($plan); ?></span>
+                </label>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <div class="mage-error" generated="true"  id="subscription-error"></div>
+</div>
+<?php if ($block->getProduct()->getWorldpayRecurringAllowStart()): ?>
+    <div class="field date worldpay-subscriptions-start-date-container" style="display: none;">
+        <legend class="label">
+            <span><?php echo $block->escapeHtml(__('Subscription Start Date')) ?></span>
+        </legend>
+<!--        <div class="control">
+            <?php //echo $block->getStartDateHtml() ?>
+        </div>-->
+        <div class="field-control ">
+            <input class="control-text" name="subscription_date" id="subscription_date" type="text" readonly="true" value="<?php echo $block->getStartDate();?>">
+            <?php //echo $block->getDateHtml() ?>
+        </div>
+    </div>
+
+    
+<?php endif; ?>
+<script type="text/javascript">
+    require([
+    "jquery",
+    "mage/calendar"
+    ], function($){
+        $('#subscription_date').datepicker({
+            prevText: '&#x3c;zurück', prevStatus: '',
+            prevJumpText: '&#x3c;&#x3c;', prevJumpStatus: '',
+            nextText: 'Vor&#x3e;', nextStatus: '',
+            nextJumpText: '&#x3e;&#x3e;', nextJumpStatus: '',
+            monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+            monthNamesShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            dayNames: ['Sunday ','Monday','Tuesday ','Wednesday','Thursday','Friday','Saturday'],
+            dayNamesShort: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+            dayNamesMin: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+            showMonthAfterYear: false,
+            dateFormat:'d-m-yy',
+            minDate: new Date()
+        });
+    });
+</script>

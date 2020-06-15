@@ -1,0 +1,47 @@
+<?php
+/**
+ * Copyright © 2020 Worldpay, LLC. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+
+namespace Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions;
+
+class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
+{
+    /**
+     * @var string
+     */
+    protected $_idFieldName = 'entity_id';
+
+    /**
+     * Reset items data changed flag
+     *
+     * @var boolean
+     */
+    protected $_resetItemsDataChanged = true;
+
+    /**
+     * Define model and resource model, set default order
+     *
+     * @return void
+     */
+    protected function _construct()
+    {
+        $this->_init(
+            'Sapient\Worldpay\Model\Recurring\Subscription\Transactions',
+            'Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions'
+        );
+    }
+
+    /**
+     * @param \Sapient\Worldpay\Model\Recurring\Subscription $subscription
+     * @return $this
+     */
+    public function setSubscriptionFilter(\Sapient\Worldpay\Model\Recurring\Subscription $subscription)
+    {
+        if ($subscription->getId()) {
+            $this->addFieldToFilter('subscription_id', $subscription->getId());
+        }
+        return $this;
+    }
+}

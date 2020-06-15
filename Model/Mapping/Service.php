@@ -89,7 +89,8 @@ class Service {
             'saveCardEnabled'        => $savemyCard,
             'tokenizationEnabled'     => $tokenizationEnabled,
             'storedCredentialsEnabled' => $storedCredentialsEnabled,
-            'cusDetails'    => $this->getCustomerDetailkfor3DS2()
+            'cusDetails'    => $this->getCustomerDetailkfor3DS2(),
+            'exemptionEngine' => $this->getExemptionEngineDetails()
         );
     }
     
@@ -104,6 +105,17 @@ class Service {
         
         return $cusDetails;
     }
+    
+    
+     public function getExemptionEngineDetails () {
+        $exemptionEngine = array();
+        $exemptionEngine['enabled'] = $this->_scopeConfig->getValue('worldpay/cc_config/exemption_engine', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $exemptionEngine['placement'] = $this->_scopeConfig->getValue('worldpay/cc_config/exemption_engine_placement', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);  
+        $exemptionEngine['type'] = $this->_scopeConfig->getValue('worldpay/cc_config/exemption_engine_type', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);  
+       
+        return $exemptionEngine;
+    }
+    
 
     public function collectRedirectOrderParameters(
         $orderCode,
@@ -209,7 +221,8 @@ class Service {
             'saveCardEnabled'        => $savemyCard,
             'tokenizationEnabled'     => $tokenizationEnabled,
             'storedCredentialsEnabled' => $storedCredentialsEnabled,
-            'cusDetails'         => $this->getCustomerDetailkfor3DS2()
+            'cusDetails'         => $this->getCustomerDetailkfor3DS2(),
+            'exemptionEngine' => $this->getExemptionEngineDetails()
         );
     }
 

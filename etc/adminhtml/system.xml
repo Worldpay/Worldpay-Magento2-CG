@@ -201,6 +201,24 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Note: "Capture Invoice Automatically" option in above, should be disabled to enable this feature.</comment>
                 </field>
+                
+                 <field id="exemption_engine" translate="label" type="select" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Exemption Engine</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                
+                <field id="exemption_engine_placement" translate="label" type="select" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Placement</label>
+                    <depends><field id="exemption_engine">1</field></depends>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\ExemptionPlacement</source_model>
+                </field>
+                
+                 <field id="exemption_engine_type" translate="label" type="select" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Types</label>
+                    <depends><field id="exemption_engine">1</field></depends>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\ExemptionTypes</source_model>
+                </field>
+
             </group>
             <!--APM-->
             <group id="apm_config" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -228,6 +246,7 @@
                 <field id="title" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Title</label>
                 </field>
+                <!-- Google Pay Settings -->
                 <group id="google_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="10">
                     <label>Google Pay</label>
                     <!--Google Pay  enabled-->
@@ -248,56 +267,43 @@
                     </field> 
                     <field id="gateway_merchantid" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Gateway MerchantId</label>
-                    </field> 
-                    
+                    </field>                    
                      <field id="google_merchantid" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Google MerchantId</label>
                         <comment>This field only required for production mode. This can be generated from merchant's Google account</comment>
                     </field> 
                      <field id="google_merchantname" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Google MerchantName</label>
-                    </field> 
-                                
-                </group>
-                
-                
+                    </field>                                
+                </group>                
+                <!-- Apple Pay Settings -->
                 <group id="apple_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="10">
-
                     <label>Apple Pay</label>
                     <!--Apple Pay  enabled-->
                     <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Enabled</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
-                    
                      <field id="certification_key" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Certifification Key</label>
                         <comment>Location of the ApplePay.key.pem. eg. /var/www/html/cert/.  Files should be have read access by the webserver</comment>
-                    </field> 
-                    
+                    </field>
                      <field id="certification_crt" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Certifification Path</label>
                         <comment>Location of the ApplePay.crt.pem. eg. /var/www/html/cert/.  Files should be have read access by the webserver</comment>
                     </field> 
-                    
                     <field id="certification_password" translate="label" type="password" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Certification Password</label>
-                    </field> 
-                    
+                    </field>
                     <field id="merchant_name" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Merchant Name</label>
                         <comment>eg. merchant.com.myshop</comment>
                     </field> 
-                    
                     <field id="domain_name" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Domain Name</label>
                         <comment>eg. mydomain.com</comment>
                     </field> 
-                   
                 </group>
-                
-                
-                
             </group>
             <!-- MOTO -->
             <group id="moto_config" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -337,7 +343,16 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
-            <group id="order_cleanup" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+            <!-- Subscription Settings -->
+            <group id="subscriptions" sortOrder="8" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Subscription Settings</label>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Subscriptions Enabled</label>
+                    <comment>Before enabling, make sure you talk to Worldpay Implementation Team</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="order_cleanup" translate="label" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Order Cleanup</label>
                 <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled</label>

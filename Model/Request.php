@@ -74,8 +74,11 @@ class Request
         $request->setOption(CURLOPT_USERPWD, $username.':'.$password);
         // Cookie Set to 2nd 3DS request only.
         $cookie = $this->helper->getWorldpayAuthCookie();
-        // Check Cookie Exist.
-        if (($this->helper->IsThreeDSRequest() || $this->helper->isDynamic3DS2Enabled()) && $cookie != "") {              // Check is 3DS request
+        if ($this->helper->IsThreeDSRequest() && $cookie != "") { // Check is 3DS request
+            $cookie = $cookie.';cookieSameSite="None"';
+            $request->setOption(CURLOPT_COOKIE, $cookie);
+        }
+	if ($this->helper->isDynamic3DS2Enabled() && $cookie != "") { // Check is 3DS2 request
             $request->setOption(CURLOPT_COOKIE, $cookie);
         }
         $request->setOption(CURLOPT_HEADER, true);

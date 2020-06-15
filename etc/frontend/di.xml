@@ -7,4 +7,14 @@
             </argument>
         </arguments>
     </type>
+    <!-- Worldpay Subscription Settings -->
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <plugin name="worldpay_recurring" type="Sapient\Worldpay\Model\Checkout\CompositeConfigProviderPlugin" sortOrder="100"/>
+    </type>
+    <type name="Magento\Checkout\Controller\Cart\Index">
+        <plugin name="worldpay_recurring" type="Sapient\Worldpay\Plugin\Checkout\Controller\Cart\Index" sortOrder="100"/>
+    </type>
+    <type name="Magento\Checkout\Block\Onepage">
+        <plugin name="worldpay_recurring" type="Sapient\Worldpay\Plugin\Checkout\Block\Onepage" sortOrder="100"/>
+    </type>
 </config>

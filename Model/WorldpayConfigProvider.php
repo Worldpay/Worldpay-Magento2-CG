@@ -189,6 +189,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['isProductionChallengeUrl'] = $this->worldpayHelper->isProductionChallengeUrl();
                 $config['payment']['ccform']['isChallengePreference'] = $this->worldpayHelper->isChallengePreference();
                 $config['payment']['ccform']['isChallengeWindowSize'] = $this->worldpayHelper->getChallengeWindowSize();
+                
+                // Subscription Status
+                $config['payment']['ccform']['isSubscribed'] = $this->worldpayHelper->getsubscriptionStatus();
             }
         }
         return $config;

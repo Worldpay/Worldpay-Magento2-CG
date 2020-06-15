@@ -48,7 +48,7 @@ class MerchantProfile extends \Magento\Config\Block\System\Config\Form\Field\Fie
 
         $this->addColumn('merchant_code', ['label' => __('Merchant Code'),'style' => 'width:120px','class' => 'required-entry']);
         $this->addColumn('merchant_username', ['label' => __('Merchant Username'),'style' => 'width:120px','class' => 'required-entry']);
-        $this->addColumn('merchant_password', ['label' => __('Merchant Password'), 
+        $this->addColumn('merchant_password', ['label' => __('Merchant Password'),
             'renderer' => $this->getLayout()->createBlock(
                 '\Sapient\Worldpay\Block\Adminhtml\Form\Field\Password'
             )
