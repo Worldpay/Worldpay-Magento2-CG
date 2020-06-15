@@ -1,0 +1,351 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2020 Worldpay, LLC. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:DataObject/etc/fieldset.xsd">
+    <scope id="global">
+        <fieldset id="quote_convert_payment">
+            <field name="echeck_account_name">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_routing_number">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_account_type">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="cc_number_enc">
+                <aspect name="to_order_payment" />
+            </field>
+        </fieldset>
+        <fieldset id="sales_convert_order_payment">
+            <field name="echeck_account_name">
+                <aspect name="to_quote_payment" />
+            </field>
+            <field name="echeck_routing_number">
+                <aspect name="to_quote_payment" />
+            </field>
+            <field name="echeck_account_type">
+                <aspect name="to_quote_payment" />
+            </field>
+            <field name="method">
+                <aspect name="to_worldpay_subscription" targetField="payment_method"/>
+            </field>
+            <field name="cc_exp_month">
+                <aspect name="to_worldpay_subscription" targetField="payment_cc_exp_month"/>
+            </field>
+            <field name="cc_exp_year">
+                <aspect name="to_worldpay_subscription" targetField="payment_cc_exp_year"/>
+            </field>
+            <field name="cc_last_4">
+                <aspect name="to_worldpay_subscription" targetField="payment_cc_last_4"/>
+            </field>
+            <field name="additional_information">
+                <aspect name="to_worldpay_subscription" targetField="payment_additional_information"/>
+            </field>
+        </fieldset>
+        <fieldset id="sales_convert_quote_payment">
+            <field name="echeck_account_name">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_routing_number">
+                <aspect name="to_order_payment" />
+            </field>
+            <field name="echeck_account_type">
+                <aspect name="to_order_payment" />
+            </field>
+        </fieldset>
+        <fieldset id="sales_convert_order_item">
+            <field name="store_id">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="product_id">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="name">
+                <aspect name="to_worldpay_subscription" targetField="product_name"/>
+            </field>
+            <field name="is_virtual">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="product_type">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="product_options">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="sku">
+                <aspect name="to_worldpay_subscription" targetField="product_sku"/>
+            </field>
+            <field name="base_price">
+                <aspect name="to_worldpay_subscription" targetField="item_price"/>
+            </field>
+            <field name="base_original_price">
+                <aspect name="to_worldpay_subscription" targetField="item_original_price"/>
+            </field>
+            <field name="tax_percent">
+                <aspect name="to_worldpay_subscription" targetField="item_tax_percent"/>
+            </field>
+            <field name="base_tax_amount">
+                <aspect name="to_worldpay_subscription" targetField="item_tax_amount"/>
+            </field>
+            <field name="discount_percent">
+                <aspect name="to_worldpay_subscription" targetField="item_discount_percent"/>
+            </field>
+            <field name="base_discount_amount">
+                <aspect name="to_worldpay_subscription" targetField="item_discount_amount"/>
+            </field>
+        </fieldset>
+        <fieldset id="sales_convert_order">
+            <field name="customer_id">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="customer_email">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="increment_id">
+                <aspect name="to_worldpay_subscription" targetField="original_order_increment_id"/>
+            </field>
+            <field name="shipping_method">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="shipping_description">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="base_discount_amount">
+                <aspect name="to_worldpay_subscription" targetField="discount_amount"/>
+            </field>
+            <field name="discount_description">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="base_shipping_amount">
+                <aspect name="to_worldpay_subscription" targetField="shipping_amount"/>
+            </field>
+            <field name="base_shipping_tax_amount">
+                <aspect name="to_worldpay_subscription" targetField="shipping_tax_amount"/>
+            </field>
+            <field name="base_subtotal">
+                <aspect name="to_worldpay_subscription" targetField="subtotal"/>
+            </field>
+            <field name="base_tax_amount">
+                <aspect name="to_worldpay_subscription" targetField="tax_amount"/>
+            </field>
+            <field name="base_subtotal_incl_tax">
+                <aspect name="to_worldpay_subscription" targetField="subtotal_incl_tax"/>
+            </field>
+            <field name="forced_shipment_with_invoice">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="weight">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+            <field name="customer_note">
+                <aspect name="to_worldpay_subscription"/>
+            </field>
+        </fieldset>
+        <fieldset id="sales_convert_order_address">
+            <field name="prefix">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="firstname">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="middlename">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="lastname">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="suffix">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="company">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="street">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="city">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="region">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="region_id">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="postcode">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="country_id">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="telephone">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+            <field name="fax">
+                <aspect name="to_worldpay_subscription_address"/>
+            </field>
+        </fieldset>
+        <fieldset id="worldpay_subscription_convert">
+            <field name="store_id">
+                <aspect name="to_order"/>
+                <aspect name="to_order_item"/>
+            </field>
+            <field name="store_name">
+                <aspect name="to_order"/>
+            </field>
+            <field name="interval_amount">
+                <aspect name="to_order" targetField="base_grand_total"/>
+                <aspect name="to_order_payment" targetField="base_amount_ordered"/>
+            </field>
+            <field name="customer_id">
+                <aspect name="to_order"/>
+            </field>
+            <field name="product_id">
+                <aspect name="to_order_item"/>
+            </field>
+            <field name="product_name">
+                <aspect name="to_order_item" targetField="name"/>
+            </field>
+            <field name="customer_email">
+                <aspect name="to_order"/>
+            </field>
+            <field name="shipping_method">
+                <aspect name="to_order"/>
+            </field>
+            <field name="shipping_description">
+                <aspect name="to_order"/>
+            </field>
+            <field name="is_virtual">
+                <aspect name="to_order"/>
+                <aspect name="to_order_item"/>
+            </field>
+            <field name="discount_amount">
+                <aspect name="to_order" targetField="base_discount_amount"/>
+            </field>
+            <field name="discount_description">
+                <aspect name="to_order"/>
+            </field>
+            <field name="shipping_amount">
+                <aspect name="to_order" targetField="base_shipping_amount"/>
+            </field>
+            <field name="shipping_tax_amount">
+                <aspect name="to_order" targetField="base_shipping_tax_amount"/>
+            </field>
+            <field name="subtotal">
+                <aspect name="to_order" targetField="base_subtotal"/>
+            </field>
+            <field name="tax_amount">
+                <aspect name="to_order" targetField="base_tax_amount"/>
+            </field>
+            <field name="subtotal_incl_tax">
+                <aspect name="to_order" targetField="base_subtotal_incl_tax"/>
+            </field>
+            <field name="forced_shipment_with_invoice">
+                <aspect name="to_order"/>
+            </field>
+            <field name="weight">
+                <aspect name="to_order"/>
+                <aspect name="to_order_item"/>
+                <aspect name="to_order_item" targetField="row_weight"/>
+            </field>
+            <field name="customer_note">
+                <aspect name="to_order"/>
+            </field>
+            <field name="product_type">
+                <aspect name="to_order_item"/>
+            </field>
+            <field name="product_sku">
+                <aspect name="to_order_item" targetField="sku"/>
+            </field>
+            <field name="item_price">
+                <aspect name="to_order_item" targetField="base_price"/>
+            </field>
+            <field name="item_original_price">
+                <aspect name="to_order_item" targetField="base_original_price"/>
+            </field>
+            <field name="item_tax_percent">
+                <aspect name="to_order_item" targetField="tax_percent"/>
+            </field>
+            <field name="item_tax_amount">
+                <aspect name="to_order_item" targetField="base_tax_amount"/>
+            </field>
+            <field name="item_discount_percent">
+                <aspect name="to_order_item" targetField="discount_percent"/>
+            </field>
+            <field name="item_discount_amount">
+                <aspect name="to_order_item" targetField="base_discount_amount"/>
+            </field>
+            <field name="payment_method">
+                <aspect name="to_order_payment" targetField="method"/>
+            </field>
+            <field name="payment_cc_exp_month">
+                <aspect name="to_order_payment" targetField="cc_exp_month"/>
+            </field>
+            <field name="payment_cc_exp_year">
+                <aspect name="to_order_payment" targetField="cc_exp_year"/>
+            </field>
+            <field name="payment_cc_last_4">
+                <aspect name="to_order_payment" targetField="cc_last_4"/>
+            </field>
+            <field name="payment_additional_information">
+                <aspect name="to_order_payment" targetField="additional_information"/>
+            </field>
+            <field name="subscription_id">
+                <aspect name="to_order" targetField="worldpay_subscription_id"/>
+            </field>
+        </fieldset>
+        <fieldset id="worldpay_subscription_address_convert">
+            <field name="region_id">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="fax">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="region">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="postcode">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="lastname">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="street">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="city">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="email">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="telephone">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="country_id">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="firstname">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="frefix">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="middlename">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="suffix">
+                <aspect name="to_order_address"/>
+            </field>
+            <field name="company">
+                <aspect name="to_order_address"/>
+            </field>
+        </fieldset>
+    </scope>
+</config>

@@ -85,6 +85,7 @@
                 <require_cvc>1</require_cvc>
                 <can_authorize_vault>1</can_authorize_vault>
                 <can_capture_vault>1</can_capture_vault>
+                <can_use_for_worldpay_subscription>1</can_use_for_worldpay_subscription>
             </worldpay_cc>
             <worldpay_cc_vault>
                 <title>Credit Cards vault</title>
@@ -97,6 +98,7 @@
                     <tokenFormat>Sapient\Worldpay\Model\InstantPurchase\CreditCard\TokenFormatter</tokenFormat>
                     <additionalInformation>Sapient\Worldpay\Model\InstantPurchase\PaymentAdditionalInformationProvider</additionalInformation>
                 </instant_purchase>
+                <can_use_for_worldpay_subscription>0</can_use_for_worldpay_subscription>
             </worldpay_cc_vault>
              <worldpay_apm>
                 <title>Alternative Payment methods</title>
@@ -105,6 +107,7 @@
                 <allow_specific>0</allow_specific>
                 <payment_action>authorize</payment_action>
                 <sort_order>11</sort_order>
+                <can_use_for_worldpay_subscription>0</can_use_for_worldpay_subscription>
             </worldpay_apm>
             <worldpay_wallets>
                 <title>Wallets</title>
@@ -113,6 +116,7 @@
                 <allow_specific>0</allow_specific>
                 <payment_action>authorize</payment_action>
                 <sort_order>11</sort_order>
+                <can_use_for_worldpay_subscription>0</can_use_for_worldpay_subscription>
             </worldpay_wallets>
             <worldpay_moto>
                 <title>MOTO</title>
@@ -122,6 +126,7 @@
                 <allow_specific>0</allow_specific>
                 <payment_action>authorize</payment_action>
                 <sort_order>12</sort_order>
+                <can_use_for_worldpay_subscription>0</can_use_for_worldpay_subscription>
             </worldpay_moto>
         </payment>
     </default>

@@ -1,6 +1,9 @@
 <?xml version='1.0'?>
 <config xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='urn:magento:framework:Event/etc/events.xsd'>
-  	<event name='controller_action_predispatch_checkout_cart_index'>
-		<observer name='Sapient\Worldpay\Model\Observer\Cart' instance='Sapient\Worldpay\Model\Observer\Cart' />
+    <event name='controller_action_predispatch_checkout_cart_index'>
+	<observer name='Sapient\Worldpay\Model\Observer\Cart' instance='Sapient\Worldpay\Model\Observer\Cart' />
+    </event>
+    <event name="checkout_allow_guest">
+        <observer name="worldpay_payment_checkout_allow_guest" instance="Sapient\Worldpay\Observer\IsAllowedGuestCheckoutObserver"/>
     </event>
 </config>

@@ -48,15 +48,6 @@ class WalletService extends \Magento\Framework\DataObject
         $payment
     ) {
         $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
-        
-        
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/worldpay.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-        $logger->info(print_r($paymentDetails, true));
-
-
-
         if($paymentDetails['additional_data']['cc_type'] == 'PAYWITHGOOGLE-SSL'){
             $walletOrderParams = $this->mappingservice->collectWalletOrderParameters(
                 $orderCode,
@@ -71,14 +62,7 @@ class WalletService extends \Magento\Framework\DataObject
             $this->_applyPaymentUpdate($directResponse, $payment);
         }
         
-        if($paymentDetails['additional_data']['cc_type'] == 'APPLEPAY-SSL'){
-            
-            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/worldpay.log');
-                $logger = new \Zend\Log\Logger();
-                $logger->addWriter($writer);
-                $logger->info('Apple pay got it ........ ..................');
-                
-                
+        if($paymentDetails['additional_data']['cc_type'] == 'APPLEPAY-SSL'){                
             $applePayOrderParams = $this->mappingservice->collectWalletOrderParameters(
                 $orderCode,
                 $quote,

@@ -19,6 +19,11 @@ class UpdateWorldpayment
      */
     protected $worldpaypayment;
     protected $paymentMethodType;
+    
+    /**
+     * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
+     */
+    private $transactionsFactory;
     /**
      * Constructor
      *
@@ -26,6 +31,7 @@ class UpdateWorldpayment
      * @param SavedTokenFactory $savedTokenFactory
      * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -36,7 +42,8 @@ class UpdateWorldpayment
         \Magento\Customer\Model\Session $customerSession,
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
         CreditCardTokenFactory $paymentTokenFactory,
-        \Magento\Backend\Model\Session\Quote $session
+        \Magento\Backend\Model\Session\Quote $session,
+        \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
     ) {
         $this->wplogger = $wplogger;
         $this->savedTokenFactory = $savedTokenFactory;
@@ -47,6 +54,7 @@ class UpdateWorldpayment
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->paymentExtensionFactory = $paymentExtensionFactory;
         $this->quotesession = $session;
+        $this->transactionFactory = $transactionsFactory;
     }
 
     /**
@@ -104,7 +112,7 @@ class UpdateWorldpayment
                 $tokenNodeWithError = $orderStatus->token->xpath('//error');
                 if (!$tokenNodeWithError) {
                     $tokenElement = $orderStatus->token;
-                    $this->saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag);
+                    $this->saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag, $orderCode);
                     // vault and instant purchase configuration goes here
                     $paymentToken = $this->getVaultPaymentToken($tokenElement);
                     if (null !== $paymentToken) {
@@ -121,7 +129,7 @@ class UpdateWorldpayment
      * @param $payment
      * @param $merchantCode
      */
-    public function saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag=null)
+    public function saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag=null, $orderCode=null)
     {
         $savedTokenFactory = $this->savedTokenFactory->create();
         // checking tokenization exist or not
@@ -165,7 +173,11 @@ class UpdateWorldpayment
                 $savedTokenFactory->setDisclaimerFlag($disclaimerFlag);
             }
             $savedTokenFactory->save();
-        } else {
+            $tokenId = $savedTokenFactory->getId();
+            $this->saveTokenDataToTransactions($tokenId,$orderCode);
+        } else {           
+            $tokenId = $tokenDataExist['id'];
+            $this->saveTokenDataToTransactions($tokenId,$orderCode);
             $this->_messageManager->addNotice(__("You already appear to have this card number stored, if your card details have changed, you can update these via the 'my cards' section"));
             return;
         }
@@ -236,4 +248,14 @@ class UpdateWorldpayment
         }
         return $extensionAttributes;
     }
+    
+    public function saveTokenDataToTransactions($tokenId,$worldpayOrderCode){        
+        $orderId = explode('-',$worldpayOrderCode);
+        $transactions = $this->transactionFactory->create();
+        $transactions->setWorldpayTokenId($tokenId);
+        $transactions->setWorldpayOrderId($worldpayOrderCode);
+        $transactions->setOriginalOrderIncrementId($orderId[0]);
+        $transactions->save();
+    }
 }
+    

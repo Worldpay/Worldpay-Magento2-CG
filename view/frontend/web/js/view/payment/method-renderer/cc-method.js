@@ -247,6 +247,7 @@ define(
                         $(".cc-Visibility-Enabled").show();
                     }
                 }
+                $('#disclaimer-error').html('');
             },
             getTemplate: function(){
                 if (this.intigrationmode == 'direct') {
@@ -326,7 +327,9 @@ define(
                       return  this.selectedCCType();
                 }
             },
-
+            isSubscribed : function (){
+                return window.checkoutConfig.payment.ccform.isSubscribed;
+            },
             /**
              * @override
              */
@@ -350,7 +353,8 @@ define(
                         'tokenization_enabled': this.isTokenizationEnabled(),
                         'stored_credentials_enabled': this.isStoredCredentialsEnabled(),
                         'dfReferenceId': window.sessionId,
-                        'disclaimerFlag': this.disclaimerFlag
+                        'disclaimerFlag': this.disclaimerFlag,
+                        'subscriptionStatus' : this.isSubscribed()
                     }
                 };
             },
@@ -378,7 +382,7 @@ define(
                 var $form = $('#' + this.getCode() + '-form');
                 var $savedCardForm = $('#' + this.getCode() + '-savedcard-form');
                 var selectedSavedCardToken = $("input[name='payment[token_to_use]']:checked").val();
-                var cc_type_selected = this.getselectedCCType('payment[cc_type]');
+                var cc_type_selected = this.getselectedCCType('payment[cc_type]');                
                 // 3DS2 JWT create function 
                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                     var bin = this.creditCardNumber();
@@ -407,6 +411,7 @@ define(
                 this.dfReferenceId = null;
 
                 if(cc_type_selected == 'savedcard'){
+                    
                     //Saved card handle
                     if((this.intigrationmode == 'direct' && $savedCardForm.validation() && $savedCardForm.validation('isValid') && selectedSavedCardToken) ||
                         (this.intigrationmode == 'redirect' && $form.validation() && $form.validation('isValid') && selectedSavedCardToken)){
@@ -419,9 +424,11 @@ define(
                             $('#saved-cvv-error').css('display', 'block');
                             $('#saved-cvv-error').html('Please, enter valid Card Verification Number');
                         }else{
+                            fullScreenLoader.startLoader();
                             this.redirectAfterPlaceOrder = false;
                             if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled && this.intigrationmode == 'direct'){
                                 window.addEventListener("message", function(event) {
+                                    
                                     var data = JSON.parse(event.data);
 
                                     var envUrl;
@@ -439,27 +446,49 @@ define(
                                             }
                                             window.sessionId = this.dfReferenceId;
                                             //place order with direct CSE method
+                                            fullScreenLoader.stopLoader();
                                             self.placeOrder();
                                         }
                                     }
                                 }, false);
                             } else {
+                                fullScreenLoader.stopLoader();
                                 self.placeOrder();
                             }
                         }
                       }
-                 }else if($form.validation() && $form.validation('isValid')){
+                 }else if($form.validation() && $form.validation('isValid')){                    
+                    // Subscription check
+                    if(this.isSubscribed()){
+                        if(cc_type_selected !== 'savedcard'){
+                            var saveCardOption = $('#' + this.getCode() + '_save_card').is(":checked");
+                            if(!saveCardOption){
+                                $('#disclaimer-error').css('display', 'block');
+                                $('#disclaimer-error').html('Please, Save the card before placing subscription order');
+                                return false;
+                            } else {
+                                $('#disclaimer-error').html('');
+                            }
+                        }
+                    }
                     //Direct form handle
                     this.saveMyCard = $('#' + this.getCode() + '_save_card').is(":checked");
                     if(this.saveMyCard && this.isDisclaimerMessageMandatory() && this.isDisclaimerMessageEnabled() && window.disclaimerDialogue === null){
                         $('#disclaimer-error').css('display', 'block');
                         $('#disclaimer-error').html('Please, Verify the disclaimer! before saving the card');
 			return false;
-                    } else if(this.saveMyCard && this.isStoredCredentialsEnabled() && this.isDisclaimerMessageEnabled() && window.disclaimerDialogue === null){
+                    } else if(this.saveMyCard && this.isStoredCredentialsEnabled() && this.isDisclaimerMessageEnabled() && (window.disclaimerDialogue === null || window.disclaimerDialogue === false)){
+                        if(this.isSubscribed()){
+                            $('#disclaimer-error').css('display', 'block');
+                            $('#disclaimer-error').html('Please, Verify the disclaimer! before saving the card');
+                            return false;
+                        }
                         this.saveMyCard = '';
                         $('#' + this.getCode() + '_save_card').prop( "checked", false );
                     }
                      if (this.intigrationmode == 'direct') {
+                         
+                         fullScreenLoader.startLoader();
                             var that = this;
                             // Need to check for 3ds2 enable or not
                             //jwtCreate(that.creditCardNumber());
@@ -486,6 +515,7 @@ define(
                                     that.dfReferenceId = null;
                                     if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                                         window.addEventListener("message", function(event) {
+                                             
                                             var data = JSON.parse(event.data);
 
                                             var envUrl;
@@ -498,11 +528,14 @@ define(
                                                 if (data !== undefined && data.Status) {
                                                    // window.sessionId = data.SessionId;
                                                     window.sessionId = data.SessionId;
-                                                    self.placeOrder();
+                                                    
+                                                     fullScreenLoader.stopLoader();
+                                                     self.placeOrder();
                                                 }
                                             }
                                         }, false);
                                     } else {
+                                        fullScreenLoader.stopLoader();
                                         self.placeOrder();
                                     }                                    
                                 });
@@ -522,11 +555,13 @@ define(
                                                 //window.sessionId = data.SessionId;
                                                 window.sessionId = data.SessionId;
                                                 //place order with direct CSE method
+                                                   fullScreenLoader.stopLoader();
                                                     self.placeOrder();
                                             } 
                                         } 
                                     }, false);
                                 } else {
+                                    fullScreenLoader.stopLoader();
                                     self.placeOrder();
                                 }  
                             }

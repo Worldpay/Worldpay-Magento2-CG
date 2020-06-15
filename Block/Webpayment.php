@@ -10,6 +10,7 @@ use Magento\Checkout\Block\Cart\AbstractCart;
 use Sapient\Worldpay\Helper\Data;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Message\ManagerInterface;
+use Sapient\Worldpay\Helper\Recurring;
 
 /**
  * Webpayment block
@@ -46,11 +47,22 @@ class Webpayment extends Template
     protected $messageManager;
 
     /**
+    * @var Magento\Store\Model\StoreManagerInterface $storeManager
+    */
+    protected $_storeManager;  
+    
+    /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
+    protected $recurringHelper;
+    
+    /**
      * Webpayment constructor.
      * @param Template\Context $context
      * @param AbstractCart $cart
      * @param Create $helper
      * @param array $data
+     * @param Recurring $recurringHelper
      */
     public function __construct(
         Template\Context $context,
@@ -60,7 +72,9 @@ class Webpayment extends Template
         Session $customerSession,
         \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Message\ManagerInterface $messageManager)
+        \Magento\Framework\Message\ManagerInterface $messageManager,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        Recurring $recurringHelper)
     {
 
         $this->_helper = $helper;
@@ -73,6 +87,18 @@ class Webpayment extends Template
         $this->_tokenModelFactory = $tokenModelFactory;
         $this->scopeConfig = $scopeConfig;
         $this->_messageManager = $messageManager;
+        $this->_storeManager = $storeManager;
+        $this->recurringHelper = $recurringHelper;
+    }
+    
+    /**
+     * Get Store code
+     *
+     * @return string
+     */
+    public function getStoreCode()
+    {
+        return $this->_storeManager->getStore()->getCode();
     }
 
     /**
@@ -190,26 +216,33 @@ class Webpayment extends Template
     
     public function getProductCount()
     {
-         $allItems = $this->_cart->getQuote()->getAllVisibleItems();
-         return $count = count($allItems);
+        $allItems = $this->_cart->getQuote()->getAllVisibleItems();
+        return $count = count($allItems);
     }
     
-     public function getChromepayButtonName() {
-     $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+    public function getChromepayButtonName() {
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
-     return $this->scopeConfig->getValue('worldpay/cc_config/chromepay_button_name', $storeScope);
-     }
+        return $this->scopeConfig->getValue('worldpay/cc_config/chromepay_button_name', $storeScope);
+    }
      
-     public function getChromepayEnabled() {
-     $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+    public function getChromepayEnabled() {
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
-     return $this->scopeConfig->getValue('worldpay/cc_config/chromepay', $storeScope);
-     }
+        return $this->scopeConfig->getValue('worldpay/cc_config/chromepay', $storeScope);
+    }
      
-     public function getPaymentMode() {
-     $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+    public function getPaymentMode() {
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
-     return $this->scopeConfig->getValue('worldpay/cc_config/integration_mode', $storeScope);
-     }
+        return $this->scopeConfig->getValue('worldpay/cc_config/integration_mode', $storeScope);
+    }
+    
+    public function checkSubscriptionItems(){
+        if ($this->recurringHelper->quoteContainsSubscription($this->_cart->getQuote())) {
+            return true;
+        }
+        return false;
+    }
     
 }

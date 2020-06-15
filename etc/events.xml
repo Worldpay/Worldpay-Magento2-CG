@@ -9,4 +9,22 @@
     <event name="email_order_set_template_vars_before">
         <observer name="add_extra_data_to_transport" instance="Sapient\Worldpay\Model\Observer\AddExtraDataToTransport" />
     </event>
+    <event name="catalog_product_get_final_price">
+        <observer name="worldpay_subscription" instance="Sapient\Worldpay\Observer\CatalogProductGetFinalPriceObserver"/>
+    </event>
+    <event name="payment_method_is_active">
+        <observer name="worldpay_subscription" instance="Sapient\Worldpay\Observer\PaymentMethodIsActiveObserver"/>
+    </event>
+    <event name="sales_quote_collect_totals_before">
+        <observer name="worldpay_subscription" instance="Sapient\Worldpay\Observer\SalesQuoteCollectTotalsBeforeObserver"/>
+    </event>
+    <event name="sales_model_service_quote_submit_before">
+        <observer name="worldpay_subscription" instance="Sapient\Worldpay\Observer\SalesServiceQuoteSubmitBeforeObserver"/>
+    </event>
+    <event name="sales_order_item_save_commit_after">
+        <observer name="worldpay_subscription" instance="Sapient\Worldpay\Observer\SaveOrderItemCommitAfterObserver"/>
+    </event>
+    <event name="checkout_cart_update_items_after">
+        <observer name="worldpay_subscription" instance="Sapient\Worldpay\Observer\CheckoutCartUpdateItemsAfterObserver"/>
+    </event>
 </config>
