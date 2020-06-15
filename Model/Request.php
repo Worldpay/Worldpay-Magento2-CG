@@ -75,7 +75,7 @@ class Request
         // Cookie Set to 2nd 3DS request only.
         $cookie = $this->helper->getWorldpayAuthCookie();
         if ($this->helper->IsThreeDSRequest() && $cookie != "") { // Check is 3DS request
-            $cookie = $cookie.';SameSite="None"';
+            $cookie = $cookie.';SameSite=None; Secure'; // Chrome 80 Cookie upgrades
             $request->setOption(CURLOPT_COOKIE, $cookie);
         }
 	if ($this->helper->isDynamic3DS2Enabled() && $cookie != "") { // Check is 3DS2 request
