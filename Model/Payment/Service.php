@@ -59,6 +59,7 @@ class Service
         if (!$worldPayPayment) {
             return false;
         }
+
         $rawXml = $this->paymentservicerequest->inquiry(
             $worldPayPayment->getMerchantId(),
             $worldPayPayment->getWorldpayOrderId(),
@@ -66,29 +67,26 @@ class Service
             $order->getPaymentMethodCode(),
             $worldPayPayment->getPaymentType()
         );
-        
+
         $paymentService = new \SimpleXmlElement($rawXml);
         $lastEvent = $paymentService->xpath('//lastEvent');
         $partialCaptureReference = $paymentService->xpath('//reference');
-        
-        
-       // $paymentTag = $paymentService->xpath('//payment/balance');
-        
-        $nodes = $paymentService->xpath('//payment/balance');
+
+        $paymentBalance = $paymentService->xpath('//payment/balance');
         $getNodeValue ='';
-        $getAttibute = '';
-        
-       if($nodes && $lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture') {
-        $getAttibute = (array) $nodes[0]->attributes()['accountType'];
-        
-        $getNodeValue = $getAttibute[0];
-        
-       }
-        
-       
-        
-        if($lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture' && $getNodeValue == 'IN_PROCESS_AUTHORISED') {
-             throw new \Magento\Framework\Exception\CouldNotDeleteException(__("Sync status action not possible for this Partial Captutre Order"));  
+        $getAttribute = '';
+
+        if ( ! isset($partialCaptureReference[0])) {
+            return simplexml_load_string($rawXml);
+        }
+
+        if ($paymentBalance && $lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture') {
+            $getAttribute = (array) $paymentBalance[0]->attributes()['accountType'];
+            $getNodeValue = $getAttribute[0];
+        }
+
+        if ($lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture' && $getNodeValue == 'IN_PROCESS_AUTHORISED') {
+            throw new \Magento\Framework\Exception\CouldNotDeleteException(__("Sync status action not possible for this Partial Capture Order"));
         }
 
         return simplexml_load_string($rawXml);
