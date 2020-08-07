@@ -8,12 +8,6 @@
                     <argument name="label" xsi:type="string">Saved Card</argument>
                 </arguments>
             </block>
-            <block class="Magento\Framework\View\Element\Html\Link\Current" name="customer-account-navigation-worldpay-subscriptions" cacheable="false">
-                <arguments>
-                    <argument name="path" xsi:type="string">worldpay/recurring</argument>
-                    <argument name="label" xsi:type="string">My Subscriptions</argument>
-                </arguments>
-            </block>
         </referenceBlock>
     </body>
  </page>

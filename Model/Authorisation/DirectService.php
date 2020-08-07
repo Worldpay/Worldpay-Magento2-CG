@@ -10,11 +10,6 @@ class DirectService extends \Magento\Framework\DataObject
 {
     protected $checkoutSession;
     protected $updateWorldPayPayment;
-    
-    /**
-     * @var \Magento\Framework\DataObject\Copy
-     */
-    private $objectCopyService;
 
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
@@ -26,8 +21,7 @@ class DirectService extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Helper\Registry $registryhelper,
         \Magento\Framework\UrlInterface $urlBuilder,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Sapient\Worldpay\Helper\Data $worldpayHelper,
-        \Magento\Framework\DataObject\Copy $objectCopyService
+        \Sapient\Worldpay\Helper\Data $worldpayHelper
     ) {
         $this->mappingservice = $mappingservice;
         $this->paymentservicerequest = $paymentservicerequest;
@@ -39,7 +33,6 @@ class DirectService extends \Magento\Framework\DataObject
         $this->worldpayHelper = $worldpayHelper;
         $this->registryhelper = $registryhelper;
         $this->urlBuilders    = $urlBuilder;
-        $this->objectCopyService = $objectCopyService;
     }
 
     public function authorizePayment(
@@ -78,7 +71,7 @@ class DirectService extends \Magento\Framework\DataObject
             $payment->setIsTransactionPending(1);
             $threeDSecureConfig = $this->get3DS2ConfigValues();
             $this->_handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $orderCode, $threeDSecureConfig);
-        } else {            
+        } else {
             // Normal order goes here.(without 3DS).
             $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment, $disclaimerFlag);
             $this->_applyPaymentUpdate($directResponse, $payment);

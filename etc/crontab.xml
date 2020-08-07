@@ -10,9 +10,4 @@
             <schedule>* * * * *</schedule>
         </job>
     </group>
-    <group id="worldpay_transactions">
-        <job name="recurring_order_transactions" instance="Sapient\Worldpay\Cron\RecurringOrders" method="execute">
-            <schedule>* * * * *</schedule>
-        </job>
-    </group>
 </config>

@@ -71,13 +71,6 @@ class Authorised
                 \Sapient\Worldpay\Model\Payment\State::STATUS_AUTHORISED
             );
         }
-        if ($this->_isWalletIntegrationMode($order)) {
-             return array(
-                \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_AUTHORISED
-            );
-        }
-        
         return array(\Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION);
     }
 
@@ -112,17 +105,6 @@ class Authorised
     {
         return $this->_configHelper->getIntegrationModelByPaymentMethodCode($order->getPaymentMethodCode(), $order->getStoreId())
             === \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::DIRECT_MODEL;
-    }
-    
-    
-    /**
-     * check if integration mode is wallet
-     * @return bool
-     */
-    private function _isWalletIntegrationMode(\Sapient\Worldpay\Model\Order $order)
-    {
-        return $this->_configHelper->getIntegrationModelByPaymentMethodCode($order->getPaymentMethodCode(), $order->getStoreId())
-            === \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::WORLDPAY_WALLETS_TYPE;
     }
 
     /**

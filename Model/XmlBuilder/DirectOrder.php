@@ -43,7 +43,6 @@ EOD;
     private $storedCredentialsEnabled;
     protected $dfReferenceId = null;
     private $cusDetails;
-    private $exemptionEngine;
 
     /**
      * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
@@ -105,8 +104,7 @@ EOD;
         $saveCardEnabled,
         $tokenizationEnabled,
         $storedCredentialsEnabled,
-        $cusDetails,
-        $exemptionEngine
+        $cusDetails
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -125,9 +123,6 @@ EOD;
         $this->tokenizationEnabled = $tokenizationEnabled;
         $this->storedCredentialsEnabled = $storedCredentialsEnabled;
         $this->cusDetails = $cusDetails;
-        $this->exemptionEngine = $exemptionEngine;
-        
-        
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -255,7 +250,6 @@ EOD;
         }
         
         $this->_addAdditional3DsElement($order);
-        $this->_addExemptionEngineElement($order);
        return $order;
     }
 
@@ -644,24 +638,6 @@ EOD;
             return $addisional3DsElement;
         }
     }
-    
-    
-    /**
-     * Add Exemption Engine data and its child tag to xml
-     * @param SimpleXMLElement $order 
-     */
-    protected function _addExemptionEngineElement($order)
-    {
-      
-        if($this->exemptionEngine['enabled']) {
-            $exemptionEngineElement = $order->addChild('exemption');
-            $exemptionEngineElement['placement'] = $this->exemptionEngine['placement'];
-            $exemptionEngineElement['type'] = $this->exemptionEngine['type'];
-            return $exemptionEngineElement;
-        }
-        
-    }
-    
 
     /**
      * @param SimpleXMLElement $element

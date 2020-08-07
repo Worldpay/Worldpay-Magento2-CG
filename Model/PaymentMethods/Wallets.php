@@ -43,7 +43,7 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-       if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isWalletsEnabled() && !$this->worlpayhelper->getsubscriptionStatus()) {
+       if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isWalletsEnabled()) {
          return true;
        }
        return false;

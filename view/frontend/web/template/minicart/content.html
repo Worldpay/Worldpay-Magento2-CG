@@ -52,22 +52,22 @@
                     "
                     translate="'Proceed to Checkout'"
                 />
-                <!-- ko if:getSubscriptionStatus() == false -->
+                
                 <if args="chromepayEnabled == 1">
                     <if args="chromePaymentMode == 'direct'">
-                        <br><br>
-                        <a class="action viewcart" data-bind="attr: {href: checkoutNowUrl}">
-                            <button 
-                                id="checkout-now"
-                                type="button"
-                                class="action primary checkout"
-                                data-action="close"
-                                data-bind="attr: {href: checkoutNowUrl, title: checkoutNowTitle}, text: checkoutNowTitle"
-                            />
-                        </a>
-                    </if>
-                </if>
-                <!-- /ko -->
+                <br><br>
+                <a class="action viewcart" data-bind="attr: {href: checkoutNowUrl}">
+                <button 
+                    id="checkout-now"
+                    type="button"
+                    class="action primary checkout"
+                    data-action="close"
+                    data-bind="attr: {href: checkoutNowUrl, title: checkoutNowTitle}, text: checkoutNowTitle"
+                />
+                </a>
+             </if>
+              </if>
+               
                 <div data-bind="html: getCartParam('extra_actions')"></div>
             </div>
         </div>

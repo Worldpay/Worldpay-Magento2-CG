@@ -197,30 +197,6 @@ define([
             var items = this.getCartParam('items') || [];
 
             return parseInt(items.length, 10);
-        },
-        
-        /**
-         * Returns subscription status of cart item
-         * @returns {Boolean}
-         */
-        getSubscriptionStatus: function(){
-            var i, o;
-            var cartItems = customerData.get('cart')().items;
-
-            var options = [];
-
-            for(i = 0; i < cartItems.length; i++) {
-                options = cartItems[i].options;
-
-                for(o = 0; o < options.length; o++) {
-                    var plan_id = cartItems[i].options[o].plan_id;
-
-                    if(plan_id) {
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
     });
 });

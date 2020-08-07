@@ -51,7 +51,9 @@ class Index extends \Magento\Framework\App\Action\Action
         $merchantName = $this->scopeConfig->getValue('worldpay/wallets_config/apple_pay_wallets_config/merchant_name', $storeScope);
         $domainName = $this->scopeConfig->getValue('worldpay/wallets_config/apple_pay_wallets_config/domain_name', $storeScope);
         
-      
+       // print_r($certificateKey);
+        //exit;
+        
         
          $validation_url = $_GET['u'];
          
@@ -89,7 +91,7 @@ class Index extends \Magento\Framework\App\Action\Action
         //define('PRODUCTION_COUNTRYCODE', 'GB');         // https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
         define('PRODUCTION_DISPLAYNAME', $domainName);
 
-        //define('DEBUG', 'true');
+        define('DEBUG', 'true');
         try {
           
             //$validation_url = "https://apple-pay-gateway-cert.apple.com/paymentservices/startSession";
@@ -98,7 +100,8 @@ class Index extends \Magento\Framework\App\Action\Action
 
         if( "https" == parse_url($validation_url, PHP_URL_SCHEME) && substr( parse_url($validation_url, PHP_URL_HOST), -10 )  == ".apple.com" ){
 
-               
+                //require_once ('apple_pay_conf.php');
+
                 // create a new cURL resource
                 $ch = curl_init();
 
@@ -128,4 +131,10 @@ class Index extends \Magento\Framework\App\Action\Action
     }
 
    
+
+   
+    public function getGrandTotalAfterUpdate()
+    {
+      
+    }
 }

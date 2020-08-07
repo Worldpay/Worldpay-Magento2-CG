@@ -17,8 +17,7 @@ define([
     'Magento_Customer/js/customer-data',
     'Magento_Checkout/js/action/set-billing-address',
     'Magento_Ui/js/model/messageList',
-    'mage/translate',
-    'Magento_Checkout/js/model/billing-address-postcode-validator'
+    'mage/translate'
 ],
 function (
     ko,
@@ -34,8 +33,7 @@ function (
     customerData,
     setBillingAddressAction,
     globalMessageList,
-    $t,
-     billingAddressPostcodeValidator
+    $t
 ) {
     'use strict';
 
@@ -59,13 +57,7 @@ function (
 
     return Component.extend({
         defaults: {
-            template: 'Magento_Checkout/billing-address',
-            actionsTemplate: 'Magento_Checkout/billing-address/actions',
-            formTemplate: 'Magento_Checkout/billing-address/form',
-            detailsTemplate: 'Magento_Checkout/billing-address/details',
-            links: {
-                isAddressFormVisible: '${$.billingAddressListProvider}:isNewAddressSelected'
-            }
+            template: 'Magento_Checkout/billing-address'
         },
         currentBillingAddress: quote.billingAddress,
         addressOptions: addressOptions,
@@ -79,7 +71,6 @@ function (
             quote.paymentMethod.subscribe(function () {
                 checkoutDataResolver.resolveBillingAddress();
             }, this);
-            billingAddressPostcodeValidator.initFields(this.get('name') + '.form-fields');
         },
 
         /**
@@ -241,5 +232,74 @@ function (
                   
         },
 
+        /**
+         * Edit address action
+         */
+        editAddress: function () {
+            lastSelectedBillingAddress = quote.billingAddress();
+            quote.billingAddress(null);
+            this.isAddressDetailsVisible(false);
+        },
+
+        /**
+         * Cancel address edit action
+         */
+        cancelAddressEdit: function () {
+            this.restoreBillingAddress();
+
+            if (quote.billingAddress()) {
+                // restore 'Same As Shipping' checkbox state
+                this.isAddressSameAsShipping(
+                    quote.billingAddress() != null &&
+                        quote.billingAddress().getCacheKey() == quote.shippingAddress().getCacheKey() && //eslint-disable-line
+                        !quote.isVirtual()
+                );
+                this.isAddressDetailsVisible(true);
+            }
+        },
+
+        /**
+         * Restore billing address
+         */
+        restoreBillingAddress: function () {
+            if (lastSelectedBillingAddress != null) {
+                selectBillingAddress(lastSelectedBillingAddress);
+            }
+        },
+
+        /**
+         * @param {Object} address
+         */
+        onAddressChange: function (address) {
+            this.isAddressFormVisible(address == newAddressOption); //eslint-disable-line eqeqeq
+        },
+
+        /**
+         * @param {Number} countryId
+         * @return {*}
+         */
+        getCountryName: function (countryId) {
+            return countryData()[countryId] != undefined ? countryData()[countryId].name : ''; //eslint-disable-line
+        },
+
+        /**
+         * Trigger action to update shipping and billing addresses
+         */
+        updateAddresses: function () {
+            if (window.checkoutConfig.reloadOnBillingAddress ||
+                !window.checkoutConfig.displayBillingOnPaymentMethod
+            ) {
+                setBillingAddressAction(globalMessageList);
+            }
+        },
+
+        /**
+         * Get code
+         * @param {Object} parent
+         * @returns {String}
+         */
+        getCode: function (parent) {
+            return _.isFunction(parent.getCode) ? parent.getCode() : 'shared';
+        }
     });
 });                                                                                                                            

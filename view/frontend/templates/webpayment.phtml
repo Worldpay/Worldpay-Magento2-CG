@@ -1,7 +1,5 @@
 <?php
 $param = $this->getRequest()->getParams();
-$storeCode = $block->getStoreCode();
-
 if (array_key_exists('chromepay', $param)) {
     ?>
     <script>
@@ -25,8 +23,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
 <script type="text/javascript">
     window.ChromepayButtonName = '<?= $block->getChromepayButtonName() ?>';
     window.ChromepayEnabled = '<?= $block->getChromepayEnabled() ?>';
-    window.ChromePaymentMode = '<?= $block->getPaymentMode() ?>';
-    window.SubscriptionStatus = '<?= $block->checkSubscriptionItems() ?>';</script>
+    window.ChromePaymentMode = '<?= $block->getPaymentMode() ?>';</script>
 
 <script>
     //Global variables
@@ -149,9 +146,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         var jsonReq = JSON.stringify(req);
         var totalsUrl;
         if (isCustomerLoggedIn) { //Api for logged inb customer
-            totalsUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/carts/mine/totals-information';
+            totalsUrl = baseUrl + 'rest/default/V1/carts/mine/totals-information';
         } else { // Api for guest customer
-            totalsUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/totals-information';
+            totalsUrl = baseUrl + 'rest/default/V1/guest-carts/' + guestMaskedQuoteId + '/totals-information';
         }
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", totalsUrl, false);
@@ -176,9 +173,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         var jsonReq = JSON.stringify(req);
         var apiUrl;
         if (isCustomerLoggedIn) { //Api for logged inb customer
-            apiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/carts/mine/estimate-shipping-methods';
+            apiUrl = baseUrl + 'rest/default/V1/carts/mine/estimate-shipping-methods';
         } else { // Api for guest customer
-            apiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/estimate-shipping-methods';
+            apiUrl = baseUrl + 'rest/default/V1/guest-carts/' + guestMaskedQuoteId + '/estimate-shipping-methods';
         }
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", apiUrl, false);
@@ -259,9 +256,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var apiUrl;
     var orderResponse;
     if (isCustomerLoggedIn) { //Api for logged in customer
-        apiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/carts/mine/shipping-information';
+        apiUrl = baseUrl + 'rest/default/V1/carts/mine/shipping-information';
     } else { // Api for guest customer
-        apiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/shipping-information';
+        apiUrl = baseUrl + 'rest/default/V1/guest-carts/' + guestMaskedQuoteId + '/shipping-information';
     }
     
     
@@ -387,9 +384,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var jsonPaymentDetails = JSON.stringify(paymentDetails);
     var orderApiUrl;
     if (isCustomerLoggedIn) { //Api for logged in customer
-    orderApiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/carts/mine/payment-information';
+    orderApiUrl = baseUrl + 'rest/default/V1/carts/mine/payment-information';
     } else { // Api for guest customer
-    orderApiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/order';
+    orderApiUrl = baseUrl + 'rest/default/V1/guest-carts/' + guestMaskedQuoteId + '/order';
     }
 
     var xhttp = new XMLHttpRequest();

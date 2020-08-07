@@ -5,37 +5,29 @@ use Sapient\Worldpay\Model\Config\Source\HppIntegration as HPPI;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    protected $_scopeConfig;
-    protected $wplogger;
-    const MERCHANT_CONFIG = 'worldpay/merchant_config/';
-    const INTEGRATION_MODE = 'worldpay/cc_config/integration_mode';
-        
-    /**
-     * @var \Sapient\Worldpay\Helper\Recurring
-     */
-    private $recurringHelper;
+	protected $_scopeConfig;
+	protected $wplogger;
+	const MERCHANT_CONFIG = 'worldpay/merchant_config/';
+	const INTEGRATION_MODE = 'worldpay/cc_config/integration_mode';
 
-
-    public function __construct(
-            \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
-            \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-            \Magento\Framework\Locale\CurrencyInterface $localeCurrency,
-            \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist,
-            \Sapient\Worldpay\Helper\Merchantprofile $merchantprofile,
-            \Magento\Checkout\Model\Session $checkoutSession,
-            \Magento\Sales\Model\OrderFactory $orderFactory,
-            \Sapient\Worldpay\Helper\Recurring $recurringHelper
-    )
-    {
-            $this->_scopeConfig = $scopeConfig;
-            $this->wplogger = $wplogger;
-            $this->paymentlist = $paymentlist;
-            $this->localecurrency = $localeCurrency;
-            $this->merchantprofile = $merchantprofile;
-            $this->_checkoutSession = $checkoutSession;
-            $this->orderFactory = $orderFactory;
-            $this->recurringHelper = $recurringHelper;
-    }
+	public function __construct(
+		\Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+		\Magento\Framework\Locale\CurrencyInterface $localeCurrency,
+		\Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist,
+		\Sapient\Worldpay\Helper\Merchantprofile $merchantprofile,
+		\Magento\Checkout\Model\Session $checkoutSession,
+		\Magento\Sales\Model\OrderFactory $orderFactory
+	)
+	{
+		$this->_scopeConfig = $scopeConfig;
+		$this->wplogger = $wplogger;
+		$this->paymentlist = $paymentlist;
+		$this->localecurrency = $localeCurrency;
+		$this->merchantprofile = $merchantprofile;
+		$this->_checkoutSession = $checkoutSession;
+		$this->orderFactory = $orderFactory;
+	}
 	public function isWorldPayEnable()
 	{
 		return (bool) $this->_scopeConfig->getValue('worldpay/general_config/enable_worldpay', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
@@ -225,8 +217,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	public function getIntegrationModelByPaymentMethodCode($paymentMethodCode, $storeId)
 	{
 
-		if($paymentMethodCode == 'worldpay_cc' || $paymentMethodCode == 'worldpay_moto' || $paymentMethodCode == 'worldpay_cc_vault' ||
-                    $paymentMethodCode == 'worldpay_wallets'){
+		if($paymentMethodCode == 'worldpay_cc' || $paymentMethodCode == 'worldpay_moto' || $paymentMethodCode == 'worldpay_cc_vault'){
 			return $this->_scopeConfig->getValue(self::INTEGRATION_MODE, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 		}else{
 			return 'redirect';
@@ -544,13 +535,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     
     public function getCountryCodeSpoofs() {
         return $this->_scopeConfig->getValue('worldpay/general_config/country_code_spoof', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-    }
-    
-    public function getsubscriptionStatus(){
-        if ($this->recurringHelper->quoteContainsSubscription($this->_checkoutSession->getQuote())) {
-            return true;
-        }
-        return false;
     }
 }
 

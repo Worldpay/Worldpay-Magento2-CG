@@ -80,36 +80,4 @@
             <argument name="code" xsi:type="const">Sapient\Worldpay\Model\WorldpayConfigProvider::CC_VAULT_CODE</argument>
         </arguments>
     </virtualType>
-    
-    <!-- Worldpay Subscription Settings -->
-    <virtualType name="Magento\Catalog\Pricing\Price\Pool" type="Magento\Framework\Pricing\Price\Pool">
-        <arguments>
-            <argument name="prices" xsi:type="array">
-                <item name="worldpay_subscription_price" xsi:type="string">Sapient\Worldpay\Model\Pricing\Price\PlanPrice</item>
-            </argument>
-        </arguments>
-    </virtualType>
-    <type name="Magento\Catalog\Helper\Product\Configuration">
-        <plugin name="worldpay_payment" type="Sapient\Worldpay\Helper\Product\Configuration\Plugin" sortOrder="100"/>
-    </type>
-    
-    <type name="Magento\Catalog\Model\Product">
-        <plugin name="worldpay_payment" type="Sapient\Worldpay\Model\ProductPlugin" sortOrder="100"/>
-    </type>
-    <type name="Magento\Catalog\Model\Product\Type\Simple">
-        <plugin name="worldpay_payment" type="Sapient\Worldpay\Model\Product\Type\SimplePlugin" sortOrder="100"/>
-    </type>
-    <type name="Magento\Catalog\Model\Product\Type\Virtual">
-        <plugin name="worldpay_payment" type="Sapient\Worldpay\Model\Product\Type\SimplePlugin" sortOrder="100"/>
-    </type>
-    
-    <type name="Magento\Sales\Block\Order\Email\Items\DefaultItems">
-        <plugin name="worldpay_payment" type="Sapient\Worldpay\Block\Sales\Order\Email\Items\DefaultItemsPlugin" sortOrder="100"/>
-    </type>
-    <type name="Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder">
-        <plugin name="worldpay_payment" type="Sapient\Worldpay\Block\Sales\Order\Email\Items\Order\DefaultOrderPlugin" sortOrder="100"/>
-    </type> 
-    <type name="Magento\Sales\Block\Order\Item\Renderer\DefaultRenderer">
-        <plugin name="worldpay_payment" type="Sapient\Worldpay\Block\Sales\Order\Item\Renderer\DefaultRendererPlugin" sortOrder="100"/>
-    </type>
 </config>

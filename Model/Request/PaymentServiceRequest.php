@@ -96,8 +96,7 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $directOrderParams['saveCardEnabled'],
             $directOrderParams['tokenizationEnabled'],
             $directOrderParams['storedCredentialsEnabled'],
-            $directOrderParams['cusDetails'],
-            $directOrderParams['exemptionEngine']
+            $directOrderParams['cusDetails']
         );
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
@@ -139,8 +138,7 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $tokenOrderParams['saveCardEnabled'],
             $tokenOrderParams['tokenizationEnabled'],
             $tokenOrderParams['storedCredentialsEnabled'],
-            $tokenOrderParams['cusDetails'],
-            $tokenOrderParams['exemptionEngine']
+            $tokenOrderParams['cusDetails']
         );
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
