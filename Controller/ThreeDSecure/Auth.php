@@ -43,6 +43,11 @@ class Auth extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {        
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/3ds.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('Step1 - Log before receiving PAReq from Worldpay');
+		
         $threeDSecureChallengeParams = $this->checkoutSession->get3Ds2Params();
         $threeDSecureChallengeConfig = $this->checkoutSession->get3DS2Config();
         $orderId = $this->checkoutSession->getAuthOrderId();
@@ -51,6 +56,7 @@ class Auth extends \Magento\Framework\App\Action\Action
             $iframe = true;
         }
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
+			$logger->info('3DS parameters--'.print_r($redirectData->getData(),true));
             print_r('
                 <form name="theForm" id="form" method="POST" action='.$redirectData->getUrl().'>
                     <input type="hidden" name="PaReq" value='.$redirectData->getPaRequest().' />

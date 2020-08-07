@@ -52,13 +52,21 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
     }
     public function continuePost3dSecureAuthorizationProcess($paResponse, $directOrderParams, $threeDSecureParams)
     {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/3ds.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('Step-3');
+        $logger->info('Pay response'.print_r($paResponse,true));
+        
         $directOrderParams['paResponse'] = $paResponse;
         $directOrderParams['echoData'] = $threeDSecureParams->getEchoData();
         // @setIs3DSRequest flag set to ensure whether it is 3DS request or not.
         // To add cookie for 3DS second request.
         $this->checkoutSession->setIs3DSRequest(true);
         try {
+            $logger->info('Trying to send request to worldpay');
             $response = $this->paymentservicerequest->order3DSecure($directOrderParams);
+            $logger->info('Response--'.print_r($response,true));
             $this->response = $this->directResponse->setResponse($response);
             // @setIs3DSRequest flag is unset from checkout session.
             $this->checkoutSession->unsIs3DSRequest();

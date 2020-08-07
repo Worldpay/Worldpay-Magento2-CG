@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Cron;
+
 use \Magento\Framework\App\ObjectManager;
 use \Magento\Sales\Model\ResourceModel\Order\CollectionFactoryInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
@@ -11,7 +12,8 @@ use Exception;
 /**
  * Model for order sync status based on configuration set by admin
  */
-class OrderSyncStatus {
+class OrderSyncStatus
+{
 
     /**
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
@@ -37,7 +39,8 @@ class OrderSyncStatus {
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      */
-    public function __construct(JsonFactory $resultJsonFactory,
+    public function __construct(
+        JsonFactory $resultJsonFactory,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
@@ -52,7 +55,6 @@ class OrderSyncStatus {
         $this->orderservice = $orderservice;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->worldpaytoken = $worldpaytoken;
-
     }
 
     /**
@@ -62,10 +64,10 @@ class OrderSyncStatus {
     {
         $this->_logger->info('Orders sync status executed on - '.date('Y-m-d H:i:s'));
         $orderIds = $this->getOrderIds();
-        
+        //echo "<pre>"; print_r($orderIds);exit;
         if (!empty($orderIds)) {
             foreach ($orderIds as $order) {
-                $this->_loadOrder($order);
+                $this->_loadOrder($order['entity_id']);
                 $this->createSyncRequest();
             }
         }
@@ -79,13 +81,25 @@ class OrderSyncStatus {
      */
     public function getOrderIds()
     {
-        // Complete order status for downloadable products
-        $orderStatus = array('pending','processing','complete');
+        $curdate = date("Y-m-d H:i:s");
+        $maxDate = strtotime(date("Y-m-d H:i:s", strtotime($curdate)) . " -1 hour");
+        $cronMaxDate = date('Y-m-d H:i:s', $maxDate);
+        
+        $minDate = strtotime(date("Y-m-d H:i:s", strtotime($curdate)) . " -24 hour");        
+        $cronMinDate = date('Y-m-d H:i:s', $minDate);
+        
+        $status = $this->worldpayhelper->getSyncOrderStatus();
+        $orderStatus = explode(',', $status);
         $orders = $this->getOrderCollectionFactory()->create();
         $orders->distinct(true);
-        $orders->addFieldToSelect(array('entity_id','increment_id','created_at'));
-        $orders->addFieldToFilter('main_table.status', array('in' => $orderStatus));
-        $orderIds = array_reduce($orders->getItems(), array($this, '_filterOrder'));
+        $orders->addFieldToSelect(['entity_id','increment_id','created_at']);
+        $orders->addFieldToFilter('main_table.status', ['in' => $orderStatus]);
+        $orders->addFieldToFilter('main_table.created_at', ['lteq' => $cronMaxDate]);
+        $orders->addFieldToFilter('main_table.created_at', ['gteq' => $cronMinDate]);
+        $orders->join(['wp' => 'worldpay_payment'], 'wp.order_id=main_table.increment_id', '');
+        $orders->join(['og' => 'sales_order_grid'], 'og.entity_id=main_table.entity_id', '');
+        
+        $orderIds = $orders->getData();
         return $orderIds;
     }
 
@@ -100,72 +114,15 @@ class OrderSyncStatus {
         }
         return $this->orderCollectionFactory;
     }
-
-    /**
-     * Returns orders have creation date exceeded the allowed limit
-     *
-     * @param array $carry Result of previous filter call
-     * @param \Magento\Sales\Model\Order
-     *
-     * @return array List of order IDs
-     */       
-    protected function _filterOrder($carry, \Magento\Sales\Model\Order $order)
-    {
-        if ($this->getCreationDate($order) > $this->getLimitDateForMethod()) {
-            $carry[] = $order->getEntityId();
-        }
-        return $carry;
-    }
-
-    /**
-     * Computes the latest valid date
-     *
-     * @return DateTime
-     */
-    protected function getLimitDateForMethod()
-    {
-        $timelimit = 24;
-        $date = new \DateTime('now');
-        $interval = new  \DateInterval(sprintf('PT%dH', $timelimit));
-        $date->sub($interval);
-        return $date;
-    }
-
-    /**
-     * @param \Magento\Sales\Model\Order $order
-     *
-     * @return float|mixed
-     */
-    protected function getCreationDate(\Magento\Sales\Model\Order $order)
-    {
-        return \DateTime::createFromFormat('Y-m-d H:i:s', $order->getData('created_at'));
-    }
-
-    /**
-     * Computes the latest valid date
-     *@return DateTime
-     */
-    protected function getLimitDate()
-    {
-        $cleanUpInterval = $this->worldpayhelper->orderCleanUpInterval();
-        $date = new \DateTime('now');
-        $interval = new  \DateInterval(sprintf('PT%dH', $cleanUpInterval));
-        $date->sub($interval);
-        return $date;
-    }
     
     private function _loadOrder($orderId)
     {
         $this->_orderId = $orderId;
         $this->_order = $this->orderservice->getById($this->_orderId);
     }
-    
-    /**
-     * Computes the latest valid date
-     *@return DateTime
-     */
-    
-    public function createSyncRequest(){
+
+    public function createSyncRequest()
+    {
         try {
             $this->_fetchPaymentUpdate();
             $this->_registerWorldPayModel();
@@ -173,11 +130,11 @@ class OrderSyncStatus {
             $this->_applyTokenUpdate();
         } catch (Exception $e) {
             $this->_logger->error($e->getMessage());
-             if ($e->getMessage() == 'same state') {
+            if ($e->getMessage() == 'same state') {
                 $this->_logger->error('Payment synchronized successfully!!');
-             } else {
-                 $this->_logger->error('Synchronising Payment Status failed: ' . $e->getMessage());
-             }
+            } else {
+                $this->_logger->error('Synchronising Payment Status failed: ' . $e->getMessage());
+            }
         }
         return true;
     }
@@ -197,9 +154,9 @@ class OrderSyncStatus {
     private function _applyPaymentUpdate()
     {
         try {
-            $this->_paymentUpdate->apply($this->_order->getPayment(),$this->_order);
+            $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
         } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+            throw new \Magento\Framework\Exception\LocalizedException($e->getMessage());
         }
     }
 
@@ -207,6 +164,4 @@ class OrderSyncStatus {
     {
         $this->worldpaytoken->updateOrInsertToken($this->_tokenState, $this->_order->getPayment());
     }
-
-
 }

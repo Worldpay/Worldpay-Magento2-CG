@@ -104,6 +104,7 @@ class WorldpayToken
      */
     public function updateOrInsertToken(TokenStateInterface $tokenState, $paymentObject)
     {
+		$this->wplogger->info('Step-13 came to updateOrInsertToken method');
         if (!$tokenState->getTokenCode()) {
             return;
         }
@@ -135,15 +136,21 @@ class WorldpayToken
             if($binNumber){
                 $tokenModel->setBinNumber($tokenState->getBin());
             }
+			$this->wplogger->info('Step-14 before saving data to db');
             $tokenModel->save();
+			$this->wplogger->info('Step-15 after saving data to db');
             $tokenModel->getResource()->commit();
             if ('worldpay_cc' == $paymentObject->getMethod()) {
+				$this->wplogger->info('Step-16 updating vault details');
                 // vault and instant purchase configuration goes here
-                $this->_updateToVault($tokenState, $paymentObject);
+                // $this->_updateToVault($tokenState, $paymentObject);
+				// $this->wplogger->info('Step-17 after updating of vault details');
             }
         } catch (\Exception $e) {
+			$this->wplogger->info('Step-18 fall to exception');
             $tokenEvent = $tokenState->getTokenEvent();
             if($tokenEvent == 'CONFLICT'){
+				$this->wplogger->info('Step-19 token got conflicted');
                 $this->wplogger->error('Duplicate Entry, This card number is already saved.');
             } else {
                 $this->wplogger->error($e->getMessage());

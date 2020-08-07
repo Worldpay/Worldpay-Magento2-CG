@@ -56,6 +56,8 @@ class UpdateWorldpayment
      */
     public function updateWorldpayPayment(\Sapient\Worldpay\Model\Response\DirectResponse $directResponse, \Magento\Payment\Model\InfoInterface $paymentObject, $disclaimerFlag = null)
     {  
+		$this->wplogger->info('Step-1 came to updateWorldpayPayment, with response');
+		$this->wplogger->info(print_r($directResponse->getXml(), true));
         $responseXml=$directResponse->getXml();
         $merchantCode = $responseXml['merchantCode'];
         $orderStatus = $responseXml->reply->orderStatus;
@@ -98,15 +100,22 @@ class UpdateWorldpayment
         $wpp->setData('aav_telephone_result_code',$payment->AAVTelephoneResultCode['description']);
         $wpp->setData('aav_email_result_code',$payment->AAVEmailResultCode['description']);
         $wpp->save();
+		
+		$this->wplogger->info('Step-2 saved data to db');
         
         if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
+			$this->wplogger->info('Step-3 customer session is active and order having token data');
+			$this->wplogger->info(print_r($orderStatus->token, true));
                 $this->customerSession->unsIsSavedCardRequested();
                 $tokenNodeWithError = $orderStatus->token->xpath('//error');
+				$this->wplogger->info('Step-4 token node '. print_r($tokenNodeWithError, true));
                 if (!$tokenNodeWithError) {
+					$this->wplogger->info('Step-5 token node without any error');
                     $tokenElement = $orderStatus->token;
                     $this->saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag);
+					$this->wplogger->info('Step-6 saving token data in to db');
                     // vault and instant purchase configuration goes here
-                    $paymentToken = $this->getVaultPaymentToken($tokenElement);
+                    // $paymentToken = $this->getVaultPaymentToken($tokenElement);
                     if (null !== $paymentToken) {
                         $extensionAttributes = $this->getExtensionAttributes($paymentObject);
                         $extensionAttributes->setVaultPaymentToken($paymentToken);
@@ -123,12 +132,16 @@ class UpdateWorldpayment
      */
     public function saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag=null)
     {
+		$this->wplogger->info('Step-7 came to saveTokenData method');
         $savedTokenFactory = $this->savedTokenFactory->create();
         // checking tokenization exist or not
             $tokenDataExist = $savedTokenFactory->getCollection()
                 ->addFieldToFilter('customer_id', $tokenElement[0]->authenticatedShopperID[0])
                 ->addFieldToFilter('token_code', $tokenElement[0]->tokenDetails[0]->paymentTokenID[0])
                 ->getFirstItem()->getData();
+		$this->wplogger->info('Step-8 check token data already exist or not');
+		$this->wplogger->info(print_r($tokenDataExist, true));
+		$this->wplogger->info('token Id ---'.print_r($tokenElement[0]->tokenDetails[0]->paymentTokenID[0], true));
         // checking storedcredentials exist or not
 //        if($storedCredentialsElement){
 //            $storedCredentialsDataExist = $savedTokenFactory->getCollection()
@@ -137,6 +150,7 @@ class UpdateWorldpayment
 //                ->getFirstItem()->getData();
 //        }
         if (empty($tokenDataExist)) {
+			$this->wplogger->info('Step-9 if token data not exist');
             if($payment->schemeResponse){
                 $savedTokenFactory->setTransactionIdentifier($payment->schemeResponse[0]->transactionIdentifier[0]);
             }
@@ -164,8 +178,11 @@ class UpdateWorldpayment
             if($disclaimerFlag){
                 $savedTokenFactory->setDisclaimerFlag($disclaimerFlag);
             }
+			$this->wplogger->info('Step-10 token data saving before');
             $savedTokenFactory->save();
+			$this->wplogger->info('Step-11 token data saving after');
         } else {
+			$this->wplogger->info('Step-12 if token data already exist');
             $this->_messageManager->addNotice(__("You already appear to have this card number stored, if your card details have changed, you can update these via the 'my cards' section"));
             return;
         }

@@ -42,11 +42,18 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/3ds.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
         $threeDSecureParams = $this->checkoutSession->get3DSecureParams();
         $this->checkoutSession->unsDirectOrderParams();
         $this->checkoutSession->uns3DSecureParams();
         try {
+            $logger->info('Step2 - Logging the action before forming the PARes');
+            $logger->info('Pay response --'.print_r($this->getRequest()->getParam('PaRes'),true));
+            $logger->info('Direct order parameters --'.print_r($directOrderParams,true));
             $this->threedsredirectresponse->continuePost3dSecureAuthorizationProcess(
                 $this->getRequest()->getParam('PaRes'), $directOrderParams, $threeDSecureParams
             );

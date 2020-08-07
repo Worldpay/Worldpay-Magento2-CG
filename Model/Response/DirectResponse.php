@@ -18,11 +18,18 @@ class DirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
      */
     public function get3dSecureParams()
     {
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/3ds.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('Step3 - Log received xml of 3ds form submit');
         $xml = $this->getXml();
+		$logger->info(print_r($xml, true));
 
         if ($xml && ($request = $xml->xpath('reply/orderStatus/requestInfo/request3DSecure'))) {
+			$logger->info('3d secure info from xml--'.print_r($request, true));
             $request = $request[0];
             $echoData = $xml->xpath('reply/orderStatus/echoData');
+			$logger->info('echoData info from xml--'.print_r($echoData, true));
             return new \Magento\Framework\DataObject(array('url' => "$request->issuerURL", 'pa_request' => "$request->paRequest", 'echo_data' => (string) $echoData[0]));
         }
     }
