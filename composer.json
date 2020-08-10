@@ -9,7 +9,7 @@
       "magento/module-quote": ">=100.0.0",
       "magento/module-vault": ">=100.0.0"
    },
-   "version": "release-2.1.7",
+   "version": "2.1.7-p1",
    "license":"proprietary",
    "autoload":{
       "files":[
