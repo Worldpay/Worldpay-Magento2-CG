@@ -115,11 +115,12 @@ class UpdateWorldpayment
                     $this->saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag);
 					$this->wplogger->info('Step-6 saving token data in to db');
                     // vault and instant purchase configuration goes here
-                    // $paymentToken = $this->getVaultPaymentToken($tokenElement);
-                    if (null !== $paymentToken) {
-                        $extensionAttributes = $this->getExtensionAttributes($paymentObject);
-                        $extensionAttributes->setVaultPaymentToken($paymentToken);
-                    }
+                    //$paymentToken = $this->getVaultPaymentToken($tokenElement);
+					$this->wplogger->info('Step-17 after updating of vault details');
+                    //if (null !== $paymentToken) {
+                        //$extensionAttributes = $this->getExtensionAttributes($paymentObject);
+                        //$extensionAttributes->setVaultPaymentToken($paymentToken);
+                    //}
                 }
             }
         }
