@@ -59,22 +59,26 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
         $logger->info('Pay response'.print_r($paResponse,true));
         
         $directOrderParams['paResponse'] = $paResponse;
-        $directOrderParams['echoData'] = $threeDSecureParams->getEchoData();
+        if(!empty($threeDSecureParams) && $threeDSecureParams->getEchoData()){
+            $directOrderParams['echoData'] = $threeDSecureParams->getEchoData();
+        }
         // @setIs3DSRequest flag set to ensure whether it is 3DS request or not.
         // To add cookie for 3DS second request.
         $this->checkoutSession->setIs3DSRequest(true);
         try {
             $logger->info('Trying to send request to worldpay');
-            $response = $this->paymentservicerequest->order3DSecure($directOrderParams);
-            $logger->info('Response--'.print_r($response,true));
-            $this->response = $this->directResponse->setResponse($response);
-            // @setIs3DSRequest flag is unset from checkout session.
-            $this->checkoutSession->unsIs3DSRequest();
-            $orderIncrementId = current(explode('-', $directOrderParams['orderCode']));
-            $this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
-            $this->_paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml($this->response->getXml());
-            $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
-            $this->_abortIfPaymentError($this->_paymentUpdate);
+			if(isset($directOrderParams['echoData'])){
+				$response = $this->paymentservicerequest->order3DSecure($directOrderParams);
+				$logger->info('Response--'.print_r($response,true));
+				$this->response = $this->directResponse->setResponse($response);
+				// @setIs3DSRequest flag is unset from checkout session.
+				$this->checkoutSession->unsIs3DSRequest();
+				$orderIncrementId = current(explode('-', $directOrderParams['orderCode']));
+				$this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
+				$this->_paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml($this->response->getXml());
+				$this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
+				$this->_abortIfPaymentError($this->_paymentUpdate);
+			}
         } catch (Exception $e) {
             $this->wplogger->info($e->getMessage());
             $this->_messageManager->addError(__($e->getMessage()));

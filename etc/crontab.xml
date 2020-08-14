@@ -7,7 +7,7 @@
     </group>
     <group id="worldpay_orders">
         <job name="order_sync_status" instance="Sapient\Worldpay\Cron\OrderSyncStatus" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/59 * * * *</schedule>
         </job>
     </group>
 </config>

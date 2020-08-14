@@ -64,7 +64,6 @@ class OrderSyncStatus
     {
         $this->_logger->info('Orders sync status executed on - '.date('Y-m-d H:i:s'));
         $orderIds = $this->getOrderIds();
-        //echo "<pre>"; print_r($orderIds);exit;
         if (!empty($orderIds)) {
             foreach ($orderIds as $order) {
                 $this->_loadOrder($order['entity_id']);
@@ -82,14 +81,13 @@ class OrderSyncStatus
     public function getOrderIds()
     {
         $curdate = date("Y-m-d H:i:s");
-        $maxDate = strtotime(date("Y-m-d H:i:s", strtotime($curdate)) . " -1 hour");
+        $maxDate = strtotime(date("Y-m-d H:i:s", strtotime($curdate)) . " -30 min");
         $cronMaxDate = date('Y-m-d H:i:s', $maxDate);
         
         $minDate = strtotime(date("Y-m-d H:i:s", strtotime($curdate)) . " -24 hour");        
         $cronMinDate = date('Y-m-d H:i:s', $minDate);
         
-        $status = $this->worldpayhelper->getSyncOrderStatus();
-        $orderStatus = explode(',', $status);
+        $orderStatus = array('pending','processing','complete');
         $orders = $this->getOrderCollectionFactory()->create();
         $orders->distinct(true);
         $orders->addFieldToSelect(['entity_id','increment_id','created_at']);
