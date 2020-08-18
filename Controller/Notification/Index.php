@@ -36,7 +36,8 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
      */
-    public function __construct(Context $context,
+    public function __construct(
+        Context $context,
         JsonFactory $resultJsonFactory,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
@@ -109,7 +110,8 @@ class Index extends \Magento\Framework\App\Action\Action
     {
         $this->wplogger->info('########## Received notification ##########');
         $this->wplogger->info($this->_getRawBody());
-        $this->wplogger->info('########## Payment update of type: ' . get_class($this->_paymentUpdate). ' created ##########');
+        $this->wplogger->info('########## Payment update of type: ' .
+                get_class($this->_paymentUpdate). ' created ##########');
     }
 
     /**
@@ -129,7 +131,9 @@ class Index extends \Magento\Framework\App\Action\Action
             $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
         } catch (Exception $e) {
             $this->wplogger->error($e->getMessage());
-            throw new Exception($e->getMessage());
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($e->getMessage())
+            );
         }
     }
 
@@ -138,9 +142,13 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     private function _applyTokenUpdate($xmlRequest)
     {
+        $this->wplogger->info('##########_applyTokenUpdate##########');
+        $this->wplogger->info($this->_order->getOrder()->getCustomerId());
         $tokenService = $this->worldpaytoken;
         $tokenService->updateOrInsertToken(
-             new \Sapient\Worldpay\Model\Token\StateXml($xmlRequest), $this->_order->getPayment()
+            new \Sapient\Worldpay\Model\Token\StateXml($xmlRequest),
+            $this->_order->getPayment(),
+            $this->_order->getOrder()->getCustomerId()
         );
     }
 
@@ -175,8 +183,8 @@ class Index extends \Magento\Framework\App\Action\Action
                 $paymentStatus=$statusNode->payment->lastEvent;
         }
         $hn = $this->historyNotification->create();
-        $hn->setData('status',$paymentStatus);
-        $hn->setData('order_id',trim($orderCode));
+        $hn->setData('status', $paymentStatus);
+        $hn->setData('order_id', trim($orderCode));
         $hn->save();
     }
 }

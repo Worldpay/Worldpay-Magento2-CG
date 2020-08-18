@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Token;
+
 /**
  * read from WP's token update response
  */
@@ -43,8 +44,6 @@ class StateXml implements \Sapient\Worldpay\Model\Token\StateInterface
         if (isset($this->_orderStatusNode->payment)) {
             $this->_paymentNode = $this->_orderStatusNode->payment;
         }
-
-
     }
 
     /**

@@ -30,7 +30,7 @@ class Validator extends \Magento\Framework\Validator\AbstractValidator
             $this->addErrorMessage($messages, 'The value "%fieldName" is a required field.', ['fieldName' => 'Code']);
         }
 
-        if (!\Zend_Validate::is(trim($value->getCode()), 'StringLength', ['min' => 0, 'max' => self::CODE_MAX_LENGTH])) {
+        if (!\Zend_Validate::is(trim($value->getCode()), 'StringLength', ['min'=>0,'max' => self::CODE_MAX_LENGTH])) {
             $this->addErrorMessage(
                 $messages,
                 'The length of value "%fieldName" must not exceed %maxValue.',
@@ -47,7 +47,7 @@ class Validator extends \Magento\Framework\Validator\AbstractValidator
             );
         }
 
-        if (!\Zend_Validate::is(trim($value->getName()), 'StringLength', ['min' => 0, 'max' => self::NAME_MAX_LENGTH])) {
+        if (!\Zend_Validate::is(trim($value->getName()), 'StringLength', ['min'=>0, 'max' => self::NAME_MAX_LENGTH])) {
             $this->addErrorMessage(
                 $messages,
                 'The length of value "%fieldName" must not exceed %maxValue.',
@@ -62,7 +62,7 @@ class Validator extends \Magento\Framework\Validator\AbstractValidator
 
         /* Start Date is required */
         if (!\Zend_Validate::is(trim($value->getStartDate()), 'NotEmpty')) {
-            $this->addErrorMessage($messages, 'The value "%fieldName" is a required field.', ['fieldName' => 'Start Date']);
+            $this->addErrorMessage($messages, 'The value "%fields" is a required field', ['fields'=>'Start Date']);
         }
 
         /* End Date is required */

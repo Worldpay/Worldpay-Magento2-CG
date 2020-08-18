@@ -13,7 +13,7 @@ class Savedcard extends \Magento\Framework\View\Element\Template
     /**
      * @var \Magento\Customer\Model\Session
      */
-	protected $_customerSession;
+    protected $_customerSession;
     /**
      * constructor
      *
@@ -22,16 +22,17 @@ class Savedcard extends \Magento\Framework\View\Element\Template
      * @param \Magento\Customer\Model\Session $customerSession
      * @param array $data
      */
-  	public function __construct(
+    public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Sapient\Worldpay\Model\SavedTokenFactory $savecard,
         \Magento\Customer\Model\Session $customerSession,
+        \Sapient\Worldpay\Helper\Data $worldpayhelper,
         array $data = []
     ) {
         $this->_savecard = $savecard;
         $this->_customerSession = $customerSession;
-       	parent::__construct($context, $data);
-
+        $this->worlpayhelper = $worldpayhelper;
+           parent::__construct($context, $data);
     }
 
     /**
@@ -39,21 +40,23 @@ class Savedcard extends \Magento\Framework\View\Element\Template
      */
     public function getSavedCard()
     {
-
-  		if (!($customerId = $this->_customerSession->getCustomerId())) {
+        if (!($customerId = $this->_customerSession->getCustomerId())) {
             return false;
         }
-   		return $savedCardCollection = $this->_savecard->create()->getCollection()
-   	 				    ->addFieldToSelect(array('card_brand','card_number',
-                                                'cardholder_name','card_expiry_month','card_expiry_year',
-                                                'transaction_identifier', 'token_code'))
-   	 				    ->addFieldToFilter('customer_id', array('eq' => $customerId)); ;
-   }
+        $merchantTokenEnabled = $this->worlpayhelper->getMerchantTokenization();
+        $tokenType = $merchantTokenEnabled ? 'merchant' : 'shopper';
+        return $savedCardCollection = $this->_savecard->create()->getCollection()
+                                    ->addFieldToSelect(['card_brand','card_number',
+                                        'cardholder_name','card_expiry_month','card_expiry_year',
+                                        'transaction_identifier', 'token_code'])
+                                    ->addFieldToFilter('customer_id', ['eq' => $customerId])
+                                    ->addFieldToFilter('token_type', ['eq' => $tokenType]);
+    }
 
    /**
-     * @param \Sapient\Worldpay\Model\SavedToken $saveCard
-     * @return string
-     */
+    * @param \Sapient\Worldpay\Model\SavedToken $saveCard
+    * @return string
+    */
     public function getDeleteUrl($saveCard)
     {
         return $this->getUrl('worldpay/savedcard/delete', ['id' => $saveCard->getId()]);

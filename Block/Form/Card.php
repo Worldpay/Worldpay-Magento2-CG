@@ -19,7 +19,7 @@ class Card extends \Magento\Payment\Block\Form
      * @param \Magento\Payment\Helper\Data $paymentHelper,
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper,
      * @param \Magento\Framework\Registry $registry
-     * @param \Magento\Backend\Model\Session\Quote $session,     
+     * @param \Magento\Backend\Model\Session\Quote $session,
      * @param array $data
      */
     public function __construct(
@@ -31,6 +31,7 @@ class Card extends \Magento\Payment\Block\Form
         \Magento\Backend\Model\Session\Quote $session,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Payment\PaymentTypes $paymenttypes,
+        \Sapient\Worldpay\Model\Payment\LatAmInstalTypes $latamtypes,
         \Magento\Backend\Model\Session\Quote $adminsessionquote,
         array $data = []
     ) {
@@ -39,6 +40,7 @@ class Card extends \Magento\Payment\Block\Form
         $this->_coreRegistry = $registry;
         $this->adminquotesession = $session;
         $this->worldpayhelper = $worldpayhelper;
+        $this->latamtypes = $latamtypes;
         $this->wplogger = $wplogger;
         $this->paymenttypes = $paymenttypes;
         $this->adminsessionquote = $adminsessionquote;
@@ -74,9 +76,9 @@ class Card extends \Magento\Payment\Block\Form
     {
         $savedcardlists = $this->configProvider->getSaveCardListForAdminOrder($this->getCustomerId());
         $lookuppaymenttypes = $this->getLookUpPaymentTypes();
-        $filterccards =  array();
-        foreach($savedcardlists as $savedcardlist){
-            if(in_array($savedcardlist['method'], $lookuppaymenttypes)){
+        $filterccards =  [];
+        foreach ($savedcardlists as $savedcardlist) {
+            if (in_array($savedcardlist['method'], $lookuppaymenttypes)) {
                 $filterccards[] = $savedcardlist;
             }
         }
@@ -91,18 +93,18 @@ class Card extends \Magento\Payment\Block\Form
     {
         $cctypes = $this->configProvider->getCcTypes(self::MOTO_CONFIG);
         $lookuppaymenttypes = $this->getLookUpPaymentTypes();
-        $filtercctypes =  array();
-        if(!empty($lookuppaymenttypes)){
-            foreach($cctypes as $k => $cctype){
-                if($k != 'savedcard'){
-                    if(in_array($k, $lookuppaymenttypes)){
+        $filtercctypes =  [];
+        if (!empty($lookuppaymenttypes)) {
+            foreach ($cctypes as $k => $cctype) {
+                if ($k != 'savedcard') {
+                    if (in_array($k, $lookuppaymenttypes)) {
                         $filtercctypes[$k] = $cctype;
                     }
-                }else{
+                } else {
                     $filtercctypes[$k] = $cctype;
                 }
             }
-        }else{
+        } else {
             $filtercctypes = $lookuppaymenttypes;
         }
         return $filtercctypes;
@@ -117,6 +119,44 @@ class Card extends \Magento\Payment\Block\Form
     {
         $integrationmode = $this->getIntegrationMode();
         return $integrationmode === 'direct';
+    }
+    
+    public function isRedirectIntegration()
+    {
+        $integrationmode = $this->getIntegrationMode();
+        return $integrationmode === 'redirect';
+    }
+    
+    public function cpfEnabled()
+    {
+        $adminQuote = $this->adminsessionquote->getQuote();
+        $address = $adminQuote->getBillingAddress();
+        $countryId = $address->getCountryId();
+        if ($countryId == 'BR') {
+            return $this->worldpayhelper->isCPFEnabled();
+        }
+        return false;
+    }
+
+    public function instalmentEnabled()
+    {
+        return $this->worldpayhelper->isInstalmentEnabled();
+    }
+    
+    public function getInstalmentTypes()
+    {
+        $adminQuote = $this->adminsessionquote->getQuote();
+        $address = $adminQuote->getBillingAddress();
+        $countryId = $address->getCountryId();
+        $filtertypes = [];
+        $countries = ['AR', 'BZ', 'BR', 'CL', 'CO', 'CR', 'SV', 'GT', 'HN', 'MX', 'NI', 'PA', 'PE'];
+        if (in_array($countryId, $countries)) {
+            $latamtypes = $this->latamtypes->getInstalmentType($countryId);
+            if (!empty($latamtypes)) {
+                $filtertypes = explode(", ", $latamtypes);
+            }
+        }
+        return $filtertypes;
     }
 
     public function getMonths()
@@ -141,5 +181,14 @@ class Card extends \Magento\Payment\Block\Form
         $countryId = $address->getCountryId();
         $paymenttypes = $this->paymenttypes->getPaymentType($countryId);
         return json_decode($paymenttypes);
+    }
+    
+    public function getJsonData($wpData)
+    {
+        $serializedData = '';
+        if ($wpData !== null) {
+            $serializedData = json_encode($wpData);
+        }
+        return $serializedData;
     }
 }

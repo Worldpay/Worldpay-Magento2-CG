@@ -20,7 +20,7 @@ class MerchantProfile extends \Magento\Config\Block\System\Config\Form\Field\Fie
     {
         if (!$this->_paymentMethod) {
             $this->_paymentMethod = $this->getLayout()->createBlock(
-                '\Sapient\Worldpay\Block\Adminhtml\Form\Field\Paymentmethod',
+                \Sapient\Worldpay\Block\Adminhtml\Form\Field\Paymentmethod::class,
                 '',
                 ['data' => ['is_render_to_js_template' => true]]
             );
@@ -28,7 +28,7 @@ class MerchantProfile extends \Magento\Config\Block\System\Config\Form\Field\Fie
         }
 
         return $this->_paymentMethod;
-   }
+    }
 
     /**
      * Prepare to render.
@@ -36,23 +36,30 @@ class MerchantProfile extends \Magento\Config\Block\System\Config\Form\Field\Fie
      * @return void
      */
     protected function _prepareToRender()
-    {   
+    {
         $this->addColumn(
             'worldpay_payment_method',
             [
                 'label' => __('Payment Method'),
+                'style' => 'width:200px !important',
                 'class' => 'required-entry',
                 'renderer' => $this->_getpaymentMethodRenderer()
             ]
         );
 
-        $this->addColumn('merchant_code', ['label' => __('Merchant Code'),'style' => 'width:120px','class' => 'required-entry']);
-        $this->addColumn('merchant_username', ['label' => __('Merchant Username'),'style' => 'width:120px','class' => 'required-entry']);
+        $this->addColumn(
+            'merchant_code',
+            ['label' => __('Merchant Code'),'style' => 'width:100px','class' => 'required-entry']
+        );
+        $this->addColumn(
+            'merchant_username',
+            ['label' => __('Merchant Username'),'style' => 'width:100px','class' => 'required-entry']
+        );
         $this->addColumn('merchant_password', ['label' => __('Merchant Password'),
             'renderer' => $this->getLayout()->createBlock(
-                '\Sapient\Worldpay\Block\Adminhtml\Form\Field\Password'
+                \Sapient\Worldpay\Block\Adminhtml\Form\Field\Password::class
             )
-            ]); 
+            ]);
         
         $this->_addAfter = false;
         $this->_addButtonLabel = __('Add');

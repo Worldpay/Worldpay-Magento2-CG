@@ -18,7 +18,7 @@ class SavedToken extends AbstractModel
      */
     protected function _construct()
     {
-        $this->_init('Sapient\Worldpay\Model\ResourceModel\SavedToken');
+        $this->_init(\Sapient\Worldpay\Model\ResourceModel\SavedToken::class);
     }
 
     /**
@@ -28,11 +28,11 @@ class SavedToken extends AbstractModel
      */
     public function loadByTokenCode($order_id)
     {
-       if (!$order_id) {
-           return;         
+        if (!$order_id) {
+            return;
         }
         $id = $this->getResource()->loadByTokenCode($order_id);
-        return $this->load($id);  
+        return $this->load($id);
     }
     
     /**
@@ -42,10 +42,10 @@ class SavedToken extends AbstractModel
      */
     public function loadByStoredCredentials($transactionIdentifier)
     {
-       if (!$transactionIdentifier) {
-           return;         
+        if (!$transactionIdentifier) {
+            return;
         }
         $id = $this->getResource()->loadByStoredCredentials($transactionIdentifier);
-        return $this->load($id);  
+        return $this->load($id);
     }
 }

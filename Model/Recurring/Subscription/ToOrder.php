@@ -74,13 +74,14 @@ class ToOrder
         $this->dataObjectHelper->populateWithArray(
             $order,
             $data,
-            '\Magento\Sales\Api\Data\OrderInterface'
+            \Magento\Sales\Api\Data\OrderInterface::class
         );
 
         $this->objectCopyService->copyFieldsetToTarget(
             'worldpay_subscription_convert',
             'to_order',
-            $subscription, $order
+            $subscription,
+            $order
         );
 
         $this->eventManager->dispatch(

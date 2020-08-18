@@ -6,7 +6,7 @@ namespace Sapient\Worldpay\Block\Adminhtml\Order\View;
 
 class View extends \Magento\Backend\Block\Template
 {
-	/**
+    /**
      * @var \Magento\Framework\Registry
      */
     protected $registry;
@@ -32,10 +32,10 @@ class View extends \Magento\Backend\Block\Template
         parent::__construct($context, $data);
     }
      /**
-     * Retrieve order object from registry
-     *
-     * @return object
-    */
+      * Retrieve order object from registry
+      *
+      * @return object
+      */
     protected function _getOrder()
     {
 
@@ -47,7 +47,7 @@ class View extends \Magento\Backend\Block\Template
      * Retrieve Worldpay Payment Detail
      *
      * @return object
-    */
+     */
     public function getWorldPaymentsDetails()
     {
         $order=$this->_getOrder();
@@ -61,29 +61,26 @@ class View extends \Magento\Backend\Block\Template
      * Retrieve payment method from order
      *
      * @return String
-    */
+     */
     public function getPaymentMethod()
     {
-       return  $this->_getOrder()->getPayment()->getMethod();
+        return  $this->_getOrder()->getPayment()->getMethod();
     }
 
     /**
      * check if order is placed through WorldPay Payment
      *
      * @return Boolean
-    */
-    public function isWorldpayPayment(){
+     */
+    public function isWorldpayPayment()
+    {
 
         $paymentMethod= $this->getPaymentMethod();
-        if ($paymentMethod=='worldpay_cc' || $paymentMethod=='worldpay_apm' || $paymentMethod=='worldpay_moto' || $paymentMethod=='worldpay_cc_vault')
-        {
+        if ($paymentMethod=='worldpay_cc' || $paymentMethod=='worldpay_apm'
+                || $paymentMethod=='worldpay_moto' || $paymentMethod=='worldpay_cc_vault') {
             return true;
         }
 
         return false;
     }
-
-
-
-
 }

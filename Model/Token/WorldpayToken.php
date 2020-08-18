@@ -12,8 +12,9 @@ use Magento\Vault\Model\Ui\VaultConfigProvider;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+
 /**
- * Worldpay token
+ * Communicate with WP server and gives back meaningful answer object
  */
 class WorldpayToken
 {
@@ -62,9 +63,10 @@ class WorldpayToken
      */
     private function _assertAccessForToken(SavedToken $token, \Magento\Customer\Model\Customer $customer)
     {
+        $msg = 'Access denied: token "%s" is not owned by customer "%d"';
         if (!$this->hasCustomerAccessForToken($token, $customer)) {
             throw new \AccessDeniedException(
-                sprintf('Access denied: token "%s" is not owned by customer "%d"', $token->getTokenCode(), $customer->getId())
+                sprintf($msg, $token->getTokenCode(), $customer->getId())
             );
         }
     }
@@ -102,7 +104,7 @@ class WorldpayToken
      * @param \Magento\Customer\Model\Customer $customer
      * @throws Sapient\WorldPay\Model\Token\AccessDeniedException
      */
-    public function updateOrInsertToken(TokenStateInterface $tokenState, $paymentObject)
+    public function updateOrInsertToken(TokenStateInterface $tokenState, $paymentObject, $customerId = null)
     {
         if (!$tokenState->getTokenCode()) {
             return;
@@ -111,6 +113,14 @@ class WorldpayToken
         $tokenModel = $this->savedtoken;
         $tokenModel->loadByTokenCode($tokenState->getTokenCode());
         $tokenModel->getResource()->beginTransaction();
+        $authenticatedShopperId = $tokenState->getAuthenticatedShopperId();
+        $tokenScope = 'shopper';
+        if (!$authenticatedShopperId) {
+            $authenticatedShopperId = $customerId;
+            $tokenScope = 'merchant';
+        }
+        $this->wplogger->info('########## Received notification customerId ##########');
+        $this->wplogger->info($authenticatedShopperId);
         
         try {
             $binNumber = $tokenState->getBin();
@@ -127,23 +137,24 @@ class WorldpayToken
             $tokenModel->setCardExpiryMonth($tokenState->getCardExpiryMonth());
             $tokenModel->setCardExpiryYear($tokenState->getCardExpiryYear());
             $tokenModel->setMerchantCode($tokenState->getMerchantCode());
-            $tokenModel->setAuthenticatedShopperId($tokenState->getAuthenticatedShopperId());
-            $tokenModel->setCustomerId($tokenState->getAuthenticatedShopperId());
-            if($transactionIdentifier){
+            $tokenModel->setAuthenticatedShopperId($authenticatedShopperId);
+            $tokenModel->setCustomerId($authenticatedShopperId);
+            if ($transactionIdentifier) {
                 $tokenModel->setTransactionIdentifier($tokenState->getTransactionIdentifier());
             }
-            if($binNumber){
+            if ($binNumber) {
                 $tokenModel->setBinNumber($tokenState->getBin());
             }
+            $tokenModel->setTokenType($tokenScope);
             $tokenModel->save();
             $tokenModel->getResource()->commit();
             if ('worldpay_cc' == $paymentObject->getMethod()) {
                 // vault and instant purchase configuration goes here
-                $this->_updateToVault($tokenState, $paymentObject);
+                $this->_updateToVault($tokenState, $paymentObject, $authenticatedShopperId);
             }
         } catch (\Exception $e) {
             $tokenEvent = $tokenState->getTokenEvent();
-            if($tokenEvent == 'CONFLICT'){
+            if ($tokenEvent == 'CONFLICT') {
                 $this->wplogger->error('Duplicate Entry, This card number is already saved.');
             } else {
                 $this->wplogger->error($e->getMessage());
@@ -153,7 +164,7 @@ class WorldpayToken
         }
     }
 
-    private function _updateToVault(TokenStateInterface $tokenState, $paymentObject)
+    private function _updateToVault(TokenStateInterface $tokenState, $paymentObject, $authenticatedShopperId)
     {
         $paymentToken = $this->getVaultPaymentToken($tokenState);
         if (null !== $paymentToken) {
@@ -169,10 +180,12 @@ class WorldpayToken
             );
             return $this;
         }
-        $paymentToken->setCustomerId($tokenState->getAuthenticatedShopperId());
+        $paymentToken->setCustomerId($authenticatedShopperId);
         $paymentToken->setIsActive(true);
         $paymentToken->setPaymentMethodCode($paymentObject->getMethod());
         $additionalInformation = $paymentObject->getAdditionalInformation();
+        $additionalInformation[VaultConfigProvider::IS_ACTIVE_CODE] = true;
+        $paymentObject->setAdditionalInformation($additionalInformation);
         $paymentToken->setIsVisible(true);
         $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
         $this->paymentTokenManagement->saveTokenWithPaymentLink($paymentToken, $paymentObject);
@@ -225,7 +238,7 @@ class WorldpayToken
 
     public function getLastFourNumbers($number)
     {
-        return substr ($number, -4);
+        return substr($number, -4);
     }
 
     public function getExpirationMonthAndYear(TokenStateInterface $tokenElement)
@@ -243,5 +256,4 @@ class WorldpayToken
         $json = \Zend_Json::encode($details);
         return $json ? $json : '{}';
     }
-
 }

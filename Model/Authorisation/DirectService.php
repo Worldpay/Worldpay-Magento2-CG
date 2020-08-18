@@ -4,7 +4,8 @@
  */
 namespace Sapient\Worldpay\Model\Authorisation;
 
-use Exception;
+use Magento\Framework\Exception\PaymentException;
+use Magento\Framework\Phrase;
 
 class DirectService extends \Magento\Framework\DataObject
 {
@@ -56,15 +57,16 @@ class DirectService extends \Magento\Framework\DataObject
             $orderStoreId,
             $paymentDetails
         );
+        
         $response = $this->paymentservicerequest->order($directOrderParams);
 
         $directResponse = $this->directResponse->setResponse($response);
         $threeDSecureParams = $directResponse->get3dSecureParams();
         $threeDsEnabled = $this->worldpayHelper->is3DSecureEnabled();
         $threeDSecureChallengeParams = $directResponse->get3ds2Params();
-        $threeDSecureConfig = array();
+        $threeDSecureConfig = [];
         $disclaimerFlag = '';
-        if(isset($paymentDetails['additional_data']['disclaimerFlag'])){
+        if (isset($paymentDetails['additional_data']['disclaimerFlag'])) {
             $disclaimerFlag = $paymentDetails['additional_data']['disclaimerFlag'];
         }
         if ($threeDSecureParams) {
@@ -72,13 +74,13 @@ class DirectService extends \Magento\Framework\DataObject
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
             $payment->setIsTransactionPending(1);
             $this->_handle3DSecure($threeDSecureParams, $directOrderParams, $orderCode);
-        } else if ($threeDSecureChallengeParams) {
+        } elseif ($threeDSecureChallengeParams) {
             // Handles success response with 3DS2 & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
             $payment->setIsTransactionPending(1);
             $threeDSecureConfig = $this->get3DS2ConfigValues();
             $this->_handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $orderCode, $threeDSecureConfig);
-        } else {            
+        } else {
             // Normal order goes here.(without 3DS).
             $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment, $disclaimerFlag);
             $this->_applyPaymentUpdate($directResponse, $payment);
@@ -107,34 +109,42 @@ class DirectService extends \Magento\Framework\DataObject
     ) {
         $paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml($directResponse->getXml());
         $paymentUpdate->apply($payment);
-        $this->_abortIfPaymentError($paymentUpdate);
+        $this->_abortIfPaymentError($paymentUpdate, $directResponse);
     }
 
-    private function _abortIfPaymentError($paymentUpdate)
+    private function _abortIfPaymentError($paymentUpdate, $directResponse)
     {
+        $responseXml = $directResponse->getXml();
+        $orderStatus = $responseXml->reply->orderStatus;
+        $payment = $orderStatus->payment;
+        $wpayCode = $payment->ISO8583ReturnCode['code'] ? $payment->ISO8583ReturnCode['code'] : 'Payment REFUSED';
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Refused) {
-             throw new Exception(sprintf('Payment REFUSED'));
-         }
+            $msg =  new Phrase($wpayCode);
+            throw new PaymentException($msg);
+        }
 
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
-            throw new Exception(sprintf('Payment CANCELLED'));
+            $msg =  new Phrase('Payment CANCELLED');
+            throw new PaymentException($msg);
         }
 
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Error) {
-            throw new Exception(sprintf('Payment ERROR'));
+            $msg =  new Phrase('Payment ERROR');
+            throw new PaymentException($msg);
         }
     }
     
     // get 3ds2 params from the configuration and set to checkout session
-    public function get3DS2ConfigValues(){
-        $data = array();
+    public function get3DS2ConfigValues()
+    {
+        $data = [];
         $data['jwtApiKey'] =  $this->worldpayHelper->isJwtApiKey();
-        $data['jwtIssuer'] =  $this->worldpayHelper->isJwtIssuer();    
+        $data['jwtIssuer'] =  $this->worldpayHelper->isJwtIssuer();
         $data['organisationalUnitId'] = $this->worldpayHelper->isOrganisationalUnitId();
         $data['challengeWindowType'] = $this->worldpayHelper->getChallengeWindowSize();
     
         $mode = $this->worldpayHelper->getEnvironmentMode();
-        if($mode == 'Test Mode'){
+        if ($mode == 'Test Mode') {
             $data['challengeurl'] =  $this->worldpayHelper->isTestChallengeUrl();
         } else {
             $data['challengeurl'] =  $this->worldpayHelper->isProductionChallengeUrl();
@@ -142,5 +152,4 @@ class DirectService extends \Magento\Framework\DataObject
         
         return $data;
     }
-
 }

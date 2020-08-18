@@ -25,6 +25,4 @@ class Service
         $session->setUseOldShippingMethod(true);
         $this->adminordercreate->initFromOrder($mageOrder);
     }
-    
-
 }

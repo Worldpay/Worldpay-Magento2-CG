@@ -7,16 +7,16 @@ namespace Sapient\Worldpay\Model\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Exception;
 
-class Cart implements ObserverInterface 
+class Cart implements ObserverInterface
 {
-	/**
+    /**
      * Constructor
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Model\Checkout\Service $checkoutservice
-     * @param \Magento\Checkout\Model\Session $checkoutsession        
+     * @param \Magento\Checkout\Model\Session $checkoutsession
      */
-	public function __construct (
+    public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Sapient\Worldpay\Model\Checkout\Service $checkoutservice,
@@ -29,14 +29,14 @@ class Cart implements ObserverInterface
     }
 
    /**
-     * Load the shopping cart from the latest authorized, but not completed order
-     */
-	public function execute(\Magento\Framework\Event\Observer $observer) 
+    * Load the shopping cart from the latest authorized, but not completed order
+    */
+    public function execute(\Magento\Framework\Event\Observer $observer)
     {
         if ($this->checkoutsession->getauthenticatedOrderId()) {
             $order = $this->orderservice->getAuthorisedOrder();
             $this->checkoutservice->reactivateQuoteForOrder($order);
             $this->orderservice->removeAuthorisedOrder();
         }
-	}
+    }
 }

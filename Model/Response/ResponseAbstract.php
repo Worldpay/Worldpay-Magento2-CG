@@ -5,6 +5,7 @@
 namespace Sapient\Worldpay\Model\Response;
 
 use Exception;
+
 /**
  * Abstract class used for reading the xml
  */
@@ -41,8 +42,10 @@ abstract class ResponseAbstract
         try {
             $this->_responseXml = new \SimpleXmlElement($response);
             $this->_merchantCode = $this->_responseXml['merchantCode'];
-        } catch(Exception $e) {
-            throw new Exception("Could not parse response XML");
+        } catch (Exception $e) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Could not parse response XML')
+            );
         }
 
         return $this;

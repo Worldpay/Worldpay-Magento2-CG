@@ -4,12 +4,16 @@
  */
 namespace Sapient\Worldpay\Model\Observer;
 
+use \Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Exception;
 
-class Redirect implements ObserverInterface {
+class Redirect implements ObserverInterface
+{
+    protected $_responseFactory;
+    protected $_url;
     
-    public function __construct (
+    public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Checkout\Model\Session $checkoutsession,
         \Magento\Framework\App\ResponseFactory $responseFactory,
@@ -22,12 +26,12 @@ class Redirect implements ObserverInterface {
     }
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
+        $event = $observer->getEvent();
         if ($this->checkoutsession->getAdminWpRedirecturl()) {
             $redirecturl = $this->checkoutsession->getAdminWpRedirecturl();
             $this->checkoutsession->unsAdminWpRedirecturl();
             $this->_responseFactory->create()->setRedirect($redirecturl)->sendResponse();
-            die();
-            return;
+            $this->getResponse()->setBody();
         }
     }
 }

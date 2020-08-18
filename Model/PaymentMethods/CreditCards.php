@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\PaymentMethods;
+
 /**
  * WorldPay CreditCards class extended from WorldPay Abstract Payment Method.
  */
@@ -38,7 +39,9 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         
         $checkoutpaymentdata = $this->paymentdetailsdata;
 
-        if (!empty($checkoutpaymentdata['additional_data']['isSavedCardPayment']) && !empty($checkoutpaymentdata['additional_data']['tokenCode']) && $integrationModel == 'direct') {
+        if (!empty($checkoutpaymentdata['additional_data']['isSavedCardPayment'])
+                && !empty($checkoutpaymentdata['additional_data']['tokenCode'])
+                && $integrationModel == 'direct') {
             return $this->tokenservice;
         }
         if ($this->_isRedirectIntegrationModeEnabled($storeId)) {
@@ -49,7 +52,6 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         }
         return $this->directservice;
     }
-
 
     /**
      * @param int storeId
@@ -65,13 +67,13 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
     /**
      * @return bool
      */
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null){
+    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    {
 
-       if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isCreditCardEnabled()) {
-         return true;
-       }
-       return false;
-
+        if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isCreditCardEnabled()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -85,15 +87,15 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
 
     public function getTitle()
     {
-        if($order = $this->registry->registry('current_order')) {
+        if ($order = $this->registry->registry('current_order')) {
             return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
-        }else if($invoice = $this->registry->registry('current_invoice')){
+        } elseif ($invoice = $this->registry->registry('current_invoice')) {
             $order = $this->worlpayhelper->getOrderByOrderId($invoice->getOrderId());
             return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
-        }else if($creditMemo = $this->registry->registry('current_creditmemo')){
+        } elseif ($creditMemo = $this->registry->registry('current_creditmemo')) {
             $order = $this->worlpayhelper->getOrderByOrderId($creditMemo->getOrderId());
             return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
-        }else{
+        } else {
             return $this->worlpayhelper->getCcTitle();
         }
     }

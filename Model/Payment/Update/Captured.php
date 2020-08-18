@@ -4,9 +4,7 @@
  */
 namespace Sapient\Worldpay\Model\Payment\Update;
 
-class Captured
-    extends \Sapient\Worldpay\Model\Payment\Update\Base
-    implements \Sapient\Worldpay\Model\Payment\Update
+class Captured extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sapient\Worldpay\Model\Payment\Update
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
@@ -40,12 +38,10 @@ class Captured
      */
     protected function _getAllowedPaymentStatuses()
     {
-        return array(
+        return [
             \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION,
             \Sapient\Worldpay\Model\Payment\State::STATUS_PENDING_PAYMENT,
             \Sapient\Worldpay\Model\Payment\State::STATUS_AUTHORISED
-        );
+        ];
     }
-
-
 }

@@ -12,7 +12,8 @@ use Magento\Framework\App\Action\Context;
  */
 
 class Redirect extends \Magento\Framework\App\Action\Action
-{   
+{
+
    /**
     * @var Magento\Framework\View\Result\PageFactory
     */

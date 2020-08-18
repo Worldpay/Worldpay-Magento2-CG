@@ -1,0 +1,32 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+ -->
+<div if="isPaymentMethodsAvailable()"
+     class="items payment-methods">
+    <div repeat="foreach: paymentGroupsList, item: '$group'"
+         class="payment-group">
+         <div class="payment-titlelogo-wrapper">
+              <div class="payment-title-wrapper">
+                   <h2 if="getRegion($group().displayArea)().length"
+                         translate="getGroupTitle($group)"
+                         class="step-title"
+                         data-role="title">
+                    </h2>
+                    <p>All transactions are secure and encrypted.</p>
+               </div>
+               <div class="payment-logo-wrapper">
+                 <img data-bind="attr: { src: require.toUrl('Sapient_Worldpay/images/cc/worldpay-logo.png') }" alt="worldpay logo" class="worldpay-logo-paymentscreen" />
+               </div>
+          </div>
+
+
+        <each args="data: getRegion($group().displayArea), as: 'method'" render=""/>
+    </div>
+</div>
+<div ifnot="isPaymentMethodsAvailable()"
+     class="no-payments-block"
+     translate="'No Payment Methods'">
+</div>

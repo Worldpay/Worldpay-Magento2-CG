@@ -6,7 +6,7 @@ namespace Sapient\Worldpay\Model\Response;
 
 class AdminhtmlResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
 {
-	
+    
     public function parseRefundResponse($xml)
     {
         $document = new \SimpleXmlElement($xml);
@@ -18,6 +18,4 @@ class AdminhtmlResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstrac
         $document = new \SimpleXmlElement($xml);
         return $document;
     }
-
 }
- 

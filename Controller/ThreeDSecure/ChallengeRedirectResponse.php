@@ -12,10 +12,10 @@ class ChallengeRedirectResponse extends \Magento\Framework\App\Action\Action
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
-     * @param \Magento\Checkout\Model\Session $checkoutSession     
-     * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender     
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
      * @param \Sapient\Worldpay\Model\Authorisation\ThreeDSecureChallenge $threedcredirectresponse
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger     
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -26,7 +26,6 @@ class ChallengeRedirectResponse extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Authorisation\ThreeDSecureChallenge $threedcredirectresponse,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
-        
     ) {
         $this->wplogger = $wplogger;
         $this->resultJsonFactory = $resultJsonFactory;
@@ -43,13 +42,12 @@ class ChallengeRedirectResponse extends \Magento\Framework\App\Action\Action
      * Accepts callback from worldpay's 3DS2 challenge iframe page.
      */
     public function execute()
-    { 
+    {
         $resultPage = $this->_resultPageFactory->create();
                 $block = $resultPage->getLayout()
-                ->createBlock('Sapient\Worldpay\Block\Checkout\Hpp\ChallengeIframe')
+                ->createBlock(\Sapient\Worldpay\Block\Checkout\Hpp\ChallengeIframe::class)
                 ->setTemplate('Sapient_Worldpay::checkout/hpp/challengeiframe.phtml')
                 ->toHtml();
-                $this->getResponse()->setBody($block);
-                return;
+                return $this->getResponse()->setBody($block);
     }
 }

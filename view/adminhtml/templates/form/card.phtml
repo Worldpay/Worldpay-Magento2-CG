@@ -3,6 +3,8 @@ $clientKey = $block->escapeHtml($block->getClientKey());
 
 
 $saveCardEnabled = $block->saveCardEnabled();
+$cpfEnabled = $block->cpfEnabled();
+$instalmentEnabled = $block->instalmentEnabled();
 $tokenizationEnabled = $block->tokenizationEnabled();
 $storedCredentialsEnabled = $block->storedCredentialsEnabled();
 if ($saveCardEnabled) {
@@ -10,41 +12,54 @@ if ($saveCardEnabled) {
 } else {
     $savedCards = [];
 }
+if ($instalmentEnabled) {
+    $instalmentTypes = $block->getInstalmentTypes();
+} else {
+    $instalmentTypes = [];
+}
 $wpData = [
     "clientKey" => $clientKey,
 ];
-$serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($wpData);
+$serializedFormData = $block->getJsonData($wpData);
 ?>
-<fieldset class="admin__fieldset payment-method" id="payment_form_<?php echo $block->escapeHtml($block->getMethodCode()) ?>" style="display: none"  data-mage-init='{"worldpayForm":<?php /* @noEscape */ echo $serializedFormData; ?>}'>
+<fieldset class="admin__fieldset payment-method"
+          id="payment_form_<?= $block->escapeHtml($block->getMethodCode()) ?>"
+          style="display: none"
+          data-mage-init='{"worldpayForm":<?= /* @noEscape */ $serializedFormData; ?>}'>
    <div class="admin__field _required">
        <label for="worldpay_cc_type" class="admin__field-label">
        <span>Credit Card Type</span>
        </label>
        <div class="admin__field-control">
-          <?php $cctypes = $block->getCCtypes(); ?>
-          <select id="worldpay_cc_type" name="payment[cc_type]" class="required-entry validate-cc-type-select admin__control-select">
+            <?php $cctypes = $block->getCCtypes(); ?>
+          <select id="worldpay_cc_type"
+                  name="payment[cc_type]"
+                  class="required-entry validate-cc-type-select admin__control-select">
               <option value="" selected="selected">
                 Card type
               </option>
-              <?php
+                <?php
                   $options = '';
-                  foreach($cctypes as $k => $v){
-                      $options .='<option value="'.$k.'">'.$v.'</option>';
-                  }
-                  echo $options;
-              ?>
+                foreach ($cctypes as $k => $v) {
+                    $options .='<option value="'.$k.'">'.$v.'</option>';
+                }
+                  echo /** @noEscape */ $options;
+                ?>
           </select>
        </div>
     </div>
-     <?php 
+        <?php
         if ($block->isDirectIntegration()) {
-     ?>
+            ?>
     <div class="admin__field _required directform">
        <label for="worldpay_cc_name" class="admin__field-label">
        <span>Card Holder name</span>
        </label>
        <div class="admin__field-control">
-          <input type="text" id="worldpay_cc_name" name="payment[cc_name]" class="input-text required-entry admin__control-text" value="">
+          <input type="text" id="worldpay_cc_name"
+                 name="payment[cc_name]"
+                 class="input-text required-entry admin__control-text"
+                 value="">
        </div>
     </div>
     <div class="admin__field _required directform">
@@ -52,7 +67,10 @@ $serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonE
        <span>Credit Card Number</span>
        </label>
        <div class="admin__field-control">
-          <input type="number" id="worldpay_cc_number" name="payment[cc_number]" class="input-text required-entry validate-cc-number admin__control-text" value="">
+          <input type="number" id="worldpay_cc_number"
+                 name="payment[cc_number]"
+                 class="input-text required-entry validate-cc-number admin__control-text"
+                 value="">
        </div>
     </div>
     <div class="admin__field _required directform">
@@ -60,43 +78,47 @@ $serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonE
        <span>Expiration Date</span>
        </label>
        <div class="admin__field-control">
-         <?php 
+            <?php
                 $months = $block->getMonths();
-              ?>
-          <select id="worldpay_card_expiration_month" name="payment[cc_exp_month]" class="validate-cc-exp required-entry admin__control-select admin__control-select-month">
+            ?>
+          <select id="worldpay_card_expiration_month"
+                  name="payment[cc_exp_month]"
+                  class="validate-cc-exp required-entry admin__control-select admin__control-select-month">
              <option value="0" selected="selected">
                 Month
              </option>
-             <?php foreach($months as $k=>$v){ ?>
-             <option value="<?php echo $k ?>">
-                <?php echo $k.' - '.$v; ?>
+             <?php foreach ($months as $k => $v) { ?>
+             <option value="<?= /** @noEscape */ $k ?>">
+                    <?= /** @noEscape */ $k.' - ' /** @noEscape */.$v; ?>
              </option>
-             <?php } ?>
+                <?php } ?>
           </select>
-           <?php 
+            <?php
                 $years = $block->getYears();
-              ?>
-          <select id="worldpay_card_expiration_yr" name="payment[cc_exp_year]" class="required-entry admin__control-select admin__control-select-year">
+            ?>
+          <select id="worldpay_card_expiration_yr"
+                  name="payment[cc_exp_year]"
+                  class="required-entry admin__control-select admin__control-select-year">
              <option value="" selected="selected">
                 Year                    
              </option>
-              <?php foreach($years as $k=>$v){ ?>
-                 <option value="<?php echo $k ?>">
-                    <?php echo $v; ?>
+              <?php foreach ($years as $k => $v) { ?>
+                 <option value="<?= /** @noEscape */ $k ?>">
+                    <?= /** @noEscape */ $v; ?>
                  </option>
-             <?php } ?>
+                <?php } ?>
           </select>
        </div>
     </div>
 
-    <?php if ($block->requireCvcEnabled()): ?>
+            <?php if ($block->requireCvcEnabled()): ?>
     <div class="admin__field field required _required directform" id="wp_cvv" >
         <label for="worldpay_card_expiration" class="admin__field-label">
             <span>CVV</span>
        </label>
         <div class="admin__field-control control" id="wp_cvc_container">
          <input type="number" autocomplete="off"
-                   class="input-text cvv saved-cvv-number required-entry"
+                   class="input-text cvv saved-cvv-number required-entry validate-cc-cvn"
                    name="payment[cc_cid]"
                    value="" />
         </div>
@@ -107,7 +129,7 @@ $serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonE
        name="payment[cse_enabled]"
        id="worldpay_cse_enabled"
        value=""/>
-   <?php } ?>
+    <?php } ?>
  
     <?php if ($saveCardEnabled && ($tokenizationEnabled || $storedCredentialsEnabled)): ?>
     <div class="admin__field field directform">
@@ -116,8 +138,12 @@ $serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonE
           <label class="label" for="worldpay_savecard">
               <span class="admin__field-label" style="padding-left:10px;">Save card</span>
           </label>
-          <input type="hidden" id="savecard_tokenization" name="payment[tokenization_enabled]" value="<?php echo $tokenizationEnabled;?>">
-          <input type="hidden" id="savecard_stored_credentials" name="payment[stored_credentials_enabled]" value="<?php echo $storedCredentialsEnabled;?>">
+          <input type="hidden" id="savecard_tokenization"
+                 name="payment[tokenization_enabled]"
+                 value="<?= /** @noEscape */ $tokenizationEnabled;?>">
+          <input type="hidden" id="savecard_stored_credentials"
+                 name="payment[stored_credentials_enabled]"
+                 value="<?= /** @noEscape */ $storedCredentialsEnabled;?>">
       </div>
     </div>
     <?php endif; ?>
@@ -132,14 +158,22 @@ $serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonE
                     <span>Saved cards</span>
                   </label>
         <?php endif; ?>
-       <?php foreach ($savedCards as $savedCard):?>
+        <?php foreach ($savedCards as $savedCard):?>
         <div class="admin__field-control admin__field-option">
-            <input id="saved_card_<?php echo $savedCard['id'];?>" value="<?php echo $savedCard['token_code']; ?>" type="radio" name="payment[tokenCode]" class="admin__control-radio saved_tokens">
-            <label class="admin__field-label" for="saved_card_<?php echo $savedCard['id'];?>"><?php echo $savedCard['method']; ?> <?php echo $savedCard['card_number']; ?></label>
-            <input id="stored_credentials_<?php echo $savedCard['id'];?>" value="<?php echo $savedCard['transaction_identifier']; ?>" type="hidden" name="payment[transactionIdentifier]">
+            <input id="saved_card_<?= /** @noEscape */ $savedCard['id'];?>"
+                   value="<?= /** @noEscape */ $savedCard['token_code']; ?>"
+                   type="radio" name="payment[tokenCode]"
+                   class="admin__control-radio saved_tokens">
+            <label class="admin__field-label" for="saved_card_<?= /** @noEscape */ $savedCard['id'];?>">
+                <?= /** @noEscape */ $savedCard['method']; ?> <?= /** @noEscape */ $savedCard['card_number']; ?>
+            </label>
+            <input id="stored_credentials_<?= /** @noEscape */ $savedCard['id'];?>"
+                   value="<?= /** @noEscape */ $savedCard['transaction_identifier']; ?>"
+                   type="hidden"
+                   name="payment[transactionIdentifier]">
         </div>
-       <?php endforeach; ?>
-       <?php if (count($savedCards) && $block->requireCvcEnabled()): ?>
+        <?php endforeach; ?>
+        <?php if (count($savedCards) && $block->requireCvcEnabled() && ($block->isDirectIntegration())): ?>
             <p>&nbsp;</p>
             
                 <label class="label admin__field-label">
@@ -154,4 +188,65 @@ $serializedFormData = $this->helper('Magento\Framework\Json\Helper\Data')->jsonE
           
         <?php endif; ?>
   </div>
+    <?php if ($cpfEnabled): ?>
+    <div class="admin__field _required">
+       <label for="worldpay_cpf" class="admin__field-label">
+       <span>CPF/CNPJ</span>
+       </label>
+       <div class="admin__field-control">
+          <input type="text" id="worldpay_cpf"
+                 name="payment[cpf]"
+                 class="input-text required-entry admin__control-text"
+                 value="">
+       </div>
+    </div>
+    <?php endif; ?>
+    <?php if (count($instalmentTypes) && $block->instalmentEnabled()): ?>
+    <div class="admin__field _required">
+       <label for="worldpay_cc_type" class="admin__field-label">
+       <span>Instalment</span>
+       </label>
+       <div class="admin__field-control">
+            <?php $cctypes = $instalmentTypes; ?>
+          <select id="worldpay_instalment"
+                  name="payment[instalment]"
+                  class="required-entry admin__control-select">
+              <option value="" selected="selected">
+                Instalment
+              </option>
+              <option value="1">
+                One Payment
+              </option>
+                <?php
+                  $options = '';
+                foreach ($cctypes as $k => $v) {
+                    $options .='<option value="'.$v.'">'.$v.'</option>';
+                }
+                  echo /** @noEscape */ $options;
+                ?>
+          </select>
+       </div>
+    </div>
+            <?php endif; ?>
+    <?php if (!$block->isRedirectIntegration() && ($cpfEnabled || (count($instalmentTypes) && $block->instalmentEnabled()))): ?>
+    <div class="admin__field _required">
+       <label for="worldpay_statement" class="admin__field-label">
+       <span>Purpose of transaction</span>
+       </label>
+       <div class="admin__field-control">
+          <input type="text" id="worldpay_statement"
+                 name="payment[statement]"
+                 class="input-text required-entry admin__control-text"
+                 value="">
+       </div>
+    </div>
+    <?php endif; ?>
+    <input type="hidden"
+       name="payment[instalment_enabled]"
+       id="worldpay_instalment_enabled"
+       value="<?= /** @noEscape */ $instalmentEnabled;?>"/>
+    <input type="hidden"
+       name="payment[cpf_enabled]"
+       id="worldpay_cpf_enabled"
+       value="<?= /** @noEscape */ $cpfEnabled;?>"/>
 </fieldset>

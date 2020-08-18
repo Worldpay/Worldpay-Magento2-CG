@@ -3,9 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model;
-/**
- * Class MethodList
- */
+
 class MethodList
 {
     /**

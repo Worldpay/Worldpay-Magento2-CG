@@ -21,7 +21,8 @@ class Service
      * @param \Magento\Sales\Model\Order\Creditmemo $creditmemo
      * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
      */
-    public function __construct(\Magento\Sales\Model\Order $mageOrder,
+    public function __construct(
+        \Magento\Sales\Model\Order $mageOrder,
         \Magento\Checkout\Model\Session $checkoutsession,
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
@@ -54,9 +55,19 @@ class Service
     public function getById($orderId)
     {
 
-         return new \Sapient\Worldpay\Model\Order(array(
+         return new \Sapient\Worldpay\Model\Order(
+             [
                 'order' => $this->mageorder->load($orderId)
-            ),$this->_invoiceService, $this->_transaction,$this->worldpaypaymentmodel,$this->creditmemoFactory,$this->Invoice,$this->CreditmemoService,$this->ordercreditmemo,$this->creditmemoRepository);
+             ],
+             $this->_invoiceService,
+             $this->_transaction,
+             $this->worldpaypaymentmodel,
+             $this->creditmemoFactory,
+             $this->Invoice,
+             $this->CreditmemoService,
+             $this->ordercreditmemo,
+             $this->creditmemoRepository
+         );
     }
 
     /**
@@ -66,9 +77,19 @@ class Service
     public function getByIncrementId($incrementId)
     {
 
-        return new \Sapient\Worldpay\Model\Order(array(
+        return new \Sapient\Worldpay\Model\Order(
+            [
                 'order' => $this->mageorder->loadByIncrementId($incrementId)
-            ), $this->_invoiceService, $this->_transaction,$this->worldpaypaymentmodel,$this->creditmemoFactory,$this->Invoice,$this->CreditmemoService,$this->ordercreditmemo,$this->creditmemoRepository);
+            ],
+            $this->_invoiceService,
+            $this->_transaction,
+            $this->worldpaypaymentmodel,
+            $this->creditmemoFactory,
+            $this->Invoice,
+            $this->CreditmemoService,
+            $this->ordercreditmemo,
+            $this->creditmemoRepository
+        );
     }
 
     /**
@@ -99,5 +120,4 @@ class Service
     {
         $this->checkoutsession->unsauthenticatedOrderId();
     }
-
 }

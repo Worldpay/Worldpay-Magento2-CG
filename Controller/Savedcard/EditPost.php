@@ -13,9 +13,10 @@ use Magento\Vault\Api\PaymentTokenRepositoryInterface;
 use Magento\Vault\Model\PaymentTokenManagement;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Exception;
+use Sapient\Worldpay\Helper\MyAccountException;
 
 /**
- *Controller for Updating Saved card
+ * Controller for Updating Saved card
  */
 class EditPost extends \Magento\Customer\Controller\AbstractAccount
 {
@@ -28,6 +29,8 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
      * @var Magento\Framework\Data\Form\FormKey\Validator
      */
     protected $formKeyValidator;
+    
+    protected $helper;
 
     /**
      * Constructor
@@ -52,7 +55,8 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         PaymentTokenRepositoryInterface $tokenRepository,
-        PaymentTokenManagement $paymentTokenManagement
+        PaymentTokenManagement $paymentTokenManagement,
+        MyAccountException $helper
     ) {
         parent::__construct($context);
         $this->_storeManager = $storeManager;
@@ -64,6 +68,7 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         $this->wplogger = $wplogger;
         $this->tokenRepository = $tokenRepository;
         $this->paymentTokenManagement = $paymentTokenManagement;
+        $this->helper = $helper;
     }
 
     /**
@@ -91,34 +96,36 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
                 $tokenUpdateResponse = $this->_tokenService->getTokenUpdate(
                     $this->_getTokenModel(),
                     $this->customerSession->getCustomer(),
-                    $this->getStoreId());
+                    $this->getStoreId()
+                );
                 $tokenInquiryResponse = $this->_tokenService->getTokenInquiry(
                     $this->_getTokenModel(),
                     $this->customerSession->getCustomer(),
-                    $this->getStoreId());
+                    $this->getStoreId()
+                );
             } catch (Exception $e) {
                 $this->wplogger->error($e->getMessage());
                 $this->messageManager->addException($e, __('Error: ').$e->getMessage());
-                $this->_redirect('*/savedcard/edit', array('id' => $this->_getTokenModel()->getId()));
+                $this->_redirect('*/savedcard/edit', ['id' => $this->_getTokenModel()->getId()]);
                 return;
             }
             if ($tokenUpdateResponse->isSuccess()) {
                 $this->_applyTokenUpdate();
                 $this->_applyVaultTokenUpdate();
             } else {
-                $this->messageManager->addError(__('Error: the card has not been updated.'));
-                $this->_redirect('*/savedcard/edit', array('id' => $this->_getTokenModel()->getId()));
+                $this->messageManager->addError(__($this->helper->getConfigValue('MCAM7')));
+                $this->_redirect('*/savedcard/edit', ['id' => $this->_getTokenModel()->getId()]);
                 return;
             }
-            if ($tokenInquiryResponse->getTokenCode()) {                
+            if ($tokenInquiryResponse->getTokenCode()) {
                 $this->_applyTokenInquiry($tokenInquiryResponse);
                 $this->_applyVaultTokenUpdate();
             } else {
-                $this->messageManager->addError(__('Error: the card has not been updated.'));
-                $this->_redirect('*/savedcard/edit', array('id' => $this->_getTokenModel()->getId()));
+                $this->messageManager->addError(__($this->helper->getConfigValue('MCAM7')));
+                $this->_redirect('*/savedcard/edit', ['id' => $this->_getTokenModel()->getId()]);
                 return;
             }
-            $this->messageManager->addSuccess(__('The card has been updated.'));
+            $this->messageManager->addSuccess(__($this->helper->getConfigValue('MCAM9')));
             $this->_redirect('*/savedcard');
             return;
         }
@@ -154,13 +161,14 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         return $token;
     }
 
-    protected function _applyVaultTokenUpdate(){
+    protected function _applyVaultTokenUpdate()
+    {
         $existingVaultPaymentToken = $this->paymentTokenManagement->getByGatewayToken(
             $this->_getTokenModel()->getTokenCode(),
             'worldpay_cc',
-            $this->customerSession->getCustomer()->getId());
+            $this->customerSession->getCustomer()->getId()
+        );
         $this->_saveVaultToken($existingVaultPaymentToken);
-
     }
 
     protected function _saveVaultToken(PaymentTokenInterface $vaultToken)
@@ -176,7 +184,7 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
             $this->wplogger->error($e->getMessage());
             $this->messageManager->addException($e, __('Error: ').$e->getMessage());
         }
-        return;
+        return true;
     }
 
     public function getExpirationMonthAndYear($token)
@@ -186,7 +194,7 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
 
     public function getLastFourNumbers($number)
     {
-        return substr ($number, -4);
+        return substr($number, -4);
     }
 
     private function convertDetailsToJSON($details)

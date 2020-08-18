@@ -14,6 +14,7 @@ use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Vault\Model\PaymentTokenFactory;
 use Sapient\Worldpay\Model\Recurring\Subscription;
 use Sapient\Worldpay\Model\Recurring\SubscriptionFactory;
+use Sapient\Worldpay\Helper\MyAccountException;
 
 class FormPost extends \Magento\Framework\App\Action\Action
 {
@@ -41,6 +42,11 @@ class FormPost extends \Magento\Framework\App\Action\Action
      * @var PaymentTokenFactory
      */
     private $tokenFactory;
+    
+    /**
+     * @var MyAccountException
+     */
+    protected $helper;
 
     /**
      * @param Context $context
@@ -56,7 +62,8 @@ class FormPost extends \Magento\Framework\App\Action\Action
         Validator $validator,
         SubscriptionFactory $subscriptionFactory,
         PaymentTokenFactory $tokenFactory,
-        CollectionFactory $regionCollectionFactory
+        CollectionFactory $regionCollectionFactory,
+        MyAccountException $helper
     ) {
         parent::__construct($context);
         $this->customerSession = $customerSession;
@@ -64,6 +71,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
         $this->subscriptionFactory = $subscriptionFactory;
         $this->tokenFactory = $tokenFactory;
         $this->regionCollectionFactory = $regionCollectionFactory;
+        $this->helper = $helper;
     }
 
     /**
@@ -74,7 +82,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
      */
     public function dispatch(RequestInterface $request)
     {
-        $loginUrl = $this->_objectManager->get('Magento\Customer\Model\Url')->getLoginUrl();
+        $loginUrl = $this->_objectManager->get(\Magento\Customer\Model\Url::class)->getLoginUrl();
 
         if (!$this->customerSession->authenticate($loginUrl)) {
             $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
@@ -94,7 +102,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
 
         $subscriptionId = $request->getParam('subscription_id');
         if (!$subscriptionId) {
-            $this->messageManager->addErrorMessage(__('An error has occurred. Please try again.'));
+            $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('MCAM4')));
 
             $resultRedirect->setPath('*/*/');
             return $resultRedirect;
@@ -103,7 +111,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
         $resultRedirect->setPath('*/*/edit', ['subscription_id' => $this->getRequest()->getParam('subscription_id')]);
 
         if (!$this->validator->validate($this->getRequest())) {
-            $this->messageManager->addErrorMessage(__('An error has occurred. Please try again.'));
+            $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('MCAM4')));
 
             return $resultRedirect;
         }
@@ -118,7 +126,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
             || $subscription->getId() != $subscriptionId
             || $subscription->getCustomerId() != $customerId
         ) {
-            $this->messageManager->addErrorMessage(__('An error has occurred. Please try again.'));
+            $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('MCAM4')));
 
             return $resultRedirect;
         }
@@ -143,10 +151,10 @@ class FormPost extends \Magento\Framework\App\Action\Action
                 $subscription->save();
             }
 
-            $this->messageManager->addSuccessMessage('Subscription has been updated.');
+            $this->messageManager->addSuccessMessage($this->helper->getConfigValue('MCAM10'));
             $resultRedirect->setPath('*/*/');
         } catch (\Exception $e) {
-            $this->messageManager->addErrorMessage(__('Failed to update subscription.'));
+            $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('MCAM11')));
         }
 
         return $resultRedirect;

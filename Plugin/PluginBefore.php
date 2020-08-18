@@ -31,9 +31,9 @@ class PluginBefore
         if ($this->_request->getFullActionName() == 'sales_order_view') {
             $requestdata = $this->request->getParams();
             $orderId = $requestdata['order_id'];
-            $syncurl = $this->_urlBuilder->getUrl("worldpay/syncstatus/index",array('order_id' => $orderId));
+            $syncurl = $this->_urlBuilder->getUrl("worldpay/syncstatus/index", ['order_id' => $orderId]);
             $order = $this->order->load($orderId);
-            if($order->getPayment()->getMethod()=='worldpay_cc'
+            if ($order->getPayment()->getMethod()=='worldpay_cc'
                 || $order->getPayment()->getMethod()=='worldpay_apm'
                 || $order->getPayment()->getMethod()=='worldpay_moto'
                 || $order->getPayment()->getMethod()=='worldpay_cc_vault') {

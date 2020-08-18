@@ -23,7 +23,7 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
      * @param \Sapient\Worldpay\Helper\Registry $registryhelper
      * @param \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate
      * @param \Magento\Checkout\Model\Session $checkoutsession
-     * @param \Magento\Framework\UrlInterface $urlInterface     
+     * @param \Magento\Framework\UrlInterface $urlInterface
      */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
@@ -35,18 +35,18 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
         \Magento\Checkout\Model\Session $checkoutsession,
         \Magento\Framework\UrlInterface $urlInterface
     ) {
-       $this->mappingservice = $mappingservice;
-       $this->paymentservicerequest = $paymentservicerequest;
-       $this->wplogger = $wplogger;
-       $this->redirectresponse = $redirectresponse;
-       $this->registryhelper = $registryhelper;
-       $this->checkoutsession = $checkoutsession;
-       $this->hppstate = $hppstate;
-       $this->_urlInterface = $urlInterface;
+        $this->mappingservice = $mappingservice;
+        $this->paymentservicerequest = $paymentservicerequest;
+        $this->wplogger = $wplogger;
+        $this->redirectresponse = $redirectresponse;
+        $this->registryhelper = $registryhelper;
+        $this->checkoutsession = $checkoutsession;
+        $this->hppstate = $hppstate;
+        $this->_urlInterface = $urlInterface;
     }
     /**
      * handles provides authorization data for Hosted Payment Page integration
-     * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl 
+     * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
      */
     public function authorizePayment(
         $mageOrder,
@@ -55,7 +55,7 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
         $orderStoreId,
         $paymentDetails,
         $payment
-    ) {    
+    ) {
 
         $this->checkoutsession->setauthenticatedOrderId($mageOrder->getIncrementId());
 
@@ -76,7 +76,6 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
         $this->registryhelper->setworldpayRedirectUrl($this->_urlInterface->getUrl('worldpay/hostedpaymentpage/pay'));
 
         $this->checkoutsession->setWpRedirecturl($this->_urlInterface->getUrl('worldpay/hostedpaymentpage/pay'));
-
     }
 
     /**
@@ -92,16 +91,14 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
     }
 
     /**
-     * @return  \Sapient\Worldpay\Model\Checkout\Hpp\State 
+     * @return  \Sapient\Worldpay\Model\Checkout\Hpp\State
      */
     protected function _getStatus()
     {
-        if (is_null($this->_status)) {
+        if ($this->_status === null) {
             $this->_status = $this->hppstate;
         }
 
         return $this->_status;
     }
-
-
 }

@@ -10,9 +10,10 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartManagementInterface;
 use Sapient\Worldpay\Model\MethodList;
 use \Sapient\Worldpay\Logger\WorldpayLogger;
+use Sapient\Worldpay\Helper\CreditCardException;
 
 /**
- * Class PaymentInformationManagement
+ * Class PaymentInformationManagement helps to manage WP payment actions
  */
 class PaymentInformationManagement
 {
@@ -32,6 +33,7 @@ class PaymentInformationManagement
      * @var bool
      */
     private $checkMethods;
+    
     /**
      * PaymentInformationManagement constructor.
      * @param CartManagementInterface $cartManagement
@@ -75,7 +77,6 @@ class PaymentInformationManagement
         } catch (LocalizedException $exception) {
             $this->logger->error($exception->getMessage());
             throw new CouldNotSaveException(__($exception->getMessage()));
-            //throw new CouldNotSaveException(__('Mentioned card details are already saved, try with other card!'),$exception);
         } catch (\Exception $exception) {
             $this->logger->error($exception->getMessage());
             throw new CouldNotSaveException(

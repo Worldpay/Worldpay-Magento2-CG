@@ -38,7 +38,7 @@ class Collection extends SubscriptionCollection implements SearchResultInterface
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         $eventPrefix,
         $eventObject,
-        $model = 'Magento\Framework\View\Element\UiComponent\DataProvider\Document',
+        $model = \Magento\Framework\View\Element\UiComponent\DataProvider\Document::class,
         $connection = null,
         \Magento\Framework\Model\ResourceModel\Db\AbstractDb $resource = null
     ) {

@@ -12,6 +12,18 @@ define(
     ],
     function ($, $t, alert) {
         'use strict';
+        
+        function getCreditCardExceptions (exceptioncode){
+                var ccData=window.checkoutConfig.payment.ccform.creditcardexceptions;
+                  for (var key in ccData) {
+                    if (ccData.hasOwnProperty(key)) {  
+                        var cxData=ccData[key];
+                    if(cxData['exception_code'].includes(exceptioncode)){
+                        return cxData['exception_module_messages']?cxData['exception_module_messages']:cxData['exception_messages'];
+                    }
+                    }
+                }
+            }
 
         $.widget('mage.eprotect', {
 
@@ -87,7 +99,7 @@ define(
                 } else {
                     alert({
                         title: $t('Credit Card Form'),
-                        content: $t('An error occurred: ') + $t(responseData.message)
+                        content: $t(getCreditCardExceptions('CCAM10')) + $t(responseData.message)
                     });
                 }
             },

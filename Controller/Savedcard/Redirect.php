@@ -11,7 +11,8 @@ class Redirect extends \Magento\Framework\App\Action\Action
 {
     protected $checkoutSession;
 
-    public function __construct(Context $context,
+    public function __construct(
+        Context $context,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Checkout\Model\Session $checkoutSession
     ) {
@@ -26,7 +27,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
                 
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
             return $this->resultRedirectFactory->create()->setPath('worldpay/threedsecure/auth', ['_current' => true]);
-        } else if ($threeDSecureChallengeParams) {
+        } elseif ($threeDSecureChallengeParams) {
             return $this->resultRedirectFactory->create()->setPath('worldpay/threedsecure/auth', ['_current' => true]);
         } else {
             return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success', ['_current' => true]);

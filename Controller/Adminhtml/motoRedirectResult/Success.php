@@ -8,9 +8,10 @@ use Magento\Framework\View\Result\PageFactory;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Exception;
+
  /**
- * Redirect to the admin view order page if order is failed
- */ 
+  * Redirect to the admin view order page if order is failed
+  */
 class Success extends \Magento\Backend\App\Action
 {
     /**
@@ -18,7 +19,7 @@ class Success extends \Magento\Backend\App\Action
      *
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger    
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      */
     public function __construct(
@@ -26,7 +27,7 @@ class Success extends \Magento\Backend\App\Action
         JsonFactory $resultJsonFactory,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Order\Service $orderservice
-    ) { 
+    ) {
        
         parent::__construct($context);
         $this->wplogger = $wplogger;
@@ -71,7 +72,6 @@ class Success extends \Magento\Backend\App\Action
         $order = $worldPayOrder->getOrder();
         $resultRedirect = $this->resultRedirectFactory->create();
         $resultRedirect->setPath('sales/order/view', ['order_id' => $order->getId()]);
-        return $resultRedirect; 
+        return $resultRedirect;
     }
- 
 }

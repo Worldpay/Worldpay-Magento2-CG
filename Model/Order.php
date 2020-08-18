@@ -5,11 +5,12 @@
 namespace Sapient\Worldpay\Model;
 
 use Exception;
+use Sapient\Worldpay\Helper\CreditCardException;
 
 class Order
 {
     private $_order;
-
+    
     /**
      * Constructor
      *
@@ -23,7 +24,8 @@ class Order
      * @param \Magento\Sales\Model\Order\Creditmemo $creditmemo
      * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
      */
-    public function __construct(array $args,
+    public function __construct(
+        array $args,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
         \Magento\Framework\DB\Transaction $transaction,
         \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
@@ -86,7 +88,6 @@ class Order
             $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_PROCESSING);
             $mageOrder->save();
         }
-
     }
 
     public function capture()
@@ -153,7 +154,6 @@ class Order
             $invoice->getOrder()
         );
         $transactionSave->save();
-
     }
 
     public function hasWorldPayPayment()
@@ -171,7 +171,9 @@ class Order
     public function getWorldPayPayment()
     {
         if ($this->getOrder()->isObjectNew()) {
-            throw new Exception(sprintf('Order with id "%s" does not exist.', $this->getOrder()->getId()));
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __(sprintf('Order with id "%s" does not exist.', $this->getOrder()->getId()))
+            );
         }
 
         return $this->worldpaypaymentmodel->loadByPaymentId($this->getOrder()->getIncrementId());
@@ -197,6 +199,7 @@ class Order
      */
     public function refund($reference, $comment)
     {
+
         if (!$reference) {
             return;
         }
@@ -205,7 +208,9 @@ class Order
         $creditmemo->load($reference, 'increment_id');
 
         if ($creditmemo->getOrder()->getId() != $this->getOrder()->getId()) {
-            throw new Exception('WorldPay refund ERROR: Credit Memo does not match Order. Reference:' . $reference);
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('WorldPay refund ERROR: Credit Memo does not match Order. Reference'. $reference)
+            );
         }
 
         if ($creditmemo->getState() == \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN) {
@@ -266,15 +271,14 @@ class Order
         $order = $this->getOrder();
 
         $invoices = $order->getInvoiceCollection();
-         foreach ($invoices as $invoice) {
+        foreach ($invoices as $invoice) {
             $invoiceincrementid = $invoice->getIncrementId();
             $invoiceobj =  $this->Invoice->loadByIncrementId($invoiceincrementid);
             $creditmemo = $this->creditmemoFactory->createByOrder($order);
             $creditmemo->setInvoice($invoiceobj);
-             $this->CreditmemoService->refund($creditmemo);
-             $this->_markRefunded($creditmemo, $comment);
+            $this->CreditmemoService->refund($creditmemo);
+            $this->_markRefunded($creditmemo, $comment);
         }
-
     }
 
     private function _markRefunded($creditmemo, $comment)
@@ -284,10 +288,10 @@ class Order
         $order->addStatusHistoryComment($comment);
 
          $transactionSave = $this->_transaction->addObject(
-            $creditmemo
-        )->addObject(
-            $creditmemo->getOrder()
-        );
+             $creditmemo
+         )->addObject(
+             $creditmemo->getOrder()
+         );
         $transactionSave->save();
     }
 
@@ -301,14 +305,15 @@ class Order
         $creditmemo->load($reference, 'increment_id');
 
         if ($creditmemo->getOrder()->getId() != $this->getOrder()->getId()) {
-            throw new Exception('WorldPay refund ERROR: Credit Memo does not match Order. Reference:' . $reference);
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('WorldPay refund ERROR: Credit Memo does not match Order. Reference'. $reference)
+            );
         }
 
         if ($creditmemo->getState() == \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN) {
             $this->_cancelCreditmemo($creditmemo, $comment);
         }
     }
-
 
     private function _cancelCreditmemo($creditmemo, $comment = null)
     {
@@ -340,7 +345,9 @@ class Order
             }
             $this->creditmemoRepository->save($creditmemo);
         } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($e->getMessage())
+            );
         }
         return true;
     }
@@ -363,6 +370,4 @@ class Order
             $order->setBaseTotalRefunded($order->getBaseTotalRefunded() - $creditmemo->getBaseGrandTotal());
         }
     }
-
-
 }

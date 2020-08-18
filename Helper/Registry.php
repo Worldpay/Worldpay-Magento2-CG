@@ -7,8 +7,9 @@ namespace Sapient\Worldpay\Helper;
 class Registry extends \Magento\Framework\App\Helper\AbstractHelper
 {
     protected $_registry;
-    public function __construct(\Magento\Framework\App\Helper\Context $context,
-         \Magento\Framework\Registry $registry
+    public function __construct(
+        \Magento\Framework\App\Helper\Context $context,
+        \Magento\Framework\Registry $registry
     ) {
 
          $this->_registry = $registry;
@@ -17,9 +18,9 @@ class Registry extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function removeAllData()
     {
-        $keys = array(
+        $keys = [
             'worldpayRedirectUrl',
-        );
+        ];
 
         foreach ($keys as $key) {
             $this->removeDataFromRegistry($key);
@@ -45,7 +46,6 @@ class Registry extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_registry->register($name, $data);
 
         return $this;
-
     }
 
     public function getDataFromRegistry($name)

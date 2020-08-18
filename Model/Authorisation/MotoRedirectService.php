@@ -23,16 +23,16 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         \Magento\Framework\UrlInterface $urlBuilder,
         \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist
     ) {
-       $this->mappingservice = $mappingservice;
-       $this->paymentservicerequest = $paymentservicerequest;
-       $this->wplogger = $wplogger;
-       $this->paymentservice = $paymentservice;
-       $this->redirectresponse = $redirectresponse;
-       $this->registryhelper = $registryhelper;
-       $this->checkoutsession = $checkoutsession;
-       $this->paymentlist = $paymentlist;
-       $this->_urlBuilder = $urlBuilder;
-       $this->worldpayhelper = $worldpayhelper;
+        $this->mappingservice = $mappingservice;
+        $this->paymentservicerequest = $paymentservicerequest;
+        $this->wplogger = $wplogger;
+        $this->paymentservice = $paymentservice;
+        $this->redirectresponse = $redirectresponse;
+        $this->registryhelper = $registryhelper;
+        $this->checkoutsession = $checkoutsession;
+        $this->paymentlist = $paymentlist;
+        $this->_urlBuilder = $urlBuilder;
+        $this->worldpayhelper = $worldpayhelper;
     }
 
     public function authorizePayment(
@@ -42,7 +42,7 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         $orderStoreId,
         $paymentDetails,
         $payment
-    ) {      
+    ) {
         $this->checkoutsession->setauthenticatedOrderId($mageOrder->getIncrementId());
 
         $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
@@ -54,14 +54,15 @@ class MotoRedirectService extends \Magento\Framework\DataObject
 
         $responseXml = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
 
-        $successUrl = $this->_buildRedirectUrl($responseXml, $redirectOrderParams['paymentType'], $this->_getCountryForQuote($quote));
+        $successUrl = $this->_buildRedirectUrl(
+            $responseXml,
+            $redirectOrderParams['paymentType'],
+            $this->_getCountryForQuote($quote)
+        );
 
         $payment->setIsTransactionPending(1);
         $this->checkoutsession->setAdminWpRedirecturl($successUrl);
-
     }
-
-   
 
     private function _buildRedirectUrl($responseXml, $paymentType, $countryCode)
     {
@@ -98,9 +99,9 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return $redirectUrl;
     }
 
-    private function _encodeUrl($path, $additionalParams = array())
+    private function _encodeUrl($path, $additionalParams = [])
     {
-        $urlParams = array('_type' => 'direct_link', '_secure' => true);
+        $urlParams = ['_type' => 'direct_link', '_secure' => true];
         $urlParams = array_merge($urlParams, $additionalParams);
         $rawurlencode = rawurlencode(
             $this->_urlBuilder->getUrl($path, $urlParams)
@@ -125,8 +126,6 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         if (substr($locale, 3, 2) == 'NO') {
             return 'no';
         }
-        return substr($locale, 0, 2); 
-    
+        return substr($locale, 0, 2);
     }
- 
 }

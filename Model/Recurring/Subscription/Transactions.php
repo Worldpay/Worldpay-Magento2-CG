@@ -13,7 +13,7 @@ use Sapient\Worldpay\Model\Recurring\Subscription;
 /**
  * Subscription Address
  */
-class Transactions extends AbstractModel 
+class Transactions extends AbstractModel
 {
     /**
      * @var Subscription
@@ -25,7 +25,7 @@ class Transactions extends AbstractModel
      */
     protected function _construct()
     {
-        $this->_init('Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions');
+        $this->_init(\Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions::class);
     }
 
     /**
@@ -63,26 +63,25 @@ class Transactions extends AbstractModel
     /**
      * Load order Details
      *
-     * 
+     *
      */
     public function loadByOrderIncrementId($order_increment_id)
     {
         if (!$order_increment_id) {
-            return;         
+            return;
         }
         $id = $this->getResource()->loadByOriginalOrderIncrementId($order_increment_id);
         return $this->load($id);
-            
     }
     /**
      * Load order Details
      *
-     * 
+     *
      */
     public function loadByWorldpayOrderId($order_id)
     {
         if (!$order_id) {
-            return;         
+            return;
         }
         $id = $this->getResource()->loadByWorldpayOrderId($order_id);
             return $this->load($id);
@@ -91,12 +90,12 @@ class Transactions extends AbstractModel
     /**
      * Load order Details
      *
-     * 
+     *
      */
     public function loadBySubscriptionId($subscriptionId)
     {
         if (!$subscriptionId) {
-            return;         
+            return;
         }
         $id = $this->getResource()->loadBySubscriptionId($subscriptionId);
             return $this->load($id);
@@ -105,13 +104,13 @@ class Transactions extends AbstractModel
     /**
      * Load order Details
      *
-     * 
+     *
      */
     public function loadById($entityId)
     {
         if (!$entityId) {
-            return;         
-}
+            return;
+        }
         $id = $this->getResource()->loadById($entityId);
             return $this->load($id);
     }

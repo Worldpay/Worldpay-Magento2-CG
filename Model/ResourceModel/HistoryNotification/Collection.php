@@ -7,7 +7,7 @@ namespace Sapient\Worldpay\Model\ResourceModel\HistoryNotification;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
 /**
- * HistoryNotification collection   
+ * HistoryNotification collection
  */
 class Collection extends AbstractCollection
 {
@@ -19,8 +19,8 @@ class Collection extends AbstractCollection
     protected function _construct()
     {
         $this->_init(
-            'Sapient\Worldpay\Model\HistoryNotification',
-            'Sapient\Worldpay\Model\ResourceModel\HistoryNotification'
+            \Sapient\Worldpay\Model\HistoryNotification::class,
+            \Sapient\Worldpay\Model\ResourceModel\HistoryNotification::class
         );
     }
 }

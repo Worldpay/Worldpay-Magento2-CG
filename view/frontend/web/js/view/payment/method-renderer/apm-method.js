@@ -28,7 +28,8 @@ define(
             defaults: {
                 redirectAfterPlaceOrder: false,
                 redirectTemplate: 'Sapient_Worldpay/payment/apm',
-                idealBankType:null
+                idealBankType:null,
+                statementNarrative:null
             },
 
             initialize: function () {
@@ -121,6 +122,7 @@ define(
             },
             selectedCCType : ko.observable(),
             selectedIdealBank:ko.observable(),
+            stmtNarrative:ko.observable(),
             getTemplate: function(){
                     return this.redirectTemplate;
             },
@@ -143,7 +145,8 @@ define(
                     'method': "worldpay_apm",
                     'additional_data': {
                         'cc_type': this.getselectedCCType(),
-                        'cc_bank': this.idealBankType
+                        'cc_bank': this.idealBankType,
+                        'statementNarrative': this.statementNarrative
                     }
                 };
             },
@@ -173,6 +176,7 @@ define(
                     if (this.getselectedCCType() =='IDEAL-SSL') {
                         this.idealBankType = this.selectedIdealBank();
                     }
+                    this.statementNarrative = this.stmtNarrative();
                     self.placeOrder();
                 } else {
                     return $form.validation() && $form.validation('isValid');
@@ -196,6 +200,7 @@ define(
                         $("#ideal_bank").prop('disabled',true);
                         $(".ideal-block").hide();
                     }
+                     $(".statment-narrative").show();
                 }else if(data){
                     if (data.selectedCCType() && data.selectedCCType() == 'IDEAL-SSL') {
                         $(".ideal-block").show();
@@ -204,6 +209,7 @@ define(
                         $("#ideal_bank").prop('disabled',true);
                         $(".ideal-block").hide();
                     }
+                     $(".statment-narrative").show();
                 } else {
                     $("#ideal_bank").prop('disabled',true);
                     $(".ideal-block").hide();

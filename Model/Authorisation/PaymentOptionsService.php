@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Authorisation;
+
 use Exception;
 
 class PaymentOptionsService extends \Magento\Framework\DataObject
@@ -13,7 +14,7 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
      * @param \Sapient\Worldpay\Model\Mapping\Service $mappingservice
      * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper   
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
@@ -21,19 +22,19 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Helper\Data $worldpayhelper
     ) {
-       $this->mappingservice = $mappingservice;
-       $this->paymentservicerequest = $paymentservicerequest;
-       $this->wplogger = $wplogger;
-       $this->worldpayhelper = $worldpayhelper;
+        $this->mappingservice = $mappingservice;
+        $this->paymentservicerequest = $paymentservicerequest;
+        $this->wplogger = $wplogger;
+        $this->worldpayhelper = $worldpayhelper;
     }
     /**
      * handles provides authorization data for redirect
-     * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl 
+     * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
      */
     public function collectPaymentOptions(
         $countryId,
         $paymenttype
-    ) {      
+    ) {
         $paymentOptionParams = $this->mappingservice->collectPaymentOptionsParameters(
             $countryId,
             $paymenttype
@@ -48,12 +49,9 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
 
     private function getPaymentOptions($xml)
     {
-         if (isset($xml->reply->paymentOption)) {
+        if (isset($xml->reply->paymentOption)) {
             return (array) $xml->reply->paymentOption;
         }
         return null;
-
     }
-
-    
 }

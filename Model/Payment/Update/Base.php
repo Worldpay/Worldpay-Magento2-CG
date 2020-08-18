@@ -5,6 +5,7 @@
 namespace Sapient\Worldpay\Model\Payment\Update;
 
 use Exception;
+use \Magento\Framework\Exception\LocalizedException;
 
 class Base
 {
@@ -20,7 +21,7 @@ class Base
     /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
-     * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment        
+     * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      */
     public function __construct(
         \Sapient\Worldpay\Model\Payment\State $paymentState,
@@ -31,19 +32,19 @@ class Base
         $this->_worldPayPayment = $worldPayPayment;
     }
     /**
-     * @return string ordercode 
+     * @return string ordercode
      */
     public function getTargetOrderCode()
     {
         return $this->_paymentState->getOrderCode();
     }
 
-    /** 
+    /**
      * check payment Status
      * @param object $order
      * @param array $allowedPaymentStatuses
      * @return null
-     * @throws Exception 
+     * @throws Exception
      */
     protected function _assertValidPaymentStatusTransition($order, $allowedPaymentStatuses)
     {
@@ -57,21 +58,23 @@ class Base
         }
 
         if ($existingPaymentStatus == $newPaymentStatus) {
-            throw new Exception('same state');
+            throw new \Magento\Framework\Exception\AlreadyExistsException(
+            __('same state')
+        );
         }
 
-        throw new Exception('invalid state transition');
-
+        throw new \Magento\Framework\Exception\AlreadyExistsException(
+            __('invalid state transition'));
     }
 
-    /** 
-     * check if order is not placed throgh worldpay payment    
-     * @throws Exception 
+    /**
+     * check if order is not placed throgh worldpay payment
+     * @throws Exception
      */
     private function _assertPaymentExists($order)
     {
         if (!$order->hasWorldPayPayment()) {
-            throw new Exception('No payment');
+            throw new \Magento\Framework\Exception\LocalizedException('No payment');
         }
     }
 
@@ -82,6 +85,4 @@ class Base
     {
         return round($amount, 2, PHP_ROUND_HALF_EVEN) / pow(10, 2);
     }
-
-
 }

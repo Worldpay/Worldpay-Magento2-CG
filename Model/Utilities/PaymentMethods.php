@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Utilities;
+
 /**
  * Reading the xml
  */
@@ -87,20 +88,19 @@ class PaymentMethods
     }
 
     /**
-     *load enable payment type
-     *
+     * load enable payment type
+     * $type is worldpay_apm $paymentType is CHINAUNIONPAY-SSL,YANDEXMONEY-SSL
      * @param string $type
      * @return array $methods
      */
     public function loadEnabledByType($type, $paymentType)
     {
-        $methods = array();
+        $methods = [];
         if ($xml = $this->_readXML()) {
             $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $type . self::TYPE_PATH . $paymentType);
             if ($this->_paymentMethodExists($node) && $this->_methodAllowedForCountry($type, $node[0])) {
                 return true;
-            }
-            else{
+            } else {
                 return false;
             }
         }
@@ -114,7 +114,7 @@ class PaymentMethods
      */
     private function _paymentMethodExists($paymentMethodNode)
     {
-        return $paymentMethodNode && sizeof($paymentMethodNode);
+        return $paymentMethodNode && count($paymentMethodNode);
     }
 
     /**
@@ -131,8 +131,10 @@ class PaymentMethods
      */
     protected function _readXML()
     {
-        if (!self::$_xml && file_exists($this->_xmlLocation)) {
-            self::$_xml = simplexml_load_file($this->_xmlLocation);
+
+        $validator = new \Zend\Validator\File\Exists();
+        if (!self::$_xml && $validator->isValid($this->_xmlLocation)) {
+             self::$_xml = simplexml_load_file($this->_xmlLocation);
         }
         return self::$_xml;
     }
@@ -158,7 +160,10 @@ class PaymentMethods
      */
     private function _paymentMethodFiltersByCountry($type)
     {
-        return $type === 'worldpay_apm' || $type === 'worldpay_cc' || $type === 'worldpay_moto' || $type === 'worldpay_cc_vault';
+        return $type === 'worldpay_apm' ||
+               $type === 'worldpay_cc' ||
+               $type === 'worldpay_moto' ||
+               $type === 'worldpay_cc_vault';
     }
 
     /**
@@ -168,7 +173,7 @@ class PaymentMethods
     private function _getAllowedCountryIds()
     {
         $quote = $this->checkoutsession->getQuote();
-        if($this->authSession->isLoggedIn()) {
+        if ($this->authSession->isLoggedIn()) {
             $adminQuote = $this->adminsessionquote->getQuote();
             if (empty($quote->getReservedOrderId()) && !empty($adminQuote->getReservedOrderId())) {
                 $quote = $adminQuote;
@@ -177,7 +182,7 @@ class PaymentMethods
         $address = $quote->getBillingAddress();
         $countryid = $address->getCountryId();
 
-        return array($countryid, 'GLOBAL');
+        return [$countryid, 'GLOBAL'];
     }
 
     /**
@@ -188,7 +193,7 @@ class PaymentMethods
     {
         $areas = (array) $paymentMethodNode->areas;
 
-        return is_array($areas['area']) ? $areas['area'] : array($areas['area']);
+        return is_array($areas['area']) ? $areas['area'] : [$areas['area']];
     }
 
     private function _isCountryAllowed($allowedCountryIds, $availableCountryIds)
@@ -203,15 +208,15 @@ class PaymentMethods
      * @param string $type
      * @return bool
      */
-    public function CheckCaptureRequest($type,$method)
+    public function checkCaptureRequest($type, $method)
     {
 
         if ($xml = $this->_readXML()) {
-            $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $type . self::TYPE_PATH . $method );
+            $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $type . self::TYPE_PATH . $method);
             if ($node) {
                 $capture_request = $this->_getCaptureRequest($node[0]);
                 if ($capture_request==1) {
-                   return true;
+                    return true;
                 }
             }
         }
@@ -229,23 +234,23 @@ class PaymentMethods
         return $capturerequest;
     }
 
-    public function CheckCurrency($code, $type)
+    public function checkCurrency($code, $type)
     {
         if ($xml = $this->_readXML()) {
              $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $code . self::TYPE_PATH . $type .'/currencies');
-             if(!$this->_currencyNodeExists($node) || $this->_typeAllowedForCurrency($node[0])){
+            if (!$this->_currencyNodeExists($node) || $this->_typeAllowedForCurrency($node[0])) {
                 return true;
-             }else{
+            } else {
                 return false;
-             }
+            }
 
         }
         return true;
     }
 
-     private function _currencyNodeExists($node)
+    private function _currencyNodeExists($node)
     {
-        return $node && sizeof($node);
+        return $node && count($node);
     }
 
     private function _typeAllowedForCurrency(\SimpleXMLElement $node)
@@ -256,18 +261,17 @@ class PaymentMethods
         );
     }
 
-
     private function _getAllowedCurrencies()
     {
         $currencyCode = $this->_storeManager->getStore()->getCurrentCurrencyCode();
-        return array($currencyCode);
+        return [$currencyCode];
     }
 
     private function _getAvailableCurrencyCodes(\SimpleXMLElement $node)
     {
         $currencies = (array) $node;
 
-        return is_array($currencies['currency']) ? $currencies['currency'] : array($currencies['currency']);
+        return is_array($currencies['currency']) ? $currencies['currency'] : [$currencies['currency']];
     }
 
     private function _isCurrencyAllowed($allowedCurrencyCodes, $availableCurrencyCodes)
@@ -277,24 +281,23 @@ class PaymentMethods
         return !empty($matchingCurrencies);
     }
 
-
-    public function CheckShipping($code, $type)
+    public function checkShipping($code, $type)
     {
         if ($xml = $this->_readXML()) {
              $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $code . self::TYPE_PATH . $type .'/shippingareas');
-             if(!$this->_shippingNodeExists($node) || $this->_typeAllowedForShipping($node[0])){
+            if (!$this->_shippingNodeExists($node) || $this->_typeAllowedForShipping($node[0])) {
                 return true;
-             }else{
+            } else {
                 return false;
-             }
+            }
 
         }
         return true;
     }
 
-     private function _shippingNodeExists($node)
+    private function _shippingNodeExists($node)
     {
-        return $node && sizeof($node);
+        return $node && count($node);
     }
 
     private function _typeAllowedForShipping(\SimpleXMLElement $node)
@@ -305,21 +308,20 @@ class PaymentMethods
         );
     }
 
-
     private function _getAllowedShippingCountries()
     {
         $quote = $this->checkoutsession->getQuote();
         $address = $quote->getShippingAddress();
         $countryid = $address->getCountryId();
 
-        return array($countryid,'GLOBAL');
+        return [$countryid,'GLOBAL'];
     }
 
     private function _getAvailableShippingCountries(\SimpleXMLElement $node)
     {
         $areas = (array) $node;
 
-        return is_array($areas['ship']) ? $areas['ship'] : array($areas['ship']);
+        return is_array($areas['ship']) ? $areas['ship'] : [$areas['ship']];
     }
 
     private function _isShippingAllowed($allowedShippingCountries, $availableShippingCountries)
@@ -329,24 +331,23 @@ class PaymentMethods
         return !empty($matchingCountries);
     }
 
-
-     public function CheckStopAutoInvoice($code, $type)
+    public function checkStopAutoInvoice($code, $type)
     {
         if ($xml = $this->_readXML()) {
              $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $code . self::TYPE_PATH . $type .'/stop_auto_invoice');
-             if($this->_autoInvoiceNodeExists($node) && $this->_getStopAutoInvoice($node[0]) == 1){
+            if ($this->_autoInvoiceNodeExists($node) && $this->_getStopAutoInvoice($node[0]) == 1) {
                 return true;
-             }else{
+            } else {
                 return false;
-             }
+            }
 
         }
         return false;
     }
 
-     private function _autoInvoiceNodeExists($node)
+    private function _autoInvoiceNodeExists($node)
     {
-        return $node && sizeof($node);
+        return $node && count($node);
     }
 
     private function _getStopAutoInvoice(\SimpleXMLElement $node)
@@ -354,14 +355,15 @@ class PaymentMethods
         $stopautoinvoice = (string) $node;
         return $stopautoinvoice;
     }
-    public function idealBanks(){
-        $banks = array();
+    public function idealBanks()
+    {
+        $banks = [];
         if ($xml = $this->_readXML()) {
             $node = $xml->xpath('/paymentMethods/' . 'worldpay_apm' . '/types/' . 'IDEAL-SSL'. '/banks');
             if ($this->_paymentMethodExists($node)) {
                  $bankinfos = $node[0];
-                $bankdetails = array();
-                foreach($bankinfos->bank as $bankinfo){
+                $bankdetails = [];
+                foreach ($bankinfos->bank as $bankinfo) {
                     $bankcode = (string) $bankinfo->code;
                     $bankvalue = (string) $bankinfo->value;
                     $bankdetails[$bankcode] = $bankvalue;
@@ -373,21 +375,20 @@ class PaymentMethods
 
     public function getPaymentTypeCountries()
     {
-        $codes = array('worldpay_cc','worldpay_apm','worldpay_moto', 'worldpay_cc_vault');
-        $paymenttypecountries = array();
-        foreach($codes as $code){
+        $codes = ['worldpay_cc','worldpay_apm','worldpay_moto', 'worldpay_cc_vault'];
+        $paymenttypecountries = [];
+        foreach ($codes as $code) {
             if ($xml = $this->_readXML()) {
                  $nodes = $xml->xpath('/paymentMethods/' . $code . '/types');
-             }
-             $typearray =  array();
-             foreach($nodes[0] as $key => $value){
+            }
+             $typearray =  [];
+            foreach ($nodes[0] as $key => $value) {
                 $key = (string) $key;
                 $area =  (array) $value->areas[0]->area;
                 $typearray[$key] = $area;
-             }
+            }
              $paymenttypecountries[$code] = $typearray;
         }
         return json_encode($paymenttypecountries);
     }
-
 }

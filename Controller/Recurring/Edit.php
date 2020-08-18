@@ -12,6 +12,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Result\PageFactory;
 use Sapient\Worldpay\Model\Recurring\SubscriptionFactory;
 use Sapient\Worldpay\Model\Config\Source\SubscriptionStatus;
+use Sapient\Worldpay\Helper\GeneralException;
 
 class Edit extends \Magento\Framework\App\Action\Action
 {
@@ -29,6 +30,8 @@ class Edit extends \Magento\Framework\App\Action\Action
      * @var SubscriptionFactory
      */
     private $subscriptionFactory;
+    
+    private $helper;
 
     /**
      * @param Context $context
@@ -40,12 +43,14 @@ class Edit extends \Magento\Framework\App\Action\Action
         Context $context,
         Session $customerSession,
         PageFactory $resultPageFactory,
-        SubscriptionFactory $subscriptionFactory
+        SubscriptionFactory $subscriptionFactory,
+        \Sapient\Worldpay\Helper\GeneralException $helper
     ) {
         $this->customerSession = $customerSession;
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
         $this->subscriptionFactory = $subscriptionFactory;
+        $this->helper = $helper;
     }
 
     /**
@@ -56,7 +61,7 @@ class Edit extends \Magento\Framework\App\Action\Action
      */
     public function dispatch(RequestInterface $request)
     {
-        $loginUrl = $this->_objectManager->get('Magento\Customer\Model\Url')->getLoginUrl();
+        $loginUrl = $this->_objectManager->get(\Magento\Customer\Model\Url::class)->getLoginUrl();
 
         if (!$this->customerSession->authenticate($loginUrl)) {
             $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
@@ -80,19 +85,19 @@ class Edit extends \Magento\Framework\App\Action\Action
             ->load($subscriptionId);
 
         if ($this->customerSession->getCustomerId() != $subscription->getCustomerId()) {
-            $this->messageManager->addErrorMessage(__('Subscription not found.'));
+            $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('ACAM9')));
 
             return $this->resultRedirectFactory->create()->setPath('*/*');
         }
 
         if (!$subscription->getId() || $subscription->getId() != $subscriptionId) {
-            $this->messageManager->addErrorMessage(__('Subscription no longer exists.'));
+            $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('ACAM5')));
 
             return $this->resultRedirectFactory->create()->setPath('*/*');
         }
 
         if ($subscription->getStatus() == SubscriptionStatus::CANCELLED) {
-            $this->messageManager->addErrorMessage(__('Subscription is no longer active.'));
+            $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('ACAM6')));
 
             return $this->resultRedirectFactory->create()->setPath('*/*');
         }

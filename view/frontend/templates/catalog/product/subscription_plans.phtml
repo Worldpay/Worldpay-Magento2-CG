@@ -11,7 +11,7 @@
 <div class="field worldpay-subscriptions">
     <label class="label"><span><?php echo $block->escapeHtml(__('Buy one time or select a Payment Plan')) ?></span></label>
     <div>
-        <input type="checkbox" id="worldpay-add-plan" name="worldpay_add_plan">
+        <input type="checkbox" id="worldpay-add-plan" name="worldpay_add_plan" onchange="valueChanged()">
         <label for="worldpay-add-plan"><span><?php echo $block->escapeHtml(__('Subscribe this product and save')) ?></span></label>
     </div>
     <div class="control" id="worldpay-subscription-plans-list" style="display: none;" data-mage-init='{"worldpayPriceSubscription":{
@@ -69,4 +69,14 @@
             minDate: new Date()
         });
     });
+    function valueChanged()
+    {
+        if(jQuery('#worldpay-add-plan').is(":checked")){
+            jQuery('#instant-purchase').hide();
+        }
+        else{
+            jQuery('#instant-purchase').show();
+        }
+    }
 </script>
+

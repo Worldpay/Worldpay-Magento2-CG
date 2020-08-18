@@ -5,6 +5,29 @@
                class="radio"
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
+        
+         <!-- ko if: ( getCode()=='worldpay_cc')-->
+
+         <div class='accepted_cc'>
+            
+             <span class='worldpay_cc_we_accept'>We Accept</span>
+             
+             <div class="paymentoptions-icon-wrapper">
+         <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
+         <!--ko if: $parent.getIcons(item.ccValue) -->
+                        <div data-bind="attr: {for: 'direct_cc_' + item.ccValue}"><img data-bind="attr: {
+                                    'src': $parent.getIcons(item.ccValue).url,
+                                    'alt': item.ccLabel,
+                                    'width': $parent.getIcons(item.ccValue).width,
+                                    'height': $parent.getIcons(item.ccValue).height
+                                    }"></div>
+                    <!--/ko-->
+         <!--/ko-->
+          </div>
+        </div>
+          <!--/ko-->
+          
+          
     </div>
     <div class="payment-method-content">
         <!-- Credit Card Form-->
@@ -27,7 +50,7 @@
         </div>
         <div class="actions-toolbar">
             <div class="primary">
-                <button class="action primary checkout"
+                <button id="checkout-place-order" class="action primary checkout"
                         type="submit"
                         data-bind="
                             click: preparePayment,

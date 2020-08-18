@@ -9,9 +9,9 @@ class Factory
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
     /**
-     * Constructor 
-     * @param \Sapient\Worldpay\Helper\Data $configHelper    
-     * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment             
+     * Constructor
+     * @param \Sapient\Worldpay\Helper\Data $configHelper
+     * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      */
     public function __construct(
         \Sapient\Worldpay\Helper\Data $configHelper,
@@ -19,7 +19,6 @@ class Factory
     ) {
             $this->_configHelper = $configHelper;
             $this->worldpaymentmodel = $worldpaymentmodel;
-        
     }
 
     /**
@@ -99,7 +98,7 @@ class Factory
                     $this->_configHelper
                 );
 
-            default :
+            default:
                 return new \Sapient\Worldpay\Model\Payment\Update\Defaultupdate(
                     $paymentState,
                     $this->worldpaymentmodel,
@@ -107,5 +106,4 @@ class Factory
                 );
         }
     }
-
 }

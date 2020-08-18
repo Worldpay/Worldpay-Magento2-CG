@@ -17,13 +17,17 @@ define(
         'mage/storage',
         'Magento_Checkout/js/model/full-screen-loader',
         'hmacSha256',
-        'encBase64'
+        'encBase64',
+        'Magento_Checkout/js/view/summary/abstract-total'
     ],
+    
     function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64) {
         'use strict';
         //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
         var filtersavedcardLists = ko.observableArray([]);
+        var isInstalment = ko.observableArray([]);
+        var checkInstal = ko.observable();
         var paymentService = false;
         var billingAddressCountryId = "";
         var dfReferenceId = "";
@@ -36,12 +40,21 @@ define(
             if (value) {
                 return evaluateRegex(value, "^[0-9]{12,20}$");
             }
-        }, $.mage.__('Card number should contain between 12 and 20 numeric characters.'));
-
+	    }, $.mage.__(getCreditCardExceptions('CCAM1')));
+	    $.validator.addMethod('worldpay-validate-cpf-number', function (value) {
+                if (value) {
+                    return (evaluateRegex(value, "^[0-9]{11,11}$") || evaluateRegex(value, "^[0-9]{14,14}$"));
+                }
+            }, $.mage.__(getCreditCardExceptions('CCAM20')));
+            $.validator.addMethod('worldpay-validate-latm-desc', function (value) {
+                if (value) {
+                    return evaluateRegex(value, "^[a-zA-Z0-9 ]+$");
+                }
+            }, $.mage.__(getCreditCardExceptions('CCAM21')));
         //Valid Card or not.
         $.validator.addMethod('worldpay-cardnumber-valid', function (value) {
             return doLuhnCheck(value);
-        }, $.mage.__('The card number entered is invalid.'));
+        }, $.mage.__(getCreditCardExceptions('CCAM0')));
 
         //Regex for valid card number.
         function evaluateRegex(data, re) {
@@ -71,7 +84,17 @@ define(
 
             return (nCheck % 10) === 0;
         }
-        
+        function getCreditCardExceptions (exceptioncode){
+                var ccData=window.checkoutConfig.payment.ccform.creditcardexceptions;
+                  for (var key in ccData) {
+                    if (ccData.hasOwnProperty(key)) {  
+                        var cxData=ccData[key];
+                    if(cxData['exception_code'].includes(exceptioncode)){
+                        return cxData['exception_module_messages']?cxData['exception_module_messages']:cxData['exception_messages'];
+                    }
+                    }
+                }
+            }
         // 3DS2 part Start
         
         var jwtUrl = url.build('worldpay/hostedpaymentpage/jwt');
@@ -93,29 +116,103 @@ define(
                 cardHolderName:'',
                 SavedcreditCardVerificationNumber:'',
                 saveMyCard:false,
-                cseData:null
+                    cseData: null,
             },
-
+                totals: quote.getTotals(),
             initialize: function () {
                 this._super();
                 this.selectedCCType(null);
+                this.initPaymentKeyEvents();
                 if(paymentService == false){
                     this.filtercardajax(1);
+                        this.getInstalmentValues(1);
+                        //this.reloadCpfSection();
                 }
             },
             initObservable: function () {
                 var that = this;
                 this._super();
+                    this._super().observe(['cpfData']);
                 quote.billingAddress.subscribe(function (newAddress) {
                     if (quote.billingAddress._latestValue != null  && quote.billingAddress._latestValue.countryId != billingAddressCountryId) {
                         billingAddressCountryId = quote.billingAddress._latestValue.countryId;
                         that.filtercardajax(1);
+                            that.getInstalmentValues(1);
+                            //that.reloadCpfSection();
                         paymentService = true;
                     }
                 });
             return this;
-            },
+                },
+                /**
+                 * cpf reload
+                 *
+                 * @return {window.Promise}
+                 */
+//        reloadCpfSection: function () {
+//
+//            return new window.Promise(function (resolve, reject) {
+//                if (this.cpfData().isinstalment) {
+//                    return resolve();
+//                }
+//            }.bind(this))
+//                    .catch(function (error) {
+//                        reject(error);
+//                    });
+//            },
+                getInstalmentValues: function (statusCheck) {
+                    if (!statusCheck) {
+                        return;
+                    }
+                    if (quote.billingAddress._latestValue == null) {
+                        return;
+                    }
+                    var serviceUrl = urlBuilder.createUrl('/worldpay/latam/types', {});
+                    var filterinstal = {};
+                    var cckey, ccvalue;
+                    var payload = {
+                        countryId: quote.billingAddress._latestValue.countryId
+                    };
+                    fullScreenLoader.startLoader();
+
+                    storage.post(
+                            serviceUrl, JSON.stringify(payload)
+                            ).done(
+                            function (apiresponse) {
+                                var response = (apiresponse);
+                                if (response.length) {
+                                    var str_array = response.split(',');
+                                    filterinstal[1]='One Payment';
+                                    for (var i = 0; i < str_array.length; i++) {
+                                        // Trim the excess whitespace.
+                                        str_array[i] = str_array[i].replace(/^\s*/, "").replace(/\s*$/, "");
+                                        // Add additional code here, such as:
+                                        cckey = str_array[i];
+                                        ccvalue = str_array[i];
+                                        filterinstal[cckey] = ccvalue;
+                                    }
+                                }
+                                var ccTypesArr1 = _.map(filterinstal, function (value, key) {
+                                    return {
+                                        'instalValue': key,
+                                        'instalccLabel': value
+                                    };
+                                });
+                                fullScreenLoader.stopLoader();
+                                isInstalment(ccTypesArr1);
+                                
+                            }
+                    ).fail(
+                            function (response) {
+                                errorProcessor.process(response);
+                                fullScreenLoader.stopLoader();
+                            }
+                    );
+                },
             filtercardajax: function(statusCheck){
+                var CreditCardPreSelected = jQuery('.paymentmethods-radio-wrapper [name="payment[cc_type]"]:checked');
+                var APMPreSelected = jQuery('.paymentmethods-radio-wrapper [name="apm_type"]:checked');
+                var WalletPreSelected = jQuery('.paymentmethods-radio-wrapper [name="wallets_type"]:checked');
                 if(!statusCheck){
                     return;
                 }
@@ -194,6 +291,16 @@ define(
                          fullScreenLoader.stopLoader();
                          ccTypesArr(ccTypesArr1);
                          filtersavedcardLists(filtercards);
+
+                         if(CreditCardPreSelected.length){
+                            jQuery('.paymentmethods-radio-wrapper #'+CreditCardPreSelected[0].id+'[name="payment[cc_type]"]').attr('checked',true).change();
+                         }
+                         if(APMPreSelected.length){
+                            jQuery('.paymentmethods-radio-wrapper #'+APMPreSelected[0].id+'[name="apm_type"]').attr('checked',true).change();
+                         }
+                         if(WalletPreSelected.length){
+                            jQuery('.paymentmethods-radio-wrapper #'+WalletPreSelected[0].id+'[name="wallets_type"]').attr('checked',true).change();
+                         }
                     }
                 ).fail(
                     function (response) {
@@ -210,8 +317,27 @@ define(
             availableCCTypes : function(){
                return ccTypesArr;
             },
+                availableInstalTypes: function () {
+                    return isInstalment();
+                },
+                availableInstalTypesCnt: function () {
+                    return isInstalment().length;
+                },
+                showCPFSection: function () {
+                    if((isInstalment().length === 0 || isInstalment().length !== 0) && this.isCPFEnabled()) {
+                        return true;
+                    }
+                    return false;
+                },
+                showInstalmentSection: function () {
+                    if((isInstalment().length !== 0) && this.isInstalmentEnabled()) {
+                        return true;
+                    }
+                    return false;
+                },
             selectedCCType : ko.observable(),
             paymentToken:ko.observable(),
+                selectedInstalment: ko.observable(),
 
             getCode: function() {
                 return 'worldpay_cc';
@@ -249,6 +375,109 @@ define(
                 }
                 $('#disclaimer-error').html('');
             },
+
+            initPaymentKeyEvents: function(){
+                var that = this;
+                $('.checkout-container').on('keyup', '.payment_cc_number', function(e){
+                    that.loadCCKeyDownEventAction(this, e);
+                })
+            },
+
+            loadCCKeyDownEventAction: function(el, event){
+                var curVal = $(el).val();
+
+                var $ccNumberContain = $(el).parents('.ccnumber_withcardtype');
+                var piCardType = '';
+
+                var visaRegex = new RegExp('^4[0-9]{0,15}$'),
+                mastercardRegex = new RegExp(
+                '^(?:5[1-5][0-9]{0,2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{0,2}|27[01][0-9]|2720)[0-9]{0,12}$'
+                ),
+                amexRegex = new RegExp('^3$|^3[47][0-9]{0,13}$'),
+                discoverRegex = new RegExp('^6[05]$|^601[1]?$|^65[0-9][0-9]?$|^6(?:011|5[0-9]{2})[0-9]{0,12}$'),
+                jcbRegex = new RegExp('^35(2[89]|[3-8][0-9])'),
+                dinersRegex = new RegExp('^36'),
+                maestroRegex = new RegExp('^(5018|5020|5038|6304|6759|676[1-3])'),
+                unionpayRegex = new RegExp('^62[0-9]{0,14}$|^645[0-9]{0,13}$|^65[0-9]{0,14}$');
+
+                // get rid of spaces and dashes before using the regular expression
+                curVal = curVal.replace(/ /g, '').replace(/-/g, '');
+
+                // checks per each, as their could be multiple hits
+                if (curVal.match(visaRegex)) {
+                    piCardType = 'visa';
+                    $ccNumberContain.addClass('is_visa');
+                } else {
+                    $ccNumberContain.removeClass('is_visa');
+                }
+
+                if (curVal.match(mastercardRegex)) {
+                    piCardType = 'mastercard';
+                    $ccNumberContain.addClass('is_mastercard');
+                } else {
+                    $ccNumberContain.removeClass('is_mastercard');
+                }
+
+                if (curVal.match(amexRegex)) {
+                    piCardType = 'amex';
+                    $ccNumberContain.addClass('is_amex');
+                } else {
+                    $ccNumberContain.removeClass('is_amex');
+                }
+
+                if (curVal.match(discoverRegex)) {
+                    piCardType = 'discover';
+                    $ccNumberContain.addClass('is_discover');
+                } else {
+                    $ccNumberContain.removeClass('is_discover');
+                }
+
+                if (curVal.match(unionpayRegex)) {
+                    piCardType = 'unionpay';
+                    $ccNumberContain.addClass('is_unionpay');
+                } else {
+                    $ccNumberContain.removeClass('is_unionpay');
+                }
+
+                if (curVal.match(jcbRegex)) {
+                    piCardType = 'jcb';
+                    $ccNumberContain.addClass('is_jcb');
+                } else {
+                    $ccNumberContain.removeClass('is_jcb');
+                }
+
+                if (curVal.match(dinersRegex)) {
+                    piCardType = 'diners';
+                    $ccNumberContain.addClass('is_diners');
+                } else {
+                    $ccNumberContain.removeClass('is_diners');
+                }
+
+                if (curVal.match(maestroRegex)) {
+                    piCardType = 'maestro';
+                    $ccNumberContain.addClass('is_maestro');
+                } else {
+                    $ccNumberContain.removeClass('is_maestro');
+                }
+
+                // if nothing is a hit we add a class to fade them all out
+                if (
+                    curVal !== '' &&
+                    !curVal.match(visaRegex) &&
+                    !curVal.match(mastercardRegex) &&
+                    !curVal.match(amexRegex) &&
+                    !curVal.match(discoverRegex) &&
+                    !curVal.match(jcbRegex) &&
+                    !curVal.match(dinersRegex) &&
+                    !curVal.match(maestroRegex) &&
+                    !curVal.match(unionpayRegex)
+                ) {
+                    $ccNumberContain.addClass('is_nothing');
+                } else {
+                    $ccNumberContain.removeClass('is_nothing');
+                }
+            },
+
             getTemplate: function(){
                 if (this.intigrationmode == 'direct') {
                     return this.direcTemplate;
@@ -330,6 +559,49 @@ define(
             isSubscribed : function (){
                 return window.checkoutConfig.payment.ccform.isSubscribed;
             },
+                isCPFEnabled: function () {
+                    if(billingAddressCountryId === 'BR') {
+                        return window.checkoutConfig.payment.ccform.isCPFEnabled;
+                    }
+                    return false;
+                },
+
+                isInstalmentEnabled: function () {
+                    return window.checkoutConfig.payment.ccform.isInstalmentEnabled;
+                },
+                getConfigLatamFound: function () {
+                    if(this.isInstalmentEnabled()) {
+                        var countries = window.checkoutConfig.payment.ccform.latAmCountries;
+                        for (var i = 0; i < countries.length; i++) {
+                            if (countries[i].includes(billingAddressCountryId)) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                },
+                belongsToLACountries: function () {
+                    var lacountries = ['AR', 'BZ', 'BR', 'CL', 'CO', 'CR', 'SV', 'GT', 'HN', 'MX', 'NI', 'PA', 'PE'];
+                    if (lacountries.includes(billingAddressCountryId)) {
+                        return true;
+                    }
+                    return false;
+                },
+                getShippingFeeForBrazil: function () {
+                    if (billingAddressCountryId == 'BR' && this.isCalculated()) {
+                        var price = this.totals()['shipping_amount'];
+                        return price;
+                    }
+                    return 0;
+                },
+                isCalculated: function () {
+                    return this.totals() && quote.shippingMethod() != null; //eslint-disable-line eqeqeq
+                },
+//            getInstalmentValues : function(billingAddressCountryId){
+//                return window.checkoutConfig.payment.ccform.instalmentvalues.billingAddressCountryId;
+//                
+//            },
+                isCPF: ko.observable(),
             /**
              * @override
              */
@@ -354,7 +626,13 @@ define(
                         'stored_credentials_enabled': this.isStoredCredentialsEnabled(),
                         'dfReferenceId': window.sessionId,
                         'disclaimerFlag': this.disclaimerFlag,
-                        'subscriptionStatus' : this.isSubscribed()
+                            'subscriptionStatus': this.isSubscribed(),
+                            'cpf_enabled': this.isCPFEnabled(),
+                            'instalment_enabled': this.isInstalmentEnabled(),
+                            'cpf': $('#' + this.getCode() + '_cpf').val(),
+                            'instalment': $('#' + this.getCode() + '_instalment').val(),
+                            'statement': this.statement,
+                            'shippingfee': this.getShippingFeeForBrazil()
                     }
                 };
             },
@@ -382,12 +660,14 @@ define(
                 var $form = $('#' + this.getCode() + '-form');
                 var $savedCardForm = $('#' + this.getCode() + '-savedcard-form');
                 var selectedSavedCardToken = $("input[name='payment[token_to_use]']:checked").val();
+                    var $cpfForm = $('#' + this.getCode() + '-cpf-form');
                 var cc_type_selected = this.getselectedCCType('payment[cc_type]');                
+                    this.statement = $('#' + this.getCode() + '_statement').val();
                 // 3DS2 JWT create function 
                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                     var bin = this.creditCardNumber();
                     if(cc_type_selected == 'savedcard'){
-                        bin = $("input[name='payment[token_to_use]']:checked").next().next().val();     
+                        bin = $("input[name='payment[token_to_use]']:checked").next().next().next().val();     
                     } 
                     if(this.intigrationmode == 'direct') {
                         if(cc_type_selected == 'savedcard'){
@@ -395,7 +675,7 @@ define(
                                if(bin) {
                                 createJwt(bin);
                                 }else{
-                                    alert('This card number cannot be used to place 3DS2 order now, please go and update this from My account first.');
+                                    alert(getCreditCardExceptions('CCAM2'));
                                     return; 
                                 }
                             }
@@ -420,9 +700,10 @@ define(
                         this.paymentToken = selectedSavedCardToken;
                         var savedcvv = $('.saved-cvv-number').val();
                         var res = this.getRegexCode(cardType).exec(savedcvv);
+                            this.statement = $('.statement').val();
                         if(savedcvv != res){
                             $('#saved-cvv-error').css('display', 'block');
-                            $('#saved-cvv-error').html('Please, enter valid Card Verification Number');
+                            $('#saved-cvv-error').html(getCreditCardExceptions('CCAM3'));
                         }else{
                             fullScreenLoader.startLoader();
                             this.redirectAfterPlaceOrder = false;
@@ -464,7 +745,7 @@ define(
                             var saveCardOption = $('#' + this.getCode() + '_save_card').is(":checked");
                             if(!saveCardOption){
                                 $('#disclaimer-error').css('display', 'block');
-                                $('#disclaimer-error').html('Please, Save the card before placing subscription order');
+                                $('#disclaimer-error').html(getCreditCardExceptions('CCAM4'));
                                 return false;
                             } else {
                                 $('#disclaimer-error').html('');
@@ -475,12 +756,12 @@ define(
                     this.saveMyCard = $('#' + this.getCode() + '_save_card').is(":checked");
                     if(this.saveMyCard && this.isDisclaimerMessageMandatory() && this.isDisclaimerMessageEnabled() && window.disclaimerDialogue === null){
                         $('#disclaimer-error').css('display', 'block');
-                        $('#disclaimer-error').html('Please, Verify the disclaimer! before saving the card');
+                            $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));
 			return false;
                     } else if(this.saveMyCard && this.isStoredCredentialsEnabled() && this.isDisclaimerMessageEnabled() && (window.disclaimerDialogue === null || window.disclaimerDialogue === false)){
                         if(this.isSubscribed()){
                             $('#disclaimer-error').css('display', 'block');
-                            $('#disclaimer-error').html('Please, Verify the disclaimer! before saving the card');
+                            $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));
                             return false;
                         }
                         this.saveMyCard = '';

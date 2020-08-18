@@ -29,5 +29,3 @@ class ProfileFields extends Field
         return $merchantcode ." ". $xmlusername ." ". $xmlpassword;
     }
 }
-
-

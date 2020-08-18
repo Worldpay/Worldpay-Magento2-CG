@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Authorisation;
+
 use Exception;
 
 class RedirectService extends \Magento\Framework\DataObject
@@ -34,15 +35,15 @@ class RedirectService extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist,
         \Sapient\Worldpay\Helper\Data $worldpayhelper
     ) {
-       $this->mappingservice = $mappingservice;
-       $this->paymentservicerequest = $paymentservicerequest;
-       $this->wplogger = $wplogger;
-       $this->paymentservice = $paymentservice;
-       $this->redirectresponse = $redirectresponse;
-       $this->registryhelper = $registryhelper;
-       $this->checkoutsession = $checkoutsession;
-       $this->paymentlist = $paymentlist;
-       $this->worldpayhelper = $worldpayhelper;
+        $this->mappingservice = $mappingservice;
+        $this->paymentservicerequest = $paymentservicerequest;
+        $this->wplogger = $wplogger;
+        $this->paymentservice = $paymentservice;
+        $this->redirectresponse = $redirectresponse;
+        $this->registryhelper = $registryhelper;
+        $this->checkoutsession = $checkoutsession;
+        $this->paymentlist = $paymentlist;
+        $this->worldpayhelper = $worldpayhelper;
     }
     /**
      * handles provides authorization data for redirect
@@ -56,37 +57,37 @@ class RedirectService extends \Magento\Framework\DataObject
         $paymentDetails,
         $payment
     ) {
+
         $this->checkoutsession->setauthenticatedOrderId($mageOrder->getIncrementId());
-        if($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL'){
+        if ($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL') {
              $redirectOrderParams = $this->mappingservice->collectKlarnaOrderParameters(
-                $orderCode,
-                $quote,
-                $orderStoreId,
-                $paymentDetails
-            );
+                 $orderCode,
+                 $quote,
+                 $orderStoreId,
+                 $paymentDetails
+             );
 
             $response = $this->paymentservicerequest->redirectKlarnaOrder($redirectOrderParams);
-       }else if(!empty($paymentDetails['additional_data']['cc_bank']) && $paymentDetails['additional_data']['cc_type'] == 'IDEAL-SSL'){
-                $callbackurl = $this->redirectresponse->getCallBackUrl();
-                $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
-                $orderCode,
-                $quote,
-                $orderStoreId,
-                $paymentDetails
-            );
-                $redirectOrderParams['cc_bank'] = $paymentDetails['additional_data']['cc_bank'];
-                $redirectOrderParams['callbackurl'] = $callbackurl;
+        } elseif (!empty($paymentDetails['additional_data']['cc_bank']) &&
+           $paymentDetails['additional_data']['cc_type'] == 'IDEAL-SSL') {
+               $callbackurl = $this->redirectresponse->getCallBackUrl();
+               $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
+                   $orderCode,
+                   $quote,
+                   $orderStoreId,
+                   $paymentDetails
+               );
+               $redirectOrderParams['cc_bank'] = $paymentDetails['additional_data']['cc_bank'];
+               $redirectOrderParams['callbackurl'] = $callbackurl;
 
-            $response = $this->paymentservicerequest->DirectIdealOrder($redirectOrderParams);
-       }
-       else{
+            $response = $this->paymentservicerequest->directIdealOrder($redirectOrderParams);
+        } else {
             $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
                 $orderCode,
                 $quote,
                 $orderStoreId,
                 $paymentDetails
             );
-
             $response = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
         }
         $successUrl = $this->_buildRedirectUrl(
@@ -100,7 +101,6 @@ class RedirectService extends \Magento\Framework\DataObject
 
         $this->registryhelper->setworldpayRedirectUrl($successUrl);
         $this->checkoutsession->setWpRedirecturl($successUrl);
-
     }
 
     private function _buildRedirectUrl($redirect, $paymentType, $countryCode, $languageCode)
@@ -123,7 +123,6 @@ class RedirectService extends \Magento\Framework\DataObject
             return $address->getCountry();
         }
         return $this->worldpayhelper->getDefaultCountry();
-
     }
 
     /**
@@ -149,6 +148,4 @@ class RedirectService extends \Magento\Framework\DataObject
         }
         return $this->_redirectResponseModel;
     }
-
-
 }

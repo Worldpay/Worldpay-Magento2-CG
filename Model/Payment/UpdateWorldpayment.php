@@ -9,6 +9,8 @@ use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Vault\Model\CreditCardTokenFactory;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
+use Magento\Vault\Model\Ui\VaultConfigProvider;
+
 /**
  * Updating Risk gardian
  */
@@ -62,8 +64,11 @@ class UpdateWorldpayment
      *
      * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
      */
-    public function updateWorldpayPayment(\Sapient\Worldpay\Model\Response\DirectResponse $directResponse, \Magento\Payment\Model\InfoInterface $paymentObject, $disclaimerFlag = null)
-    {  
+    public function updateWorldpayPayment(
+        \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
+        \Magento\Payment\Model\InfoInterface $paymentObject,
+        $disclaimerFlag = null
+    ) {
         $responseXml=$directResponse->getXml();
         $merchantCode = $responseXml['merchantCode'];
         $orderStatus = $responseXml->reply->orderStatus;
@@ -81,47 +86,49 @@ class UpdateWorldpayment
         $riskProviderFinalScore=$payment->riskScore['finalScore'];
         $refusalcode=$payment->issueResponseCode['code'] ? : $payment->ISO8583ReturnCode['code'];
         $refusaldescription=$payment->issueResponseCode['description'] ? : $payment->ISO8583ReturnCode['description'];
-
+        $lataminstalments=$payment->instalments[0];
         $wpp = $this->worldpaypayment->create();
         $wpp = $wpp->loadByWorldpayOrderId($orderCode);
-        $wpp->setData('card_number',$cardNumber);
-        $wpp->setData('payment_status',$paymentStatus);
-        if($payment->paymentMethod[0]){
+        $wpp->setData('card_number', $cardNumber);
+        $wpp->setData('payment_status', $paymentStatus);
+        if ($payment->paymentMethod[0]) {
             $this->paymentMethodType = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
-            $wpp->setData('payment_type',str_replace("_CREDIT", "", $this->paymentMethodType));
+            $wpp->setData('payment_type', str_replace("_CREDIT", "", $this->paymentMethodType));
         }
-        $wpp->setData('avs_result',$avsnumber);
+        $wpp->setData('avs_result', $avsnumber);
         $wpp->setData('cvc_result', $cvcnumber);
         $wpp->setData('risk_score', $riskScore);
-        $wpp->setData('merchant_id',$responseXml['merchantCode']);
+        $wpp->setData('merchant_id', $responseXml['merchantCode']);
         $wpp->setData('risk_provider_score', $riskProviderScore);
-        $wpp->setData('risk_provider_id',$riskProviderid);
+        $wpp->setData('risk_provider_id', $riskProviderid);
         $wpp->setData('risk_provider_threshold', $riskProviderThreshold);
         $wpp->setData('risk_provider_final', $riskProviderFinalScore);
         $wpp->setData('refusal_code', $refusalcode);
         $wpp->setData('refusal_description', $refusaldescription);
-        $wpp->setData('aav_address_result_code',$payment->AAVAddressResultCode['description']);
-        $wpp->setData('avv_postcode_result_code',$payment->AAVPostcodeResultCode['description']);
-        $wpp->setData('aav_cardholder_name_result_code',$payment->AAVCardholderNameResultCode['description']);
-        $wpp->setData('aav_telephone_result_code',$payment->AAVTelephoneResultCode['description']);
-        $wpp->setData('aav_email_result_code',$payment->AAVEmailResultCode['description']);
+        $wpp->setData('aav_address_result_code', $payment->AAVAddressResultCode['description']);
+        $wpp->setData('avv_postcode_result_code', $payment->AAVPostcodeResultCode['description']);
+        $wpp->setData('aav_cardholder_name_result_code', $payment->AAVCardholderNameResultCode['description']);
+        $wpp->setData('aav_telephone_result_code', $payment->AAVTelephoneResultCode['description']);
+        $wpp->setData('aav_email_result_code', $payment->AAVEmailResultCode['description']);
+        $wpp->setData('latam_instalments', $lataminstalments);
         $wpp->save();
         
         if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
                 $this->customerSession->unsIsSavedCardRequested();
                 $tokenNodeWithError = $orderStatus->token->xpath('//error');
-                if (!$tokenNodeWithError) {
-                    $tokenElement = $orderStatus->token;
-                    $this->saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag, $orderCode);
-                    // vault and instant purchase configuration goes here
-                    $paymentToken = $this->getVaultPaymentToken($tokenElement);
-                    if (null !== $paymentToken) {
-                        $extensionAttributes = $this->getExtensionAttributes($paymentObject);
-                        $extensionAttributes->setVaultPaymentToken($paymentToken);
-                    }
+            if (!$tokenNodeWithError) {
+                $tokenElement = $orderStatus->token;
+                $this->saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag, $orderCode);
+                // vault and instant purchase configuration goes here
+                $paymentToken = $this->getVaultPaymentToken($tokenElement);
+                if (null !== $paymentToken) {
+                    $extensionAttributes = $this->getExtensionAttributes($paymentObject);
+                    $this->getAdditionalInformation($paymentObject);
+                    $extensionAttributes->setVaultPaymentToken($paymentToken);
                 }
             }
         }
+    }
 
     /**
      * Saved token data
@@ -129,12 +136,18 @@ class UpdateWorldpayment
      * @param $payment
      * @param $merchantCode
      */
-    public function saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag=null, $orderCode=null)
+    public function saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag = null, $orderCode = null)
     {
         $savedTokenFactory = $this->savedTokenFactory->create();
         // checking tokenization exist or not
+            $customerId = $tokenElement[0]->authenticatedShopperID[0];
+            $tokenScope = 'shopper';
+        if (!$customerId) {
+            $customerId = $this->customerSession->getCustomerId();
+            $tokenScope = 'merchant';
+        }
             $tokenDataExist = $savedTokenFactory->getCollection()
-                ->addFieldToFilter('customer_id', $tokenElement[0]->authenticatedShopperID[0])
+                ->addFieldToFilter('customer_id', $customerId)
                 ->addFieldToFilter('token_code', $tokenElement[0]->tokenDetails[0]->paymentTokenID[0])
                 ->getFirstItem()->getData();
         // checking storedcredentials exist or not
@@ -145,7 +158,7 @@ class UpdateWorldpayment
 //                ->getFirstItem()->getData();
 //        }
         if (empty($tokenDataExist)) {
-            if($payment->schemeResponse){
+            if ($payment->schemeResponse) {
                 $savedTokenFactory->setTransactionIdentifier($payment->schemeResponse[0]->transactionIdentifier[0]);
             }
             $binNumber = $tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->bin[0];
@@ -153,35 +166,43 @@ class UpdateWorldpayment
             $dateNode = $tokenElement[0]->tokenDetails->paymentTokenExpiry->date;
             $tokenexpirydate = (int)$dateNode['year'].'-'.(int)$dateNode['month'].'-'.(int)$dateNode['dayOfMonth'];
             $savedTokenFactory->setTokenExpiryDate($tokenexpirydate);
-            $savedTokenFactory->setTokenReason($tokenElement[0]->tokenReason[0]);                
-            $savedTokenFactory->setCardNumber($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->obfuscatedPAN[0]);
-            $savedTokenFactory->setCardholderName($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->cardHolderName[0]);
-            $savedTokenFactory->setCardExpiryMonth((int)$tokenElement[0]->paymentInstrument->cardDetails->expiryDate->date['month']);
-            $savedTokenFactory->setCardExpiryYear((int)$tokenElement[0]->paymentInstrument->cardDetails->expiryDate->date['year']);
-            $paymentmethodmethod = str_replace(array("_CREDIT","_DEBIT"), "", $payment->paymentMethod[0]);
+            $savedTokenFactory->setTokenReason($tokenElement[0]->tokenReason[0]);
+            $savedTokenFactory->setCardNumber($tokenElement[0]->paymentInstrument[0]
+                    ->cardDetails[0]->derived[0]->obfuscatedPAN[0]);
+            $savedTokenFactory->setCardholderName($tokenElement[0]->paymentInstrument[0]
+                    ->cardDetails[0]->cardHolderName[0]);
+            $savedTokenFactory->setCardExpiryMonth((int)$tokenElement[0]->paymentInstrument
+                    ->cardDetails->expiryDate->date['month']);
+            $savedTokenFactory->setCardExpiryYear((int)$tokenElement[0]->paymentInstrument
+                    ->cardDetails->expiryDate->date['year']);
+            $paymentmethodmethod = str_replace(["_CREDIT","_DEBIT"], "", $payment->paymentMethod[0]);
             $savedTokenFactory->setMethod($paymentmethodmethod);
-            $savedTokenFactory->setCardBrand($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->cardBrand[0]);
-            $savedTokenFactory->setCardSubBrand($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->cardSubBrand[0]);
-            $savedTokenFactory->setCardIssuerCountryCode($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->issuerCountryCode[0]);
+            $savedTokenFactory->setCardBrand($tokenElement[0]->paymentInstrument[0]
+                    ->cardDetails[0]->derived[0]->cardBrand[0]);
+            $savedTokenFactory->setCardSubBrand($tokenElement[0]->paymentInstrument[0]
+                    ->cardDetails[0]->derived[0]->cardSubBrand[0]);
+            $savedTokenFactory->setCardIssuerCountryCode($tokenElement[0]->paymentInstrument[0]
+                    ->cardDetails[0]->derived[0]->issuerCountryCode[0]);
             $savedTokenFactory->setMerchantCode($merchantCode[0]);
-            $savedTokenFactory->setCustomerId($tokenElement[0]->authenticatedShopperID[0]);
+            $savedTokenFactory->setCustomerId($customerId);
             $savedTokenFactory->setAuthenticatedShopperID($tokenElement[0]->authenticatedShopperID[0]);
-            if($binNumber){
-                $savedTokenFactory->setBinNumber($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->bin[0]);
+            if ($binNumber) {
+                $bin = $tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->bin[0];
+                $savedTokenFactory->setBinNumber($bin);
             }
-            if($disclaimerFlag){
+            if ($disclaimerFlag) {
                 $savedTokenFactory->setDisclaimerFlag($disclaimerFlag);
             }
+            $savedTokenFactory->setTokenType($tokenScope);
             $savedTokenFactory->save();
             $tokenId = $savedTokenFactory->getId();
-            $this->saveTokenDataToTransactions($tokenId,$orderCode);
-        } else {           
+            $this->saveTokenDataToTransactions($tokenId, $orderCode);
+        } else {
             $tokenId = $tokenDataExist['id'];
-            $this->saveTokenDataToTransactions($tokenId,$orderCode);
-            $this->_messageManager->addNotice(__("You already appear to have this card number stored, if your card details have changed, you can update these via the 'my cards' section"));
+            $this->saveTokenDataToTransactions($tokenId, $orderCode);
+            $this->_messageManager->addNotice(__($this->worldpayHelper->getCreditCardSpecificexception('CCAM22')));
             return;
         }
-
     }
 
     protected function getVaultPaymentToken($tokenElement)
@@ -199,21 +220,22 @@ class UpdateWorldpayment
         $paymentToken->setIsVisible(true);
         $paymentToken->setTokenDetails($this->convertDetailsToJSON([
             'type' => $this->paymentMethodType,
-            'maskedCC' => $this->getLastFourNumbers($tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->obfuscatedPAN[0]),
+            'maskedCC' => $this->getLastFourNumbers($tokenElement[0]->paymentInstrument[0]
+                    ->cardDetails[0]->derived[0]->obfuscatedPAN[0]),
             'expirationDate'=> $this->getExpirationMonthAndYear($tokenElement)
         ]));
-
         return $paymentToken;
     }
     public function getExpirationMonthAndYear($tokenElement)
     {
-        $dateNode = $tokenElement[0]->tokenDetails->paymentTokenExpiry->date;
-        return $dateNode['month'].'/'.$dateNode['year'];
+        $month = $tokenElement[0]->paymentInstrument[0]->cardDetails[0]->expiryDate[0]->date['month'];
+        $year = $tokenElement[0]->paymentInstrument[0]->cardDetails[0]->expiryDate[0]->date['year'];
+        return $month.'/'.$year;
     }
 
     public function getLastFourNumbers($number)
     {
-        return substr ($number, -4);
+        return substr($number, -4);
     }
 
     private function getExpirationDate($tokenElement)
@@ -229,7 +251,7 @@ class UpdateWorldpayment
             . '00:00:00',
             new \DateTimeZone('UTC')
         );
-        $expDate->add(new \DateInterval('P1M'));
+       // $expDate->add(new \DateInterval('P1M'));
         return $expDate->format('Y-m-d 00:00:00');
     }
 
@@ -249,8 +271,19 @@ class UpdateWorldpayment
         return $extensionAttributes;
     }
     
-    public function saveTokenDataToTransactions($tokenId,$worldpayOrderCode){        
-        $orderId = explode('-',$worldpayOrderCode);
+    private function getAdditionalInformation(InfoInterface $payment)
+    {
+        $additionalInformation = $payment->getAdditionalInformation();
+        if (null === $additionalInformation) {
+            $additionalInformation = $this->paymentExtensionFactory->create();
+        }
+        $additionalInformation[VaultConfigProvider::IS_ACTIVE_CODE] = true;
+        $payment->setAdditionalInformation($additionalInformation);
+    }
+    
+    public function saveTokenDataToTransactions($tokenId, $worldpayOrderCode)
+    {
+        $orderId = explode('-', $worldpayOrderCode);
         $transactions = $this->transactionFactory->create();
         $transactions->setWorldpayTokenId($tokenId);
         $transactions->setWorldpayOrderId($worldpayOrderCode);
@@ -258,4 +291,3 @@ class UpdateWorldpayment
         $transactions->save();
     }
 }
-    

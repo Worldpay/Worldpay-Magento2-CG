@@ -55,6 +55,7 @@
                 <!-- ko if:getSubscriptionStatus() == false -->
                 <if args="chromepayEnabled == 1">
                     <if args="chromePaymentMode == 'direct'">
+                        <if args="isChromium == '1'">
                         <br><br>
                         <a class="action viewcart" data-bind="attr: {href: checkoutNowUrl}">
                             <button 
@@ -66,6 +67,7 @@
                             />
                         </a>
                     </if>
+                   </if>
                 </if>
                 <!-- /ko -->
                 <div data-bind="html: getCartParam('extra_actions')"></div>

@@ -14,12 +14,12 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
      *
      * @param \Magento\Framework\UrlInterface $urlBuilder
      */
-	public function __construct(\Magento\Framework\UrlInterface $urlBuilder)
+    public function __construct(\Magento\Framework\UrlInterface $urlBuilder)
     {
-		$this->_urlBuilder = $urlBuilder;
-	}
+        $this->_urlBuilder = $urlBuilder;
+    }
     
-    /**          
+    /**
      * @param SimpleXmlElement $xml
      * @return string $url
      */
@@ -30,12 +30,12 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
         $url .= '&successURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/success');
         $url .= '&pendingURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/pending');
         $url .= '&cancelURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/cancel');
-        $url .= '&failureURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/failure'); 
+        $url .= '&failureURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/failure');
 
         return $url;
     }
 
-    /**          
+    /**
      * @param SimpleXmlElement $xml
      * @return string $url
      */
@@ -49,12 +49,11 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
 
     public function getCallBackUrl()
     {
-        $callbackurl = array();
+        $callbackurl = [];
         $callbackurl['successURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/success');
         $callbackurl['pendingURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/pending');
         $callbackurl['cancelURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/cancel');
         $callbackurl['failureURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/failure');
         return $callbackurl;
     }
-
 }

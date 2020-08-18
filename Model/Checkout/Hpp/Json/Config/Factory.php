@@ -15,7 +15,7 @@ use Exception;
 class Factory
 {
    /**  @var \Magento\Store\Model\Store*/
-    private $store; 
+    private $store;
 
     /**
      * @param StoreManagerInterface $storeManager,
@@ -27,7 +27,7 @@ class Factory
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
      */
     public function __construct(
-         StoreManagerInterface $storeManager,
+        StoreManagerInterface $storeManager,
         \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         Repository $assetrepo,
@@ -36,7 +36,7 @@ class Factory
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Sales\Model\Order $mageOrder,
-        $services = array()
+        $services = []
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->assetRepo = $assetrepo;
@@ -54,7 +54,7 @@ class Factory
             $this->state = $services['state'];
         } else {
             $this->state = $hppstate;
-        } 
+        }
     }
 
     /**
@@ -72,19 +72,19 @@ class Factory
         $country = $this->_getCountryForQuote($quote);
         $language = $this->_getLanguageForLocale();
 
-        $params = array('_secure' => $this->request->isSecure());
+        $params = ['_secure' => $this->request->isSecure()];
         $helperhtml = $this->assetRepo->getUrlWithParams('Sapient_Worldpay::helper.html', $params);
         $iframeurl = 'worldpay/redirectresult/iframe';
         $urlConfig = new UrlConfig(
-            $this->store->getUrl($iframeurl, array('status' => 'success')),
-            $this->store->getUrl($iframeurl, array('status' => 'cancel')),
-            $this->store->getUrl($iframeurl, array('status' => 'pending')),
-            $this->store->getUrl($iframeurl, array('status' => 'error')),
-            $this->store->getUrl($iframeurl, array('status' => 'failure'))
+            $this->store->getUrl($iframeurl, ['status' => 'success']),
+            $this->store->getUrl($iframeurl, ['status' => 'cancel']),
+            $this->store->getUrl($iframeurl, ['status' => 'pending']),
+            $this->store->getUrl($iframeurl, ['status' => 'error']),
+            $this->store->getUrl($iframeurl, ['status' => 'failure'])
         );
       
         return new Config(
-            $this->worldpayhelper->getRedirectIntegrationMode( $this->store->getId()),
+            $this->worldpayhelper->getRedirectIntegrationMode($this->store->getId()),
             $javascriptObjectVariable,
             $helperhtml,
             $this->store->getBaseUrl(),
@@ -112,18 +112,14 @@ class Factory
         if (substr($locale, 3, 2) == 'NO') {
             return 'no';
         }
-        return substr($locale, 0, 2); 
-    
+        return substr($locale, 0, 2);
     }
 
-     private static function _extractOrderId($orderKey)
+    private static function _extractOrderId($orderKey)
     {
         $array = explode('^', $orderKey);
         $ordercode = end($array);
         $ordercodearray = explode('-', $ordercode);
         return reset($ordercodearray);
     }
-
- 
-
 }

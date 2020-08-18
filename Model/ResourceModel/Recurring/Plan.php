@@ -27,7 +27,7 @@ class Plan extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     {
         $table = $this->getMainTable();
         $where = $this->getConnection()->quoteInto("plan_id = ?", $planId);
-        $sql = $this->getConnection()->select()->from($table,array('plan_id'))->where($where);
+        $sql = $this->getConnection()->select()->from($table, ['plan_id'])->where($where);
         $id = $this->getConnection()->fetchOne($sql);
         return $id;
     }

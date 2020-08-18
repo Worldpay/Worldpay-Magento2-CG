@@ -10,6 +10,7 @@ use Sapient\Worldpay\Model\Config\Source\TrialInterval;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -73,7 +74,11 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     protected $scopeConfig = null;
     
     protected $_customerSession;
-
+    
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
 
     /**
      * Recurring constructor.
@@ -105,7 +110,8 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Quote\Model\Quote\Payment $payment,
         \Magento\Checkout\Model\Cart $cart,
         \Magento\Customer\Model\Session $customerSession,
-        \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory
+        \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory,
+        SerializerInterface $serializer
     ) {
         parent::__construct($context);
         $this->plansCollectionFactory = $plansCollectionFactory;
@@ -127,6 +133,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_cart = $cart;
         $this->_customerSession = $customerSession;
         $this->_tokenModelFactory = $tokenModelFactory;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -432,12 +439,9 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
         $startDateOption = $product->getCustomOption('subscription_date');
         if ($startDateOption && $startDateOption->getValue() && $product->getWorldpayRecurringAllowStart()) {
-            try {
+            
                 $startDate = $startDateOption->getValue() ? $startDateOption->getValue() : date('d-m-yy');
-                //$startDate = $this->localeDate->date($startDateOption->getValue(), null, false);
-            } catch (\Exception $e) {
-                // intentionally suppressing any exceptions during date object creation
-            }
+               
             if (isset($startDateOption)) {
                 $startDateInfo = [
                     [
@@ -486,63 +490,63 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $startDate = '';
         $productOption = $item->getProductOptionByCode('worldpay_subscription_options');
         $productBuyOptions = $item->getProductOptionByCode('info_buyRequest');
-        if (is_array($productOption) && is_array($productBuyOptions) && isset($productBuyOptions['subscription_date'])) {
+        if (is_array($productOption) && is_array($productBuyOptions) &&
+                isset($productBuyOptions['subscription_date'])) {
             $startDate = $productBuyOptions['subscription_date'];
         }
 
         return $startDate;
     }
     
-    public function createMageOrder($orderData, $paymentData){
-        
+    public function createMageOrder($orderData, $paymentData)
+    {
         $this->_storeManager->setCurrentStore($orderData['store_id']);
         $store = $this->_storeManager->getStore();
         $websiteId = $this->_storeManager->getStore()->getWebsiteId();
         $customer = $this->customerFactory->create();
         $customer->setWebsiteId($websiteId);
         $customer->loadByEmail($orderData['email']);// load customet by email address
-        //$this->_customerSession->setCustomerAsLoggedIn($customer);
         $customerToken = $this->_tokenModelFactory->create();
         $tokenKey = $customerToken->createCustomerToken($customer->getId())->getToken();
-        //echo "<br>";
-        //echo 'cusomer email---'.$orderData['email'];
-        $savedShippingMethod = explode('_',$orderData['shipping_method']);
+        $savedShippingMethod = explode('_', $orderData['shipping_method']);
         
         $quoteId = $this->createEmptyQuote($tokenKey);
-        $itemData = array();
-        $itemData['cartItem'] = array('sku' => $orderData['product_sku'], 'qty' => $orderData['qty'], 'quote_id' => $quoteId);
+        $itemData = [];
+        $itemData['cartItem'] = ['sku' => $orderData['product_sku'],
+            'qty' => $orderData['qty'], 'quote_id' => $quoteId];
         $itemResponse = $this->addItemsToQuote($tokenKey, json_encode($itemData), $quoteId);
         
         $cartId = $quoteId;
         $itemId = $itemResponse['item_id'];
         $price = $orderData['item_price'];
         $this->updateCartItem($cartId, $itemId, $price, $orderData['qty']);
-        $addressData = array();
+        $addressData = [];
         $addressData['address'] = $orderData['shipping_address'];
         $shippingMethodResponse = $this->getShippingMethods($tokenKey, json_encode($addressData));
-        foreach($shippingMethodResponse as $shippingMethod){
-            if($shippingMethod['carrier_code'] == $savedShippingMethod[0]){
+        foreach ($shippingMethodResponse as $shippingMethod) {
+            if ($shippingMethod['carrier_code'] == $savedShippingMethod[0]) {
                 $shippingCarrierCode = $shippingMethod['carrier_code'];
                 $shippingMethodCode = $shippingMethod['method_code'];
             }
         }
-        $shippingInformation = array();
-        $shippingInformation['addressInformation']['shipping_address'] = $orderData['shipping_address']; 
-        $shippingInformation['addressInformation']['billing_address'] = $orderData['billing_address']; 
-        $shippingInformation['addressInformation']['shipping_carrier_code'] = $shippingCarrierCode; 
-        $shippingInformation['addressInformation']['shipping_method_code'] = $shippingMethodCode; 
+        $shippingInformation = [];
+        $shippingInformation['addressInformation']['shipping_address'] = $orderData['shipping_address'];
+        $shippingInformation['addressInformation']['billing_address'] = $orderData['billing_address'];
+        $shippingInformation['addressInformation']['shipping_carrier_code'] = $shippingCarrierCode;
+        $shippingInformation['addressInformation']['shipping_method_code'] = $shippingMethodCode;
                 
         $shippingResponse = $this->setShippingInformation($tokenKey, json_encode($shippingInformation));
         $paymentData = json_encode($paymentData);
-        $orderId = $this->orderPayment($tokenKey, $paymentData);        
+        $orderId = $this->orderPayment($tokenKey, $paymentData);
         return $orderId;
     }
     
-    public function createEmptyQuote($tokenKey){
+    public function createEmptyQuote($tokenKey)
+    {
         $token = 'Bearer '.$tokenKey;
         $curl = curl_init();
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine');
-        curl_setopt_array($curl, array(
+        curl_setopt_array($curl, [
           CURLOPT_URL => $apiUrl,
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => "",
@@ -552,26 +556,27 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => "POST",
           CURLOPT_POSTFIELDS =>'',
-          CURLOPT_HTTPHEADER => array(
+          CURLOPT_HTTPHEADER => [
             "Authorization: $token",
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, "
+              . "like Gecko) Chrome/81.0.4044.138 Safari/537.36",
             "Content-Type: application/json"
             //"Cookie: private_content_version=6803ffbab48db2029bb648e4a02b9692; PHPSESSID=d4nbqs1pbd0uc2dn04061mvjp4"
-          ),
+          ],
 
-        ));
+        ]);
         $response = curl_exec($curl);
         curl_close($curl);
         return $response;
     }
     
-    public function addItemsToQuote($tokenKey, $itemData, $quoteId){
+    public function addItemsToQuote($tokenKey, $itemData, $quoteId)
+    {
         $token = 'Bearer '.$tokenKey;
         $curl = curl_init();
-        //carts/mine/items?cart_id=222
         $apiUrl = '';
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
-        curl_setopt_array($curl, array(
+        curl_setopt_array($curl, [
           CURLOPT_URL => $apiUrl.'items?cart_id='.$quoteId,
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => "",
@@ -581,42 +586,43 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => "POST",
           CURLOPT_POSTFIELDS => $itemData,
-          CURLOPT_HTTPHEADER => array(
+          CURLOPT_HTTPHEADER => [
             "Authorization: $token",
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
+              . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
             "Content-Type: application/json"
             //"Cookie: private_content_version=6803ffbab48db2029bb648e4a02b9692; PHPSESSID=d4nbqs1pbd0uc2dn04061mvjp4"
-          ),
+          ],
 
-        ));
+        ]);
 
         $response = curl_exec($curl);
-        curl_close($curl);       
-        return json_decode($response, TRUE);
+        curl_close($curl);
+        return json_decode($response, true);
     }
     
-    public function updateCartItem($cartId,$itemId,$price,$qty) {
-        if($price){
-            //$quote = $this->quoteRepository->getActive($cartId);
+    public function updateCartItem($cartId, $itemId, $price, $qty)
+    {
+        if ($price) {
             $quote = $this->quote->create()->load($cartId);
             $quoteItem = $quote->getItemById($itemId);
             $quoteItem->setQty($qty);
             $quoteItem->setCustomPrice($price);
             $quoteItem->setName($price);
             $quoteItem->setOriginalCustomPrice($price);
-            $quoteItem->getProduct()->setIsSuperMode(true);            
+            $quoteItem->getProduct()->setIsSuperMode(true);
             $quoteItem->save();
             $quote->save();
         }
         return true;
     }
     
-    public function getShippingMethods($tokenKey, $addressData){
+    public function getShippingMethods($tokenKey, $addressData)
+    {
         $token = 'Bearer '.$tokenKey;
         $curl = curl_init();
-        //carts/mine/items?cart_id=222
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
-        curl_setopt_array($curl, array(
+        curl_setopt_array($curl, [
           CURLOPT_URL => $apiUrl.'estimate-shipping-methods',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => "",
@@ -626,26 +632,27 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => "POST",
           CURLOPT_POSTFIELDS => $addressData,
-          CURLOPT_HTTPHEADER => array(
+          CURLOPT_HTTPHEADER => [
             "Authorization: $token",
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
+              . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
             "Content-Type: application/json"
             //"Cookie: private_content_version=6803ffbab48db2029bb648e4a02b9692; PHPSESSID=d4nbqs1pbd0uc2dn04061mvjp4"
-          ),
+          ],
 
-        ));
+        ]);
 
         $response = curl_exec($curl);
-        curl_close($curl);       
-        return json_decode($response, TRUE);
+        curl_close($curl);
+        return json_decode($response, true);
     }
     
-    public function setShippingInformation($tokenKey, $shippingInformation){
+    public function setShippingInformation($tokenKey, $shippingInformation)
+    {
         $token = 'Bearer '.$tokenKey;
         $curl = curl_init();
-        //carts/mine/items?cart_id=222
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
-        curl_setopt_array($curl, array(
+        curl_setopt_array($curl, [
           CURLOPT_URL => $apiUrl.'shipping-information',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => "",
@@ -655,25 +662,27 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => "POST",
           CURLOPT_POSTFIELDS => $shippingInformation,
-          CURLOPT_HTTPHEADER => array(
+          CURLOPT_HTTPHEADER => [
             "Authorization: $token",
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
+              . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
             "Content-Type: application/json"
             //"Cookie: private_content_version=6803ffbab48db2029bb648e4a02b9692; PHPSESSID=d4nbqs1pbd0uc2dn04061mvjp4"
-          ),
+          ],
 
-        ));
+        ]);
 
         $response = curl_exec($curl);
         curl_close($curl);
-        return json_decode($response, TRUE);
+        return json_decode($response, true);
     }
     
-    public function orderPayment($tokenKey, $paymentData){
+    public function orderPayment($tokenKey, $paymentData)
+    {
         $token = 'Bearer '.$tokenKey;
         $curl = curl_init();
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
-        curl_setopt_array($curl, array(
+        curl_setopt_array($curl, [
           CURLOPT_URL => $apiUrl.'payment-information',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => "",
@@ -683,18 +692,32 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
           CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
           CURLOPT_CUSTOMREQUEST => "POST",
           CURLOPT_POSTFIELDS =>$paymentData,
-          CURLOPT_HTTPHEADER => array(
+          CURLOPT_HTTPHEADER => [
             "Authorization: $token",
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
+              . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
             "Content-Type: application/json"
             //"Cookie: private_content_version=6803ffbab48db2029bb648e4a02b9692; PHPSESSID=d4nbqs1pbd0uc2dn04061mvjp4"
-          ),
+          ],
 
-        ));
+        ]);
 
         $response = curl_exec($curl);
         curl_close($curl);
-        return json_decode($response, TRUE);
+        return json_decode($response, true);
     }
     
-}   
+    public function getMyAccountExceptions($exceptioncode)
+    {
+        $accdata = $this->serializer->unserialize($this->scopeConfig->getValue('worldpay_exceptions/'
+                . 'my_account_alert_codes/response_codes', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        if (is_array($accdata) || is_object($accdata)) {
+            foreach ($accdata as $key => $valuepair) {
+                if ($key == $exceptioncode) {
+                    return $valuepair['exception_module_messages']?$valuepair['exception_module_messages']:
+                        $valuepair['exception_messages'];
+                }
+            }
+        }
+    }
+}

@@ -8,13 +8,14 @@ use Magento\Framework\App\Action\Context;
 use \Magento\Framework\View\Result\PageFactory;
 use \Sapient\Worldpay\Model\SavedTokenFactory;
 use \Magento\Customer\Model\Session;
+
 /**
  *  Display Saved card form
  */
-class Edit extends \Magento\Framework\App\Action\Action 
+class Edit extends \Magento\Framework\App\Action\Action
 {
     /**
-     * @var \Magento\Framework\View\Result\PageFactory 
+     * @var \Magento\Framework\View\Result\PageFactory
      */
     protected $_resultPageFactory;
     
@@ -26,10 +27,10 @@ class Edit extends \Magento\Framework\App\Action\Action
     /**
      * Constructor
      *
-     * @param Context $context     
+     * @param Context $context
      * @param PageFactory $resultPageFactory
      * @param SavedTokenFactory $savecard
-     * @param Session $customerSession         
+     * @param Session $customerSession
      */
     public function __construct(
         Context $context,
@@ -52,17 +53,17 @@ class Edit extends \Magento\Framework\App\Action\Action
         $resultPage = $this->_resultPageFactory->create();
         $id = $this->getRequest()->getParam('id');
         $customerId = $this->customerSession->getCustomer()->getId();
-        if($id){      
+        if ($id) {
             $cardDetails = $this->savecard->create()->load($id);
-            if($cardDetails->getCustomerId() != $customerId){               
+            if ($cardDetails->getCustomerId() != $customerId) {
                 $this->_redirect('404notfound');
                 return;
             }
             $resultPage->getConfig()->getTitle()->set(__('Update Saved Card'));
             return $resultPage;
-        } else{
+        } else {
             $this->_redirect('404notfound');
             return;
-        }   
+        }
     }
 }

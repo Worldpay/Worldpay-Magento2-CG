@@ -83,21 +83,21 @@ class SimplePlugin
             return $proceed($buyRequest, $product, $processMode);
         }
         
-        $product->addCustomOption('worldpay_subscription_plan_id', $planId);        
+        $product->addCustomOption('worldpay_subscription_plan_id', $planId);
 
         if ($product->getWorldpayRecurringAllowStart() && $buyRequest->getSubscriptionDate()) {
             $startDate = ($buyRequest->getSubscriptionDate())
                 ? $buyRequest->getSubscriptionDate() : date('d-m-yy');
             $product->addCustomOption(
-                    'subscription_date',
-                    $startDate
-                );
+                'subscription_date',
+                $startDate
+            );
         }
 
         $result = $proceed($buyRequest, $product, $processMode);
 
         if (!$buyRequest->getResetCount() && ($item = $this->checkoutSession->getQuote()->getItemByProduct($product))) {
-            return __('Subscription already in the cart');
+            return __($this->recurringHelper->getMyAccountExceptions('MCAM21'));
         } else {
             if ($processMode == \Magento\Catalog\Model\Product\Type\AbstractType::PROCESS_MODE_FULL) {
                 $product->setCartQty(1);
@@ -138,14 +138,14 @@ class SimplePlugin
             || !in_array($plan->getWebsiteId(), [0, $this->storeManager->getStore()->getWebsiteId()])
         ) {
             throw new \Magento\Framework\Exception\LocalizedException(
-                __('Selected subscription plan is not available.')
+                __($this->recurringHelper->getMyAccountExceptions('MCAM20'))
             );
         }
 
         $quoteItem = $planOption->getItem();
         if ($quoteItem->getQuote()->getItemsQty() > 1) {
             $quoteItem->setHasError(true)->setMessage(
-                __('Subscriptions can be bought only separately, one subscription at a time.')
+                __($this->recurringHelper->getMyAccountExceptions('MCAM19'))
             );
             $quoteItem->getQuote()->setHasError(true);
         }
@@ -215,15 +215,9 @@ class SimplePlugin
                 ]
             ];
             $planStartDateOption = $product->getCustomOption('subscription_date');
-            if ($planStartDateOption && $planStartDateOption->getValue() && $product->getWorldpayRecurringAllowStart()) {
+            if ($planStartDateOption && $planStartDateOption->getValue()
+                    && $product->getWorldpayRecurringAllowStart()) {
                 $startDate = $planStartDateOption->getValue() ? $planStartDateOption->getValue() : date('d-m-yy');
-//                try {
-//                    $startDate = $this->localeDate->date($planStartDateOption->getValue(), null, false);
-//                } catch (\Exception $e) {
-//                    $this->logger->info('====================================================');
-//                    // intentionally suppressing any exceptions during date object creation
-//                    $this->logger->error($e);
-//                }
                 $subscriptionOptions['worldpay_subscription_options']['subscription_date']
                     = $startDate;
                 $subscriptionOptions['worldpay_subscription_options']['options_to_display']['subscription_date']

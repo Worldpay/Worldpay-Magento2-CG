@@ -20,13 +20,15 @@ class Success extends \Magento\Framework\App\Action\Action
     /**
      * Constructor
      *
-     * @param \Sapient\Worldpay\Model\Order\Service $orderservice 
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger     
+     * @param \Sapient\Worldpay\Model\Order\Service $orderservice
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      */
-    public function __construct(Context $context, PageFactory $pageFactory, 
+    public function __construct(
+        Context $context,
+        PageFactory $pageFactory,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-    ) { 
+    ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
         $this->wplogger = $wplogger;
@@ -39,5 +41,5 @@ class Success extends \Magento\Framework\App\Action\Action
         $this->orderservice->redirectOrderSuccess();
         $this->orderservice->removeAuthorisedOrder();
         return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success', ['_current' => true]);
-    }    
+    }
 }

@@ -4,18 +4,25 @@
  */
 namespace Sapient\Worldpay\Controller\ThreeDSecure;
 
+use Sapient\Worldpay\Helper\CreditCardException;
+
 class AuthResponse extends \Magento\Framework\App\Action\Action
 {
+
+    /**
+     * @var CreditCardException
+     */
+    protected $helper;
     /**
      * Constructor
      *
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      * @param \Magento\Sales\Model\OrderFactory $orderFactory
-     * @param \Magento\Checkout\Model\Session $checkoutSession     
-     * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender     
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
      * @param \Sapient\Worldpay\Model\Authorisation\ThreeDSecureService $threedsredirectresponse
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger     
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -24,7 +31,8 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender,
         \Sapient\Worldpay\Model\Authorisation\ThreeDSecureService $threedsredirectresponse,
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        CreditCardException $helper
     ) {
         $this->wplogger = $wplogger;
         $this->resultJsonFactory = $resultJsonFactory;
@@ -33,6 +41,7 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         $this->orderFactory = $orderFactory;
         $this->orderSender = $orderSender;
         $this->threedsredirectresponse = $threedsredirectresponse;
+        $this->helper = $helper;
         parent::__construct($context);
     }
 
@@ -48,12 +57,14 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         $this->checkoutSession->uns3DSecureParams();
         try {
             $this->threedsredirectresponse->continuePost3dSecureAuthorizationProcess(
-                $this->getRequest()->getParam('PaRes'), $directOrderParams, $threeDSecureParams
+                $this->getRequest()->getParam('PaRes'),
+                $directOrderParams,
+                $threeDSecureParams
             );
         } catch (\Exception $e) {
             $this->wplogger->error($e->getMessage());
             $this->wplogger->error('3DS Failed');
-            $this->_messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));
+            $this->_messageManager->addError(__($this->helper->getConfigValue('CCAM9')));
             $this->getResponse()->setRedirect($this->urlBuilders->getUrl('checkout/cart', ['_secure' => true]));
         }
         $redirectUrl = $this->checkoutSession->getWpResponseForwardUrl();

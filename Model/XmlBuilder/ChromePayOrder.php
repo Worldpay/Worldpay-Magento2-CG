@@ -12,7 +12,6 @@ use \Sapient\Worldpay\Logger\WorldpayLogger;
 class ChromePayOrder
 {
 
-    const EXPONENT = 2;
     const ALLOW_INTERACTION_TYPE = 'MOTO';
     const DYNAMIC3DS_DO3DS = 'do3DS';
     const DYNAMIC3DS_NO3DS = 'no3DS';
@@ -35,21 +34,12 @@ EOD;
     private $shippingAddress;
     private $billingAddress;
     private $echoData = null;
+    private $exponent;
 
     /**
      * @var Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration
      */
     protected $tokenRequestConfig;
-
-    /**
-     * Constructor
-     *
-     * @param array $args
-     */
-    public function __construct(array $args = array())
-    {
-        //$this->tokenRequestConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration($args['tokenRequestConfig']);
-    }
 
     /**
      * Build xml for processing Request
@@ -83,7 +73,8 @@ EOD;
         $shippingAddress,
         $billingAddress,
         //$shopperId,
-        $shopperEmail
+        $shopperEmail,
+        $exponent
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -96,6 +87,7 @@ EOD;
         $this->shippingAddress = $shippingAddress;
         $this->billingAddress = $billingAddress;
         $this->shopperEmail = $shopperEmail;
+        $this->exponent = $exponent;
         //$this->acceptHeader = $acceptHeader;
         //$this->userAgentHeader = $userAgentHeader;
 
@@ -137,7 +129,6 @@ EOD;
         $this->_addShippingElement($order);
         $this->_addBillingElement($order);
 
-
         if ($this->echoData) {
             $order->addChild('echoData', $this->echoData);
         }
@@ -145,7 +136,7 @@ EOD;
         //$this->_addCreateTokenElement($order);
         //$this->_addDynamicInteractionTypeElement($order);
 
-       return $order;
+        return $order;
     }
 
     /**
@@ -168,7 +159,7 @@ EOD;
     {
         $amountElement = $order->addChild('amount');
         $amountElement['currencyCode'] = $this->currencyCode;
-        $amountElement['exponent'] = self::EXPONENT;
+        $amountElement['exponent'] = $this->exponent;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
     }
     
@@ -208,8 +199,8 @@ EOD;
     private function _addCreateTokenElement($order)
     {
 
-       $createTokenElement = $order->addChild('createToken');
-       $createTokenElement['tokenScope'] = self::TOKEN_SCOPE;
+        $createTokenElement = $order->addChild('createToken');
+        $createTokenElement['tokenScope'] = self::TOKEN_SCOPE;
 
         if ($this->tokenRequestConfig->getTokenReason($this->orderCode)) {
             $createTokenElement->addChild(
@@ -238,8 +229,6 @@ EOD;
             $this->billingAddress->country
         );
     }
-
-    
 
     /**
      * Add CSE-DATA and its child tag to xml
@@ -391,6 +380,6 @@ EOD;
      */
     private function _amountAsInt($amount)
     {
-        return round($amount, self::EXPONENT, PHP_ROUND_HALF_EVEN) * pow(10, self::EXPONENT);
+        return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
     }
 }

@@ -1,15 +1,23 @@
-<?php 
+<?php
     $data = $block->challengeConfigs();
     $threeDSecureChallengeConfig = $data['threeDSecureChallengeConfig'] ;
     $threeDSecureChallengeParams = $data['threeDSecureChallengeParams'] ;
 ?>
     <!-- An example 3DS2 challenge window size. -->
-    <form name= "iframe_challengeForm" id="challengeForm" method= "POST" action="<?php echo $threeDSecureChallengeConfig["challengeurl"] ?>">
-    <!-- Use the above Challenge URL for test, we will provide a static Challenge URL for production once you go live -->
+    <form name= "iframe_challengeForm" 
+          id="challengeForm"
+          method= "POST"
+          action="<?= /* @noEscape */ $threeDSecureChallengeConfig["challengeurl"] ?>">
+    <!-- 
+    Use the above Challenge URL for test, we will provide a static Challenge URL for production once you go live 
+    -->
         <input type = "hidden" name= "JWT" id= "challenge_jwt" value= "" />
         <!-- Encoding of the JWT above with the secret "worldpaysecret". -->
-        <input type="hidden" name="MD" value="<?php echo $data['orderId'] ?>" />
-        <!-- Extra field for you to pass data in to the challenge that will be included in the post back to the return URL after challenge complete -->
+        <input type="hidden" name="MD" value="<?= /* @noEscape */ $data['orderId'] ?>" />
+        <!-- 
+        Extra field for you to pass data in to the challenge that will be included in the post 
+        back to the return URL after challenge complete 
+        -->
     </form>
                
     
@@ -26,17 +34,17 @@
     var data = {
         "jti": jti,
         "iat": iat,
-        "iss": "<?php echo $threeDSecureChallengeConfig["jwtIssuer"]?>",
-        "OrgUnitId": "<?php echo $threeDSecureChallengeConfig["organisationalUnitId"] ?>",
-        "ReturnUrl": "<?php echo $data['redirectUrl'] ?>",
+        "iss": "<?= /* @noEscape */ $threeDSecureChallengeConfig["jwtIssuer"]?>",
+        "OrgUnitId": "<?= /* @noEscape */ $threeDSecureChallengeConfig["organisationalUnitId"] ?>",
+        "ReturnUrl": "<?= /* @noEscape */ $data['redirectUrl'] ?>",
         "Payload": {
-            "ACSUrl": "<?php echo $threeDSecureChallengeParams['acsURL']?>",
-            "Payload": "<?php echo $threeDSecureChallengeParams['payload']?>",
-            "TransactionId": "<?php echo $threeDSecureChallengeParams['transactionId3DS']?>"
+            "ACSUrl": "<?= /* @noEscape */ $threeDSecureChallengeParams['acsURL']?>",
+            "Payload": "<?= /* @noEscape */ $threeDSecureChallengeParams['payload']?>",
+            "TransactionId": "<?= /* @noEscape */ $threeDSecureChallengeParams['transactionId3DS']?>"
         },
         "ObjectifyPayload": true
     };
-    var secret = "<?php echo $threeDSecureChallengeConfig['jwtApiKey']?>";
+    var secret = "<?= /* @noEscape */ $threeDSecureChallengeConfig['jwtApiKey']?>";
 
     var stringifiedHeader = CryptoJS.enc.Utf8.parse(JSON.stringify(header));
     var encodedHeader = base64url(stringifiedHeader);

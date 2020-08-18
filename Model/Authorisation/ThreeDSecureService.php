@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Authorisation;
+
 use Exception;
 
 class ThreeDSecureService extends \Magento\Framework\DataObject
@@ -24,6 +25,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
      * @param \Magento\Framework\Message\ManagerInterface $messageManager,
      * @param \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment,
      * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
@@ -36,7 +38,8 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment,
         \Magento\Customer\Model\Session $customerSession,
-        \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
+        \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper
     ) {
         $this->paymentservicerequest = $paymentservicerequest;
         $this->wplogger = $wplogger;
@@ -49,33 +52,53 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
         $this->updateWorldPayPayment = $updateWorldPayPayment;
         $this->customerSession = $customerSession;
         $this->worldpaytoken = $worldpaytoken;
+        $this->worldpayHelper = $worldpayHelper;
     }
     public function continuePost3dSecureAuthorizationProcess($paResponse, $directOrderParams, $threeDSecureParams)
     {
         $directOrderParams['paResponse'] = $paResponse;
-        $directOrderParams['echoData'] = $threeDSecureParams->getEchoData();
+        if(!empty($threeDSecureParams) && $threeDSecureParams->getEchoData()){
+            $directOrderParams['echoData'] = $threeDSecureParams->getEchoData();
+        }
         // @setIs3DSRequest flag set to ensure whether it is 3DS request or not.
         // To add cookie for 3DS second request.
         $this->checkoutSession->setIs3DSRequest(true);
         try {
-            $response = $this->paymentservicerequest->order3DSecure($directOrderParams);
-            $this->response = $this->directResponse->setResponse($response);
-            // @setIs3DSRequest flag is unset from checkout session.
-            $this->checkoutSession->unsIs3DSRequest();
-            $orderIncrementId = current(explode('-', $directOrderParams['orderCode']));
-            $this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
-            $this->_paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml($this->response->getXml());
-            $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
-            $this->_abortIfPaymentError($this->_paymentUpdate);
+            if(isset($directOrderParams['echoData'])){
+                $response = $this->paymentservicerequest->order3DSecure($directOrderParams);
+                $this->response = $this->directResponse->setResponse($response);
+                // @setIs3DSRequest flag is unset from checkout session.
+                $this->checkoutSession->unsIs3DSRequest();
+                $orderIncrementId = current(explode('-', $directOrderParams['orderCode']));
+                $this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
+                $this->_paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml(
+                    $this->response->getXml()
+                );
+                $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
+                $this->_abortIfPaymentError($this->_paymentUpdate, $orderIncrementId);
+            }
+            else
+            {
+                $errormessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM15');
+                $this->wplogger->info($errormessage);
+                $this->_messageManager->addError(__($errormessage?$errormessage:$e->getMessage()));
+                $this->checkoutSession->setWpResponseForwardUrl(
+                    $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
+                );
+                return;
+            }
         } catch (Exception $e) {
+            $errormessage='';
             $this->wplogger->info($e->getMessage());
-            $this->_messageManager->addError(__($e->getMessage()));
+            if (strpos($e->getMessage(), "Parse error")!==false) {
+                $errormessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM23');
+            }
+            $this->_messageManager->addError(__($errormessage?$errormessage:$e->getMessage()));
             $this->checkoutSession->setWpResponseForwardUrl(
-                  $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
+                $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );
             return;
         }
-
     }
 
     /**
@@ -84,7 +107,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
     private function _handleAuthoriseSuccess()
     {
         $this->checkoutSession->setWpResponseForwardUrl(
-            $this->urlBuilders->getUrl('checkout/onepage/success',array('_secure' => true))
+            $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
         );
     }
 
@@ -92,17 +115,24 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
      * it handles if payment is refused or cancelled
      * @param  Object $paymentUpdate
      */
-    private function _abortIfPaymentError($paymentUpdate)
+    private function _abortIfPaymentError($paymentUpdate, $orderId)
     {
+        $responseXml = $this->response->getXml();
+        $orderStatus = $responseXml->reply->orderStatus;
+        $payment = $orderStatus->payment;
+        $wpayCode = $payment->ISO8583ReturnCode['code'] ? $payment->ISO8583ReturnCode['code'] : '';
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Refused) {
-          $this->_messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));
+            $message = $this->worldpayHelper->getExtendedResponse($wpayCode, $orderId);
+            $responseMessage = !empty($message) ? $message :
+            $this->paymentservicerequest->getCreditCardSpecificException('CCAM9');
+            $this->_messageManager->addError(__($responseMessage));
              $this->checkoutSession->setWpResponseForwardUrl(
-              $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
-            );
+                 $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
+             );
         } elseif ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
-            $this->_messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));
+            $this->_messageManager->addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM9')));
             $this->checkoutSession->setWpResponseForwardUrl(
-              $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
+                $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );
         } else {
             $this->orderservice->removeAuthorisedOrder();
@@ -132,7 +162,8 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
     {
         $tokenService = $this->worldpaytoken;
         $tokenService->updateOrInsertToken(
-             new \Sapient\Worldpay\Model\Token\StateXml($xmlRequest), $this->_order->getPayment()
+            new \Sapient\Worldpay\Model\Token\StateXml($xmlRequest),
+            $this->_order->getPayment()
         );
     }
 }

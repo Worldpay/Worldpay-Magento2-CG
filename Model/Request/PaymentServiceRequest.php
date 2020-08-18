@@ -1,14 +1,16 @@
 <?php
 namespace Sapient\Worldpay\Model\Request;
+
 /**
  * @copyright 2017 Sapient
  */
 use Exception;
 use Sapient\Worldpay\Model\SavedToken;
+
 /**
  * Prepare the request and process them
  */
-class PaymentServiceRequest  extends \Magento\Framework\DataObject
+class PaymentServiceRequest extends \Magento\Framework\DataObject
 {
     /**
      * @var \Sapient\Worldpay\Model\Request $request
@@ -26,7 +28,7 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Request $request,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
-         \Magento\Sales\Model\Service\InvoiceService $invoiceService
+        \Magento\Sales\Model\Service\InvoiceService $invoiceService
     ) {
         $this->_wplogger = $wplogger;
         $this->_request = $request;
@@ -42,14 +44,16 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
      */
     public function order3DSecure($directOrderParams)
     {
-        $this->_wplogger->info('########## Submitting direct 3DSecure order request. OrderCode: ' . $directOrderParams['orderCode'] . ' ##########');
-        $requestConfiguration = array(
+        $loggerMsg = '########## Submitting direct 3DSecure order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $directOrderParams['orderCode'] . ' ##########');
+        $requestConfiguration = [
             'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
             'tokenRequestConfig' => $directOrderParams['tokenRequestConfig']
-        );
+        ];
 
         $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
-        $paymentType = isset($directOrderParams['paymentDetails']['brand']) ? $directOrderParams['paymentDetails']['brand']: $directOrderParams['paymentDetails']['paymentType'];
+        $paymentType = isset($directOrderParams['paymentDetails']['brand']) ?
+                $directOrderParams['paymentDetails']['brand']: $directOrderParams['paymentDetails']['paymentType'];
         $orderSimpleXml = $this->xmldirectorder->build3DSecure(
             $directOrderParams['merchantCode'],
             $directOrderParams['orderCode'],
@@ -73,12 +77,34 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
      */
     public function order($directOrderParams)
     {
-        $this->_wplogger->info('########## Submitting direct order request. OrderCode: ' . $directOrderParams['orderCode'] . ' ##########');
-        $requestConfiguration = array(
+        $loggerMsg = '########## Submitting direct order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $directOrderParams['orderCode'] . ' ##########');
+        $requestConfiguration = [
             'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
             'tokenRequestConfig' => $directOrderParams['tokenRequestConfig']
-        );
+        ];
         $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
+        
+        if (empty($directOrderParams['thirdPartyData']) && empty($directOrderParams['shippingfee'])) {
+            $directOrderParams['thirdPartyData']='';
+            $directOrderParams['shippingfee']='';
+        }
+        
+        if (empty($directOrderParams['saveCardEnabled'])) {
+            $directOrderParams['saveCardEnabled']='';
+        }
+        if (empty($directOrderParams['tokenizationEnabled'])) {
+            $directOrderParams['tokenizationEnabled']='';
+        }
+        if (empty($directOrderParams['storedCredentialsEnabled'])) {
+            $directOrderParams['storedCredentialsEnabled']='';
+        }
+        if (empty($directOrderParams['exemptionEngine'])) {
+            $directOrderParams['exemptionEngine']='';
+        }
+        if (empty($directOrderParams['cusDetails'])) {
+            $directOrderParams['cusDetails']='';
+        }
         $orderSimpleXml = $this->xmldirectorder->build(
             $directOrderParams['merchantCode'],
             $directOrderParams['orderCode'],
@@ -97,15 +123,18 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $directOrderParams['tokenizationEnabled'],
             $directOrderParams['storedCredentialsEnabled'],
             $directOrderParams['cusDetails'],
-            $directOrderParams['exemptionEngine']
+            $directOrderParams['exemptionEngine'],
+            $directOrderParams['thirdPartyData'],
+            $directOrderParams['shippingfee'],
+            $directOrderParams['exponent']
         );
+        
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
             $this->worldpayhelper->getXmlUsername($directOrderParams['paymentDetails']['paymentType']),
             $this->worldpayhelper->getXmlPassword($directOrderParams['paymentDetails']['paymentType'])
         );
     }
-
 
     /**
      * Send a payment request using tokenised saved card to the WorldPay server based on the order parameters.
@@ -115,13 +144,18 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
      */
     public function orderToken($tokenOrderParams)
     {
-        $this->_wplogger->info('########## Submitting direct token order request. OrderCode: ' . $tokenOrderParams['orderCode'] . ' ##########');
+        $loggerMsg = '########## Submitting direct token order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $tokenOrderParams['orderCode'] . ' ##########');
 
-        $requestConfiguration = array(
+        $requestConfiguration = [
             'threeDSecureConfig' => $tokenOrderParams['threeDSecureConfig'],
             'tokenRequestConfig' => $tokenOrderParams['tokenRequestConfig']
-        );
+        ];
         $this->xmltokenorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
+        if (empty($tokenOrderParams['thirdPartyData']) && empty($tokenOrderParams['shippingfee'])) {
+            $tokenOrderParams['thirdPartyData']='';
+            $tokenOrderParams['shippingfee']='';
+        }
         $orderSimpleXml = $this->xmltokenorder->build(
             $tokenOrderParams['merchantCode'],
             $tokenOrderParams['orderCode'],
@@ -140,7 +174,10 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $tokenOrderParams['tokenizationEnabled'],
             $tokenOrderParams['storedCredentialsEnabled'],
             $tokenOrderParams['cusDetails'],
-            $tokenOrderParams['exemptionEngine']
+            $tokenOrderParams['exemptionEngine'],
+            $tokenOrderParams['thirdPartyData'],
+            $tokenOrderParams['shippingfee'],
+            $tokenOrderParams['exponent']
         );
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
@@ -157,14 +194,22 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
      */
     public function redirectOrder($redirectOrderParams)
     {
-        $this->_wplogger->info('########## Submitting redirect order request. OrderCode: ' . $redirectOrderParams['orderCode'] . ' ##########');
+        $loggerMsg = '########## Submitting redirect order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $redirectOrderParams['orderCode'] . ' ##########');
 
-        $requestConfiguration = array(
+        $requestConfiguration = [
             'threeDSecureConfig' => $redirectOrderParams['threeDSecureConfig'],
             'tokenRequestConfig' => $redirectOrderParams['tokenRequestConfig'],
             'shopperId' => $redirectOrderParams['shopperId']
-        );
+        ];
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectOrder($requestConfiguration);
+        if (empty($redirectOrderParams['thirdPartyData']) && empty($redirectOrderParams['shippingfee'])) {
+            $redirectOrderParams['thirdPartyData']='';
+            $redirectOrderParams['shippingfee']='';
+        }
+        if (empty($redirectOrderParams['statementNarrative'])) {
+            $redirectOrderParams['statementNarrative']='';
+        }
         $redirectSimpleXml = $this->xmlredirectorder->build(
             $redirectOrderParams['merchantCode'],
             $redirectOrderParams['orderCode'],
@@ -173,6 +218,7 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $redirectOrderParams['amount'],
             $redirectOrderParams['paymentType'],
             $redirectOrderParams['shopperEmail'],
+            $redirectOrderParams['statementNarrative'],
             $redirectOrderParams['acceptHeader'],
             $redirectOrderParams['userAgentHeader'],
             $redirectOrderParams['shippingAddress'],
@@ -180,9 +226,11 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $redirectOrderParams['paymentPagesEnabled'],
             $redirectOrderParams['installationId'],
             $redirectOrderParams['hideAddress'],
-            $redirectOrderParams['paymentDetails']    
+            $redirectOrderParams['paymentDetails'],
+            $redirectOrderParams['thirdPartyData'],
+            $redirectOrderParams['shippingfee'],
+            $redirectOrderParams['exponent']
         );
-
         return $this->_sendRequest(
             dom_import_simplexml($redirectSimpleXml)->ownerDocument,
             $this->worldpayhelper->getXmlUsername($redirectOrderParams['paymentType']),
@@ -198,8 +246,11 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
      */
     public function redirectKlarnaOrder($redirectOrderParams)
     {
-        $this->_wplogger->info('########## Submitting klarna redirect order request. OrderCode: ' . $redirectOrderParams['orderCode'] . ' ##########');
-
+        $loggerMsg = '########## Submitting klarna redirect order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $redirectOrderParams['orderCode'] . ' ##########');
+        if (empty($redirectOrderParams['statementNarrative'])) {
+            $redirectOrderParams['statementNarrative']='';
+        }
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectKlarnaOrder();
         $redirectSimpleXml = $this->xmlredirectorder->build(
             $redirectOrderParams['merchantCode'],
@@ -209,6 +260,7 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $redirectOrderParams['amount'],
             $redirectOrderParams['paymentType'],
             $redirectOrderParams['shopperEmail'],
+            $redirectOrderParams['statementNarrative'],
             $redirectOrderParams['acceptHeader'],
             $redirectOrderParams['userAgentHeader'],
             $redirectOrderParams['shippingAddress'],
@@ -216,7 +268,8 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $redirectOrderParams['paymentPagesEnabled'],
             $redirectOrderParams['installationId'],
             $redirectOrderParams['hideAddress'],
-            $redirectOrderParams['orderLineItems']
+            $redirectOrderParams['orderLineItems'],
+            $redirectOrderParams['exponent']
         );
 
         return $this->_sendRequest(
@@ -232,15 +285,19 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
      * @param array $redirectOrderParams
      * @return mixed
      */
-    public function DirectIdealOrder($redirectOrderParams)
+    public function directIdealOrder($redirectOrderParams)
     {
-        $this->_wplogger->info('########## Submitting direct Ideal order request. OrderCode: ' . $redirectOrderParams['orderCode'] . ' ##########');
+        $loggerMsg = '########## Submitting direct Ideal order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $redirectOrderParams['orderCode'] . ' ##########');
 
-        $requestConfiguration = array(
+        $requestConfiguration = [
             'threeDSecureConfig' => $redirectOrderParams['threeDSecureConfig'],
             'tokenRequestConfig' => $redirectOrderParams['tokenRequestConfig'],
             'shopperId' => $redirectOrderParams['shopperId']
-        );
+        ];
+        if (empty($redirectOrderParams['statementNarrative'])) {
+            $redirectOrderParams['statementNarrative']='';
+        }
         $this->xmldirectidealorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectIdealOrder($requestConfiguration);
         $redirectSimpleXml = $this->xmldirectidealorder->build(
             $redirectOrderParams['merchantCode'],
@@ -250,6 +307,7 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $redirectOrderParams['amount'],
             $redirectOrderParams['paymentType'],
             $redirectOrderParams['shopperEmail'],
+            $redirectOrderParams['statementNarrative'],
             $redirectOrderParams['acceptHeader'],
             $redirectOrderParams['userAgentHeader'],
             $redirectOrderParams['shippingAddress'],
@@ -258,7 +316,8 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $redirectOrderParams['installationId'],
             $redirectOrderParams['hideAddress'],
             $redirectOrderParams['callbackurl'],
-            $redirectOrderParams['cc_bank']
+            $redirectOrderParams['cc_bank'],
+            $redirectOrderParams['exponent']
         );
 
         return $this->_sendRequest(
@@ -267,7 +326,6 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentType'])
         );
     }
-
 
     /**
      * Send capture XML to Worldpay server
@@ -280,16 +338,18 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
     public function capture(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode)
     {
         $orderCode = $wp->getWorldpayOrderId();
-        $this->_wplogger->info('########## Submitting capture request. Order: ' . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
+        $loggerMsg = '########## Submitting capture request. Order: ';
+        $this->_wplogger->info($loggerMsg . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
         $this->xmlcapture = new \Sapient\Worldpay\Model\XmlBuilder\Capture();
-        
-        
-        
+        $currencyCode = $order->getOrderCurrencyCode();
+        $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
+         
         $captureSimpleXml = $this->xmlcapture->build(
             $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
             $orderCode,
             $order->getOrderCurrencyCode(),
             $order->getGrandTotal(),
+            $exponent,
             $wp->getPaymentType()
         );
 
@@ -299,9 +359,7 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
         );
     }
-    
-    
-    
+       
     /**
      * Send Partial capture XML to Worldpay server
      *
@@ -313,15 +371,18 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
     public function partialCapture(\Magento\Sales\Model\Order $order, $wp, $grandTotal)
     {
         $orderCode = $wp->getWorldpayOrderId();
-        $this->_wplogger->info('########## Submitting Partial capture request. Order: ' . $orderCode . ' Amount:' . $grandTotal . ' ##########');
+        $loggerMsg = '########## Submitting Partial capture request. Order: ';
+        $this->_wplogger->info($loggerMsg . $orderCode . ' Amount:' . $grandTotal . ' ##########');
         $this->xmlcapture = new \Sapient\Worldpay\Model\XmlBuilder\Capture();
-       
+        $currencyCode = $order->getOrderCurrencyCode();
+        $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
         
         $captureSimpleXml = $this->xmlcapture->build(
             $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
             $orderCode,
             $order->getOrderCurrencyCode(),
             $grandTotal,
+            $exponent,
             $wp->getPaymentType()
         );
 
@@ -332,8 +393,6 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         );
     }
     
-    
-
     /**
      * process the request
      *
@@ -368,10 +427,12 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         if ($error) {
             $this->_wplogger->error('An error occurred while sending the request');
             $this->_wplogger->error('Error (code ' . $error[0]['code'] . '): ' . $error[0]);
-            if($error[0]['code'] == 6){
-                $error[0] = '3DS2 services are disabled, please contact system administrator.';
+            if ($error[0]['code'] == 6) {
+                $error[0] = $this->getCreditCardSpecificException('CCAM12');
             }
-            throw new Exception($error[0]);
+            throw new \Magento\Framework\Exception\ValidatorException(
+                __($error[0])
+            );
         }
     }
 
@@ -393,14 +454,18 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         $reference
     ) {
         $orderCode = $wp->getWorldpayOrderId();
-        $this->_wplogger->info('########## Submitting refund request. OrderCode: ' . $orderCode . ' ##########');
+        $loggerMsg = '########## Submitting refund request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $orderCode . ' ##########');
         $this->xmlrefund = new \Sapient\Worldpay\Model\XmlBuilder\Refund();
+        $currencyCode = $order->getOrderCurrencyCode();
+        $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
         $refundSimpleXml = $this->xmlrefund->build(
             $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
             $orderCode,
             $order->getOrderCurrencyCode(),
             $amount,
-            $reference
+            $reference,
+            $exponent
         );
 
         return $this->_sendRequest(
@@ -450,11 +515,11 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         $storeId
     ) {
         $this->_wplogger->info('########## Submitting token update. TokenId: ' . $tokenModel->getId() . ' ##########');
-        $requestParameters = array(
+        $requestParameters = [
             'tokenModel'   => $tokenModel,
             'customer'     => $customer,
             'merchantCode' => $this->worldpayhelper->getMerchantCode($tokenModel->getMethod()),
-        );
+        ];
         /** @var SimpleXMLElement $simpleXml */
         $this->tokenUpdateXml = new \Sapient\Worldpay\Model\XmlBuilder\TokenUpdate($requestParameters);
         $tokenUpdateSimpleXml = $this->tokenUpdateXml->build();
@@ -481,11 +546,11 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
     ) {
         $this->_wplogger->info('########## Submitting token Delete. TokenId: ' . $tokenModel->getId() . ' ##########');
 
-        $requestParameters = array(
+        $requestParameters = [
             'tokenModel'   => $tokenModel,
             'customer'     => $customer,
             'merchantCode' => $this->worldpayhelper->getMerchantCode($tokenModel->getMethod()),
-        );
+        ];
 
         /** @var SimpleXMLElement $simpleXml */
         $this->tokenDeleteXml = new \Sapient\Worldpay\Model\XmlBuilder\TokenDelete($requestParameters);
@@ -502,8 +567,8 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
     {
         $spoofCountryId = '';
         $countryCodeSpoofs = $this->worldpayhelper->getCountryCodeSpoofs();
-        if($countryCodeSpoofs){
-            $spoofCountryId = $this->getCountryCodeSpoof($countryCodeSpoofs,$paymentOptionsParams['countryCode']);
+        if ($countryCodeSpoofs) {
+            $spoofCountryId = $this->getCountryCodeSpoof($countryCodeSpoofs, $paymentOptionsParams['countryCode']);
         }
         $countryId = ($spoofCountryId)? $spoofCountryId : $paymentOptionsParams['countryCode'];
         $this->_wplogger->info('########## Submitting payment otions request ##########');
@@ -528,21 +593,23 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
      */
     public function walletsOrder($walletOrderParams)
     {
-        $this->_wplogger->info('########## Submitting wallet order request. OrderCode: ' . $walletOrderParams['orderCode'] . ' ##########');
+        $loggerMsg = '########## Submitting wallet order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $walletOrderParams['orderCode'] . ' ##########');
 
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\WalletOrder();
             $walletSimpleXml = $this->xmlredirectorder->build(
-            $walletOrderParams['merchantCode'],
-            $walletOrderParams['orderCode'],
-            $walletOrderParams['orderDescription'],
-            $walletOrderParams['currencyCode'],
-            $walletOrderParams['amount'],
-            $walletOrderParams['paymentType'],
-            $walletOrderParams['shopperEmail'],
-            $walletOrderParams['protocolVersion'],
-            $walletOrderParams['signature'],
-            $walletOrderParams['signedMessage']
-        );
+                $walletOrderParams['merchantCode'],
+                $walletOrderParams['orderCode'],
+                $walletOrderParams['orderDescription'],
+                $walletOrderParams['currencyCode'],
+                $walletOrderParams['amount'],
+                $walletOrderParams['paymentType'],
+                $walletOrderParams['shopperEmail'],
+                $walletOrderParams['protocolVersion'],
+                $walletOrderParams['signature'],
+                $walletOrderParams['signedMessage'],
+                $walletOrderParams['exponent']
+            );
             
         return $this->_sendRequest(
             dom_import_simplexml($walletSimpleXml)->ownerDocument,
@@ -551,22 +618,20 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         );
     }
     
-    
-    
      /**
-     * Send Apple Pay order XML to Worldpay server
-     *
-     * @param array $walletOrderParams
-     * @return mixed
-     */
+      * Send Apple Pay order XML to Worldpay server
+      *
+      * @param array $walletOrderParams
+      * @return mixed
+      */
     public function applePayOrder($applePayOrderParams)
     {
-        $this->_wplogger->info('########## Submitting apple pay order request. OrderCode: ' . $applePayOrderParams['orderCode'] . ' ##########');
+        $loggerMsg = '########## Submitting apple pay order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $applePayOrderParams['orderCode'] . ' ##########');
 
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\ApplePayOrder();
         
-            
-            $appleSimpleXml = $this->xmlredirectorder->build(
+        $appleSimpleXml = $this->xmlredirectorder->build(
             $applePayOrderParams['merchantCode'],
             $applePayOrderParams['orderCode'],
             $applePayOrderParams['orderDescription'],
@@ -577,13 +642,11 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $applePayOrderParams['protocolVersion'],
             $applePayOrderParams['signature'],
             $applePayOrderParams['data'],
-            $applePayOrderParams['ephemeralPublicKey'],        
+            $applePayOrderParams['ephemeralPublicKey'],
             $applePayOrderParams['publicKeyHash'],
-            $applePayOrderParams['transactionId']
-              
+            $applePayOrderParams['transactionId'],
+            $applePayOrderParams['exponent']
         );
-        
-        
         
         return $this->_sendRequest(
             dom_import_simplexml($appleSimpleXml)->ownerDocument,
@@ -592,10 +655,7 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         );
     }
     
-    
-    
-    
-     /**
+    /**
      * Send chromepay order XML to Worldpay server
      *
      * @param array $chromepayOrderParams
@@ -603,7 +663,8 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
      */
     public function chromepayOrder($chromeOrderParams)
     {
-        $this->_wplogger->info('########## Submitting chromepay order request. OrderCode: ' . $chromeOrderParams['orderCode'] . ' ##########');
+        $loggerMsg = '########## Submitting chromepay order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $chromeOrderParams['orderCode'] . ' ##########');
         $paymentType = 'worldpay_cc';
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\ChromePayOrder();
         $chromepaySimpleXml = $this->xmlredirectorder->build(
@@ -616,7 +677,8 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
             $chromeOrderParams['paymentDetails'],
             $chromeOrderParams['shippingAddress'],
             $chromeOrderParams['billingAddress'],
-            $chromeOrderParams['shopperEmail']
+            $chromeOrderParams['shopperEmail'],
+            $chromeOrderParams['exponent']
         );
         //echo $this->worldpayhelper->getXmlUsername($paymentType);exit;
         return $this->_sendRequest(
@@ -634,14 +696,16 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
      */
     public function order3Ds2Secure($directOrderParams)
     {
-        $this->_wplogger->info('########## Submitting direct 3Ds2Secure order request. OrderCode: ' . $directOrderParams['orderCode'] . ' ##########');
-        $requestConfiguration = array(
+        $loggerMsg = '########## Submitting direct 3Ds2Secure order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $directOrderParams['orderCode'] . ' ##########');
+        $requestConfiguration = [
             'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
             'tokenRequestConfig' => $directOrderParams['tokenRequestConfig']
-        );
+        ];
 
         $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
-        $paymentType = isset($directOrderParams['paymentDetails']['brand']) ? $directOrderParams['paymentDetails']['brand']: $directOrderParams['paymentDetails']['paymentType'];
+        $paymentType = isset($directOrderParams['paymentDetails']['brand']) ?
+                $directOrderParams['paymentDetails']['brand']: $directOrderParams['paymentDetails']['paymentType'];
         $orderSimpleXml = $this->xmldirectorder->build3Ds2Secure(
             $directOrderParams['merchantCode'],
             $directOrderParams['orderCode'],
@@ -670,11 +734,11 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         $storeId
     ) {
         $this->_wplogger->info('########## Submitting token inquiry. TokenId: ' . $tokenModel->getId() . ' ##########');
-        $requestParameters = array(
+        $requestParameters = [
             'tokenModel'   => $tokenModel,
             'customer'     => $customer,
             'merchantCode' => $this->worldpayhelper->getMerchantCode($tokenModel->getMethod()),
-        );
+        ];
         /** @var SimpleXMLElement $simpleXml */
         $this->tokenInquiryXml = new \Sapient\Worldpay\Model\XmlBuilder\TokenInquiry($requestParameters);
         $tokenInquirySimpleXml = $this->tokenInquiryXml->build();
@@ -686,16 +750,22 @@ class PaymentServiceRequest  extends \Magento\Framework\DataObject
         );
     }
     
-    private function getCountryCodeSpoof($cntrs,$cntryId){
-        if($cntrs){
-            $countryList = explode(',',$cntrs);
-            foreach($countryList as $contry){
+    private function getCountryCodeSpoof($cntrs, $cntryId)
+    {
+        if ($cntrs) {
+            $countryList = explode(',', $cntrs);
+            foreach ($countryList as $contry) {
                 list($k, $v) = explode('-', $contry);
-                if($k === $cntryId){
+                if ($k === $cntryId) {
                     return $v;
                 }
-            }            
+            }
         }
         return false;
+    }
+    
+    public function getCreditCardSpecificException($exceptioncode)
+    {
+        return $this->worldpayhelper->getCreditCardSpecificexception($exceptioncode);
     }
 }

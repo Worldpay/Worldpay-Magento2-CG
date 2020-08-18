@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Authorisation;
+
 use Exception;
 
 class ThreeDSecureChallenge extends \Magento\Framework\DataObject
@@ -24,6 +25,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
      * @param \Magento\Framework\Message\ManagerInterface $messageManager,
      * @param \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment,
      * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
@@ -36,7 +38,8 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment,
         \Magento\Customer\Model\Session $customerSession,
-        \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
+        \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper
     ) {
         $this->paymentservicerequest = $paymentservicerequest;
         $this->wplogger = $wplogger;
@@ -49,6 +52,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
         $this->updateWorldPayPayment = $updateWorldPayPayment;
         $this->customerSession = $customerSession;
         $this->worldpaytoken = $worldpaytoken;
+        $this->worldpayHelper = $worldpayHelper;
     }
     public function continuePost3dSecure2AuthorizationProcess($directOrderParams, $threeDSecureParams)
     {
@@ -64,22 +68,23 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
             $this->checkoutSession->setIs3DS2Request();
             $orderIncrementId = current(explode('-', $directOrderParams['orderCode']));
             $this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
-            $this->_paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml($this->response->getXml());
+            $this->_paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml(
+                $this->response->getXml()
+            );
             $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
-            $this->_abortIfPaymentError($this->_paymentUpdate);
+            $this->_abortIfPaymentError($this->_paymentUpdate, $orderIncrementId);
         } catch (Exception $e) {
-            $this->wplogger->info($e->getMessage());            
-            if($e->getMessage() === 'Asymmetric transaction rollback.'){
-                $this->_messageManager->addError(__('Duplicate Entry, This card number is already saved.'));
+            $this->wplogger->info($e->getMessage());
+            if ($e->getMessage() === 'Asymmetric transaction rollback.') {
+                $this->_messageManager->addError(__($this->paymentservice->getCreditCardSpecificException('CCAM16')));
             } else {
                 $this->_messageManager->addError(__($e->getMessage()));
-            }            
+            }
             $this->checkoutSession->setWpResponseForwardUrl(
-                  $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
+                $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );
             return;
         }
-
     }
 
     /**
@@ -88,7 +93,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
     private function _handleAuthoriseSuccess()
     {
         $this->checkoutSession->setWpResponseForwardUrl(
-            $this->urlBuilders->getUrl('checkout/onepage/success',array('_secure' => true))
+            $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
         );
     }
 
@@ -96,17 +101,24 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
      * it handles if payment is refused or cancelled
      * @param  Object $paymentUpdate
      */
-    private function _abortIfPaymentError($paymentUpdate)
+    private function _abortIfPaymentError($paymentUpdate, $orderId)
     {
+        $responseXml = $this->response->getXml();
+        $orderStatus = $responseXml->reply->orderStatus;
+        $payment = $orderStatus->payment;
+        $wpayCode = $payment->ISO8583ReturnCode['code'] ? $payment->ISO8583ReturnCode['code'] : '';
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Refused) {
-          $this->_messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));
+            $message = $this->worldpayHelper()->getExtendedResponse($wpayCode, $orderId);
+            $responseMessage = !empty($message) ? $message :
+            $this->paymentservice->getCreditCardSpecificException('CCAM9');
+            $this->_messageManager->addError(__($responseMessage));
              $this->checkoutSession->setWpResponseForwardUrl(
-              $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
-            );
+                 $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
+             );
         } elseif ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
-            $this->_messageManager->addError(__('Unfortunately the order could not be processed. Please contact us or try again later.'));
+            $this->_messageManager->addError(__($this->paymentservice->getCreditCardSpecificException('CCAM9')));
             $this->checkoutSession->setWpResponseForwardUrl(
-              $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
+                $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );
         } else {
             $this->orderservice->removeAuthorisedOrder();
@@ -136,7 +148,8 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
     {
         $tokenService = $this->worldpaytoken;
         $tokenService->updateOrInsertToken(
-             new \Sapient\Worldpay\Model\Token\StateXml($xmlRequest), $this->_order->getPayment()
+            new \Sapient\Worldpay\Model\Token\StateXml($xmlRequest),
+            $this->_order->getPayment()
         );
     }
 }

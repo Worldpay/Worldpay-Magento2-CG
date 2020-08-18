@@ -34,8 +34,14 @@ class SaveOrderItemCommitAfterObserver implements ObserverInterface
 
         $orderItem = $observer->getEvent()->getItem();
         $subscription = $orderItem->getWorldpaySubscription();
+        //$subscription = $orderItem->getWorldpaySubscription();
         
-        if ($orderItem->getWorldpaySubscription()){
+//        if (($subscription = $orderItem->getWorldpaySubscription()) && $subscription->getWorldpaySubscriptionId()
+//            && !$subscription->getId()
+//        ) {
+            //$logger->info('$subscription->getWorldpaySubscriptionId()--'.print_r($subscription->getWorldpaySubscriptionId(),true));
+        //$logger->info('$subscription->getId()--'.print_r($subscription->getId(),true));
+        if ($orderItem->getWorldpaySubscription()) {
             $order = $orderItem->getOrder();
             $paymentData = $this->objectCopyService->getDataFromFieldset(
                 'sales_convert_order_payment',

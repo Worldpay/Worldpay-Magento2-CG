@@ -4,34 +4,35 @@
  */
 namespace Sapient\Worldpay\Model\Payment;
 
-/** 
+/**
  * Updating Risk gardian
  */
-class WorldPayPayment 
-{   
-    /** 
+class WorldPayPayment
+{
+
+    /**
      * Constructor
      *
-     * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment 
+     * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
      */
-    public function __construct(			 
-        \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment                
-    ) {    	
-        $this->worldpaypayment = $worldpaypayment;         
+    public function __construct(
+        \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
+    ) {
+        $this->worldpaypayment = $worldpaypayment;
     }
 
-    /** 
+    /**
      * Updating Risk gardian
      *
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      */
     public function updateWorldpayPayment(\Sapient\Worldpay\Model\Payment\State $paymentState)
     {
-     	$wpp = $this->worldpaypayment->create();
+         $wpp = $this->worldpaypayment->create();
 
-		$wpp = $wpp->loadByWorldpayOrderId($paymentState->getOrderCode());
+        $wpp = $wpp->loadByWorldpayOrderId($paymentState->getOrderCode());
 
-		$wpp->setData('payment_status', $paymentState->getPaymentStatus());
+        $wpp->setData('payment_status', $paymentState->getPaymentStatus());
         $wpp->setData('card_number', $paymentState->getCardNumber());
         $wpp->setData('avs_result', $paymentState->getAvsResultCode());
         $wpp->setData('cvc_result', $paymentState->getCvcResultCode());
@@ -48,7 +49,7 @@ class WorldPayPayment
         $wpp->setData('aav_cardholder_name_result_code', $paymentState->getAAVCardholderNameResultCode());
         $wpp->setData('aav_telephone_result_code', $paymentState->getAAVTelephoneResultCode());
         $wpp->setData('aav_email_result_code', $paymentState->getAAVEmailResultCode());
-		
-		$wpp->save();
+        
+        $wpp->save();
     }
 }

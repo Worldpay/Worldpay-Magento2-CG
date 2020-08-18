@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Token;
+
 /**
  * Interface Sapient_WorldPay_Model_Token_UpdateInterface
  *
@@ -19,5 +20,4 @@ interface UpdateInterface
      * @return boolean
      */
     public function isSuccess();
-
 }

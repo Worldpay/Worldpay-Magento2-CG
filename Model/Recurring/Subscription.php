@@ -163,7 +163,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param SubscriptionStatus $statusSource
      * @param \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
-     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\CollectionFactory $addressCollectionFactory
+     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\CollectionFactory
+     * $addressCollectionFactory
      * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      * @param \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder
@@ -179,7 +180,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         SubscriptionStatus $statusSource,
         \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory,
-        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\CollectionFactory $addressCollectionFactory,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\CollectionFactory
+        $addressCollectionFactory,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder,
@@ -206,17 +208,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
      */
     protected function _construct()
     {
-        $this->_init('Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription');
+        $this->_init(\Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription::class);
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function beforeSave()
-    {
-        return parent::beforeSave();
-    }
-    
     /**
      * @inheritdoc
      */
@@ -554,7 +547,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     public function getProductOptions()
     {
         $data = $this->_getData('product_options');
-        return is_string($data) ? unserialize($data) : $data;
+        return is_string($data) ?
+        \Magento\Framework\Serialize\SerializerInterface::unserialize($data) : $data;
     }
 
     /**
@@ -735,39 +729,34 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
      */
     public function updateTransactionsData()
     {
-        $startDate = '';        
+        $startDate = '';
         if ($this->getStartDate()) {
             $startDate = $this->getStartDate();
         }
        
         $date = $this->getStartDate();
-        $transactionData = array('subscription_id'=>$this->getId(),
+        $transactionData = ['subscription_id'=>$this->getId(),
                 'customer_id'   =>  $this->getCustomerId(),
                 'original_order_id' =>  $this->getOriginalOrderId(),
                 'original_order_increment_id'   =>  $this->getOriginalOrderIncrementId(),
                 'plan_id'   =>  $this->getPlanId(),
                 'recurring_date'   =>  $startDate,
                 'recurring_end_date'   =>  $date,
-                'email'=>$this->getCustomerEmail(), 
+                'email'=>$this->getCustomerEmail(),
                 'status'=>'active',
-                'recurring_order_id' => $this->getOriginalOrderId());
-        //$order = $item->getOrder();
-        $transactions = $this->transactionsFactory->create()->loadByOrderIncrementId($this->getOriginalOrderIncrementId());
-        $transactions->setData('subscription_id',$this->getId());
-        $transactions->setData('customer_id',$this->getCustomerId());
-        $transactions->setData('original_order_id',$this->getOriginalOrderId());
-        $transactions->setData('plan_id',$this->getPlanId());
-        $transactions->setData('recurring_date',$startDate);
-        $transactions->setData('recurring_end_date',$date);
-        $transactions->setData('email',$this->getCustomerEmail());
-        $transactions->setData('status','active');
-        $transactions->setData('recurring_order_id',$this->getOriginalOrderId());
-        
-//        $transactions = $this->transactionsFactory->create()->loadByOrderIncrementId($this->getOriginalOrderIncrementId());
-//        $transactions->setData($transactionData)->save();
+                'recurring_order_id' => $this->getOriginalOrderId()];
+        $transactions = $this->transactionsFactory->create()
+                ->loadByOrderIncrementId($this->getOriginalOrderIncrementId());
+        $transactions->setData('subscription_id', $this->getId());
+        $transactions->setData('customer_id', $this->getCustomerId());
+        $transactions->setData('original_order_id', $this->getOriginalOrderId());
+        $transactions->setData('plan_id', $this->getPlanId());
+        $transactions->setData('recurring_date', $startDate);
+        $transactions->setData('recurring_end_date', $date);
+        $transactions->setData('email', $this->getCustomerEmail());
+        $transactions->setData('status', 'active');
+        $transactions->setData('recurring_order_id', $this->getOriginalOrderId());
         $transactions->save();
-        //$this->getResource()->updateOrderRelation($this->getOriginalOrderId(), $this->getId());
-        //return $this;
     }
     
     public function getOrderStatus($orderId)
@@ -780,12 +769,12 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     /**
      * Load subscription Details
      *
-     * 
+     *
      */
     public function loadByOrderId($order_id)
     {
         if (!$order_id) {
-            return;         
+            return;
         }
         $id = $this->getResource()->loadByOriginalOrderIncrementId($order_id);
             return $this->load($id);

@@ -1,10 +1,10 @@
 <?php
 namespace Sapient\Worldpay\Model\XmlBuilder;
+
 use Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecureConfig;
 
 class RedirectKlarnaOrder
 {
-    const EXPONENT = 2;
     const DYNAMIC3DS_DO3DS = 'do3DS';
     const DYNAMIC3DS_NO3DS = 'no3DS';
     const TOKEN_SCOPE = 'shopper';
@@ -20,6 +20,7 @@ EOD;
     private $amount;
     private $paymentType;
     private $shopperEmail;
+    private $statementNarrative;
     private $acceptHeader;
     private $userAgentHeader;
     private $shippingAddress;
@@ -27,18 +28,15 @@ EOD;
     private $paymentPagesEnabled;
     private $installationId;
     private $hideAddress;
-
-
+    private $exponent;
     private $threeDSecureConfig;
-
     private $tokenRequestConfig;
 
-   public function __construct()
+    public function __construct()
     {
          $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure();
 
         $this->tokenRequestConfig = false;
-
     }
 
     public function build(
@@ -49,6 +47,7 @@ EOD;
         $amount,
         $paymentType,
         $shopperEmail,
+        $statementNarrative,
         $acceptHeader,
         $userAgentHeader,
         $shippingAddress,
@@ -56,9 +55,9 @@ EOD;
         $paymentPagesEnabled,
         $installationId,
         $hideAddress,
-        $orderlineitems
-    )
-    {
+        $orderlineitems,
+        $exponent
+    ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
         $this->orderDescription = $orderDescription;
@@ -66,6 +65,7 @@ EOD;
         $this->amount = $amount;
         $this->paymentType = $paymentType;
         $this->shopperEmail = $shopperEmail;
+        $this->statementNarrative = $statementNarrative;
         $this->acceptHeader = $acceptHeader;
         $this->userAgentHeader = $userAgentHeader;
         $this->shippingAddress = $shippingAddress;
@@ -74,6 +74,7 @@ EOD;
         $this->installationId = $installationId;
         $this->hideAddress = $hideAddress;
         $this->orderlineitems = $orderlineitems;
+        $this->exponent = $exponent;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -113,9 +114,11 @@ EOD;
         $this->_addShopperElement($order);
         $this->_addShippingElement($order);
         $this->_addBillingElement($order);
+        if (!empty($this->statementNarrative)) {
+            $this->_addStatementNarrativeElement($order);
+        }
         $this->_addOrderLineItemElement($order);
         $this->_addDynamic3DSElement($order);
-
         return $order;
     }
 
@@ -129,7 +132,7 @@ EOD;
     {
         $amountElement = $order->addChild('amount');
         $amountElement['currencyCode'] = $this->currencyCode;
-        $amountElement['exponent'] = self::EXPONENT;
+        $amountElement['exponent'] = $this->exponent;
         //$amountElement['value'] = $this->_amountAsInt($this->amount);
         $amountElement['value'] = $this->_amountAsInt($this->_roundOfTotal($order));
     }
@@ -170,6 +173,16 @@ EOD;
         $userAgentHeader = $browser->addChild('userAgentHeader');
         $this->_addCDATA($userAgentHeader, $this->userAgentHeader);
     }
+    
+     /**
+      * Add _addStatementNarrativeElement to xml
+      *
+      * @param SimpleXMLElement $order
+      */
+    private function _addStatementNarrativeElement($order)
+    {
+        $order->addChild('statementNarrative', $this->statementNarrative);
+    }
 
     private function _addShippingElement($order)
     {
@@ -199,8 +212,15 @@ EOD;
         );
     }
 
-    private function _addAddressElement($parentElement, $firstName, $lastName, $street, $postalCode, $city, $countryCode)
-    {
+    private function _addAddressElement(
+        $parentElement,
+        $firstName,
+        $lastName,
+        $street,
+        $postalCode,
+        $city,
+        $countryCode
+    ) {
         $address = $parentElement->addChild('address');
 
         $firstNameElement = $address->addChild('firstName');
@@ -234,15 +254,35 @@ EOD;
          $termsURLElement = $orderLinesElement->addChild('termsURL');
         $this->_addCDATA($termsURLElement, $orderlineitems['termsURL']);
 
-        foreach($orderlineitems['lineItem'] as $lineitem){
+        foreach ($orderlineitems['lineItem'] as $lineitem) {
             $totaldiscountamount = (isset($lineitem['totalDiscountAmount'])) ? $lineitem['totalDiscountAmount'] : 0;
-            $this->_addLineItemElement($orderLinesElement, $lineitem['reference'], $lineitem['name'], $lineitem['quantity'], $lineitem['quantityUnit'], $lineitem['unitPrice'], $lineitem['taxRate'], $lineitem['totalAmount'], $lineitem['totalTaxAmount'], $totaldiscountamount);
+            $this->_addLineItemElement(
+                $orderLinesElement,
+                $lineitem['reference'],
+                $lineitem['name'],
+                $lineitem['quantity'],
+                $lineitem['quantityUnit'],
+                $lineitem['unitPrice'],
+                $lineitem['taxRate'],
+                $lineitem['totalAmount'],
+                $lineitem['totalTaxAmount'],
+                $totaldiscountamount
+            );
         }
     }
 
-    private function _addLineItemElement($parentElement, $reference, $name, $quantity, $quantityUnit, $unitPrice,
-        $taxRate, $totalAmount, $totalTaxAmount, $totalDiscountAmount = 0)
-    {
+    private function _addLineItemElement(
+        $parentElement,
+        $reference,
+        $name,
+        $quantity,
+        $quantityUnit,
+        $unitPrice,
+        $taxRate,
+        $totalAmount,
+        $totalTaxAmount,
+        $totalDiscountAmount = 0
+    ) {
         $unitPrice = sprintf('%0.2f', $unitPrice);
         $totalAmount = $quantity * $unitPrice;
 
@@ -274,9 +314,9 @@ EOD;
           $totalTaxAmountElement = $lineitem->addChild('totalTaxAmount');
         $this->_addCDATA($totalTaxAmountElement, $this->_amountAsInt($totalTaxAmount));
 
-         if($totalDiscountAmount > 0){
-          $totalDiscountAmountElement = $lineitem->addChild('totalDiscountAmount');
-          $this->_addCDATA($totalDiscountAmountElement, $this->_amountAsInt($totalDiscountAmount));
+        if ($totalDiscountAmount > 0) {
+            $totalDiscountAmountElement = $lineitem->addChild('totalDiscountAmount');
+            $this->_addCDATA($totalDiscountAmountElement, $this->_amountAsInt($totalDiscountAmount));
         }
     }
 
@@ -289,15 +329,17 @@ EOD;
 
     private function _amountAsInt($amount)
     {
-        return round($amount, self::EXPONENT, PHP_ROUND_HALF_EVEN) * pow(10, self::EXPONENT);
+        return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
     }
 
-    private function _roundOfTotal($order){
+    private function _roundOfTotal($order)
+    {
         $accTotalAmt = 0;
 
         $orderlineitems = $this->orderlineitems;
-        foreach($orderlineitems['lineItem'] as $lineitem){
-            $totaldiscountamount = (isset($lineitem['totalDiscountAmount'])) ? sprintf('%0.2f',$lineitem['totalDiscountAmount']) : 0;
+        foreach ($orderlineitems['lineItem'] as $lineitem) {
+            $totaldiscountamount = (isset($lineitem['totalDiscountAmount']))
+                                    ? sprintf('%0.2f', $lineitem['totalDiscountAmount']) : 0;
             $unitPrice = sprintf('%0.2f', $lineitem['unitPrice']);
             $accTotalAmt = $accTotalAmt + ($lineitem['quantity'] * $unitPrice) - $totaldiscountamount;
         }

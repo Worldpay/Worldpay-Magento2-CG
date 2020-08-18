@@ -16,7 +16,6 @@ class PaymentMethodSelection implements \Magento\Framework\Option\ArrayInterface
 
         return [
             ['value' => self::RADIO_BUTTONS, 'label' => __('Radio Buttons')],
-            ['value' => self::DROPDOWN_MENU, 'label' => __('Dropdown Menu')],
         ];
     }
 }

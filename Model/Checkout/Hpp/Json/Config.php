@@ -49,12 +49,20 @@ class Config
     private $urlConfig;
 
     public function __construct(
-        $type, $iframeIntegrationID, $iframeHelperURL, $iframeBaseURL, $url, $target,
-        UrlConfig $urlConfig, $language = 'en', $country = 'gb',
-        $preferredPaymentMethod = null, $debug = false
+        $type,
+        $iframeIntegrationID,
+        $iframeHelperURL,
+        $iframeBaseURL,
+        $url,
+        $target,
+        UrlConfig $urlConfig,
+        $language = 'en',
+        $country = 'gb',
+        $preferredPaymentMethod = null,
+        $debug = false
     ) {
        
-        $availableTypes = array(self::TYPE_IFRAME);
+        $availableTypes = [self::TYPE_IFRAME];
 
         if (!in_array($type, $availableTypes)) {
             throw new \InvalidArgumentException(
@@ -76,7 +84,7 @@ class Config
         if (empty($target)) {
             throw new \InvalidArgumentException('target parameter must be set.');
         }
-        if (!is_null($debug) && !is_bool($debug)) {
+        if ($debug !== null && !is_bool($debug)) {
             throw new \InvalidArgumentException('debug parameter must be a boolean.');
         }
 
@@ -177,5 +185,4 @@ class Config
     {
         return $this->preferredPaymentMethod;
     }
-
 }

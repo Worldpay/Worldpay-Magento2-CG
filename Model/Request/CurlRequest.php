@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Request;
+
 /**
  * set curl param request
  */
@@ -27,9 +28,9 @@ class CurlRequest
         return curl_exec($this->_handle);
     }
 
-    public function getInfo($opt=null)
+    public function getInfo($opt = null)
     {
-       return curl_getinfo($this->_handle, $opt);
+        return curl_getinfo($this->_handle, $opt);
     }
 
     public function getError()

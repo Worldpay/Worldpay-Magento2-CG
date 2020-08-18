@@ -1,97 +1,110 @@
 <?php
 $isworldpayment=$block->isWorldpayPayment();
 if ($isworldpayment) {
-$payment = $block->getWorldPaymentsDetails();
-?>
+    $payment = $block->getWorldPaymentsDetails();
+    ?>
 
 <table class="fieldset">
             <tr>
                 <td class="label"><label>Worldpay Order Id</label></td>
-                <td class="value"><strong><?php echo $payment->getWorldpayOrderId() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getWorldpayOrderId() ?></strong></td>
             </tr>
         <tr>
                 <td class="label"><label>Payment Status</label></td>
-                <td class="value"><strong><?php echo $payment->getPaymentStatus() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getPaymentStatus() ?></strong></td>
             </tr>
                <?php if ($payment->getRefusalCode()): ?>
                 <tr>
-                    <td class="label"><label><?php echo $this->__('Refusal Description'); ?></label></td>
-                    <td class="value"><strong><?php echo $payment->getRefusalDescription() ?> (<?php echo $payment->getRefusalCode() ?>)</strong></td>
+                    <td class="label"><label><?= /* @noEscape */ $block->__('Refusal Description'); ?></label></td>
+                    <td class="value">
+                        <strong><?= /* @noEscape */ $payment->getRefusalDescription() ?>
+                            (<?= /* @noEscape */ $payment->getRefusalCode() ?>)
+                        </strong>
+                    </td>
                 </tr>
             <?php endif; ?>
             <tr>
                 <td class="label"><label>Payment Model</label></td>
-                <td class="value"><strong><?php echo ucwords($payment->getPaymentModel()) ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ ucwords($payment->getPaymentModel()) ?></strong></td>
             </tr>
             <?php if ($payment->getPaymentModel() == 'direct'): ?>
                 <tr>
                     <td class="label"><label>Client side encryption</label></td>
-                    <td class="value"><strong><?php echo ucwords($payment->getClientSideEncryption()? "YES" : "NO") ?></strong></td>
+                    <td class="value">
+                        <strong><?= /* @noEscape */ ucwords($payment->getClientSideEncryption()? "YES" : "NO") ?>
+                        </strong>
+                    </td>
                 </tr>
             <?php endif; ?>
             <tr>
                 <td class="label"><label>Payment Method</label></td>
-                <td class="value"><strong><?php echo $payment->getPaymentType() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getPaymentType() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>Card Number</label></td>
-                <td class="value"><strong><?php echo $payment->getCardNumber() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getCardNumber() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>AVS Result</label></td>
-                <td class="value"><strong><?php echo $payment->getAvsResult() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getAvsResult() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>CVC Result</label></td>
-                <td class="value"><strong><?php echo $payment->getCvcResult() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getCvcResult() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>Basic Risk Score</label></td>
-                <td class="value"><strong><?php echo $payment->getRiskScore() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getRiskScore() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>Advanced Risk Provider</label></td>
-                <td class="value"><strong><?php echo $payment->getRiskProvider() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getRiskProvider() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>Advanced Risk Score</label></td>
-                <td class="value"><strong><?php echo $payment->getRiskProviderScore() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getRiskProviderScore() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>Advanced Risk Threshold</label></td>
-                <td class="value"><strong><?php echo $payment->getRiskProviderThreshold() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getRiskProviderThreshold() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>Advanced Risk Final Score</label></td>
-                <td class="value"><strong><?php echo $payment->getRiskProviderFinal() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getRiskProviderFinal() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>Advanced Risk Id</label></td>
-                <td class="value"><strong><?php echo $payment->getRiskProviderId() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getRiskProviderId() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>AAV Address Result Code</label></td>
-                <td class="value"><strong><?php echo $payment->getAavAddressResultCode() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getAavAddressResultCode() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>AAV Postcode Result Code</label></td>
-                <td class="value"><strong><?php echo $payment->getAvvPostcodeResultCode() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getAvvPostcodeResultCode() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>AAV Telephone Result Code</label></td>
-                <td class="value"><strong><?php echo $payment->getAavCardholderNameResultCode() ?></strong></td>
+                <td class="value">
+                    <strong><?= /* @noEscape */ $payment->getAavCardholderNameResultCode() ?>
+                    </strong>
+                </td>
             </tr>
             <tr>
                 <td class="label"><label>AAV Email Result Code </label></td>
-                <td class="value"><strong><?php echo $payment->getAavEmailResultCode() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getAavEmailResultCode() ?></strong></td>
             </tr>
             <tr>
                 <td class="label"><label>AAV Cardholder Name Result Code</label></td>
-                <td class="value"><strong><?php echo $payment->getAavCardholderNameResultCode() ?></strong></td>
+                <td class="value">
+                    <strong><?= /* @noEscape */ $payment->getAavCardholderNameResultCode() ?>
+                    </strong>
+                </td>
             </tr>
             <tr>
                 <td class="label"><label>Interaction Type</label></td>
-                <td class="value"><strong><?php echo $payment->getInteractionType() ?></strong></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getInteractionType() ?></strong></td>
             </tr>
             </table>
 

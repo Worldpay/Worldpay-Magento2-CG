@@ -13,8 +13,10 @@ class AvailabilityChecker implements \Magento\InstantPurchase\PaymentMethodInteg
      * AvailabilityChecker constructor.
      * @param Config $config
      */
-    public function __construct(\Sapient\Worldpay\Helper\Data $worldpayHelper, \Sapient\Worldpay\Logger\WorldpayLogger $wplogger)
-    {
+    public function __construct(
+        \Sapient\Worldpay\Helper\Data $worldpayHelper,
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+    ) {
         $this->config = $worldpayHelper;
         $this->wplogger = $wplogger;
     }
@@ -28,7 +30,7 @@ class AvailabilityChecker implements \Magento\InstantPurchase\PaymentMethodInteg
             $this->config->isCreditCardEnabled() &&
             $this->config->instantPurchaseEnabled() ) {
             return true;
-         }
+        }
          $this->wplogger->info("Instant Purchase is disabled:");
          return false;
     }

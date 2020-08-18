@@ -5,10 +5,11 @@
 namespace Sapient\Worldpay\Model\Token;
 
 use Sapient\Worldpay\Model\SavedToken;
-/** 
+
+/**
  * Communicate with WP server and gives back meaningful answer object
  */
-class Service 
+class Service
 {
 
     /**
