@@ -5,6 +5,7 @@
 namespace Sapient\Worldpay\Helper;
 
 use Magento\Store\Model\Store;
+use Magento\Framework\Serialize\SerializerInterface;
 
 /**
  * MinSaleQty value manipulation helper
@@ -27,13 +28,20 @@ class Merchantprofile
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Math\Random $mathRandom
      */
+    
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+    
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Math\Random $mathRandom
+        \Magento\Framework\Math\Random $mathRandom,
+        SerializerInterface $serializer
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->mathRandom = $mathRandom;
-
+        $this->serializer = $serializer;
     }
 
     /**
@@ -53,7 +61,7 @@ class Merchantprofile
                 }
             }
 
-            return serialize($data);
+            return $this->serializer->serialize($data);
         } else {
             return '';
         }
@@ -67,8 +75,8 @@ class Merchantprofile
      */
     protected function unserializeValue($value)
     {
-       if (is_string($value) && !empty($value)) {
-            return unserialize($value);
+        if (is_string($value) && !empty($value) && $value != 'a:0:{}') {
+            return $this->serializer->unserialize($value);
         } else {
             return [];
         }
@@ -125,7 +133,7 @@ class Merchantprofile
      */
     protected function decodeArrayFieldValue(array $value)
     {
-        $result = array();
+        $result = [];
         unset($value['__empty']);
         foreach ($value as $row) {
             if (!is_array($row)
@@ -140,7 +148,7 @@ class Merchantprofile
                && !empty($row['merchant_code'])
                && !empty($row['merchant_username'])
                || !empty($row['merchant_password'])
-           ) {
+            ) {
                 $payment_type = $row['worldpay_payment_method'];
                 $rs['merchant_code'] = $row['merchant_code'];
                 $rs['merchant_username'] = $row['merchant_username'];
@@ -150,8 +158,6 @@ class Merchantprofile
         }
         return $result;
     }
-
-
 
     /**
      * Make value readable by \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray
@@ -204,10 +210,8 @@ class Merchantprofile
             $value = $this->decodeArrayFieldValue($value);
         }
 
-        if (!empty($value[$paymenttype]))
+        if (!empty($value[$paymenttype])) {
             return $value[$paymenttype];
-
-        return;
+        }
     }
-
 }

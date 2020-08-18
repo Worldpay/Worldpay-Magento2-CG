@@ -6,8 +6,8 @@ use Sapient\Worldpay\Helper\Data;
 class Challenge extends \Magento\Framework\View\Element\Template
 {
     /**
-    * @var Sapient\Worldpay\Helper\Data;
-    */
+     * @var Sapient\Worldpay\Helper\Data;
+     */
     
     protected $helper;
     
@@ -49,7 +49,7 @@ class Challenge extends \Magento\Framework\View\Element\Template
     {
         $ddcurl = '';
         $mode = $this->_helper->getEnvironmentMode();
-        if($mode == 'Test Mode'){
+        if ($mode == 'Test Mode') {
             $ddcurl =  $this->_helper->isTestDdcUrl();
         } else {
             $ddcurl =  $this->_helper->isProductionDdcUrl();
@@ -57,7 +57,8 @@ class Challenge extends \Magento\Framework\View\Element\Template
         return $ddcurl;
     }
     
-    public function challengeConfigs(){
+    public function challengeConfigs()
+    {
         $data['threeDSecureChallengeConfig'] = $this->checkoutSession->get3DS2Config();
         $data['threeDSecureChallengeParams'] =  $this->checkoutSession->get3Ds2Params();
         $data['orderId'] = $this->checkoutSession->getAuthOrderId();
@@ -65,6 +66,4 @@ class Challenge extends \Magento\Framework\View\Element\Template
         //$data['redirectUrl'] = $this->getUrl('worldpay/threedsecure/challengeauthresponse', ['_secure' => true]);
         return $data;
     }
-    
-    
 }

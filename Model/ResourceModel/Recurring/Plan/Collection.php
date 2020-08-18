@@ -44,7 +44,10 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     protected function _construct()
     {
-        $this->_init('Sapient\Worldpay\Model\Recurring\Plan', 'Sapient\Worldpay\Model\ResourceModel\Recurring\Plan');
+        $this->_init(
+            \Sapient\Worldpay\Model\Recurring\Plan::class,
+            \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan::class
+        );
 
         $this->addOrder('sort_order', \Magento\Framework\Data\Collection::SORT_ORDER_ASC);
     }

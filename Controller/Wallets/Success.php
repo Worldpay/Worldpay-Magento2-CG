@@ -16,7 +16,8 @@ class Success extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
-    public function __construct(Context $context,
+    public function __construct(
+        Context $context,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {

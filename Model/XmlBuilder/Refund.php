@@ -8,8 +8,8 @@ namespace Sapient\Worldpay\Model\XmlBuilder;
  * Build xml for Refund request
  */
 class Refund
-{ 
-    const EXPONENT = 2;
+{
+
     const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
@@ -20,6 +20,7 @@ EOD;
     private $currencyCode;
     private $amount;
     private $refundReference;
+    private $exponent;
 
     /**
      * Build xml for processing Request
@@ -30,13 +31,14 @@ EOD;
      * @param string $refundReference
      * @return SimpleXMLElement $xml
      */
-    public function build($merchantCode, $orderCode, $currencyCode, $amount, $refundReference)
+    public function build($merchantCode, $orderCode, $currencyCode, $amount, $refundReference, $exponent)
     {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
         $this->currencyCode = $currencyCode;
         $this->amount = $amount;
         $this->refundReference = $refundReference;
+        $this->exponent = $exponent;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -81,7 +83,7 @@ EOD;
         $amountElement = $refund->addChild('amount');
         $amountElement['value'] = $this->_amountAsInt($this->amount);
         $amountElement['currencyCode'] = $this->currencyCode;
-        $amountElement['exponent'] = self::EXPONENT;
+        $amountElement['exponent'] = $this->exponent;
     }
 
     /**
@@ -90,6 +92,6 @@ EOD;
      */
     private function _amountAsInt($amount)
     {
-        return round($amount, self::EXPONENT, PHP_ROUND_HALF_EVEN) * pow(10, self::EXPONENT);
+        return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
     }
 }

@@ -29,11 +29,13 @@ class Token
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
-        \Sapient\Worldpay\Model\Request $request
+        \Sapient\Worldpay\Model\Request $request,
+        \Magento\Framework\Session\SessionManager $sessionManager
     ) {
         $this->wplogger = $wplogger;
         $this->_request = $request;
         $this->worldpayhelper = $worldpayhelper;
+        $this->_session = $sessionManager;
     }
 
      /**
@@ -46,19 +48,24 @@ class Token
     public function getPaymentToken($customerData, $paymentData)
     {
         $this->wplogger->info("*** TOKEN Method called [befor order place]");
-        $xmlTokenParams =  array(
+        $xmlTokenParams =  [
             'merchantCode'     => $this->worldpayhelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
             'authenticatedShopperID'        => $customerData['id'],
             'tokenScope'     => "shopper",
             'tokenEventReference' => 'jkd',
-            'tokenReason'     => 'ClothesDepartment',
-            'paymentDetails'   => $this->_getPaymentDetails($paymentData),
-            'customerAddress'      => $customerData['addresses'][0],
-            'acceptHeader'     => php_sapi_name() !== "cli" ? $_SERVER['HTTP_ACCEPT'] : '',
-            'userAgentHeader'  => php_sapi_name() !== "cli" ? $_SERVER['HTTP_USER_AGENT'] : '',
-            'method'           => $paymentData['method'],
-            'orderStoreId'     => $customerData['store_id']
-        );
+            'tokenReason'       => 'ClothesDepartment',
+            'paymentDetails'    => $this->_getPaymentDetails($paymentData),
+            'customerAddress'   => $customerData['addresses'][0],
+            'acceptHeader'      => php_sapi_name() !== "cli" ? filter_input(INPUT_SERVER, 'HTTP_ACCEPT') : '',
+            'userAgentHeader'   => php_sapi_name() !== "cli" ? filter_input(
+                INPUT_SERVER,
+                'HTTP_USER_AGENT',
+                FILTER_SANITIZE_STRING,
+                FILTER_FLAG_STRIP_LOW
+            ) : '',
+            'method'            => $paymentData['method'],
+            'orderStoreId'      => $customerData['store_id']
+        ];
         $this->xmlDirectOrderToken = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrderToken();
 
         $orderSimpleXml = $this->xmlDirectOrderToken->build(
@@ -89,22 +96,22 @@ class Token
     private function _getPaymentDetails($paymentDetails)
     {
         if (isset($paymentDetails['encryptedData'])) {
-            $details = array(
+            $details = [
                 'encryptedData' => $paymentDetails['encryptedData']
-            );
+            ];
         } else {
-            $details = array(
+            $details = [
                 'paymentType' => $paymentDetails['additional_data']['cc_type'],
                 'cardNumber' => $paymentDetails['additional_data']['cc_number'],
                 'expiryMonth' => $paymentDetails['additional_data']['cc_exp_month'],
                 'expiryYear' => $paymentDetails['additional_data']['cc_exp_year'],
                 'cardHolderName' => $paymentDetails['additional_data']['cc_name'],
-            );
+            ];
             if (isset($paymentDetails['additional_data']['cc_cid'])) {
                 $details['cvc'] = $paymentDetails['additional_data']['cc_cid'];
             }
         }
-        $details['sessionId'] = session_id();
+        $details['sessionId'] = $this->_session->getSessionId();
         return $details;
     }
 
@@ -136,7 +143,7 @@ class Token
         if ($error) {
             $this->_wplogger->error('An error occurred while sending the request');
             $this->_wplogger->error('Error (code ' . $error[0]['code'] . '): ' . $error[0]);
-            throw new \Exception();
+            throw new \Magento\Framework\Exception\LocalizedException();
         }
     }
 }

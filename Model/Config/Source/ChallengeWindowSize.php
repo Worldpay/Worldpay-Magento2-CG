@@ -16,5 +16,4 @@ class ChallengeWindowSize extends \Magento\Framework\App\Config\Value
             ['value' => 'iframe', 'label' => __('Iframe')]
         ];
     }
-
 }

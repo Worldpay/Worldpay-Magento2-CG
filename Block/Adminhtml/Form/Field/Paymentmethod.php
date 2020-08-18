@@ -40,9 +40,9 @@ class Paymentmethod extends \Magento\Framework\View\Element\Html\Select
     public function _toHtml()
     {
        
-        $paymetType= $this->getAllPaymentType() ;  
+        $paymetType= $this->getAllPaymentType() ;
 
-        foreach ($paymetType as $paymentname=>$paymentTitle) {                
+        foreach ($paymetType as $paymentname => $paymentTitle) {
             $this->addOption($paymentname, $paymentTitle);
         }
 
@@ -54,14 +54,15 @@ class Paymentmethod extends \Magento\Framework\View\Element\Html\Select
      *
      * @return mixed
      */
-    private function getAllPaymentType(){
+    private function getAllPaymentType()
+    {
 
-        $result= array();
-        $result['']=__('Select'); 
-        $paymetType= $this->paymentutils->getAvailableMethods() ;      
+        $result= [];
+        $result['']=__('Select');
+        $paymetType= $this->paymentutils->getAvailableMethods() ;
         foreach ($paymetType as $methods) {
             foreach ($methods->types->children() as $m) {
-                $result[$m->getName()]=__($m->title);  
+                $result[$m->getName()]=__($m->title);
             }
         }
 

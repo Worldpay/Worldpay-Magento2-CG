@@ -33,14 +33,16 @@ class TokenConfiguration
     /**
      * @return string
      */
-    public function getTokenReason($orderCode = null){
+    public function getTokenReason($orderCode = null)
+    {
         return 'To Save Card '.$orderCode;
     }
     
     /**
      * @return bool
      */
-    public function istokenizationIsEnabled(){
+    public function istokenizationIsEnabled()
+    {
         return $this->createTokenEnabled;
     }
 }

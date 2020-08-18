@@ -99,7 +99,7 @@ class SalesServiceQuoteSubmitBeforeObserver implements ObserverInterface
         \Sapient\Worldpay\Model\Recurring\Subscription $subscription,
         \Magento\Sales\Model\Order $order,
         \Magento\Sales\Model\Order\Item $item
-            ){
+    ) {
         
         if (($subscription = $item->getWorldpaySubscription()) && $subscription->getWorldpaySubscriptionId()
             && !$subscription->getId()

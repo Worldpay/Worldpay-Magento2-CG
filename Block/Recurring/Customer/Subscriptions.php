@@ -77,7 +77,7 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
     {
         parent::_prepareLayout();
 
-        $pagination = $this->getLayout()->createBlock('Magento\Theme\Block\Html\Pager', 'subscriptions_pagination')
+        $pagination=$this->getLayout()->createBlock(\Magento\Theme\Block\Html\Pager::class, 'subscriptions_pagination')
             ->setCollection($this->getSubscriptions())
             ->setPath('worldpay/recurring/index');
         $this->setChild('pagination', $pagination);
@@ -139,7 +139,7 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
      */
     public function getEditUrl(Subscription $subscription)
     {
-        return $this->getUrl('worldpay/recurring/edit', ['subscription_id' => $subscription->getId(), '_secure' => true]);
+        return $this->getUrl('worldpay/recurring/edit', ['subscription_id'=>$subscription->getId(), '_secure' => true]);
     }
 
     /**
@@ -155,5 +155,10 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
                 '_secure' => true
             ]
         );
+    }
+    
+    public function getMyAccountSpecificException($exceptioncode)
+    {
+        return $this->recurringHelper->getMyAccountExceptions($exceptioncode);
     }
 }

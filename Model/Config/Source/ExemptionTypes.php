@@ -13,9 +13,9 @@ class ExemptionTypes implements \Magento\Framework\Option\ArrayInterface
     {
 
         return [
-            ['value' => 'LV', 'label' => __('LV')],
-            ['value' => 'LR', 'label' => __('LR')],
-            ['value' => 'OP', 'label' => __('OP')],
+            ['value' => 'LV', 'label' => __('LV - Low value exemption')],
+            ['value' => 'LR', 'label' => __('LR - Low risk exemption')],
+            ['value' => 'OP', 'label' => __('OP - Optimised exemption')],
         ];
     }
 }

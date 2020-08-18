@@ -121,6 +121,18 @@ define(
             return paymentsClient;
         }
         
+        function getCreditCardExceptions (exceptioncode){
+                var ccData=window.checkoutConfig.payment.ccform.creditcardexceptions;
+                  for (var key in ccData) {
+                    if (ccData.hasOwnProperty(key)) {  
+                        var cxData=ccData[key];
+                    if(cxData['exception_code'].includes(exceptioncode)){
+                        return cxData['exception_module_messages']?cxData['exception_module_messages']:cxData['exception_messages'];
+                    }
+                    }
+                }
+            }
+        
         return Component.extend({         
             defaults: {
                 redirectAfterPlaceOrder: false,
@@ -236,7 +248,7 @@ define(
                 var $form = $('#' + this.getCode() + '-form');
                 if(this.getselectedCCType()== undefined){
                     $('.mage-error').css({'display' : 'block','margin-bottom': '7px'});
-                    $('.mage-error').html('Please select one of the options.');
+                    $('.mage-error').html(getCreditCardExceptions('CCAM6'));
                     return false;
                 }
                 if (this.getselectedCCType()=='PAYWITHGOOGLE-SSL') {
@@ -285,7 +297,7 @@ define(
                     var session = new ApplePaySession(1, paymentRequest);
 
                     // Merchant Validation
-                    session.onvalidatemerchant = function (event) {
+                    session.onvalidatemerchant = function (event) {                        
                         var promise = performValidation(event.validationURL);
                         promise.then(function (merchantSession) {
                             session.completeMerchantValidation(merchantSession);
@@ -294,12 +306,13 @@ define(
 
                     session.onpaymentmethodselected = function(event) {                    
 
-                        var linkUrl = url.build('worldpay/applepay/index?u=getTotal');
+                        var linkUrl = url.build('worldpay/applepay/index?u=getTotal');                         
                         var xhttp = new XMLHttpRequest();
                         xhttp.open("GET", linkUrl, false);
-                        xhttp.setRequestHeader("Content-type", "application/json");
+                         xhttp.setRequestHeader("Content-type", "application/json");
                         xhttp.send();
-                        var finalTotal = xhttp.responseText;
+                        var finalTotal = xhttp.responseText.slice(1, -1); // removing quotes
+                        
                         var runningTotal = (Math.round(finalTotal * 100) / 100).toFixed(2);
                         var newTotal = { type: 'final', label: 'Order Total', amount: runningTotal };
                         var newLineItems =[{type: 'final',label: subTotalDescr, amount: runningAmount }];
@@ -337,8 +350,11 @@ define(
     function performValidation(valURL) {
         return new Promise(function(resolve, reject) {
             var xhr = new XMLHttpRequest();
-            xhr.onload = function() {
-                var data = JSON.parse(this.responseText);
+            xhr.onload = function() {      
+                var finaldata = this.responseText.slice(1, -1);
+                var finaldata = finaldata.replace(/\\/g, '');
+                
+                var data = JSON.parse(finaldata);
                 resolve(data);
             };
             xhr.onerror = reject;
@@ -351,12 +367,12 @@ define(
 
     function getRealTotal() {
         var linkUrl = url.build('worldpay/applepay/index?u=getTotal');
-
+                
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET", linkUrl, false);
         xhttp.setRequestHeader("Content-type", "application/json");
         xhttp.send();
-
+       
         var finalTotal = xhttp.responseText;
 
     }

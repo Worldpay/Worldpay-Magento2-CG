@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Authorisation;
+
 use Exception;
 
 class TokenService extends \Magento\Framework\DataObject
@@ -20,17 +21,16 @@ class TokenService extends \Magento\Framework\DataObject
         \Magento\Checkout\Model\Session $checkoutSession,
         \Sapient\Worldpay\Helper\Data $worldpayHelper,
         \Sapient\Worldpay\Helper\Registry $registryhelper
-        )
-    {
-       $this->mappingservice = $mappingservice;
-       $this->paymentservicerequest = $paymentservicerequest;
-       $this->wplogger = $wplogger;
-       $this->directResponse = $directResponse;
-       $this->paymentservice = $paymentservice;
-       $this->updateWorldPayPayment = $updateWorldPayPayment;
-       $this->checkoutSession = $checkoutSession;
-       $this->worldpayHelper = $worldpayHelper;
-       $this->registryhelper = $registryhelper;
+    ) {
+        $this->mappingservice = $mappingservice;
+        $this->paymentservicerequest = $paymentservicerequest;
+        $this->wplogger = $wplogger;
+        $this->directResponse = $directResponse;
+        $this->paymentservice = $paymentservice;
+        $this->updateWorldPayPayment = $updateWorldPayPayment;
+        $this->checkoutSession = $checkoutSession;
+        $this->worldpayHelper = $worldpayHelper;
+        $this->registryhelper = $registryhelper;
     }
 
     public function authorizePayment(
@@ -53,19 +53,19 @@ class TokenService extends \Magento\Framework\DataObject
         $threeDSecureParams = $directResponse->get3dSecureParams();
         $threeDsEnabled = $this->worldpayHelper->is3DSecureEnabled();
         $threeDSecureChallengeParams = $directResponse->get3ds2Params();
-        $threeDSecureConfig = array();
+        $threeDSecureConfig = [];
         if ($threeDSecureParams) {
             // Handles success response with 3DS & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
             $payment->setIsTransactionPending(1);
             $this->_handle3DSecure($threeDSecureParams, $tokenOrderParams, $orderCode);
-        } else if ($threeDSecureChallengeParams) {
+        } elseif ($threeDSecureChallengeParams) {
             // Handles success response with 3DS2 & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
             $payment->setIsTransactionPending(1);
             $threeDSecureConfig = $this->get3DS2ConfigValues();
             $this->_handle3Ds2($threeDSecureChallengeParams, $tokenOrderParams, $orderCode, $threeDSecureConfig);
-        } else{
+        } else {
             
             // Normal order goes here.(without 3DS).
             $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment);
@@ -94,34 +94,43 @@ class TokenService extends \Magento\Framework\DataObject
     
     private function _applyPaymentUpdate(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
-        $payment)
-    {
+        $payment
+    ) {
         $paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml($directResponse->getXml());
         $paymentUpdate->apply($payment);
-        $this->_abortIfPaymentError($paymentUpdate);
+        $this->_abortIfPaymentError($paymentUpdate, $directResponse);
     }
 
-    private function _abortIfPaymentError($paymentUpdate)
+    private function _abortIfPaymentError($paymentUpdate, $directResponse)
     {
+        $responseXml = $directResponse->getXml();
+        $orderStatus = $responseXml->reply->orderStatus;
+        $payment = $orderStatus->payment;
+        $wpayCode = $payment->ISO8583ReturnCode['code'] ? $payment->ISO8583ReturnCode['code'] : 'Payment REFUSED';
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Refused) {
-             throw new Exception(sprintf('Payment REFUSED'));
-         }
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($wpayCode)
+            );
+        }
 
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
-            throw new Exception(sprintf('Payment CANCELLED'));
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Payment CANCELLED')
+            );
         }
     }
     
     // get 3ds2 params from the configuration and set to checkout session
-    public function get3DS2ConfigValues(){
-        $data = array();
+    public function get3DS2ConfigValues()
+    {
+        $data = [];
         $data['jwtApiKey'] =  $this->worldpayHelper->isJwtApiKey();
-        $data['jwtIssuer'] =  $this->worldpayHelper->isJwtIssuer();    
+        $data['jwtIssuer'] =  $this->worldpayHelper->isJwtIssuer();
         $data['organisationalUnitId'] = $this->worldpayHelper->isOrganisationalUnitId();
         $data['challengeWindowType'] = $this->worldpayHelper->getChallengeWindowSize();
     
         $mode = $this->worldpayHelper->getEnvironmentMode();
-        if($mode == 'Test Mode'){
+        if ($mode == 'Test Mode') {
             $data['challengeurl'] =  $this->worldpayHelper->isTestChallengeUrl();
         } else {
             $data['challengeurl'] =  $this->worldpayHelper->isProductionChallengeUrl();

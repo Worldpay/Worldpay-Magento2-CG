@@ -22,5 +22,4 @@ class AuthenticationMethods extends \Magento\Framework\App\Config\Value
             ['value' => 'thirdPartyAuthentication', 'label' => __('ThirdParty Authentication')]
         ];
     }
-
 }

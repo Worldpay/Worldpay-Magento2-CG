@@ -9,7 +9,8 @@ use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\DB\Ddl\Table;
 
-class InstallSchema implements InstallSchemaInterface {
+class InstallSchema implements InstallSchemaInterface
+{
 
     const WORLDPAY_PAYMENT = 'worldpay_payment';
     const WORLDPAY_TOKEN = 'worldpay_token';
@@ -217,21 +218,21 @@ class InstallSchema implements InstallSchemaInterface {
                 null,
                 ['nullable' => false],
                 'Payment Id'
-                )
+            )
             ->addColumn(
                 'order_code',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 25,
                 ['nullable'=> false],
                 'Order Code'
-                )
+            )
             ->addColumn(
                 'merchant_code',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 50,
                 ['nullable' => false,'unsigned' => true],
                 'Merchant Code'
-                )
+            )
             ->setComment('Reucurring Table')
             ->setOption('type', 'InnoDB')
             ->setOption('charset', 'utf8');
@@ -262,84 +263,84 @@ class InstallSchema implements InstallSchemaInterface {
                 21,
                 ['nullable' => false],
                 'Token Code'
-                )
+            )
             ->addColumn(
                 'token_expiry_date',
                 \Magento\Framework\DB\Ddl\Table::TYPE_DATE,
                 null,
                 ['nullable'=> false],
                 'Token Expiry Date'
-                )
+            )
             ->addColumn(
                 'token_reason',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 255,
                 ['nullable' => false],
                 'Token Reason'
-                )
+            )
             ->addColumn(
                 'card_number',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 null,
                 ['nullable' => false],
                 'Obfuscated Card number'
-                )
+            )
             ->addColumn(
                 'cardholder_name',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 null,
                 [],
                 'Card Holder Name'
-                )
+            )
             ->addColumn(
                 'card_expiry_month',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 null,
                 ['nullable' => false],
                 'Card Expiry Month'
-                )
+            )
             ->addColumn(
                 'card_expiry_year',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
                 null,
                 ['nullable' => false],
                 'Card Expiry Year'
-                )
+            )
             ->addColumn(
                 'method',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 null,
                 [],
                 'Payment method used'
-                )
+            )
             ->addColumn(
                 'card_brand',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 null,
                 [],
                 'Card Brand'
-                )
+            )
             ->addColumn(
                 'card_sub_brand',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 null,
                 [],
                 'Card Sub Brand'
-                )
+            )
             ->addColumn(
                 'card_issuer_country_code',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 null,
                 [],
                 'Card Issuer Country Code'
-                )
+            )
             ->addColumn(
                 'merchant_code',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 50,
                 ['nullable' => false,'unsigned' => true],
                 'Merchant Code'
-                )
+            )
             ->addColumn(
                 'customer_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
@@ -349,14 +350,14 @@ class InstallSchema implements InstallSchemaInterface {
                 'nullable' => false
                 ],
                 'Customer Id'
-                )
+            )
             ->addColumn(
                 'authenticated_shopper_id',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 null,
                 [],
                 'Authenticated Shopper ID'
-                )
+            )
             ->addColumn(
                 'created_at',
                 \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
@@ -366,23 +367,22 @@ class InstallSchema implements InstallSchemaInterface {
                 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT
                 ],
                 'Created At'
-                )
+            )
             ->addIndex(
                 $installer->getIdxName(self::WORLDPAY_TOKEN, ['token_code']),
                 ['token_code'],
-                 \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
-                )
+                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+            )
             ->addIndex(
                 $installer->getIdxName(self::WORLDPAY_TOKEN, ['customer_id']),
                 ['customer_id'],
-                 \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
-                )
+                \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+            )
             ->setComment('Token Table')
             ->setOption('type', 'InnoDB')
             ->setOption('charset', 'utf8');
             $installer->getConnection()->createTable($table);
         }
         $installer->endSetup();
-
     }
 }

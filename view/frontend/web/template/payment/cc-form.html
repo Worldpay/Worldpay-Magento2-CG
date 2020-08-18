@@ -20,7 +20,7 @@
             <!-- ko if: (paymentMethodSelection()=='radio')-->
             
                 <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
-                
+                <div class="paymentmethods-radio-wrapper">
                     <input type="radio" name="payment[cc_type]"
                             data-bind="event:{ change: $parent.loadEventAction }, attr: {'value': item.ccValue,
                             'data-validate': JSON.stringify({ 'validate-one-required-by-name':true }),id: 'direct_cc_' + item.ccValue}"/>
@@ -35,37 +35,17 @@
                     <!--ko ifnot: $parent.getIcons(item.ccValue) -->
                             <label data-bind="attr: {for: 'direct_cc_' + item.ccValue}"><!-- ko text: item.ccLabel --><!-- /ko --></label>
                     <!--/ko-->
-                    
+                </div>
                 <!--/ko-->
                 
             <!-- /ko -->
         </div>
     </div>
     <!--<div data-bind="visible: false" class="cc-Visibility-Enabled">-->
-    <div class="field name required cc-Visibility-Enabled" data-bind="visible: false">
-        <label data-bind="attr: {for: getCode() + '_cc_name'}" class="label">
-            <span><!-- ko i18n: 'Card Holder Name'--><!-- /ko --></span>
-        </label>
-        <div class="control">
-            <input type="text" name="payment[cc_name]" class="input-text" value=""
-                   data-bind="attr: {
-                                    autocomplete: off,
-                                    id: getCode() + '_cc_name',
-                                    title: $t('Card Holder Name'),
-                                    'data-container': getCode() + '-cc-Name',
-                                    'data-validate': JSON.stringify({
-                                      'required':true
-                                    })},
-                                    value: cardHolderName,
-                                    "/>
-        </div>
-    </div>
     <div class="field number required cc-Visibility-Enabled" data-bind="visible: false">
-        <label data-bind="attr: {for: getCode() + '_cc_number'}" class="label">
-            <span><!-- ko i18n: 'Credit Card Number'--><!-- /ko --></span>
-        </label>
-        <div class="control">
-            <input type="number" name="payment[cc_number]" class="input-text" value=""
+       
+        <div class="control ccnumber_withcardtype">
+            <input type="number" placeholder="Credit Card Number" name="payment[cc_number]" class="input-text payment_cc_number" value=""
                    data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_cc_number',
@@ -80,12 +60,28 @@
                                     value: creditCardNumber,
                                     valueUpdate: 'keyup'
                                     "/>
+            <span class="cc-card-type"></span>
         </div>
     </div>
+
+    <div class="field name required cc-Visibility-Enabled" data-bind="visible: false">
+        <div class="control">
+            <input type="text" placeholder="Card Holder Name" name="payment[cc_name]" class="input-text" value=""
+                   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_cc_name',
+                                    title: $t('Card Holder Name'),
+                                    'data-container': getCode() + '-cc-Name',
+                                    'data-validate': JSON.stringify({
+                                      'required':true
+                                    })},
+                                    value: cardHolderName,
+                                    "/>
+        </div>
+    </div>
+
     <div class="field date required cc-Visibility-Enabled" data-bind="attr: {id: getCode() + '_cc_type_exp_div'},visible: false">
-        <label data-bind="attr: {for: getCode() + '_expiration'}" class="label">
-            <span><!-- ko i18n: 'Expiration Date'--><!-- /ko --></span>
-        </label>
+       
         <div class="control">
             <div class="fields group group-2">
                 <div class="field no-label month">
@@ -121,11 +117,9 @@
     </div>
     <!-- ko if: (hasVerification())-->
     <div class="field cvv required cc-Visibility-Enabled" data-bind="attr: {id: getCode() + '_cc_type_cvv_div'},visible: false">
-        <label data-bind="attr: {for: getCode() + '_cc_cid'}" class="label">
-            <span><!-- ko i18n: 'Card Verification Number'--><!-- /ko --></span>
-        </label>
+      
         <div class="control _with-tooltip">
-            <input type="number"
+            <input type="number" placeholder="CVV" 
                    autocomplete="off"
                    class="input-text cvv"
                    name="payment[cc_cid]"
@@ -172,6 +166,68 @@
     <div class="mage-error" generated="true"  id="disclaimer-error"></div>
     <!-- /ko -->
     <!--</div>-->
+      <div class="field cpf required cc-Visibility-Enabled">
+            <label data-bind="attr: {for: getCode() + '_cpf'},visible: (showCPFSection())" class="label">
+                            <span> CPF/CNPJ  </span>
+                            <!--            <span> ko i18n: 'CPF/CNPJ' /ko </span>-->
+                        </label>  
+                        <div class="control cc-Visibility-Enabled" data-bind="visible: (showCPFSection())">
+                            <input type="number" style="width: 225px;" name="payment[cpf]" class="input-text" value=""   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_cpf',
+                                    title: $t('CPF/CNPJ'),
+                                    'data-container': getCode() + '-cpf-number',
+                                    'data-validate': JSON.stringify({'required-number':true,
+                                      'worldpay-validate-cpf-number': true})}, visible: (showCPFSection()) ,
+                                    enable: isActive($parents),
+                                    value: isCPF,
+                                    valueUpdate: 'keyup'"
+                                   /> 
+                        </div>
+                    </div>
+                    <div class="field instalment required cc-Visibility-Enabled">
+                        <label data-bind="attr: {for: getCode() + '_instalment'},visible: (showInstalmentSection())" class="label">
+                            <span> Instalment </span>
+                            <!--           <span> ko i18n: 'Instalment' /ko </span>-->
+                        </label>  
+                        <div class="control cc-Visibility-Enabled" data-bind="visible: (showInstalmentSection())" style=" width:225px;align:'center'">
+
+                            <select name="payment[instalment]"
+                                    class="select select-instalment"
+                                    data-bind="visible: (showInstalmentSection()),
+                                           attr: {id: getCode() + '_instalment', 
+                                           'data-container': getCode() + '-instalment', 
+                                           'data-validate': JSON.stringify({required:true})},
+                                           enable: isActive($parents),
+                                           options: availableInstalTypes(),
+                                           optionsValue: 'instalValue',
+                                           optionsText: 'instalccLabel',
+                                           optionsCaption: $t('Instalment'),
+                                           title: $t('Instalment'),
+                                           value: selectedInstalment">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field statementnarative required cc-Visibility-Enabled">
+                        <label data-bind="attr: {for: getCode() + '_statement'},visible: (showCPFSection() || showInstalmentSection())" class="label">
+                            <span> Purpose of transaction </span>
+                            <!--            <span> ko i18n: 'Purpose of transaction' /ko </span>-->
+                        </label>
+                    <div class="control cc-Visibility-Enabled" data-bind="visible: (showCPFSection() || showInstalmentSection())">
+                        <input type="text" style="width: 225px;"  name="payment[statement]" class="input-text" value="" 
+                               data-bind="visible: (showCPFSection() || showInstalmentSection()), attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_statement',
+                                    title: $t('Purpose of transaction'),
+                                    'data-container': getCode() + '-statement',
+                                    'data-validate': JSON.stringify({required:true,
+                                            'worldpay-validate-latm-desc':true
+                                    })},
+                                    enable: isActive($parents),
+                                    valueUpdate: 'keyup'
+                               "/> 
+                    </div>
+                </div>
     </fieldset>
 </form>
 

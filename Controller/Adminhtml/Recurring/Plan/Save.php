@@ -6,6 +6,7 @@
 namespace Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan;
 
 use Magento\Framework\Controller\ResultFactory;
+use Sapient\Worldpay\Helper\GeneralException;
 
 class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
 {
@@ -13,6 +14,10 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
      * @var \Sapient\Payment\Ui\DataProvider\Product\Form\Modifier\Data\RecurringPlans
      */
     private $planGridDataProvider;
+    
+    private $helper;
+    
+    private $storeManager;
 
     /**
      * Save controller action constructor.
@@ -25,11 +30,15 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
         \Magento\Backend\App\Action\Context $context,
         \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory,
         \Sapient\Worldpay\Ui\DataProvider\Product\Form\Modifier\Data\RecurringPlans $planGridDataProvider,
-        \Magento\Framework\Locale\FormatInterface $localeFormat
+        \Magento\Framework\Locale\FormatInterface $localeFormat,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Sapient\Worldpay\Helper\GeneralException $helper
     ) {
         parent::__construct($context, $planFactory);
         $this->planGridDataProvider = $planGridDataProvider;
         $this->localeFormat = $localeFormat;
+        $this->helper = $helper;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -39,6 +48,7 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
     {
         $data = $this->getRequest()->getPostValue();
         $productId = $this->getRequest()->getParam('product_id');
+        $store=$this->storeManager->getWebsite($data['website_id'])->getCode();
         if ($data && $productId) {
             $data['code'] = $this->buildCode(
                 isset($data['code']) ? $data['code'] : '',
@@ -76,7 +86,7 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
 
         return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData([
             'error' => true,
-            'messages' => [__('Something went wrong, please reload the page')]
+            'messages' => [__($this->helper->getConfigValue('ACAM0', $store))]
         ]);
     }
 }

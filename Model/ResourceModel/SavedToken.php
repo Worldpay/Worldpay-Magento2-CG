@@ -24,13 +24,14 @@ class SavedToken extends AbstractDb
     /**
      * Load token detail by tokencode
      *
-     * @param int $tokencode        
+     * @param int $tokencode
      * @return int $id
      */
-    public function loadByTokenCode($tokencode){
+    public function loadByTokenCode($tokencode)
+    {
         $table = $this->getMainTable();
         $where = $this->getConnection()->quoteInto("token_code = ?", $tokencode);
-        $sql = $this->getConnection()->select()->from($table,array('id'))->where($where);
+        $sql = $this->getConnection()->select()->from($table, ['id'])->where($where);
         $id = $this->getConnection()->fetchOne($sql);
         return $id;
     }
@@ -38,13 +39,14 @@ class SavedToken extends AbstractDb
     /**
      * Load token detail by tokencode
      *
-     * @param int $transactionIdentifier        
+     * @param int $transactionIdentifier
      * @return int $id
      */
-    public function loadByStoredCredentials($transactionIdentifier){
+    public function loadByStoredCredentials($transactionIdentifier)
+    {
         $table = $this->getMainTable();
         $where = $this->getConnection()->quoteInto("transaction_identifier = ?", $transactionIdentifier);
-        $sql = $this->getConnection()->select()->from($table,array('id'))->where($where);
+        $sql = $this->getConnection()->select()->from($table, ['id'])->where($where);
         $id = $this->getConnection()->fetchOne($sql);
         return $id;
     }

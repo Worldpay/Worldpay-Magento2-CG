@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Token;
+
 /**
  * Interface Sapient\WorldPay\Model\Token\StateInterface
  *

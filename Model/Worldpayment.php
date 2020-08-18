@@ -7,7 +7,7 @@ namespace Sapient\Worldpay\Model;
 /**
  * Resource Model
  */
-class Worldpayment extends \Magento\Framework\Model\AbstractModel 
+class Worldpayment extends \Magento\Framework\Model\AbstractModel
 {
     /**
      * Initialize resource model
@@ -16,7 +16,7 @@ class Worldpayment extends \Magento\Framework\Model\AbstractModel
      */
     protected function _construct()
     {
-        $this->_init('Sapient\Worldpay\Model\ResourceModel\Worldpayment');
+        $this->_init(\Sapient\Worldpay\Model\ResourceModel\Worldpayment::class);
     }
 
     /**
@@ -28,11 +28,10 @@ class Worldpayment extends \Magento\Framework\Model\AbstractModel
     {
 
         if (!$orderId) {
-            return;         
+            return;
         }
         $id = $this->getResource()->loadByPaymentId($orderId);
         return $this->load($id);
-        
     }
 
     /**
@@ -43,11 +42,9 @@ class Worldpayment extends \Magento\Framework\Model\AbstractModel
     public function loadByWorldpayOrderId($order_id)
     {
         if (!$order_id) {
-            return;         
+            return;
         }
         $id = $this->getResource()->loadByWorldpayOrderId($order_id);
-        return $this->load($id);  
+        return $this->load($id);
     }
- 
-   
 }

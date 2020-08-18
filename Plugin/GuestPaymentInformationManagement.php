@@ -10,9 +10,13 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\GuestCartManagementInterface;
 use \Sapient\Worldpay\Logger\WorldpayLogger;
 use Sapient\Worldpay\Model\MethodList;
-/**
- * Class GuestPaymentInformationManagement
- */
+use Sapient\Worldpay\Helper\CreditCardException;
+
+ /**
+  * Initialize  plugin
+  *
+  * @return void
+  */
 class GuestPaymentInformationManagement
 {
     /**
@@ -31,6 +35,7 @@ class GuestPaymentInformationManagement
      * @var bool
      */
     private $checkMethods;
+    
     /**
      * GuestPaymentInformationManagement constructor.
      * @param GuestCartManagementInterface $cartManagement

@@ -5,6 +5,7 @@
 namespace Sapient\Worldpay\Model;
 
 use Exception;
+
 /**
  * Used for processing the Request
  */
@@ -74,15 +75,15 @@ class Request
         $request->setOption(CURLOPT_USERPWD, $username.':'.$password);
         // Cookie Set to 2nd 3DS request only.
         $cookie = $this->helper->getWorldpayAuthCookie();
-        if ($this->helper->IsThreeDSRequest() && $cookie != "") { // Check is 3DS request
-            $cookie = $cookie.';SameSite=None; Secure'; // Chrome 80 Cookie upgrades
+        if ($this->helper->isThreeDSRequest() && $cookie != "") { // Check is 3DS request
+            $cookie = $cookie.';SameSite=None; Secure';
             $request->setOption(CURLOPT_COOKIE, $cookie);
         }
-	if ($this->helper->isDynamic3DS2Enabled() && $cookie != "") { // Check is 3DS2 request
+        if ($this->helper->isDynamic3DS2Enabled() && $cookie != "") { // Check is 3DS2 request
             $request->setOption(CURLOPT_COOKIE, $cookie);
         }
         $request->setOption(CURLOPT_HEADER, true);
-        $request->setOption(CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
+        $request->setOption(CURLOPT_HTTPHEADER, ['Content-Type: text/xml']);
         $logger->info('Sending XML as: ' . $this->_getObfuscatedXmlLog($quote));
 
         $request->setOption(CURLINFO_HEADER_OUT, true);
@@ -90,7 +91,7 @@ class Request
         $result = $request->execute();
 
         // logging Headder for 3DS request to check Cookie.
-        if ($this->helper->IsThreeDSRequest()) {
+        if ($this->helper->isThreeDSRequest()) {
             $information = $request->getInfo(CURLINFO_HEADER_OUT);
             $logger->info("**REQUEST HEADER START**");
             $logger->info($information);
@@ -101,7 +102,9 @@ class Request
             $logger->info('Request could not be sent.');
             $logger->info($result);
             $logger->info('########### END OF REQUEST - FAILURE WHILST TRYING TO SEND REQUEST ###########');
-            throw new Exception('Worldpay api service not available');
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Worldpay api service not available')
+            );
         }
         $request->close();
         $logger->info('Request successfully sent');
@@ -127,7 +130,7 @@ class Request
      */
     protected function _getObfuscatedXmlLog($quote)
     {
-        $elems = array('cardNumber', 'cvc');
+        $elems = ['cardNumber', 'cvc'];
         $_xml  = clone($quote);
 
         foreach ($elems as $_e) {
@@ -144,7 +147,7 @@ class Request
      */
     private function _getUrl()
     {
-        if ($this->helper->getEnvironmentMode()=='Live Mode'){
+        if ($this->helper->getEnvironmentMode()=='Live Mode') {
             return $this->helper->getLiveUrl();
         }
         return $this->helper->getTestUrl();
@@ -161,5 +164,4 @@ class Request
 
         return $this->_request;
     }
-
 }

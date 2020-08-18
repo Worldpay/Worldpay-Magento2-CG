@@ -28,18 +28,18 @@ class Iframe extends \Magento\Framework\App\Action\Action
      * @param Context $context
      * @param PageFactory $pageFactory
      * @param \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate
-     * @param \Magento\Framework\UrlInterface $urlInterface     
+     * @param \Magento\Framework\UrlInterface $urlInterface
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      */
     public function __construct(
         Context $context,
         PageFactory $pageFactory,
-        \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate,        
+        \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-    ) { 
+    ) {
         $this->pageFactory = $pageFactory;
         $this->wplogger = $wplogger;
-        $this->hppstate = $hppstate;       
+        $this->hppstate = $hppstate;
         return parent::__construct($context);
     }
  
@@ -61,12 +61,10 @@ class Iframe extends \Magento\Framework\App\Action\Action
 
     protected function _getStatus()
     {
-        if (is_null($this->_status)) {
+        if ($this->_status === null) {
             $this->_status = $this->hppstate;
         }
 
         return $this->_status;
     }
-
-    
 }

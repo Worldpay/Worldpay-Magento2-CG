@@ -29,21 +29,21 @@ use Magento\Vault\Model\VaultPaymentInterface;
 
 class CcVault extends \Magento\Vault\Model\Method\Vault
 {
-     protected $_code = 'worldpay_cc_vault';
-     protected $_isGateway = true;
-     protected $_canAuthorize = true;
-     protected $_canUseInternal = false;
-     protected $_canUseCheckout = true;
-     protected $_canCapture = true;
-     protected $_canRefund = true;
-     protected $_canRefundInvoicePartial = true;
-     protected $_canVoid = true;
-     protected $_canCapturePartial = true;
+    protected $_code = 'worldpay_cc_vault';
+    protected $_isGateway = true;
+    protected $_canAuthorize = true;
+    protected $_canUseInternal = false;
+    protected $_canUseCheckout = true;
+    protected $_canCapture = true;
+    protected $_canRefund = true;
+    protected $_canRefundInvoicePartial = true;
+    protected $_canVoid = true;
+    protected $_canCapturePartial = true;
 
      const DIRECT_MODEL = 'direct';
-     protected static $paymentDetails;
+    protected static $paymentDetails;
 
-     public function __construct(
+    public function __construct(
         ConfigInterface $config,
         ConfigFactoryInterface $configFactory,
         ObjectManagerInterface $objectManager,
@@ -64,8 +64,8 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
         \Sapient\Worldpay\Model\Response\AdminhtmlResponse $adminhtmlresponse,
         \Magento\Framework\Registry $registry
-     ) {
-         parent::__construct(
+    ) {
+        parent::__construct(
             $config,
             $configFactory,
             $objectManager,
@@ -87,7 +87,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $this->paymentservicerequest = $paymentservicerequest;
         $this->adminhtmlresponse = $adminhtmlresponse;
         $this->registry = $registry;
-     }
+    }
 
     public function initialize($paymentAction, $stateObject)
     {
@@ -120,7 +120,6 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $transaction = $payment->addTransaction(Transaction::TYPE_AUTH);
         $message = $payment->prependMessage($message);
         $payment->addTransactionCommentsToOrder($transaction, $message);
-
     }
 
     private function _generateOrderCode($quote)
@@ -136,21 +135,21 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         try {
-        $orderCode = $this->_generateOrderCode($quote);
-             $this->_createWorldPayPayment($payment,$orderCode,$quote->getStoreId(),$quote->getReservedOrderId());
+            $orderCode = $this->_generateOrderCode($quote);
+             $this->_createWorldPayPayment($payment, $orderCode, $quote->getStoreId(), $quote->getReservedOrderId());
              $authorisationService = $this->getAuthorisationService($quote->getStoreId());
              $authorisationService->authorizePayment(
-                $mageOrder,
-                $quote,
-                $orderCode,
-                $quote->getStoreId(),
-                self::$paymentDetails,
-                $payment
-            );
+                 $mageOrder,
+                 $quote,
+                 $orderCode,
+                 $quote->getStoreId(),
+                 self::$paymentDetails,
+                 $payment
+             );
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
             $this->logger->error('Authorising payment failed.');
-            $errormessage = $this->worlpayhelper->updateErrorMessage($e->getMessage(),$quote->getReservedOrderId());
+            $errormessage = $this->worlpayhelper->updateErrorMessage($e->getMessage(), $quote->getReservedOrderId());
             $this->logger->error($errormessage);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __($errormessage)
@@ -164,30 +163,36 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         return $this->vaultService;
     }
 
-    private function _createWorldPayPayment(\Magento\Payment\Model\InfoInterface $payment, $orderCode, $storeId,$orderId,$interactionType='ECOM')
-    {
+    private function _createWorldPayPayment(
+        \Magento\Payment\Model\InfoInterface $payment,
+        $orderCode,
+        $storeId,
+        $orderId,
+        $interactionType = 'ECOM'
+    ) {
         $paymentdetails = self::$paymentDetails;
-        $integrationType = $this->worlpayhelper->getIntegrationModelByPaymentMethodCode($payment->getMethod(),$storeId);
+        $integrationType =$this->worlpayhelper->getIntegrationModelByPaymentMethodCode($payment->getMethod(), $storeId);
         $wpp = $this->worldpaypayment->create();
-        $wpp->setData('order_id',$orderId);
-        $wpp->setData('payment_status',\Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION);
-        $wpp->setData('worldpay_order_id',$orderCode);
-        $wpp->setData('store_id',$storeId);
-        $wpp->setData('merchant_id',$this->worlpayhelper->getMerchantCode($paymentdetails['cc_type']));
-        $wpp->setData('3d_verified',$this->worlpayhelper->isDynamic3DEnabled());
-        $wpp->setData('payment_model',$integrationType);
+        $wpp->setData('order_id', $orderId);
+        $wpp->setData('payment_status', \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION);
+        $wpp->setData('worldpay_order_id', $orderCode);
+        $wpp->setData('store_id', $storeId);
+        $wpp->setData('merchant_id', $this->worlpayhelper->getMerchantCode($paymentdetails['cc_type']));
+        $wpp->setData('3d_verified', $this->worlpayhelper->isDynamic3DEnabled());
+        $wpp->setData('payment_model', $integrationType);
         $wpp->setData('payment_type', $paymentdetails['cc_type']);
-        $wpp->setData('interaction_type',$interactionType);
+        $wpp->setData('interaction_type', $interactionType);
         $wpp->save();
     }
 
-     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
         $this->logger->info('Vault capture function executed');
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
         $paymenttype = $worldPayPayment->getPaymentType();
-        if ($this->paymentutils->CheckCaptureRequest($payment->getMethod(), $paymenttype)) {
+        if ($this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype)) {
             $this->paymentservicerequest->capture(
                 $payment->getOrder(),
                 $worldPayPayment,
@@ -198,7 +203,8 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         return $this;
     }
 
-    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
         $this->logger->info('Vault refund payment model function executed');
         if ($order = $payment->getOrder()) {
             $mageOrder = $payment->getOrder();
@@ -219,9 +225,10 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
             }
 
         }
-
+        $gatewayError = 'No matching order found in WorldPay to refund';
+        $errorMsg = 'Please visit your WorldPay merchant interface and refund the order manually.';
         throw new \Magento\Framework\Exception\LocalizedException(
-            __('No matching order found in WorldPay to refund. Please visit your WorldPay merchant interface and refund the order manually.')
+            __($gatewayError.' '.$errorMsg)
         );
     }
     public function canRefund()
@@ -241,7 +248,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
     {
         $allowed = in_array(
             $state,
-            array(
+            [
                 \Sapient\Worldpay\Model\Payment\State::STATUS_CAPTURED,
                 \Sapient\Worldpay\Model\Payment\State::STATUS_SETTLED,
                 \Sapient\Worldpay\Model\Payment\State::STATUS_SETTLED_BY_MERCHANT,
@@ -249,22 +256,22 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
                 \Sapient\Worldpay\Model\Payment\State::STATUS_REFUNDED,
                 \Sapient\Worldpay\Model\Payment\State::STATUS_REFUNDED_BY_MERCHANT,
                 \Sapient\Worldpay\Model\Payment\State::STATUS_REFUND_FAILED
-            )
+            ]
         );
         return $allowed;
     }
 
     public function getTitle()
     {
-        if($order = $this->registry->registry('current_order')) {
+        if ($order = $this->registry->registry('current_order')) {
             return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
-        }else if($invoice = $this->registry->registry('current_invoice')){
+        } elseif ($invoice = $this->registry->registry('current_invoice')) {
             $order = $this->worlpayhelper->getOrderByOrderId($invoice->getOrderId());
             return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
-        }else if($creditMemo = $this->registry->registry('current_creditmemo')){
+        } elseif ($creditMemo = $this->registry->registry('current_creditmemo')) {
             $order = $this->worlpayhelper->getOrderByOrderId($creditMemo->getOrderId());
             return $this->worlpayhelper->getPaymentTitleForOrders($order, $this->_code, $this->worldpaypayment);
-        }else{
+        } else {
             return $this->worlpayhelper->getCcTitle();
         }
     }

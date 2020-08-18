@@ -30,7 +30,7 @@ class Merchantprofile extends \Magento\Framework\App\Config\Value
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
-       $this->merchantprofile = $merchantprofile;
+        $this->merchantprofile = $merchantprofile;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
     }
 
@@ -55,7 +55,7 @@ class Merchantprofile extends \Magento\Framework\App\Config\Value
     public function beforeSave()
     {
         $value = $this->getValue();
-        $value = $this->merchantprofile->makeStorableArrayFieldValue($value);        
+        $value = $this->merchantprofile->makeStorableArrayFieldValue($value);
         $this->setValue($value);
     }
 }

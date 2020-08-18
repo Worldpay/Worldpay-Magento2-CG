@@ -33,7 +33,7 @@ EOD;
      */
     protected $merchantCode;
 
-    public function __construct(array $args = array())
+    public function __construct(array $args = [])
     {
         if (isset($args['tokenModel']) && $args['tokenModel'] instanceof \Sapient\WorldPay\Model\SavedToken) {
             $this->tokenModel = $args['tokenModel'];
@@ -80,10 +80,12 @@ EOD;
     private function _addTokenUpdateElement($modify)
     {
         $tokenUpdate = $modify->addChild('paymentTokenUpdate');
-        $tokenUpdate['tokenScope'] = self::TOKEN_SCOPE;
+        $tokenUpdate['tokenScope'] = $this->tokenModel->getTokenType();
 
         $tokenUpdate->addChild('paymentTokenID', $this->tokenModel->getTokenCode());
-        $tokenUpdate->addChild('authenticatedShopperID', $this->customer->getId());
+        if ($this->tokenModel->getTokenType() == self::TOKEN_SCOPE) {
+            $tokenUpdate->addChild('authenticatedShopperID', $this->customer->getId());
+        }
         $cardDetails = $tokenUpdate
             ->addChild('paymentInstrument')
             ->addChild('cardDetails');

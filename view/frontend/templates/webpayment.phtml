@@ -1,5 +1,5 @@
 <?php
-$param = $this->getRequest()->getParams();
+$param = $block->getRequest()->getParams();
 $storeCode = $block->getStoreCode();
 
 if (array_key_exists('chromepay', $param)) {
@@ -13,8 +13,9 @@ if (array_key_exists('chromepay', $param)) {
     <?php
 }
 
+$myaccountexception = $block->getMyAccountSpecificException('MCAM8') ;
 if (array_key_exists('error', $param)) {
-    $this->_messageManager->addError(__("Error occurred, please check your card details."));
+    $block->_messageManager->addError(__($myaccountexception));
 }
 
 $cusToken = 'Bearer ' . $block->getCustomerToken();
@@ -23,21 +24,31 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
 ?>
 
 <script type="text/javascript">
-    window.ChromepayButtonName = '<?= $block->getChromepayButtonName() ?>';
-    window.ChromepayEnabled = '<?= $block->getChromepayEnabled() ?>';
-    window.ChromePaymentMode = '<?= $block->getPaymentMode() ?>';
-    window.SubscriptionStatus = '<?= $block->checkSubscriptionItems() ?>';</script>
+    window.ChromepayButtonName = '<?= /* @noEscape */ $block->getChromepayButtonName() ?>';
+    window.ChromepayEnabled = '<?= /* @noEscape */ $block->getChromepayEnabled() ?>';
+    window.ChromePaymentMode = '<?= /* @noEscape */ $block->getPaymentMode() ?>';
+    window.SubscriptionStatus = '<?= /* @noEscape */ $block->checkSubscriptionItems() ?>'
+    window.GeneralExceptions = '<?= /* @noEscape */ $block->getGeneralException() ?>'
+    window.MyAccountExceptions = '<?= /* @noEscape */ $block->MyAccountExceptions() ?>';
+    
+    if(typeof window.chrome != "undefined") {
+        window.ChromepayAvailable = '1';
+    }else{
+        window.ChromepayAvailable = '0';
+    }
+
+</script>
 
 <script>
     //Global variables
     var carrierCode;
-    var token = '<?= $cusToken ?>';
+    var token = '<?= /* @noEscape */ $cusToken ?>';
     var cardType;
     var totalAmount;
-    var baseUrl = '<?= $block->getBaseUrl() ?>';
-    var baseCurrency = '<?= $block->getCurrency() ?>';
+    var baseUrl = '<?= /* @noEscape */ $block->getBaseUrl() ?>';
+    var baseCurrency = '<?= /* @noEscape */ $block->getCurrency() ?>';
     var orderCode;
-    var reqShipping = '<?= $block->getshippingRequired() ?>';
+    var reqShipping = '<?= /* @noEscape */ $block->getshippingRequired() ?>';
     function initPaymentRequest() {
 
     const networks = [
@@ -53,35 +64,40 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     }];
     var isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
     var guestMaskedQuoteId = window.checkoutConfig.quoteData.entity_id;
-    var isDownlodable = <?= $block->checkDownloadableProduct() ?>;
+    var isDownlodable = <?= /* @noEscape */ $block->checkDownloadableProduct() ?>;
     const details = {
     displayItems: [
 
 <?php foreach ($block->getAllItems() as $item) { ?>
         {
-        label: "<?= $item->getData('name') ?>",
-                amount: { currency: '<?= $block->getCurrency() ?>', value: '<?= $item->getData('price') ?>' }
+        label: "<?= /* @noEscape */ $item->getData('name') ?>",
+                amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+            value: '<?= /* @noEscape */ $item->getData('price') ?>' }
         },
 <?php } ?>
 
     {
     label: 'Subtotal',
-            amount: { currency: '<?= $block->getCurrency() ?>', value: '<?= $block->getSubTotal() ?>' }
+            amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+                value: '<?= /* @noEscape */ $block->getSubTotal() ?>' }
     },
     {
     label: 'Shipping',
-            amount: {currency: '<?= $block->getCurrency() ?>', value: '<?= $block->getShippingRate() ?>'},
+            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+                value: '<?= /* @noEscape */ $block->getShippingRate() ?>'},
             pending: true,
     },
     {
     label: 'Tax',
-            amount: {currency: '<?= $block->getCurrency() ?>', value: '<?= $block->getTaxRate() ?>'},
+            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+                value: '<?= /* @noEscape */ $block->getTaxRate() ?>'},
             pending: true,
     },
     ],
             total: {
             label: 'Total',
-                    amount: { currency: '<?= $block->getCurrency() ?>', value: '<?= $block->getTotal() ?>' }
+                    amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+                    value: '<?= /* @noEscape */ $block->getTotal() ?>' }
             },
     };  
     var options = {
@@ -115,9 +131,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
 
         carrierCode = details.shippingOptions[selectedOptIndex].carrier;
         var newShippingAmount = Number(details.shippingOptions[selectedOptIndex].amount.value);
-        var newTotal = Number(<?= $block->getSubTotal() ?>) + newShippingAmount;
+        var newTotal = Number(<?= /* @noEscape */ $block->getSubTotal() ?>) + newShippingAmount;
         selectedShippingOption = details.shippingOptions[selectedOptIndex];
-        var productCount = Number(<?= $block->getProductCount() ?>);
+        var productCount = Number(<?= /* @noEscape */ $block->getProductCount() ?>);
         var shippingPosition = Number(productCount + 1);
         details.total.amount.value = newTotal;
         totalAmount = newTotal;
@@ -149,9 +165,10 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         var jsonReq = JSON.stringify(req);
         var totalsUrl;
         if (isCustomerLoggedIn) { //Api for logged inb customer
-            totalsUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/carts/mine/totals-information';
+            totalsUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/totals-information';
         } else { // Api for guest customer
-            totalsUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/totals-information';
+            totalsUrl = baseUrl + 'rest/<?= /* @noEscape */  $storeCode; ?>/V1/guest-carts/' + 
+                    guestMaskedQuoteId + '/totals-information';
         }
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", totalsUrl, false);
@@ -176,9 +193,10 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         var jsonReq = JSON.stringify(req);
         var apiUrl;
         if (isCustomerLoggedIn) { //Api for logged inb customer
-            apiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/carts/mine/estimate-shipping-methods';
+            apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/estimate-shipping-methods';
         } else { // Api for guest customer
-            apiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/estimate-shipping-methods';
+            apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + 
+                    guestMaskedQuoteId + '/estimate-shipping-methods';
         }
         var xhttp = new XMLHttpRequest();
         xhttp.open("POST", apiUrl, false);
@@ -194,7 +212,8 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         id: shippindMethods[i].method_code,
                 label: shippindMethods[i].carrier_title,
                 carrier: shippindMethods[i].carrier_code,
-                amount: {currency: '<?= $block->getCurrency() ?>', value: shippindMethods[i].amount},
+                amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+                    value: shippindMethods[i].amount},
                 selected: false,
         });
         }
@@ -227,7 +246,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     function onBuyClicked(request) {
 
     var isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
-    var isDownlodable = <?= $block->checkDownloadableProduct() ?>;
+    var isDownlodable = <?= /* @noEscape */ $block->checkDownloadableProduct() ?>;
     if (isCustomerLoggedIn == false && isDownlodable == true) {
         var error = 'Please log in to continue';
         alert(error);
@@ -259,9 +278,10 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var apiUrl;
     var orderResponse;
     if (isCustomerLoggedIn) { //Api for logged in customer
-        apiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/carts/mine/shipping-information';
+        apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/shipping-information';
     } else { // Api for guest customer
-        apiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/shipping-information';
+        apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + 
+                guestMaskedQuoteId + '/shipping-information';
     }
     
     
@@ -387,9 +407,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var jsonPaymentDetails = JSON.stringify(paymentDetails);
     var orderApiUrl;
     if (isCustomerLoggedIn) { //Api for logged in customer
-    orderApiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/carts/mine/payment-information';
+    orderApiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/payment-information';
     } else { // Api for guest customer
-    orderApiUrl = baseUrl + 'rest/<?php echo $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/order';
+    orderApiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/order';
     }
 
     var xhttp = new XMLHttpRequest();
@@ -419,7 +439,8 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             return "VISA-SSL";
     // Mastercard 
     // Updated for Mastercard 2017 BINs expansion
-    if (/^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$/.test(cardNumber))
+    var binExps = /^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$/;
+    if (binExps.test(cardNumber))
             return "ECMC-SSL";
     // AMEX
     re = new RegExp("^3[47]");

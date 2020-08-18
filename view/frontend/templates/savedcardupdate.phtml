@@ -1,38 +1,50 @@
 
 <?php $carddeatils = $block->getTokenData() ?>
-<form class="form form-edit-account" action="<?php /* @escapeNotVerified */ echo $block->getUrl("worldpay/savedcard/editPost") ?>"
+<form class="form form-edit-account"
+    action="<?= /* @noEscape */ $block->getUrl("worldpay/savedcard/editPost") ?>"
     method="post" id="form-validate" enctype="multipart/form-data" autocomplete="off">
     <fieldset class="fieldset info">
-        <?php echo $block->getBlockHtml('formkey')?>
-        <legend class="legend"><span><?php /* @escapeNotVerified */ echo __('Card Information') ?></span></legend><br>
+        <?= /* @noEscape */ $block->getBlockHtml('formkey')?>
+        <legend class="legend"><span><?= /* @noEscape */ __('Card Information') ?></span></legend><br>
 
-        <input type="hidden" name="token[id]" value="<?php echo $carddeatils->getTokenCode() ?>" />
+        <input type="hidden" name="token[id]" value="<?= /* @noEscape */ $carddeatils->getTokenCode() ?>" />
 
         <div class="field card Number">
-            <label class="label" for="card number"><span><?php /* @escapeNotVerified */ echo __('Card Number') ?></span></label>
+            <label class="label" for="card number">
+                <span><?= /* @noEscape */ __('Card Number') ?></span>
+            </label>
             <div class="control">
-                <span><?php echo $this->escapeHtml($carddeatils->getCardNumber()) ?></span>
+                <span><?= /* @noEscape */ $block->escapeHtml($carddeatils->getCardNumber()) ?></span>
             </div>
         </div>
 
         <div class="field card holder name">
-            <label class="label" for="card holder name"><span><?php /* @escapeNotVerified */ echo __('Card Holder Name') ?></span></label>
+            <label class="label" for="card holder name">
+                <span><?= /* @noEscape */ __('Card Holder Name') ?></span>
+            </label>
             <div class="control">
-                <input type="text" name="token[cardholder_name]" required='true' id="card-holder-name" title="<?php /* @escapeNotVerified */ echo __('Card Holder Name') ?>"
-                value="<?php echo $block->escapeHtml($carddeatils->getCardholderName()) ?>" class="input-text required cardholder_name worldpay-cardholdername-length">
+                <input type="text" name="token[cardholder_name]" required='true' id="card-holder-name" 
+                       title="<?= /* @noEscape */ __('Card Holder Name') ?>"
+                value="<?= /* @noEscape */ $block->escapeHtml($carddeatils->getCardholderName()) ?>"
+                class="input-text required cardholder_name worldpay-cardholdername-length">
             </div>
         </div>
 
         <div class="field card expiry month">
-            <label class="label" for="card holder name"><span><?php /* @escapeNotVerified */ echo __('Expiry Mont/Year') ?></span></label>
+            <label class="label" for="card holder name">
+                <span><?= /* @noEscape */ __('Expiry Mont/Year') ?>
+                </span>
+            </label>
             <div class="fields group group-2">
                 <div class="field no-label month">
                     <div class="control">
                         <select id="expiry_month" name="token[card_expiry_month]"
                         class="month required-entry worldpay-month-included worldpay-month-length worldpay-month-range">
-                        <?php foreach($block->getMonths() as $k=>$v): ?>
-                            <option value="<?php echo $this->escapeHtml($k) ?>" <?php if ($k == $carddeatils->getCardExpiryMonth()): ?>
-                            selected<?php endif ?>><?php echo $this->escapeHtml($v) ?></option>
+                        <?php foreach ($block->getMonths() as $k => $v): ?>
+                            <option value="<?= /* @noEscape */ $block->escapeHtml($k) ?>"
+                                <?php if ($k == $carddeatils->getCardExpiryMonth()): ?>
+                            selected<?php endif ?>>
+                            <?= /* @noEscape */ $block->escapeHtml($v) ?></option>
                         <?php endforeach; ?>
                         </select>
                     </div>
@@ -40,10 +52,15 @@
                 <div class="field no-label year">
                     <div class="control">
                         <select id="expiry_month" name="token[card_expiry_year]"
-                              class="month required-entry worldpay-month-included worldpay-month-length worldpay-month-range">
-                        <?php foreach($block->getExpiryYears() as $k=>$v): ?>
-                            <option value="<?php echo $this->escapeHtml($k) ?>" <?php if ($k == $carddeatils->getCardExpiryYear()): ?>
-                            selected<?php endif ?>><?php echo $this->escapeHtml($v) ?></option>
+                              class="month required-entry
+                              worldpay-month-included
+                              worldpay-month-length
+                              worldpay-month-range">
+                        <?php foreach ($block->getExpiryYears() as $k => $v): ?>
+                            <option value="<?= /* @noEscape */$block->escapeHtml($k) ?>"
+                                <?php if ($k == $carddeatils->getCardExpiryYear()): ?>
+                            selected<?php endif ?>>
+                            <?= /* @noEscape */ $block->escapeHtml($v) ?></option>
                         <?php endforeach; ?>
                         </select>
                     </div>
@@ -52,7 +69,10 @@
         </div>
         <div class="actions-toolbar">
             <div class="primary">
-                <button type="submit" class="action save primary" title="<?php /* @escapeNotVerified */ echo __('Save') ?>"><span><?php /* @escapeNotVerified */ echo __('Save') ?></span></button>
+                <button type="submit" class="action save primary"
+                        title="<?= /* @noEscape */ __('Save') ?>">
+                    <span><?= /* @noEscape */ __('Save') ?></span>
+                </button>
             </div>
         </div>
     </fieldset>

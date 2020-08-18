@@ -36,7 +36,5 @@ class Service
         $this->checkoutsession->restoreQuote();
         $this->cart->save();
         $this->wplogger->info('cart restored');
-
     }
-
 }

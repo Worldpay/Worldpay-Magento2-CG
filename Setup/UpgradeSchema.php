@@ -8,7 +8,8 @@ use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 
-class UpgradeSchema implements UpgradeSchemaInterface {
+class UpgradeSchema implements UpgradeSchemaInterface
+{
 
     const WORLDPAY_NOTIFICATION_HISTORY = 'worldpay_notification_history';
     const WORLDPAY_PAYMENT = 'worldpay_payment';
@@ -18,7 +19,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
     const WORLDPAY_SUBSCRIPTIONS_ADDRESS = 'worldpay_subscription_address';
     const WORLDPAY_RECURRING_TRANSACTIONS = 'worldpay_recurring_transactions';
 
-    public function upgrade( SchemaSetupInterface $setup, ModuleContextInterface $context )
+    public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $installer = $setup;
         $installer->startSetup();
@@ -27,42 +28,42 @@ class UpgradeSchema implements UpgradeSchemaInterface {
                 $installer->getTable(self::WORLDPAY_NOTIFICATION_HISTORY)
             )
             ->addColumn(
-                    'id',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
-                    null,
-                    [
+                'id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                [
                         'identity' => true,
                         'nullable' => false,
                         'primary'  => true,
                         'unsigned' => true,
                     ],
-                    'Id'
+                'Id'
             )
             ->addColumn(
-                    'order_id',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
-                    null,
-                    ['nullable' => false,
+                'order_id',
+                \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+                null,
+                ['nullable' => false,
                     'unsigned' => true],
-                    'Order Id'
+                'Order Id'
             )
             ->addColumn(
-                    'status',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-                    255,
-                    [],
-                    'Status'
+                'status',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                255,
+                [],
+                'Status'
             )
             ->addColumn(
-                    'created_at',
-                    \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
-                    null,
-                    ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
-                    'Created At'
+                'created_at',
+                \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
+                null,
+                ['nullable' => false, 'default' => \Magento\Framework\DB\Ddl\Table::TIMESTAMP_INIT],
+                'Created At'
             )
             ->addIndex(
-                    $installer->getIdxName(self::WORLDPAY_NOTIFICATION_HISTORY, ['order_id']),
-                    ['order_id']
+                $installer->getIdxName(self::WORLDPAY_NOTIFICATION_HISTORY, ['order_id']),
+                ['order_id']
             )
             ->setComment('Worldpay Notification History')
             ->setOption('type', 'InnoDB')
@@ -99,7 +100,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
             $this->addColumnDisclaimer($installer);
         }
         if (version_compare($context->getVersion(), '1.2.7', '<')) {
-            $this->createRecurringPlansTable($installer);            
+            $this->createRecurringPlansTable($installer);
         }
         if (version_compare($context->getVersion(), '1.2.8', '<')) {
             $this->createSubscriptionsTable($installer);
@@ -112,6 +113,12 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         }
         if (version_compare($context->getVersion(), '1.3.1', '<')) {
             $this->createRecurringTransactionsTable($installer);
+        }
+        if (version_compare($context->getVersion(), '1.3.2', '<')) {
+            $this->addColumnTokenTypeToWorldpayToken($installer);
+        }
+        if (version_compare($context->getVersion(), '1.3.3', '<')) {
+            $this->addColumnLatAmInstalments($installer);
         }
         $installer->endSetup();
     }
@@ -440,7 +447,7 @@ class UpgradeSchema implements UpgradeSchemaInterface {
             'store_name',
             \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
             255,
-            [], 
+            [],
             'Store Name'
         )->addColumn(
             'created_at',
@@ -915,7 +922,12 @@ class UpgradeSchema implements UpgradeSchemaInterface {
             [],
             'Company'
         )->addForeignKey(
-            $installer->getFkName(self::WORLDPAY_SUBSCRIPTIONS_ADDRESS, 'subscription_id',self::WORLDPAY_SUBSCRIPTIONS, 'subscription_id'),
+            $installer->getFkName(
+                self::WORLDPAY_SUBSCRIPTIONS_ADDRESS,
+                'subscription_id',
+                self::WORLDPAY_SUBSCRIPTIONS,
+                'subscription_id'
+            ),
             'subscription_id',
             $installer->getTable(self::WORLDPAY_SUBSCRIPTIONS),
             'subscription_id',
@@ -1052,7 +1064,12 @@ class UpgradeSchema implements UpgradeSchemaInterface {
             'entity_id',
             \Magento\Framework\DB\Ddl\Table::ACTION_SET_NULL
         )->addForeignKey(
-            $installer->getFkName(self::WORLDPAY_RECURRING_TRANSACTIONS, 'subscription_id',self::WORLDPAY_SUBSCRIPTIONS, 'subscription_id'),
+            $installer->getFkName(
+                self::WORLDPAY_RECURRING_TRANSACTIONS,
+                'subscription_id',
+                self::WORLDPAY_SUBSCRIPTIONS,
+                'subscription_id'
+            ),
             'subscription_id',
             $installer->getTable(self::WORLDPAY_SUBSCRIPTIONS),
             'subscription_id',
@@ -1063,5 +1080,39 @@ class UpgradeSchema implements UpgradeSchemaInterface {
         $installer->getConnection()->createTable($table);
 
         return $this;
+    }
+    
+    private function addColumnLatAmInstalments(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'latam_instalments',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
+            'nullable' => true,
+            'comment' => 'Latin America Instalments',
+            'after' => 'interaction_type'
+               ]
+        );
+    }
+    /**
+     * @param SchemaSetupInterface $installer
+     * @return void
+     */
+    private function addColumnTokenTypeToWorldpayToken(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_TOKEN),
+            'token_type',
+            [
+                'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                '32',
+                [],
+                'comment' => 'Token type',
+                'before' => 'created_at'
+            ]
+        );
     }
 }

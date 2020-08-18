@@ -12,14 +12,13 @@ use Exception;
 
 /**
  * if payment is canceled redirect to admin create order page
- */ 
+ */
 class Cancel extends \Magento\Backend\App\Action
 {
     protected $pageFactory;
     protected $_rawBody;
 
     private $_paymentUpdate;
-
 
     /**
      * Constructor
@@ -32,13 +31,15 @@ class Cancel extends \Magento\Backend\App\Action
      * @param \Sapient\Worldpay\Model\Adminhtml\Order\Service $adminorderservice
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      */
-    public function __construct(Context $context,  JsonFactory $resultJsonFactory,
+    public function __construct(
+        Context $context,
+        JsonFactory $resultJsonFactory,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
         \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice,
         \Sapient\Worldpay\Model\Adminhtml\Order\Service $adminorderservice,
         \Sapient\Worldpay\Model\Order\Service $orderservice
-    ) { 
+    ) {
        
         parent::__construct($context);
         $this->wplogger = $wplogger;
@@ -47,7 +48,6 @@ class Cancel extends \Magento\Backend\App\Action
         $this->resultJsonFactory = $resultJsonFactory;
         $this->adminorderservice = $adminorderservice;
         $this->authenticatinservice = $authenticatinservice;
-
     }
     /**
      * Execute if payment is canceled
@@ -83,13 +83,8 @@ class Cancel extends \Magento\Backend\App\Action
      */
     private function _getCancellationNoticeForOrder($order)
     {
-
         $incrementId = $order->getIncrementId();
-
-        $message = is_null($incrementId)
-            ? __('Order Cancelled')
-            : __('Order #'. $incrementId.' Cancelled');
-
+        $message = $incrementId === null ? __('Order Cancelled'): __('Order #'. $incrementId.' Cancelled');
         return $message;
     }
 
@@ -114,7 +109,6 @@ class Cancel extends \Magento\Backend\App\Action
         }
     }
 
-
     /**
      * @return string
      */
@@ -122,7 +116,6 @@ class Cancel extends \Magento\Backend\App\Action
     {
         $resultRedirect = $this->resultRedirectFactory->create();
         $resultRedirect->setPath('sales/order_create/index');
-        return $resultRedirect; 
+        return $resultRedirect;
     }
- 
 }

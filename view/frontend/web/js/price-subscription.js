@@ -7,6 +7,19 @@ define([
     "jquery"
 ], function ($) {
     "use strict";
+    
+     function getMyAccountExceptions (exceptioncode){
+                var data=window.MyAccountExceptions;
+                var gendata=JSON.parse(data);
+                for (var key in gendata) {
+                    if (gendata.hasOwnProperty(key)) {  
+                        var cxData=gendata[key];
+                    if(cxData['exception_code'].includes(exceptioncode)){
+                        return cxData['exception_module_messages']?cxData['exception_module_messages']:cxData['exception_messages'];
+                    }
+                    }
+                }
+            }
 
     $.widget('mage.worldpayPriceSubscription', {
         options: {
@@ -86,9 +99,9 @@ define([
                 return true;
             } else {
                 if(result === false){
-                    $('#subscription-error').html('Choose any of the plan!');
+                    $('#subscription-error').html(getMyAccountExceptions('MCAM1'));
                 } else if($('#subscription_date').val() === '') {
-                    $('#subscription-error').html('Choose plan start date!');
+                    $('#subscription-error').html(getMyAccountExceptions('MCAM2'));
                 }
                 $('#subscription-error').css('display', 'block');                
                 return false;
@@ -111,9 +124,9 @@ define([
                 event.preventDefault();
                 event.stopPropagation();
                 if(result === false){
-                    $('#subscription-error').html('Choose any of the plan!');
+                    $('#subscription-error').html(getMyAccountExceptions('MCAM1'));
                 } else if($('#subscription_date').val() === '') {
-                    $('#subscription-error').html('Choose plan start date!');
+                    $('#subscription-error').html(getMyAccountExceptions('MCAM2'));
                 }
                 $('#subscription-error').css('display', 'block');                
                 return false;

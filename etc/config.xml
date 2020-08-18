@@ -5,11 +5,9 @@
                 <enable_worldpay>0</enable_worldpay>
                 <environment_mode>Test Mode</environment_mode>
                 <test_url>https://secure-test.worldpay.com/jsp/merchant/xml/paymentService.jsp</test_url>
-                <enable_dynamic3DS>0</enable_dynamic3DS>
                 <enable_logging>0</enable_logging>
                 <payment_method_selection>radio</payment_method_selection>
                 <order_description>WorldPay Order</order_description>
-                <country_code_spoof>JE-GB,IM-GB</country_code_spoof>
             </general_config>
             <cc_config>
                 <enabled>1</enabled>
@@ -18,61 +16,53 @@
                 <cse_enabled>0</cse_enabled>
                 <require_cvc>1</require_cvc>
                 <integration_mode>direct</integration_mode>
-                <hpp_integration>full_page</hpp_integration>
-                <saved_card>0</saved_card>
-                <stored_credentials_message_enable>1</stored_credentials_message_enable>
-                <stored_credentials_flag>1</stored_credentials_flag>
-                <chromepay_enabled>1</chromepay_enabled>
             </cc_config>
-            <apm_config>
-                <enabled>1</enabled>
-                <title>Alternative Payment Methods</title>
-                <paymentmethods>PAYPAL-EXPRESS,GIROPAY-SSL</paymentmethods>
-            </apm_config>
+            <order_sync_status>
+                <order_status>pending,processing,canceled,complete</order_status>
+                <order_sync_interval>24</order_sync_interval>
+            </order_sync_status>
+            <tokenization>
+                <saved_card>0</saved_card>
+                <save_tokenization>0</save_tokenization>
+                <enable_merchant_tokens>0</enable_merchant_tokens>
+                <save_stored_credentials>0</save_stored_credentials>
+                <configure_disclaimer>
+                    <stored_credentials_disclaimer_message>
+                        Information about save card for future usage will be displayed here as provided in disclaimer message section.                        
+                        Please refer http://support.worldpay.com/support/kb/gg/stored-credentials-overview/ before constructing this message.
+                    </stored_credentials_disclaimer_message>
+                    <stored_credentials_message_enable>0</stored_credentials_message_enable>
+                    <stored_credentials_flag>0</stored_credentials_flag>
+                </configure_disclaimer>                
+            </tokenization>
+            <hpp_config>
+                <hpp_integration>iframe</hpp_integration>
+            </hpp_config>
             <wallets_config>
                 <title>Wallets</title>
                 <google_pay_wallets_config>
-                    <enabled>1</enabled>
+                    <enabled>0</enabled>
                     <paymentmethods>AMEX,VISA,DISCOVER,JCB,MASTERCARD</paymentmethods>
                     <authmethods>PAN_ONLY,CRYPTOGRAM_3DS</authmethods>
                 </google_pay_wallets_config>
             </wallets_config>
+            <chromepay_config>
+                <chromepay_button_name>Buy Now</chromepay_button_name>
+            </chromepay_config>
             <moto_config>
                 <enabled>1</enabled>
-                <title>Moto</title>
+                <title>Mail Order Telephone Order</title>
                 <paymentmethods>AMEX-SSL,VISA-SSL,ECMC-SSL</paymentmethods>
             </moto_config>
-            <custom_paymentpages>
+            <apm_config>
                 <enabled>0</enabled>
-                <hideaddress>0</hideaddress>
-            </custom_paymentpages>
-            <order_cleanup>
-                <enabled>0</enabled>
-                <order_statuses>pending,pending_payment</order_statuses>
-                <CHINAUNIONPAY_SSL_payment_method>24</CHINAUNIONPAY_SSL_payment_method>
-                <IDEAL_SSL_payment_method>24</IDEAL_SSL_payment_method>
-                <PAYPAL_EXPRESS_payment_method>24</PAYPAL_EXPRESS_payment_method>
-                <YANDEXMONEY_SSL_payment_method>24</YANDEXMONEY_SSL_payment_method>
-                <SOFORT_SSL_payment_method>24</SOFORT_SSL_payment_method>
-                <GIROPAY_SSL_payment_method>24</GIROPAY_SSL_payment_method>
-                <BOLETO_SSL_payment_method>24</BOLETO_SSL_payment_method>
-                <ALIPAY_SSL_payment_method>24</ALIPAY_SSL_payment_method>
-                <QIWI_SSL_payment_method>24</QIWI_SSL_payment_method>
-                <SEPA_DIRECT_DEBIT_SSL_payment_method>24</SEPA_DIRECT_DEBIT_SSL_payment_method>
-                <KlARNA_SSL_payment_method>24</KlARNA_SSL_payment_method>
-                <PRZELEWY_SSL_payment_method>24</PRZELEWY_SSL_payment_method>
-                <MISTERCASH_SSL_payment_method>24</MISTERCASH_SSL_payment_method>
-                <AMEX_SSL_payment_method>24</AMEX_SSL_payment_method>
-                <VISA_SSL_payment_method>24</VISA_SSL_payment_method>
-                <ECMC_SSL_payment_method>24</ECMC_SSL_payment_method>
-                <CB_SSL_payment_method>24</CB_SSL_payment_method>
-                <CARTEBLEUE_SSL_payment_method>24</CARTEBLEUE_SSL_payment_method>
-                <DANKORT_SSL_payment_method>24</DANKORT_SSL_payment_method>
-                <DINERS_SSL_payment_method>24</DINERS_SSL_payment_method>
-                <DISCOVER_SSL_payment_method>24</DISCOVER_SSL_payment_method>
-                <JCB_SSL_payment_method>24</JCB_SSL_payment_method>
-                <MAESTRO_SSL_payment_method>24</MAESTRO_SSL_payment_method>
-            </order_cleanup>
+                <title>Alternative Payment Methods</title>
+                <paymentmethods>PAYPAL-EXPRESS</paymentmethods>
+            </apm_config>            
+            <miscellaneous>
+                <country_code_spoof>JE-GB,IM-GB</country_code_spoof>
+                <global_currency_exponent>2</global_currency_exponent>
+            </miscellaneous>
         </worldpay>
         <payment>
             <worldpay_cc>

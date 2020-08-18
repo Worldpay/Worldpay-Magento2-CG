@@ -1,5 +1,6 @@
 <?php
 namespace Sapient\Worldpay\Model\PaymentMethods;
+
 use Exception;
 use Magento\Sales\Model\Order\Payment\Transaction;
 
@@ -177,14 +178,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         return $this->registryhelper->getworldpayRedirectUrl();
     }
 
-    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount){
-
-        
+    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
-        if($this->authSession->isLoggedIn()) {
+        if ($this->authSession->isLoggedIn()) {
             $adminquote = $this->adminsessionquote->getQuote();
-            if(empty($quote->getReservedOrderId()) && !empty($adminquote->getReservedOrderId())){
+            if (empty($quote->getReservedOrderId()) && !empty($adminquote->getReservedOrderId())) {
                 $quote = $adminquote;
             }
         }
@@ -194,11 +194,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->paymentdetailsdata = self::$paymentDetails;
         try {
             $this->validatePaymentData(self::$paymentDetails);
-            if(self::$paymentDetails['method'] != self::WORLDPAY_WALLETS_TYPE){
+            if (self::$paymentDetails['method'] != self::WORLDPAY_WALLETS_TYPE) {
                 $this->_checkpaymentapplicable($quote);
             }
             $this->_checkShippingApplicable($quote);
-            $this->_createWorldPayPayment($payment,$orderCode,$quote->getStoreId(),$quote->getReservedOrderId());
+            $this->_createWorldPayPayment($payment, $orderCode, $quote->getStoreId(), $quote->getReservedOrderId());
+            
             $authorisationService = $this->getAuthorisationService($quote->getStoreId());
             $authorisationService->authorizePayment(
                 $mageOrder,
@@ -212,55 +213,76 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         } catch (Exception $e) {
             $this->_wplogger->error($e->getMessage());
             $this->_wplogger->error('Authorising payment failed.');
-            $errormessage = $this->worlpayhelper->updateErrorMessage($e->getMessage(),$quote->getReservedOrderId());
+            $errormessage = $this->worlpayhelper->updateErrorMessage($e->getMessage(), $quote->getReservedOrderId());
             $this->_wplogger->error($errormessage);
+            $this->authSession->setOrderCode(false);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __($errormessage)
             );
-            $this->authSession->setOrderCode(false);
         }
-
     }
-    public function validatePaymentData($paymentData){
+    public function validatePaymentData($paymentData)
+    {
         $mode = $this->worlpayhelper->getCcIntegrationMode();
         $method = $paymentData['method'];
-        $generalErrorMessage = __('Invalid Payment Type. Please Refresh and check again');
+        $generalErrorMessage = __($this->worlpayhelper->getCreditCardSpecificexception('CCAM13'));
+
         if ($method == self::WORLDPAY_CC_TYPE || $method == self::WORLDPAY_MOTO_TYPE) {
             if (isset($paymentData['additional_data'])) {
                 $data = $paymentData['additional_data'];
+                if (($method == self::WORLDPAY_MOTO_TYPE) &&
+                       (isset($data['cpf_enabled']) && $data['cpf_enabled'] ||
+                        isset($data['instalment_enabled']) && $data['instalment_enabled'])) {
+                    //validating cpf number-
+                    if (isset($data['cpf']) && !(preg_match("/^\d{11}$/", $data['cpf'], $matches) ||
+                            preg_match("/^\d{14}$/", $data['cpf'], $matches))) {
+                        $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM20');
+                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                    }
+                    if (isset($data['statement']) && !preg_match("/^[a-zA-Z0-9 ]*$/", $data['statement'], $matches)) {
+                        $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM21');
+                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                    }
+                }
                 if ($mode == 'redirect') {
                     if (!isset($data['cc_type'])) {
-                        throw new Exception($generalErrorMessage, 1);
+                        throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
                     }
                     if (isset($data['cc_number']) && $data['cc_number'] != null) {
-                        throw new Exception(__("Invalid Configuration. Please Refresh and check again"), 1);
+                        $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM24');
+                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
                     }
-                } elseif($mode == self::DIRECT_MODEL) {
+                } elseif ($mode == self::DIRECT_MODEL) {
                     if (!isset($data['cc_type'])) {
-                        throw new Exception($generalErrorMessage, 1);
+                        throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
                     }
                     if ($data['cc_type'] != 'savedcard') {
                         if (!isset($data['cc_exp_year'])) {
-                            throw new Exception(__("Invalid Expiry Year. Please Refresh and check again"), 1);
+                            $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM25');
+                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
                         }
                         if (!isset($data['cc_exp_month'])) {
-                            throw new Exception(__("Invalid Expiry Month. Please Refresh and check again"), 1);
+                            $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM26');
+                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
                         }
                         if (!isset($data['cc_number'])) {
-                            throw new Exception(__('Invalid Card Number. Please Refresh and check again'), 1);
+                            $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM27');
+                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
                         }
                         if (!isset($data['cc_name'])) {
-                            throw new Exception(__('Invalid Card Holder Name. Please Refresh and check again'), 1);
+                            $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM28');
+                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
                         }
                     }
                 }
             } else {
-                throw new Exception(__("Invalid Payment Details. Please Refresh and check again"), 1);
+                $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM13');
+                throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
             }
         } elseif ($method == self::WORLDPAY_APM_TYPE && !isset($paymentData['additional_data']['cc_type'])) {
-             throw new Exception($generalErrorMessage, 1);
+            throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
         } elseif ($method == self::WORLDPAY_WALLETS_TYPE && !isset($paymentData['additional_data']['cc_type'])) {
-            throw new Exception($generalErrorMessage, 1);
+            throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
         }
     }
 
@@ -282,25 +304,39 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     /**
      * Save Risk gardian
      */
-    private function _createWorldPayPayment(\Magento\Payment\Model\InfoInterface $payment, $orderCode, $storeId,$orderId,$interactionType='ECOM')
-    {
+    private function _createWorldPayPayment(
+        \Magento\Payment\Model\InfoInterface $payment,
+        $orderCode,
+        $storeId,
+        $orderId,
+        $interactionType = 'ECOM'
+    ) {
         $paymentdetails = self::$paymentDetails;
-        $integrationType = $this->worlpayhelper->getIntegrationModelByPaymentMethodCode($payment->getMethod(),$storeId);
+        $integrationType =$this->worlpayhelper->getIntegrationModelByPaymentMethodCode($payment->getMethod(), $storeId);
         if ($paymentdetails['method'] == self::WORLDPAY_WALLETS_TYPE) {
             $integrationType = 'direct';
         }
+        $mode = $this->worlpayhelper->getCcIntegrationMode();
+        $method = $paymentdetails['method'];
+        if (($mode == 'redirect') && $method == self::WORLDPAY_MOTO_TYPE) {
+            $integrationType = 'redirect';
+        }
         $wpp = $this->worldpaypayment->create();
-        $wpp->setData('order_id',$orderId);
-        $wpp->setData('payment_status',\Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION);
-        $wpp->setData('worldpay_order_id',$orderCode);
-        $wpp->setData('store_id',$storeId);
-        $wpp->setData('merchant_id',$this->worlpayhelper->getMerchantCode($paymentdetails['additional_data']['cc_type']));
-        $wpp->setData('3d_verified',$this->worlpayhelper->isDynamic3DEnabled());
-        $wpp->setData('payment_model',$integrationType);
-        if ($paymentdetails && !empty($paymentdetails['additional_data']['cc_type']) && empty($paymentdetails['additional_data']['tokenCode'])) {
-            $wpp->setData('payment_type',$paymentdetails['additional_data']['cc_type']);
+        $wpp->setData('order_id', $orderId);
+        $wpp->setData('payment_status', \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION);
+        $wpp->setData('worldpay_order_id', $orderCode);
+        $wpp->setData('store_id', $storeId);
+        $wpp->setData(
+            'merchant_id',
+            $this->worlpayhelper->getMerchantCode($paymentdetails['additional_data']['cc_type'])
+        );
+        $wpp->setData('3d_verified', $this->worlpayhelper->isDynamic3DEnabled());
+        $wpp->setData('payment_model', $integrationType);
+        if ($paymentdetails && !empty($paymentdetails['additional_data']['cc_type'])
+                && empty($paymentdetails['additional_data']['tokenCode'])) {
+            $wpp->setData('payment_type', $paymentdetails['additional_data']['cc_type']);
         } else {
-            $wpp->setData('payment_type',$this->_getpaymentType());
+            $wpp->setData('payment_type', $this->_getpaymentType());
         }
         if ($paymentdetails['method'] == self::WORLDPAY_MOTO_TYPE) {
             $interactionType='MOTO';
@@ -308,40 +344,38 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         if ($integrationType == self::DIRECT_MODEL && $this->worlpayhelper->isCseEnabled()) {
             $wpp->setData('client_side_encryption', true);
         }
-        $wpp->setData('interaction_type',$interactionType);
+        $wpp->setData('interaction_type', $interactionType);
+        // Check for Merchant Token
+        $wpp->setData('token_type', $this->worlpayhelper->getMerchantTokenization());
         $wpp->save();
     }
 
-
-    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+    public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
         
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
         $autoInvoice = $this->_scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
-        $partialCapture = $this->_scopeConfig->getValue('worldpay/cc_config/partial_capture', $storeScope);
-
-        
-         
+        $partialCapture = $this->_scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
+ 
         //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
-       if($partialCapture && !$autoInvoice) {
-           return $this;
+        if ($partialCapture && !$autoInvoice) {
+            return $this;
         }
-         
-       
+            
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
         $orderId = '';
-        if($quote->getReservedOrderId()){
+        if ($quote->getReservedOrderId()) {
             $orderId = $quote->getReservedOrderId();
-        }else{
+        } else {
             $orderId = $mageOrder->getIncrementId();
         }
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($orderId);
-        
-        
+              
         $paymenttype = $worldPayPayment->getPaymentType();
-        if ($this->paymentutils->CheckCaptureRequest($payment->getMethod(), $paymenttype)) {
+        if ($this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype)) {
             $this->paymentservicerequest->capture(
                 $payment->getOrder(),
                 $worldPayPayment,
@@ -352,7 +386,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         return $this;
     }
 
-    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    {
         $this->_wplogger->info('refund payment model function executed');
         if ($order = $payment->getOrder()) {
             $mageOrder = $payment->getOrder();
@@ -371,11 +406,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             if ($this->_response->reply->ok) {
                 return $this;
             }
-
         }
-
+        $gatewayError = 'No matching order found in WorldPay to refund';
+        $errorMsg = 'Please visit your WorldPay merchant interface and refund the order manually.';
         throw new \Magento\Framework\Exception\LocalizedException(
-            __('No matching order found in WorldPay to refund. Please visit your WorldPay merchant interface and refund the order manually.')
+            __($gatewayError.' '.$errorMsg)
         );
     }
 
@@ -400,7 +435,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     {
         $allowed = in_array(
             $state,
-            array(
+            [
                 \Sapient\Worldpay\Model\Payment\State::STATUS_CAPTURED,
                 \Sapient\Worldpay\Model\Payment\State::STATUS_SETTLED,
                 \Sapient\Worldpay\Model\Payment\State::STATUS_SETTLED_BY_MERCHANT,
@@ -408,7 +443,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 \Sapient\Worldpay\Model\Payment\State::STATUS_REFUNDED,
                 \Sapient\Worldpay\Model\Payment\State::STATUS_REFUNDED_BY_MERCHANT,
                 \Sapient\Worldpay\Model\Payment\State::STATUS_REFUND_FAILED
-            )
+            ]
         );
         return $allowed;
     }
@@ -420,14 +455,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @return bool
      * @throw Exception
      */
-    protected function _checkpaymentapplicable($quote){
+    protected function _checkpaymentapplicable($quote)
+    {
         $type = strtoupper($this->_getpaymentType());
         $billingaddress = $quote->getBillingAddress();
         $countryId = $billingaddress->getCountryId();
         $paymenttypes = json_decode($this->paymenttypes->getPaymentType($countryId));
-//        if(!in_array($type, $paymenttypes)){
-//             throw new Exception('Payment Type not valid for the billing country');
-//        }
     }
 
     /**
@@ -438,16 +471,19 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @return bool
      * @throw Exception
      */
-    protected function _checkShippingApplicable($quote){
+    protected function _checkShippingApplicable($quote)
+    {
         $type = strtoupper($this->_getpaymentType());
-        if($type == 'KLARNA-SSL'){
+        if ($type == 'KLARNA-SSL') {
             $shippingaddress = $quote->getShippingAddress();
             $billingaddress = $quote->getBillingAddress();
             $shippingCountryId = $shippingaddress->getCountryId();
             $countryId = isset($shippingCountryId)?$shippingCountryId:$billingaddress->getCountryId();
             $paymenttypes = json_decode($this->paymenttypes->getPaymentType($countryId));
-            if(!in_array($type, $paymenttypes)){
-                 throw new Exception('Payment Type not valid for the shipping country');
+            if (!in_array($type, $paymenttypes)) {
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __('Payment Type not valid for the shipping country')
+                );
             }
         }
     }
@@ -457,21 +493,26 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      *
      * @return bool
      */
-    protected function _getpaymentType(){
+    protected function _getpaymentType()
+    {
         if (empty($this->paymentdetailsdata['additional_data']['tokenCode'])) {
             return  $this->paymentdetailsdata['additional_data']['cc_type'];
         } else {
+            $merchantTokenEnabled = $this->worlpayhelper->getMerchantTokenization();
+            $tokenType = $merchantTokenEnabled ? 'merchant' : 'shopper';
             $savedCard= $this->_savecard->create()->getCollection()
-                ->addFieldToSelect(array('method'))
-                ->addFieldToFilter('token_code', array('eq' => $this->paymentdetailsdata['additional_data']['tokenCode']))
+                ->addFieldToSelect(['method'])
+                ->addFieldToFilter('token_code', ['eq' => $this->paymentdetailsdata['additional_data']['tokenCode']])
+                ->addFieldToFilter('token_type', ['eq' => $tokenType])
                 ->getData();
-            if($savedCard){
+            if ($savedCard) {
                 return $savedCard[0]['method'];
             } else {
-                throw new Exception('Inavalid Card deatils. Please Refresh and check again');
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __('Inavalid Card deatils. Please Refresh and check again')
+                );
             }
         }
-
     }
 
     protected function _addtransaction($payment, $amount)
@@ -490,9 +531,5 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $transaction = $payment->addTransaction(Transaction::TYPE_AUTH);
         $message = $payment->prependMessage($message);
         $payment->addTransactionCommentsToOrder($transaction, $message);
-
     }
-
-
-
 }

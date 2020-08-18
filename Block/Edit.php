@@ -11,16 +11,16 @@ class Edit extends \Magento\Framework\View\Element\Template
      */
     protected $_savecard;
      /**
-     * @var \Magento\Customer\Model\Session
-     */
+      * @var \Magento\Customer\Model\Session
+      */
     protected $_customerSession;
      /**
-     * @var array
-     */
+      * @var array
+      */
     protected static $_months;
      /**
-     * @var array
-     */
+      * @var array
+      */
     protected static $_expiryYears;
     /**
      * Constructor
@@ -39,7 +39,6 @@ class Edit extends \Magento\Framework\View\Element\Template
         $this->_savecard = $savecard;
         $this->_customerSession = $customerSession;
         parent::__construct($context, $data);
-
     }
 
     /**
@@ -47,7 +46,8 @@ class Edit extends \Magento\Framework\View\Element\Template
      *
      * @return object
      */
-    public function getTokenData(){
+    public function getTokenData()
+    {
         if (!($customerId = $this->_customerSession->getCustomerId())) {
             return false;
         }
@@ -65,7 +65,7 @@ class Edit extends \Magento\Framework\View\Element\Template
     public function getMonths()
     {
         if (!self::$_months) {
-            self::$_months = array('' => __('Month'));
+            self::$_months = ['' => __('Month')];
             for ($i = 1; $i < 13; $i++) {
                 $month = str_pad($i, 2, '0', STR_PAD_LEFT);
                 self::$_months[$month] = date("$i - F", mktime(0, 0, 0, $i, 1));
@@ -83,7 +83,7 @@ class Edit extends \Magento\Framework\View\Element\Template
     public function getExpiryYears()
     {
         if (!self::$_expiryYears) {
-            self::$_expiryYears = array('' => __('Year'));
+            self::$_expiryYears = ['' => __('Year')];
             $year = date('Y');
             $endYear = ($year + 20);
             while ($year < $endYear) {

@@ -46,7 +46,8 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
      */
     public function isSubscriptionsEnabled()
     {
-        return $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/active') && in_array($this->getProduct()->getTypeId(), $this->recurringHelper->getAllowedProductTypeIds());
+        return $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/active')
+                && in_array($this->getProduct()->getTypeId(), $this->recurringHelper->getAllowedProductTypeIds());
     }
 
     /**
@@ -143,7 +144,7 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
     private function getHtmlSelect($name, $value = null)
     {
         $require = '';
-        $select = $this->getLayout()->createBlock('Magento\Framework\View\Element\Html\Select')
+        $select = $this->getLayout()->createBlock(\Magento\Framework\View\Element\Html\Select::class)
             ->setId('worldpay_subscription_start_date_' . $name)
             ->setClass('admin__control-select datetime-picker' . $require)
             ->setName('worldpay_subscription_start_date[' . $name . ']');
@@ -250,7 +251,8 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
         return parent::_toHtml();
     }
     
-    public function getStartDate(){
+    public function getStartDate()
+    {
         return $this->getProduct()->getPreconfiguredValues()->getSubscriptionDate();
     }
 }

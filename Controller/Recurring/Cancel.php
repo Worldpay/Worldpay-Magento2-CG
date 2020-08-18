@@ -13,6 +13,7 @@ use Magento\Framework\App\ResponseInterface;
 use Sapient\Worldpay\Model\Config\Source\SubscriptionStatus;
 use Sapient\Worldpay\Model\Recurring\SubscriptionFactory;
 use Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory;
+use Sapient\Worldpay\Helper\MyAccountException;
 
 class Cancel extends \Magento\Framework\App\Action\Action
 {
@@ -30,6 +31,8 @@ class Cancel extends \Magento\Framework\App\Action\Action
      * @var Session
      */
     private $customerSession;
+    
+    private $helper;
 
     /**
      * @param Context $context
@@ -40,12 +43,14 @@ class Cancel extends \Magento\Framework\App\Action\Action
         Context $context,
         Session $customerSession,
         SubscriptionFactory $subscriptionFactory,
-        TransactionsFactory $transactionFactory
+        TransactionsFactory $transactionFactory,
+        MyAccountException $helper
     ) {
         parent::__construct($context);
         $this->customerSession = $customerSession;
         $this->subscriptionFactory = $subscriptionFactory;
         $this->transactionFactory = $transactionFactory;
+        $this->helper = $helper;
     }
 
     /**
@@ -56,7 +61,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
      */
     public function dispatch(RequestInterface $request)
     {
-        $loginUrl = $this->_objectManager->get('Magento\Customer\Model\Url')->getLoginUrl();
+        $loginUrl = $this->_objectManager->get(\Magento\Customer\Model\Url::class)->getLoginUrl();
 
         if (!$this->customerSession->authenticate($loginUrl)) {
             $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
@@ -83,19 +88,19 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $redirectResult = $this->resultRedirectFactory->create()->setPath('*/*');
 
         if (!$subscription->getId() || $subscription->getId() != $subscriptionId) {
-            $this->messageManager->addErrorMessage(__('Subscription no longer exists.'));
+            $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('MCAM15')));
 
             return $redirectResult;
         }
 
         if ($subscription->getStatus() == SubscriptionStatus::CANCELLED) {
-            $this->messageManager->addErrorMessage(__('Subscription is no longer active.'));
+            $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('MCAM16')));
 
             return $redirectResult;
         }
 
         if ($subscription->getCustomerId() != $this->customerSession->getCustomerId()) {
-            $this->messageManager->addErrorMessage(__('Subscription is not found.'));
+            $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('MCAM17')));
 
             return $redirectResult;
         }
@@ -106,9 +111,9 @@ class Cancel extends \Magento\Framework\App\Action\Action
             $recurring->setStatus(SubscriptionStatus::CANCELLED)
                 ->save();
 
-            $this->messageManager->addSuccessMessage(__('Subscription has been cancelled.'));
+            $this->messageManager->addSuccessMessage(__($this->helper->getConfigValue('MCAM14')));
         } catch (\Exception $e) {
-            $this->messageManager->addErrorMessage(__('Failed to cancel subscription.'));
+            $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('MCAM18')));
         }
 
         return $redirectResult;

@@ -26,7 +26,7 @@ class Address extends AbstractModel implements AddressModelInterface
      */
     protected function _construct()
     {
-        $this->_init('Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address');
+        $this->_init(\Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address::class);
     }
 
     /**

@@ -25,12 +25,11 @@ class OrderStatus implements \Magento\Framework\Option\ArrayInterface
      */
     public function toOptionArray()
     {
-        $statuses = $this->_orderConfig->getStatuses();
-
-        $options = [['value' => '', 'label' => __('-- Please Select --')]];
-        foreach ($statuses as $code => $label) {
-            $options[] = ['value' => $code, 'label' => $label];
-        }
-        return $options;
+        return [
+            ['value' => 'pending', 'label' => __('Pending')],
+            ['value' => 'processing', 'label' => __('Processing')],
+            ['value' => 'canceled', 'label' => __('Canceled')],
+            ['value' => 'complete', 'label' => __('Complete')]
+        ];
     }
 }

@@ -50,14 +50,14 @@ class Transactions extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     /**
      * Load transcation detail by $orderIncrementId
      *
-     * @param int $orderIncrementId        
+     * @param int $orderIncrementId
      * @return int $id
      */
     public function loadByOriginalOrderIncrementId($orderIncrementId)
     {
         $table = $this->getMainTable();
         $where = $this->getConnection()->quoteInto("original_order_increment_id = ?", $orderIncrementId);
-        $sql = $this->getConnection()->select()->from($table,array('entity_id'))->where($where);
+        $sql = $this->getConnection()->select()->from($table, ['entity_id'])->where($where);
         $id = $this->getConnection()->fetchOne($sql);
         return $id;
     }
@@ -65,14 +65,14 @@ class Transactions extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     /**
      * Load transcation detail by $subscriptionId
      *
-     * @param int $subscriptionId        
+     * @param int $subscriptionId
      * @return int $id
      */
     public function loadBySubscriptionId($subscriptionId)
     {
         $table = $this->getMainTable();
         $where = $this->getConnection()->quoteInto("subscription_id = ?", $subscriptionId);
-        $sql = $this->getConnection()->select()->from($table,array('entity_id'))->where($where);
+        $sql = $this->getConnection()->select()->from($table, ['entity_id'])->where($where);
         $id = $this->getConnection()->fetchOne($sql);
         return $id;
     }
@@ -80,14 +80,14 @@ class Transactions extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     /**
      * Load transcation detail by $entityId
      *
-     * @param int $entityId        
+     * @param int $entityId
      * @return int $id
      */
     public function loadById($entityId)
     {
         $table = $this->getMainTable();
         $where = $this->getConnection()->quoteInto("entity_id = ?", $entityId);
-        $sql = $this->getConnection()->select()->from($table,array('entity_id'))->where($where);
+        $sql = $this->getConnection()->select()->from($table, ['entity_id'])->where($where);
         $id = $this->getConnection()->fetchOne($sql);
         return $id;
     }

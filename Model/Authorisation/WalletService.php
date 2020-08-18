@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Authorisation;
+
 use Exception;
 
 class WalletService extends \Magento\Framework\DataObject
@@ -48,7 +49,7 @@ class WalletService extends \Magento\Framework\DataObject
         $payment
     ) {
         $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
-        if($paymentDetails['additional_data']['cc_type'] == 'PAYWITHGOOGLE-SSL'){
+        if ($paymentDetails['additional_data']['cc_type'] == 'PAYWITHGOOGLE-SSL') {
             $walletOrderParams = $this->mappingservice->collectWalletOrderParameters(
                 $orderCode,
                 $quote,
@@ -62,7 +63,7 @@ class WalletService extends \Magento\Framework\DataObject
             $this->_applyPaymentUpdate($directResponse, $payment);
         }
         
-        if($paymentDetails['additional_data']['cc_type'] == 'APPLEPAY-SSL'){                
+        if ($paymentDetails['additional_data']['cc_type'] == 'APPLEPAY-SSL') {
             $applePayOrderParams = $this->mappingservice->collectWalletOrderParameters(
                 $orderCode,
                 $quote,
@@ -89,15 +90,21 @@ class WalletService extends \Magento\Framework\DataObject
     private function _abortIfPaymentError($paymentUpdate)
     {
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Refused) {
-             throw new Exception(sprintf('Payment REFUSED'));
-         }
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __(sprintf('Payment REFUSED'))
+            );
+        }
 
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
-            throw new Exception(sprintf('Payment CANCELLED'));
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __(sprintf('Payment CANCELLED'))
+            );
         }
 
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Error) {
-            throw new Exception(sprintf('Payment ERROR'));
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __(sprintf('Payment ERROR'))
+            );
         }
     }
 }

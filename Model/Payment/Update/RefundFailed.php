@@ -4,9 +4,7 @@
  */
 namespace Sapient\Worldpay\Model\Payment\Update;
 
-class RefundFailed
-    extends \Sapient\Worldpay\Model\Payment\Update\Base
-    implements \Sapient\Worldpay\Model\Payment\Update
+class RefundFailed extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sapient\Worldpay\Model\Payment\Update
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
@@ -16,7 +14,7 @@ class RefundFailed
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
-     * @param \Sapient\Worldpay\Helper\Data $configHelper        
+     * @param \Sapient\Worldpay\Helper\Data $configHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Payment\State $paymentState,
@@ -28,14 +26,14 @@ class RefundFailed
         $this->_configHelper = $configHelper;
     }
 
-    public function apply($payment,$order = null)
+    public function apply($payment, $order = null)
     {
         $paymentStatus = $this->_paymentState->getPaymentStatus();
         $this->_reference = $this->_paymentState->getJournalReference(
             $this->_paymentState->getPaymentStatus()
         );
 
-         if ($paymentStatus == \Sapient\Worldpay\Model\Payment\State::STATUS_REFUND_EXPIRED) {
+        if ($paymentStatus == \Sapient\Worldpay\Model\Payment\State::STATUS_REFUND_EXPIRED) {
             $this->_message = self::REFUND_EXPIRED_COMMENT;
         } else {
             $this->_message = self::REFUND_FAILED_COMMENT;
@@ -44,7 +42,5 @@ class RefundFailed
 
         $order->cancelRefund($this->_reference, $this->_message);
         $this->_worldPayPayment->updateWorldPayPayment($this->_paymentState);
-
     }
-
 }

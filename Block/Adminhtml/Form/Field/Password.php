@@ -6,23 +6,23 @@
 namespace Sapient\Worldpay\Block\Adminhtml\Form\Field;
 
 /**
- * Class Password
+ * Class Password which helps to set WP merchant handlings
  */
 class Password extends \Magento\Framework\View\Element\AbstractBlock
 {
     protected function _toHtml()
     {
 
-        $html = '<input type="password" style="width:120px;" name="' . $this->getName() . '" id="' . $this->getId() . '" ';
+        $html = '<input type="password" style="width:120px;" name="'.$this->getName().'" id="'.$this->getId().'"';
         $html .= 'value="' . $this->escapeHtml($this->getValue()) . '" ';
         $html .= 'class="required-entry ' . $this->getClass() . '" ' . $this->getExtraParams() . '/> ';
         return $html;
     }
 
      /**
-     * @param string $value
-     * @return Sapient\Worldpay\Block\Adminhtml\Form\Field\MerchantProfile
-     */
+      * @param string $value
+      * @return Sapient\Worldpay\Block\Adminhtml\Form\Field\MerchantProfile
+      */
     public function setInputName($value)
     {
         return $this->setName($value);
@@ -32,8 +32,7 @@ class Password extends \Magento\Framework\View\Element\AbstractBlock
     {
         return $this->setId($value);
     }
-
-     
+   
     public function getHtml()
     {
         return $this->toHtml();

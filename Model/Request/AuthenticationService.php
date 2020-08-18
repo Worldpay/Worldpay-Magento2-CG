@@ -6,7 +6,8 @@ namespace Sapient\Worldpay\Model\Request;
 
 use Exception;
 
-class AuthenticationService  extends \Magento\Framework\DataObject {
+class AuthenticationService extends \Magento\Framework\DataObject
+{
 
     /**
      * Constructor
@@ -15,10 +16,10 @@ class AuthenticationService  extends \Magento\Framework\DataObject {
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
      */
     public function __construct(
-    	\Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Helper\Data $worldpayhelper
     ) {
-	    $this->_wplogger = $wplogger;
+        $this->_wplogger = $wplogger;
         $this->worldpayhelper = $worldpayhelper;
     }
 
@@ -27,7 +28,6 @@ class AuthenticationService  extends \Magento\Framework\DataObject {
      */
     public function requestAuthenticated($params, $type = 'ecom')
     {
-       return true;
+        return true;
     }
-
 }

@@ -6,6 +6,29 @@
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
 
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
+        
+         <!-- ko if: ( getCode()=='worldpay_apm')-->
+
+         <div class='accepted_cc'>
+              
+             <span class='worldpay_cc_we_accept'>We Accept</span>
+             
+             <div class="paymentoptions-icon-wrapper">
+         <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
+         <!--ko if: $parent.getIcons(item.ccValue) -->
+                        <div data-bind="attr: {for: 'direct_cc_' + item.ccValue}"><img data-bind="attr: {
+                                    'src': $parent.getIcons(item.ccValue).url,
+                                    'alt': item.ccLabel,
+                                    'width': $parent.getIcons(item.ccValue).width,
+                                    'height': $parent.getIcons(item.ccValue).height
+                                    }"></div>
+                    <!--/ko-->
+         <!--/ko-->
+          </div>
+         </div>
+          <!--/ko-->
+          
+          
     </div>
     <div class="payment-method-content">
 
@@ -15,7 +38,7 @@
                 <!-- ko if: (paymentMethodSelection()=='radio')-->
                 
                     <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
-                    
+                        <div class="paymentmethods-radio-wrapper">
                         <input type="radio"  data-bind="event:{ change: $parent.checkPaymentTypes },attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
                                         'validate-one-required-by-name':true
                                                 }),id: 'apm_' + item.ccValue}" name="apm_type" />
@@ -30,7 +53,7 @@
                         <!--ko ifnot: $parent.getIcons(item.ccValue) -->
                             <label data-bind="attr: {for: 'apm_' + item.ccValue}"><!-- ko text: item.ccLabel --><!-- /ko --></label>
                         <!--/ko-->
-                    
+                    </div>
                 <!--/ko-->
                 
             <!-- /ko -->
@@ -57,6 +80,34 @@
                                optionsCaption: 'Select Your Bank'">
             </select>
         </div>
+        <div class="field type statment-narrative" data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative_div'},visible: false">
+            <label data-bind="attr: {for: getCode() + '_statement'}" class="label">
+                <span> Purpose of transaction </span>
+                <!--            <span> ko i18n: 'Purpose of transaction' /ko </span>-->
+            </label> 
+            <div>
+            <textarea name="stmt_narrative" maxlength ="255" cols="20" rows="3"
+                      data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative', 
+                       'data-container': getCode() + '-cc-type-narrative',
+                                    'data-validate': JSON.stringify({
+                                      'validate-no-html-tags': true
+                                    })},
+                                    enable: isActive($parents),
+                        value: stmtNarrative,
+                        event:{ change: $parent.checkPaymentTypes },
+                        event:{ change: checkPaymentTypes }"
+                      style="width:225px;text-align:left;resize: none;">
+            </textarea>
+            </div>
+            <div>
+                <small><strong>Purpose of transaction</strong> will reflect on your statement, 
+                    only if it is supported by the selected payment method.</small></div>
+                     <div><small><strong>Purpose of transaction</strong> will be validated 
+                    by the payment method before processing.</small></div>
+                      <div><small>Please adhere to the 
+                    <strong>Statement Narrative</strong> guidelines of the selected payment method 
+                    before entering the <strong>Purpose of transaction.</strong></small></div>
+        </div>
         <div class="field"></div>
         </fieldset>
         </form>
@@ -76,7 +127,7 @@
         </div>
         <div class="actions-toolbar">
             <div class="primary">
-                <button class="action primary checkout"
+                <button id="checkout-place-order" class="action primary checkout"
                         type="submit"
                         data-bind="
                             click: preparePayment,

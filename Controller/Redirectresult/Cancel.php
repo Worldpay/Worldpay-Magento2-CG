@@ -46,7 +46,6 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $this->paymentservice = $paymentservice;
         $this->authenticatinservice = $authenticatinservice;
         return parent::__construct($context);
-
     }
 
     public function execute()
@@ -74,7 +73,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
 
         $incrementId = $order->getIncrementId();
 
-        $message = is_null($incrementId)
+        $message = $incrementId === null
             ? __('Order Cancelled')
             : __('Order #'. $incrementId.' Cancelled');
 
@@ -91,5 +90,4 @@ class Cancel extends \Magento\Framework\App\Action\Action
             $this->wplogger->error($e->getMessage());
         }
     }
-
 }

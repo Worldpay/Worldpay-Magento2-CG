@@ -6,8 +6,8 @@ use Sapient\Worldpay\Helper\Data;
 class Jwt extends \Magento\Framework\View\Element\Template
 {
     /**
-    * @var Sapient\Worldpay\Helper\Data;
-    */
+     * @var Sapient\Worldpay\Helper\Data;
+     */
     
     protected $helper;
     
@@ -19,8 +19,8 @@ class Jwt extends \Magento\Framework\View\Element\Template
 
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
-        Data $helper)
-    {
+        Data $helper
+    ) {
         $this->_helper = $helper;
         parent::__construct($context);
     }
@@ -44,7 +44,7 @@ class Jwt extends \Magento\Framework\View\Element\Template
     {
         $ddcurl = '';
         $mode = $this->_helper->getEnvironmentMode();
-        if($mode == 'Test Mode'){
+        if ($mode == 'Test Mode') {
             $ddcurl =  $this->_helper->isTestDdcUrl();
         } else {
             $ddcurl =  $this->_helper->isProductionDdcUrl();
@@ -52,5 +52,8 @@ class Jwt extends \Magento\Framework\View\Element\Template
         return $ddcurl;
     }
     
-    
+    public function getCookie()
+    {
+        return $cookie = $this->_helper->getWorldpayAuthCookie();
+    }
 }

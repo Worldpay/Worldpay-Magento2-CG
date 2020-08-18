@@ -17,5 +17,4 @@ class AuthMethods extends \Magento\Framework\App\Config\Value
             ['value' => 'CRYPTOGRAM_3DS', 'label' => __('Cryptogram 3ds')]
         ];
     }
-
 }

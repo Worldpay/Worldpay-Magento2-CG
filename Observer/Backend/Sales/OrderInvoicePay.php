@@ -5,9 +5,8 @@ namespace Sapient\Worldpay\Observer\Backend\Sales;
 
 class OrderInvoicePay implements \Magento\Framework\Event\ObserverInterface
 {
-
     
-    public function __construct (
+    public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentServiceReq,
         \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
@@ -21,8 +20,7 @@ class OrderInvoicePay implements \Magento\Framework\Event\ObserverInterface
         $this->scopeConfig = $scopeConfig;
         $this->messageManager = $messageManager;
         $this->_request = $request;
-    } 
-    
+    }
     
     /**
      * Execute observer
@@ -34,62 +32,45 @@ class OrderInvoicePay implements \Magento\Framework\Event\ObserverInterface
         \Magento\Framework\Event\Observer $observer
     ) {
         
-       
-         
         $invoice = $this->_request->getPost();
-        
        
-        if(!isset($invoice['invoice'])) {
+        if (!isset($invoice['invoice'])) {
             
             return;
         }
-        
        
-        
-        
-        
         $invoice = $observer->getEvent()->getInvoice();
         $order = $invoice->getOrder();
-        
-        
             
          // check the payment has been captured already or not.
          $wp = $this->worldpaypaymentmodel->loadByPaymentId($order->getIncrementId());
-        
          
-         
-       $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
         $autoInvoice = $this->scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
-        $partialCapture = $this->scopeConfig->getValue('worldpay/cc_config/partial_capture', $storeScope);
-
-        
-        
-         
+        $partialCapture = $this->scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
          
         //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
-       if($partialCapture && !$autoInvoice) {
+        if ($partialCapture && !$autoInvoice) {
            
-           //total amount from invoice and order should not be same for partial capture
-           if(floatval($invoice->getGrandTotal()) !=floatval($order->getGrandTotal())) {
+            //total amount from invoice and order should not be same for partial capture
+            if (floatval($invoice->getGrandTotal()) !=floatval($order->getGrandTotal())) {
             
-            $this->paymentServiceReq->partialCapture(
+                $this->paymentServiceReq->partialCapture(
+                    $order,
+                    $wp,
+                    $invoice->getGrandTotal()
+                );
+            }
+        
+        } else {
+            //normal capture
+            $paymentMethod ='';
+            $this->paymentServiceReq->capture(
                 $order,
                 $wp,
-                $invoice->getGrandTotal()
+                $paymentMethod
             );
         }
-        
-       }else {
-           //normal capture
-           $paymentMethod ='';
-           $this->paymentServiceReq->capture(
-               $order,
-               $wp,
-               $paymentMethod
-            );
-       }
-       
-        
     }
 }

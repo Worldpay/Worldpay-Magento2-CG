@@ -14,7 +14,19 @@ define([
     'mage/dropdown'
 ], function (Component, customerData, $, ko, _) {
     'use strict';
-
+    
+    function getMyAccountExceptions (exceptioncode){
+                var data=window.MyAccountExceptions;
+                var gendata=JSON.parse(data);
+                for (var key in gendata) {
+                    if (gendata.hasOwnProperty(key)) {  
+                        var cxData=gendata[key];
+                    if(cxData['exception_code'] === exceptioncode){
+                        return cxData['exception_module_messages']?cxData['exception_module_messages']:cxData['exception_messages'];
+                    }
+                    }
+                }
+            }
     var sidebarInitialized = false,
         addToCartCalls = 0,
         miniCart;
@@ -68,15 +80,15 @@ define([
                 'qty': ':input.cart-item-qty',
                 'button': ':button.update-cart-item'
             },
-            'confirmMessage': $.mage.__('Are you sure you would like to remove this item from the shopping cart?')
+            'confirmMessage': $.mage.__(getMyAccountExceptions('MCAM3'))
         });
     }
 
     miniCart.on('dropdowndialogopen', function () {
         initSidebar();
     });
+  
     
-
     return Component.extend({
         shoppingCartUrl: window.checkout.shoppingCartUrl,
         maxItemsToDisplay: window.checkout.maxItemsToDisplay,
@@ -86,6 +98,7 @@ define([
         checkoutNowTitle: window.ChromepayButtonName,
         chromepayEnabled: window.ChromepayEnabled,
         chromePaymentMode: window.ChromePaymentMode,
+        isChromium: window.ChromepayAvailable,
          
         cart: {},
 

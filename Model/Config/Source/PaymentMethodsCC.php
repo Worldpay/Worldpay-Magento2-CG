@@ -25,5 +25,4 @@ class PaymentMethodsCC extends \Magento\Framework\App\Config\Value
             ['value' => 'MAESTRO-SSL', 'label' => __('Maestro')]
         ];
     }
-
 }

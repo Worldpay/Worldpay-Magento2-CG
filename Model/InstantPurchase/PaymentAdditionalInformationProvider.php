@@ -4,6 +4,7 @@ namespace Sapient\Worldpay\Model\InstantPurchase;
 use Magento\InstantPurchase\PaymentMethodIntegration\PaymentAdditionalInformationProviderInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Sapient\Worldpay\Logger\WorldpayLogger;
+
 /**
  * Provides Braintree specific payment additional information for instant purchase.
  */

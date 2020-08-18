@@ -47,20 +47,30 @@ class VaultService extends \Magento\Framework\DataObject
     ) {
         $paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml($directResponse->getXml());
         $paymentUpdate->apply($payment);
-        $this->_abortIfPaymentError($paymentUpdate);
+        $this->_abortIfPaymentError($paymentUpdate, $directResponse);
     }
-    private function _abortIfPaymentError($paymentUpdate)
+    private function _abortIfPaymentError($paymentUpdate, $directResponse)
     {
+        $responseXml = $directResponse->getXml();
+        $orderStatus = $responseXml->reply->orderStatus;
+        $payment = $orderStatus->payment;
+        $wpayCode = $payment->ISO8583ReturnCode['code'] ? $payment->ISO8583ReturnCode['code'] : 'Payment REFUSED';
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Refused) {
-             throw new Exception(sprintf('Payment REFUSED'));
-         }
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($wpayCode)
+            );
+        }
 
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
-            throw new Exception(sprintf('Payment CANCELLED'));
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Payment CANCELLED')
+            );
         }
 
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Error) {
-            throw new Exception(sprintf('Payment ERROR'));
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Payment ERROR')
+            );
         }
     }
 }

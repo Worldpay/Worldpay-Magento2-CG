@@ -27,7 +27,7 @@ class TokenFormatter implements PaymentTokenFormatterInterface
         'DINERS-SSL' => 'Diners',
     ];
 
-     public function __construct(
+    public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
     ) {
         $this->wplogger = $wplogger;

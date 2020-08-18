@@ -11,7 +11,6 @@ use Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecureConfig;
  */
 class WalletOrder
 {
-    const EXPONENT = 2;
     const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
@@ -23,6 +22,7 @@ EOD;
     private $currencyCode;
     private $amount;
     private $paymentType;
+    private $exponent;
 
     /**
      * Build xml for processing Request
@@ -45,7 +45,8 @@ EOD;
         $shopperEmail,
         $protocolVersion,
         $signature,
-        $signedMessage
+        $signedMessage,
+        $exponent
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -57,6 +58,7 @@ EOD;
         $this->protocolVersion = $protocolVersion;
         $this->signature = $signature;
         $this->signedMessage = $signedMessage;
+        $this->exponent = $exponent;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -117,7 +119,7 @@ EOD;
     {
         $amountElement = $order->addChild('amount');
         $amountElement['currencyCode'] = $this->currencyCode;
-        $amountElement['exponent'] = self::EXPONENT;
+        $amountElement['exponent'] = $this->exponent;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
     }
 
@@ -165,6 +167,6 @@ EOD;
      */
     private function _amountAsInt($amount)
     {
-        return round($amount, self::EXPONENT, PHP_ROUND_HALF_EVEN) * pow(10, self::EXPONENT);
+        return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
     }
 }

@@ -11,7 +11,7 @@ use Exception;
 
 /**
  * Redirect to the admin create order page  if order is failed
- */ 
+ */
 class Failure extends \Magento\Backend\App\Action
 {
   
@@ -24,18 +24,19 @@ class Failure extends \Magento\Backend\App\Action
      * @param \Sapient\Worldpay\Model\Adminhtml\Order\Service $adminorderservice
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      */
-    public function __construct(Context $context,  JsonFactory $resultJsonFactory,
+    public function __construct(
+        Context $context,
+        JsonFactory $resultJsonFactory,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Adminhtml\Order\Service $adminorderservice,
         \Sapient\Worldpay\Model\Order\Service $orderservice
-    ) { 
+    ) {
        
         parent::__construct($context);
         $this->wplogger = $wplogger;
         $this->orderservice = $orderservice;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->adminorderservice = $adminorderservice;
-
     }
     
     /**
@@ -66,7 +67,7 @@ class Failure extends \Magento\Backend\App\Action
     private function _getFailureNoticeForOrder($order)
     {
         return __('Order #'.$order->getIncrementId().' failed');
-    } 
+    }
 
     /**
      * @return string
@@ -86,7 +87,6 @@ class Failure extends \Magento\Backend\App\Action
     {
         $resultRedirect = $this->resultRedirectFactory->create();
         $resultRedirect->setPath('sales/order_create/index');
-        return $resultRedirect; 
+        return $resultRedirect;
     }
- 
 }

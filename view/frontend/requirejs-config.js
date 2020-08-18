@@ -13,6 +13,8 @@ var config = {
             "Magento_Checkout/js/sidebar": "Sapient_Worldpay/js/sidebar",
             "Magento_Checkout/js/proceed-to-checkout": "Sapient_Worldpay/js/proceed-to-checkout",
             "Magento_Checkout/template/minicart/content.html": "Sapient_Worldpay/template/minicart/content.html",
+            "Magento_Checkout/template/payment.html": "Sapient_Worldpay/template/payment.html",
+            "Magento_Checkout/template/payment-methods/list.html": "Sapient_Worldpay/template/payment-methods/list.html",
             "Magento_Checkout/js/view/minicart": "Sapient_Worldpay/js/minicart"
            // "Magento_Checkout/js/view/billing-address": "Sapient_Worldpay/js/view/billing-address",
            // "Magento_Checkout/js/view/billing-address/list": "Magento_Checkout/js/view/billing-address/list"

@@ -4,9 +4,7 @@
  */
 namespace Sapient\Worldpay\Model\Payment\Update;
 
-class Cancelled
-    extends \Sapient\Worldpay\Model\Payment\Update\Base
-    implements \Sapient\Worldpay\Model\Payment\Update
+class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sapient\Worldpay\Model\Payment\Update
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
@@ -14,7 +12,7 @@ class Cancelled
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
-     * @param \Sapient\Worldpay\Helper\Data $configHelper        
+     * @param \Sapient\Worldpay\Helper\Data $configHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Payment\State $paymentState,
@@ -25,7 +23,7 @@ class Cancelled
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
     }
-    public function apply($payment,$order = null)
+    public function apply($payment, $order = null)
     {
         if (!empty($order)) {
             $this->_assertValidPaymentStatusTransition($order, $this->_getAllowedPaymentStatuses());
@@ -34,15 +32,13 @@ class Cancelled
         }
     }
     /**
-     * @return array  
+     * @return array
      */
     protected function _getAllowedPaymentStatuses()
     {
-        return array(
+        return [
             \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION,
             \Sapient\Worldpay\Model\Payment\State::STATUS_AUTHORISED
-        );
+        ];
     }
-
-
 }

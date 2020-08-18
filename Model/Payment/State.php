@@ -3,6 +3,7 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Payment;
+
 /**
  * Describe what can be read from WP's xml response
  */
@@ -48,10 +49,10 @@ interface State
     public function getFullRefundAmount();
     public function isAsyncNotification();
     public function isDirectReply();
-    public function getAAVAddressResultCode();    
+    public function getAAVAddressResultCode();
     public function getAAVPostcodeResultCode();
     public function getAAVCardholderNameResultCode();
     public function getAAVTelephoneResultCode();
     public function getAAVEmailResultCode();
-    public function getCurrency();  
+    public function getCurrency();
 }

@@ -4,9 +4,7 @@
  */
 namespace Sapient\Worldpay\Model\Payment\Update;
 
-class Refunded
-    extends \Sapient\Worldpay\Model\Payment\Update\Base
-    implements \Sapient\Worldpay\Model\Payment\Update
+class Refunded extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sapient\Worldpay\Model\Payment\Update
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
@@ -15,7 +13,7 @@ class Refunded
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
-     * @param \Sapient\Worldpay\Helper\Data $configHelper        
+     * @param \Sapient\Worldpay\Helper\Data $configHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Payment\State $paymentState,
@@ -27,7 +25,7 @@ class Refunded
         $this->_configHelper = $configHelper;
     }
 
-    public function apply($payment,$order = null)
+    public function apply($payment, $order = null)
     {
         $reference = $this->_paymentState->getJournalReference(
             \Sapient\Worldpay\Model\Payment\State::STATUS_REFUNDED
@@ -36,6 +34,4 @@ class Refunded
         $order->refund($reference, $message);
         $this->_worldPayPayment->updateWorldPayPayment($this->_paymentState);
     }
-
-
 }

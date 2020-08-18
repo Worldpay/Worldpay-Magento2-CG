@@ -11,7 +11,6 @@ use Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecureConfig;
  */
 class RedirectOrder
 {
-    const EXPONENT = 2;
     const DYNAMIC3DS_DO3DS = 'do3DS';
     const DYNAMIC3DS_NO3DS = 'no3DS';
     const TOKEN_SCOPE = 'shopper';
@@ -27,6 +26,7 @@ EOD;
     private $amount;
     private $paymentType;
     private $shopperEmail;
+    private $statementNarrative;
     private $acceptHeader;
     private $userAgentHeader;
     private $shippingAddress;
@@ -34,6 +34,9 @@ EOD;
     private $paymentPagesEnabled;
     private $installationId;
     private $hideAddress;
+    private $thirdparty;
+    private $shippingfee;
+    private $exponent;
 
     /**
      * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
@@ -49,13 +52,14 @@ EOD;
      *
      * @param array $args
      */
-    public function __construct(array $args = array())
+    public function __construct(array $args = [])
     {
          $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure();
 
-        $this->tokenRequestConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration($args['tokenRequestConfig']);
+        $this->tokenRequestConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration(
+            $args['tokenRequestConfig']
+        );
         $this->shopperId = $args['shopperId'];
-
     }
 
     /**
@@ -68,6 +72,7 @@ EOD;
      * @param float $amount
      * @param string $paymentType
      * @param $shopperEmail
+     * @param $statementNarrative
      * @param string $acceptHeader
      * @param string $userAgentHeader
      * @param string $shippingAddress
@@ -86,6 +91,7 @@ EOD;
         $amount,
         $paymentType,
         $shopperEmail,
+        $statementNarrative,
         $acceptHeader,
         $userAgentHeader,
         $shippingAddress,
@@ -93,7 +99,10 @@ EOD;
         $paymentPagesEnabled,
         $installationId,
         $hideAddress,
-        $paymentDetails
+        $paymentDetails,
+        $thirdparty,
+        $shippingfee,
+        $exponent
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -102,6 +111,7 @@ EOD;
         $this->amount = $amount;
         $this->paymentType = $paymentType;
         $this->shopperEmail = $shopperEmail;
+        $this->statementNarrative = $statementNarrative;
         $this->acceptHeader = $acceptHeader;
         $this->userAgentHeader = $userAgentHeader;
         $this->shippingAddress = $shippingAddress;
@@ -110,6 +120,9 @@ EOD;
         $this->installationId = $installationId;
         $this->hideAddress = $hideAddress;
         $this->paymentDetails = $paymentDetails;
+        $this->thirdparty = $thirdparty;
+        $this->shippingfee = $shippingfee;
+        $this->exponent = $exponent;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -157,7 +170,7 @@ EOD;
 
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
-        if(isset($this->paymentDetails['paymentType']) && $this->paymentDetails['paymentType'] == "TOKEN-SSL"){            
+        if (isset($this->paymentDetails['paymentType']) && $this->paymentDetails['paymentType'] == "TOKEN-SSL") {
             $this->_addPaymentDetailsElement($order);
         } else {
             $this->_addPaymentMethodMaskElement($order);
@@ -165,9 +178,14 @@ EOD;
         $this->_addShopperElement($order);
         $this->_addShippingElement($order);
         $this->_addBillingElement($order);
+        if (!empty($this->thirdparty)) {
+            $this->_addThirdPartyData($order);
+        }
         $this->_addDynamic3DSElement($order);
         $this->_addCreateTokenElement($order);
-
+        if (!empty($this->statementNarrative)) {
+            $this->_addStatementNarrativeElement($order);
+        }
         return $order;
     }
 
@@ -179,7 +197,11 @@ EOD;
     private function _addDescriptionElement($order)
     {
         $description = $order->addChild('description');
-        $this->_addCDATA($description, $this->orderDescription);
+        if (!empty($this->thirdparty['statement'])) {
+            $this->_addCDATA($description, $this->thirdparty['statement']);
+        } else {
+            $this->_addCDATA($description, $this->orderDescription);
+        }
     }
 
     /**
@@ -191,7 +213,7 @@ EOD;
     {
         $amountElement = $order->addChild('amount');
         $amountElement['currencyCode'] = $this->currencyCode;
-        $amountElement['exponent'] = self::EXPONENT;
+        $amountElement['exponent'] = $this->exponent;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
     }
 
@@ -223,7 +245,13 @@ EOD;
 
         $createTokenElement = $order->addChild('createToken');
         $createTokenElement['tokenScope'] = self::TOKEN_SCOPE;
-
+        if ($this->paymentDetails['token_type']) {
+            $createTokenElement['tokenScope'] = 'merchant';
+            $createTokenElement->addChild(
+                'tokenEventReference',
+                time().'_'.random_int(0, 99999)
+            );
+        }
         if ($this->tokenRequestConfig->getTokenReason($this->orderCode)) {
             $createTokenElement->addChild(
                 'tokenReason',
@@ -245,6 +273,15 @@ EOD;
         $include['code'] = $this->paymentType;
     }
 
+     /**
+      * Add _addStatementNarrativeElement to xml
+      *
+      * @param SimpleXMLElement $order
+      */
+    private function _addStatementNarrativeElement($order)
+    {
+        $order->addChild('statementNarrative', $this->statementNarrative);
+    }
     /**
      * Add shopper and its child tag to xml
      *
@@ -253,14 +290,13 @@ EOD;
     private function _addShopperElement($order)
     {
         $shopper = $order->addChild('shopper');
-        
-
         $shopper->addChild('shopperEmailAddress', $this->shopperEmail);
-
-        if ($this->tokenRequestConfig->istokenizationIsEnabled()) {
-            $shopper->addChild('authenticatedShopperID', $this->shopperId);
-        } elseif (isset($this->paymentDetails['tokenCode'])) {
-            $shopper->addChild('authenticatedShopperID', $this->paymentDetails['customerId']);
+        if (!$this->paymentDetails['token_type']) {
+            if ($this->tokenRequestConfig->istokenizationIsEnabled()) {
+                $shopper->addChild('authenticatedShopperID', $this->shopperId);
+            } elseif (isset($this->paymentDetails['tokenCode'])) {
+                $shopper->addChild('authenticatedShopperID', $this->paymentDetails['customerId']);
+            }
         }
 
         $browser = $shopper->addChild('browser');
@@ -321,8 +357,15 @@ EOD;
      * @param string $city
      * @param string $countryCode
      */
-    private function _addAddressElement($parentElement, $firstName, $lastName, $street, $postalCode, $city, $countryCode)
-    {
+    private function _addAddressElement(
+        $parentElement,
+        $firstName,
+        $lastName,
+        $street,
+        $postalCode,
+        $city,
+        $countryCode
+    ) {
         $address = $parentElement->addChild('address');
 
         $firstNameElement = $address->addChild('firstName');
@@ -361,7 +404,7 @@ EOD;
      */
     private function _amountAsInt($amount)
     {
-        return round($amount, self::EXPONENT, PHP_ROUND_HALF_EVEN) * pow(10, self::EXPONENT);
+        return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
     }
     
     /**
@@ -389,15 +432,33 @@ EOD;
         if (isset($this->paymentDetails['encryptedData'])) {
             $cseElement = $this->_addCseElement($paymentDetailsElement);
         }
-
         $tokenNode = $paymentDetailsElement->addChild($this->paymentDetails['paymentType']);
         $tokenNode['tokenScope'] = self::TOKEN_SCOPE;
-        if(isset($this->paymentDetails['ccIntegrationMode']) && $this->paymentDetails['ccIntegrationMode'] == "redirect" && $this->paymentDetails['paymentPagesEnabled']){
+        if ($this->paymentDetails['token_type']) {
+            $tokenNode['tokenScope'] = 'merchant';
+        }
+        if (isset($this->paymentDetails['ccIntegrationMode']) &&
+            $this->paymentDetails['ccIntegrationMode'] == "redirect" && $this->paymentDetails['paymentPagesEnabled']) {
             $tokenNode['captureCvc'] = "true";
         }
         
         $tokenNode->addChild('paymentTokenID', $this->paymentDetails['tokenCode']);
     }
     
-    
+    protected function _addThirdPartyData($order)
+    {
+        $thirdparty = $order->addChild('thirdPartyData');
+        if (!empty($this->thirdparty['instalment'])) {
+            $thirdparty->addChild('instalments', $this->thirdparty['instalment']);
+        }
+        if ($this->billingAddress['countryCode']=='BR' && !empty($this->shippingfee['shippingfee'])) {
+            $firstinstalment = $thirdparty->addChild('firstInstalment');
+            $firstinstalment = $firstinstalment->addChild('amountNoCurrency');
+            $firstinstalment['value'] =$this->_amountAsInt($this->shippingfee['shippingfee']);
+        }
+        if (!empty($this->thirdparty['cpf'])) {
+            $thirdparty->addChild('cpf', $this->thirdparty['cpf']);
+        }
+        return $thirdparty;
+    }
 }

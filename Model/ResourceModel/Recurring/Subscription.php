@@ -68,7 +68,7 @@ class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
             ['worldpay_subscription_id' => $subscriptionId],
             ['entity_id = ?' => $orderId]
         );
-        $this->updateSubscriptionStatus($orderId,$subscriptionId);
+        $this->updateSubscriptionStatus($orderId, $subscriptionId);
         return $this;
     }
     
@@ -79,14 +79,14 @@ class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      * @param $subscriptionId
      * @return $this
      */
-    public function updateSubscriptionStatus($orderId,$subscriptionId)
+    public function updateSubscriptionStatus($orderId, $subscriptionId)
     {
         $orderStatus = $this->getOrderStatus($orderId);
         $this->getConnection()->update(
             'worldpay_subscriptions',
             ['status' => 'cancel'],
             ['subscription_id = ?' => $subscriptionId]
-        );        
+        );
         return $this;
     }
     
@@ -100,14 +100,14 @@ class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     /**
      * Load subscription detail by $orderIncrementId
      *
-     * @param int $orderIncrementId        
+     * @param int $orderIncrementId
      * @return int $id
      */
     public function loadByOriginalOrderIncrementId($orderIncrementId)
     {
         $table = $this->getMainTable();
         $where = $this->getConnection()->quoteInto("original_order_increment_id = ?", $orderIncrementId);
-        $sql = $this->getConnection()->select()->from($table,array('subscription_id'))->where($where);
+        $sql = $this->getConnection()->select()->from($table, ['subscription_id'])->where($where);
         $id = $this->getConnection()->fetchOne($sql);
         return $id;
     }

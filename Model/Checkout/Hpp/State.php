@@ -39,7 +39,7 @@ class State
     {
         if (!$this->isUninitialised()) {
             throw new \DomainException('Hosted Payment has been already initialised.');
-        } 
+        }
       
         $this->session->setData(self::SESSION_KEY_URL, $redirectUrl);
         $this->session->setData(self::SESSION_KEY_STATE, 'initialised');
@@ -94,5 +94,4 @@ class State
             throw new \DomainException('Hosted Payment has not been initialised.');
         }
     }
-
 }

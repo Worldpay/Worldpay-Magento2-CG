@@ -19,16 +19,20 @@ class ProductSaveAfterActionObserver implements ObserverInterface
      * @var \Magento\Framework\Message\ManagerInterface
      */
     private $messageManager;
+    
+    private $helper;
 
     /**
      * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan\CollectionFactory $plansCollection
      */
     public function __construct(
         \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan\CollectionFactory $plansCollectionFactory,
-        \Magento\Framework\Message\ManagerInterface $messageManager
+        \Magento\Framework\Message\ManagerInterface $messageManager,
+        \Sapient\Worldpay\Helper\GeneralException $helper
     ) {
         $this->plansCollectionFactory = $plansCollectionFactory;
         $this->messageManager = $messageManager;
+        $this->helper = $helper;
     }
 
     /**
@@ -39,6 +43,7 @@ class ProductSaveAfterActionObserver implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
+        
         $request = $observer->getEvent()->getController()->getRequest();
         $plansData = $request->getPost('worldpay_recurring_plans');
         if (is_array($plansData) && isset($plansData['plans']) && is_array($plansData['plans'])) {
@@ -86,7 +91,7 @@ class ProductSaveAfterActionObserver implements ObserverInterface
                     $plan->save();
                 } catch (\Exception $e) {
                     $this->messageManager->addError(
-                        __('Unable to update subscription plan with code %1: %2', $plan->getCode(), $e->getMessage())
+                        __($this->helper->getConfigValue('ACAM10'), $plan->getCode(), $e->getMessage())
                     );
                 }
             }

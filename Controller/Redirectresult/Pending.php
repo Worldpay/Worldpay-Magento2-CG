@@ -17,7 +17,7 @@ class Pending extends \Magento\Framework\App\Action\Action
      * @var Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;
-
+    
     /**
      * Constructor
      *
@@ -42,7 +42,6 @@ class Pending extends \Magento\Framework\App\Action\Action
         $this->checkoutservice = $checkoutservice;
         $this->paymentservice = $paymentservice;
         return parent::__construct($context);
-
     }
 
     public function execute()
@@ -85,7 +84,9 @@ class Pending extends \Magento\Framework\App\Action\Action
             $this->_paymentUpdate->apply($order->getPayment(), $order);
         } catch (\Exception $e) {
             $this->wplogger->error($e->getMessage());
-            throw new \Exception($e->getMessage());
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($e->getMessage())
+            );
         }
     }
 }

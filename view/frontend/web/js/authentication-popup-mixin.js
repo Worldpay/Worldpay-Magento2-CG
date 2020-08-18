@@ -8,11 +8,24 @@ define([
     'Magento_Ui/js/model/messageList'
 ],function ($, customerData, messageList) {
     'use strict';
-
+    
+    function getMyAccountExceptions (exceptioncode){
+                var data=window.MyAccountExceptions;
+                var gendata=JSON.parse(data);
+                for (var key in gendata) {
+                    if (gendata.hasOwnProperty(key)) {  
+                        var cxData=gendata[key];
+                    if(cxData['exception_code'].includes(exceptioncode)){
+                        return cxData['exception_module_messages']?cxData['exception_module_messages']:cxData['exception_messages'];
+                    }
+                    }
+                }
+               
+            }
     var mixin = {
         showModal: function() {
             if(this.shouldDisplayMessage()) {
-                messageList.addSuccessMessage({'message': $.mage.__('You should login or register to buy a subscription.')});
+                messageList.addSuccessMessage({'message': $.mage.__(getMyAccountExceptions('MCAM0'))});
             }
 
             $(this.modalWindow).modal('openModal');

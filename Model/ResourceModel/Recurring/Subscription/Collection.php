@@ -58,8 +58,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected function _construct()
     {
         $this->_init(
-            'Sapient\Worldpay\Model\Recurring\Subscription',
-            'Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription'
+            \Sapient\Worldpay\Model\Recurring\Subscription::class,
+            \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription::class
         );
     }
 
