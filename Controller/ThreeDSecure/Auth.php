@@ -52,6 +52,12 @@ class Auth extends \Magento\Framework\App\Action\Action
         $threeDSecureChallengeConfig = $this->checkoutSession->get3DS2Config();
         $orderId = $this->checkoutSession->getAuthOrderId();
         $iframe = false;
+		$cookie_name = "machine";
+        $cookie_value = "";
+        if(isset($_COOKIE[$cookie_name])) {
+          $cookie_value = $_COOKIE[$cookie_name];
+        }
+        setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
         if($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe'){
             $iframe = true;
         }

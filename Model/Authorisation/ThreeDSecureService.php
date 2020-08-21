@@ -79,6 +79,13 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
 				$this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
 				$this->_abortIfPaymentError($this->_paymentUpdate);
 			}
+			else{
+                $errormessage = "Unfortunately the order cannot be processed now, try again later";
+                $this->wplogger->info($errormessage);
+                $this->_messageManager->addError(__($errormessage?$errormessage:$e->getMessage()));
+                $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true]));
+           return;
+           }
         } catch (Exception $e) {
             $this->wplogger->info($e->getMessage());
             $this->_messageManager->addError(__($e->getMessage()));
