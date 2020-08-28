@@ -237,8 +237,12 @@ class Webpayment extends Template
     public function getChromepayEnabled()
     {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $wpayEnabled = (bool)$this->_scopeConfig->getValue('worldpay/general_config/enable_worldpay', $storeScope);
 
-        return $this->scopeConfig->getValue('worldpay/chromepay_config/chromepay', $storeScope);
+        if ($wpayEnabled) {
+            return $this->scopeConfig->getValue('worldpay/chromepay_config/chromepay', $storeScope);
+        }
+        return false;
     }
      
     public function getPaymentMode()

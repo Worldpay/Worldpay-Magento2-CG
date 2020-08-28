@@ -31,6 +31,12 @@ class OrderInvoicePay implements \Magento\Framework\Event\ObserverInterface
     public function execute(
         \Magento\Framework\Event\Observer $observer
     ) {
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $isWorldpayEnabled = $this->scopeConfig->getValue('worldpay/general_config/enable_worldpay', $storeScope);
+        
+        if (!$isWorldpayEnabled) {
+            return;
+        }
         
         $invoice = $this->_request->getPost();
        
@@ -45,11 +51,9 @@ class OrderInvoicePay implements \Magento\Framework\Event\ObserverInterface
          // check the payment has been captured already or not.
          $wp = $this->worldpaypaymentmodel->loadByPaymentId($order->getIncrementId());
          
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-
         $autoInvoice = $this->scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
         $partialCapture = $this->scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
-         
+             
         //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
         if ($partialCapture && !$autoInvoice) {
            

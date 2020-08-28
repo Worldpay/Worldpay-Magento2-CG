@@ -59,12 +59,13 @@ class Base
 
         if ($existingPaymentStatus == $newPaymentStatus) {
             throw new \Magento\Framework\Exception\AlreadyExistsException(
-            __('same state')
-        );
+                __('same state')
+            );
         }
 
         throw new \Magento\Framework\Exception\AlreadyExistsException(
-            __('invalid state transition'));
+            __('invalid state transition')
+        );
     }
 
     /**
