@@ -43,13 +43,13 @@ ul{
 }
 
 .accepted_cc .paymentoptions-icon-wrapper > div > img {
-max-width: 60px;
+max-width: 65px;
 height: 30px;
 vertical-align: middle;
 }
 
 .paymentmethods-radio-wrapper label img {
-max-width: 60px;
+max-width: 65px;
 }
 
 .checkout-payment-method .payment-method+.payment-method .payment-method-title {

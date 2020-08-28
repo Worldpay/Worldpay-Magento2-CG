@@ -29,12 +29,14 @@ class Auth extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Framework\View\Asset\Repository $assetRepo
+        \Magento\Framework\View\Asset\Repository $assetRepo,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper
     ) {
         $this->wplogger = $wplogger;
         $this->checkoutSession = $checkoutSession;
         $this->_resultPageFactory = $resultPageFactory;
         $this->_assetRepo = $assetRepo;
+        $this->worldpayHelper = $worldpayHelper;
         parent::__construct($context);
     }
 
@@ -48,6 +50,17 @@ class Auth extends \Magento\Framework\App\Action\Action
         $threeDSecureChallengeConfig = $this->checkoutSession->get3DS2Config();
         $orderId = $this->checkoutSession->getAuthOrderId();
         $iframe = false;
+        // Chrome 84 releted updates for 3DS
+        $cookies = $this->worldpayHelper->getWorldpayAuthCookie();
+        $cookie_name = "machine";
+        $matches = [];
+        $cookie = preg_match('/machine=(.*?)\;/s', $cookies, $matches);
+        if (is_array($matches)) {
+            setcookie($cookie_name, $matches[1], time() + 3600, "/");
+        }
+        $phpsessId = $_COOKIE['PHPSESSID'];
+        setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
+        
         if ($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe') {
             $iframe = true;
         }

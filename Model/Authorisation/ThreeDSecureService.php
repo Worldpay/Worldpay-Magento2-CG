@@ -57,14 +57,14 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
     public function continuePost3dSecureAuthorizationProcess($paResponse, $directOrderParams, $threeDSecureParams)
     {
         $directOrderParams['paResponse'] = $paResponse;
-        if(!empty($threeDSecureParams) && $threeDSecureParams->getEchoData()){
+        if (!empty($threeDSecureParams) && $threeDSecureParams->getEchoData()) {
             $directOrderParams['echoData'] = $threeDSecureParams->getEchoData();
         }
         // @setIs3DSRequest flag set to ensure whether it is 3DS request or not.
         // To add cookie for 3DS second request.
         $this->checkoutSession->setIs3DSRequest(true);
         try {
-            if(isset($directOrderParams['echoData'])){
+            if (isset($directOrderParams['echoData'])) {
                 $response = $this->paymentservicerequest->order3DSecure($directOrderParams);
                 $this->response = $this->directResponse->setResponse($response);
                 // @setIs3DSRequest flag is unset from checkout session.
@@ -76,9 +76,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
                 );
                 $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
                 $this->_abortIfPaymentError($this->_paymentUpdate, $orderIncrementId);
-            }
-            else
-            {
+            } else {
                 $errormessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM15');
                 $this->wplogger->info($errormessage);
                 $this->_messageManager->addError(__($errormessage?$errormessage:$e->getMessage()));

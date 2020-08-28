@@ -352,11 +352,18 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
 
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        if (!$this->worlpayhelper->isWorldPayEnable()) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Worldpay Plugin is not available')
+            );
+            return false;
+        }
         
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
         $autoInvoice = $this->_scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
         $partialCapture = $this->_scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
+
  
         //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
         if ($partialCapture && !$autoInvoice) {
@@ -388,6 +395,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
 
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        if (!$this->worlpayhelper->isWorldPayEnable()) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Worldpay Plugin is not available')
+            );
+            return false;
+        }
+        
         $this->_wplogger->info('refund payment model function executed');
         if ($order = $payment->getOrder()) {
             $mageOrder = $payment->getOrder();

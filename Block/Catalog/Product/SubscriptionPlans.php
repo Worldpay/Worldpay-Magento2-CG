@@ -8,6 +8,7 @@ namespace Sapient\Worldpay\Block\Catalog\Product;
 
 use Sapient\Worldpay\Model\Recurring\Plan;
 use Magento\Framework\Serialize\Serializer\Json;
+use Sapient\Worldpay\Helper\Data;
 
 class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
 {
@@ -32,10 +33,12 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
         \Magento\Catalog\Block\Product\Context $context,
         \Sapient\Worldpay\Helper\Recurring $recurringHelper,
         Json $encoder,
+        Data $worldpayHelper,
         array $data = []
     ) {
         $this->recurringHelper = $recurringHelper;
         $this->encoder = $encoder;
+        $this->worldpayHelper = $worldpayHelper;
         parent::__construct($context, $data);
     }
 
@@ -240,6 +243,7 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
     protected function _toHtml()
     {
         if (!($this->getProduct()->isSaleable()
+            && $this->worldpayHelper->isWorldPayEnable()
             && $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/active')
             && $this->isSubscriptionsEnabled()
             && $this->getProduct()->getWorldpayRecurringEnabled()

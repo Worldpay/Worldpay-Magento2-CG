@@ -695,7 +695,7 @@ define(
                     //Saved card handle
                     if((this.intigrationmode == 'direct' && $savedCardForm.validation() && $savedCardForm.validation('isValid') && selectedSavedCardToken) ||
                         (this.intigrationmode == 'redirect' && $form.validation() && $form.validation('isValid') && selectedSavedCardToken)){
-                        var cardType = $("input[name='payment[token_to_use]']:checked").next().val();
+                        var cardType = $("input[name='payment[token_to_use]']:checked").next().next().val();
                         this.isSavedCardPayment=true;
                         this.paymentToken = selectedSavedCardToken;
                         var savedcvv = $('.saved-cvv-number').val();
