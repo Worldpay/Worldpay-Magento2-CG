@@ -984,7 +984,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getSavedCardsCount($customerId)
     {
         $now = new \DateTime();
-        $lastDay = new  \DateInterval(sprintf('P%dD', 1));
+        $lastDay = $now->sub(new \DateInterval(sprintf('P%dD', 1)));
         $savedCards = $this->_savecard->create()->getCollection()
                         ->addFieldToSelect(['id'])
                         ->addFieldToFilter('customer_id', ['eq' => $customerId])
