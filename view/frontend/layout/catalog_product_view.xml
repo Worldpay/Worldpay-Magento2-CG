@@ -10,8 +10,7 @@
         <referenceContainer name="product.info.options.wrapper">
             <block class="Sapient\Worldpay\Block\Catalog\Product\SubscriptionPlans" 
                    name="product.info.worldpay.subscription.options" as="worldpay_subscription_options" 
-                   before="-" template="Sapient_Worldpay::catalog/product/subscription_plans.phtml" cacheable="false" 
-                   ifconfig="worldpay/tokenization/saved_card">
+                   before="-" template="Sapient_Worldpay::catalog/product/subscription_plans.phtml" ifconfig="worldpay/tokenization/saved_card">
                 <block class="Magento\Catalog\Pricing\Render" name="product.price.worldpay.subscription">
                     <arguments>
                         <argument name="price_render" xsi:type="string">product.price.render.default</argument>
