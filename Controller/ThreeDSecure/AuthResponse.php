@@ -65,10 +65,29 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
             $this->wplogger->error($e->getMessage());
             $this->wplogger->error('3DS Failed');
             $this->_messageManager->addError(__($this->helper->getConfigValue('CCAM9')));
-            $this->getResponse()->setRedirect($this->urlBuilders->getUrl('checkout/cart', ['_secure' => true]));
+            if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                $this->checkoutSession->unsInstantPurchaseRedirectUrl();
+                $this->checkoutSession->unsInstantPurchaseOrder();
+                $this->getResponse()->setRedirect($redirectUrl);
+            } else {
+                $this->getResponse()->setRedirect($this->urlBuilders->getUrl('checkout/cart', ['_secure' => true]));
+            }
         }
-        $redirectUrl = $this->checkoutSession->getWpResponseForwardUrl();
-        $this->checkoutSession->unsWpResponseForwardUrl();
-        $this->getResponse()->setRedirect($redirectUrl);
+        if ($this->checkoutSession->getInstantPurchaseOrder()) {
+            $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+            $this->checkoutSession->unsInstantPurchaseRedirectUrl();
+            $this->checkoutSession->unsInstantPurchaseOrder();
+            $message=$this->checkoutSession->getInstantPurchaseMessage();
+            if ($message) {
+                $this->checkoutSession->unsInstantPurchaseMessage();
+                $this->messageManager->addSuccessMessage($message);
+            }
+            $this->getResponse()->setRedirect($redirectUrl);
+        } else {
+            $redirectUrl = $this->checkoutSession->getWpResponseForwardUrl();
+            $this->checkoutSession->unsWpResponseForwardUrl();
+            $this->getResponse()->setRedirect($redirectUrl);
+        }
     }
 }

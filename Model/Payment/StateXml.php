@@ -318,4 +318,63 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
         $statusNode = $this->_getStatusNode();
         return (string) $statusNode->payment->amount['currencyCode'];
     }
+    
+    public function getNetworkUsed()
+    {
+        $statusNode = $this->_getStatusNode();
+        return (string) $statusNode->payment->primeRoutingResponse->networkUsed;
+    }
+    public function getSourceType()
+    {
+        $statusNode = $this->_getStatusNode();
+        if (!empty($statusNode->payment->enhancedAuthResponse)) {
+            return (string) $statusNode->payment->enhancedAuthResponse->fundingSource->sourceType;
+        }
+    }
+    public function getAvailableBalance()
+    {
+        $statusNode = $this->_getStatusNode();
+        if (!empty($statusNode->payment->enhancedAuthResponse)) {
+            return (string) $statusNode->payment->enhancedAuthResponse->fundingSource->availableBalance;
+        }
+    }
+    public function getPrepaidCardType()
+    {
+        $statusNode = $this->_getStatusNode();
+        if (!empty($statusNode->payment->enhancedAuthResponse)) {
+            return (string) $statusNode->payment->enhancedAuthResponse->fundingSource->prepaidCardType;
+        }
+    }
+    public function getReloadable()
+    {
+        $statusNode = $this->_getStatusNode();
+        if (!empty($statusNode->payment->enhancedAuthResponse)) {
+            return (string) $statusNode->payment->enhancedAuthResponse->fundingSource->reloadable;
+        }
+    }
+    public function getCardProductType()
+    {
+        $statusNode = $this->_getStatusNode();
+        return (string) $statusNode->payment->enhancedAuthResponse->cardProductType;
+    }
+    public function getAffluence()
+    {
+        $statusNode = $this->_getStatusNode();
+        return (string) $statusNode->payment->enhancedAuthResponse->affluence;
+    }
+    public function getAccountRangeId()
+    {
+        $statusNode = $this->_getStatusNode();
+        return (string) $statusNode->payment->enhancedAuthResponse->accountRangeId;
+    }
+    public function getIssuerCountry()
+    {
+        $statusNode = $this->_getStatusNode();
+        return (string) $statusNode->payment->enhancedAuthResponse->issuerCountry;
+    }
+    public function getVirtualAccountNumber()
+    {
+        $statusNode = $this->_getStatusNode();
+        return (string) $statusNode->payment->enhancedAuthResponse->virtualAccountNumber;
+    }
 }

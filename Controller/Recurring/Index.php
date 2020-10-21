@@ -17,12 +17,15 @@ class Index extends \Magento\Framework\App\Action\Action
     /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Customer\Model\Session $customerSession,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper
     ) {
         $this->customerSession = $customerSession;
+        $this->worldpayHelper = $worldpayHelper;
         parent::__construct($context);
     }
 
@@ -50,7 +53,7 @@ class Index extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $this->_view->loadLayout();
-        $this->_view->getPage()->getConfig()->getTitle()->set(__('My Subscriptions'));
+        $this->_view->getPage()->getConfig()->getTitle()->set($this->worldpayHelper->getAccountLabelbyCode('AC12'));
         $this->_view->renderLayout();
     }
 }

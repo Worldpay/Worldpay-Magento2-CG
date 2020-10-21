@@ -28,7 +28,7 @@ class AvailabilityChecker implements \Magento\InstantPurchase\PaymentMethodInteg
     {
         if ($this->config->isWorldPayEnable() &&
             $this->config->isCreditCardEnabled() &&
-            $this->config->instantPurchaseEnabled() ) {
+            $this->config->instantPurchaseEnabled()) {
             return true;
         }
          $this->wplogger->info("Instant Purchase is disabled:");

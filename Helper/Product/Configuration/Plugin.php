@@ -41,7 +41,8 @@ class Plugin
         if (in_array($product->getTypeId(), $this->recurringHelper->getAllowedProductTypeIds())) {
             $subscriptionOptions = array_merge(
                 $this->recurringHelper->getSelectedPlanOptionInfo($product),
-                $this->recurringHelper->getSelectedPlanStartDateOptionInfo($product)
+                $this->recurringHelper->getSelectedPlanStartDateOptionInfo($product),
+                $this->recurringHelper->getSelectedPlanEndDateOptionInfo($product)
             );
             return array_merge($subscriptionOptions, $proceed($item));
         }

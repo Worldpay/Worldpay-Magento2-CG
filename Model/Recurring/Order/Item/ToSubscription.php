@@ -97,6 +97,12 @@ class ToSubscription
         ) {
             $subscription->setStartDate($startDate);
         }
+        
+        if (!$subscription->hasEndDate()
+            && ($endDate = $this->recurringHelper->getOrderItemSubscriptionEndDate($item))
+        ) {
+            $subscription->setEndDate($endDate);
+        }
 
         if (!$subscription->hasPlanCode()) {
             $subscription->setPlanCode($plan->getCode());

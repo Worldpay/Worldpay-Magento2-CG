@@ -259,19 +259,19 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                     if ($data['cc_type'] != 'savedcard') {
                         if (!isset($data['cc_exp_year'])) {
                             $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM25');
-                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
                         }
                         if (!isset($data['cc_exp_month'])) {
                             $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM26');
-                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
                         }
                         if (!isset($data['cc_number'])) {
                             $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM27');
-                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
                         }
                         if (!isset($data['cc_name'])) {
                             $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM28');
-                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
                         }
                     }
                 }
@@ -314,6 +314,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $paymentdetails = self::$paymentDetails;
         $integrationType =$this->worlpayhelper->getIntegrationModelByPaymentMethodCode($payment->getMethod(), $storeId);
         if ($paymentdetails['method'] == self::WORLDPAY_WALLETS_TYPE) {
+            $integrationType = 'direct';
+        }
+        if ($paymentdetails['additional_data']['cc_type'] === 'ACH_DIRECT_DEBIT-SSL') {
             $integrationType = 'direct';
         }
         $mode = $this->worlpayhelper->getCcIntegrationMode();
@@ -363,7 +366,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
 
         $autoInvoice = $this->_scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
         $partialCapture = $this->_scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
-
  
         //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
         if ($partialCapture && !$autoInvoice) {
@@ -488,18 +490,18 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     protected function _checkShippingApplicable($quote)
     {
         $type = strtoupper($this->_getpaymentType());
-        if ($type == 'KLARNA-SSL') {
-            $shippingaddress = $quote->getShippingAddress();
-            $billingaddress = $quote->getBillingAddress();
-            $shippingCountryId = $shippingaddress->getCountryId();
-            $countryId = isset($shippingCountryId)?$shippingCountryId:$billingaddress->getCountryId();
-            $paymenttypes = json_decode($this->paymenttypes->getPaymentType($countryId));
-            if (!in_array($type, $paymenttypes)) {
-                throw new \Magento\Framework\Exception\LocalizedException(
-                    __('Payment Type not valid for the shipping country')
-                );
-            }
-        }
+//        if ($type == 'KLARNA-SSL') {
+//            $shippingaddress = $quote->getShippingAddress();
+//            $billingaddress = $quote->getBillingAddress();
+//            $shippingCountryId = $shippingaddress->getCountryId();
+//            $countryId = isset($shippingCountryId)?$shippingCountryId:$billingaddress->getCountryId();
+//            $paymenttypes = json_decode($this->paymenttypes->getPaymentType($countryId));
+//            if (!in_array($type, $paymenttypes)) {
+//                throw new \Magento\Framework\Exception\LocalizedException(
+//                    __('Payment Type not valid for the shipping country')
+//                );
+//            }
+//        }
     }
 
     /**
@@ -545,5 +547,48 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $transaction = $payment->addTransaction(Transaction::TYPE_AUTH);
         $message = $payment->prependMessage($message);
         $payment->addTransactionCommentsToOrder($transaction, $message);
+    }
+    
+    public function canVoidSale($order)
+    {
+
+        $payment = $order->getPayment();
+        $mageOrder = $order->getOrder();
+        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
+        $worldpaydata = $worldPayPayment->getData();
+
+        $paymenttype = $worldPayPayment->getPaymentType();
+        $isPrimeRoutingRequest = $worldPayPayment->getIsPrimeroutingEnabled();
+        if (($paymenttype === 'ACH_DIRECT_DEBIT-SSL' || $isPrimeRoutingRequest)
+                && !($worldPayPayment->getPaymentStatus() === 'VOIDED')) {
+            $xml = $this->paymentservicerequest->voidSale(
+                $payment->getOrder(),
+                $worldPayPayment,
+                $payment->getMethod()
+            );
+            $payment->setTransactionId(time());
+            $this->_response = $this->adminhtmlresponse->parseVoidSaleRespone($xml);
+            if ($this->_response->reply->ok) {
+                return $this;
+            }
+        } else {
+            throw new \Magento\Framework\Exception\LocalizedException(__('The void action is not available.'
+                    . 'Possible reason this was already executed for this order. '
+                    . 'Please check Payment Status below for confirmation.'));
+        }
+    }
+    
+    public function updateOrderStatusForVoidSale($order)
+    {
+        $payment = $order->getPayment();
+        $mageOrder = $order->getOrder();
+        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
+        $paymentStatus = $worldPayPayment->getPaymentStatus();
+       
+        if ($paymentStatus === 'VOIDED') {
+            $mageOrder->setState(\Magento\Sales\Model\Order::STATE_CLOSED, true);
+            $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_CLOSED);
+            $mageOrder->save();
+        }
     }
 }

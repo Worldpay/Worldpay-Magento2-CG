@@ -7,7 +7,7 @@
     <!-- /ko -->
     <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
         <label data-bind="attr: {for: getCode() + '_cc_type'}" class="label">
-            <span><!-- ko i18n: 'Credit Card Type'--><!-- /ko --></span>
+            <span><!-- ko i18n: getCheckoutLabels('CO1')--><!-- /ko --></span> 
         </label>
         <div class="control">
             <!-- ko if: (paymentMethodSelection()=='dropdown')-->
@@ -45,8 +45,9 @@
     <div class="field number required cc-Visibility-Enabled" data-bind="visible: false">
        
         <div class="control ccnumber_withcardtype">
-            <input type="number" placeholder="Credit Card Number" name="payment[cc_number]" class="input-text payment_cc_number" value=""
+            <input type="number" name="payment[cc_number]" class="input-text payment_cc_number" value=""
                    data-bind="attr: {
+                                    placeholder : getCheckoutLabels('CO3'),
                                     autocomplete: off,
                                     id: getCode() + '_cc_number',
                                     title: $t('Credit Card Number'),
@@ -66,8 +67,9 @@
 
     <div class="field name required cc-Visibility-Enabled" data-bind="visible: false">
         <div class="control">
-            <input type="text" placeholder="Card Holder Name" name="payment[cc_name]" class="input-text" value=""
+            <input type="text" name="payment[cc_name]" class="input-text" value=""
                    data-bind="attr: {
+                                    placeholder: getCheckoutLabels('CO4'),
                                     autocomplete: off,
                                     id: getCode() + '_cc_name',
                                     title: $t('Card Holder Name'),
@@ -93,7 +95,7 @@
                                             options: getCcMonthsValues(),
                                             optionsValue: 'value',
                                             optionsText: 'month',
-                                            optionsCaption: $t('Month'),
+                                            optionsCaption: $t(getCheckoutLabels('CO6')),
                                             value: creditCardExpMonth">
                         </select>
                     </div>
@@ -107,7 +109,7 @@
                                            options: getCcYearsValues(),
                                            optionsValue: 'value',
                                            optionsText: 'year',
-                                           optionsCaption: $t('Year'),
+                                           optionsCaption: $t(getCheckoutLabels('CO7')),
                                            value: creditCardExpYear">
                         </select>
                     </div>
@@ -119,12 +121,14 @@
     <div class="field cvv required cc-Visibility-Enabled" data-bind="attr: {id: getCode() + '_cc_type_cvv_div'},visible: false">
       
         <div class="control _with-tooltip">
-            <input type="number" placeholder="CVV" 
+            <input type="number" 
                    autocomplete="off"
                    class="input-text cvv"
                    name="payment[cc_cid]"
                    value=""
-                   data-bind="attr: {id: getCode() + '_cc_cid',
+                   data-bind="attr: {
+                        placeholder: getCheckoutLabels('CO5'),
+                        id: getCode() + '_cc_cid',
                         title: $t('Card Verification Number'),
                         'data-container': getCode() + '-cc-cvv',
                         'data-validate': JSON.stringify({'required-number':true, 'validate-card-cvv':'#' + getCode() + '_cc_type'})},
@@ -151,14 +155,14 @@
                     id: getCode() + '_save_card', title: $t('Save This Card'),
                     'data-container': getCode() + '-save-card'}, value: saveMyCard">
              <label data-bind="attr: {for: getCode() + 'save-card'}" class="label">
-                <span><!-- ko i18n: 'Save This Card'--><!-- /ko --></span> 
+                <span><!-- ko i18n: getCheckoutLabels('CO8')--><!-- /ko --></span> 
                 <!-- ko if: (isStoredCredentialsEnabled() && isDisclaimerMessageEnabled())-->
-                    <span>(<a data-bind="click: disclaimerPopup">Important Disclaimer!</a>)</span>
+                    <span>(<a data-bind="click: disclaimerPopup"><!-- ko i18n: getCheckoutLabels('CO9')--><!-- /ko --></a>)</span>
                 <!-- /ko -->
             </label>
         </div>
     </div>
-    <div id="dialog" style="display: none" align = "center" title="Disclaimer!">
+    <div data-bind="attr: {title: getCheckoutLabels('CO23')}" id="dialog" style="display: none" align = "center" title="">
         <form id="disclaimer" name="disclaimer">
             <div data-bind="html: disclaimerMessage()"></div>
         </form>
@@ -168,7 +172,7 @@
     <!--</div>-->
       <div class="field cpf required cc-Visibility-Enabled">
             <label data-bind="attr: {for: getCode() + '_cpf'},visible: (showCPFSection())" class="label">
-                            <span> CPF/CNPJ  </span>
+                            <span><!-- ko i18n: getCheckoutLabels('CO10')--><!-- /ko --></span> 
                             <!--            <span> ko i18n: 'CPF/CNPJ' /ko </span>-->
                         </label>  
                         <div class="control cc-Visibility-Enabled" data-bind="visible: (showCPFSection())">
@@ -187,7 +191,7 @@
                     </div>
                     <div class="field instalment required cc-Visibility-Enabled">
                         <label data-bind="attr: {for: getCode() + '_instalment'},visible: (showInstalmentSection())" class="label">
-                            <span> Instalment </span>
+                            <span><!-- ko i18n: getCheckoutLabels('CO11')--><!-- /ko --></span> 
                             <!--           <span> ko i18n: 'Instalment' /ko </span>-->
                         </label>  
                         <div class="control cc-Visibility-Enabled" data-bind="visible: (showInstalmentSection())" style=" width:225px;align:'center'">
@@ -202,7 +206,7 @@
                                            options: availableInstalTypes(),
                                            optionsValue: 'instalValue',
                                            optionsText: 'instalccLabel',
-                                           optionsCaption: $t('Instalment'),
+                                           optionsCaption: $t(getCheckoutLabels('CO11')),
                                            title: $t('Instalment'),
                                            value: selectedInstalment">
                             </select>
@@ -210,7 +214,7 @@
                     </div>
                     <div class="field statementnarative required cc-Visibility-Enabled">
                         <label data-bind="attr: {for: getCode() + '_statement'},visible: (showCPFSection() || showInstalmentSection())" class="label">
-                            <span> Purpose of transaction </span>
+                            <span><!-- ko i18n: getCheckoutLabels('CO12')--><!-- /ko --></span> 
                             <!--            <span> ko i18n: 'Purpose of transaction' /ko </span>-->
                         </label>
                     <div class="control cc-Visibility-Enabled" data-bind="visible: (showCPFSection() || showInstalmentSection())">
@@ -235,11 +239,13 @@
     <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
     <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
         <!-- ko if: (getSavedCardsCount() > 0)-->
-            <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
+<!--        <h4> ko i18n: 'Saved cards' /ko </h4>-->
+            <h4><!-- ko i18n: getCheckoutLabels('CO25')--><!-- /ko --></h4>
             <!-- ko template: 'Sapient_Worldpay/payment/saved-card-form' --><!-- /ko -->
         <!-- /ko -->
         <!-- ko ifnot: (getSavedCardsCount() > 0)-->
-            <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
+            <h4><!-- ko i18n: getCheckoutLabels('CO25')--><!-- /ko --></h4>
+<!--            <h4> ko i18n: 'Saved cards' /ko </h4>-->
             <span><!-- ko i18n: 'You have no Saved Card.'--><!-- /ko --></span>
         <!-- /ko -->
     </fieldset>

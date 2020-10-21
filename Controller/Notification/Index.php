@@ -142,8 +142,6 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     private function _applyTokenUpdate($xmlRequest)
     {
-        $this->wplogger->info('##########_applyTokenUpdate##########');
-        $this->wplogger->info($this->_order->getOrder()->getCustomerId());
         $tokenService = $this->worldpaytoken;
         $tokenService->updateOrInsertToken(
             new \Sapient\Worldpay\Model\Token\StateXml($xmlRequest),

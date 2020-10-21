@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright  Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp/etc/csp_whitelist.xsd">
+	<policies>
+		<policy id="script-src">
+	        <values>
+                <value id="payment-shim" type="host">https://storage.googleapis.com/prshim/v1/payment-shim.js</value>
+	            <value id="google-recaptcha" type="host">https://www.google.com/recaptcha/api.js</value>
+                <value id="gstatic" type="host">*.gstatic.com</value>
+                <value id="cloudflare" type="host">*.cloudflare.com</value>
+                <value id="google-pay" type="host">https://pay.google.com/gp/p/js/pay.js</value>
+                <value id="google-analytics" type="host">www.google-analytics.com</value>
+                <value id="wpay-cse" type="host">https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.2.min.js</value>
+	        </values>
+    	</policy>
+    	<policy id="style-src">
+    		<values>
+                <value id="cloudflare" type="host">*.cloudflare.com</value>
+            </values>
+    	</policy>
+    	<policy id="img-src">
+            <values>
+            	<value id="cloudflare" type="host">*.cloudflare.com</value>
+            	<value id="gstatic" type="host">*.gstatic.com</value>
+            	<value id="google-analytics" type="host">www.google-analytics.com</value>
+            </values>
+        </policy>
+        <policy id="frame-src">
+            <values>
+            	<value id="google-pay" type="host">https://pay.google.com</value>
+                <value id="worldpay-pay" type="host">https://secure-test.worldpay.com</value>
+            </values>
+        </policy>
+        <policy id="form-action">
+            <values>
+                <value id="secure-test.worldpay.com" type="host">https://secure-test.worldpay.com/shopper/3ds/ddc.html</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>

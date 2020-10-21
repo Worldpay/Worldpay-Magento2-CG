@@ -158,13 +158,13 @@ function (
                    
                    if(wallets_APPLEPAY) {
                        //document.getElementById("wallets_APPLEPAY-SSL").style.display = "block";
-                       document.getElementById("wallets_APPLEPAY-SSL").style.display = "inline";
+                       document.getElementById("wallets_APPLEPAY-SSL").style.display = "table-cell";
                    }
                    if(wallets_image_APPLEPAY) {
-                       document.getElementById("wallets_image_APPLEPAY-SSL").style.display = "inline";
+                       document.getElementById("wallets_image_APPLEPAY-SSL").style.display = "table-cell";
                    }
                    if(wallets_label_APPLEPAY) {
-                       document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "inline";
+                       document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "table-cell";
                    }
                   
                      

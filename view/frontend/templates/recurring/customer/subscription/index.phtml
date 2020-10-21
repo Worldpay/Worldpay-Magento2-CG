@@ -14,14 +14,17 @@
             <caption class="table-caption"><?php echo $block->escapeHtml(__('Subscriptions')) ?></caption>
             <thead>
             <tr>
-                <th scope="col" class="col original-order-id"><?php echo $block->escapeHtml(__('Original Order #')) ?></th>
-                <th scope="col" class="col original-order-date"><?php echo $block->escapeHtml(__('Original Order Date')) ?></th>
-                <th scope="col" class="col product"><?php echo $block->escapeHtml(__('Product')) ?></th>
-                <th scope="col" class="col interval-amount"><?php echo $block->escapeHtml(__('Amount')) ?></th>
-                <th scope="col" class="col interval"><?php echo $block->escapeHtml(__('Interval')) ?></th>
-                <th scope="col" class="col start-date"><?php echo $block->escapeHtml(__('Start Date')) ?></th>
-                <th scope="col" class="col status"><?php echo $block->escapeHtml(__('Status')) ?></th>
-                <th scope="col" class="col actions"><?php echo $block->escapeHtml(__('Actions')) ?></th>
+                <th scope="col" class="col original-order-id"><?php echo $block->escapeHtml($block->getMyAccountLabels('AC13')) ?></th>
+                <th scope="col" class="col original-order-date"><?php echo $block->escapeHtml($block->getMyAccountLabels('AC14')) ?></th>
+                <th scope="col" class="col product"><?php echo $block->escapeHtml($block->getMyAccountLabels('AC15')) ?></th>
+                <th scope="col" class="col interval-amount"><?php echo $block->escapeHtml($block->getMyAccountLabels('AC16')) ?></th>
+                <th scope="col" class="col interval"><?php echo $block->escapeHtml($block->getMyAccountLabels('AC17')) ?></th>
+                <th scope="col" class="col start-date"><?php echo $block->escapeHtml($block->getMyAccountLabels('AC18')) ?></th>
+                <?php if ($block->isEndDateEnabled()): ?>
+                <th scope="col" class="col start-date"><?php echo $block->escapeHtml($block->getMyAccountLabels('AC19')) ?></th>
+                <?php endif; ?>
+                <th scope="col" class="col status"><?php echo $block->escapeHtml($block->getMyAccountLabels('AC20')) ?></th>
+                <th scope="col" class="col actions"><?php echo $block->escapeHtml($block->getMyAccountLabels('AC21')) ?></th>
             </tr>
             </thead>
             <tbody>
@@ -37,11 +40,15 @@
                     <td data-th="<?php echo $block->escapeHtml(__('Interval')) ?>" class="col interval"><?php echo $block->escapeHtml($block->getSubscriptionIntervalLabel($subscription)) ?></td>
                     <td data-th="<?php echo $block->escapeHtml(__('Start Date')) ?>" class="col start-date"><?php /* @noEscape */
                         echo $block->formatDate($subscription->getStartDate(), \IntlDateFormatter::SHORT, false, date_default_timezone_get()) ?></td>
+                    <?php if ($block->isEndDateEnabled()): ?>
+                    <td data-th="<?php echo $block->escapeHtml(__('End Date')) ?>" class="col end-date"><?php /* @noEscape */
+                        echo $block->formatDate($subscription->getEndDate(), \IntlDateFormatter::SHORT, false, date_default_timezone_get()) ?></td>
+                    <?php endif; ?>
                     <td data-th="<?php echo $block->escapeHtml(__('Status')) ?>" class="col status"><?php echo $block->escapeHtml($subscription->getStatusLabel()) ?></td>
                     <td data-th="<?php echo $block->escapeHtml(__('Actions')) ?>" class="col actions">
                         <?php if($subscription->getStatus() == 'active') : ?>
-                            <a href="<?php echo $block->getEditUrl($subscription); ?>" class="action edit"><span><?php echo __('Edit') ?></span></a>
-                            <a href="javascript:void(0)" data-cancel-url="<?php echo $block->getCancelUrl($subscription); ?>" class="action delete"><span><?php echo __('Cancel') ?></span></a>
+                            <a href="<?php echo $block->getEditUrl($subscription); ?>" class="action edit"><span><?php echo $block->getMyAccountLabels('AC22') ?></span></a>
+                            <a href="javascript:void(0)" data-cancel-url="<?php echo $block->getCancelUrl($subscription); ?>" class="action delete"><span><?php echo $block->getMyAccountLabels('AC23') ?></span></a>
                         <?php endif; ?>
                     </td>
                 </tr>

@@ -67,6 +67,20 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
         }
         return $this->subscriptionCollection;
     }
+     /**
+      * Check is subscriptions functionality enabled end date globally
+      *
+      * @return bool
+      */
+    public function isEndDateEnabled()
+    {
+        return $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/endDate');
+    }
+    
+    public function getMyAccountLabels($labelCode)
+    {
+        return $this->recurringHelper->getAccountLabelbyCode($labelCode);
+    }
     
     /**
      * Prepare layout (initialise pagination block)
@@ -141,7 +155,7 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
     {
         return $this->getUrl('worldpay/recurring/edit', ['subscription_id'=>$subscription->getId(), '_secure' => true]);
     }
-
+    
     /**
      * @param Subscription $subscription
      * @return string

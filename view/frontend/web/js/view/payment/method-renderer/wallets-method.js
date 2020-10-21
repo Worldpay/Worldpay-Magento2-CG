@@ -16,9 +16,10 @@ define(
         'Magento_Checkout/js/model/url-builder',
         'mage/storage',
         'Magento_Checkout/js/model/full-screen-loader',
-        'googlePay'
+        'googlePay',
+        'samsungPay'
     ],
-    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, googlePay) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, googlePay, samsungPay) {
         'use strict';
         var ccTypesArr = ko.observableArray([]);        
         
@@ -28,6 +29,11 @@ define(
         var appleResponse = "";
         var paymentToken = "";
         var merchantId = '';
+        var response = '';
+        var response1 = '';
+
+  
+        
         if(window.checkoutConfig.payment.general.environmentMode == 'PRODUCTION'){
             merchantId = "merchantId:"+window.checkoutConfig.payment.ccform.googleMerchantid;
         }
@@ -46,13 +52,13 @@ define(
 
                     if(wallets_APPLEPAY) {
                        //document.getElementById("wallets_APPLEPAY-SSL").style.display = "block";
-                       document.getElementById("wallets_APPLEPAY-SSL").style.display = "inline";
+                       document.getElementById("wallets_APPLEPAY-SSL").style.display = "table-cell";
                     }
                     if(wallets_image_APPLEPAY) {
-                       document.getElementById("wallets_image_APPLEPAY-SSL").style.display = "inline";
+                       document.getElementById("wallets_image_APPLEPAY-SSL").style.display = "table-cell";
                     }
                     if(wallets_label_APPLEPAY) {
-                       document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "inline";
+                       document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "table-cell";
                     }
                 }
             }); 
@@ -190,6 +196,17 @@ define(
             availableCCTypes : function(){
                return ccTypesArr;
             },
+             getCheckoutLabels: function (labelcode) {
+                    var ccData = window.checkoutConfig.payment.ccform.checkoutlabels;
+                    for (var key in ccData) {
+                        if (ccData.hasOwnProperty(key)) {
+                            var cxData = ccData[key];
+                            if (cxData['wpay_label_code'].includes(labelcode)) {
+                                return cxData['wpay_custom_label'] ? cxData['wpay_custom_label'] : cxData['wpay_label_desc'];
+                            }
+                        }
+                    }
+                },
             selectedCCType : ko.observable(),
             //paymentToken:ko.observable(),
 
@@ -340,10 +357,46 @@ define(
                     }
 
                     session.begin();
-                } //esle end       
+                }  else if (this.getselectedCCType()=='SAMSUNGPAY-SSL') {
+                    console.log('Initiating Samsung Pay......');
+
+                var quoteId = window.checkoutConfig.quoteData.entity_id;
+                    
+                    var linkUrl = url.build('worldpay/samsungpay/index?quoteId=' + quoteId);                         
+                        var xhttp = new XMLHttpRequest();
+                        xhttp.open("GET", linkUrl, false);
+                         
+                        xhttp.send(); 
+                        
+                        var response = JSON.parse(xhttp.responseText);                        
+                        
+                         response1 = JSON.parse(response); 
+                         
+                         if(response1.resultMessage == 'SUCCESS') {
+                             self.placeOrder();           
+                           
+                         }
+
+                } //else if end
             },
-            afterPlaceOrder: function (data, event) {
-            window.location.replace(url.build('worldpay/wallets/success'));
+            afterPlaceOrder: function (data, event) { 
+              
+              if (this.getselectedCCType()=='SAMSUNGPAY-SSL') {
+                var cancel = url.build('worldpay/samsungpay/CallBack');
+                var serviceId = window.checkoutConfig.payment.ccform.samsungServiceId;
+ 
+                var callback = url.build('worldpay/samsungpay/CallBack');
+                var countryCode = window.checkoutConfig.defaultCountryId;
+               
+               console.log('Authentication is success, Redirecting to Samsung Payment Page......');
+               
+                  SamsungPay.connect(
+                        response1.id, response1.href, serviceId, callback, cancel, countryCode,
+                        response1.encInfo.mod, response1.encInfo.exp, response1.encInfo.keyId
+                        ); 
+            }else{
+             window.location.replace(url.build('worldpay/wallets/success'));
+            }
         }
     }); //return ends
            

@@ -23,6 +23,8 @@ use Sapient\Worldpay\Model\Config\Source\SubscriptionStatus;
  * @method \Sapient\Worldpay\Model\Recurring\Subscription setIntervalAmount(float $value)
  * @method string getStartDate()
  * @method \Sapient\Worldpay\Model\Recurring\Subscription setStartDate(string $value)
+ * @method string getEndDate()
+ * @method \Sapient\Worldpay\Model\Recurring\Subscription setEndDate(string $value)
  * @method int getWorldpaySubscriptionId()
  * @method \Sapient\Worldpay\Model\Recurring\Subscription setWorldpaySubscriptionId(int $value)
  * @method int getCustomerId()
@@ -31,6 +33,10 @@ use Sapient\Worldpay\Model\Config\Source\SubscriptionStatus;
  * @method \Sapient\Worldpay\Model\Recurring\Subscription setOriginalOrderId(int $value)
  * @method string getOriginalOrderIncrementId()
  * @method \Sapient\Worldpay\Model\Recurring\Subscription setOriginalOrderIncrementId(string $value)
+ * @method string getWorldpayOrderId()
+ * @method \Sapient\Worldpay\Model\Recurring\Subscription setWorldpayOrderId(string $value)
+ * @method string getWorldpayTokenId()
+ * @method \Sapient\Worldpay\Model\Recurring\Subscription setWorldpayTokenId(string $value)
  * @method int getProductId()
  * @method \Sapient\Worldpay\Model\Recurring\Subscription setProductId(int $value)
  * @method string getProductName()
@@ -182,6 +188,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory,
         \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\CollectionFactory
         $addressCollectionFactory,
+        \Sapient\Worldpay\Helper\Recurring $recurringHelper,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder,
@@ -195,6 +202,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $this->storeManager = $storeManager;
         $this->statusSource = $statusSource;
         $this->planFactory = $planFactory;
+        $this->recurringHelper = $recurringHelper;
         $this->addressCollectionFactory = $addressCollectionFactory;
         $this->orderRepository = $orderRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
@@ -722,6 +730,16 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         return $this;
     }
     
+     /**
+      * Check is subscriptions functionality enabled globally and product is of supported type
+      *
+      * @return bool
+      */
+    public function isEndDateEnabled()
+    {
+        return $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/endDate');
+    }
+    
     /**
      * Update recurring transactions data
      *
@@ -733,15 +751,19 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         if ($this->getStartDate()) {
             $startDate = $this->getStartDate();
         }
-       
-        $date = $this->getStartDate();
+        $endDate = '';
+        if ($this->getEndDate()) {
+            $endDate = $this->getEndDate();
+        } else {
+             $endDate = $this->getStartDate();
+        }
         $transactionData = ['subscription_id'=>$this->getId(),
                 'customer_id'   =>  $this->getCustomerId(),
                 'original_order_id' =>  $this->getOriginalOrderId(),
                 'original_order_increment_id'   =>  $this->getOriginalOrderIncrementId(),
                 'plan_id'   =>  $this->getPlanId(),
                 'recurring_date'   =>  $startDate,
-                'recurring_end_date'   =>  $date,
+                'recurring_end_date'   =>  $endDate,
                 'email'=>$this->getCustomerEmail(),
                 'status'=>'active',
                 'recurring_order_id' => $this->getOriginalOrderId()];
@@ -750,9 +772,12 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $transactions->setData('subscription_id', $this->getId());
         $transactions->setData('customer_id', $this->getCustomerId());
         $transactions->setData('original_order_id', $this->getOriginalOrderId());
+        //$transactions->setData('worldpay_token_id', $this->getWorldpayTokenId());
+        //$transactions->setData('worldpay_order_id', $this->getWorldpayOrderId());
+        $transactions->setData('original_order_increment_id', $this->getOriginalOrderIncrementId());
         $transactions->setData('plan_id', $this->getPlanId());
         $transactions->setData('recurring_date', $startDate);
-        $transactions->setData('recurring_end_date', $date);
+        $transactions->setData('recurring_end_date', $endDate);
         $transactions->setData('email', $this->getCustomerEmail());
         $transactions->setData('status', 'active');
         $transactions->setData('recurring_order_id', $this->getOriginalOrderId());

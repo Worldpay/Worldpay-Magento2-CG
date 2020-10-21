@@ -52,7 +52,8 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
                     __('Saved cards not found')
                 );
         }
-        if (!empty($checkoutpaymentdata['additional_data']['tokenCode']) && !$this->_isRedirectIntegrationModeEnabled($storeId)) {
+        if (!empty($checkoutpaymentdata['additional_data']['tokenCode'])
+                && !$this->_isRedirectIntegrationModeEnabled($storeId)) {
             return $this->tokenservice;
         }
         if ($this->_isRedirectIntegrationModeEnabled($storeId)) {

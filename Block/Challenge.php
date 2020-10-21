@@ -63,6 +63,7 @@ class Challenge extends \Magento\Framework\View\Element\Template
         $data['threeDSecureChallengeParams'] =  $this->checkoutSession->get3Ds2Params();
         $data['orderId'] = $this->checkoutSession->getAuthOrderId();
         $data['redirectUrl'] = $this->getUrl('worldpay/threedsecure/challengeredirectresponse', ['_secure' => true]);
+        
         //$data['redirectUrl'] = $this->getUrl('worldpay/threedsecure/challengeauthresponse', ['_secure' => true]);
         return $data;
     }

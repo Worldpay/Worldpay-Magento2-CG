@@ -28,6 +28,7 @@ interface State
     const STATUS_INFORMATION_SUPPLIED = 'INFORMATION_SUPPLIED';
     const STATUS_INFORMATION_REQUESTED = 'INFORMATION_REQUESTED';
     const STATUS_REFUNDED_BY_MERCHANT = 'REFUNDED_BY_MERCHANT';
+    const STATUS_VOIDED = 'VOIDED';
    
     public function getPaymentStatus();
     public function getOrderCode();
@@ -55,4 +56,14 @@ interface State
     public function getAAVTelephoneResultCode();
     public function getAAVEmailResultCode();
     public function getCurrency();
+    public function getNetworkUsed();
+    public function getSourceType();
+    public function getAvailableBalance();
+    public function getPrepaidCardType();
+    public function getReloadable();
+    public function getCardProductType();
+    public function getAffluence();
+    public function getAccountRangeId();
+    public function getIssuerCountry();
+    public function getVirtualAccountNumber();
 }

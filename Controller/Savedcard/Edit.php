@@ -36,12 +36,14 @@ class Edit extends \Magento\Framework\App\Action\Action
         Context $context,
         PageFactory $resultPageFactory,
         SavedTokenFactory $savecard,
-        Session $customerSession
+        Session $customerSession,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper
     ) {
         parent::__construct($context);
         $this->_resultPageFactory = $resultPageFactory;
         $this->savecard = $savecard;
         $this->customerSession = $customerSession;
+        $this->worldpayHelper = $worldpayHelper;
     }
 
     public function execute()
@@ -59,7 +61,7 @@ class Edit extends \Magento\Framework\App\Action\Action
                 $this->_redirect('404notfound');
                 return;
             }
-            $resultPage->getConfig()->getTitle()->set(__('Update Saved Card'));
+            $resultPage->getConfig()->getTitle()->set($this->worldpayHelper->getAccountLabelbyCode('AC7'));
             return $resultPage;
         } else {
             $this->_redirect('404notfound');

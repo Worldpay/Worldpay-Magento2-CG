@@ -34,10 +34,12 @@ class Edit extends \Magento\Framework\View\Element\Template
         \Magento\Backend\Block\Template\Context $context,
         \Sapient\Worldpay\Model\SavedTokenFactory $savecard,
         \Magento\Customer\Model\Session $customerSession,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper,
         array $data = []
     ) {
         $this->_savecard = $savecard;
         $this->_customerSession = $customerSession;
+        $this->worldpayHelper = $worldpayHelper;
         parent::__construct($context, $data);
     }
 
@@ -75,6 +77,15 @@ class Edit extends \Magento\Framework\View\Element\Template
         return self::$_months;
     }
 
+    public function getAccountLabelbyCode($labelCode)
+    {
+        return $this->worldpayHelper->getAccountLabelbyCode($labelCode);
+    }
+    
+    public function getCheckoutLabelbyCode($labelCode)
+    {
+        return $this->worldpayHelper->getCheckoutLabelbyCode($labelCode);
+    }
     /**
      * Helps to build year html dropdown
      *

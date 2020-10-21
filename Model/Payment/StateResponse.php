@@ -303,4 +303,46 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     {
         return null;
     }
+    
+    public function getNetworkUsed()
+    {
+        return null;
+    }
+    
+    public function getSourceType()
+    {
+        return null;
+    }
+    public function getAvailableBalance()
+    {
+        return null;
+    }
+    public function getPrepaidCardType()
+    {
+        return null;
+    }
+    public function getReloadable()
+    {
+        return null;
+    }
+    public function getCardProductType()
+    {
+        return null;
+    }
+    public function getAffluence()
+    {
+        return null;
+    }
+    public function getAccountRangeId()
+    {
+        return null;
+    }
+    public function getIssuerCountry()
+    {
+        return null;
+    }
+    public function getVirtualAccountNumber()
+    {
+        return null;
+    }
 }

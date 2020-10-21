@@ -164,6 +164,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                         ->isDisclaimerMessageMandatory();
                 $config['payment']['ccform']['apmtitle'] = $this->getApmtitle();
                 $config['payment']['ccform']['walletstitle'] = $this->getWalletstitle();
+                $config['payment']['ccform']['samsungServiceId'] = $this->getSamsungServiceId();
                 $config['payment']['ccform']['paymentMethodSelection'] = $this->getPaymentMethodSelection();
                 $config['payment']['ccform']['paymentTypeCountries'] = $this->
                         paymentmethodutils->getPaymentTypeCountries();
@@ -220,7 +221,15 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['isCPFEnabled'] = $this->worldpayHelper->isCPFEnabled();
                 $config['payment']['ccform']['isInstalmentEnabled'] = $this->worldpayHelper->isInstalmentEnabled();
                 $config['payment']['ccform']['latAmCountries'] = $this->worldpayHelper->getConfigCountries();
-    
+                //ACH Pay
+                $config['payment']['ccform']['achdetails'] = $this->worldpayHelper->getACHDetails();
+                //Prime Routing
+                $config['payment']['ccform']['isPrimeRoutingEnabled'] = $this->worldpayHelper->isPrimeRoutingEnabled();
+                
+                // Custom label configuration
+                $config['payment']['ccform']['myaccountlabels'] = $this->getMyAccountLabels();
+                $config['payment']['ccform']['checkoutlabels'] = $this->getCheckoutLabels();
+                $config['payment']['ccform']['adminlabels'] = $this->getAdminLabels();
             }
         }
         return $config;
@@ -232,8 +241,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     public function getSaveCardList()
     {
         $savedCardsList = [];
+        $isSavedCardEnabled = $this->getIsSaveCardAllowed();
         $tokenType = $this->worldpayHelper->getMerchantTokenization() ? 'merchant' : 'shopper';
-        if ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn()) {
+        if ($isSavedCardEnabled && ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn())) {
             $savedCardsList = $this->savedTokenFactory->create()->getCollection()
             ->addFieldToFilter('customer_id', $this->customerSession->getCustomerId())
             ->addFieldToFilter('token_type', $tokenType)->getData();
@@ -266,10 +276,12 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     public function getCcTypes($paymentconfig = "cc_config")
     {
         $options = $this->worldpayHelper->getCcTypes($paymentconfig);
-        if (!empty($this->getSaveCardList()) || !empty($this->
-                getSaveCardListForAdminOrder($this->adminquotesession->getCustomerId()))) {
-             $options['savedcard'] = 'Use Saved Card';
+        $isSavedCardEnabled = $this->getIsSaveCardAllowed();
+        if ($isSavedCardEnabled && (!empty($this->getSaveCardList()) || !empty($this->
+                getSaveCardListForAdminOrder($this->adminquotesession->getCustomerId())))) {
+             $options['savedcard'] = $this->worldpayHelper->getCheckoutLabelbyCode('CO13');
         }
+        
         return $options;
     }
 
@@ -357,6 +369,14 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     {
         return $this->worldpayHelper->getWalletstitle();
     }
+    
+    /**
+     * @return String
+     */
+    public function getSamsungServiceId()
+    {
+        return $this->worldpayHelper->getSamsungServiceId();
+    }
 
     /**
      * @return boolean
@@ -388,7 +408,6 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
         return $savedCardsList;
     }
-    
    
     public function getApmIdealBankList()
     {
@@ -399,7 +418,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
         return [];
     }
-
+    
     public function getIcons()
     {
         if (!empty($this->icons)) {
@@ -531,5 +550,70 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         } else {
             return [];
         }
+    }
+    
+    public function getSaveCardListForMyAccount()
+    {
+        $savedCardsList = [];
+        $tokenType = $this->worldpayHelper->getMerchantTokenization() ? 'merchant' : 'shopper';
+        if ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn()) {
+            $savedCardsList = $this->savedTokenFactory->create()->getCollection()
+            ->addFieldToFilter('customer_id', $this->customerSession->getCustomerId())
+            ->addFieldToFilter('token_type', $tokenType)->getData();
+        }
+        return $savedCardsList;
+    }
+    
+    public function getMyAccountLabels()
+    {
+        $generaldata=$this->unserializeValue($this->worldpayHelper->getMyAccountLabels());
+        $result=[];
+        $data=[];
+        if (is_array($generaldata) || is_object($generaldata)) {
+            foreach ($generaldata as $key => $value) {
+
+                $result['wpay_label_code']=$key;
+                $result['wpay_label_desc'] = $value['wpay_label_desc'];
+                $result['wpay_custom_label'] = $value['wpay_custom_label'];
+                array_push($data, $result);
+            
+            }
+        }
+        return $data;
+    }
+    
+    public function getCheckoutLabels()
+    {
+        $generaldata=$this->unserializeValue($this->worldpayHelper->getCheckoutLabels());
+        $result=[];
+        $data=[];
+        if (is_array($generaldata) || is_object($generaldata)) {
+            foreach ($generaldata as $key => $value) {
+
+                $result['wpay_label_code']=$key;
+                $result['wpay_label_desc'] = $value['wpay_label_desc'];
+                $result['wpay_custom_label'] = $value['wpay_custom_label'];
+                array_push($data, $result);
+            
+            }
+        }
+        return $data;
+    }
+    public function getAdminLabels()
+    {
+        $generaldata=$this->unserializeValue($this->worldpayHelper->getAdminLabels());
+        $result=[];
+        $data=[];
+        if (is_array($generaldata) || is_object($generaldata)) {
+            foreach ($generaldata as $key => $value) {
+
+                $result['wpay_label_code']=$key;
+                $result['wpay_label_desc'] = $value['wpay_label_desc'];
+                $result['wpay_custom_label'] = $value['wpay_custom_label'];
+                array_push($data, $result);
+            
+            }
+        }
+        return $data;
     }
 }

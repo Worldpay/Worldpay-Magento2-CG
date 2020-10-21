@@ -80,9 +80,15 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
                 $errormessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM15');
                 $this->wplogger->info($errormessage);
                 $this->_messageManager->addError(__($errormessage?$errormessage:$e->getMessage()));
-                $this->checkoutSession->setWpResponseForwardUrl(
-                    $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
-                );
+                if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                    $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                    $this->checkoutSession->unsInstantPurchaseMessage();
+                    $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+                } else {
+                    $this->checkoutSession->setWpResponseForwardUrl(
+                        $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
+                    );
+                }
                 return;
             }
         } catch (Exception $e) {
@@ -92,9 +98,15 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
                 $errormessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM23');
             }
             $this->_messageManager->addError(__($errormessage?$errormessage:$e->getMessage()));
-            $this->checkoutSession->setWpResponseForwardUrl(
-                $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
-            );
+            if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                    $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                    $this->checkoutSession->unsInstantPurchaseMessage();
+                    $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+            } else {
+                $this->checkoutSession->setWpResponseForwardUrl(
+                    $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
+                );
+            }
             return;
         }
     }
@@ -124,14 +136,26 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
             $responseMessage = !empty($message) ? $message :
             $this->paymentservicerequest->getCreditCardSpecificException('CCAM9');
             $this->_messageManager->addError(__($responseMessage));
-             $this->checkoutSession->setWpResponseForwardUrl(
-                 $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
-             );
+            if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                $this->checkoutSession->unsInstantPurchaseMessage();
+                $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+            } else {
+                $this->checkoutSession->setWpResponseForwardUrl(
+                    $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
+                );
+            }
         } elseif ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
             $this->_messageManager->addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM9')));
-            $this->checkoutSession->setWpResponseForwardUrl(
-                $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
-            );
+            if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                $this->checkoutSession->unsInstantPurchaseMessage();
+                $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+            } else {
+                $this->checkoutSession->setWpResponseForwardUrl(
+                    $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
+                );
+            }
         } else {
             $this->orderservice->removeAuthorisedOrder();
             $this->_handleAuthoriseSuccess();

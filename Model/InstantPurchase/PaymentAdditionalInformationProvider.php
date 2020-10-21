@@ -11,9 +11,14 @@ use Sapient\Worldpay\Logger\WorldpayLogger;
 class PaymentAdditionalInformationProvider implements PaymentAdditionalInformationProviderInterface
 {
 
-    public function __construct(WorldpayLogger $logger)
-    {
+    public function __construct(
+        WorldpayLogger $logger,
+        \Magento\Framework\Session\SessionManagerInterface $session,
+        \Magento\Checkout\Model\Session $checkoutSession
+    ) {
         $this->logger = $logger;
+        $this->session = $session;
+         $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -22,10 +27,23 @@ class PaymentAdditionalInformationProvider implements PaymentAdditionalInformati
     public function getAdditionalInformation(PaymentTokenInterface $paymentToken): array
     {
         $vaultCardDetails = json_decode($paymentToken->getDetails());
-        return [
+        $dfId = $this->checkoutSession->getDfReferenceId();
+        if ($dfId === null) {
+            return [
             'cc_type' => $vaultCardDetails->type,
             'card_brand' => str_replace('-SSL', '', $vaultCardDetails->type),
             'token' => $paymentToken->getGatewayToken(),
-        ];
+            
+            ];
+        } else {
+            $this->checkoutSession->unsDfReferenceId();
+            return [
+            'cc_type' => $vaultCardDetails->type,
+            'card_brand' => str_replace('-SSL', '', $vaultCardDetails->type),
+            'token' => $paymentToken->getGatewayToken(),
+            'dfReferenceId' => $dfId,
+            
+            ];
+        }
     }
 }

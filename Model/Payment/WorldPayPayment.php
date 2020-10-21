@@ -4,6 +4,8 @@
  */
 namespace Sapient\Worldpay\Model\Payment;
 
+use Magento\Payment\Model\InfoInterface;
+
 /**
  * Updating Risk gardian
  */
@@ -49,7 +51,35 @@ class WorldPayPayment
         $wpp->setData('aav_cardholder_name_result_code', $paymentState->getAAVCardholderNameResultCode());
         $wpp->setData('aav_telephone_result_code', $paymentState->getAAVTelephoneResultCode());
         $wpp->setData('aav_email_result_code', $paymentState->getAAVEmailResultCode());
-        
+        $wpp->setData('primerouting_networkused', $paymentState->getNetworkUsed());
+        $wpp->setData('source_type', $paymentState->getSourceType());
+        $wpp->setData('available_balance', $paymentState->getAvailableBalance());
+        $wpp->setData('prepaid_card_type', $paymentState->getPrepaidCardType());
+        $wpp->setData('reloadable', $paymentState->getReloadable());
+        $wpp->setData('card_product_type', $paymentState->getCardProductType());
+        $wpp->setData('affluence', $paymentState->getAffluence());
+        $wpp->setData('account_range_id', $paymentState->getAccountRangeId());
+        $wpp->setData('issuer_country', $paymentState->getIssuerCountry());
+        $wpp->setData('virtual_account_number', $paymentState->getVirtualAccountNumber());
         $wpp->save();
+    }
+    
+    public function updatePrimeroutingData(InfoInterface $payment, \Sapient\Worldpay\Model\Payment\State $paymentState)
+    {
+        $wpp = $this->worldpaypayment->create();
+        $wpp = $wpp->loadByWorldpayOrderId($paymentState->getOrderCode());
+        $isPrimeRoutingRequest = $this->getPrimeRoutingEnabled($payment);
+        $wpp->setData('is_primerouting_enabled', $isPrimeRoutingRequest);
+        $wpp->save();
+    }
+    
+    private function getPrimeRoutingEnabled(InfoInterface $paymentObject)
+    {
+        $paymentAditionalInformation = $paymentObject->getAdditionalInformation();
+        if (!empty($paymentAditionalInformation)
+                && array_key_exists('worldpay_primerouting_enabled', $paymentAditionalInformation)) {
+            $wpPrimeRoutingEnabled=$paymentAditionalInformation['worldpay_primerouting_enabled'];
+            return $wpPrimeRoutingEnabled;
+        }
     }
 }

@@ -5,13 +5,13 @@
     method="post" id="form-validate" enctype="multipart/form-data" autocomplete="off">
     <fieldset class="fieldset info">
         <?= /* @noEscape */ $block->getBlockHtml('formkey')?>
-        <legend class="legend"><span><?= /* @noEscape */ __('Card Information') ?></span></legend><br>
+        <legend class="legend"><span><?= /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?></span></legend><br>
 
         <input type="hidden" name="token[id]" value="<?= /* @noEscape */ $carddeatils->getTokenCode() ?>" />
 
         <div class="field card Number">
             <label class="label" for="card number">
-                <span><?= /* @noEscape */ __('Card Number') ?></span>
+                <span><?= /* @noEscape */ $block->getAccountLabelbyCode('AC9') ?></span>
             </label>
             <div class="control">
                 <span><?= /* @noEscape */ $block->escapeHtml($carddeatils->getCardNumber()) ?></span>
@@ -20,11 +20,11 @@
 
         <div class="field card holder name">
             <label class="label" for="card holder name">
-                <span><?= /* @noEscape */ __('Card Holder Name') ?></span>
+                <span><?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?></span>
             </label>
             <div class="control">
                 <input type="text" name="token[cardholder_name]" required='true' id="card-holder-name" 
-                       title="<?= /* @noEscape */ __('Card Holder Name') ?>"
+                       title="<?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?>"
                 value="<?= /* @noEscape */ $block->escapeHtml($carddeatils->getCardholderName()) ?>"
                 class="input-text required cardholder_name worldpay-cardholdername-length">
             </div>
@@ -32,7 +32,7 @@
 
         <div class="field card expiry month">
             <label class="label" for="card holder name">
-                <span><?= /* @noEscape */ __('Expiry Mont/Year') ?>
+                <span><?= /* @noEscape */ $block->getAccountLabelbyCode('AC10') ?>
                 </span>
             </label>
             <div class="fields group group-2">
@@ -70,8 +70,8 @@
         <div class="actions-toolbar">
             <div class="primary">
                 <button type="submit" class="action save primary"
-                        title="<?= /* @noEscape */ __('Save') ?>">
-                    <span><?= /* @noEscape */ __('Save') ?></span>
+                        title="<?= /* @noEscape */ $block->getAccountLabelbyCode('AC39') ?>">
+                    <span><?= /* @noEscape */ $block->getAccountLabelbyCode('AC39') ?></span>
                 </button>
             </div>
         </div>

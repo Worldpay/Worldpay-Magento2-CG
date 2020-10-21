@@ -12,8 +12,8 @@
             <item name="deps" xsi:type="string">catalog_product_recurring_plan_add_form.catalog_product_recurring_plan_add_form_data_source</item>
         </item>
         <item name="buttons" xsi:type="array">
-            <item name="cancel" xsi:type="string">Sapient\Worldpay\Block\Adminhtml\Catalog\Product\Recurring\Plan\Button\Cancel</item>
-            <item name="save" xsi:type="string">Sapient\Worldpay\Block\Adminhtml\Catalog\Product\Recurring\Plan\Button\Save</item>
+            <item name="cancel" xsi:type="string" translate="true">Sapient\Worldpay\Block\Adminhtml\Catalog\Product\Recurring\Plan\Button\Cancel</item>
+            <item name="save" xsi:type="string" translate="true">Sapient\Worldpay\Block\Adminhtml\Catalog\Product\Recurring\Plan\Button\Save</item>
         </item>
         <item name="label" xsi:type="string" translate="true">New Payment Plan</item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
@@ -77,7 +77,7 @@
                     <item name="dataType" xsi:type="string">string</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="label" xsi:type="string" translate="true">Code</item>
-                    <item name="notice" xsi:type="string" translate="true">Automatically prepended with product id plus underscore to help with uniqueness, total length should not exceed 25 characters.</item>
+                    <item name="notice" xsi:type="string" translate="true">A prefix (Product ID with "_") will be addded with this code, total length cannot exceed 25 characters.</item>
                     <item name="source" xsi:type="string">worldpay_recurring_plan</item>
                     <item name="required" xsi:type="boolean">true</item>
                     <item name="validation" xsi:type="array">
@@ -86,21 +86,6 @@
                 </item>
             </argument>
         </field>
-<!--        <field name="name">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="sortOrder" xsi:type="number">30</item>
-                    <item name="dataType" xsi:type="string">string</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="label" xsi:type="string" translate="true">Name</item>
-                    <item name="notice" xsi:type="string" translate="true">Maximum 100 chars.</item>
-                    <item name="source" xsi:type="string">worldpay_recurring_plan</item>
-                    <item name="validation" xsi:type="array">
-                        <item name="max_text_length" xsi:type="number">100</item>
-                    </item>
-                </item>
-            </argument>
-        </field>-->
         <field name="description">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -124,6 +109,7 @@
                     <item name="dataType" xsi:type="string">string</item>
                     <item name="formElement" xsi:type="string">select</item>
                     <item name="label" xsi:type="string" translate="true">Recurring Cycle</item>
+                    <item name="notice" xsi:type="string" translate="true">Below the Recurring cycle drop down, add a meesage - Frequency of orders to be fulfilled</item>
                     <item name="source" xsi:type="string">worldpay_recurring_plan</item>
                     <item name="required" xsi:type="boolean">true</item>
                     <item name="validation" xsi:type="array">
@@ -139,6 +125,7 @@
                     <item name="dataType" xsi:type="string">number</item>
                     <item name="formElement" xsi:type="string">input</item>
                     <item name="label" xsi:type="string" translate="true">Recurring Amount</item>
+                    <item name="notice" xsi:type="string" translate="true">Below the Recurring amount drop down, add a meesage - Amount to be paid for subscription order</item>
                     <item name="source" xsi:type="string">worldpay_recurring_plan</item>
                     <item name="required" xsi:type="boolean">true</item>
                     <item name="validation" xsi:type="array">
@@ -149,53 +136,6 @@
                 </item>
             </argument>
         </field>
-<!--        <field name="number_of_payments">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="sortOrder" xsi:type="number">60</item>
-                    <item name="dataType" xsi:type="string">number</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="label" xsi:type="string" translate="true"># of Payments</item>
-                    <item name="notice" xsi:type="string" translate="true">Leave blank for subscription to never end.</item>
-                    <item name="source" xsi:type="string">worldpay_recurring_plan</item>
-                    <item name="required" xsi:type="boolean">true</item>
-                    <item name="validation" xsi:type="array">
-                        <item name="validate-digits" xsi:type="boolean">true</item>
-                        <item name="validate-greater-than-zero" xsi:type="boolean">true</item>
-                        <item name="less-than-equals-to" xsi:type="number">99</item>
-                    </item>
-                </item>
-            </argument>
-        </field>-->
-        
-<!--        <field name="number_of_trial_intervals">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="sortOrder" xsi:type="number">80</item>
-                    <item name="dataType" xsi:type="string">number</item>
-                    <item name="formElement" xsi:type="string">input</item>
-                    <item name="label" xsi:type="string" translate="true"># of Trial Intervals</item>
-                    <item name="source" xsi:type="string">worldpay_recurring_plan</item>
-                    <item name="validation" xsi:type="array">
-                        <item name="validate-digits" xsi:type="boolean">true</item>
-                        <item name="validate-greater-than-zero" xsi:type="boolean">true</item>
-                        <item name="less-than-equals-to" xsi:type="number">99</item>
-                    </item>
-                </item>
-            </argument>
-        </field>-->
-<!--        <field name="trial_interval">
-            <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">Sapient\Worldpay\Model\Config\Source\TrialInterval</item>
-                <item name="config" xsi:type="array">
-                    <item name="sortOrder" xsi:type="number">90</item>
-                    <item name="dataType" xsi:type="string">string</item>
-                    <item name="formElement" xsi:type="string">select</item>
-                    <item name="label" xsi:type="string" translate="true">Trial Interval</item>
-                    <item name="source" xsi:type="string">worldpay_recurring_plan</item>
-                </item>
-            </argument>
-        </field>-->
         <field name="website_id">
             <argument name="data" xsi:type="array">
                 <item name="options" xsi:type="object">Sapient\Worldpay\Model\Config\Source\Website</item>

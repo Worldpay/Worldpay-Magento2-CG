@@ -26,10 +26,12 @@ class Captured extends \Sapient\Worldpay\Model\Payment\Update\Base implements \S
 
     public function apply($payment, $order = null)
     {
+
         if (!empty($order)) {
             $this->_assertValidPaymentStatusTransition($order, $this->_getAllowedPaymentStatuses());
             $order->capture();
             $this->_worldPayPayment->updateWorldPayPayment($this->_paymentState);
+            $this->_worldPayPayment->updatePrimeroutingData($order->getPayment(), $this->_paymentState);
         }
     }
 

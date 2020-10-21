@@ -51,24 +51,44 @@ class DirectService extends \Magento\Framework\DataObject
         $paymentDetails,
         $payment
     ) {
-        $directOrderParams = $this->mappingservice->collectDirectOrderParameters(
-            $orderCode,
-            $quote,
-            $orderStoreId,
-            $paymentDetails
-        );
+        if ($paymentDetails['additional_data']['cc_type'] == 'ACH_DIRECT_DEBIT-SSL') {
+            $directOrderParams = $this->mappingservice->collectACHOrderParameters(
+                $orderCode,
+                $quote,
+                $orderStoreId,
+                $paymentDetails
+            );
+            $response = $this->paymentservicerequest->achOrder($directOrderParams);
+        } else {
+            $directOrderParams = $this->mappingservice->collectDirectOrderParameters(
+                $orderCode,
+                $quote,
+                $orderStoreId,
+                $paymentDetails
+            );
         
-        $response = $this->paymentservicerequest->order($directOrderParams);
-
+            $response = $this->paymentservicerequest->order($directOrderParams);
+        }
+        
         $directResponse = $this->directResponse->setResponse($response);
         $threeDSecureParams = $directResponse->get3dSecureParams();
         $threeDsEnabled = $this->worldpayHelper->is3DSecureEnabled();
         $threeDSecureChallengeParams = $directResponse->get3ds2Params();
         $threeDSecureConfig = [];
         $disclaimerFlag = '';
+        
+        if (!empty($directOrderParams['primeRoutingData'])) {
+            $additionalInformation = $payment->getAdditionalInformation();
+            $additionalInformation["worldpay_primerouting_enabled"]=true;
+                $payment->setAdditionalInformation(
+                    $additionalInformation
+                );
+        }
+        
         if (isset($paymentDetails['additional_data']['disclaimerFlag'])) {
             $disclaimerFlag = $paymentDetails['additional_data']['disclaimerFlag'];
         }
+        
         if ($threeDSecureParams) {
             // Handles success response with 3DS & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());

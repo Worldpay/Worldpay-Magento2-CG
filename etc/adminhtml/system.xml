@@ -173,8 +173,32 @@
                     </depends>
                 </group>
             </group>
+            <!-- Prime routing -->
+             <group id="prime_routing" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Prime Routing</label>
+                <field id="enable_prime_routing" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Prime Routing</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>                
+                <field id="enable_advanced_prime_routing" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Advanced Prime Routing</label>
+                    <depends><field id="enable_prime_routing">1</field></depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Enable Advance Prime Routing to make use of Routing Preference and Debit Networks.</comment>
+                </field>
+                <field id="routing_preference" translate="label" sortOrder="3" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Routing Preference</label>
+                    <depends><field id="enable_prime_routing">1</field></depends>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\RoutingPreference</source_model>
+                </field>
+                <field id="debit_networks" translate="label" sortOrder="4" type="multiselect" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Debit Networks</label>
+                    <depends><field id="enable_prime_routing">1</field></depends>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\DebitNetworks</source_model>
+                </field>
+            </group>
             <!-- Latin America Payments -->
-            <group id="lat_america_payments" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="lat_america_payments" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Latin America Payments</label>
                 <field id="enable_cpf" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable CPF/CPNJ </label>
@@ -188,7 +212,6 @@
                 </field>
                 <field id="instalment_config" translate="label" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Instalment Configuration</label>
-                    <depends><field id="enable_instalment">1</field></depends>
                     <frontend_model>Sapient\Worldpay\Block\Adminhtml\Form\Field\InstalmentConfig</frontend_model>
                     <backend_model>Sapient\Worldpay\Model\System\Config\Backend\Instalmentconfig</backend_model>
                     <comment>
@@ -287,7 +310,7 @@
             </group>
             <!--HPP-->
             <group id="hpp_config" translate="label" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Hosted Payment Page</label>                
+                <label>Hosted Payment Page</label>
                 <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -374,6 +397,33 @@
                         <label>Google MerchantName</label>
                     </field>    
                 </group>
+                
+                <group id="samsung_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="4">
+                    <label>Samsung Pay</label>
+                    <!--Samsung Pay  enabled-->
+                    <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                   
+                    <field id="service_id" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Service Id</label>
+                    </field> 
+                    
+                     <field id="samsung_merchant_shop_name" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Samsung Merchant Shop Name</label>
+                    </field> 
+                    
+                     <field id="samsung_order_description" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Samsung Order Description</label>
+                    </field> 
+                     
+                    <field id="samsung_merchant_shop_url" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Samsung Merchant Shop URL</label>
+                    </field> 
+                       
+                </group>
+                
             </group>
             <!--Chrome Pay-->
             <group id="chromepay_config" translate="label" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -415,21 +465,25 @@
                     <label>Payment Methods</label>
                     <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethodsApm</source_model>
                 </field>
-                <field id="title" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="achaccounttypes" translate="label" type="multiselect" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>ACH Account Types</label>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\ACHAccountTypes</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Title</label>
                 </field>
             </group>
             <!-- Instant Purchase with Worldpay -->
-            <group id="quick_checkout_config" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="quick_checkout_config" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Instant Purchase with Worldpay</label>                
-                <field id="instant_purchase" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="instant_purchase" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Instant Page Checkout</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>If set to "Yes", Worldpay as payment method will be available during Instant purchase.</comment>
                 </field>
             </group>       
             <!-- Multiple partial capture options -->
-            <group id="partial_capture_config" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="partial_capture_config" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Multiple Partial Capture</label>
                 <field id="partial_capture" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Partial Capture</label>
@@ -438,7 +492,7 @@
                 </field>
             </group>
             <!-- Merchant profile -->
-            <group id="merchant_config" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="merchant_config" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Merchant Profile Override Configuration</label>
                 <field id="merchant_profile" translate="label" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Merchant Profile Configuration</label>
@@ -447,12 +501,32 @@
                 </field>
             </group>
             <!-- Subscription Settings -->
-            <group id="subscriptions" sortOrder="15" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="0">
+            <group id="subscriptions" sortOrder="16" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Subscription Settings</label>
-                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Subscriptions Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Before enabling, make sure you connect with Worldpay contact.</comment>
+                </field>
+                <field id="endDate" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>End Date Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_email" translate="label" type="select" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Recurring Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="buy_onetime_label" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Main Label for Subscription</label>
+                </field>
+                <field id="subscribe_label" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Subscription Checkbox Label</label>
+                </field>
+                <field id="start_date_label" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Start Date Label</label>
+                </field>
+                <field id="end_date_label" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>End Date Label</label>
                 </field>
             </group>
             <!-- Miscellaneous -->
@@ -516,6 +590,36 @@
                     <label>Configurable Alert Messages</label>
                     <frontend_model>Sapient\Worldpay\Block\Adminhtml\Form\Field\CreditCardException</frontend_model>
                     <backend_model>Sapient\Worldpay\Model\System\Config\Backend\CreditCardException</backend_model>
+                </field>
+            </group>
+        </section>
+        <!-- New Tab for Worldpay Custom Labels -->
+        <section id="worldpay_custom_labels" translate="label" type="text" sortOrder="403" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Worldpay Custom Labels</label>
+            <tab>sales</tab>
+            <resource>Sapient_Worldpay::config_worldpay_custom_labels</resource>
+            <group id="checkout_labels" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Checkout Labels</label>
+                <field id="checkout_label" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Checkout Label</label>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Form\Field\CheckoutLabels</frontend_model>
+                    <backend_model>Sapient\Worldpay\Model\System\Config\Backend\CheckoutLabels</backend_model>
+                </field>
+            </group>
+            <group id="my_account_labels" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>My Account Labels</label>
+                <field id="my_account_label" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>My Account Label</label>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Form\Field\MyAccountLabels</frontend_model>
+                    <backend_model>Sapient\Worldpay\Model\System\Config\Backend\MyAccountLabels</backend_model>
+                </field>
+            </group>
+            <group id="admin_labels" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Admin Labels</label>
+                <field id="admin_label" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Admin Label</label>
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\Form\Field\AdminLabels</frontend_model>
+                    <backend_model>Sapient\Worldpay\Model\System\Config\Backend\AdminLabels</backend_model>
                 </field>
             </group>
         </section>

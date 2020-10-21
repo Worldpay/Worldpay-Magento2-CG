@@ -11,7 +11,7 @@
 
          <div class='accepted_cc'>
               
-             <span class='worldpay_cc_we_accept'>We Accept</span>
+             <span class='worldpay_cc_we_accept'><!-- ko i18n: getCheckoutLabels('CO2')--><!-- /ko --></span>
              
              <div class="paymentoptions-icon-wrapper">
          <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
@@ -78,12 +78,136 @@
                                value: selectedIdealBank,
                                optionsValue: 'bankCode',
                                optionsCaption: 'Select Your Bank'">
-            </select>
-        </div>
+                    </select>
+                </div>
+                
+                <div class="control field type required ach-block" data-bind="visible: false">
+                    <label data-bind="attr: {for: getCode() + '_ach_account_type'}" class="label">
+                        <span><!-- ko i18n: getCheckoutLabels('CO15')--><!-- /ko --></span> 
+                        <!--            <span> ko i18n: 'Bank Account Types' /ko </span>-->
+                </label>
+                <div class ="field type required ach-account-type" style="margin-bottom:10px;">
+                    <select name="ach_pay" class="select select-ccytpe" disabled
+                                data-bind="attr: {id: 'ach_pay', 'data-validate': JSON.stringify({required:true})},
+                               options: getACHBankAccountTypes(),
+                               optionsText: 'accountText',
+                               value: selectedACHAccountType,
+                               enable: isActive($parents),
+                               optionsValue: 'accountCode',
+                               optionsCaption: 'Select Account Type'"
+                                >
+                    </select>
+                </div>
+
+                <label data-bind="attr: {for: getCode() + '_ach_account_number'}" class="label">
+                    <span><!-- ko i18n: getCheckoutLabels('CO16')--><!-- /ko --></span> 
+                        <!--            <span> ko i18n: 'Account Number' /ko </span>-->
+                </label>
+                <div class="field type required ach-account-number" style="margin-bottom:10px;">
+
+                    <input type="number" onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189 && event.keyCode !== 190" style="width: 225px;" name="ach-account-number" class="input-text" value=""   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_ach_account_number',
+                                    title: $t('Account Number'),
+                                    'data-container': getCode() + '-ach-account-number',
+                                    'data-validate': JSON.stringify({'required':true,
+                                      'worldpay-validate-ach-accountnumber': true})},
+                                    enable: isActive($parents),
+                                    value: achaccountnumber,
+                                    valueUpdate: 'keyup'"
+                               />  
+
+                </div>
+
+                <label data-bind="attr: {for: getCode() + '_ach_routing_number'}" class="label">
+                    <span><!-- ko i18n: getCheckoutLabels('CO17')--><!-- /ko --></span> 
+                        <!--            <span> ko i18n: 'Routing Number' /ko </span>-->
+                </label>
+                <div class="field type required ach-routing-number" style="margin-bottom:10px;">
+
+                    <input type="number" onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189 && event.keyCode !== 190" style="width: 225px;" name="ach-routing-number" class="input-text" value=""   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_ach_routing_number',
+                                    title: $t('Routing Number'),
+                                    'data-container': getCode() + '-ach-routing-number',
+                                    'data-validate': JSON.stringify({'required':true,
+                                      'worldpay-validate-ach-routingnumber': true})},
+                                    enable: isActive($parents),
+                                    value: achroutingnumber,
+                                    valueUpdate: 'keyup'"
+                               /> 
+
+                </div>
+
+                <div class="field type ach-check-number" style="margin-bottom:10px;">
+                    <label data-bind="attr: {for: getCode() + '_ach_check_number'}" class="label">
+                        <span><!-- ko i18n: getCheckoutLabels('CO18')--><!-- /ko --></span> 
+                            <!--            <span> ko i18n: 'Check Number' /ko </span>-->
+                    </label>
+                    <div class="checknumber">
+                        <input type="number" onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189 && event.keyCode !== 190"
+                                   style="width: 225px;" name="ach-check-number" class="input-text" value=""   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_ach_check_number',
+                                    title: $t('Check Number'),
+                                    'data-container': getCode() + '-ach-check-number',
+                                    'data-validate': JSON.stringify({'required':false,
+                                      'worldpay-validate-ach-checknumber': true})},
+                                    enable: isActive($parents),
+                                    value: achchecknumber,
+                                    valueUpdate: 'keyup'"
+                                   /> 
+                    </div>
+
+                </div>
+
+                <div class="field type ach-company-name" style="margin-bottom:10px;">
+                    <label data-bind="attr: {for: getCode() + '_ach_company_name'}" class="label">
+                        <span><!-- ko i18n: getCheckoutLabels('CO19')--><!-- /ko --></span> 
+                            <!--            <span> ko i18n: 'Company Name' /ko </span>-->
+                    </label>
+                    <div class="companame">
+                        <input type="text" style="width: 225px;" name="ach-company-name" class="input-text" value=""   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_ach_company_name',
+                                    title: $t('Company Name'),
+                                    'data-container': getCode() + '-ach-company-name',
+                                    'data-validate': JSON.stringify({'required':false,
+                                      'worldpay-validate-ach-companyname': true})},
+                                    enable: isActive($parents),
+                                    value: achcompanyname,
+                                    valueUpdate: 'keyup'"
+                                   /> 
+                    </div>
+
+                </div>
+
+                <div class="field type ach-email-address" data-bind="attr: {id: getCode() + '_ach_email_address'}" style="margin-bottom:10px;" >
+                    <label data-bind="attr: {for: getCode() + '_ach_email_address'}" class="label">
+                        <span><!-- ko i18n: getCheckoutLabels('CO20')--><!-- /ko --></span> 
+                            <!--            <span> ko i18n: 'Email Address' /ko </span>-->
+                    </label>
+                    <div class="achemail">
+                            <input type="email" style="width: 225px;" name="ach-email-address" class="input-text" value=""   data-bind="attr: {
+                                    autocomplete: off,
+                                    id: getCode() + '_ach_email_address',
+                                    title: $t('Email Address'),
+                                    'data-container': getCode() + '-ach-email-address',
+                                    'data-validate': JSON.stringify({
+                                      'validate-email':true})},
+                                    enable: isActive($parents),
+                                    value: achemailaddress,
+                                    valueUpdate: 'keyup'"
+                                   /> 
+                    </div>
+
+                </div>
+
+            </div>
         <div class="field type statment-narrative" data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative_div'},visible: false">
             <label data-bind="attr: {for: getCode() + '_statement'}" class="label">
-                <span> Purpose of transaction </span>
-                <!--            <span> ko i18n: 'Purpose of transaction' /ko </span>-->
+                <span><!-- ko i18n: getCheckoutLabels('CO12')--><!-- /ko --></span> 
+                <!--  <span> ko i18n: 'Purpose of transaction' /ko </span>-->
             </label> 
             <div>
             <textarea name="stmt_narrative" maxlength ="255" cols="20" rows="3"
@@ -93,9 +217,7 @@
                                       'validate-no-html-tags': true
                                     })},
                                     enable: isActive($parents),
-                        value: stmtNarrative,
-                        event:{ change: $parent.checkPaymentTypes },
-                        event:{ change: checkPaymentTypes }"
+                        value: stmtNarrative,"
                       style="width:225px;text-align:left;resize: none;">
             </textarea>
             </div>
@@ -136,7 +258,7 @@
                             enable: (getCode() == isChecked())
                             "
                         disabled>
-                    <span data-bind="text: $t('Place Order')"></span>
+                    <span><!-- ko i18n: getCheckoutLabels('CO14')--><!-- /ko --></span> 
                 </button>
             </div>
         </div>

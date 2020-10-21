@@ -25,16 +25,19 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      */
     public function __construct(
         Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Customer\Model\Session $customerSession,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper
     ) {
         
         parent::__construct($context);
         $this->_resultPageFactory = $resultPageFactory;
         $this->customerSession = $customerSession;
+        $this->worldpayHelper = $worldpayHelper;
     }
 
     /**
@@ -49,7 +52,7 @@ class Index extends \Magento\Framework\App\Action\Action
             return;
         }
         $resultPage = $this->_resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->set(__('My Saved Card'));
+        $resultPage->getConfig()->getTitle()->set($this->worldpayHelper->getAccountLabelbyCode('AC29'));
         return $resultPage;
     }
 }
