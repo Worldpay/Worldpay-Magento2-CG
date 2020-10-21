@@ -31,12 +31,14 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
      */
     public function apply($payment, $order = null)
     {
+       
         if (empty($order)) {
             $this->_applyUpdate($payment);
         } else {
             $this->_assertValidPaymentStatusTransition($order, $this->_getAllowedPaymentStatuses($order));
             $this->_applyUpdate($order->getPayment(), $order);
             $this->_worldPayPayment->updateWorldPayPayment($this->_paymentState);
+            $this->_worldPayPayment->updatePrimeroutingData($order->getPayment(), $this->_paymentState);
             $this->_captureOrderIfAutoCaptureEnabled($order);
         }
     }
@@ -78,6 +80,13 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
                 \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION,
                 \Sapient\Worldpay\Model\Payment\State::STATUS_AUTHORISED
              ];
+        }
+        if ($this->_isACHIntegrationMode($order)) {
+              return [
+                \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION,
+                \Sapient\Worldpay\Model\Payment\State::STATUS_AUTHORISED,
+                \Sapient\Worldpay\Model\Payment\State::STATUS_CAPTURED
+              ];
         }
         
         return [\Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION];
@@ -144,5 +153,17 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
             $order->getStoreId()
         )
             === \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::REDIRECT_MODEL;
+    }
+    
+    /**
+     * check if integration mode is ach
+     * @return bool
+     */
+    private function _isACHIntegrationMode(\Sapient\Worldpay\Model\Order $order)
+    {
+        if ($order->getPaymentType() === 'ACH_DIRECT_DEBIT-SSL') {
+            return true;
+        }
+        return false;
     }
 }

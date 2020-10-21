@@ -46,6 +46,7 @@ EOD;
     private $thirdparty;
     private $shippingfee;
     private $exponent;
+    private $primeRoutingData;
 
     /**
      * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
@@ -117,7 +118,8 @@ EOD;
         $exemptionEngine,
         $thirdparty,
         $shippingfee,
-        $exponent
+        $exponent,
+        $primeRoutingData
     ) {
         
         $this->merchantCode = $merchantCode;
@@ -141,6 +143,7 @@ EOD;
         $this->thirdparty = $thirdparty;
         $this->shippingfee = $shippingfee;
         $this->exponent = $exponent;
+        $this->primeRoutingData =$primeRoutingData;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -177,7 +180,6 @@ EOD;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
-
         $submit = $this->_addSubmitElement($xml);
         $this->_addOrderElement($submit);
         return $xml;
@@ -205,7 +207,6 @@ EOD;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
-
         $submit = $this->_addSubmitElement($xml);
         $this->_addOrderElement($submit);
         return $xml;
@@ -246,6 +247,7 @@ EOD;
             $session['id'] = $this->paymentDetails['sessionId'];
             return $order;
         }
+        
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
         $this->_addPaymentDetailsElement($order);
@@ -261,6 +263,9 @@ EOD;
         $this->_addDynamic3DSElement($order);
         $this->_addCreateTokenElement($order);
         $this->_addDynamicInteractionTypeElement($order);
+        if (isset($this->primeRoutingData['advanced_primerouting'])) {
+            $this->_addPrimeRoutingElement($order);
+        }
         $this->_addCustomerRiskData($order);
         $this->_addAdditional3DsElement($order);
         $this->_addExemptionEngineElement($order);
@@ -418,6 +423,9 @@ EOD;
     protected function _addPaymentDetailsElement($order)
     {
         $paymentDetailsElement = $order->addChild('paymentDetails');
+        if (isset($this->primeRoutingData['primerouting'])) {
+            $paymentDetailsElement['action'] = 'SALE';
+        }
         if (isset($this->paymentDetails['tokenCode'])) {
             $this->_addPaymentDetailsForTokenOrder($paymentDetailsElement);
             if (isset($this->paymentDetails['transactionIdentifier']) &&
@@ -800,5 +808,21 @@ EOD;
         }
         
         return $thirdparty;
+    }
+    
+    private function _addPrimeRoutingElement($order)
+    {
+        $primeRouting = $order->addChild('primeRoutingRequest');
+        $routingPreference = $this->primeRoutingData['routing_preference'];
+        $primeRouting->addChild('routingPreference', $routingPreference);
+        $debitNetworks = $this->primeRoutingData['debit_networks'];
+        if (!empty($debitNetworks)) {
+            $preferredNetworks = $primeRouting->addChild('preferredNetworks');
+            foreach ($debitNetworks as $key => $network) {
+                $preferredNetworks->addChild('networkName', $network);
+            }
+            
+        }
+        return $primeRouting;
     }
 }

@@ -7,6 +7,8 @@ namespace Sapient\Worldpay\Cron;
 use \Magento\Framework\App\ObjectManager;
 use \Magento\Sales\Model\ResourceModel\Order\CollectionFactoryInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Sapient\Worldpay\Model\Recurring\SubscriptionFactory;
+use Sapient\Worldpay\Model\Config\Source\SubscriptionStatus;
 use Exception;
 
 /**
@@ -15,6 +17,10 @@ use Exception;
 class RecurringOrders
 {
 
+    /**
+     * @var SubscriptionFactory
+     */
+    private $subscriptionFactory;
     /**
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
@@ -27,6 +33,7 @@ class RecurringOrders
     private $_order;
     private $_paymentUpdate;
     private $_tokenState;
+    private $_newEntityId;
     
     /**
      * @var CollectionFactory
@@ -69,6 +76,7 @@ class RecurringOrders
         \Sapient\Worldpay\Model\Recurring\Subscription\Transactions $recurringTransactions,
         \Sapient\Worldpay\Model\Recurring\Subscription\Address $subscriptionAddress,
         \Sapient\Worldpay\Helper\Recurring $recurringhelper,
+        SubscriptionFactory $subscriptionFactory,
         \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
         \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
     ) {
@@ -77,6 +85,7 @@ class RecurringOrders
         $this->worldpayhelper = $worldpayhelper;
         $this->paymentservice = $paymentservice;
         $this->orderservice = $orderservice;
+        $this->subscriptionFactory = $subscriptionFactory;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->worldpaytoken = $worldpaytoken;
         $this->subscriptionCollectionFactory = $subscriptions;
@@ -94,7 +103,6 @@ class RecurringOrders
     {
         $this->_logger->info('Recurring Orders transactions executed on - '.date('Y-m-d H:i:s'));
         $recurringOrderIds = $this->getRecurringOrderIds();
-                
         if (!empty($recurringOrderIds)) {
             foreach ($recurringOrderIds as $recurringOrder) {
                 $orderData = $paymentData = [];
@@ -129,8 +137,12 @@ class RecurringOrders
                     $paymentData['paymentMethod']['additional_data'] = $this->getAdditionalData($tokenDetails);
                     $paymentData['billing_address'] = $this->getBillingAddress($addressDetails['billing']);
                     try {
-                        $result = $this->recurringhelper->createMageOrder($orderData, $paymentData);
-                        $this->updateRecurringTransactions($result, $recurringOrderData['entity_id']);
+                        $result = $subscriptionDetails['original_order_id'];
+                        $currentStatus = $this->updateRecurringTransactions($result, $recurringOrderData['entity_id']);
+                        if ($currentStatus == 'completed') {
+                            $result = $this->recurringhelper->createMageOrder($orderData, $paymentData);
+                            $this->updateRecurringTransOrderId($result, $this->_newEntityId);
+                        }
                     } catch (Exception $e) {
                         $this->_logger->error($e->getMessage());
                     }
@@ -138,6 +150,19 @@ class RecurringOrders
             }
         }
         return $this;
+    }
+    
+    /**
+     * Update recurring order Transactionsfor next order
+     *
+     *
+     */
+    public function updateRecurringTransOrderId($orderId, $recurringId)
+    {
+        $transactionDetails = $this->transactionFactory->create()->loadById($recurringId);
+        if ($transactionDetails) {
+               $transactionDetails->setOriginalOrderId($orderId)->save();
+        }
     }
     
     /**
@@ -150,8 +175,6 @@ class RecurringOrders
         $curdate = date("Y-m-d");
         $fiveDays = strtotime(date("Y-m-d", strtotime($curdate)) . " +5 day");
         $cronDate = date('Y-m-d', $fiveDays);
-        
-        
         $result = $this->transactionCollectionFactory->getCollection()
                 ->addFieldToFilter('status', ['eq' => 'active'])
                 ->addFieldToFilter('recurring_date', ['gteq' => $curdate])
@@ -291,12 +314,13 @@ class RecurringOrders
                             'saved_cc_cid' => '',
                             'isSavedCardPayment' => 1,
                             'tokenization_enabled' => 1,
+                            'isRecurringOrder' => 1,
                             'stored_credentials_enabled' => 1,
                             'subscriptionStatus' => ''
                         ];
         return $additionalData;
     }
-
+    
     /**
      * Update recurring order Transactionsfor next order
      *
@@ -305,8 +329,7 @@ class RecurringOrders
     public function updateRecurringTransactions($orderId, $recurringId)
     {
         $transactionDetails = $this->transactionFactory->create()->loadById($recurringId);
-        $this->insertNewTransaction($transactionDetails, $orderId);
-        $transactionDetails->setStatus('completed')->save();
+        return $this->insertNewTransaction($transactionDetails, $orderId);
     }
 
     public function insertNewTransaction($transactionDetails, $orderId)
@@ -335,18 +358,35 @@ class RecurringOrders
             } elseif ($planInterval == 'ANNUAL') {
                 $recurringDate = date('Y-m-d', $yeardate);
             }
-            $transactions = $this->transactionFactory->create();
-            $transactions->setOriginalOrderId($orderId);
-            $transactions->setCustomerId($transactionDetails->getCustomerId());
-            $transactions->setPlanId($transactionDetails->getPlanId());
-            $transactions->setSubscriptionId($transactionDetails->getSubscriptionId());
-            $transactions->setRecurringDate($recurringDate);
-            $transactions->setRecurringEndDate($recurringDate);
-            $transactions->setStatus('active');
-            $transactions->setRecurringOrderId($recurringOrderId);
-            $transactions->setWorldpayTokenId($transactionDetails->getWorldpayTokenId());
-            $transactions->setWorldpayOrderId($transactionDetails->getWorldpayOrderId());
-            $transactions->save();
+            if (!$this->recurringhelper->getSubscriptionValue('worldpay/subscriptions/endDate')
+                    || ($transactionDetails->getRecurringEndDate()
+                    && $recurringDate <= $transactionDetails->getRecurringEndDate())) {
+                $transactions = $this->transactionFactory->create();
+                $transactions->setOriginalOrderId($orderId);
+                $transactions->setCustomerId($transactionDetails->getCustomerId());
+                $transactions->setPlanId($transactionDetails->getPlanId());
+                $transactions->setSubscriptionId($transactionDetails->getSubscriptionId());
+                $transactions->setRecurringDate($recurringDate);
+                if (!$this->recurringhelper->getSubscriptionValue('worldpay/subscriptions/endDate')) {
+                    $transactions->setRecurringEndDate($recurringDate);
+                } else {
+                    $transactions->setRecurringEndDate($transactionDetails->getRecurringEndDate());
+                }
+                $transactions->setStatus('active');
+                $transactions->setRecurringOrderId($recurringOrderId);
+                $transactions->setWorldpayTokenId($transactionDetails->getWorldpayTokenId());
+                $transactions->setWorldpayOrderId($transactionDetails->getWorldpayOrderId());
+                $transactions->save();
+                $this->_newEntityId = $transactions->getEntityId();
+                $transactionDetails->setStatus('completed')->save();
+                return 'completed';
+            } else {
+                $subscription = $this->subscriptionFactory->create()->load($transactionDetails->getSubscriptionId());
+                $subscription->setStatus(SubscriptionStatus::EXPIRED)->save();
+                $transactionDetails->setStatus('expired')->save();
+                return 'expired';
+                
+            }
         }
     }
 }

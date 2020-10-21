@@ -120,6 +120,18 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '1.3.3', '<')) {
             $this->addColumnLatAmInstalments($installer);
         }
+        if (version_compare($context->getVersion(), '1.3.7', '<')) {
+            $this->addColumnSubscriptionEndDate($installer);
+        }
+        if (version_compare($context->getVersion(), '1.3.7', '<')) {
+            $this->addColumnIsRecurringOrder($installer);
+        }
+        if (version_compare($context->getVersion(), '1.3.8', '<')) {
+            $this->addColumnPrimeRouting($installer);
+        }
+        if (version_compare($context->getVersion(), '1.3.8', '<')) {
+            $this->addColumnIssuerInsightResponse($installer);
+        }
         $installer->endSetup();
     }
     /**
@@ -798,6 +810,28 @@ class UpgradeSchema implements UpgradeSchemaInterface
         return $this;
     }
     
+     /**
+      * Create subscription address table
+      *
+      * @param SchemaSetupInterface $setup
+      * @return $this
+      */
+    private function addColumnSubscriptionEndDate(SchemaSetupInterface $installer)
+    {
+        
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_SUBSCRIPTIONS),
+            'end_date',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DATE,
+            'nullable' => true,
+            'comment' => 'Subscription End Date',
+            'after' => 'start_date'
+               ]
+        );
+    }
+    
     /**
      * Create subscription address table
      *
@@ -1096,6 +1130,21 @@ class UpgradeSchema implements UpgradeSchemaInterface
                ]
         );
     }
+    
+    private function addColumnIsRecurringOrder(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'is_recurring_order',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+            'nullable' => false,
+            'comment' => 'Check Recurring Order',
+            'after' => 'latam_instalments'
+             ]
+        );
+    }
     /**
      * @param SchemaSetupInterface $installer
      * @return void
@@ -1113,6 +1162,127 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'comment' => 'Token type',
                 'before' => 'created_at'
             ]
+        );
+    }
+    
+    private function addColumnPrimeRouting(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'is_primerouting_enabled',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+            'nullable' => true,
+            'comment' => 'PrimeRouting Enabled',
+            'after' => 'latam_instalments'
+             ]
+        );
+        
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'primerouting_networkused',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            'nullable' => true,
+            'comment' => 'PrimeRouting Network Used',
+            'after' => 'is_primerouting_enabled'
+             ]
+        );
+    }
+    
+    private function addColumnIssuerInsightResponse(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'source_type',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            'nullable' => true,
+            'comment' => 'Issuer Insight Source Type',
+            'after' => 'primerouting_networkused'
+             ]
+        );
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'available_balance',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            'nullable' => true,
+            'comment' => 'Issuer Insight Available Balance',
+            'after' => 'source_type'
+             ]
+        );
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'prepaid_card_type',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            'nullable' => true,
+            'comment' => 'Issuer Insight Prepaid CardType',
+            'after' => 'available_balance'
+             ]
+        );
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'reloadable',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            'nullable' => true,
+            'comment' => 'Issuer Insight Reloadable',
+            'after' => 'prepaid_card_type'
+             ]
+        );
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'card_product_type',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            'nullable' => true,
+            'comment' => 'Issuer Insight Card Product Type',
+            'after' => 'reloadable'
+             ]
+        );
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'affluence',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            'nullable' => true,
+            'comment' => 'Issuer Insight Affluence',
+            'after' => 'card_product_type'
+             ]
+        );
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'account_range_id',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            'length' => 19,
+            'comment' => 'Issuer Insight Account RangeId',
+            'after' => 'affluence'
+             ]
+        );
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'issuer_country',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            'nullable' => true,
+            'comment' => 'Issuer Insight Issuer Country',
+            'after' => 'account_range_id'
+             ]
+        );
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'virtual_account_number',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            'nullable' => true,
+            'comment' => 'Issuer Insight Virtual Account Number',
+            'after' => 'issuer_country'
+             ]
         );
     }
 }

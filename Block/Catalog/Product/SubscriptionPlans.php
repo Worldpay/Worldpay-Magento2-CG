@@ -52,6 +52,16 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
         return $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/active')
                 && in_array($this->getProduct()->getTypeId(), $this->recurringHelper->getAllowedProductTypeIds());
     }
+    
+     /**
+      * Check is subscriptions functionality enabled globally and product is of supported type
+      *
+      * @return bool
+      */
+    public function isEndDateEnabled()
+    {
+        return $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/endDate');
+    }
 
     /**
      * Retrieve product subscription plans
@@ -175,6 +185,17 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
     {
         return $this->recurringHelper->buildPlanOptionTitle($plan, $this->getPlanPrice($plan));
     }
+    
+     /**
+      * Generate payment plan option id
+      *
+      * @param Plan $plan
+      * @return string
+      */
+    public function buildPlanOptionId(Plan $plan)
+    {
+        return $this->recurringHelper->buildPlanOptionId($plan);
+    }
 
     /**
      * @param Plan $plan
@@ -258,5 +279,30 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
     public function getStartDate()
     {
         return $this->getProduct()->getPreconfiguredValues()->getSubscriptionDate();
+    }
+    
+    public function getBuyOneTimelabel()
+    {
+        return $this->recurringHelper->getBuyOneTimelabel();
+    }
+    
+    public function getStartDateLabel()
+    {
+        return $this->recurringHelper->getStartDateLabel();
+    }
+    
+    public function getEndDateLabel()
+    {
+        return $this->recurringHelper->getEndDateLabel();
+    }
+    
+    public function getSubscribeCheckboxLabel()
+    {
+        return $this->recurringHelper->getSubscribeCheckboxLabel();
+    }
+    
+    public function getEndDate()
+    {
+        return $this->getProduct()->getPreconfiguredValues()->getSubscriptionEndDate();
     }
 }

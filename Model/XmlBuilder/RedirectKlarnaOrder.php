@@ -114,11 +114,11 @@ EOD;
         $this->_addShopperElement($order);
         $this->_addShippingElement($order);
         $this->_addBillingElement($order);
+        $this->_addOrderLineItemElement($order);
+        $this->_addDynamic3DSElement($order);
         if (!empty($this->statementNarrative)) {
             $this->_addStatementNarrativeElement($order);
         }
-        $this->_addOrderLineItemElement($order);
-        $this->_addDynamic3DSElement($order);
         return $order;
     }
 
@@ -136,7 +136,7 @@ EOD;
         //$amountElement['value'] = $this->_amountAsInt($this->amount);
         $amountElement['value'] = $this->_amountAsInt($this->_roundOfTotal($order));
     }
-
+    
     private function _addDynamic3DSElement($order)
     {
         if ($this->threeDSecureConfig->isDynamic3DEnabled() === false) {
@@ -154,10 +154,10 @@ EOD;
     private function _addPaymentMethodMaskElement($order)
     {
         $paymentMethodMask = $order->addChild('paymentMethodMask');
-
+        
         $include = $paymentMethodMask->addChild('include');
         $include['code'] = $this->paymentType;
-    }
+        }
 
     private function _addShopperElement($order)
     {
@@ -231,7 +231,7 @@ EOD;
 
         $streetElement = $address->addChild('street');
         $this->_addCDATA($streetElement, $street);
-
+        
         $postalCodeElement = $address->addChild('postalCode');
         $this->_addCDATA($postalCodeElement, $postalCode);
 
@@ -345,4 +345,4 @@ EOD;
         }
         return $accTotalAmt;
     }
-}
+    }

@@ -22,7 +22,9 @@ use Sapient\Worldpay\Helper\Data;
  */
 class SubscriptionsLink extends \Magento\Framework\View\Element\Html\Link\Current
 {
+
     protected $_scopeConfig = null;
+
     public function __construct(
         Context $context,
         Subscriptions $subscriptionconfig,
@@ -36,22 +38,20 @@ class SubscriptionsLink extends \Magento\Framework\View\Element\Html\Link\Curren
         $this->helper = $helper;
         $this->worldpayHelper = $worldpayHelper;
     }
-    
+
     public function _toHtml()
     {
-        
         if ($this->worldpayHelper->isWorldPayEnable() && $this->checkSubscriptionTabToBeEnabled()) {
             return parent::_toHtml();
         } else {
             return '';
         }
     }
-    
+
     public function checkSubscriptionTabToBeEnabled()
     {
-        
         if ($this->helper->getSubscriptionValue('worldpay/subscriptions/active') ||
-            !empty($this->subscriptionconfig->getSubscriptions()->getData())) {
+                !empty($this->subscriptionconfig->getSubscriptions()->getData())) {
             return true;
         }
     }

@@ -67,6 +67,7 @@ class UpdateWorldpayment
     public function updateWorldpayPayment(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
         \Magento\Payment\Model\InfoInterface $paymentObject,
+        $tokenId = null,
         $disclaimerFlag = null
     ) {
         $responseXml=$directResponse->getXml();
@@ -87,8 +88,12 @@ class UpdateWorldpayment
         $refusalcode=$payment->issueResponseCode['code'] ? : $payment->ISO8583ReturnCode['code'];
         $refusaldescription=$payment->issueResponseCode['description'] ? : $payment->ISO8583ReturnCode['description'];
         $lataminstalments=$payment->instalments[0];
+        $primeRoutingEnabled = $this->getPrimeRoutingEnabled($paymentObject);
+        $networkUsed=$payment->primeRoutingResponse->networkUsed[0];
+        $issureInsightresponse=$this->getIssuerInsightResponseData($payment);
         $wpp = $this->worldpaypayment->create();
         $wpp = $wpp->loadByWorldpayOrderId($orderCode);
+        
         $wpp->setData('card_number', $cardNumber);
         $wpp->setData('payment_status', $paymentStatus);
         if ($payment->paymentMethod[0]) {
@@ -110,7 +115,19 @@ class UpdateWorldpayment
         $wpp->setData('aav_cardholder_name_result_code', $payment->AAVCardholderNameResultCode['description']);
         $wpp->setData('aav_telephone_result_code', $payment->AAVTelephoneResultCode['description']);
         $wpp->setData('aav_email_result_code', $payment->AAVEmailResultCode['description']);
+        $wpp->setData('is_recurring_order', $paymentObject->getIsRecurringOrder());
         $wpp->setData('latam_instalments', $lataminstalments);
+        $wpp->setData('is_primerouting_enabled', $primeRoutingEnabled);
+        $wpp->setData('primerouting_networkused', $networkUsed);
+        $wpp->setData('source_type', $issureInsightresponse['sourceType']);
+        $wpp->setData('available_balance', $issureInsightresponse['availableBalance']);
+        $wpp->setData('prepaid_card_type', $issureInsightresponse['prepaidCardType']);
+        $wpp->setData('reloadable', $issureInsightresponse['reloadable']);
+        $wpp->setData('card_product_type', $issureInsightresponse['cardProductType']);
+        $wpp->setData('affluence', $issureInsightresponse['affluence']);
+        $wpp->setData('account_range_id', $issureInsightresponse['accountRangeId']);
+        $wpp->setData('issuer_country', $issureInsightresponse['issuerCountry']);
+        $wpp->setData('virtual_account_number', $issureInsightresponse['virtualAccountNumber']);
         $wpp->save();
         
         if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
@@ -126,6 +143,11 @@ class UpdateWorldpayment
                     $this->getAdditionalInformation($paymentObject);
                     $extensionAttributes->setVaultPaymentToken($paymentToken);
                 }
+            }
+        } else {
+             $tokenNodeWithError = $orderStatus->token->xpath('//error');
+            if (!$tokenNodeWithError && $tokenId != null) {
+                $this->saveTokenDataToTransactions($tokenId, $orderCode);
             }
         }
     }
@@ -289,5 +311,34 @@ class UpdateWorldpayment
         $transactions->setWorldpayOrderId($worldpayOrderCode);
         $transactions->setOriginalOrderIncrementId($orderId[0]);
         $transactions->save();
+    }
+    
+    private function getPrimeRoutingEnabled(InfoInterface $paymentObject)
+    {
+        $paymentAditionalInformation = $paymentObject->getAdditionalInformation();
+        if (!empty($paymentAditionalInformation)
+                && array_key_exists('worldpay_primerouting_enabled', $paymentAditionalInformation)) {
+            $wpPrimeRoutingEnabled=$paymentAditionalInformation['worldpay_primerouting_enabled'];
+            return $wpPrimeRoutingEnabled;
+        }
+    }
+    
+    private function getIssuerInsightResponseData($payment)
+    {
+        $issuerInsightData = [];
+        $enhancedAuthResponse = $payment->enhancedAuthResponse;
+        if (!empty($enhancedAuthResponse)) {
+            $issuerInsightData['sourceType'] = $enhancedAuthResponse->fundingSource->sourceType;
+            $issuerInsightData['availableBalance'] = $enhancedAuthResponse->fundingSource->availableBalance;
+            $issuerInsightData['prepaidCardType'] = $enhancedAuthResponse->fundingSource->prepaidCardType;
+            $issuerInsightData['reloadable'] = $enhancedAuthResponse->fundingSource->reloadable;
+            $issuerInsightData['cardProductType'] = $enhancedAuthResponse->cardProductType;
+            $issuerInsightData['affluence'] = $enhancedAuthResponse->affluence;
+            $issuerInsightData['accountRangeId'] = $enhancedAuthResponse->accountRangeId;
+            $issuerInsightData['issuerCountry'] = $enhancedAuthResponse->issuerCountry;
+            $issuerInsightData['virtualAccountNumber'] = $enhancedAuthResponse->virtualAccountNumber;
+            
+            return $issuerInsightData;
+        }
     }
 }

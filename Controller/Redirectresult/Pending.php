@@ -58,7 +58,10 @@ class Pending extends \Magento\Framework\App\Action\Action
             if ($params) {
                 $worldPayPayment = $order->getWorldPayPayment();
                 $paymentType = $worldPayPayment->getPaymentType();
-                $this->_applyPaymentUpdate(PaymentStateResponse::createFromPendingResponse($params, $paymentType), $order);
+                $this->_applyPaymentUpdate(
+                    PaymentStateResponse::createFromPendingResponse($params, $paymentType),
+                    $order
+                );
             }
         } catch (\Exception $e) {
             $this->wplogger->error($e->getMessage());

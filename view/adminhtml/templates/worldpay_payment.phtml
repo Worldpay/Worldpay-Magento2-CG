@@ -106,6 +106,48 @@ if ($isworldpayment) {
                 <td class="label"><label>Interaction Type</label></td>
                 <td class="value"><strong><?= /* @noEscape */ $payment->getInteractionType() ?></strong></td>
             </tr>
+            <tr>
+                <td style="padding-top: .5em;">
+                    <span style="font-weight:600;font-size:1.7rem;">Issuer Insights</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label>Source Type</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getSourceType() ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label>Available Balance</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getAvailableBalance() ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label>Reloadable</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getReloadable() ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label>Prepaid Card Type</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getPrepaidCardType() ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label>Affluence</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getAffluence() ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label>Issuer Country</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getIssuerCountry() ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label>Card Product Type</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getCardProductType() ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label>Virtual Account Number</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getVirtualAccountNumber() ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label>Account Range Id</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getAccountRangeId() ?></strong></td>
+            </tr>
+            
             </table>
 
 <?php } ?>

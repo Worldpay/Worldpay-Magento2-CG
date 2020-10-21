@@ -61,7 +61,6 @@ define(
             var patt = new RegExp(re);
             return patt.test(data);
         }
-
         function doLuhnCheck(value) {
             var nCheck = 0;
             var nDigit = 0;
@@ -95,6 +94,8 @@ define(
                     }
                 }
             }
+            
+           
         // 3DS2 part Start
         
         var jwtUrl = url.build('worldpay/hostedpaymentpage/jwt');
@@ -317,6 +318,17 @@ define(
             availableCCTypes : function(){
                return ccTypesArr;
             },
+            getCheckoutLabels: function (labelcode) {
+                var ccData = window.checkoutConfig.payment.ccform.checkoutlabels;
+                for (var key in ccData) {
+                    if (ccData.hasOwnProperty(key)) {
+                        var cxData = ccData[key];
+                        if (cxData['wpay_label_code'].includes(labelcode)) {
+                            return cxData['wpay_custom_label'] ? cxData['wpay_custom_label'] : cxData['wpay_label_desc'];
+                        }
+                    }
+                }
+             },
                 availableInstalTypes: function () {
                     return isInstalment();
                 },
@@ -667,7 +679,7 @@ define(
                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                     var bin = this.creditCardNumber();
                     if(cc_type_selected == 'savedcard'){
-                        bin = $("input[name='payment[token_to_use]']:checked").next().next().next().val();     
+                        bin = $("input[name='payment[token_to_use]']:checked").next().next().next().val();      
                     } 
                     if(this.intigrationmode == 'direct') {
                         if(cc_type_selected == 'savedcard'){

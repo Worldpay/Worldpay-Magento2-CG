@@ -68,35 +68,9 @@ class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
             ['worldpay_subscription_id' => $subscriptionId],
             ['entity_id = ?' => $orderId]
         );
-        $this->updateSubscriptionStatus($orderId, $subscriptionId);
         return $this;
     }
-    
-    /**
-     * Update subscription status
-     *
-     * @param $orderId
-     * @param $subscriptionId
-     * @return $this
-     */
-    public function updateSubscriptionStatus($orderId, $subscriptionId)
-    {
-        $orderStatus = $this->getOrderStatus($orderId);
-        $this->getConnection()->update(
-            'worldpay_subscriptions',
-            ['status' => 'cancel'],
-            ['subscription_id = ?' => $subscriptionId]
-        );
-        return $this;
-    }
-    
-    public function getOrderStatus($orderId)
-    {
-        $order = $this->orderFactory->get($orderId);
-        $state = $order->getStatus(); //Get Order State(Complete, Processing, ....)
-        return $state;
-    }
-    
+
     /**
      * Load subscription detail by $orderIncrementId
      *

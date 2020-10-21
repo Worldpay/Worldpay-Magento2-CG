@@ -8,7 +8,10 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="product.info.options.wrapper">
-            <block class="Sapient\Worldpay\Block\Catalog\Product\SubscriptionPlans" name="product.info.worldpay.subscription.options" as="worldpay_subscription_options" before="-" template="Sapient_Worldpay::catalog/product/subscription_plans.phtml">
+            <block class="Sapient\Worldpay\Block\Catalog\Product\SubscriptionPlans" 
+                   name="product.info.worldpay.subscription.options" as="worldpay_subscription_options" 
+                   before="-" template="Sapient_Worldpay::catalog/product/subscription_plans.phtml" cacheable="false" 
+                   ifconfig="worldpay/tokenization/saved_card">
                 <block class="Magento\Catalog\Pricing\Render" name="product.price.worldpay.subscription">
                     <arguments>
                         <argument name="price_render" xsi:type="string">product.price.render.default</argument>
@@ -17,5 +20,39 @@
                 </block>
             </block>
         </referenceContainer>
+        <referenceBlock name="product.info.addtocart">
+            <block name="product.info.addtocart.instantPurchase" class="Sapient\Worldpay\Block\InstantPurchase\Button" 
+                   template="Magento_InstantPurchase::button.phtml" before="-">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="instant-purchase" xsi:type="array">
+                                <item name="component" xsi:type="string">Sapient_Worldpay/js/view/instant-purchase</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">Sapient_Worldpay/instant-purchase/instant-purchase</item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.additional">
+            <block name="product.info.addtocart.instantPurchase.additional" class="Sapient\Worldpay\Block\InstantPurchase\Button" 
+                   template="Magento_InstantPurchase::button.phtml" before="-">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="instant-purchase" xsi:type="array">
+                                <item name="component" xsi:type="string">Sapient_Worldpay/js/view/instant-purchase</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">Sapient_Worldpay/instant-purchase/instant-purchase</item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceBlock>
     </body>
 </page>

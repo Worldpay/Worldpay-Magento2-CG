@@ -8,6 +8,7 @@
                         <resource id="Magento_Config::config">
                             <resource id="Sapient_Worldpay::config_worldpay" title="Extension worldpay" sortOrder="50" />
                             <resource id="Sapient_Worldpay::config_worldpay_exceptions" title="Extension worldpay exceptions" sortOrder="60" />
+                            <resource id="Sapient_Worldpay::config_worldpay_custom_labels" title="Extension worldpay custom labels" sortOrder="70" />
                         </resource>
                     </resource>
                 </resource>

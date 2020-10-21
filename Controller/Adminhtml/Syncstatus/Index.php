@@ -24,6 +24,7 @@ class Index extends \Magento\Backend\App\Action
     private $_tokenState;
     private $helper;
     private $storeManager;
+    private $abstractMethod;
 
     /**
      * Constructor
@@ -33,7 +34,8 @@ class Index extends \Magento\Backend\App\Action
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice,
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
-     * @param \Sapient\Worldpay\Model\Order\Service $orderservice
+     * @param \Sapient\Worldpay\Model\Order\Service $orderservice,
+     * @param \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod $abstractMethod
      */
     public function __construct(
         Context $context,
@@ -43,6 +45,7 @@ class Index extends \Magento\Backend\App\Action
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod $abstractMethod,
         \Sapient\Worldpay\Helper\GeneralException $helper
     ) {
 
@@ -54,6 +57,7 @@ class Index extends \Magento\Backend\App\Action
         $this->worldpaytoken = $worldpaytoken;
         $this->helper = $helper;
         $this->storeManager = $storeManager;
+        $this->abstractMethod = $abstractMethod;
     }
 
     public function execute()
@@ -65,6 +69,7 @@ class Index extends \Magento\Backend\App\Action
             $this->_fetchPaymentUpdate();
             $this->_registerWorldPayModel();
             $this->_applyPaymentUpdate();
+            $this->_updateOrderStatus();
             $this->_applyTokenUpdate();
 
         } catch (Exception $e) {
@@ -123,5 +128,9 @@ class Index extends \Magento\Backend\App\Action
         $resultRedirect = $this->resultRedirectFactory->create();
         $resultRedirect->setPath($this->_redirect->getRefererUrl());
         return $resultRedirect;
+    }
+    private function _updateOrderStatus()
+    {
+        $this->abstractMethod->updateOrderStatusForVoidSale($this->_order);
     }
 }

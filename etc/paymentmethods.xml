@@ -217,6 +217,13 @@
                 </areas>
                 <capture_request>0</capture_request>
             </MISTERCASH-SSL>
+            <ACH_DIRECT_DEBIT-SSL>
+                <title>ACH Pay</title>
+                <areas>
+                    <area>US</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </ACH_DIRECT_DEBIT-SSL>
         </types>
     </worldpay_apm>
     <worldpay_cc>

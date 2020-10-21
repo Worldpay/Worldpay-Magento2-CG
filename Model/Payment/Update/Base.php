@@ -1,7 +1,9 @@
 <?php
+
 /**
  * @copyright 2017 Sapient
  */
+
 namespace Sapient\Worldpay\Model\Payment\Update;
 
 use Exception;
@@ -9,8 +11,10 @@ use \Magento\Framework\Exception\LocalizedException;
 
 class Base
 {
+
     /** @var \Sapient\Worldpay\Model\Payment\State */
     protected $_paymentState;
+
     /** @var \Sapient\Worldpay\Model\Payment\WorldPayPayment */
     protected $_worldPayPayment;
 
@@ -31,6 +35,7 @@ class Base
         $this->_paymentState = $paymentState;
         $this->_worldPayPayment = $worldPayPayment;
     }
+
     /**
      * @return string ordercode
      */
@@ -49,7 +54,6 @@ class Base
     protected function _assertValidPaymentStatusTransition($order, $allowedPaymentStatuses)
     {
         $this->_assertPaymentExists($order);
-
         $existingPaymentStatus = $order->getPaymentStatus();
         $newPaymentStatus = $this->_paymentState->getPaymentStatus();
 
@@ -58,14 +62,10 @@ class Base
         }
 
         if ($existingPaymentStatus == $newPaymentStatus) {
-            throw new \Magento\Framework\Exception\AlreadyExistsException(
-                __('same state')
-            );
+            throw new \Magento\Framework\Exception\LocalizedException(__('same state'));
         }
 
-        throw new \Magento\Framework\Exception\AlreadyExistsException(
-            __('invalid state transition')
-        );
+        throw new \Magento\Framework\Exception\LocalizedException(__('invalid state transition'));
     }
 
     /**
@@ -75,13 +75,13 @@ class Base
     private function _assertPaymentExists($order)
     {
         if (!$order->hasWorldPayPayment()) {
-            throw new \Magento\Framework\Exception\LocalizedException('No payment');
+            throw new \Magento\Framework\Exception\LocalizedException(__('No payment'));
         }
     }
 
     /*
-    * convert worldpay amount to magento amount
-    */
+     * convert worldpay amount to magento amount
+     */
     protected function _amountAsInt($amount)
     {
         return round($amount, 2, PHP_ROUND_HALF_EVEN) / pow(10, 2);

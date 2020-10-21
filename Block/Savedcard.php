@@ -4,6 +4,8 @@
  */
 namespace Sapient\Worldpay\Block;
 
+use Magento\Framework\Serialize\SerializerInterface;
+
 class Savedcard extends \Magento\Framework\View\Element\Template
 {
     /**
@@ -14,6 +16,10 @@ class Savedcard extends \Magento\Framework\View\Element\Template
      * @var \Magento\Customer\Model\Session
      */
     protected $_customerSession;
+     /**
+      * @var SerializerInterface
+      */
+    private $serializer;
     /**
      * constructor
      *
@@ -27,10 +33,12 @@ class Savedcard extends \Magento\Framework\View\Element\Template
         \Sapient\Worldpay\Model\SavedTokenFactory $savecard,
         \Magento\Customer\Model\Session $customerSession,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
+        SerializerInterface $serializer,
         array $data = []
     ) {
         $this->_savecard = $savecard;
         $this->_customerSession = $customerSession;
+        $this->serializer = $serializer;
         $this->worlpayhelper = $worldpayhelper;
            parent::__construct($context, $data);
     }
@@ -51,6 +59,32 @@ class Savedcard extends \Magento\Framework\View\Element\Template
                                         'transaction_identifier', 'token_code'])
                                     ->addFieldToFilter('customer_id', ['eq' => $customerId])
                                     ->addFieldToFilter('token_type', ['eq' => $tokenType]);
+    }
+    
+    public function getMyAccountLabels($labelCode)
+    {
+        $accdata = $this->serializer->unserialize($this->worlpayhelper->getMyAccountLabels());
+        if (is_array($accdata) || is_object($accdata)) {
+            foreach ($accdata as $key => $valuepair) {
+                if ($key == $labelCode) {
+                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
+                        $valuepair['wpay_label_desc'];
+                }
+            }
+        }
+    }
+    
+    public function getCheckoutLabels($labelCode)
+    {
+        $accdata = $this->serializer->unserialize($this->worlpayhelper->getCheckoutLabels());
+        if (is_array($accdata) || is_object($accdata)) {
+            foreach ($accdata as $key => $valuepair) {
+                if ($key == $labelCode) {
+                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
+                        $valuepair['wpay_label_desc'];
+                }
+            }
+        }
     }
 
    /**

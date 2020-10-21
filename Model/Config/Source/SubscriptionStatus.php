@@ -11,6 +11,7 @@ class SubscriptionStatus extends AbstractArraySource
     const ACTIVE = 'active';
     const SUSPENDED = 'suspended';
     const CANCELLED = 'cancelled';
+    const EXPIRED = 'expired';
 
     /**
      * {@inheritdoc}
@@ -20,6 +21,7 @@ class SubscriptionStatus extends AbstractArraySource
         return [
             ['value' => self::ACTIVE, 'label' => __('Active')],
             ['value' => self::SUSPENDED, 'label' => __('Suspended')],
+            ['value' => self::EXPIRED, 'label' => __('Expired')],
             ['value' => self::CANCELLED, 'label' => __('Cancelled')]
         ];
     }

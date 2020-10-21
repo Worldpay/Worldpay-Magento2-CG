@@ -25,6 +25,7 @@ class PaymentMethodsApm extends \Magento\Framework\App\Config\Value
                 __('SEPA (One off transactions)')],['value' => 'KLARNA-SSL', 'label' => __('Klarna (Redirect)')],
             ['value' => 'PRZELEWY-SSL', 'label' => __('P24')],
             ['value' => 'MISTERCASH-SSL', 'label' => __('Mistercash/Bancontact')],
+            ['value' => 'ACH_DIRECT_DEBIT-SSL', 'label' => __('ACH Pay')],
 
         ];
     }

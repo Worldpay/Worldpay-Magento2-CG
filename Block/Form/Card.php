@@ -191,4 +191,17 @@ class Card extends \Magento\Payment\Block\Form
         }
         return $serializedData;
     }
+    
+    public function getCheckoutSpecificLabel($labelcode)
+    {
+        $data = $this->configProvider->getCheckoutLabels();
+        if (is_array($data) || is_object($data)) {
+            foreach ($data as $key => $valuepair) {
+                if ($valuepair['wpay_label_code'] == $labelcode) {
+                    return $valuepair['wpay_custom_label']?
+                            $valuepair['wpay_custom_label']:$valuepair['wpay_label_desc'];
+                }
+            }
+        }
+    }
 }

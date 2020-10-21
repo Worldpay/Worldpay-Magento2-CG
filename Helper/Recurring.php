@@ -222,6 +222,19 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return ($renderedPrice ? $renderedPrice . ' ' : '')
         . $this->escaper->escapeHtml(__('paid') . ' ' . $planInterval . $trialInfo . $maxPaymentsInfo);
     }
+    
+    /**
+     * Build plan option id
+     *
+     * @param \Sapient\Worldpay\Model\Recurring\Plan $plan
+     * @param string $renderedPrice
+     * @return string
+     */
+    public function buildPlanOptionId(\Sapient\Worldpay\Model\Recurring\Plan $plan)
+    {
+        $planInterval = strtolower($this->getPlanIntervalLabel($plan->getInterval()));
+        return $this->escaper->escapeHtml($planInterval);
+    }
 
     /**
      * Retrieve selected plan for product
@@ -445,7 +458,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             if (isset($startDateOption)) {
                 $startDateInfo = [
                     [
-                        'label' => 'Subscription Date',
+                        'label' => 'Subscription Start Date',
                         'value' => $startDate
                     ]
                 ];
@@ -453,6 +466,34 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $startDateInfo;
+    }
+    
+     /**
+      * Get array with selected plan start date information
+      *
+      * @param Product $product
+      * @return array|bool
+      */
+    public function getSelectedPlanEndDateOptionInfo(Product $product)
+    {
+        $endDateInfo = [];
+
+        $endDateOption = $product->getCustomOption('subscription_end_date');
+        if ($endDateOption && $endDateOption->getValue()) {
+            
+                $endDate = $endDateOption->getValue() ? $endDateOption->getValue() : date('d-m-yy');
+               
+            if (isset($endDateOption)) {
+                $endDateInfo = [
+                    [
+                        'label' => 'Subscription End Date',
+                        'value' => $endDate
+                    ]
+                ];
+            }
+        }
+
+        return $endDateInfo;
     }
     
     /**
@@ -473,6 +514,9 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             }
             if (isset($optionsToDisplay['subscription_date'])) {
                 $result = array_merge($result, $optionsToDisplay['subscription_date']);
+            }
+            if (isset($optionsToDisplay['subscription_end_date'])) {
+                $result = array_merge($result, $optionsToDisplay['subscription_end_date']);
             }
         }
 
@@ -496,6 +540,25 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $startDate;
+    }
+    
+     /**
+      * Retrieve selected subscription start date from order item
+      *
+      * @param \Magento\Sales\Model\Order\Item $item
+      * @return string
+      */
+    public function getOrderItemSubscriptionEndDate(\Magento\Sales\Model\Order\Item $item)
+    {
+        $endDate = '';
+        $productOption = $item->getProductOptionByCode('worldpay_subscription_options');
+        $productBuyOptions = $item->getProductOptionByCode('info_buyRequest');
+        if (is_array($productOption) && is_array($productBuyOptions) &&
+                isset($productBuyOptions['subscription_end_date'])) {
+            $endDate = $productBuyOptions['subscription_end_date'];
+        }
+
+        return $endDate;
     }
     
     public function createMageOrder($orderData, $paymentData)
@@ -705,6 +768,114 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $response = curl_exec($curl);
         curl_close($curl);
         return json_decode($response, true);
+    }
+    
+    public function getBuyOneTimelabel()
+    {
+        $label = $this->scopeConfig->getValue(
+            'worldpay/subscriptions/buy_onetime_label',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        if (!$label) {
+            $label = 'Buy one time or select a Payment Plan';
+        }
+        
+        return $label;
+    }
+    
+    public function getSubscribeCheckboxLabel()
+    {
+        $label = $this->scopeConfig->getValue(
+            'worldpay/subscriptions/subscribe_label',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        if (!$label) {
+            $label = 'Subscribe this product and save';
+        }
+        
+        return $label;
+    }
+    
+    public function getStartDateLabel()
+    {
+        $label = $this->scopeConfig->getValue(
+            'worldpay/subscriptions/start_date_label',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        if (!$label) {
+            $label = 'Subscription Start Date';
+        }
+        
+        return $label;
+    }
+    
+    public function getEndDateLabel()
+    {
+        $label = $this->scopeConfig->getValue(
+            'worldpay/subscriptions/end_date_label',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        if (!$label) {
+            $label = 'Subscription End Date';
+        }
+        
+        return $label;
+    }
+    public function getAdminLabels($labelCode, $store = null, $scope = null)
+    {
+        if ($scope==='website') {
+            $adminLabels = $this->serializer->unserialize($this->scopeConfig->getValue(
+                'worldpay_custom_labels/admin_labels/admin_label',
+                \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE,
+                $store
+            ));
+        } else {
+            $adminLabels = $this->serializer->unserialize($this->scopeConfig->getValue(
+                'worldpay_custom_labels/admin_labels/admin_label',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $store
+            ));
+        }
+        if (is_array($adminLabels) || is_object($adminLabels)) {
+            foreach ($adminLabels as $key => $valuepair) {
+                if ($key == $labelCode) {
+                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
+                        $valuepair['wpay_label_desc'];
+                }
+            }
+        }
+    }
+
+    public function getAccountLabelbyCode($labelCode)
+    {
+        $aLabels = $this->serializer->unserialize($this->scopeConfig->getValue(
+            'worldpay_custom_labels/my_account_labels/my_account_label',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        ));
+        if (is_array($aLabels) || is_object($aLabels)) {
+            foreach ($aLabels as $key => $valuepair) {
+                if ($key == $labelCode) {
+                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
+                    $valuepair['wpay_label_desc'];
+                }
+            }
+        }
+    }
+    
+    public function getCheckoutLabelbyCode($labelCode)
+    {
+        $aLabels = $this->serializer->unserialize($this->scopeConfig->getValue(
+            'worldpay_custom_labels/checkout_labels/checkout_label',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        ));
+        if (is_array($aLabels) || is_object($aLabels)) {
+            foreach ($aLabels as $key => $valuepair) {
+                if ($key == $labelCode) {
+                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
+                    $valuepair['wpay_label_desc'];
+                }
+            }
+        }
     }
     
     public function getMyAccountExceptions($exceptioncode)

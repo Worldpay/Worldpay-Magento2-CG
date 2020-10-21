@@ -40,6 +40,7 @@ define([
                 } else {
                     this.element.hide();
                     $(this.options.startDateContainerElement).hide();
+                    $(this.options.endDateContainerElement).hide();
                     $(this.options.qtySelector).show();
 
                     var selectedPlan = this.element.find(this.options.planElement + ':checked').first();
@@ -52,6 +53,7 @@ define([
 
             if(this.element.find(this.options.planElement + ':checked').first().length) {
                 $(this.options.addPlanElement).prop('checked', true);
+                $(this.options.instantPurchaseButton).hide();
                 this.element.show();
             }
 
@@ -74,6 +76,7 @@ define([
                 finalPrice = this.options.config.plans[selectedPlan.val()].finalPrice;
 
                 $(this.options.startDateContainerElement).show();
+                $(this.options.endDateContainerElement).show();
                 $(this.options.qtySelector).hide();
             }
 
@@ -94,18 +97,26 @@ define([
                     result = true;
                 }
             });
-            if(result === true && $('#subscription_date').val() !== ''){
+            if(result === true && $('#show_endDate').val() !== '1' && $('#subscription_date').val() !== ''){
                 $('#subscription-error').html('');				
-                return true;
+                return result;
+            } 
+            if(result === true && $('#show_endDate').val() === '1' && 
+                    $('#subscription_end_date').val() !== ''){
+                $('#subscription-error').html('');				
+                return result;
             } else {
                 if(result === false){
                     $('#subscription-error').html(getMyAccountExceptions('MCAM1'));
                 } else if($('#subscription_date').val() === '') {
                     $('#subscription-error').html(getMyAccountExceptions('MCAM2'));
+                } else if($('#subscription_end_date').val() === '') {
+                    $('#subscription-error').html(getMyAccountExceptions('MCAM22'));
                 }
                 $('#subscription-error').css('display', 'block');                
                 return false;
             }
+            return result;
         } 
     });
     $('#product-updatecart-button').on('click', function(){
@@ -116,10 +127,15 @@ define([
                     result = true;
                 }
             });
-            if(result === true && $('#subscription_date').val() !== ''){
+            if(result === true && $('#show_endDate').val() !== '1'&& $('#subscription_date').val() !== ''){
                 $('#subscription-error').html('');				
                 return true;
-            } else {
+            } 
+            if(result === true && $('#show_endDate').val() === '1' && 
+                    $('#subscription_end_date').val() !== ''){
+                $('#subscription-error').html('');				
+                return result;
+            }else {
                 event.stopImmediatePropagation();
                 event.preventDefault();
                 event.stopPropagation();
@@ -127,10 +143,13 @@ define([
                     $('#subscription-error').html(getMyAccountExceptions('MCAM1'));
                 } else if($('#subscription_date').val() === '') {
                     $('#subscription-error').html(getMyAccountExceptions('MCAM2'));
+                } else if($('#subscription_end_date').val() === '') {
+                    $('#subscription-error').html(getMyAccountExceptions('MCAM22'));
                 }
                 $('#subscription-error').css('display', 'block');                
                 return false;
             }
+            return result;
         } 
     });
 

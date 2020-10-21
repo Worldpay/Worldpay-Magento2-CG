@@ -96,7 +96,7 @@ class Index extends \Magento\Framework\App\Action\Action
             if ("https" == parse_url($validation_url, PHP_URL_SCHEME) && substr(
                 parse_url($validation_url, PHP_URL_HOST),
                 -10
-            )  == ".apple.com" ) {
+            )  == ".apple.com") {
                
                 // create a new cURL resource
                 $ch = curl_init();

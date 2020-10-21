@@ -4,12 +4,17 @@ namespace Sapient\Worldpay\Model\InstantPurchase\CreditCard;
 
 use Magento\InstantPurchase\PaymentMethodIntegration\PaymentTokenFormatterInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
+use Sapient\Worldpay\Model\ResourceModel\SavedToken;
 
 /**
  * Braintree stored credit card formatter.
  */
 class TokenFormatter implements PaymentTokenFormatterInterface
 {
+     /**
+      * @var \Sapient\Worldpay\Model\WorldpaymentFactory
+      */
+    protected $_worldpaymentFactory;
     /**
      * Most used credit card types
      * @var array
@@ -28,9 +33,15 @@ class TokenFormatter implements PaymentTokenFormatterInterface
     ];
 
     public function __construct(
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        \Sapient\Worldpay\Model\SavedTokenFactory $savedWPFactory,
+        \Sapient\Worldpay\Helper\Data $wpdata,
+        SavedToken $savedtoken
     ) {
         $this->wplogger = $wplogger;
+        $this->savecard = $savedWPFactory;
+        $this->wpdata = $wpdata;
+        $this->savedtoken = $savedtoken;
     }
 
     /**
@@ -48,16 +59,33 @@ class TokenFormatter implements PaymentTokenFormatterInterface
         } else {
             $ccType = $details['type'];
         }
-
-        $formatted = sprintf(
-            '%s: %s, %s: %s (%s: %s)',
-            __('Credit Card'),
-            $ccType,
-            __('ending'),
-            $details['maskedCC'],
-            __('expires'),
-            $details['expirationDate']
-        );
+        if ($this->wpdata->isDynamic3DS2Enabled()) {
+            $tokenCode = $paymentToken->getGatewayToken();
+            $savedCardDataId = $this->savedtoken->loadByTokenCode($tokenCode);
+            $model = $this->savecard->create();
+            $model->load($savedCardDataId);
+            $formatted = sprintf(
+                '%s: %s, %s: %s ,%s: %s, %s: %s',
+                __('Credit Card'),
+                $ccType,
+                __('ending'),
+                $details['maskedCC'],
+                __('expires'),
+                $details['expirationDate'],
+                __('bin'),
+                $model->getData('bin_number')
+            );
+        } else {
+            $formatted = sprintf(
+                '%s: %s, %s: %s ,%s: %s',
+                __('Credit Card'),
+                $ccType,
+                __('ending'),
+                $details['maskedCC'],
+                __('expires'),
+                $details['expirationDate']
+            );
+        }
         return $formatted;
     }
 }

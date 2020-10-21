@@ -32,6 +32,7 @@ class Service
         \Sapient\Worldpay\Model\SavedToken $savedtoken,
         \Magento\Framework\UrlInterface $urlBuilder,
         \Magento\Customer\Model\Session $customerSession,
+        \Sapient\Worldpay\Helper\Recurring $recurringHelper,
         SessionManagerInterface $session,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
@@ -39,6 +40,7 @@ class Service
         $this->savedTokenFactory = $savedTokenFactory;
         $this->worldpayHelper = $worldpayHelper;
         $this->customerSession = $customerSession;
+        $this->recurringHelper = $recurringHelper;
         $this->savedtoken = $savedtoken;
         $this->_urlBuilder = $urlBuilder;
         $this->session = $session;
@@ -79,7 +81,8 @@ class Service
             'method' => $paymentDetails['method'],
             'orderStoreId' => $orderStoreId,
             'shopperId' => $quote->getCustomerId(),
-            'exponent' => $exponent
+            'exponent' => $exponent,
+            'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote)
         ];
     }
 
@@ -139,7 +142,8 @@ class Service
                 'exemptionEngine' => $this->getExemptionEngineDetails(),
                 'thirdPartyData' => $thirdPartyData,
                 'shippingfee' => $shippingFee,
-                'exponent' => $exponent
+                'exponent' => $exponent,
+                'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote)
             ];
     }
 
@@ -281,7 +285,7 @@ class Service
     ) {
         $reservedOrderId = $quote->getReservedOrderId();
         $stmtNarrative = '';
-        
+       
         $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
         if (array_key_exists($paymentDetails['additional_data']['cc_type'], $apmPaymentTypes) &&
                 (isset($paymentDetails['additional_data']['statementNarrative']))) {
@@ -327,7 +331,11 @@ class Service
     ) {
         $reservedOrderId = $quote->getReservedOrderId();
         $updatedPaymentDetails = $this->_getPaymentDetailsUsingToken($paymentDetails, $quote);
-
+        
+        $id = '';
+        if ($this->recurringHelper->quoteContainsSubscription($quote)) {
+             $id = isset($updatedPaymentDetails['id'])? $updatedPaymentDetails['id'] : '';
+        }
         $savemyCard = isset($paymentDetails['additional_data']['save_my_card'])
                 ? $paymentDetails['additional_data']['save_my_card'] : '';
         $tokenizationEnabled = isset($paymentDetails['additional_data']['tokenization_enabled'])
@@ -348,6 +356,7 @@ class Service
         return [
             'orderCode' => $orderCode,
                 'merchantCode' => $this->worldpayHelper->getMerchantCode($updatedPaymentDetails['brand']),
+                'id' => $id,
                 'orderDescription' => $this->_getOrderDescription($reservedOrderId),
                 'currencyCode' => $quote->getQuoteCurrencyCode(),
                 'amount' => $quote->getGrandTotal(),
@@ -375,8 +384,57 @@ class Service
                 'exemptionEngine' => $this->getExemptionEngineDetails(),
                 'thirdPartyData' => $thirdPartyData,
                 'shippingfee' => $shippingFee,
-                'exponent' => $exponent
+                'exponent' => $exponent,
+                'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote)
             ];
+    }
+    
+    public function collectACHOrderParameters(
+        $orderCode,
+        $quote,
+        $orderStoreId,
+        $paymentDetails
+    ) {
+        $reservedOrderId = $quote->getReservedOrderId();
+        $stmtNarrative = '';
+        $achEmailAddress = '';
+        $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
+        if (array_key_exists($paymentDetails['additional_data']['cc_type'], $apmPaymentTypes)
+                && (isset($paymentDetails['additional_data']['statementNarrative']))) {
+            $stmtNarrative = $paymentDetails['additional_data']['statementNarrative'];
+            $stmtNarrative = strlen($stmtNarrative)>15?substr($stmtNarrative, 0, 15):$stmtNarrative;
+        }
+       
+        if (array_key_exists($paymentDetails['additional_data']['cc_type'], $apmPaymentTypes)
+                && (isset($paymentDetails['additional_data']['ach_emailaddress']))) {
+            $achEmailAddress = $paymentDetails['additional_data']['ach_emailaddress'];
+        }
+        $currencyCode = $quote->getQuoteCurrencyCode();
+        $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
+        
+        return [
+            'orderCode' => $orderCode,
+            'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
+            'orderDescription' => $this->_getOrderDescription($reservedOrderId),
+            'currencyCode' => $quote->getQuoteCurrencyCode(),
+            'amount' => $quote->getGrandTotal(),
+            'paymentDetails' => $this->_getPaymentDetails($paymentDetails),
+            'shopperEmail' => $achEmailAddress?$achEmailAddress:$quote->getCustomerEmail(),
+            'acceptHeader' => php_sapi_name() !== "cli" ? filter_input(INPUT_SERVER, 'HTTP_ACCEPT') : '',
+            'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
+                INPUT_SERVER,
+                'HTTP_USER_AGENT',
+                FILTER_SANITIZE_STRING,
+                FILTER_FLAG_STRIP_LOW
+            ) : '',
+            'shippingAddress' => $this->_getShippingAddress($quote),
+            'billingAddress' => $this->_getBillingAddress($quote),
+            'method' => $paymentDetails['method'],
+            'orderStoreId' => $orderStoreId,
+            'shopperId' => $quote->getCustomerId(),
+            'statementNarrative' => $stmtNarrative,
+            'exponent' => $exponent
+        ];
     }
 
     public function collectPaymentOptionsParameters(
@@ -406,8 +464,8 @@ class Service
             ];
         } elseif ($method == 'worldpay_cc_vault') {
             return [
-                'isDynamic3D' => true,
-                'is3DSecure' => false
+                'isDynamic3D' => (bool) $this->worldpayHelper->isDynamic3DEnabled(),
+                'is3DSecure' => (bool) $this->worldpayHelper->is3DSecureEnabled()
             ];
         } else {
             return [
@@ -425,12 +483,12 @@ class Service
         }
         return $shippingaddress;
     }
-
+    
     private function _getBillingAddress($quote)
     {
         return $this->_getAddress($quote->getBillingAddress());
     }
-
+    
     private function _getOrderLineItems($quote, $paymentType = null)
     {
         $orderitems = [];
@@ -499,7 +557,7 @@ class Service
             'countryCode' => $address->getCountryId(),
         ];
     }
-
+    
     private function _getCardAddress($quote)
     {
         return $this->_getAddress($quote->getBillingAddress());
@@ -512,6 +570,25 @@ class Service
             return $paymentDetails['additional_data']['cc_type'];
         }
 
+        if ($paymentDetails['additional_data']['cc_type'] == "ACH_DIRECT_DEBIT-SSL") {
+            
+            $details = [
+               'paymentType' => $paymentDetails['additional_data']['cc_type'],
+               'achaccount' => $paymentDetails['additional_data']['ach_account'],
+               'achAccountNumber' => $paymentDetails['additional_data']['ach_accountNumber'],
+               'achRoutingNumber' => $paymentDetails['additional_data']['ach_routingNumber']
+            ];
+            if (isset($paymentDetails['additional_data']['ach_checknumber'])) {
+                $details['achCheckNumber'] = $paymentDetails['additional_data']['ach_checknumber'];
+            }
+            if (isset($paymentDetails['additional_data']['ach_companyname'])) {
+                $details['achCompanyName'] = $paymentDetails['additional_data']['ach_companyname'];
+            }
+            $details['sessionId'] = $this->session->getSessionId();
+            $details['shopperIpAddress'] = $this->_getClientIPAddress();
+            return $details;
+        }
+        
         if ($paymentDetails['additional_data']['cse_enabled']) {
             $details = [
                 'cseEnabled' => $paymentDetails['additional_data']['cse_enabled'],
@@ -586,6 +663,7 @@ class Service
             }
         }
         $details['sessionId'] = $this->session->getSessionId();
+        $details['id'] = $savedCardData->getId();
         $details['shopperIpAddress'] = $this->_getClientIPAddress();
         $details['dynamicInteractionType'] = $this->worldpayHelper->
                 getDynamicIntegrationType($paymentDetails['method']);
@@ -616,6 +694,11 @@ class Service
                                                 getDynamicIntegrationType($paymentDetails['method']);
         // Check for Merchant Token
         $details['token_type'] = $this->worldpayHelper->getMerchantTokenization();
+        //3ds changes for vault
+        if (isset($paymentDetails['dfReferenceId'])) {
+            $details['dfReferenceId'] = $paymentDetails['dfReferenceId'];
+        }
+        
         return $details;
     }
 
@@ -861,4 +944,24 @@ class Service
             return $indicator;
         }
     }
-}
+    
+    public function getPrimeRoutingDetails($paymentDetails, $quote)
+    {
+        $billingAdress = $this->_getBillingAddress($quote);
+        if ($billingAdress['countryCode']==='US') {
+            if ($this->worldpayHelper->isPrimeRoutingEnabled()
+                && $this->worldpayHelper->isAdvancedPrimeRoutingEnabled()) {
+                $details['primerouting'] = $this->worldpayHelper->isPrimeRoutingEnabled();
+                $details['advanced_primerouting'] = $this->worldpayHelper->isAdvancedPrimeRoutingEnabled();
+                $details['routing_preference'] = $this->worldpayHelper->getRoutingPreference();
+                $details['debit_networks'] = $this->worldpayHelper->getDebitNetworks();
+            
+                return $details;
+            } elseif ($this->worldpayHelper->isPrimeRoutingEnabled()) {
+                $details['primerouting'] = $this->worldpayHelper->isPrimeRoutingEnabled();
+            
+                return $details;
+            }
+        }
+    }
+    }

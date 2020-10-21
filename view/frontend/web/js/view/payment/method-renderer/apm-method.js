@@ -20,15 +20,63 @@ define(
         'use strict';
         var ccTypesArr = ko.observableArray([]);
         var paymentService = false;
+        var isACH = false;
         var billingAddressCountryId = "";
         if (quote.billingAddress()) {
             billingAddressCountryId = quote.billingAddress._latestValue.countryId;
+        }
+        var achAccountCodeMessage = 'Maximum allowed length of 17 exceeded';
+        var achAccountDisplayMessage = getCreditCardExceptions('CACH03')?getCreditCardExceptions('CACH03'):achAccountCodeMessage;
+        var achRoutingCodeMessage = 'Required length should be 8 or 9';
+        var achRoutingDisplayMessage = getCreditCardExceptions('CACH04')?getCreditCardExceptions('CACH04'):achRoutingCodeMessage;
+        var achCheckNumberCodeMessage = 'Maximum allowed length of 15 exceeded';
+        var achCheckNumberDisplayMsg = getCreditCardExceptions('CACH05')?getCreditCardExceptions('CACH05'):achCheckNumberCodeMessage;
+        var achCompanyCodeMessage = 'Maximum allowed length of 40 exceeded' ;
+        var achCompanyDisplayMsg = getCreditCardExceptions('CACH06')?getCreditCardExceptions('CACH06'):achCompanyCodeMessage;
+        
+        $.validator.addMethod('worldpay-validate-ach-accountnumber', function (value) {
+            if (value) {
+                return evaluateRegex(value, "^[0-9]{0,17}$");
+            }
+	    }, $.mage.__(achAccountDisplayMessage));
+        $.validator.addMethod('worldpay-validate-ach-routingnumber', function (value) {
+            if (value) {
+                return evaluateRegex(value, "^[0-9]{8,9}$");
+            }
+	    }, $.mage.__(achRoutingDisplayMessage));
+        $.validator.addMethod('worldpay-validate-ach-checknumber', function (value) {
+            if ((value) || value.length === 0) {
+                return evaluateRegex(value, "^[0-9]{0,15}$");
+            }
+	    }, $.mage.__(achCheckNumberDisplayMsg));
+        $.validator.addMethod('worldpay-validate-ach-companyname', function (value) {
+            if (value || value.length === 0) {
+                return value.length<40;
+            }
+	    }, $.mage.__(achCompanyDisplayMsg));
+        function evaluateRegex(data, re) {
+            var patt = new RegExp(re);
+            return patt.test(data);
+        }
+        function getCreditCardExceptions (exceptioncode){
+                var ccData=window.checkoutConfig.payment.ccform.creditcardexceptions;
+                  for (var key in ccData) {
+                    if (ccData.hasOwnProperty(key)) {  
+                        var cxData=ccData[key];
+                    if(cxData['exception_code'] === exceptioncode){
+                        return cxData['exception_module_messages']?cxData['exception_module_messages']:cxData['exception_messages'];
+                    }
+                    }
+                }
         }
         return Component.extend({
             defaults: {
                 redirectAfterPlaceOrder: false,
                 redirectTemplate: 'Sapient_Worldpay/payment/apm',
                 idealBankType:null,
+                ach_accountType:null,
+                ach_accountnumber:null,
+                ach_routingNumber:null,
                 statementNarrative:null
             },
 
@@ -68,7 +116,7 @@ define(
                  var payload = {
                     countryId: quote.billingAddress._latestValue.countryId
                 };
-
+                var integrationMode = window.checkoutConfig.payment.ccform.intigrationmode;
                  fullScreenLoader.startLoader();
 
                  storage.post(
@@ -81,10 +129,16 @@ define(
                                 var found = false;
                                 $.each(ccavailabletypes, function(key, value){
                                     if(response[responsekey] == key.toUpperCase()){
+                                       if((integrationMode === 'redirect' && key !== 'ACH_DIRECT_DEBIT-SSL')
+                                            || integrationMode === 'direct' ){
                                         found = true;
                                         cckey = key;
                                         ccvalue = ccavailabletypes[key];
+                                        if (key === 'ACH_DIRECT_DEBIT-SSL'){
+                                            isACH = true;
+                                        }
                                         return false;
+                                    }
                                     }
                                 });
                                 if(found){
@@ -101,7 +155,7 @@ define(
                              'ccLabel': value
                             };
                         });
-
+					
                         fullScreenLoader.stopLoader();
                         ccTypesArr(ccTypesArr1);
                     }
@@ -117,11 +171,28 @@ define(
                  return ccTypesArr;
             },
 
-             availableCCTypes : function(){
+            availableCCTypes : function(){
                return ccTypesArr;
+            },
+            getCheckoutLabels: function (labelcode) {
+                var ccData = window.checkoutConfig.payment.ccform.checkoutlabels;
+                for (var key in ccData) {
+                    if (ccData.hasOwnProperty(key)) {
+                        var cxData = ccData[key];
+                        if (cxData['wpay_label_code'].includes(labelcode)) {
+                            return cxData['wpay_custom_label'] ? cxData['wpay_custom_label'] : cxData['wpay_label_desc'];
+                        }
+                    }
+                }
             },
             selectedCCType : ko.observable(),
             selectedIdealBank:ko.observable(),
+            selectedACHAccountType:ko.observable(),
+            achaccountnumber: ko.observable(),
+            achroutingnumber: ko.observable(),
+            achchecknumber: ko.observable(),
+            achcompanyname: ko.observable(),
+            achemailaddress:ko.observable(),
             stmtNarrative:ko.observable(),
             getTemplate: function(){
                     return this.redirectTemplate;
@@ -137,6 +208,10 @@ define(
             isActive: function() {
                 return true;
             },
+            getACHAccounttypes: function(code) {
+                var accounttypes = window.checkoutConfig.payment.ccform.achdetails;
+                return accounttypes[code];
+            },
             /**
              * @override
              */
@@ -146,15 +221,21 @@ define(
                     'additional_data': {
                         'cc_type': this.getselectedCCType(),
                         'cc_bank': this.idealBankType,
+                        'ach_account': this.ach_accountType,
+                        'ach_accountNumber': this.ach_accountnumber,
+                        'ach_routingNumber': this.ach_routingnumber,
+                        'ach_checknumber': this.ach_checknumber,
+                        'ach_companyname': this.ach_companyname,
+                        'ach_emailaddress': this.ach_emailaddress,
                         'statementNarrative': this.statementNarrative
                     }
                 };
             },
              getselectedCCType : function(){
                 if(this.paymentMethodSelection()=='radio'){
-                     return $("input[name='apm_type']:checked").val();
-                    } else{
-                      return  this.selectedCCType();
+                    return $("input[name='apm_type']:checked").val();
+                } else{
+                    return  this.selectedCCType();
                 }
             },
             getIdealBankList: function() {
@@ -166,6 +247,21 @@ define(
                                 });
                 return ko.observableArray(bankList);
             },
+            getACHBankAccountTypes : function() {
+                var accounttypes = _.map(window.checkoutConfig.payment.ccform.achdetails, function (value, key) {
+                                           return {
+                                              'accountCode': key,
+                                              'accountText': value
+                                    };
+                                });
+                return ko.observableArray(accounttypes);
+            },
+            showACH : function() {
+                if(isACH && this.getselectedCCType() == 'ACH_DIRECT_DEBIT-SSL'){
+                    return true;
+                }
+              return false;
+            },
             paymentMethodSelection: function() {
                 return window.checkoutConfig.payment.ccform.paymentMethodSelection;
             },
@@ -175,6 +271,14 @@ define(
                 if($form.validation() && $form.validation('isValid')){
                     if (this.getselectedCCType() =='IDEAL-SSL') {
                         this.idealBankType = this.selectedIdealBank();
+                    }else if(this.getselectedCCType() == 'ACH_DIRECT_DEBIT-SSL'){
+                        this.ach_accountType = this.getACHAccounttypes(this.selectedACHAccountType());
+                        this.ach_accountnumber = this.achaccountnumber();
+                        this.ach_routingnumber = this.achroutingnumber();
+                        this.ach_checknumber = this.achchecknumber();
+                        this.ach_companyname = this.achcompanyname();
+                        this.ach_emailaddress = this.achemailaddress();
+                        
                     }
                     this.statementNarrative = this.stmtNarrative();
                     self.placeOrder();
@@ -189,30 +293,51 @@ define(
             },
 
             afterPlaceOrder: function (data, event) {
+                if(this.getselectedCCType()=='ACH_DIRECT_DEBIT-SSL'){
+                       window.location.replace(url.build('worldpay/threedsecure/auth'));
+                }else{
                 window.location.replace(url.build('worldpay/redirectresult/redirect'));
+            }
             },
             checkPaymentTypes: function (data, event){
-                if (data && data.ccValue) {
+               if (data && data.ccValue) {
                     if (data.ccValue=='IDEAL-SSL') {
                         $(".ideal-block").show();
                         $("#ideal_bank").prop('disabled',false);
+                        $(".ach-block").hide();
+                    }else if(data.ccValue=='ACH_DIRECT_DEBIT-SSL'){
+                        $(".ach-block").show();
+                        $("#ach_pay").prop('disabled',false);
+                        $(".ideal-block").hide();
                     }else{
                         $("#ideal_bank").prop('disabled',true);
                         $(".ideal-block").hide();
+                        $("#ach_pay").prop('disabled',true);
+                        $(".ach-block").hide();
                     }
                      $(".statment-narrative").show();
                 }else if(data){
                     if (data.selectedCCType() && data.selectedCCType() == 'IDEAL-SSL') {
                         $(".ideal-block").show();
                         $("#ideal_bank").prop('disabled',false);
+                        $(".ach-block").hide();
+                    }else if (data.selectedCCType() && data.selectedCCType() == 'ACH_DIRECT_DEBIT-SSL') {
+                        $(".ach-block").show();
+                        $("#ach_pay").prop('disabled',false);
+                        $(".ideal-block").hide();
                     }else{
                         $("#ideal_bank").prop('disabled',true);
                         $(".ideal-block").hide();
+                        $("#ach_pay").prop('disabled',true);
+                        $(".ach-block").hide();
                     }
                      $(".statment-narrative").show();
-                } else {
+                }else {
+                    $("#apm_ACH_DIRECT_DEBIT-SSL").prop('checked', false);
+                    $("#apm_IDEAL-SSL").prop('checked', false);
                     $("#ideal_bank").prop('disabled',true);
                     $(".ideal-block").hide();
+                    $(".ach-block").hide();
                 }
             }
         });

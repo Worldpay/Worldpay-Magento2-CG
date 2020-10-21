@@ -9,23 +9,25 @@
 ?>
 
 <div class="field worldpay-subscriptions">
-    <label class="label"><span><?php echo $block->escapeHtml(__('Buy one time or select a Payment Plan')) ?></span></label>
+    <label class="label"><span><?php echo $block->getBuyOneTimelabel() ?></span></label>
     <div>
         <input type="checkbox" id="worldpay-add-plan" name="worldpay_add_plan" onchange="valueChanged()">
-        <label for="worldpay-add-plan"><span><?php echo $block->escapeHtml(__('Subscribe this product and save')) ?></span></label>
+        <label for="worldpay-add-plan"><span><?php echo $block->getSubscribeCheckboxLabel() ?></span></label>
     </div>
     <div class="control" id="worldpay-subscription-plans-list" style="display: none;" data-mage-init='{"worldpayPriceSubscription":{
              "addPlanElement":"#worldpay-add-plan",
              "planElement":"input:radio[value]",
              "startDateContainerElement":"#product-options-wrapper .worldpay-subscriptions-start-date-container",
+             "endDateContainerElement":"#product-options-wrapper .worldpay-subscriptions-end-date-container",
+             "instantPurchaseButton":"#instant-purchase",
              "config":<?php /* @noEscape */ echo $block->getJsonConfig() ?>}}'>
         <?php foreach ($this->getPlans() as $plan): ?>
             <div class="field choice">
-                <input type="radio"
+                <input type="radio" onchange="valueRadioChanged()"
                        name="worldpay_subscription_plan"
-                       id="worldpay_subscription_plan_<?php echo $block->escapeHtml($plan->getId()) ?>"
+                       id="worldpay_subscription_plan_<?php echo $block->buildPlanOptionId($plan) ?>"
                        value="<?php echo $block->escapeHtml($plan->getId()) ?>" <?php if ($block->isPlanSelected($plan)): ?>checked<?php endif; ?>/>
-                <label class="label" for="worldpay_subscription_plan_<?php echo $block->escapeHtml($plan->getId()) ?>">
+                <label class="label" for="worldpay_subscription_plan_<?php echo $block->buildPlanOptionId($plan) ?>">
                     <span><?php /* @noEscape */ echo $block->getPlanTitle($plan); ?></span>
                 </label>
             </div>
@@ -34,41 +36,38 @@
     <div class="mage-error" generated="true"  id="subscription-error"></div>
 </div>
 <?php if ($block->getProduct()->getWorldpayRecurringAllowStart()): ?>
-    <div class="field date worldpay-subscriptions-start-date-container" style="display: none;">
+    <div class="field required date worldpay-subscriptions-start-date-container" style="display: none;">
         <legend class="label">
-            <span><?php echo $block->escapeHtml(__('Subscription Start Date')) ?></span>
+            <span><?php echo $block->getStartDateLabel() ?></span>
         </legend>
-<!--        <div class="control">
-            <?php //echo $block->getStartDateHtml() ?>
-        </div>-->
         <div class="field-control ">
-            <input class="control-text" name="subscription_date" id="subscription_date" type="text" readonly="true" value="<?php echo $block->getStartDate();?>">
+            <input class="control-text" style="width: calc(50% - 33px);" name="subscription_date" 
+                   id="subscription_date" type="text" readonly="true" value="<?php echo $block->getStartDate();?>">
             <?php //echo $block->getDateHtml() ?>
         </div>
     </div>
-
-    
 <?php endif; ?>
+<?php if ($block->isEndDateEnabled()): ?>
+    <div class="field required date worldpay-subscriptions-end-date-container" style="display: none;">
+        <legend class="label">
+            <span><?php echo $block->getEndDateLabel() ?></span>
+        </legend>
+        <div class="field-control ">
+            <input class="control-text" style="width: 44%;"
+                   name="subscription_end_date" id="subscription_end_date" type="text" readonly="true" value="<?php echo $block->getEndDate();?>">
+            <input type="hidden" id="show_endDate" value="1">
+            <?php //echo $block->getDateHtml() ?>
+        </div>
+    </div>
+<?php endif; ?>
+
+<style>
+    .ui-datepicker .ui-datepicker-title .ui-datepicker-month {
+        width: 53%;
+    }
+</style>
+
 <script type="text/javascript">
-    require([
-    "jquery",
-    "mage/calendar"
-    ], function($){
-        $('#subscription_date').datepicker({
-            prevText: '&#x3c;zurück', prevStatus: '',
-            prevJumpText: '&#x3c;&#x3c;', prevJumpStatus: '',
-            nextText: 'Vor&#x3e;', nextStatus: '',
-            nextJumpText: '&#x3e;&#x3e;', nextJumpStatus: '',
-            monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December'],
-            monthNamesShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-            dayNames: ['Sunday ','Monday','Tuesday ','Wednesday','Thursday','Friday','Saturday'],
-            dayNamesShort: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
-            dayNamesMin: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
-            showMonthAfterYear: false,
-            dateFormat:'d-m-yy',
-            minDate: new Date()
-        });
-    });
     function valueChanged()
     {
         if(jQuery('#worldpay-add-plan').is(":checked")){
@@ -78,5 +77,67 @@
             jQuery('#instant-purchase').show();
         }
     }
+    
+    function valueRadioChanged()
+    {
+        if(jQuery('#subscription_date').val()) {
+            document.getElementById('subscription_date').value = '';
+        }
+        if(jQuery('#subscription_end_date').val()) {
+           document.getElementById('subscription_end_date').value = ''; 
+        }
+    }
+       
+    require([
+    "jquery",
+    "mage/calendar"
+    ], function($){
+        var dateFormat= "d-m-yy", from = $("#subscription_date")
+         .datepicker({
+         minDate: new Date(),
+         changeMonth: true,
+         numberOfMonths: 1,
+         dateFormat: "d-m-yy"
+         })
+         .on("change", function() {
+         to.datepicker( "option", "minDate", getDate(this) );
+         }),
+         to = $("#subscription_end_date").datepicker({
+         changeMonth: true,
+         numberOfMonths: 1,
+         dateFormat: "d-m-yy"
+         })
+         .on( "change", function() {
+         from.datepicker( "option", "maxDate", getDate(this));
+         });
+
+         function getDate(element) {
+         var date;
+         try {
+            date = $.datepicker.parseDate( dateFormat, element.value );
+            if(document.getElementById('worldpay_subscription_plan_weekly')!==null 
+                    && document.getElementById('worldpay_subscription_plan_weekly').checked) {
+                date.setDate(date.getDate() + 7);
+            } else if(document.getElementById('worldpay_subscription_plan_monthly')!==null
+                    && document.getElementById('worldpay_subscription_plan_monthly').checked) {
+                date.setMonth(date.getMonth() + 1);
+            } else if(document.getElementById('worldpay_subscription_plan_quarterly')!==null
+                    && document.getElementById('worldpay_subscription_plan_quarterly').checked) {
+                date.setMonth(date.getMonth() + 3);
+            } else if(document.getElementById('worldpay_subscription_plan_semiannually')!==null
+                    && document.getElementById('worldpay_subscription_plan_semiannually').checked) {
+                date.setMonth(date.getMonth() + 6);
+            } else if(document.getElementById('worldpay_subscription_plan_annually')!==null
+                    && document.getElementById('worldpay_subscription_plan_annually').checked) {
+                date.setMonth(date.getMonth() + 12);
+            }
+         } catch(error) {
+            date = null;
+         }
+
+         return date;
+         }
+      });
+    
 </script>
 

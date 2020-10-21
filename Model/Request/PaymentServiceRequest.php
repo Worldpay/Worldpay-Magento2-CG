@@ -105,6 +105,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         if (empty($directOrderParams['cusDetails'])) {
             $directOrderParams['cusDetails']='';
         }
+        if (empty($directOrderParams['primeRoutingData'])) {
+            $directOrderParams['primeRoutingData'] = '';
+        }
         $orderSimpleXml = $this->xmldirectorder->build(
             $directOrderParams['merchantCode'],
             $directOrderParams['orderCode'],
@@ -126,6 +129,42 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $directOrderParams['exemptionEngine'],
             $directOrderParams['thirdPartyData'],
             $directOrderParams['shippingfee'],
+            $directOrderParams['exponent'],
+            $directOrderParams['primeRoutingData']
+        );
+        
+        return $this->_sendRequest(
+            dom_import_simplexml($orderSimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($directOrderParams['paymentDetails']['paymentType']),
+            $this->worldpayhelper->getXmlPassword($directOrderParams['paymentDetails']['paymentType'])
+        );
+    }
+    
+    /**
+     * Send ACH order XML to Worldpay server
+     *
+     * @param array $directOrderParams
+     * @return mixed
+     */
+    public function achOrder($directOrderParams)
+    {
+        $this->_wplogger->info('########## Submitting ACH order request. OrderCode: ' .
+        $directOrderParams['orderCode'] . ' ##########');
+        $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\ACHOrder();
+        $orderSimpleXml = $this->xmldirectorder->build(
+            $directOrderParams['merchantCode'],
+            $directOrderParams['orderCode'],
+            $directOrderParams['orderDescription'],
+            $directOrderParams['currencyCode'],
+            $directOrderParams['amount'],
+            $directOrderParams['paymentDetails'],
+            $directOrderParams['shopperEmail'],
+            $directOrderParams['acceptHeader'],
+            $directOrderParams['userAgentHeader'],
+            $directOrderParams['shippingAddress'],
+            $directOrderParams['billingAddress'],
+            $directOrderParams['shopperId'],
+            $directOrderParams['statementNarrative'],
             $directOrderParams['exponent']
         );
         
@@ -156,6 +195,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $tokenOrderParams['thirdPartyData']='';
             $tokenOrderParams['shippingfee']='';
         }
+        if (empty($tokenOrderParams['primeRoutingData'])) {
+            $tokenOrderParams['primeRoutingData'] = '';
+        }
         $orderSimpleXml = $this->xmltokenorder->build(
             $tokenOrderParams['merchantCode'],
             $tokenOrderParams['orderCode'],
@@ -177,7 +219,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $tokenOrderParams['exemptionEngine'],
             $tokenOrderParams['thirdPartyData'],
             $tokenOrderParams['shippingfee'],
-            $tokenOrderParams['exponent']
+            $tokenOrderParams['exponent'],
+            $tokenOrderParams['primeRoutingData']
         );
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
@@ -404,7 +447,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     protected function _sendRequest($xml, $username, $password)
     {
         $response = $this->_request->sendRequest($xml, $username, $password);
-
+       
         $this->_checkForError($response);
         return $response;
     }
@@ -656,6 +699,47 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     }
     
     /**
+     * Send Samsung Pay order XML to Worldpay server
+     *
+     * @param array $walletOrderParams
+     * @return mixed
+     */
+    public function samsungPayOrder($samsungPayOrderParams)
+    {
+        $loggerMsg = '########## Submitting samsung pay order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $samsungPayOrderParams['orderCode'] . ' ##########');
+   
+        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\SamsungPayOrder();
+  
+        $appleSimpleXml = $this->xmlredirectorder->build(
+            $samsungPayOrderParams['merchantCode'],
+            $samsungPayOrderParams['orderCode'],
+            $samsungPayOrderParams['orderDescription'],
+            $samsungPayOrderParams['currencyCode'],
+            $samsungPayOrderParams['amount'],
+            $samsungPayOrderParams['paymentType'],
+            $samsungPayOrderParams['shopperEmail'],
+            $samsungPayOrderParams['data'],
+            $samsungPayOrderParams['exponent']
+        );
+        
+        return $response =  $this->_sendRequest(
+            dom_import_simplexml($appleSimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($samsungPayOrderParams['paymentType']),
+            $this->worldpayhelper->getXmlPassword($samsungPayOrderParams['paymentType'])
+        );
+        
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/worldpay.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('response ....');
+
+        $logger->info(print_r($response, true));
+
+        $logger->info('response got it....');
+    }
+    
+    /**
      * Send chromepay order XML to Worldpay server
      *
      * @param array $chromepayOrderParams
@@ -767,5 +851,29 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     public function getCreditCardSpecificException($exceptioncode)
     {
         return $this->worldpayhelper->getCreditCardSpecificexception($exceptioncode);
+    }
+    public function voidSale(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode)
+    {
+        $orderCode = $wp->getWorldpayOrderId();
+        $this->_wplogger->info('########## Submitting void sale request. Order: '
+        . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
+        $this->xmlvoidsale = new \Sapient\Worldpay\Model\XmlBuilder\VoidSale();
+        $currencyCode = $order->getOrderCurrencyCode();
+        $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
+        
+        $voidSaleSimpleXml = $this->xmlvoidsale->build(
+            $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
+            $orderCode,
+            $order->getOrderCurrencyCode(),
+            $order->getGrandTotal(),
+            $exponent,
+            $wp->getPaymentType()
+        );
+
+        return $this->_sendRequest(
+            dom_import_simplexml($voidSaleSimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
+            $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
+        );
     }
 }

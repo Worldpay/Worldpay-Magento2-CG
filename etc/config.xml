@@ -17,6 +17,9 @@
                 <require_cvc>1</require_cvc>
                 <integration_mode>direct</integration_mode>
             </cc_config>
+            <prime_routing>
+             <debit_networks>Accel,AFFN,CU24,Jeanie,NYCE,Pulse,Shazam,Star SouthEast,Star West,Star NorthEast</debit_networks>
+            </prime_routing>
             <order_sync_status>
                 <order_status>pending,processing,canceled,complete</order_status>
                 <order_sync_interval>24</order_sync_interval>
@@ -28,7 +31,7 @@
                 <save_stored_credentials>0</save_stored_credentials>
                 <configure_disclaimer>
                     <stored_credentials_disclaimer_message>
-                        Information about save card for future usage will be displayed here as provided in disclaimer message section.                        
+                        Information about save card for future usage will be displayed here as provided in disclaimer message section.
                         Please refer http://support.worldpay.com/support/kb/gg/stored-credentials-overview/ before constructing this message.
                     </stored_credentials_disclaimer_message>
                     <stored_credentials_message_enable>0</stored_credentials_message_enable>

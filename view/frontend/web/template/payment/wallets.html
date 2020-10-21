@@ -22,7 +22,7 @@
 
          <div class='accepted_cc'>
             
-             <span class='worldpay_cc_we_accept'>We Accept</span>
+             <span class='worldpay_cc_we_accept'><!-- ko i18n: getCheckoutLabels('CO2')--><!-- /ko --></span>
              
              <div class="paymentoptions-icon-wrapper">
          <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
@@ -105,7 +105,7 @@
                             css: {disabled: !isPlaceOrderActionAllowed()},
                             enable: (getCode() === isChecked())
                         " disabled>
-                    <span data-bind="text: $t('Place Order')"></span>
+                    <span><!-- ko i18n: getCheckoutLabels('CO14')--><!-- /ko --></span>
                 </button>
             </div>
         </div>

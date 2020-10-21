@@ -93,7 +93,16 @@ class SimplePlugin
                 $startDate
             );
         }
-
+        
+        if ($buyRequest->getSubscriptionEndDate()) {
+            $endDate = ($buyRequest->getSubscriptionEndDate())
+                ? $buyRequest->getSubscriptionEndDate() : date('d-m-yy');
+            $product->addCustomOption(
+                'subscription_end_date',
+                $endDate
+            );
+        }
+        
         $result = $proceed($buyRequest, $product, $processMode);
 
         if (!$buyRequest->getResetCount() && ($item = $this->checkoutSession->getQuote()->getItemByProduct($product))) {
@@ -143,6 +152,10 @@ class SimplePlugin
         }
 
         $quoteItem = $planOption->getItem();
+        
+        $quoteItem->setHasError(false)->setMessage(
+                __('Please verify subscription data, before placing the order')
+            );
         if ($quoteItem->getQuote()->getItemsQty() > 1) {
             $quoteItem->setHasError(true)->setMessage(
                 __($this->recurringHelper->getMyAccountExceptions('MCAM19'))
@@ -179,6 +192,10 @@ class SimplePlugin
         $planStartDate = $buyRequest->getSubscriptionDate();
         if ($planStartDate) {
             $subscriptionOptions['subscription_date'] = $planStartDate;
+        }
+        $planEndDate = $buyRequest->getSubscriptionEndDate();
+        if ($planEndDate) {
+            $subscriptionOptions['subscription_end_date'] = $planEndDate;
         }
 
         return array_merge($subscriptionOptions, $result);
@@ -222,6 +239,14 @@ class SimplePlugin
                     = $startDate;
                 $subscriptionOptions['worldpay_subscription_options']['options_to_display']['subscription_date']
                         = $this->recurringHelper->getSelectedPlanStartDateOptionInfo($product);
+            }
+            $planEndDateOption = $product->getCustomOption('subscription_end_date');
+            if ($planEndDateOption && $planEndDateOption->getValue()) {
+                $endDate = $planEndDateOption->getValue() ? $planEndDateOption->getValue() : date('d-m-yy');
+                $subscriptionOptions['worldpay_subscription_options']['subscription_end_date']
+                    = $endDate;
+                $subscriptionOptions['worldpay_subscription_options']['options_to_display']['subscription_end_date']
+                        = $this->recurringHelper->getSelectedPlanEndDateOptionInfo($product);
             }
         }
 

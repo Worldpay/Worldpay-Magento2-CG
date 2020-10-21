@@ -93,9 +93,14 @@ class Edit extends \Magento\Framework\View\Element\Template
     {
         parent::_prepareLayout();
 
-        $this->pageConfig->getTitle()->set(__('Edit Subscription'));
+        $this->pageConfig->getTitle()->set($this->recurringHelper->getAccountLabelbyCode('AC24'));
 
         return $this;
+    }
+    
+    public function getMyAccountLabels($labelCode)
+    {
+        return $this->recurringHelper->getAccountLabelbyCode($labelCode);
     }
 
     /**

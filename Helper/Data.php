@@ -221,7 +221,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'SEPA_DIRECT_DEBIT-SSL' => 'SEPA (One off transactions)',
             'KLARNA-SSL' => 'Klarna',
             'PRZELEWY-SSL' => 'P24',
-            'MISTERCASH-SSL' => 'Mistercash/Bancontact'
+            'MISTERCASH-SSL' => 'Mistercash/Bancontact',
+            'ACH_DIRECT_DEBIT-SSL' => 'ACH Pay'
         ];
         $configMethods = explode(',', $this->_scopeConfig->getValue(
             'worldpay/apm_config/paymentmethods',
@@ -450,6 +451,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
             $message = $this->getCreditCardSpecificexception('CCAM11');
         }
+        if (strpos($message, "prime routing")!==false) {
+            $cammessage = $this->getCreditCardSpecificException('CPR01');
+            $message = $cammessage?$cammessage:$message;
+        }
         return $message;
     }
 
@@ -498,7 +503,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $instantPurchaseEnabled = false;
         $caseSensitiveVal = trim($this->getCcIntegrationMode());
         $caseSensVal  = strtoupper($caseSensitiveVal);
-        if ($caseSensVal === 'DIRECT') {
+        $isSavedCardEnabled = $this->getSaveCard();
+        if ($caseSensVal === 'DIRECT' && $isSavedCardEnabled) {
             $instantPurchaseEnabled = (bool) $this->_scopeConfig->
                 getValue(
                     'worldpay/quick_checkout_config/instant_purchase',
@@ -575,6 +581,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/title',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    public function getSamsungServiceId()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/samsung_pay_wallets_config/service_id',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
@@ -858,6 +872,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
+    public function get3Ds2ParamsFromSession()
+    {
+        return $this->_checkoutSession->get3Ds2Params();
+    }
+    
+    public function get3DS2ConfigFromSession()
+    {
+        return $this->_checkoutSession->get3DS2Config();
+    }
+    
+    public function getAuthOrderIdFromSession()
+    {
+        return $this->_checkoutSession->getAuthOrderId();
+    }
+    
     public function getInstalmentValues($countryId)
     {
         return $this->instalmentconfig->getConfigTypeForCountry($countryId);
@@ -1025,5 +1054,130 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         
         return $globalexponent;
+    }
+    
+    public function getACHDetails()
+    {
+        $integrationmode = $this->getCcIntegrationMode();
+        $apmmethods = $this->getApmTypes('worldpay_apm');
+        if (strtoupper($integrationmode) === 'DIRECT' &&
+                array_key_exists("ACH_DIRECT_DEBIT-SSL", $apmmethods)) {
+            $data = $this->getACHBankAccountTypes();
+            return explode(",", $data);
+        }
+        return [];
+    }
+
+    public function getACHBankAccountTypes()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/apm_config/achaccounttypes',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    public function isPrimeRoutingEnabled()
+    {
+        $integrationmode = $this->getCcIntegrationMode();
+        if (strtoupper($integrationmode) === 'DIRECT') {
+            return $this->_scopeConfig->getValue(
+                'worldpay/prime_routing/enable_prime_routing',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
+    }
+    
+    public function isAdvancedPrimeRoutingEnabled()
+    {
+        $isPrimeRoutingEnabled = $this->isPrimeRoutingEnabled();
+        if ($isPrimeRoutingEnabled) {
+            return $this->_scopeConfig->getValue(
+                'worldpay/prime_routing/enable_advanced_prime_routing',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+           
+        }
+    }
+    
+    public function getRoutingPreference()
+    {
+        $isAdvancedPrimeRoutingEnabled = $this->isAdvancedPrimeRoutingEnabled();
+        if ($isAdvancedPrimeRoutingEnabled) {
+            return $this->_scopeConfig->getValue(
+                'worldpay/prime_routing/routing_preference',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
+    }
+    
+    public function getDebitNetworks()
+    {
+        $isAdvancedPrimeRoutingEnabled = $this->isAdvancedPrimeRoutingEnabled();
+        if ($isAdvancedPrimeRoutingEnabled) {
+            $debitNetworks = $this->_scopeConfig->getValue(
+                'worldpay/prime_routing/debit_networks',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+            if (strlen($debitNetworks)>0) {
+                return explode(",", $debitNetworks);
+            }
+        }
+        return [];
+    }
+    
+    public function getMyAccountLabels()
+    {
+                return $this->_scopeConfig->getValue(
+                    'worldpay_custom_labels/my_account_labels/my_account_label',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                );
+    }
+    
+    public function getCheckoutLabels()
+    {
+                return $this->_scopeConfig->getValue(
+                    'worldpay_custom_labels/checkout_labels/checkout_label',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                );
+    }
+    
+    public function getAdminLabels()
+    {
+               return $this->_scopeConfig->getValue(
+                   'worldpay_custom_labels/admin_labels/admin_label',
+                   \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+               );
+    }
+    
+    public function getAccountLabelbyCode($labelCode)
+    {
+        $aLabels = $this->serializer->unserialize($this->_scopeConfig->getValue(
+            'worldpay_custom_labels/my_account_labels/my_account_label',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        ));
+        if (is_array($aLabels) || is_object($aLabels)) {
+            foreach ($aLabels as $key => $valuepair) {
+                if ($key == $labelCode) {
+                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
+                    $valuepair['wpay_label_desc'];
+                }
+            }
+        }
+    }
+    
+    public function getCheckoutLabelbyCode($labelCode)
+    {
+        $aLabels = $this->serializer->unserialize($this->_scopeConfig->getValue(
+            'worldpay_custom_labels/checkout_labels/checkout_label',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        ));
+        if (is_array($aLabels) || is_object($aLabels)) {
+            foreach ($aLabels as $key => $valuepair) {
+                if ($key == $labelCode) {
+                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
+                    $valuepair['wpay_label_desc'];
+                }
+            }
+        }
     }
 }

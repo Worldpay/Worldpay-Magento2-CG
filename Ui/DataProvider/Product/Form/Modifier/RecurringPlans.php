@@ -103,7 +103,7 @@ class RecurringPlans extends AbstractModifier
                                 'config' => [
                                     'componentType' => Form\Fieldset::NAME,
                                     'additionalClasses' => 'admin__fieldset-section',
-                                    'label' => __('Payment Plans'),
+                                    'label' => $this->recurringHelper->getAdminLabels('AD3'),
                                     'dataScope' => 'data.' . self::CODE_RECURRING_PLANS,
                                 ]
                             ]
@@ -245,26 +245,12 @@ class RecurringPlans extends AbstractModifier
                                         'dataType' => Form\Element\DataType\Text::NAME,
                                         'formElement' => Form\Element\Input::NAME,
                                         'elementTmpl' => 'ui/dynamic-rows/cells/text',
-                                        'label' => __('Code'),
+                                        'label' => $this->recurringHelper->getAdminLabels('AD4'),
                                         'dataScope' => 'code',
                                     ]
                                 ]
                             ]
                         ],
-//                        'name' => [
-//                            'arguments' => [
-//                                'data' => [
-//                                    'config' => [
-//                                        'componentType' => Form\Field::NAME,
-//                                        'dataType' => Form\Element\DataType\Text::NAME,
-//                                        'formElement' => Form\Element\Input::NAME,
-//                                        'elementTmpl' => 'ui/dynamic-rows/cells/text',
-//                                        'label' => __('Name'),
-//                                        'dataScope' => 'name',
-//                                    ]
-//                                ]
-//                            ]
-//                        ],
                         'description' => [
                             'arguments' => [
                                 'data' => [
@@ -273,26 +259,12 @@ class RecurringPlans extends AbstractModifier
                                         'dataType' => Form\Element\DataType\Text::NAME,
                                         'formElement' => Form\Element\Input::NAME,
                                         'elementTmpl' => 'ui/dynamic-rows/cells/text',
-                                        'label' => __('Description'),
+                                        'label' => $this->recurringHelper->getAdminLabels('AD5'),
                                         'dataScope' => 'description',
                                     ]
                                 ]
                             ]
                         ],
-//                        'number_of_payments' => [
-//                            'arguments' => [
-//                                'data' => [
-//                                    'config' => [
-//                                        'componentType' => Form\Field::NAME,
-//                                        'dataType' => Form\Element\DataType\Text::NAME,
-//                                        'formElement' => Form\Element\Input::NAME,
-//                                        'elementTmpl' => 'ui/dynamic-rows/cells/text',
-//                                        'label' => __('# of Payments'),
-//                                        'dataScope' => 'number_of_payments',
-//                                    ]
-//                                ]
-//                            ]
-//                        ],
                         'interval' => [
                             'arguments' => [
                                 'data' => [
@@ -301,7 +273,7 @@ class RecurringPlans extends AbstractModifier
                                         'dataType' => Form\Element\DataType\Text::NAME,
                                         'formElement' => Form\Element\Input::NAME,
                                         'elementTmpl' => 'ui/dynamic-rows/cells/text',
-                                        'label' => __('Recurring Cycle'),
+                                        'label' => $this->recurringHelper->getAdminLabels('AD6'),
                                         'dataScope' => 'interval',
                                     ]
                                 ]
@@ -315,40 +287,12 @@ class RecurringPlans extends AbstractModifier
                                         'dataType' => Form\Element\DataType\Text::NAME,
                                         'formElement' => Form\Element\Input::NAME,
                                         'elementTmpl' => 'ui/dynamic-rows/cells/text',
-                                        'label' => __('Recurring Amount'),
+                                        'label' => $this->recurringHelper->getAdminLabels('AD7'),
                                         'dataScope' => 'interval_amount',
                                     ]
                                 ]
                             ]
                         ],
-//                        'trial_interval' => [
-//                            'arguments' => [
-//                                'data' => [
-//                                    'config' => [
-//                                        'componentType' => Form\Field::NAME,
-//                                        'dataType' => Form\Element\DataType\Text::NAME,
-//                                        'formElement' => Form\Element\Input::NAME,
-//                                        'elementTmpl' => 'ui/dynamic-rows/cells/text',
-//                                        'label' => __('Trial Interval'),
-//                                        'dataScope' => 'trial_interval',
-//                                    ]
-//                                ]
-//                            ]
-//                        ],
-//                        'number_of_trial_intervals' => [
-//                            'arguments' => [
-//                                'data' => [
-//                                    'config' => [
-//                                        'componentType' => Form\Field::NAME,
-//                                        'dataType' => Form\Element\DataType\Text::NAME,
-//                                        'formElement' => Form\Element\Input::NAME,
-//                                        'elementTmpl' => 'ui/dynamic-rows/cells/text',
-//                                        'label' => __('# of Trial Intervals'),
-//                                        'dataScope' => 'number_of_trial_intervals',
-//                                    ]
-//                                ]
-//                            ]
-//                        ],
                         'position' => [
                             'arguments' => [
                                 'data' => [
@@ -366,7 +310,7 @@ class RecurringPlans extends AbstractModifier
                             'arguments' => [
                                 'data' => [
                                     'config' => [
-                                        'label' => __('Website'),
+                                        'label' => $this->recurringHelper->getAdminLabels('AD8'),
                                         'formElement' => Form\Element\Select::NAME,
                                         'componentType' => Form\Field::NAME,
                                         'dataType' => Form\Element\DataType\Number::NAME,
@@ -380,7 +324,7 @@ class RecurringPlans extends AbstractModifier
                             'arguments' => [
                                 'data' => [
                                     'config' => [
-                                        'label' => __('Active'),
+                                        'label' => $this->recurringHelper->getAdminLabels('AD9'),
                                         'formElement' => Form\Element\Checkbox::NAME,
                                         'componentType' => Form\Field::NAME,
                                         'dataType' => Form\Element\DataType\Number::NAME,
@@ -410,7 +354,7 @@ class RecurringPlans extends AbstractModifier
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'title' => __('Add Payment Plan'),
+                        'title' => $this->recurringHelper->getAdminLabels('AD10'),
                         'formElement' => Container::NAME,
                         'componentType' => Container::NAME,
                         'component' => 'Magento_Ui/js/form/components/button',
@@ -444,7 +388,7 @@ class RecurringPlans extends AbstractModifier
                         'dataScope' => '',
                         'provider' => 'product_form.product_form_data_source',
                         'options' => [
-                            'title' => __('Add Payment Plan'),
+                            'title' => $this->recurringHelper->getAdminLabels('AD10'),
                         ],
                         'imports' => [
                             'state' => '!index=catalog_product_recurring_plan_add_form:responseStatus'
@@ -457,7 +401,7 @@ class RecurringPlans extends AbstractModifier
                     'arguments' => [
                         'data' => [
                             'config' => [
-                                'label' => __('New Payment Plan'),
+                                'label' => $this->recurringHelper->getAdminLabels('AD12'),
                                 'componentType' => Container::NAME,
                                 'component' => 'Sapient_Worldpay/js/components/new-recurring-plan-insert-form',
                                 'dataScope' => '',
