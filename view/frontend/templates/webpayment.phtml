@@ -38,13 +38,12 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     window.CreditCardException = '<?= /* @noEscape */ $block->getCreditCardException() ?>';
     window.isDynamic3DS2Enabled = '<?= /* @noEscape */ $block->isDynamic3DS2Enabled() ?>';
     window.jwtEventUrl = '<?= /* @noEscape */ $block->getJwtEventUrl() ?>';
-    
     var envMode = '<?= /* @noEscape */ $block->getEnvMode() ?>';
     
     if(envMode == 'Test Mode') {
-        document.cookie = "envMode=Test Mode";
+        document.cookie = "envMode=Test Mode; path=/";
     }else{
-        document.cookie = "envMode=Live Mode";
+        document.cookie = "envMode=Live Mode; path=/";
     }
     
     var browserType = window.navigator.userAgent.match(/chrome/i);

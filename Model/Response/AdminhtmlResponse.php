@@ -24,4 +24,10 @@ class AdminhtmlResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstrac
         $document = new \SimpleXmlElement($xml);
         return $document;
     }
+    
+    public function parseCancelOrderRespone($xml)
+    {
+        $document = new \SimpleXmlElement($xml);
+        return $document;
+    }
 }

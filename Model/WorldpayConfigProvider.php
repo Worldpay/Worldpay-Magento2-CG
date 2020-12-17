@@ -230,6 +230,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['myaccountlabels'] = $this->getMyAccountLabels();
                 $config['payment']['ccform']['checkoutlabels'] = $this->getCheckoutLabels();
                 $config['payment']['ccform']['adminlabels'] = $this->getAdminLabels();
+                
+                //Klarna Pay
+                $config['payment']['ccform']['klarnaTypesAndContries'] = $this->getKlarnaTypesAndContries();
             }
         }
         return $config;
@@ -615,5 +618,20 @@ class WorldpayConfigProvider implements ConfigProviderInterface
             }
         }
         return $data;
+    }
+    
+    public function getKlarnaTypesAndContries()
+    {
+        $klarnaValues = [];
+
+        $klarnaSlicietType = $this->worldpayHelper->getKlarnaSliceitType();
+        $klarnaPayLaterType = $this->worldpayHelper->getKlarnaPayLaterType();
+        $klarnaPayNowType = $this->worldpayHelper->getKlarnaPayNowType();
+
+        $klarnaValues[$klarnaSlicietType] = $this->worldpayHelper->getKlarnaSliceitContries();
+        $klarnaValues[$klarnaPayLaterType] = $this->worldpayHelper->getKlarnaPayLaterContries();
+        $klarnaValues[$klarnaPayNowType] = $this->worldpayHelper->getKlarnaPayNowContries();
+      
+        return $klarnaValues;
     }
 }

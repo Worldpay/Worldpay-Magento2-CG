@@ -1267,97 +1267,94 @@ class UpgradeData implements UpgradeDataInterface
                                     $index.'_6' => ["wpay_label_code" => "AC8",
                                         "wpay_label_desc" => "Card Information",
                                         "wpay_custom_label" => ""],
-                                    $index.'_7' => ["wpay_label_code" => "AC9",
-                                        "wpay_label_desc" => "Card Number",
-                                        "wpay_custom_label" => ""],
-                                    $index.'_8' => ["wpay_label_code" => "AC10",
+                                    $index.'_7' => ["wpay_label_code" => "AC10",
                                         "wpay_label_desc" => "Expiry Month/Year",
                                         "wpay_custom_label" => ""],
-                                    $index.'_9' => ["wpay_label_code" => "AC11",
+                                    $index.'_8' => ["wpay_label_code" => "AC11",
                                         "wpay_label_desc" => "Delete",
                                         "wpay_custom_label" => ""],
-                                    $index.'_10' => ["wpay_label_code" => "AC12",
+                                    $index.'_9' => ["wpay_label_code" => "AC12",
                                         "wpay_label_desc" => "My Subscriptions",
                                         "wpay_custom_label" => ""],
-                                    $index.'_11' => ["wpay_label_code" => "AC13",
+                                    $index.'_10' => ["wpay_label_code" => "AC13",
                                         "wpay_label_desc" => "Original Order #",
                                         "wpay_custom_label" => ""],
-                                    $index.'_12' => ["wpay_label_code" => "AC14",
+                                    $index.'_11' => ["wpay_label_code" => "AC14",
                                         "wpay_label_desc" => "Original Order Date",
                                         "wpay_custom_label" => ""],
-                                    $index.'_13' => ["wpay_label_code" => "AC15",
+                                    $index.'_12' => ["wpay_label_code" => "AC15",
                                         "wpay_label_desc" => "Product",
                                         "wpay_custom_label" => ""],
-                                    $index.'_14' => ["wpay_label_code" => "AC16",
+                                    $index.'_13' => ["wpay_label_code" => "AC16",
                                         "wpay_label_desc" => "Amount",
                                         "wpay_custom_label" => ""],
-                                    $index.'_15' => ["wpay_label_code" => "AC17",
+                                    $index.'_14' => ["wpay_label_code" => "AC17",
                                         "wpay_label_desc" => "Interval",
                                         "wpay_custom_label" => ""],
-                                    $index.'_16' => ["wpay_label_code" => "AC18",
+                                    $index.'_15' => ["wpay_label_code" => "AC18",
                                         "wpay_label_desc" => "Start Date",
                                         "wpay_custom_label" => ""],
-                                    $index.'_17' => ["wpay_label_code" => "AC19",
+                                    $index.'_16' => ["wpay_label_code" => "AC19",
                                         "wpay_label_desc" => "End Date",
                                         "wpay_custom_label" => ""],
-                                    $index.'_18' => ["wpay_label_code" => "AC20",
+                                    $index.'_17' => ["wpay_label_code" => "AC20",
                                         "wpay_label_desc" => "Status",
                                         "wpay_custom_label" => ""],
-                                    $index.'_19' => ["wpay_label_code" => "AC21",
+                                    $index.'_18' => ["wpay_label_code" => "AC21",
                                         "wpay_label_desc" => "Actions",
                                         "wpay_custom_label" => ""],
-                                    $index.'_20' => ["wpay_label_code" => "AC22",
+                                    $index.'_19' => ["wpay_label_code" => "AC22",
                                         "wpay_label_desc" => "Edit",
                                         "wpay_custom_label" => ""],
-                                    $index.'_21' => ["wpay_label_code" => "AC23",
+                                    $index.'_20' => ["wpay_label_code" => "AC23",
                                         "wpay_label_desc" => "Cancel",
                                         "wpay_custom_label" => ""],
-                                    $index.'_22' => ["wpay_label_code" => "AC24",
+                                    $index.'_21' => ["wpay_label_code" => "AC24",
                                         "wpay_label_desc" => "Edit Subscription",
                                         "wpay_custom_label" => ""],
-                                    $index.'_23' => ["wpay_label_code" => "AC25",
+                                    $index.'_22' => ["wpay_label_code" => "AC25",
                                         "wpay_label_desc" => "Subscription Information",
                                         "wpay_custom_label" => ""],
-                                    $index.'_24' => ["wpay_label_code" => "AC26",
+                                    $index.'_23' => ["wpay_label_code" => "AC26",
                                         "wpay_label_desc" => "Product Name",
                                         "wpay_custom_label" => ""],
-                                    $index.'_25' => ["wpay_label_code" => "AC27",
+                                    $index.'_24' => ["wpay_label_code" => "AC27",
                                         "wpay_label_desc" => "Payment Plan",
                                         "wpay_custom_label" => ""],
-                                    $index.'_26' => ["wpay_label_code" => "AC28",
+                                    $index.'_25' => ["wpay_label_code" => "AC28",
                                         "wpay_label_desc" => "Save Subscription",
                                         "wpay_custom_label" => ""],
-                                    $index.'_27' => ["wpay_label_code" => "AC29",
+                                    $index.'_26' => ["wpay_label_code" => "AC29",
                                         "wpay_label_desc" => "My Saved Card",
                                         "wpay_custom_label" => ""],
-                                    $index.'_28' => ["wpay_label_code" => "AC30",
+                                    $index.'_27' => ["wpay_label_code" => "AC30",
                                         "wpay_label_desc" => "You have no Saved Card.",
                                         "wpay_custom_label" => ""],
-                                    $index.'_29' => ["wpay_label_code" => "AC31",
+                                    $index.'_28' => ["wpay_label_code" => "AC31",
                                         "wpay_label_desc" => "Billing Information",
                                         "wpay_custom_label" => ""],
-                                    $index.'_30' => ["wpay_label_code" => "AC32",
+                                    $index.'_29' => ["wpay_label_code" => "AC32",
                                         "wpay_label_desc" => "First Name",
                                         "wpay_custom_label" => ""],
-                                    $index.'_31' => ["wpay_label_code" => "AC33",
+                                    $index.'_30' => ["wpay_label_code" => "AC33",
                                         "wpay_label_desc" => "Last Name",
                                         "wpay_custom_label" => ""],
-                                    $index.'_32' => ["wpay_label_code" => "AC34",
+                                    $index.'_31' => ["wpay_label_code" => "AC34",
                                         "wpay_label_desc" => "Address",
                                         "wpay_custom_label" => ""],
-                                    $index.'_33' => ["wpay_label_code" => "AC35",
+                                    $index.'_32' => ["wpay_label_code" => "AC35",
                                         "wpay_label_desc" => "City",
                                         "wpay_custom_label" => ""],
-                                    $index.'_34' => ["wpay_label_code" => "AC36",
+                                    $index.'_33' => ["wpay_label_code" => "AC36",
                                         "wpay_label_desc" => "Zip/Postal Code",
                                         "wpay_custom_label" => ""],
-                                    $index.'_35' => ["wpay_label_code" => "AC37",
+                                    $index.'_34' => ["wpay_label_code" => "AC37",
                                         "wpay_label_desc" => "Country",
                                         "wpay_custom_label" => ""],
-                                    $index.'_36' => ["wpay_label_code" => "AC38",
+                                    $index.'_35' => ["wpay_label_code" => "AC38",
                                         "wpay_label_desc" => "State/Province",
                                         "wpay_custom_label" => ""],
-                                    $index.'_37' => ["wpay_label_code" => "AC39",
+                                    $index.'_36' => ["wpay_label_code" => "AC39",
                                         "wpay_label_desc" => "Save",
                                         "wpay_custom_label" => ""],
                                 ]
@@ -1421,6 +1418,83 @@ class UpgradeData implements UpgradeDataInterface
                 ],
             ];
              /** @var \Magento\Config\Model\Config $configModel */
+            $configModel = $this->configFactory->create(['data' => $configData]);
+            $configModel->save();
+        }
+        if (version_compare($context->getVersion(), '1.3.9', '<')) {
+            $index = time();
+            $configData = [
+                'section' => 'worldpay',
+                'website' => null,
+                'store'   => null,
+                'groups'  => [
+                    'klarna_config/klarna_countries_config' => [
+                        'fields' => [
+                            'klarna_contries' => [
+                                'value' => [
+                                    $index.'_0' => "AT,CH,NO,DE,DK,US,FI,GB,NL,SE",
+                                ]
+                            ],
+                        ],
+                    ],
+                    'klarna_config/sliceit_config' => [
+                        'fields' => [
+                            'sliceit_contries' => [
+                                'value' => [
+                                    $index.'_0' => "SE,NO,FI,DE,AT,GB,DK,US",
+                                ]
+                            ],
+                        ],
+                    ],
+                    'klarna_config/paylater_config' => [
+                        'fields' => [
+                            'paylater_contries' => [
+                                'value' => [
+                                    $index.'_0' => "SE,NO,FI,DE,NL,AT,CH,GB,DK,US",
+                                ]
+                            ],
+                        ],
+                    ],
+                    'klarna_config/paynow_config' => [
+                        'fields' => [
+                            'paynow_contries' => [
+                                'value' => [
+                                    $index.'_0' => "SE,DE,NL,AT",
+                                ]
+                            ],
+                        ],
+                    ],
+                    'klarna_config/paylater_config/paylater_days_config' => [
+                        'fields' => [
+                            'subscription_days' => [
+                                'value' => [
+                                    $index.'_0' => ["worldpay_klarna_subscription" => "SE",
+                                            "subscription_days" => "14"],
+                                    $index.'_1' => ["worldpay_klarna_subscription" => "NO",
+                                            "subscription_days" => "14"],
+                                    $index.'_2' => ["worldpay_klarna_subscription" => "FI",
+                                            "subscription_days" => "14"],
+                                    $index.'_3' => ["worldpay_klarna_subscription" => "DE",
+                                            "subscription_days" => "14"],
+                                    $index.'_4' => ["worldpay_klarna_subscription" => "AT",
+                                            "subscription_days" => "14"],
+                                    $index.'_5' => ["worldpay_klarna_subscription" => "GB",
+                                            "subscription_days" => "30"],
+                                    $index.'_6' => ["worldpay_klarna_subscription" => "DK",
+                                            "subscription_days" => "14"],
+                                    $index.'_7' => ["worldpay_klarna_subscription" => "US",
+                                            "subscription_days" => "30"],
+                                    $index.'_8' => ["worldpay_klarna_subscription" => "NL",
+                                            "subscription_days" => "14"],
+                                    $index.'_9' => ["worldpay_klarna_subscription" => "CH",
+                                            "subscription_days" => "14"],
+                                ]
+                            ],
+                        ],
+                    ],
+                ],
+            ];
+            /** @var \Magento\Config\Model\Config $configModel */
             $configModel = $this->configFactory->create(['data' => $configData]);
             $configModel->save();
         }

@@ -1,0 +1,430 @@
+<?php
+$storeCode = $block->getStoreCode();
+?>
+<form class="form form-edit-account" name="addnewcardform" data-mage-init='{"validation":{}}'
+      method="post" id="form_add_card" autocomplete="off">
+    <fieldset class="fieldset info">
+        <?= /* @noEscape */ $block->getBlockHtml('formkey') ?>
+        <legend class="legend">
+            <span><?php print /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?
+                        $block->getAccountLabelbyCode('AC8') : 'Card Information'
+        ?>
+            </span>
+        </legend><br>
+
+        <div class="field card type required">
+            <label class="label" for="card_type">
+                <span><?php print $block->getCheckoutSpecificLabel('CO1') ?
+                                $block->getCheckoutSpecificLabel('CO1') : 'Credit Card Type';
+        ?>
+                </span>
+     <!--       <span>Credit Card Type</span>-->
+            </label>
+            <div class="control">
+<?php $cctypes = $block->getCCtypes(); ?>
+                <select id="cc_type"
+                        name="paymentType"
+                        class="required-entry validate-cc-type-select control-select-new-card">
+                    <option value="" selected="selected">
+                        <!--                Card type-->
+                    <?php print $block->getAccountLabelbyCode('IAVAC2') ?
+                                    $block->getAccountLabelbyCode('IAVAC2') : 'Card type';
+                    ?>
+                    </option>
+                    <?php
+                    $options = '';
+                    foreach ($cctypes as $k => $v) {
+                        $options .= '<option value="' . $k . '">' . $v . '</option>';
+                    }
+                    echo /** @noEscape */ $options;
+                    ?>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="field card Number">
+            <label class="label" for="card number">
+                <span>
+<?php print /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
+                $block->getAccountLabelbyCode('AC3') : 'Card Number'
+?>
+                </span>
+            </label>
+            <div class="control">
+                <input type="number" name="cardNumber" required='true' id="card_number" 
+                       title="
+                           <?php print /* @noEscape */ $block->getCheckoutLabelbyCode('CO4')
+                                   ? $block->getCheckoutLabelbyCode('CO4') : 'Card Holder Name'?>"
+                       class="input-text required cardholder_name validate-cc-number 
+                       worldpay-cardholdername-length worldpay-cardnumber-valid">
+            </div>
+        </div>
+
+        <div class="field card holder name">
+            <label class="label" for="card holder name">
+                <span>
+<?php print /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
+                $block->getCheckoutLabelbyCode('CO4') : 'Card Holder Name'
+?>
+                </span>
+            </label>
+            <div class="control">
+                <input type="text" name="cardHolderName" required='true' id="card-holder-name" 
+                       title="<?php print /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
+                $block->getCheckoutLabelbyCode('CO4') : 'Card Holder Name'
+?>"
+                       class="input-text required cardholder_name worldpay-cardholdername-length">
+            </div>
+        </div>
+
+        <div class="field card expiry month">
+            <label class="label" for="expiry">
+                <span>
+                    <?php print /* @noEscape */ $block->getAccountLabelbyCode('AC10')
+                            ? $block->getAccountLabelbyCode('AC10') : 'Expiry Month/Year'?>
+                </span>
+            </label>
+            <div class="fields group group-2">
+                <div class="field no-label month">
+                    <div class="control">
+                        <select id="expiry_month" name="expiryMonth"
+                                class="month required validate-cc-exp required-entry worldpay-month-included 
+                                worldpay-month-length worldpay-month-range">
+<?php foreach ($block->getMonths() as $k => $v): ?>
+                                <option value="<?= /* @noEscape */ $block->escapeHtml($k) ?>">
+    <?= /* @noEscape */ $block->escapeHtml($v) ?></option>
+<?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="field no-label year">
+                    <div class="control">
+                        <select id="expiry_year" name="expiryYear"
+                                class="year required required-entry
+                                worldpay-year-included
+                                worldpay-year-length
+                                worldpay-year-range">
+<?php foreach ($block->getExpiryYears() as $k => $v): ?>
+                                <option value="<?= /* @noEscape */$block->escapeHtml($k) ?>">
+            <?= /* @noEscape */ $block->escapeHtml($v) ?></option>
+        <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+<?php if ($block->requireCvcEnabled()): ?>
+            <div class="field required _required cvv">
+                <label for="cvv" class="label">
+                    <span><?php print $block->getCheckoutSpecificLabel('CO5') ?
+                    $block->getCheckoutSpecificLabel('CO5') : 'CVV';
+    ?></span>
+        <!--            <span>CVV</span>-->
+                </label>
+<div class="field savecc cc-Visibility-Enabled" id:"_save-card_div'", visible: false">                
+                <div class="control">
+                    <input type="number" autocomplete="off" length="4" id="cvv"
+                           class="input-text required cvv saved-cvv-number required-entry 
+                           validate-card-cvv validate-length maximum-length-4"
+                           name="cvc"
+                           value="" style="width:12%"/>
+               
+                <div id="cvv_msg" style="color:red;font-size: 1.2rem;"></div>
+                
+                 
+                <label for="save-card" class="label">
+                  <?php if ($block->getStoredCredentialsEnabledValue() && $block->getDisclaimerMessageEnable()): ?> 
+                    <span>(<a href="javascript:void(0)" id="btnShow">Important Disclaimer!</a>)</span>
+                    <?php endif; ?>
+                </label>
+                 </div>
+                
+                    </div>
+  <div title="Disclaimer!" id="dialog" style="display: none" align ="center" >
+    <form id="disclaimer" name="disclaimer">
+            <div><?php echo $block->getDisclaimerText(); ?></div>
+        </form>
+</div>
+ <div class="mage-error" generated="true" id="disclaimer-error"></div>
+ </div>
+            
+            
+<?php endif; ?>
+        <div class="field billing-address">
+            <label class="label" for="billing-address">
+                <span><?php
+                    print /* @noEscape */ $block->escapeHtml(
+                                    $block->getAccountLabelbyCode('IAVAC3') ?
+                                            $block->getAccountLabelbyCode('IAVAC3') : 'Default Billing Address'
+                    )
+                    ?>
+                </span>
+            </label>
+            <div class="control">
+                <address>
+<?= $block->getPrimaryBillingAddressHtml() ?>
+                </address>
+            </div>
+        </div>
+        <div class="actions-toolbar">
+            <div class="primary">
+                <input type="hidden"
+                       name="cseEnabled"
+                       id="worldpay_cse_enabled"
+                       value=""/>
+                <input type="hidden"
+                       name="dfReferenceId"
+                       id="dfReferenceId"
+                       value=""/>
+                <button type="submit" class="action save primary" 
+                        onclick="javascript:onConfirmBtn(); return false;"
+                        id ="save_newcard"
+                        title="
+                            <?php print /* @noEscape */ $block->getAccountLabelbyCode('AC39')
+                                    ? $block->getAccountLabelbyCode('AC39') : 'Save'?>">
+                    <span>
+                        <?php print /* @noEscape */ $block->getAccountLabelbyCode('AC39')
+                                ? $block->getAccountLabelbyCode('AC39') : 'Save'?>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+    
+    require(['jquery',
+        'mage/url',
+        'prototype'
+    ], function ($, urlBuilder) {
+        var baseUrl = '<?= /* @noEscape */ $block->getBaseUrl() ?>';
+        var jwtUrl = baseUrl + 'worldpay/hostedpaymentpage/jwt';
+        var disclaimerFlag=null;
+        function createJwt(cardNumber) {
+            var bin = cardNumber;
+            var encryptedBin = btoa(bin);
+            var iframe = document.createElement('iframe');
+            iframe.src = jwtUrl + '?instrument=' + encryptedBin;
+            iframe.name = "jwt_frm";
+            iframe.id = "jwt_frm";
+            iframe.style.display = "none";
+            document.body.appendChild(iframe);
+        }
+        function validateCVV() {
+            if (document.addnewcardform.paymentType.value == "AMEX-SSL") {
+                if (document.getElementById('cvv').value.length != 4) {
+                    document.getElementById("cvv_msg")
+                            .innerHTML = "Please, Enter 4 digit valid Card Verification Number";
+                    document.addnewcardform.cvc.focus();
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                if (document.getElementById('cvv').value.length != 3) {
+                    document.getElementById("cvv_msg")
+                            .innerHTML = "Please, Enter 3 digit valid Card Verification Number";
+                    document.addnewcardform.cvc.focus();
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+        
+        
+        function onConfirmBtn() {
+            var cvvValid = validateCVV();
+            
+             mandatoryMessage= parseInt("<?php echo !empty($block->getDisclaimerMessageMandatory())?$block->getDisclaimerMessageMandatory():0; ?>");
+       disclaimerMessageEnabled = parseInt("<?php echo !empty($block->getDisclaimerMessageEnable())?$block->getDisclaimerMessageEnable():0; ?>");
+        storedCredentials = parseInt("<?php echo !empty($block->getStoredCredentialsEnabledValue())?$block->getStoredCredentialsEnabledValue():0; ?>");
+     
+        
+        
+         
+            if (cvvValid && jQuery('#form_add_card').valid() && !(window.isDynamic3DS2Enabled)) {
+                document.getElementById('save_newcard').disabled=true;
+        
+    if(mandatoryMessage && disclaimerMessageEnabled && window.disclaimerDialogue === null){
+                        $('#disclaimer-error').css('display', 'block');
+                            $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
+			return false;
+                    } 
+
+                createPayment();
+            } else if (cvvValid && jQuery('#form_add_card').valid() && window.isDynamic3DS2Enabled) {
+                document.getElementById('save_newcard').disabled=true;
+
+    if(mandatoryMessage && disclaimerMessageEnabled && window.disclaimerDialogue === null){
+                        $('#disclaimer-error').css('display', 'block');
+                            $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
+			return false;
+                    } 
+
+                var bin = jQuery('[name=cardNumber]').val();
+                var binNew = bin.substring(0, 6);
+                createJwt(binNew);
+                window.sessionId = '<?= /* @noEscape */ $block->getSessionId(); ?>';
+                window.addEventListener("message", function (event) {
+                    console.log("inside listener");
+                    var data = JSON.parse(event.data);
+                    var envUrl;
+                    if (window.jwtEventUrl !== '') {
+                        envUrl = window.jwtEventUrl;
+                    }
+                    if (event.origin === envUrl) {
+                        var data = JSON.parse(event.data);
+                        if (data !== undefined && data.Status) {
+                            var sessionId = data.SessionId;
+                            if (sessionId) {
+                                dfReferenceId = sessionId;
+                            }
+                            window.sessionId = dfReferenceId;
+                            jQuery('[name=dfReferenceId]').val(dfReferenceId);
+                            createPayment3DS();
+                        }
+                    }
+                }, false);
+            }
+            function createPayment() {
+                var paymentDetails = {
+                    "payment": {
+                        "cardNumber": jQuery('[name=cardNumber]').val(),
+                        "paymentType": jQuery('[name=paymentType]').val(),
+                        "cardHolderName": jQuery('[name=cardHolderName]').val(),
+                        "expiryMonth": jQuery('[name=expiryMonth]').val(),
+                        "expiryYear": jQuery('[name=expiryYear]').val(),
+                        "cvc": jQuery('[name=cvc]').val(),
+                        "cseEnabled": jQuery('[name=cseEnabled]').val(),
+                        "disclaimerFlag": disclaimerFlag
+                        
+                    }
+                };
+                var jsonPaymentDetails = JSON.stringify(paymentDetails);
+                $.ajax({
+                    url: urlBuilder.build('worldpay/savedcard/addnewcardPost'),
+                    data: jsonPaymentDetails,
+                    type: 'post',
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    success: function (data, status, jqXHR) {
+                        response = JSON.stringify(data);
+                        var result = JSON.parse(response);
+                        if (result.threeD) {
+                            window.location.href = baseUrl + 'worldpay/savedcard/redirect';
+                        }
+                        if (result.success) {
+                            window.location.replace(urlBuilder.build('worldpay/savedcard'));
+                        } else {
+                            window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));
+                        }
+                    },
+                    error: function (error) {
+                        response = JSON.stringify(error)
+                        window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));
+                    },
+                    /** Show loader before send */
+                    beforeSend: function () {
+                        $('body').trigger('processStart');
+                    }
+                }).always(function () {
+                    $('body').trigger('processStop');
+                });
+            }
+            function createPayment3DS() {
+                var paymentDetails = {
+                    "payment": {
+                        "cardNumber": jQuery('[name=cardNumber]').val(),
+                        "paymentType": jQuery('[name=paymentType]').val(),
+                        "cardHolderName": jQuery('[name=cardHolderName]').val(),
+                        "expiryMonth": jQuery('[name=expiryMonth]').val(),
+                        "expiryYear": jQuery('[name=expiryYear]').val(),
+                        "cvc": jQuery('[name=cvc]').val(),
+                        "cseEnabled": jQuery('[name=cseEnabled]').val(),
+                        "dfReferenceId": window.sessionId,
+                        "disclaimerFlag": disclaimerFlag
+                    }
+                };
+                var jsonPaymentDetails = JSON.stringify(paymentDetails);
+                $.ajax({
+                    url: urlBuilder.build('worldpay/savedcard/addnewcardPost'),
+                    data: jsonPaymentDetails,
+                    type: 'post',
+                    success: function (data) {
+                        window.location.replace(urlBuilder.build('worldpay/threedsecure/auth'));
+                    },
+                    error: function (data) {
+                        window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));
+                    },
+                    /** Show loader before send */
+                    beforeSend: function () {
+                        $('body').trigger('processStart');
+                    }
+                    
+                }).always(function () {
+                    $('body').trigger('processStop');
+                });
+            }
+                
+        }
+        window.onConfirmBtn = onConfirmBtn;
+        $(document).ready(function (){
+          window.disclaimerDialogue=null;
+          
+        });
+        
+        
+         $("#btnShow").click(function (){
+            mandatoryMessage= parseInt("<?php echo !empty($block->getDisclaimerMessageMandatory())?$block->getDisclaimerMessageMandatory():0; ?>"); 
+           disclaimerMessageEnabled = parseInt("<?php echo !empty($block->getDisclaimerMessageEnable())?$block->getDisclaimerMessageEnable():0; ?>");
+           storedCredentials = parseInt("<?php echo !empty($block->getStoredCredentialsEnabledValue())?$block->getStoredCredentialsEnabledValue():0; ?>");
+            
+         
+            that=this;     
+                 
+        $("#dialog").dialog({
+                    autoResize: true,
+                    show: "clip",
+                    hide: "clip",
+                    height: 350,
+                    width: 450,
+                    autoOpen: false,
+                    modal: true,
+                    position: 'center',
+                    draggable: false,
+                    buttons: {
+                        Agree: function() { 
+                            $( this ).dialog( "close" );
+                            disclaimerFlag = true;
+                            window.disclaimerDialogue = true;
+                            $('#disclaimer-error').css('display', 'none');
+                            $('#save_newcard').prop( "disabled", false );
+                        },
+                        Disagree: function() { 
+                            $( this ).dialog( "close" );
+                            disclaimerFlag = false;
+                            window.disclaimerDialogue = false;
+                             $('#disclaimer-error').css('display', 'none');
+                             if (mandatoryMessage){
+                                $('#save_newcard').prop( "disabled", true );
+                            }
+                            
+                        }
+                    },
+                    open: function (type, data) {
+                        $(this).parent().appendTo("#disclaimer");
+                    }
+        });
+        if(storedCredentials && disclaimerMessageEnabled){
+        $('#dialog').dialog('open');
+         }
+         
+         
+    });
+    });
+   
+    
+</script>

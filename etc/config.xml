@@ -66,6 +66,23 @@
                 <country_code_spoof>JE-GB,IM-GB</country_code_spoof>
                 <global_currency_exponent>2</global_currency_exponent>
             </miscellaneous>
+            <klarna_config>
+                <klarna_countries_config>
+                    <klarna_contries>SE,NO,FI,DE,AT,GB,DK,US,NL,CH</klarna_contries>
+                </klarna_countries_config>
+                <sliceit_config>
+                    <klarna_sliceit>KLARNA_SLICEIT</klarna_sliceit>
+                    <sliceit_contries>SE,NO,FI,DE,AT,GB,DK,US</sliceit_contries>
+                </sliceit_config>
+                <paylater_config>
+                    <klarna_paylater>KLARNA_PAYLATER</klarna_paylater>
+                    <paylater_contries>SE,NO,FI,DE,NL,AT,CH,GB,DK,US</paylater_contries>
+                </paylater_config>
+                <paynow_config>
+                    <klarna_paynow>KLARNA_PAYNOW</klarna_paynow>
+                    <paynow_contries>SE,DE,NL,AT</paynow_contries>
+                </paynow_config>
+            </klarna_config>
         </worldpay>
         <payment>
             <worldpay_cc>

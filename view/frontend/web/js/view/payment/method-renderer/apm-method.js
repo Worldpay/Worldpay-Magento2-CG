@@ -25,6 +25,8 @@ define(
         if (quote.billingAddress()) {
             billingAddressCountryId = quote.billingAddress._latestValue.countryId;
         }
+        var klarnaPay = window.checkoutConfig.payment.ccform.klarnaTypesAndContries;
+        
         var achAccountCodeMessage = 'Maximum allowed length of 17 exceeded';
         var achAccountDisplayMessage = getCreditCardExceptions('CACH03')?getCreditCardExceptions('CACH03'):achAccountCodeMessage;
         var achRoutingCodeMessage = 'Required length should be 8 or 9';
@@ -33,7 +35,8 @@ define(
         var achCheckNumberDisplayMsg = getCreditCardExceptions('CACH05')?getCreditCardExceptions('CACH05'):achCheckNumberCodeMessage;
         var achCompanyCodeMessage = 'Maximum allowed length of 40 exceeded' ;
         var achCompanyDisplayMsg = getCreditCardExceptions('CACH06')?getCreditCardExceptions('CACH06'):achCompanyCodeMessage;
-        
+        var klarnaTypesArr = ko.observableArray([]);
+        var isKlarnaAvailabel,isKlarna;
         $.validator.addMethod('worldpay-validate-ach-accountnumber', function (value) {
             if (value) {
                 return evaluateRegex(value, "^[0-9]{0,17}$");
@@ -77,7 +80,8 @@ define(
                 ach_accountType:null,
                 ach_accountnumber:null,
                 ach_routingNumber:null,
-                statementNarrative:null
+                statementNarrative:null,
+                klarnaType:null
             },
 
             initialize: function () {
@@ -111,19 +115,25 @@ define(
                 }
                 var ccavailabletypes = this.getCcAvailableTypes();
                 var filtercclist = {};
-                var cckey,ccvalue;
+                var cckey,ccvalue,typeKey,typeValue;
                 var serviceUrl = urlBuilder.createUrl('/worldpay/payment/types', {});
                  var payload = {
                     countryId: quote.billingAddress._latestValue.countryId
                 };
                 var integrationMode = window.checkoutConfig.payment.ccform.intigrationmode;
                  fullScreenLoader.startLoader();
+                isKlarnaAvailabel = !("" in klarnaPay);
+                isKlarna = isKlarnaAvailabel 
+                                && (klarnaPay.KLARNA_PAYLATER.includes(quote.billingAddress._latestValue.countryId)
+                                || klarnaPay.KLARNA_SLICEIT.includes(quote.billingAddress._latestValue.countryId) 
+                                || klarnaPay.KLARNA_PAYNOW.includes(quote.billingAddress._latestValue.countryId));
 
                  storage.post(
                     serviceUrl, JSON.stringify(payload)
                 ).done(
                     function (apiresponse) {
                         var response = JSON.parse(apiresponse);
+                        var klarnaTypes = {};
                         if(response.length){
                             $.each(response, function(responsekey, value){
                                 var found = false;
@@ -155,9 +165,33 @@ define(
                              'ccLabel': value
                             };
                         });
+                        //Klarna
+                        if(isKlarna){
+                            var klarnaObj = {
+                                'ccValue': 'KLARNA-SSL',
+                                'ccLabel': 'KLARNA'
+                            };
+                            ccTypesArr1.push(klarnaObj);
+                        }
+                        for (var key in klarnaPay) {
+                            if (klarnaPay.hasOwnProperty(key)) {
+                                if (klarnaPay[key] !== null && klarnaPay[key].includes(quote.billingAddress._latestValue.countryId)) {
+                                    typeKey = key+'-SSL';
+                                    typeValue = key;
+                                    klarnaTypes[typeKey] = typeValue;
+                                }
+                            }
+                        }
+                        var klarnaTypesArr1 = _.map(klarnaTypes, function (value, key) {
+                            return {
+                             'klarnaLabel': key,
+                             'klarnaCode': value
+                            };
+                        });
 					
                         fullScreenLoader.stopLoader();
                         ccTypesArr(ccTypesArr1);
+			klarnaTypesArr(klarnaTypesArr1);
                     }
                 ).fail(
                     function (response) {
@@ -174,6 +208,9 @@ define(
             availableCCTypes : function(){
                return ccTypesArr;
             },
+            availableKlarnaTypes : function(){
+               return klarnaTypesArr;
+            },
             getCheckoutLabels: function (labelcode) {
                 var ccData = window.checkoutConfig.payment.ccform.checkoutlabels;
                 for (var key in ccData) {
@@ -188,6 +225,7 @@ define(
             selectedCCType : ko.observable(),
             selectedIdealBank:ko.observable(),
             selectedACHAccountType:ko.observable(),
+            selectedKlarnaType:ko.observable(),
             achaccountnumber: ko.observable(),
             achroutingnumber: ko.observable(),
             achchecknumber: ko.observable(),
@@ -221,6 +259,7 @@ define(
                     'additional_data': {
                         'cc_type': this.getselectedCCType(),
                         'cc_bank': this.idealBankType,
+                        'klarna_type': this.klarnaType,
                         'ach_account': this.ach_accountType,
                         'ach_accountNumber': this.ach_accountnumber,
                         'ach_routingNumber': this.ach_routingnumber,
@@ -262,6 +301,12 @@ define(
                 }
               return false;
             },
+            isKlarnaPayLater : function() {
+                if(isKlarna && this.selectedKlarnaType() == 'KLARNA_PAYLATER-SSL'){
+                    return true;
+                }
+		return false;
+            },
             paymentMethodSelection: function() {
                 return window.checkoutConfig.payment.ccform.paymentMethodSelection;
             },
@@ -271,6 +316,8 @@ define(
                 if($form.validation() && $form.validation('isValid')){
                     if (this.getselectedCCType() =='IDEAL-SSL') {
                         this.idealBankType = this.selectedIdealBank();
+                    }else if(isKlarna && this.getselectedCCType() == 'KLARNA-SSL'){
+                        this.klarnaType = this.selectedKlarnaType();
                     }else if(this.getselectedCCType() == 'ACH_DIRECT_DEBIT-SSL'){
                         this.ach_accountType = this.getACHAccounttypes(this.selectedACHAccountType());
                         this.ach_accountnumber = this.achaccountnumber();
@@ -305,15 +352,24 @@ define(
                         $(".ideal-block").show();
                         $("#ideal_bank").prop('disabled',false);
                         $(".ach-block").hide();
+                        $(".klarna-block").hide();
                     }else if(data.ccValue=='ACH_DIRECT_DEBIT-SSL'){
                         $(".ach-block").show();
                         $("#ach_pay").prop('disabled',false);
                         $(".ideal-block").hide();
+                        $(".klarna-block").hide();
+                    }else if(isKlarna && data.ccValue=='KLARNA-SSL'){
+                        $(".klarna-block").show();
+                        $("#klarna_pay").prop('disabled',false);
+                        $(".ideal-block").hide();
+                        $(".ach-block").hide();
                     }else{
                         $("#ideal_bank").prop('disabled',true);
                         $(".ideal-block").hide();
                         $("#ach_pay").prop('disabled',true);
                         $(".ach-block").hide();
+                        $("#klarna_pay").prop('disabled',true);
+                        $(".klarna-block").hide();
                     }
                      $(".statment-narrative").show();
                 }else if(data){
@@ -321,23 +377,35 @@ define(
                         $(".ideal-block").show();
                         $("#ideal_bank").prop('disabled',false);
                         $(".ach-block").hide();
+                        $(".klarna-block").hide();
                     }else if (data.selectedCCType() && data.selectedCCType() == 'ACH_DIRECT_DEBIT-SSL') {
                         $(".ach-block").show();
                         $("#ach_pay").prop('disabled',false);
                         $(".ideal-block").hide();
-                    }else{
+                        $(".klarna-block").hide();
+                    }else if (isKlarna && data.selectedCCType() && data.selectedCCType() == 'KLARNA-SSL') {
+                        $(".klarna-block").show();
+                        $("#klarna_pay").prop('disabled',false);
+                        $(".ideal-block").hide();
+                        $(".ach-block").hide();
+                    }
+                    else{
                         $("#ideal_bank").prop('disabled',true);
                         $(".ideal-block").hide();
                         $("#ach_pay").prop('disabled',true);
                         $(".ach-block").hide();
+                        $("#klarna_pay").prop('disabled',true);
+                        $(".klarna-block").hide();
                     }
                      $(".statment-narrative").show();
                 }else {
+                    $("#apm_KLARNA-SSL").prop('checked', false);
                     $("#apm_ACH_DIRECT_DEBIT-SSL").prop('checked', false);
                     $("#apm_IDEAL-SSL").prop('checked', false);
                     $("#ideal_bank").prop('disabled',true);
                     $(".ideal-block").hide();
                     $(".ach-block").hide();
+                    $(".klarna-block").hide();
                 }
             }
         });
