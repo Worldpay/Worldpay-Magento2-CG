@@ -11,4 +11,4 @@ This version is compatible with Magento 2.4.1 with following key features:
 10. Mobile order and Telephone Order support for customer support executive
 11. Shopper tokens and Merchant tokens
 12. Intelligent Account Verification
-11. Multi store and multi merchant support
+13. Multi store and multi merchant support
