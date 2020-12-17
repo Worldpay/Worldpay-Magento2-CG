@@ -87,10 +87,10 @@ class CallBack extends \Magento\Framework\App\Action\Action
                 getValue('worldpay/general_config/environment_mode', $storeScope);
 
       
-        if($environmentMode == 'Test Mode') {
-        $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId;
-        }else{
-        $serviceUrl = "https://api-ops.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId; 
+        if ($environmentMode == 'Test Mode') {
+            $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId;
+        } else {
+            $serviceUrl = "https://api-ops.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId;
         }
         
         

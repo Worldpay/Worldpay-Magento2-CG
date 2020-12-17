@@ -535,8 +535,10 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $productOption = $item->getProductOptionByCode('worldpay_subscription_options');
         $productBuyOptions = $item->getProductOptionByCode('info_buyRequest');
         if (is_array($productOption) && is_array($productBuyOptions) &&
-                isset($productBuyOptions['subscription_date'])) {
-            $startDate = $productBuyOptions['subscription_date'];
+                isset($productBuyOptions['subscription_date']) ||
+                isset($productOption['subscription_date'])) {
+            $startDate = isset($productOption['subscription_date'])?$productOption['subscription_date']
+                    :$productBuyOptions['subscription_date'];
         }
 
         return $startDate;
@@ -554,8 +556,10 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $productOption = $item->getProductOptionByCode('worldpay_subscription_options');
         $productBuyOptions = $item->getProductOptionByCode('info_buyRequest');
         if (is_array($productOption) && is_array($productBuyOptions) &&
-                isset($productBuyOptions['subscription_end_date'])) {
-            $endDate = $productBuyOptions['subscription_end_date'];
+                (isset($productBuyOptions['subscription_end_date']) ||
+                isset($productOption['subscription_end_date']))) {
+            $endDate = isset($productOption['subscription_end_date'])?$productOption['subscription_end_date']
+                    :$productBuyOptions['subscription_end_date'];
         }
 
         return $endDate;
@@ -884,6 +888,19 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
                 . 'my_account_alert_codes/response_codes', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
         if (is_array($accdata) || is_object($accdata)) {
             foreach ($accdata as $key => $valuepair) {
+                if ($key == $exceptioncode) {
+                    return $valuepair['exception_module_messages']?$valuepair['exception_module_messages']:
+                        $valuepair['exception_messages'];
+                }
+            }
+        }
+    }
+    public function getCheckoutExceptions($exceptioncode)
+    {
+        $ccdata = $this->serializer->unserialize($this->scopeConfig->getValue('worldpay_exceptions/'
+                . 'ccexceptions/cc_exception', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        if (is_array($ccdata) || is_object(accdata)) {
+            foreach ($ccdata as $key => $valuepair) {
                 if ($key == $exceptioncode) {
                     return $valuepair['exception_module_messages']?$valuepair['exception_module_messages']:
                         $valuepair['exception_messages'];

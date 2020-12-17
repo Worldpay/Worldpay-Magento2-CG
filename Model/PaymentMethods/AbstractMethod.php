@@ -591,4 +591,44 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             $mageOrder->save();
         }
     }
+    
+    public function canCancel($order)
+    {
+        $payment = $order->getPayment();
+        $mageOrder = $order->getOrder();
+        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
+        $orderStatus = $mageOrder->getStatus();
+        $paymentStatus = $worldPayPayment->getPaymentStatus();
+        if (strtoupper($orderStatus) !== 'CANCELED') {
+            $xml = $this->paymentservicerequest->cancelOrder(
+                $payment->getOrder(),
+                $worldPayPayment,
+                $payment->getMethod()
+            );
+         
+            $payment->setTransactionId(time());
+            $this->_response = $this->adminhtmlresponse->parseCancelOrderRespone($xml);
+            if ($this->_response->reply->ok) {
+                return $this;
+            }
+        } else {
+            throw new \Magento\Framework\Exception\LocalizedException(__('Cancel operation was already executed on '
+                   . 'this order. '
+                   . 'Please check Payment Status or Order Status below for confirmation.'));
+        }
+    }
+    
+    public function updateOrderStatusForCancelOrder($order)
+    {
+        $payment = $order->getPayment();
+        $mageOrder = $order->getOrder();
+        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
+        $paymentStatus = $worldPayPayment->getPaymentStatus();
+       
+        if ($paymentStatus === 'CANCELLED') {
+            $mageOrder->setState(\Magento\Sales\Model\Order::STATE_CANCELED, true);
+            $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
+            $mageOrder->save();
+        }
+    }
 }

@@ -74,6 +74,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    
+    public function isIAVEnabled()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/cc_config/enable_iav',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
 
     public function getLiveUrl()
     {
@@ -121,7 +129,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    public function getMyAccountSpecificexception($exceptioncode)
+    {
 
+        $ccdata=$this->serializer->unserialize($this->getMyAccountException());
+        if (is_array($ccdata) || is_object($ccdata)) {
+            foreach ($ccdata as $key => $valuepair) {
+                if ($key == $exceptioncode) {
+                    return $valuepair['exception_module_messages']?$valuepair['exception_module_messages']:
+                        $valuepair['exception_messages'];
+                }
+            }
+        }
+    }
     public function isMacEnabled()
     {
         return $this->_scopeConfig->getValue(
@@ -212,11 +232,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'CHINAUNIONPAY-SSL' => 'Union Pay',
             'IDEAL-SSL' => 'IDEAL',
             'QIWI-SSL' => 'Qiwi',
-            'YANDEXMONEY-SSL' => 'Yandex.Money',
+           // 'YANDEXMONEY-SSL' => 'Yandex.Money',
             'PAYPAL-EXPRESS' => 'PayPal',
             'SOFORT-SSL' => 'SoFort EU',
             'GIROPAY-SSL' => 'GiroPay',
-            'BOLETO-SSL' => 'Boleto Bancairo',
+          //  'BOLETO-SSL' => 'Boleto Bancairo',
             'ALIPAY-SSL' => 'AliPay',
             'SEPA_DIRECT_DEBIT-SSL' => 'SEPA (One off transactions)',
             'KLARNA-SSL' => 'Klarna',

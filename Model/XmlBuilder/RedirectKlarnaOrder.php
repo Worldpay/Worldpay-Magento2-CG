@@ -157,7 +157,7 @@ EOD;
         
         $include = $paymentMethodMask->addChild('include');
         $include['code'] = $this->paymentType;
-        }
+    }
 
     private function _addShopperElement($order)
     {
@@ -345,4 +345,4 @@ EOD;
         }
         return $accTotalAmt;
     }
-    }
+}

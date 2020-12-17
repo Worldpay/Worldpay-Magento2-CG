@@ -117,8 +117,6 @@ define([
                  this.paymentToken(data.paymentToken);
                  this.dfreference("");
             }
-            console.log(data.paymentToken);
-             console.log(fulltoken);
             this.shippingAddress(data.shippingAddress);
             this.billingAddress(data.billingAddress);
             this.shippingMethod(data.shippingMethod);
@@ -154,7 +152,9 @@ define([
                             type: 'post',
                             dataType: 'json',
                             success: function (data) {
+                                if(window.isDynamic3DS2Enabled) {
                                 window.location.replace(urlBuilder.build('worldpay/savedcard/instantredirect'));
+                            }
                             },
                             /** Show loader before send */
                             beforeSend: function () {

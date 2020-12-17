@@ -377,4 +377,30 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
         $statusNode = $this->_getStatusNode();
         return (string) $statusNode->payment->enhancedAuthResponse->virtualAccountNumber;
     }
+    public function getFraudsightMessage()
+    {
+        if (strtoupper($this->getAdvancedRiskProvider()) === 'FRAUDSIGHT') {
+            $statusNode = $this->_getStatusNode();
+            return (string) $statusNode->payment->riskScore['message'];
+        }
+    }
+    public function getFraudsightScore()
+    {
+        $statusNode = $this->_getStatusNode();
+        if (!empty($statusNode->payment->FraudSight)) {
+            return (string) $statusNode->payment->FraudSight['score'];
+        }
+    }
+    public function getFraudsightReasonCode()
+    {
+        $statusNode = $this->_getStatusNode();
+        if (!empty($statusNode->payment->FraudSight)) {
+            $reasoncodes = $statusNode->payment->FraudSight->reasonCodes->reasonCode;
+            $savereasoncode='';
+            foreach ($reasoncodes as $key => $reasoncode) {
+                    $savereasoncode=$savereasoncode.",".$reasoncode;
+            }
+            return ltrim($savereasoncode, ",");
+        }
+    }
 }

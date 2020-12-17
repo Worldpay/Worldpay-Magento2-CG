@@ -53,14 +53,13 @@ class Auth extends \Magento\Framework\App\Action\Action
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
         $orderId = $this->checkoutSession->getAuthOrderId();
         $iframe = false;
-        
+        // Chrome 84 releted updates for 3DS
+        $phpsessId = $_COOKIE['PHPSESSID'];
+        setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
         if ($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe') {
             $iframe = true;
         }
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
-            // Chrome 84 releted updates for 3DS
-            $phpsessId = $_COOKIE['PHPSESSID'];
-            setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
             $responseUrl = $this->_url->getUrl('worldpay/threedsecure/authresponse', ['_secure' => true]);
             print_r('
                 <form name="theForm" id="form" method="POST" action=' . $redirectData->getUrl() . '>
@@ -173,6 +172,9 @@ class Auth extends \Magento\Framework\App\Action\Action
                 $this->checkoutSession->uns3DS2Params();
                 $this->checkoutSession->uns3DS2Config();
             }
+        } elseif ($this->checkoutSession->getIavCall()) {
+            $this->checkoutSession->unsIavCall();
+            return $this->resultRedirectFactory->create()->setPath('worldpay/savedcard', ['_current' => true]);
         } else {
             return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success', ['_current' => true]);
         }

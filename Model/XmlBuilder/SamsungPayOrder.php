@@ -63,9 +63,6 @@ EOD;
 
         $submit = $this->_addSubmitElement($xml);
         $this->_addOrderElement($submit);
-        
-       
-
         return $xml;
     }
 
@@ -131,14 +128,9 @@ EOD;
     private function _addPaymentDetailsElement($order)
     {
         $paymentDetails = $order->addChild('paymentDetails');
-
         $paymentType = $paymentDetails->addChild($this->paymentType);
-        
         $paymentThreeDS = $paymentType->addChild('ThreeDS');
-        
-       
         $paymentThreeDS->addChild('data', $this->data);
-        
         $paymentThreeDS->addChild('version', 100);
     }
 
@@ -150,7 +142,6 @@ EOD;
     private function _addShopperElement($order)
     {
         $shopper = $order->addChild('shopper');
-
         $shopper->addChild('shopperEmailAddress', $this->shopperEmail);
     }
 

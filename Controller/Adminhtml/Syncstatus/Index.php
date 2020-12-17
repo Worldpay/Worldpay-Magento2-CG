@@ -132,5 +132,6 @@ class Index extends \Magento\Backend\App\Action
     private function _updateOrderStatus()
     {
         $this->abstractMethod->updateOrderStatusForVoidSale($this->_order);
+        $this->abstractMethod->updateOrderStatusForCancelOrder($this->_order);
     }
 }

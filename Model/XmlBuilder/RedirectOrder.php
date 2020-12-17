@@ -37,6 +37,7 @@ EOD;
     private $thirdparty;
     private $shippingfee;
     private $exponent;
+    private $cusDetails;
 
     /**
      * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
@@ -102,7 +103,8 @@ EOD;
         $paymentDetails,
         $thirdparty,
         $shippingfee,
-        $exponent
+        $exponent,
+        $cusDetails
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -123,6 +125,7 @@ EOD;
         $this->thirdparty = $thirdparty;
         $this->shippingfee = $shippingfee;
         $this->exponent = $exponent;
+        $this->cusDetails = $cusDetails;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -186,6 +189,7 @@ EOD;
         if (!empty($this->statementNarrative)) {
             $this->_addStatementNarrativeElement($order);
         }
+        $this->_addFraudSightData($order);
         return $order;
     }
 
@@ -460,5 +464,32 @@ EOD;
             $thirdparty->addChild('cpf', $this->thirdparty['cpf']);
         }
         return $thirdparty;
+    }
+    
+    private function _addFraudSightData($order)
+    {
+        $fraudsightData = $order->addChild('FraudSightData');
+        $shopperFields = $fraudsightData->addChild('shopperFields');
+        $shopperFields->addChild('shopperName', $this->cusDetails['shopperName']);
+        if (isset($this->cusDetails['shopperId'])) {
+            $shopperFields->addChild('shopperId', $this->cusDetails['shopperId']);
+        }
+        if (isset($this->cusDetails['birthDate'])) {
+            $shopperDOB = $shopperFields->addChild('birthDate');
+            $dateElement= $shopperDOB->addChild('date');
+            $dateElement['dayOfMonth'] = date("d", strtotime($this->cusDetails['birthDate']));
+            $dateElement['month'] = date("m", strtotime($this->cusDetails['birthDate']));
+            $dateElement['year'] = date("Y", strtotime($this->cusDetails['birthDate']));
+        }
+        $shopperAddress = $shopperFields->addChild('shopperAddress');
+        $this->_addAddressElement(
+            $shopperAddress,
+            $this->billingAddress['firstName'],
+            $this->billingAddress['lastName'],
+            $this->billingAddress['street'],
+            $this->billingAddress['postalCode'],
+            $this->billingAddress['city'],
+            $this->billingAddress['countryCode']
+        );
     }
 }

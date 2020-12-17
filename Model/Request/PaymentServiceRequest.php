@@ -46,22 +46,36 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     {
         $loggerMsg = '########## Submitting direct 3DSecure order request. OrderCode: ';
         $this->_wplogger->info($loggerMsg . $directOrderParams['orderCode'] . ' ##########');
-        $requestConfiguration = [
+        if (isset($directOrderParams['tokenRequestConfig'])) {
+            $requestConfiguration = [
             'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
             'tokenRequestConfig' => $directOrderParams['tokenRequestConfig']
-        ];
+            ];
 
-        $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
-        $paymentType = isset($directOrderParams['paymentDetails']['brand']) ?
+            $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
+            $paymentType = isset($directOrderParams['paymentDetails']['brand']) ?
                 $directOrderParams['paymentDetails']['brand']: $directOrderParams['paymentDetails']['paymentType'];
-        $orderSimpleXml = $this->xmldirectorder->build3DSecure(
-            $directOrderParams['merchantCode'],
-            $directOrderParams['orderCode'],
-            $directOrderParams['paymentDetails'],
-            $directOrderParams['paResponse'],
-            $directOrderParams['echoData']
-        );
-
+            $orderSimpleXml = $this->xmldirectorder->build3DSecure(
+                $directOrderParams['merchantCode'],
+                $directOrderParams['orderCode'],
+                $directOrderParams['paymentDetails'],
+                $directOrderParams['paResponse'],
+                $directOrderParams['echoData']
+            );
+        } else {
+            $requestConfiguration = [
+            'threeDSecureConfig' => $directOrderParams['threeDSecureConfig']
+            ];
+            $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\WalletOrder($requestConfiguration);
+            $paymentType = $directOrderParams['paymentType'];
+            $orderSimpleXml = $this->xmldirectorder->build3DSecure(
+                $directOrderParams['merchantCode'],
+                $directOrderParams['orderCode'],
+                $directOrderParams['paymentDetails'],
+                $directOrderParams['paResponse'],
+                $directOrderParams['echoData']
+            );
+        }
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
             $this->worldpayhelper->getXmlUsername($paymentType),
@@ -89,7 +103,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $directOrderParams['thirdPartyData']='';
             $directOrderParams['shippingfee']='';
         }
-        
+        if (empty($directOrderParams['shippingAddress'])) {
+            $directOrderParams['shippingAddress']='';
+        }
         if (empty($directOrderParams['saveCardEnabled'])) {
             $directOrderParams['saveCardEnabled']='';
         }
@@ -272,7 +288,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $redirectOrderParams['paymentDetails'],
             $redirectOrderParams['thirdPartyData'],
             $redirectOrderParams['shippingfee'],
-            $redirectOrderParams['exponent']
+            $redirectOrderParams['exponent'],
+            $redirectOrderParams['cusDetails']
         );
         return $this->_sendRequest(
             dom_import_simplexml($redirectSimpleXml)->ownerDocument,
@@ -639,7 +656,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $loggerMsg = '########## Submitting wallet order request. OrderCode: ';
         $this->_wplogger->info($loggerMsg . $walletOrderParams['orderCode'] . ' ##########');
 
-        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\WalletOrder();
+         $requestConfiguration = [
+            'threeDSecureConfig' => $walletOrderParams['threeDSecureConfig'],
+         ];
+         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\WalletOrder($requestConfiguration);
             $walletSimpleXml = $this->xmlredirectorder->build(
                 $walletOrderParams['merchantCode'],
                 $walletOrderParams['orderCode'],
@@ -648,9 +668,16 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $walletOrderParams['amount'],
                 $walletOrderParams['paymentType'],
                 $walletOrderParams['shopperEmail'],
+                $walletOrderParams['acceptHeader'],
+                $walletOrderParams['userAgentHeader'],
                 $walletOrderParams['protocolVersion'],
                 $walletOrderParams['signature'],
                 $walletOrderParams['signedMessage'],
+                $walletOrderParams['shippingAddress'],
+                $walletOrderParams['billingAddress'],
+                $walletOrderParams['cusDetails'],
+                $walletOrderParams['shopperIpAddress'],
+                $walletOrderParams['paymentDetails'],
                 $walletOrderParams['exponent']
             );
             
@@ -782,21 +809,34 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     {
         $loggerMsg = '########## Submitting direct 3Ds2Secure order request. OrderCode: ';
         $this->_wplogger->info($loggerMsg . $directOrderParams['orderCode'] . ' ##########');
-        $requestConfiguration = [
+        if (isset($directOrderParams['tokenRequestConfig'])) {
+            $requestConfiguration = [
             'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
             'tokenRequestConfig' => $directOrderParams['tokenRequestConfig']
-        ];
+            ];
 
-        $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
-        $paymentType = isset($directOrderParams['paymentDetails']['brand']) ?
+            $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
+            $paymentType = isset($directOrderParams['paymentDetails']['brand']) ?
                 $directOrderParams['paymentDetails']['brand']: $directOrderParams['paymentDetails']['paymentType'];
-        $orderSimpleXml = $this->xmldirectorder->build3Ds2Secure(
-            $directOrderParams['merchantCode'],
-            $directOrderParams['orderCode'],
-            $directOrderParams['paymentDetails'],
-            $directOrderParams['paymentDetails']['dfReferenceId']
-        );
-
+            $orderSimpleXml = $this->xmldirectorder->build3Ds2Secure(
+                $directOrderParams['merchantCode'],
+                $directOrderParams['orderCode'],
+                $directOrderParams['paymentDetails'],
+                $directOrderParams['paymentDetails']['dfReferenceId']
+            );
+        } else {
+            $requestConfiguration = [
+            'threeDSecureConfig' => $directOrderParams['threeDSecureConfig']
+            ];
+            $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\WalletOrder($requestConfiguration);
+            $paymentType = $directOrderParams['paymentType'];
+            $orderSimpleXml = $this->xmldirectorder->build3Ds2Secure(
+                $directOrderParams['merchantCode'],
+                $directOrderParams['orderCode'],
+                $directOrderParams['paymentDetails'],
+                $directOrderParams['paymentDetails']['dfReferenceId']
+            );
+        }
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
             $this->worldpayhelper->getXmlUsername($paymentType),
@@ -872,6 +912,31 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         return $this->_sendRequest(
             dom_import_simplexml($voidSaleSimpleXml)->ownerDocument,
+            $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
+            $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
+        );
+    }
+    
+    public function cancelOrder(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode)
+    {
+        $orderCode = $wp->getWorldpayOrderId();
+        $this->_wplogger->info('########## Submitting cancel order request. Order: '
+        . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
+        $this->xmlcancel = new \Sapient\Worldpay\Model\XmlBuilder\CancelOrder();
+        $currencyCode = $order->getOrderCurrencyCode();
+        $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
+        
+        $cancelSimpleXml = $this->xmlcancel->build(
+            $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
+            $orderCode,
+            $order->getOrderCurrencyCode(),
+            $order->getGrandTotal(),
+            $exponent,
+            $wp->getPaymentType()
+        );
+
+        return $this->_sendRequest(
+            dom_import_simplexml($cancelSimpleXml)->ownerDocument,
             $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
             $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
         );

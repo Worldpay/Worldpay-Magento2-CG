@@ -21,6 +21,8 @@ class Index extends \Magento\Framework\App\Action\Action
      * @var \Sapient\Worldpay\Model\HistoryNotificationFactory
      */
     protected $historyNotification;
+    
+    private $abstractMethod;
 
     const RESPONSE_OK = '[OK]';
     const RESPONSE_FAILED = '[FAILED]';
@@ -34,6 +36,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
+     * @param \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod $abstractMethod
      * @param \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
      */
     public function __construct(
@@ -43,6 +46,7 @@ class Index extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
+        \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod $abstractMethod,
         \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
     ) {
         parent::__construct($context);
@@ -52,6 +56,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->resultJsonFactory = $resultJsonFactory;
         $this->historyNotification = $historyNotification;
         $this->worldpaytoken = $worldpaytoken;
+        $this->abstractMethod = $abstractMethod;
     }
 
     public function execute()
@@ -65,6 +70,7 @@ class Index extends \Magento\Framework\App\Action\Action
                 $this->_createPaymentUpdate($xmlRequest);
                 $this->_loadOrder();
                 $this->_tryToApplyPaymentUpdate();
+                $this->_updateOrderStatus();
                 $this->_applyTokenUpdate($xmlRequest);
                 return $this->_returnOk();
             } else {
@@ -184,5 +190,11 @@ class Index extends \Magento\Framework\App\Action\Action
         $hn->setData('status', $paymentStatus);
         $hn->setData('order_id', trim($orderCode));
         $hn->save();
+    }
+    
+    private function _updateOrderStatus()
+    {
+        $this->abstractMethod->updateOrderStatusForVoidSale($this->_order);
+        $this->abstractMethod->updateOrderStatusForCancelOrder($this->_order);
     }
 }

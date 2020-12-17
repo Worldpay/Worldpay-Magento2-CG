@@ -61,6 +61,9 @@ class WorldPayPayment
         $wpp->setData('account_range_id', $paymentState->getAccountRangeId());
         $wpp->setData('issuer_country', $paymentState->getIssuerCountry());
         $wpp->setData('virtual_account_number', $paymentState->getVirtualAccountNumber());
+        $wpp->setData('fraudsight_message', $paymentState->getFraudsightMessage());
+        $wpp->setData('fraudsight_score', $paymentState->getFraudsightScore());
+        $wpp->setData('fraudsight_reasoncode', $paymentState->getFraudsightReasonCode());
         $wpp->save();
     }
     

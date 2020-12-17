@@ -91,6 +91,10 @@
                     <label>Require CVC</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="enable_iav" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Intelligent Account Verification</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
             <!--Credit Card 3DS-->
             <group id="3ds_config" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -395,7 +399,10 @@
                     </field> 
                      <field id="google_merchantname" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Google MerchantName</label>
-                    </field>    
+                    </field>
+                     <!--<field id="test_cardholdername" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                         <label>Test 3DS CardHolderName</label>
+                     </field>   --> 
                 </group>
                 
                 <group id="samsung_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="4">

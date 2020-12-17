@@ -67,25 +67,82 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
             // @setIs3DSRequest flag is unset from checkout session.
             $this->checkoutSession->setIs3DS2Request();
             $orderIncrementId = current(explode('-', $directOrderParams['orderCode']));
-            $this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
-            $this->_paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml(
-                $this->response->getXml()
-            );
-            $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
-            $this->_abortIfPaymentError($this->_paymentUpdate, $orderIncrementId);
+            if ($this->checkoutSession->getIavCall()) {
+                    $responseXml = $this->response->getXml();
+                    $orderStatus = $responseXml->reply->orderStatus;
+                    $payment=$orderStatus->payment;
+                    $lastEvent = $payment->lastEvent;
+                    $riskScore=$payment->riskScore['value'];
+                    $riskProviderFinalScore=$payment->riskScore['finalScore'];
+                    $this->_messageManager->getMessages(true);
+                if (($lastEvent[0] == 'AUTHORISED') ||
+                        ($this->isIAVEnabled() && ($lastEvent[0] == 'CANCELLED') &&
+                         ($riskScore < 100 || $riskProviderFinalScore < 100))) {
+                    if ($this->checkoutSession->getIavCall()) {
+                        $this->customerSession->setIavCall(true);
+                    }
+                    $this->updateWorldPayPayment->create()
+                    ->updateWorldpayPaymentForMyAccount($this->response, $payment);
+                     $this->_messageManager->addSuccess(
+                         $this->worldpayHelper->getMyAccountSpecificexception('IAVMA3')
+                                ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA3')
+                         : 'The card has been added'
+                     );
+                     $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(
+                         'worldpay/savedcard',
+                         ['_secure' => true]
+                     ));
+                } else {
+                     $this->_messageManager->addError(
+                         $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
+                                ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
+                         : 'Your card could not be saved'
+                     );
+                    $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(
+                        'worldpay/savedcard',
+                        ['_secure' => true]
+                    ));
+                }
+                    
+            } else {
+                    $this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
+                    $this->_paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml(
+                        $this->response->getXml()
+                    );
+                    $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
+                    $this->_abortIfPaymentError($this->_paymentUpdate, $orderIncrementId);
+            }
         } catch (Exception $e) {
             $this->wplogger->info($e->getMessage());
             if ($e->getMessage() === 'Asymmetric transaction rollback.') {
                 $errorMessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM16');
                 $this->_messageManager->addError(__($errorMessage));
             } else {
-                $this->_messageManager->addError(__($e->getMessage()));
+                $this->_messageManager->getMessages(true);
+                $this->_messageManager->addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM10')));
             }
             $this->checkoutSession->setWpResponseForwardUrl(
                 $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );
+            if ($this->checkoutSession->getIavCall()) {
+                $this->checkoutSession->unsIavCall();
+                $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(
+                    'worldpay/savedcard/addnewcard',
+                    ['_secure' => true]
+                ));
+            }
             return;
         }
+    }
+    /**
+     * Get order id column value
+     *
+     * @return string
+     */
+   
+    public function isIAVEnabled()
+    {
+        return $this->worldpayHelper->isIAVEnabled();
     }
 
     /**
@@ -117,17 +174,31 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
                 $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
                 $this->checkoutSession->unsInstantPurchaseMessage();
                 $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+            } elseif ($this->checkoutSession->getIavCall()) {
+                $this->checkoutSession->unsIavCall();
+                $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(
+                    'worldpay/savedcard/addnewcard',
+                    ['_secure' => true]
+                ));
             } else {
                 $this->checkoutSession->setWpResponseForwardUrl(
                     $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
                 );
             }
         } elseif ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
-            $this->_messageManager->addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM9')));
+            $this->_messageManager
+                    ->addError(__($this->paymentservicerequest
+                            ->getCreditCardSpecificException('CCAM9')));
             if ($this->checkoutSession->getInstantPurchaseOrder()) {
                 $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
                 $this->checkoutSession->unsInstantPurchaseMessage();
                 $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+            } elseif ($this->checkoutSession->getIavCall()) {
+                $this->checkoutSession->unsIavCall();
+                $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(
+                    'worldpay/savedcard/addnewcard',
+                    ['_secure' => true]
+                ));
             } else {
                 $this->checkoutSession->setWpResponseForwardUrl(
                     $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])

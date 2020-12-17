@@ -42,7 +42,7 @@
                         echo $block->formatDate($subscription->getStartDate(), \IntlDateFormatter::SHORT, false, date_default_timezone_get()) ?></td>
                     <?php if ($block->isEndDateEnabled()): ?>
                     <td data-th="<?php echo $block->escapeHtml(__('End Date')) ?>" class="col end-date"><?php /* @noEscape */
-                        echo $block->formatDate($subscription->getEndDate(), \IntlDateFormatter::SHORT, false, date_default_timezone_get()) ?></td>
+                        echo $block->formatDate($subscription->getEndDate()?$subscription->getEndDate():$subscription->getStartDate(), \IntlDateFormatter::SHORT, false, date_default_timezone_get()) ?></td>
                     <?php endif; ?>
                     <td data-th="<?php echo $block->escapeHtml(__('Status')) ?>" class="col status"><?php echo $block->escapeHtml($subscription->getStatusLabel()) ?></td>
                     <td data-th="<?php echo $block->escapeHtml(__('Actions')) ?>" class="col actions">

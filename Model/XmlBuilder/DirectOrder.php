@@ -252,7 +252,9 @@ EOD;
         $this->_addAmountElement($order);
         $this->_addPaymentDetailsElement($order);
         $this->_addShopperElement($order);
-        $this->_addShippingElement($order);
+        if (!isset($this->paymentDetails['myaccountSave'])) {
+            $this->_addShippingElement($order);
+        }
         $this->_addBillingElement($order);
         if (!empty($this->thirdparty)) {
             $this->_addThirdPartyData($order);
@@ -269,6 +271,7 @@ EOD;
         $this->_addCustomerRiskData($order);
         $this->_addAdditional3DsElement($order);
         $this->_addExemptionEngineElement($order);
+        $this->_addFraudSightData($order);
         
         return $order;
     }
@@ -423,6 +426,9 @@ EOD;
     protected function _addPaymentDetailsElement($order)
     {
         $paymentDetailsElement = $order->addChild('paymentDetails');
+        if (isset($this->paymentDetails['isIAVEnabled'])) {
+            $paymentDetailsElement['action'] = "ACCOUNTVERIFICATION";
+        }
         if (isset($this->primeRoutingData['primerouting'])) {
             $paymentDetailsElement['action'] = 'SALE';
         }
@@ -607,10 +613,13 @@ EOD;
         
         $orderCreateDate = strtotime($this->cusDetails['order_details']['created_at']);
         $orderUpdateDate = strtotime($this->cusDetails['order_details']['updated_at']);
-        
-        $shippingNameMatchesAccountName = ($this->billingAddress['firstName'] == $this->
+        if ($this->shippingAddress) {
+            $shippingNameMatchesAccountName = ($this->billingAddress['firstName'] == $this->
             shippingAddress['firstName']) ? 'true' : 'false';
         
+        } else {
+            $shippingNameMatchesAccountName = 'false';
+        }
         //Authentication risk data
         $authenticationRiskData = $riskData->addChild('authenticationRiskData');
         $authenticationRiskData['authenticationMethod'] = !empty($this->shopperId)? 'localAccount' : 'guestCheckout';
@@ -824,5 +833,32 @@ EOD;
             
         }
         return $primeRouting;
+    }
+    
+    private function _addFraudSightData($order)
+    {
+        $fraudsightData = $order->addChild('FraudSightData');
+        $shopperFields = $fraudsightData->addChild('shopperFields');
+        $shopperFields->addChild('shopperName', $this->cusDetails['shopperName']);
+        if (isset($this->cusDetails['shopperId'])) {
+            $shopperFields->addChild('shopperId', $this->cusDetails['shopperId']);
+        }
+        if (isset($this->cusDetails['birthDate'])) {
+            $shopperDOB = $shopperFields->addChild('birthDate');
+            $dateElement= $shopperDOB->addChild('date');
+            $dateElement['dayOfMonth'] = date("d", strtotime($this->cusDetails['birthDate']));
+            $dateElement['month'] = date("m", strtotime($this->cusDetails['birthDate']));
+            $dateElement['year'] = date("Y", strtotime($this->cusDetails['birthDate']));
+        }
+        $shopperAddress = $shopperFields->addChild('shopperAddress');
+        $this->_addAddressElement(
+            $shopperAddress,
+            $this->billingAddress['firstName'],
+            $this->billingAddress['lastName'],
+            $this->billingAddress['street'],
+            $this->billingAddress['postalCode'],
+            $this->billingAddress['city'],
+            $this->billingAddress['countryCode']
+        );
     }
 }

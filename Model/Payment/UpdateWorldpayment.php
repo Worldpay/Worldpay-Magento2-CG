@@ -10,6 +10,7 @@ use Magento\Payment\Model\InfoInterface;
 use Magento\Vault\Model\CreditCardTokenFactory;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
 use Magento\Vault\Model\Ui\VaultConfigProvider;
+use Magento\Framework\Encryption\EncryptorInterface;
 
 /**
  * Updating Risk gardian
@@ -45,6 +46,8 @@ class UpdateWorldpayment
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
         CreditCardTokenFactory $paymentTokenFactory,
         \Magento\Backend\Model\Session\Quote $session,
+        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
+        EncryptorInterface $encryptor,
         \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
     ) {
         $this->wplogger = $wplogger;
@@ -56,9 +59,84 @@ class UpdateWorldpayment
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->paymentExtensionFactory = $paymentExtensionFactory;
         $this->quotesession = $session;
+        $this->paymentTokenRepository = $paymentTokenRepository;
+        $this->encryptor = $encryptor;
         $this->transactionFactory = $transactionsFactory;
     }
 
+    /**
+     * Updating Risk gardian
+     *
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     */
+    public function updateWorldpayPaymentForMyAccount(
+        \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
+        $paymentObject,
+        $tokenId = null,
+        $disclaimerFlag = null
+    ) {
+        $responseXml=$directResponse->getXml();
+        $merchantCode = $responseXml['merchantCode'];
+        $orderStatus = $responseXml->reply->orderStatus;
+        $orderCode=$orderStatus['orderCode'];
+        $payment=$orderStatus->payment;
+        $cardDetail=$payment->paymentMethodDetail->card;
+        $cardNumber=$cardDetail['number'];
+        $paymentStatus=$payment->lastEvent;
+        $cvcnumber=$payment->CVCResultCode['description'];
+        $avsnumber=$payment->AVSResultCode['description'];
+        $riskScore=$payment->riskScore['value'];
+        $riskProviderid=$payment->riskScore['RGID'];
+        $riskProviderScore=$payment->riskScore['tScore'];
+        $riskProviderThreshold=$payment->riskScore['tRisk'];
+        $riskProviderFinalScore=$payment->riskScore['finalScore'];
+        $refusalcode=$payment->issueResponseCode['code'] ? : $payment->ISO8583ReturnCode['code'];
+        $refusaldescription=$payment->issueResponseCode['description'] ? : $payment->ISO8583ReturnCode['description'];
+        if (!($payment->instalments[0]===null)) {
+            $lataminstalments=$payment->instalments[0];
+        }
+        $wpp = $this->worldpaypayment->create();
+        $wpp = $wpp->loadByWorldpayOrderId($orderCode);
+        
+        $wpp->setData('card_number', $cardNumber);
+        $wpp->setData('payment_status', $paymentStatus);
+        if ($payment->paymentMethod[0]) {
+            $this->paymentMethodType = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
+            $wpp->setData('payment_type', str_replace("_CREDIT", "", $this->paymentMethodType));
+        }
+        $wpp->setData('avs_result', $avsnumber);
+        $wpp->setData('cvc_result', $cvcnumber);
+        $wpp->setData('risk_score', $riskScore);
+        $wpp->setData('merchant_id', $responseXml['merchantCode']);
+        $wpp->setData('risk_provider_score', $riskProviderScore);
+        $wpp->setData('risk_provider_id', $riskProviderid);
+        $wpp->setData('risk_provider_threshold', $riskProviderThreshold);
+        $wpp->setData('risk_provider_final', $riskProviderFinalScore);
+        $wpp->setData('refusal_code', $refusalcode);
+        $wpp->setData('refusal_description', $refusaldescription);
+        $wpp->setData('aav_address_result_code', $payment->AAVAddressResultCode['description']);
+        $wpp->setData('avv_postcode_result_code', $payment->AAVPostcodeResultCode['description']);
+        $wpp->setData('aav_cardholder_name_result_code', $payment->AAVCardholderNameResultCode['description']);
+        $wpp->setData('aav_telephone_result_code', $payment->AAVTelephoneResultCode['description']);
+        $wpp->setData('aav_email_result_code', $payment->AAVEmailResultCode['description']);
+        $wpp->setData('latam_instalments', $lataminstalments);
+        $wpp->save();
+        if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
+                $this->customerSession->unsIsSavedCardRequested();
+                $tokenNodeWithError = $orderStatus->token->xpath('//error');
+            if (!$tokenNodeWithError) {
+                $tokenElement = $orderStatus->token;
+                $this->saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag, $orderCode);
+                // vault and instant purchase configuration goes here
+                $this->setVaultPaymentTokenMyAccount($tokenElement);
+            }
+        } else {
+             $tokenNodeWithError = $orderStatus->token->xpath('//error');
+            if (!$tokenNodeWithError && $tokenId != null) {
+                $this->saveTokenDataToTransactions($tokenId, $orderCode);
+            }
+        }
+    }
     /**
      * Updating Risk gardian
      *
@@ -91,6 +169,8 @@ class UpdateWorldpayment
         $primeRoutingEnabled = $this->getPrimeRoutingEnabled($paymentObject);
         $networkUsed=$payment->primeRoutingResponse->networkUsed[0];
         $issureInsightresponse=$this->getIssuerInsightResponseData($payment);
+        $riskProvider = $payment->riskScore['Provider'];
+        $fraudsightData = $this->getFraudsightData($payment);
         $wpp = $this->worldpaypayment->create();
         $wpp = $wpp->loadByWorldpayOrderId($orderCode);
         
@@ -128,6 +208,14 @@ class UpdateWorldpayment
         $wpp->setData('account_range_id', $issureInsightresponse['accountRangeId']);
         $wpp->setData('issuer_country', $issureInsightresponse['issuerCountry']);
         $wpp->setData('virtual_account_number', $issureInsightresponse['virtualAccountNumber']);
+        $wpp->setData('risk_provider', $riskProvider);
+        $wpp->setData('fraudsight_message', $fraudsightData['message']);
+        if (isset($fraudsightData['score'])) {
+            $wpp->setData('fraudsight_score', $fraudsightData['score']);
+        }
+        if (isset($fraudsightData['reasonCode'])) {
+            $wpp->setData('fraudsight_reasoncode', $fraudsightData['reasonCode']);
+        }
         $wpp->save();
         
         if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
@@ -222,9 +310,49 @@ class UpdateWorldpayment
         } else {
             $tokenId = $tokenDataExist['id'];
             $this->saveTokenDataToTransactions($tokenId, $orderCode);
-            $this->_messageManager->addNotice(__($this->worldpayHelper->getCreditCardSpecificexception('CCAM22')));
+            if (!$this->customerSession->getIavCall()) {
+                $this->_messageManager->addNotice(__($this->worldpayHelper->getCreditCardSpecificexception('CCAM22')));
+            }
             return;
         }
+    }
+    protected function setVaultPaymentTokenMyAccount($tokenElement)
+    {
+        // Check token existing in gateway response
+        $token = $tokenElement[0]->tokenDetails[0]->paymentTokenID[0];
+        if (empty($token)) {
+            return null;
+        }
+
+        /** @var PaymentTokenInterface $paymentToken */
+        $paymentToken = $this->paymentTokenFactory->create();
+        $paymentToken->setGatewayToken($token);
+        $paymentToken->setExpiresAt($this->getExpirationDate($tokenElement));
+        $paymentToken->setIsVisible(true);
+        $paymentToken->setTokenDetails($this->convertDetailsToJSON([
+          'type' => $this->paymentMethodType,
+          'maskedCC' => $this->getLastFourNumbers($tokenElement[0]->paymentInstrument[0]
+                  ->cardDetails[0]->derived[0]->obfuscatedPAN[0]),
+          'expirationDate'=> $this->getExpirationMonthAndYear($tokenElement)
+        ]));
+        $paymentToken->setIsActive(true);
+        $paymentToken->setPaymentMethodCode('worldpay_cc');
+        $paymentToken->setCustomerId($this->customerSession->getCustomerId());
+        $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
+        $this->paymentTokenRepository->save($paymentToken);
+    }
+    
+    protected function generatePublicHash(PaymentTokenInterface $paymentToken)
+    {
+        $hashKey = $paymentToken->getGatewayToken();
+        if ($paymentToken->getCustomerId()) {
+            $hashKey = $paymentToken->getCustomerId();
+        }
+        $hashKey .= $paymentToken->getPaymentMethodCode()
+           . $paymentToken->getType()
+           . $paymentToken->getTokenDetails();
+
+        return $this->encryptor->getHash($hashKey);
     }
 
     protected function getVaultPaymentToken($tokenElement)
@@ -340,5 +468,31 @@ class UpdateWorldpayment
             
             return $issuerInsightData;
         }
+    }
+    
+    private function getFraudsightData($payment)
+    {
+        $fraudsightData = [];
+        $frausdightProvider = $payment->riskScore['Provider'];
+        if (strtoupper($frausdightProvider) === 'FRAUDSIGHT') {
+            $fraudsightData['message'] = $payment->riskScore['message'];
+            if (isset($payment->FraudSight)) {
+                $fraudsightData['score']  = $payment->FraudSight['score'];
+            }
+            if (isset($payment->FraudSight->reasonCodes)) {
+                $reasoncodes = $payment->FraudSight->reasonCodes->reasonCode;
+                $fraudsightData['reasonCode']  = $this->getReasoncodes($reasoncodes);
+            }
+            return $fraudsightData;
+        }
+    }
+    
+    private function getReasoncodes($reasoncodes)
+    {
+        $savereasoncode = '';
+        foreach ($reasoncodes as $key => $reasoncode) {
+            $savereasoncode = $savereasoncode . "," . $reasoncode;
+        }
+        return ltrim($savereasoncode, ",");
     }
 }

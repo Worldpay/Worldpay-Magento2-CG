@@ -66,7 +66,7 @@ class Service
             'cardAddress' => $this->_getCardAddress($quote),
             'shopperEmail' => $quote->getCustomerEmail(),
             'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
-            'tokenRequestConfig' => $this->_getTokenRequestConfig($paymentDetails),
+            'tokenRequestConfig' => 0,
             'acceptHeader' => php_sapi_name() !== "cli" ? filter_input(INPUT_SERVER, 'HTTP_ACCEPT') : '',
             'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
                 INPUT_SERVER,
@@ -185,7 +185,12 @@ class Service
         $cusDetails['order_count'] = $orderCount;
         $cusDetails['card_count'] = $savedCardCount;
         $cusDetails['shipping_method'] = $quote->getShippingAddress()->getShippingMethod();
-
+        
+        //Fraudsight
+        $cusDetails['shopperName'] = $quote->getBillingAddress()->getFirstname();
+        $cusDetails['shopperId'] = $quote->getCustomerId();
+        $cusDetails['birthDate']= $this ->getCustomerDOB($quote->getCustomer());
+        
         return $cusDetails;
     }
 
@@ -273,7 +278,8 @@ class Service
                 'paymentDetails' => $updatedPaymentDetails,
                 'thirdPartyData' => $thirdPartyData,
                 'shippingfee' => $shippingFee,
-                'exponent' => $exponent
+                'exponent' => $exponent,
+                'cusDetails' => $this->getCustomerDetailsfor3DS2($quote)
             ];
     }
 
@@ -452,6 +458,8 @@ class Service
     {
         if (isset($paymentDetails['additional_data']['save_my_card'])) {
             return $paymentDetails['additional_data']['save_my_card'];
+        } else {
+            return false;
         }
     }
 
@@ -726,21 +734,51 @@ class Service
                 $paymentMethodData = (array) $walletResponse['paymentMethodData'];
                 $tokenizationData = (array) $paymentMethodData['tokenizationData'];
                 $token = (array) json_decode($tokenizationData['token']);
-
+                // 3DS2 value
+                $sessionId = $this->session->getSessionId();
+                $paymentDetails['sessionId'] = $sessionId;
+                $dfReferenceId = '';
+                $orderDescription = $this->_getOrderDescription($reservedOrderId);
+                if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
+                    $paymentDetails['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
+                    $environmentMode = $this->_scopeConfig->
+                        getValue('worldpay/general_config/environment_mode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+//                    if ($environmentMode == 'Test Mode') {
+//                        $orderDescription =   $this->_scopeConfig->getValue(
+//                            'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
+//                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+//                        );
+//                    }
+                } else {
+                    $orderDescription = $this->_getOrderDescription($reservedOrderId);
+                }
                 return [
                     'orderCode' => $orderCode,
                     'merchantCode' => $this->worldpayHelper->
                         getMerchantCode($paymentDetails['additional_data']['cc_type']),
-                    'orderDescription' => $this->_getOrderDescription($reservedOrderId),
+                    'orderDescription' => $orderDescription,
                     'currencyCode' => $quote->getQuoteCurrencyCode(),
                     'amount' => $quote->getGrandTotal(),
                     'paymentType' => $this->_getRedirectPaymentType($paymentDetails),
                     'shopperEmail' => $quote->getCustomerEmail(),
+                    'acceptHeader' => php_sapi_name() !== "cli" ? filter_input(INPUT_SERVER, 'HTTP_ACCEPT') : '',
+                    'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
+                        INPUT_SERVER,
+                        'HTTP_USER_AGENT',
+                        FILTER_SANITIZE_STRING,
+                        FILTER_FLAG_STRIP_LOW
+                    ) : '',
                     'method' => $paymentDetails['method'],
                     'orderStoreId' => $orderStoreId,
                     'protocolVersion' => $token['protocolVersion'],
                     'signature' => $token['signature'],
                     'signedMessage' => $token['signedMessage'],
+                    'shippingAddress' => $this->_getShippingAddress($quote),
+                    'billingAddress' => $this->_getBillingAddress($quote),
+                    'cusDetails' => $this->getCustomerDetailsfor3DS2($quote),
+                    'paymentDetails' => $paymentDetails,
+                    'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
+                    'shopperIpAddress' => $this->_getClientIPAddress(),
                     'exponent' => $exponent
                 ];
             }
@@ -964,4 +1002,13 @@ class Service
             }
         }
     }
+    public function getCustomerDOB($customer)
+    {
+        $now = new \DateTime();
+        $dob = $customer->getDob();
+        if (isset($dob)) {
+            $dob = date('Y-m-d', strtotime($dob));
+            return $dob;
+        }
     }
+}

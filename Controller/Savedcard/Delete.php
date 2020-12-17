@@ -156,11 +156,15 @@ class Delete extends \Magento\Framework\App\Action\Action
             'worldpay_cc',
             $customer->getId()
         );
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $model = $objectManager->create(\Magento\Vault\Model\PaymentToken::class);
+        $model->load($paymentToken->getEntityId());
         if ($paymentToken === null) {
             return;
         }
         try {
             $this->tokenRepository->delete($paymentToken);
+            $model->delete();
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('MCAM6')));
         }
