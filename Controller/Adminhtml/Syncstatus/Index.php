@@ -35,7 +35,7 @@ class Index extends \Magento\Backend\App\Action
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice,
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice,
-     * @param \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod $abstractMethod
+     * @param \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod
      */
     public function __construct(
         Context $context,
@@ -45,7 +45,7 @@ class Index extends \Magento\Backend\App\Action
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod $abstractMethod,
+        \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod,
         \Sapient\Worldpay\Helper\GeneralException $helper
     ) {
 
@@ -132,5 +132,6 @@ class Index extends \Magento\Backend\App\Action
     private function _updateOrderStatus()
     {
         $this->abstractMethod->updateOrderStatusForVoidSale($this->_order);
+        $this->abstractMethod->updateOrderStatusForCancelOrder($this->_order);
     }
 }

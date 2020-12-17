@@ -41,8 +41,9 @@ class SubscriptionsLink extends \Magento\Framework\View\Element\Html\Link\Curren
 
     public function _toHtml()
     {
+
         if ($this->worldpayHelper->isWorldPayEnable() && $this->checkSubscriptionTabToBeEnabled()) {
-            return parent::_toHtml();
+             return parent::_toHtml();
         } else {
             return '';
         }

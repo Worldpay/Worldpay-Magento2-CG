@@ -31,7 +31,7 @@ define(
         var merchantId = '';
         var response = '';
         var response1 = '';
-
+        var dfReferenceId = "";
   
         
         if(window.checkoutConfig.payment.general.environmentMode == 'PRODUCTION'){
@@ -255,6 +255,7 @@ define(
                     'additional_data': {
                         'cc_type': this.getselectedCCType(),
                         'walletResponse' : googleResponse,
+                        'dfReferenceId': window.sessionId,
                         'appleResponse' : appleResponse
                     }
                 };
@@ -276,7 +277,36 @@ define(
                     .then(function(paymentData) {
                         googleResponse = JSON.stringify(paymentData);
                         if($form.validation() && $form.validation('isValid')){
-                            self.placeOrder();
+                            fullScreenLoader.startLoader();
+                            if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
+                                createJwt();
+                                window.addEventListener("message", function(event) {
+                                    var data = JSON.parse(event.data);
+                                    var envUrl;
+                                    if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
+                                        envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
+                                    }
+                                    if (event.origin === envUrl) {
+                                        var data = JSON.parse(event.data);
+                                        //console.warn('Merchant received a message:', data);
+                                        if (data !== undefined && data.Status) {
+                                            //window.sessionId = data.SessionId;
+                                            var sessionId = data.SessionId;
+                                            if(sessionId){
+                                                this.dfReferenceId = sessionId;
+                                            }
+                                            window.sessionId = this.dfReferenceId;
+                                            //place order with direct CSE method
+                                            fullScreenLoader.stopLoader();
+                                            self.placeOrder();
+                                        }
+                                    }
+                                }, false);
+                            } else {
+                                fullScreenLoader.stopLoader();
+                                self.placeOrder();
+                            }
+                            //self.placeOrder();
                         }else {
                             return $form.validation() && $form.validation('isValid');
                         }
@@ -358,7 +388,7 @@ define(
 
                     session.begin();
                 }  else if (this.getselectedCCType()=='SAMSUNGPAY-SSL') {
-                    console.log('Initiating Samsung Pay......');
+                    console.log('Initiating Samsung Pay........');
 
                 var quoteId = window.checkoutConfig.quoteData.entity_id;
                     
@@ -368,8 +398,7 @@ define(
                          
                         xhttp.send(); 
                         
-                        var response = JSON.parse(xhttp.responseText);                        
-                        
+                        var response = JSON.parse(xhttp.responseText);                                           
                          response1 = JSON.parse(response); 
                          
                          if(response1.resultMessage == 'SUCCESS') {
@@ -380,21 +409,20 @@ define(
                 } //else if end
             },
             afterPlaceOrder: function (data, event) { 
-              
               if (this.getselectedCCType()=='SAMSUNGPAY-SSL') {
                 var cancel = url.build('worldpay/samsungpay/CallBack');
                 var serviceId = window.checkoutConfig.payment.ccform.samsungServiceId;
  
                 var callback = url.build('worldpay/samsungpay/CallBack');
                 var countryCode = window.checkoutConfig.defaultCountryId;
-               
-               console.log('Authentication is success, Redirecting to Samsung Payment Page......');
-               
-                  SamsungPay.connect(
+                console.log('Authentication is success, Redirecting to Samsung Payment Page......');
+                                  SamsungPay.connect(
                         response1.id, response1.href, serviceId, callback, cancel, countryCode,
                         response1.encInfo.mod, response1.encInfo.exp, response1.encInfo.keyId
                         ); 
-            }else{
+            } else if (this.getselectedCCType()=='PAYWITHGOOGLE-SSL') {
+                window.location.replace(url.build('worldpay/savedcard/redirect'));
+            } else{
              window.location.replace(url.build('worldpay/wallets/success'));
             }
         }
@@ -429,7 +457,11 @@ define(
         var finalTotal = xhttp.responseText;
 
     }
-
+    function createJwt(){
+            var encryptedBin = "";
+            var jwtUrl = url.build('worldpay/hostedpaymentpage/jwt');
+            $('body').append('<iframe src="'+jwtUrl+'?instrument='+encryptedBin+'" name="jwt_frm" id="jwt_frm" style="display: none"></iframe>');
+    }
     function sendPaymentToken(paymentToken) {
         return new Promise(function(resolve, reject) {
             var appleResponse = paymentToken;

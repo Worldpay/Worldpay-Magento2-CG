@@ -100,7 +100,7 @@
                 </areas>
                 <capture_request>1</capture_request>
             </PAYPAL-EXPRESS>
-            <YANDEXMONEY-SSL>
+<!--            <YANDEXMONEY-SSL>
                 <title>Yandex.Money</title>
                 <areas>
                     <area>AM</area>
@@ -117,7 +117,7 @@
                     <area>UZ</area>
                 </areas>
                 <capture_request>0</capture_request>
-            </YANDEXMONEY-SSL>
+            </YANDEXMONEY-SSL>-->
             <SOFORT-SSL>
                 <title>SoFort EU</title>
                 <areas>
@@ -136,14 +136,14 @@
                 </areas>
                 <capture_request>0</capture_request>
             </GIROPAY-SSL>
-            <BOLETO-SSL>
+<!--            <BOLETO-SSL>
                 <title>Boleto Bancairo</title>
                 <areas>
                     <area>BR</area>
                 </areas>
                 <capture_request>0</capture_request>
                 <stop_auto_invoice>1</stop_auto_invoice>
-            </BOLETO-SSL>
+            </BOLETO-SSL>-->
             <ALIPAY-SSL>
                 <title>AliPay</title>
                 <areas>

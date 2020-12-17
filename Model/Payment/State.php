@@ -66,4 +66,7 @@ interface State
     public function getAccountRangeId();
     public function getIssuerCountry();
     public function getVirtualAccountNumber();
+    public function getFraudsightMessage();
+    public function getFraudsightScore();
+    public function getFraudsightReasonCode();
 }

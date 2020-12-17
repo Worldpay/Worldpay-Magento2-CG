@@ -132,11 +132,14 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '1.3.8', '<')) {
             $this->addColumnIssuerInsightResponse($installer);
         }
+        if (version_compare($context->getVersion(), '1.4.0', '<')) {
+            $this->addFraudsightToWp($installer);
+        }
         $installer->endSetup();
     }
     /**
      * @param SchemaSetupInterface $installer
-     * @return void
+     * @return voids
      */
     private function addColumnCse(SchemaSetupInterface $installer)
     {
@@ -1282,6 +1285,44 @@ class UpgradeSchema implements UpgradeSchemaInterface
             'nullable' => true,
             'comment' => 'Issuer Insight Virtual Account Number',
             'after' => 'issuer_country'
+             ]
+        );
+    }
+    
+    public function addFraudsightToWp(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'fraudsight_message',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+             'length' => '25',
+            'nullable' => true,
+            'comment' => 'Fraudsight Message',
+            'after' => 'virtual_account_number'
+             ]
+        );
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'fraudsight_score',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_DECIMAL,
+            'length' => '8,4',
+            'nullable'  => true,
+            'comment' => 'Fraudsight Score',
+            'after' => 'fraudsight_message'
+             ]
+        );
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'fraudsight_reasoncode',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            'length' => '255',
+            'nullable' => true,
+            'comment' => 'Fraudsight reasoncode',
+            'after' => 'fraudsight_score'
              ]
         );
     }

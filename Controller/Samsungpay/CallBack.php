@@ -67,7 +67,6 @@ class CallBack extends \Magento\Framework\App\Action\Action
 
     public function execute()
     {
-
         $order = $this->_checkoutSession->getLastRealOrder();
         $orderDetails = $order->getData();
         $refId = $this->request->getParam('ref_id');
@@ -82,18 +81,17 @@ class CallBack extends \Magento\Framework\App\Action\Action
         
         $merchantCode = $this->scopeConfig->
                 getValue('worldpay/general_config/merchant_code', $storeScope);
-      
+              
         $environmentMode = $this->scopeConfig->
                 getValue('worldpay/general_config/environment_mode', $storeScope);
 
       
-        if($environmentMode == 'Test Mode') {
-        $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId;
-        }else{
-        $serviceUrl = "https://api-ops.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId; 
+        if ($environmentMode == 'Test Mode') {
+            $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId;
+        } else {
+            $serviceUrl = "https://api-ops.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId;
         }
-        
-        
+
         $orderCode = $order->getIncrementId();
         $orderId = $order->getId();
 
@@ -130,7 +128,7 @@ class CallBack extends \Magento\Framework\App\Action\Action
                 $response = json_decode($json, true);
 
                 if ($response['resultMessage'] == 'SUCCESS') {
-                  
+
                     //response is success, collect the order details and send request to worldpay with this reponse from samsung
                     
                     //$order = $this->orderFactory->create()->loadByIncrementId($orderId);

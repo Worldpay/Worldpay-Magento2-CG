@@ -56,4 +56,10 @@ class Jwt extends \Magento\Framework\View\Element\Template
     {
         return $cookie = $this->_helper->getWorldpayAuthCookie();
     }
+    
+    public function getCurrentDate()
+    {
+        $curdate = date("Y-m-d H:i:s");
+        return strtotime(date("Y-m-d H:i:s", strtotime($curdate)). " -1 min");
+    }
 }

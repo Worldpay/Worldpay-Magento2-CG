@@ -345,4 +345,16 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     {
         return null;
     }
+    public function getFraudsightMessage()
+    {
+        return null;
+    }
+    public function getFraudsightScore()
+    {
+        return null;
+    }
+    public function getFraudsightReasonCode()
+    {
+        return null;
+    }
 }

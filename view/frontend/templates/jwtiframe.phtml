@@ -14,6 +14,7 @@ $organisationalUnitId = $block->getOrganisationalUnitId();
 $ddcUrl = $block->getDdcUrl();
 $environmentMode = $block->getEnvironmentMode();
 $cookie = $block->getCookie();
+$phpdate = $block->getCurrentDate();
 ?>
 
 <form method="post" action="<?= /* @noEscape */ $ddcUrl;?>" id="collectionForm" name="collectionForm"> 
@@ -34,7 +35,7 @@ $cookie = $block->getCookie();
         "alg": "HS256"
     };
             
-    var iat = Math.floor(new Date().getTime()/1000);
+    var iat = <?= /* @noEscape */ $phpdate?>; 
     var jti = uuidv4();
     var data = {
         "jti": jti,

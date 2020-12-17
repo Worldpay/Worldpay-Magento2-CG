@@ -148,6 +148,28 @@ if ($isworldpayment) {
                 <td class="value"><strong><?= /* @noEscape */ $payment->getAccountRangeId() ?></strong></td>
             </tr>
             
+            <tr>
+                <td style="padding-top: .5em;">
+                    <span style="font-weight:600;font-size:1.7rem;">Fraudsight Data</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label>Fraudsight Message</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getFraudsightMessage() ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label>Fraudsight Score</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getFraudsightScore() ?></strong></td>
+            </tr>
+            <tr style="padding-top: .2em;">
+                <td class="label"><label>Fraudsight ReasonCodes</label></td>
+                <td class="value">
+                        <div style="width: 280px; word-wrap: break-word">
+                            <b><?= /* @noEscape */ $payment->getFraudsightReasoncode() ?></b>
+                        </div>
+                    </td>
+            </tr>
+            
             </table>
 
 <?php } ?>

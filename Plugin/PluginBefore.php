@@ -47,7 +47,17 @@ class PluginBefore
                     -1
                 );
             }
-                    
+             
+            //Cancel button function to send order-modification request to Cancel Order.
+            $cancelurl = $this->_urlBuilder->getUrl(
+                "worldpay/cancel/index",
+                ['order_id' => $orderId]
+            );
+            $buttonList->remove('order_cancel');
+            $buttonList->add('cancel', ['label' => __('Cancel'),
+                        'onclick' => 'setLocation("' . $cancelurl . '")',
+                        'class' => 'cancel'], -1);
+            //Void Sale changes
             $data = $order->getData();
             $paymenttype = $this->getPaymentType($data['increment_id']);
             if ($this->checkEligibilityForVoidSale($order)) {

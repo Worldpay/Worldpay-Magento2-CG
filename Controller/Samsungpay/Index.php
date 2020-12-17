@@ -52,8 +52,7 @@ class Index extends \Magento\Framework\App\Action\Action
     }
 
     public function execute()
-    {
- 
+    {    
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         
         $serviceId = $this->scopeConfig->
@@ -68,11 +67,11 @@ class Index extends \Magento\Framework\App\Action\Action
         $environmentMode = $this->scopeConfig->
                 getValue('worldpay/general_config/environment_mode', $storeScope);
         
-        if($environmentMode == 'Test Mode') {
-        $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions";
-        }else{
-        $serviceUrl = "https://api-ops.mpay.samsung.com/ops/v1/transactions";
-        } 
+        if ($environmentMode == 'Test Mode') {
+            $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions";
+        } else {
+            $serviceUrl = "https://api-ops.mpay.samsung.com/ops/v1/transactions";
+        }
         
         $baseUrl =  $this->_storeManager->getStore()->getBaseUrl();
         
@@ -99,12 +98,11 @@ class Index extends \Magento\Framework\App\Action\Action
          $postFields['paymentDetails']['merchant']['name'] = $shopName;
          $postFields['paymentDetails']['merchant']['url'] = $shopUrl;
          $postFields['paymentDetails']['merchant']['reference'] = 'ref-'.time();
-         $postFields['paymentDetails']['allowedBrands'] = ['VI', 'MC', 'AX'];
+         $postFields['paymentDetails']['allowedBrands'] = ['VI', 'MC'];
              
         $postFieldsJson = (json_encode($postFields));
               
-        try {
-         
+        try {      
             $curl = curl_init();
             curl_setopt_array($curl, [
               CURLOPT_URL => $serviceUrl,
@@ -124,12 +122,12 @@ class Index extends \Magento\Framework\App\Action\Action
             $response = curl_exec($curl);
 
             curl_close($curl);
-                $resultJson = ''; 
+
+                $resultJson = '';
                 $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
                 $resultJson->setData($response);
-            
-                 return $resultJson;
-  
+                return $resultJson;
+      
         } catch (Exception $e) {
             $this->wplogger->error($e->getMessage());
            

@@ -679,7 +679,7 @@ define(
                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                     var bin = this.creditCardNumber();
                     if(cc_type_selected == 'savedcard'){
-                        bin = $("input[name='payment[token_to_use]']:checked").next().next().next().val();      
+                        bin = $("input[name='payment[token_to_use]']:checked").next().next().next().val(); 
                     } 
                     if(this.intigrationmode == 'direct') {
                         if(cc_type_selected == 'savedcard'){
@@ -707,7 +707,7 @@ define(
                     //Saved card handle
                     if((this.intigrationmode == 'direct' && $savedCardForm.validation() && $savedCardForm.validation('isValid') && selectedSavedCardToken) ||
                         (this.intigrationmode == 'redirect' && $form.validation() && $form.validation('isValid') && selectedSavedCardToken)){
-                        var cardType = $("input[name='payment[token_to_use]']:checked").next().next().val();
+                       var cardType = $("input[name='payment[token_to_use]']:checked").next().next().val();
                         this.isSavedCardPayment=true;
                         this.paymentToken = selectedSavedCardToken;
                         var savedcvv = $('.saved-cvv-number').val();

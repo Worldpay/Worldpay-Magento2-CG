@@ -115,7 +115,7 @@
          var date;
          try {
             date = $.datepicker.parseDate( dateFormat, element.value );
-            if(document.getElementById('worldpay_subscription_plan_weekly')!==null 
+           if(document.getElementById('worldpay_subscription_plan_weekly')!==null 
                     && document.getElementById('worldpay_subscription_plan_weekly').checked) {
                 date.setDate(date.getDate() + 7);
             } else if(document.getElementById('worldpay_subscription_plan_monthly')!==null
