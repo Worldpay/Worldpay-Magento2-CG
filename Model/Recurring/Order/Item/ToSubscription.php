@@ -236,6 +236,8 @@ class ToSubscription
         $addon->setStartDate($startDate);
 
         $endDate = $this->recurringHelper->calculateEndDate($subscription);
+        
+        //write log here
         $addon->setEndDate($endDate);
 
         return $addon;

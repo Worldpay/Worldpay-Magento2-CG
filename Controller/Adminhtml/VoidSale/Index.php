@@ -36,7 +36,7 @@ class Index extends \Magento\Backend\App\Action
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
        @param \Sapient\Worldpay\Helper\GeneralException $helper
-       @param \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod $abstractMethod
+       @param \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod
      */
     public function __construct(
         Context $context,
@@ -47,7 +47,7 @@ class Index extends \Magento\Backend\App\Action
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Sapient\Worldpay\Helper\GeneralException $helper,
-        \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod $abstractMethod
+        \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod
     ) {
 
         parent::__construct($context);
@@ -74,9 +74,9 @@ class Index extends \Magento\Backend\App\Action
 
         } catch (Exception $e) {
             $this->wplogger->error($e->getMessage());
-            $codeErrorMessage = 'Void Sale Action Failled!!!';
+            $codeErrorMessage = 'Void Sale Action Failed';
             $camErrorMessage = $this->helper->getConfigValue('AACH01', $store);
-            $codeMessage = 'Void Sale executed Successfully!!! Please run Sync Status after sometime.';
+            $codeMessage = 'Void Sale executed Successfully, Please run Sync Status after sometime.';
             $camMessage = $this->helper->getConfigValue('AACH02', $store);
             $message = $camMessage? $camMessage : $codeMessage;
             $errorMessage = $camErrorMessage? $camErrorMessage : $codeErrorMessage;
@@ -88,7 +88,7 @@ class Index extends \Magento\Backend\App\Action
             }
             return $this->_redirectBackToOrderView();
         }
-        $codeMessage = 'Void Sale executed Successfully!!! Please run Sync Status after sometime.';
+        $codeMessage = 'Void Sale executed Successfully, Please run Sync Status after sometime.';
         $camMessage = $this->helper->getConfigValue('AACH02', $store);
         $message = $camMessage? $camMessage : $codeMessage;
         $this->messageManager->addSuccess($message);

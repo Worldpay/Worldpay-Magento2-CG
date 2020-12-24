@@ -38,8 +38,9 @@ class SavedCardLink extends \Magento\Framework\View\Element\Html\Link\Current
 
     public function _toHtml()
     {
+  
         if ($this->helper->isWorldPayEnable() && $this->checkSaveCardTabToBeEnabled()) {
-            return parent::_toHtml();
+             return parent::_toHtml();
         } else {
             return '';
         }

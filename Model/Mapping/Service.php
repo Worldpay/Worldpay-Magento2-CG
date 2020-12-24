@@ -66,7 +66,7 @@ class Service
             'cardAddress' => $this->_getCardAddress($quote),
             'shopperEmail' => $quote->getCustomerEmail(),
             'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
-            'tokenRequestConfig' => $this->_getTokenRequestConfig($paymentDetails),
+            'tokenRequestConfig' => 0,
             'acceptHeader' => php_sapi_name() !== "cli" ? filter_input(INPUT_SERVER, 'HTTP_ACCEPT') : '',
             'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
                 INPUT_SERVER,
@@ -92,6 +92,7 @@ class Service
         $orderStoreId,
         $paymentDetails
     ) {
+        
         $reservedOrderId = $quote->getReservedOrderId();
         $savemyCard = isset($paymentDetails['additional_data']['save_my_card'])
                 ? $paymentDetails['additional_data']['save_my_card'] : '';
@@ -112,6 +113,7 @@ class Service
         }
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
+        
         return [
                 'orderCode' => $orderCode,
                 'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -185,7 +187,12 @@ class Service
         $cusDetails['order_count'] = $orderCount;
         $cusDetails['card_count'] = $savedCardCount;
         $cusDetails['shipping_method'] = $quote->getShippingAddress()->getShippingMethod();
-
+        
+        //Fraudsight
+        $cusDetails['shopperName'] = $quote->getBillingAddress()->getFirstname();
+        $cusDetails['shopperId'] = $quote->getCustomerId();
+        $cusDetails['birthDate']= $this ->getCustomerDOB($quote->getCustomer());
+        
         return $cusDetails;
     }
 
@@ -273,7 +280,8 @@ class Service
                 'paymentDetails' => $updatedPaymentDetails,
                 'thirdPartyData' => $thirdPartyData,
                 'shippingfee' => $shippingFee,
-                'exponent' => $exponent
+                'exponent' => $exponent,
+                'cusDetails' => $this->getCustomerDetailsfor3DS2($quote)
             ];
     }
 
@@ -285,6 +293,7 @@ class Service
     ) {
         $reservedOrderId = $quote->getReservedOrderId();
         $stmtNarrative = '';
+        $orderContent = '';
        
         $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
         if (array_key_exists($paymentDetails['additional_data']['cc_type'], $apmPaymentTypes) &&
@@ -293,6 +302,7 @@ class Service
         }
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
+        $countryCode = $quote->getBillingAddress()->getCountryId();
         return [
             'orderCode' => $orderCode,
             'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -311,15 +321,17 @@ class Service
                 FILTER_SANITIZE_STRING,
                 FILTER_FLAG_STRIP_LOW
             ) : '',
-            'shippingAddress' => $this->_getShippingAddress($quote),
-            'billingAddress' => $this->_getBillingAddress($quote),
+            'shippingAddress' => $this->_getKlarnaShippingAddress($quote),
+            'billingAddress' => $this->_getKlarnaBillingAddress($quote),
             'method' => $paymentDetails['method'],
             'paymentPagesEnabled' => $this->worldpayHelper->getCustomPaymentEnabled(),
             'installationId' => $this->worldpayHelper->getInstallationId(),
             'hideAddress' => $this->worldpayHelper->getHideAddress(),
             'orderLineItems' => $this->_getOrderLineItems($quote, 'KLARNA-SSL'),
             'orderStoreId' => $orderStoreId,
-            'exponent' => $exponent
+            'exponent' => $exponent,
+            'sessionData' => $this->_getSessionDetails($paymentDetails, $countryCode),
+            'orderContent' => $orderContent
         ];
     }
 
@@ -484,11 +496,25 @@ class Service
         return $shippingaddress;
     }
     
+    private function _getKlarnaShippingAddress($quote)
+    {
+        $shippingaddress = $this->_getKlarnaAddress($quote->getShippingAddress());
+        if (!array_filter($shippingaddress)) {
+            $shippingaddress = $this->_getKlarnaAddress($quote->getBillingAddress());
+        }
+        return $shippingaddress;
+    }
+
     private function _getBillingAddress($quote)
     {
         return $this->_getAddress($quote->getBillingAddress());
     }
     
+    private function _getKlarnaBillingAddress($quote)
+    {
+        return $this->_getKlarnaAddress($quote->getBillingAddress());
+    }
+
     private function _getOrderLineItems($quote, $paymentType = null)
     {
         $orderitems = [];
@@ -511,8 +537,8 @@ class Service
                 $lineitem['name'] = $_item->getName();
                 $lineitem['quantity'] = (int) $_item->getQty();
                 $lineitem['quantityUnit'] = $this->worldpayHelper->getQuantityUnit($_item->getProduct());
-                $lineitem['unitPrice'] = ($rowtotal / $_item->getQty()) + ($totaltax / $_item->getQty());
-                $lineitem['taxRate'] = (int) $_item->getTaxPercent();
+                $lineitem['unitPrice'] = $rowtotal / $_item->getQty();
+                $lineitem['taxRate'] = $totaltax;
                 $lineitem['totalAmount'] = $totalamount + $totaltax;
                 $lineitem['totalTaxAmount'] = $totaltax;
                 if ($discountamount > 0) {
@@ -543,6 +569,8 @@ class Service
         if (!empty($paymentType) && $paymentType == "KLARNA-SSL" && $orderitems['orderTaxAmount'] == 0) {
             $orderitems['orderTaxAmount'] = $totaltax;
         }
+        $orderitems['urls'] = $this->getReturnUrls();
+        $orderitems['locale_code'] = $this->worldpayHelper->getLocaleDefault();
         return $orderitems;
     }
 
@@ -558,6 +586,20 @@ class Service
         ];
     }
     
+    private function _getKlarnaAddress($address)
+    {
+        return [
+            'firstName' => $address->getFirstname(),
+            'lastName' => $address->getLastname(),
+            'address1' => $address->getData('street'),
+            'postalCode' => $address->getPostcode(),
+            'city' => $address->getCity(),
+            'state' => $address->getData('region'),
+            'countryCode' => $address->getCountryId(),
+            'telephoneNumber' => $address->getData('telephone'),
+        ];
+    }
+
     private function _getCardAddress($quote)
     {
         return $this->_getAddress($quote->getBillingAddress());
@@ -631,6 +673,10 @@ class Service
     {
         if ('CARTEBLEUE-SSL' == $paymentDetails['additional_data']['cc_type']) {
             return 'ECMC-SSL';
+        }
+        if ($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL' &&
+            isset($paymentDetails['additional_data']['klarna_type'])) {
+            return $paymentDetails['additional_data']['klarna_type'];
         }
         return $paymentDetails['additional_data']['cc_type'];
     }
@@ -726,21 +772,51 @@ class Service
                 $paymentMethodData = (array) $walletResponse['paymentMethodData'];
                 $tokenizationData = (array) $paymentMethodData['tokenizationData'];
                 $token = (array) json_decode($tokenizationData['token']);
-
+                // 3DS2 value
+                $sessionId = $this->session->getSessionId();
+                $paymentDetails['sessionId'] = $sessionId;
+                $dfReferenceId = '';
+                $orderDescription = $this->_getOrderDescription($reservedOrderId);
+                if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
+                    $paymentDetails['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
+                    $environmentMode = $this->_scopeConfig->
+                        getValue('worldpay/general_config/environment_mode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+//                    if ($environmentMode == 'Test Mode') {
+//                        $orderDescription =   $this->_scopeConfig->getValue(
+//                            'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
+//                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+//                        );
+//                    }
+                } else {
+                   $orderDescription = $this->_getOrderDescription($reservedOrderId); 
+                }
                 return [
                     'orderCode' => $orderCode,
                     'merchantCode' => $this->worldpayHelper->
                         getMerchantCode($paymentDetails['additional_data']['cc_type']),
-                    'orderDescription' => $this->_getOrderDescription($reservedOrderId),
+                    'orderDescription' => $orderDescription,
                     'currencyCode' => $quote->getQuoteCurrencyCode(),
                     'amount' => $quote->getGrandTotal(),
                     'paymentType' => $this->_getRedirectPaymentType($paymentDetails),
                     'shopperEmail' => $quote->getCustomerEmail(),
+                    'acceptHeader' => php_sapi_name() !== "cli" ? filter_input(INPUT_SERVER, 'HTTP_ACCEPT') : '',
+                    'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
+                    INPUT_SERVER,
+                    'HTTP_USER_AGENT',
+                    FILTER_SANITIZE_STRING,
+                    FILTER_FLAG_STRIP_LOW
+                    ) : '',
                     'method' => $paymentDetails['method'],
                     'orderStoreId' => $orderStoreId,
                     'protocolVersion' => $token['protocolVersion'],
                     'signature' => $token['signature'],
                     'signedMessage' => $token['signedMessage'],
+                    'shippingAddress' => $this->_getShippingAddress($quote),
+                    'billingAddress' => $this->_getBillingAddress($quote),
+                    'cusDetails' => $this->getCustomerDetailsfor3DS2($quote),
+                    'paymentDetails' => $paymentDetails,
+                    'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
+                    'shopperIpAddress' => $this->_getClientIPAddress(),
                     'exponent' => $exponent
                 ];
             }
@@ -964,4 +1040,42 @@ class Service
             }
         }
     }
+    
+    /**
+     * getReturnUrls to return from the payment page
+     *
+     * return array
+     */
+    public function getReturnUrls()
+    {
+        $urls = [];
+        $urls['successURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/success');
+        $urls['pendingURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/pending');
+        $urls['cancelURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/cancel');
+        $urls['failureURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/failure');
+        return $urls;
     }
+    
+    private function _getSessionDetails($paymentDetails, $countryCode)
+    {
+        $sessionDetails = [];
+        if ($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL' &&
+            isset($paymentDetails['additional_data']['klarna_type'])) {
+            $sessionDetails['sessionId'] = $this->session->getSessionId();
+            $sessionDetails['shopperIpAddress'] = $this->_getClientIPAddress();
+            $sessionDetails['subscriptionDays'] = $this->worldpayHelper->getKlarnaSubscriptionDays($countryCode);
+            return $sessionDetails;
+        }
+        return $sessionDetails;
+    }
+    
+    public function getCustomerDOB($customer)
+    {
+        $now = new \DateTime();
+        $dob = $customer->getDob();
+        if (isset($dob)) {
+            $dob = date('Y-m-d', strtotime($dob));
+            return $dob;
+        }
+    }
+}

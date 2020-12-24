@@ -31,6 +31,8 @@ EOD;
     private $exponent;
     private $threeDSecureConfig;
     private $tokenRequestConfig;
+    private $sessionData;
+    private $orderContent;
 
     public function __construct()
     {
@@ -56,7 +58,9 @@ EOD;
         $installationId,
         $hideAddress,
         $orderlineitems,
-        $exponent
+        $exponent,
+        $sessionData,
+        $orderContent
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -75,6 +79,8 @@ EOD;
         $this->hideAddress = $hideAddress;
         $this->orderlineitems = $orderlineitems;
         $this->exponent = $exponent;
+        $this->sessionData = $sessionData;
+        $this->orderContent = $orderContent;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -110,15 +116,16 @@ EOD;
 
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
+        $this->_addOrderContentElement($order);
         $this->_addPaymentMethodMaskElement($order);
         $this->_addShopperElement($order);
         $this->_addShippingElement($order);
         $this->_addBillingElement($order);
-        $this->_addOrderLineItemElement($order);
-        $this->_addDynamic3DSElement($order);
         if (!empty($this->statementNarrative)) {
             $this->_addStatementNarrativeElement($order);
         }
+        $this->_addOrderLineItemElement($order);
+        $this->_addDynamic3DSElement($order);
         return $order;
     }
 
@@ -137,6 +144,12 @@ EOD;
         $amountElement['value'] = $this->_amountAsInt($this->_roundOfTotal($order));
     }
     
+    private function _addOrderContentElement($order)
+    {
+        $orderContent = $order->addChild('orderContent');
+        $this->_addCDATA($orderContent, $this->orderDescription);
+    }
+
     private function _addDynamic3DSElement($order)
     {
         if ($this->threeDSecureConfig->isDynamic3DEnabled() === false) {
@@ -153,25 +166,34 @@ EOD;
 
     private function _addPaymentMethodMaskElement($order)
     {
-        $paymentMethodMask = $order->addChild('paymentMethodMask');
+        $paymentMethodMask = $order->addChild('paymentDetails');
+        $urls = $this->orderlineitems['urls'];
+        $locale = $this->orderlineitems['locale_code'];
+        $include = $paymentMethodMask->addChild($this->paymentType);
+        $include['shopperCountryCode'] = $this->billingAddress['countryCode'];
+        $include['locale'] = $locale;
         
-        $include = $paymentMethodMask->addChild('include');
-        $include['code'] = $this->paymentType;
+        $successUrl = $include->addChild('successURL', $urls['successURL']);
+        $cancelURL = $include->addChild('cancelURL', $urls['cancelURL']);
+        $pendingURL = $include->addChild('pendingURL', $urls['pendingURL']);
+        $failureURL = $include->addChild('failureURL', $urls['failureURL']);
+        if (!empty($this->paymentType) && $this->paymentType === "KLARNA_PAYLATER-SSL") {
+            $customerToken = $include->addChild('customerToken');
+            $customerToken['usage'] = "SUBSCRIPTION";
+            $customerToken->addChild('description', 'Customer Subscription');
+            $klarnaExtraMerchantData = $include->addChild('klarnaExtraMerchantData');
+            $this->_addSubscriptionElement($klarnaExtraMerchantData);
         }
+        $session = $paymentMethodMask->addChild('session');
+        $session['shopperIPAddress'] = $this->sessionData['shopperIpAddress'];
+        $session['id'] = $this->sessionData['sessionId'];
+    }
 
     private function _addShopperElement($order)
     {
         $shopper = $order->addChild('shopper');
 
         $shopper->addChild('shopperEmailAddress', $this->shopperEmail);
-
-        $browser = $shopper->addChild('browser');
-
-        $acceptHeader = $browser->addChild('acceptHeader');
-        $this->_addCDATA($acceptHeader, $this->acceptHeader);
-
-        $userAgentHeader = $browser->addChild('userAgentHeader');
-        $this->_addCDATA($userAgentHeader, $this->userAgentHeader);
     }
     
      /**
@@ -191,10 +213,12 @@ EOD;
             $shippingAddress,
             $this->shippingAddress['firstName'],
             $this->shippingAddress['lastName'],
-            $this->shippingAddress['street'],
+            $this->shippingAddress['address1'],
             $this->shippingAddress['postalCode'],
             $this->shippingAddress['city'],
-            $this->shippingAddress['countryCode']
+            $this->shippingAddress['state'],
+            $this->shippingAddress['countryCode'],
+            $this->shippingAddress['telephoneNumber']
         );
     }
 
@@ -205,10 +229,12 @@ EOD;
             $billingAddress,
             $this->billingAddress['firstName'],
             $this->billingAddress['lastName'],
-            $this->billingAddress['street'],
+            $this->billingAddress['address1'],
             $this->billingAddress['postalCode'],
             $this->billingAddress['city'],
-            $this->billingAddress['countryCode']
+            $this->billingAddress['state'],
+            $this->billingAddress['countryCode'],
+            $this->billingAddress['telephoneNumber']
         );
     }
 
@@ -216,10 +242,12 @@ EOD;
         $parentElement,
         $firstName,
         $lastName,
-        $street,
+        $address1,
         $postalCode,
         $city,
-        $countryCode
+        $state,
+        $countryCode,
+        $telephoneNumber
     ) {
         $address = $parentElement->addChild('address');
 
@@ -229,8 +257,8 @@ EOD;
         $lastNameElement = $address->addChild('lastName');
         $this->_addCDATA($lastNameElement, $lastName);
 
-        $streetElement = $address->addChild('street');
-        $this->_addCDATA($streetElement, $street);
+        $streetElement1 = $address->addChild('address1');
+        $this->_addCDATA($streetElement1, $address1);
         
         $postalCodeElement = $address->addChild('postalCode');
         $this->_addCDATA($postalCodeElement, $postalCode);
@@ -238,8 +266,14 @@ EOD;
         $cityElement = $address->addChild('city');
         $this->_addCDATA($cityElement, $city);
 
+        $stateElement = $address->addChild('state');
+        $this->_addCDATA($stateElement, $state);
+        
         $countryCodeElement = $address->addChild('countryCode');
         $this->_addCDATA($countryCodeElement, $countryCode);
+        
+        $telephoneElement = $address->addChild('telephoneNumber');
+        $this->_addCDATA($telephoneElement, $telephoneNumber);
     }
 
     private function _addOrderLineItemElement($order)
@@ -284,7 +318,6 @@ EOD;
         $totalDiscountAmount = 0
     ) {
         $unitPrice = sprintf('%0.2f', $unitPrice);
-        $totalAmount = $quantity * $unitPrice;
 
         $lineitem = $parentElement->addChild('lineItem');
 
@@ -340,9 +373,60 @@ EOD;
         foreach ($orderlineitems['lineItem'] as $lineitem) {
             $totaldiscountamount = (isset($lineitem['totalDiscountAmount']))
                                     ? sprintf('%0.2f', $lineitem['totalDiscountAmount']) : 0;
+            $taxrate = (isset($lineitem['taxRate']))
+                                    ? sprintf('%0.2f', $lineitem['taxRate']) : 0;
             $unitPrice = sprintf('%0.2f', $lineitem['unitPrice']);
-            $accTotalAmt = $accTotalAmt + ($lineitem['quantity'] * $unitPrice) - $totaldiscountamount;
+            $accTotalAmt += $taxrate + ($lineitem['quantity'] * $unitPrice) - $totaldiscountamount;
         }
         return $accTotalAmt;
     }
+    
+    private function _addSubscriptionElement($parentElement)
+    {
+        $fullName = $this->billingAddress['firstName'] . " " . $this->billingAddress['lastName'];
+        $subscription = $parentElement->addChild('subscription');
+        $nameElement = $subscription->addChild('name', $fullName);
+        $subscriptionDays = $this->sessionData['subscriptionDays'];
+
+        $startElement = $subscription->addChild('start');
+        $startDate = $startElement->addChild('date');
+        $today = new \DateTime();
+        $this->_getStartdate($startDate, $today);
+
+        $endElement = $subscription->addChild('end');
+        $endDate = $endElement->addChild('date');
+        $this->_getEndDate($endDate, $today, $subscriptionDays);
+        $autoRenewElement = $subscription->addChild('autoRenew', 'false');
+        $affiliateNameElement = $subscription->addChild('affiliateName', $fullName);
     }
+
+    public function _getStartDate($date, $today)
+    {
+        $date['dayOfMonth'] = $today->format('d');
+        $date['month'] = $today->format('m');
+        $date['year'] = $today->format('Y');
+        $this->_getTime($date, $today);
+    }
+
+    public function _getEndDate($date, $today, $subscriptionDays)
+    {
+        if ($subscriptionDays) {
+            date_add($today, date_interval_create_from_date_string($subscriptionDays." days"));
+        } elseif ($this->billingAddress['countryCode'] === 'US' || $this->billingAddress['countryCode'] === 'GB') {
+            date_add($today, date_interval_create_from_date_string("30 days"));
+        } else {
+            date_add($today, date_interval_create_from_date_string("14 days"));
+        }
+        $date['dayOfMonth'] = $today->format('d');
+        $date['month'] = $today->format('m');
+        $date['year'] = $today->format('Y');
+        $this->_getTime($date, $today);
+    }
+
+    public function _getTime($date, $today)
+    {
+        $date['hour'] = $today->format('H');
+        $date['minute'] = $today->format('i');
+        $date['second'] = $today->format('s');
+    }
+}

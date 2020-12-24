@@ -32,6 +32,8 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender,
         \Sapient\Worldpay\Model\Authorisation\ThreeDSecureService $threedsredirectresponse,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        \Magento\Framework\UrlInterface $urlBuilder,
+		\Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
         CreditCardException $helper
     ) {
         $this->wplogger = $wplogger;
@@ -41,6 +43,8 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         $this->orderFactory = $orderFactory;
         $this->orderSender = $orderSender;
         $this->threedsredirectresponse = $threedsredirectresponse;
+        $this->urlBuilders    = $urlBuilder;
+		$this->resultRedirectFactory = $resultRedirectFactory;
         $this->helper = $helper;
         parent::__construct($context);
     }
@@ -64,12 +68,16 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         } catch (\Exception $e) {
             $this->wplogger->error($e->getMessage());
             $this->wplogger->error('3DS Failed');
-            $this->_messageManager->addError(__($this->helper->getConfigValue('CCAM9')));
+            $this->messageManager->addError(__($this->helper->getConfigValue('CCAM9')));
             if ($this->checkoutSession->getInstantPurchaseOrder()) {
                 $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
                 $this->checkoutSession->unsInstantPurchaseRedirectUrl();
                 $this->checkoutSession->unsInstantPurchaseOrder();
-                $this->getResponse()->setRedirect($redirectUrl);
+                return $this->resultRedirectFactory->create()->setUrl($redirectUrl);
+            } elseif ($this->checkoutSession->getIavCall()) {
+                $this->checkoutSession->unsIavCall();
+                $this->getResponse()->setRedirect($this->urlBuilders->getUrl(
+                'savedcard/addnewcard', ['_secure' => true]));
             } else {
                 $this->getResponse()->setRedirect($this->urlBuilders->getUrl('checkout/cart', ['_secure' => true]));
             }
@@ -83,7 +91,10 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
                 $this->checkoutSession->unsInstantPurchaseMessage();
                 $this->messageManager->addSuccessMessage($message);
             }
-            $this->getResponse()->setRedirect($redirectUrl);
+           return $this->resultRedirectFactory->create()->setUrl($redirectUrl);
+        } elseif ($this->checkoutSession->getIavCall()) {
+                $this->checkoutSession->unsIavCall();
+                $this->getResponse()->setRedirect($this->urlBuilders->getUrl('worldpay/savedcard', ['_secure' => true]));
         } else {
             $redirectUrl = $this->checkoutSession->getWpResponseForwardUrl();
             $this->checkoutSession->unsWpResponseForwardUrl();

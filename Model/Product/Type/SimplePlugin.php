@@ -75,6 +75,7 @@ class SimplePlugin
         $product,
         $processMode = null
     ) {
+       
         if (!(in_array($product->getTypeId(), $this->recurringHelper->getAllowedProductTypeIds())
             && $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/active')
             && $product->getWorldpayRecurringEnabled()
@@ -84,25 +85,49 @@ class SimplePlugin
         }
         
         $product->addCustomOption('worldpay_subscription_plan_id', $planId);
-
-        if ($product->getWorldpayRecurringAllowStart() && $buyRequest->getSubscriptionDate()) {
+        $startDateDisplay='';
+        $displayToday = '';
+        if ($product->getWorldpayRecurringAllowStart() ) {
+            $startDate= '';
+            if ($buyRequest->getSubscriptionDate()) {
             $startDate = ($buyRequest->getSubscriptionDate())
                 ? $buyRequest->getSubscriptionDate() : date('d-m-yy');
+            }
+            $today = date('d-m-Y');
+            $modifyStartdate = date_create($startDate);
+            $modifyTodaydate = date_create($today);
+            $displayToday = date('d-m-Y', strtotime("+ 1 day"));
+            
+            $startDateDisplay = $this->modifyStartDate($startDate,$modifyStartdate,$modifyTodaydate)?
+                    $startDate:$displayToday;
+
             $product->addCustomOption(
                 'subscription_date',
-                $startDate
+                $startDateDisplay
             );
         }
         
-        if ($buyRequest->getSubscriptionEndDate()) {
-            $endDate = ($buyRequest->getSubscriptionEndDate())
+        $endDateEnabled = $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/endDate');
+        
+        if ($endDateEnabled) {
+            $endDate = '';
+            if ($buyRequest->getSubscriptionEndDate()) {
+                $endDate = ($buyRequest->getSubscriptionEndDate())
                 ? $buyRequest->getSubscriptionEndDate() : date('d-m-yy');
+            
+            }
+            
+            
+        
+            $endDateDisplay = $this->showModifiedEndDate($startDateDisplay,$displayToday,$endDate) ? 
+                    date('d-m-Y', strtotime("+1 year", strtotime($displayToday))) : $endDate;
             $product->addCustomOption(
                 'subscription_end_date',
-                $endDate
+                $endDateDisplay
             );
-        }
         
+        }
+            
         $result = $proceed($buyRequest, $product, $processMode);
 
         if (!$buyRequest->getResetCount() && ($item = $this->checkoutSession->getQuote()->getItemByProduct($product))) {
@@ -152,10 +177,13 @@ class SimplePlugin
         }
 
         $quoteItem = $planOption->getItem();
-        
+        $subcriptionCodeMessage = 'Please verify subscription data, before placing the order';
+        $subscriptionCamMessage = $this->recurringHelper->getCheckoutExceptions('CSUB01');
+        $subscriptionDisplayMessage = $subscriptionCamMessage?$subscriptionCamMessage:$subcriptionCodeMessage;
         $quoteItem->setHasError(false)->setMessage(
-                __('Please verify subscription data, before placing the order')
-            );
+            __($subscriptionDisplayMessage)
+        );
+
         if ($quoteItem->getQuote()->getItemsQty() > 1) {
             $quoteItem->setHasError(true)->setMessage(
                 __($this->recurringHelper->getMyAccountExceptions('MCAM19'))
@@ -197,7 +225,7 @@ class SimplePlugin
         if ($planEndDate) {
             $subscriptionOptions['subscription_end_date'] = $planEndDate;
         }
-
+        
         return array_merge($subscriptionOptions, $result);
     }
 
@@ -249,7 +277,7 @@ class SimplePlugin
                         = $this->recurringHelper->getSelectedPlanEndDateOptionInfo($product);
             }
         }
-
+        
         return array_merge($result, $subscriptionOptions);
     }
 
@@ -277,5 +305,26 @@ class SimplePlugin
         }
 
         return $product->getWorldpayRecurringEnabled() && $this->recurringHelper->getProductSubscriptionPlans($product);
+    }
+    
+    public function showModifiedEndDate($startDateDisplay,$displayToday,$endDate)
+    {
+        $result = false;
+        if(!empty($startDateDisplay)) {
+           if ($startDateDisplay === $displayToday && ($endDate<=$displayToday || empty($endDate))) {
+               $result = true;
+           }
+        }
+        
+        return $result;
+    }
+    
+    public function modifyStartDate ($startDate,$modifyStartdate,$modifyTodaydate)
+    {
+        $result = false;
+        if (!empty($startDate) && $modifyStartdate>=$modifyTodaydate) {
+            $result = true;
+        }
+        return $result;
     }
 }

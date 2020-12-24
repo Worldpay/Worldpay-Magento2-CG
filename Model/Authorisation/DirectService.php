@@ -66,7 +66,7 @@ class DirectService extends \Magento\Framework\DataObject
                 $orderStoreId,
                 $paymentDetails
             );
-        
+            
             $response = $this->paymentservicerequest->order($directOrderParams);
         }
         
