@@ -4,7 +4,7 @@ This version is compatible with Magento 2.4.1 with following key features:
 3. Alternative payment methods like Paypal, AliPay, Klarna, ACH Pay etc.
 4. Mobile wallets like Google Pay, Apple pay and Samsung Pay (Samsung Pay with only Visa and MasterCard) 
 5. Client side encryption for direct integration
-6. 3DS Authentication
+6. 3DS Flex Authentication
 7. Exemption Engine
 8. FraudSight
 9. Latin America Specific Payment 
