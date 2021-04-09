@@ -54,12 +54,38 @@ class Auth extends \Magento\Framework\App\Action\Action
         $orderId = $this->checkoutSession->getAuthOrderId();
         $iframe = false;
         // Chrome 84 releted updates for 3DS
-        $phpsessId = $_COOKIE['PHPSESSID'];
-        setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
-        if ($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe') {
-            $iframe = true;
+        
+        if (isset($_COOKIE['PHPSESSID'])) {
+            $phpsessId = $_COOKIE['PHPSESSID'];
+            if (phpversion() < '7.3.0') {
+                setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
+            } else {
+            $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+            setcookie("PHPSESSID", $phpsessId, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'domain' => $domain,
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'None',
+            ]);
+        }
+	}
+
+        //setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
+        
+        
+        
+        if (!$threeDSecureChallengeConfig == null) {
+        
+            if ($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe') {
+                $iframe = true;
+            }
         }
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
+            // Chrome 84 releted updates for 3DS
+//            $phpsessId = $_COOKIE['PHPSESSID'];
+//          setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
             $responseUrl = $this->_url->getUrl('worldpay/threedsecure/authresponse', ['_secure' => true]);
             print_r('
                 <form name="theForm" id="form" method="POST" action=' . $redirectData->getUrl() . '>
