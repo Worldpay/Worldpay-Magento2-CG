@@ -52,7 +52,7 @@ class Index extends \Magento\Framework\App\Action\Action
     }
 
     public function execute()
-    {    
+    {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         
         $serviceId = $this->scopeConfig->
@@ -102,7 +102,7 @@ class Index extends \Magento\Framework\App\Action\Action
              
         $postFieldsJson = (json_encode($postFields));
               
-        try {      
+        try {
             $curl = curl_init();
             curl_setopt_array($curl, [
               CURLOPT_URL => $serviceUrl,

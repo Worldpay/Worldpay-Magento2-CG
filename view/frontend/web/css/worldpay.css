@@ -156,6 +156,11 @@ span.cc-card-type {
     display: inline-block;
     background-position-x: -43px;
 }
+.is_dankort .cc-card-type:before {
+    background: url('../images/cc/dankort-ssl.png') no-repeat center center;
+    display: inline-block;
+    background-position-x: 0;
+}
 .is_mastercard .cc-card-type:before {
     display: inline-block;
     background-position-x: 0;

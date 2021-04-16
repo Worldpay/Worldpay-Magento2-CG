@@ -27,7 +27,7 @@ class DefaultRendererPlugin
      * @return array
      */
     public function afterGetItemOptions(\Magento\Sales\Block\Order\Item\Renderer\DefaultRenderer $subject, $result)
-    {
+    {      
         return array_merge(
             $this->recurringHelper->prepareOrderItemOptions($subject->getOrderItem()),
             $result

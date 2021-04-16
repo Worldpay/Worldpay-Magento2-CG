@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2020 Worldpay. All rights reserved.
+ * Copyright � 2020 Worldpay. All rights reserved.
  */
 
 namespace Sapient\Worldpay\Setup;
@@ -52,7 +52,6 @@ class UpgradeData implements UpgradeDataInterface
     {
         /** @var \Magento\Catalog\Setup\CategorySetup $catalogSetup */
         $catalogSetup = $this->categorySetupFactory->create(['setup' => $setup]);
-
         if (version_compare($context->getVersion(), '1.2.7', '<')) {
             $groupName = 'Subscriptions';
             $catalogSetup->addAttributeGroup(Product::ENTITY, 'Default', $groupName, 16);
@@ -1497,6 +1496,69 @@ class UpgradeData implements UpgradeDataInterface
             /** @var \Magento\Config\Model\Config $configModel */
             $configModel = $this->configFactory->create(['data' => $configData]);
             $configModel->save();
+        }
+        
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/worldpay.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('got it from upgradeData.php');
+        $logger->info(print_r($context->getVersion(), true));
+        
+        if (version_compare($context->getVersion(), '1.4.1', '<')) {
+             $logger->info('got it from inside upgradeData.php');
+             
+            $groupName = 'Level23 Data Configuration';
+            $catalogSetup->addAttributeGroup(Product::ENTITY, 'Default', $groupName, 16);
+
+            $catalogSetup->addAttribute(
+                \Magento\Catalog\Model\Product::ENTITY,
+                'commodity_code',
+                [
+                    'group' => $groupName,
+                    'type' => 'varchar',
+                    'frontend' => '',
+                    'label' => 'commodity code',
+                    'input' => 'text',
+                    'class' => '',
+                    'source' => '',
+                    'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_WEBSITE,
+                    'visible' => true,
+                    'required' => false,
+                    'user_defined' => true,
+                    'default' => '',
+                    'apply_to' => '',
+                    'visible_on_front' => false,
+                    'is_used_in_grid' => true,
+                    'is_visible_in_grid' => false,
+                    'is_filterable_in_grid' => false,
+                    'used_in_product_listing' => true
+                ]
+            );
+
+            $catalogSetup->addAttribute(
+                \Magento\Catalog\Model\Product::ENTITY,
+                'unit_of_measure',
+                [
+                    'group' => $groupName,
+                    'type' => 'varchar',
+                    'frontend' => '',
+                    'label' => 'Unit of Measure',
+                    'input' => 'text',
+                    'class' => '',
+                    'source' => '',
+                    'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_WEBSITE,
+                    'visible' => true,
+                    'required' => false,
+                    'user_defined' => true,
+                    'default' => '',
+                    'apply_to' => '',
+                    'visible_on_front' => false,
+                    'is_used_in_grid' => false,
+                    'is_visible_in_grid' => false,
+                    'is_filterable_in_grid' => false
+                ]
+            );
+            
         }
     }
 }

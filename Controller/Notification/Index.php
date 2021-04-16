@@ -22,7 +22,7 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     protected $historyNotification;
     
-     private $abstractMethod;
+    private $abstractMethod;
 
     const RESPONSE_OK = '[OK]';
     const RESPONSE_FAILED = '[FAILED]';

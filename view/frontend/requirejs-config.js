@@ -10,26 +10,33 @@ var sdkJs;
 
  var cookieArr = document.cookie.split(";");
  
-    // Loop through the array elements
-    for(var i = 0; i < cookieArr.length; i++) {
-        var cookiePair = cookieArr[i].split("=");
-        
-        /* Removing whitespace at the beginning of the cookie name
-        and compare it with the given string */
-        if(cookiePair[1].trim() == 'Test Mode') {
-            environmentMode = 'Test Mode';
-            break;
-        }
+ if(cookieArr != '') {
+     try {
+            // Loop through the array elements
+          for(var i = 0; i < cookieArr.length; i++) {
+              var cookiePair = cookieArr[i].split("=");
+
+              /* Removing whitespace at the beginning of the cookie name
+              and compare it with the given string */
+              if(cookiePair[1].trim() == 'Test Mode') {
+                  environmentMode = 'Test Mode';
+                  break;
+              }
+            }
+         }
+    catch(err) {
+    console.log(err.message);
     }
-        
+ }
+   
+       
+var sdkJs = 'https://d35p4vvdul393k.cloudfront.net/sdk_library/us/stg/ops/pc_gsmpi_web_sdk.js';
         
 if(environmentMode == 'Test Mode') {
     var sdkJs = 'https://d35p4vvdul393k.cloudfront.net/sdk_library/us/stg/ops/pc_gsmpi_web_sdk.js';
 }else{
     var sdkJs = 'https://d16i99j5zwwv51.cloudfront.net/sdk_library/us/prd/ops/pc_gsmpi_web_sdk.js';
 }
-
-var sdkJs = 'https://d35p4vvdul393k.cloudfront.net/sdk_library/us/stg/ops/pc_gsmpi_web_sdk.js';
 
 var config = {
     map: {

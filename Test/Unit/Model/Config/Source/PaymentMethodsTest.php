@@ -13,12 +13,14 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use \PHPUnit\Framework\TestCase;
 
-class PaymentMethodsTest extends TestCase {
+class PaymentMethodsTest extends TestCase
+{
 
     /** @var PaymentMethods  */
     protected $model;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $contextMock = $this->getMockBuilder(Context::class)
                         ->disableOriginalConstructor()->getMock();
         $registryMock = $this->getMockBuilder(Registry::class)
@@ -30,7 +32,8 @@ class PaymentMethodsTest extends TestCase {
         $this->model = new PaymentMethods($contextMock, $registryMock, $configMock, $cacheTypeListMock);
     }
 
-    public function testToOptionArray() {
+    public function testToOptionArray()
+    {
         $expectedResult = [
             ['value' => 'AMEX', 'label' => __('American Express')],
             ['value' => 'VISA', 'label' => __('Visa')],
@@ -40,5 +43,4 @@ class PaymentMethodsTest extends TestCase {
         ];
         $this->assertEquals($expectedResult, $this->model->toOptionArray());
     }
-
 }

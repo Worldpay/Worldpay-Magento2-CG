@@ -96,6 +96,28 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
+            <!--Level 2/3 Data-->
+              <group id="level23_config" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Level 2/3 Data for US and Canada payments</label>
+                <field id="level23" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Level 2/3 Data</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="CardAcceptorTaxId" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Card Acceptor TaxId</label>
+                    <depends><field id="level23" >1</field></depends>
+                </field>
+                <field id="duty_amount" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Duty Amount</label>
+                    <depends><field id="level23" >1</field></depends>
+                </field>
+                <field id="unit_of_measure" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Unit Of Measure</label>
+                    <depends><field id="level23" >1</field></depends>
+                    <validate>required-entry</validate>
+                </field>
+                
+                </group>   
             <!--Credit Card 3DS-->
             <group id="3ds_config" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Credit Card 3DS Authentication</label>
@@ -400,9 +422,9 @@
                      <field id="google_merchantname" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Google MerchantName</label>
                     </field> 
-                    <!--<field id="test_cardholdername" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="test_cardholdername" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Test 3DS CardHolderName</label>
-                    </field>  -->  
+                    </field>
                 </group>
                 
                 <group id="samsung_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="4">

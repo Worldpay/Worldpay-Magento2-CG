@@ -47,6 +47,7 @@ EOD;
     private $shippingfee;
     private $exponent;
     private $primeRoutingData;
+    private $orderLineItems;
 
     /**
      * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
@@ -119,7 +120,8 @@ EOD;
         $thirdparty,
         $shippingfee,
         $exponent,
-        $primeRoutingData
+        $primeRoutingData,
+        $orderLineItems
     ) {
         
         $this->merchantCode = $merchantCode;
@@ -144,6 +146,7 @@ EOD;
         $this->shippingfee = $shippingfee;
         $this->exponent = $exponent;
         $this->primeRoutingData =$primeRoutingData;
+        $this->orderLineItems = $orderLineItems;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -256,6 +259,20 @@ EOD;
             $this->_addShippingElement($order);
         }
         $this->_addBillingElement($order);
+        
+       
+
+
+        //Level 23 data request body
+        if (!empty($this->paymentDetails['isLevel23Enabled']) && $this->paymentDetails['isLevel23Enabled']
+            && (($this->paymentDetails['paymentType'] === 'ECMC-SSL' || $this->paymentDetails['paymentType'] === 'VISA-SSL')
+                || (($this->paymentDetails['cardType'] === 'ECMC-SSL' || $this->paymentDetails['cardType'] === 'VISA-SSL')))
+           && ($this->paymentDetails['countryCode'] === 'US' || $this->paymentDetails['countryCode'] === 'CA')) {
+            
+            
+            $this->_addBranchSpecificExtension($order);
+        }
+        
         if (!empty($this->thirdparty)) {
             $this->_addThirdPartyData($order);
         }
@@ -859,5 +876,153 @@ EOD;
             $this->billingAddress['city'],
             $this->billingAddress['countryCode']
         );
+    }
+    
+     /**
+      * Add branchSpecificExtension and its child tag to xml
+      *
+      * @param SimpleXMLElement $order
+      */
+    private function _addBranchSpecificExtension($order)
+    {
+        $order_details = $this->cusDetails['order_details'];
+
+        $branchSpecificExtension = $order->addChild('branchSpecificExtension');
+        $purchase = $branchSpecificExtension->addChild('purchase');
+        //$purchase->addChild('invoiceReferenceNumber',null);
+        
+        $customerId = '';
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $customerSession = $objectManager->get('Magento\Customer\Model\Session');
+           if($customerSession->isLoggedIn()) {
+              $customerId =  $customerSession->getCustomer()->getId();
+           }
+           
+        if (!empty($customerId)) {
+            $purchase->addChild('customerReference', $customerId);
+        } else {
+            $purchase->addChild('customerReference', 'guest');
+        }
+        
+        $purchase->addChild('cardAcceptorTaxId', $this->paymentDetails['cardAcceptorTaxId']);
+        
+        $salesTax = $purchase->addChild('salesTax');
+ 
+         $this->_addAmountElementDirect($salesTax, $this->currencyCode, $this->exponent, $this->paymentDetails['salesTax']);
+                  
+        if (isset($this->cusDetails['discount_amount'])) {
+              $discountAmount = $purchase->addChild('discountAmount');
+              $this->_addAmountElementDirect($discountAmount, $this->currencyCode, $this->exponent, $this->cusDetails['discount_amount']);
+        }
+                 
+        if (isset($this->cusDetails['shipping_amount'])) {
+                $shippingAmount = $purchase->addChild('shippingAmount');
+               $this->_addAmountElementDirect($shippingAmount, $this->currencyCode, $this->exponent, $this->cusDetails['shipping_amount']);
+        }
+            
+        
+        if (isset($this->paymentDetails['dutyAmount'])) {
+            $dutyAmount = $purchase->addChild('dutyAmount');
+            $this->_addAmountElementDirect($dutyAmount, $this->currencyCode, $this->exponent, $this->paymentDetails['dutyAmount']);
+        }
+        
+        //$purchase->addChild('shipFromPostalCode', '');
+        $purchase->addChild('destinationPostalCode', $this->shippingAddress['postalCode']);
+        $purchase->addChild('destinationCountryCode', $this->shippingAddress['countryCode']);
+        
+        $orderDate = $purchase->addChild('orderDate');
+        $dateElement = $orderDate->addChild('date');
+        $today = new \DateTime();
+        $dateElement['dayOfMonth'] = $today->format('d');
+        $dateElement['month'] = $today->format('m');
+        $dateElement['year'] = $today->format('Y');
+        
+        $purchase->addChild('taxExempt', $this->paymentDetails['salesTax'] > 0 ? 'true' : 'false');
+        
+        $this->_addL23OrderLineItemElement($order, $purchase);
+    }
+    
+    private function _addL23OrderLineItemElement($order, $purchase)
+    {
+        
+        $orderLineItems = $this->orderLineItems;
+        
+        foreach ($orderLineItems['lineItem'] as $lineitem) {
+            $this->_addLineItemElement(
+                $purchase,
+                $lineitem['description'],
+                $lineitem['productCode'],
+                $lineitem['commodityCode'],
+                $lineitem['quantity'],
+                $lineitem['unitCost'],
+                $lineitem['unitOfMeasure'],
+                $lineitem['itemTotal'],
+                $lineitem['itemTotalWithTax'],
+                $lineitem['itemDiscountAmount'],
+                $lineitem['taxAmount']
+            );
+        }
+    }
+    
+    private function _addLineItemElement(
+        $parentElement,
+        $description,
+        $productCode,
+        $commodityCode,
+        $quantity,
+        $unitCost,
+        $unitOfMeasure,
+        $itemTotal,
+        $itemTotalWithTax,
+        $itemDiscountAmount,
+        $taxAmount
+    ) {
+        $item = $parentElement->addChild('item');
+        
+        $descriptionElement = $item->addChild('description');
+        $this->_addCDATA($descriptionElement, $description);
+        
+        $productCodeElement = $item->addChild('productCode');
+        $this->_addCDATA($productCodeElement, $productCode);
+        
+        if ($commodityCode) {
+            $commodityCodeElement = $item->addChild('commodityCode');
+            $this->_addCDATA($commodityCodeElement, $commodityCode);
+        }
+
+        $quantityElement = $item->addChild('quantity');
+        $this->_addCDATA($quantityElement, $quantity);
+
+        $unitCostElement = $item->addChild('unitCost');
+        $this->_addAmountElementDirect($unitCostElement, $this->currencyCode, $this->exponent, $unitCost);
+        
+        if ($unitOfMeasure) {
+            $unitOfMeasureElement = $item->addChild('unitOfMeasure');
+            $this->_addCDATA($unitOfMeasureElement, $unitOfMeasure);
+        }
+        
+        $itemTotalElement = $item->addChild('itemTotal');
+        $this->_addAmountElementDirect($itemTotalElement, $this->currencyCode, $this->exponent, $itemTotal);
+
+        $itemTotalWithTaxElement = $item->addChild('itemTotalWithTax');
+        $this->_addAmountElementDirect($itemTotalWithTaxElement, $this->currencyCode, $this->exponent, $itemTotalWithTax);
+
+        $itemDiscountAmountElement = $item->addChild('itemDiscountAmount');
+        $this->_addAmountElementDirect($itemDiscountAmountElement, $this->currencyCode, $this->exponent, $itemDiscountAmount);
+
+        $taxAmountElement = $item->addChild('taxAmount');
+        $this->_addAmountElementDirect($taxAmountElement, $this->currencyCode, $this->exponent, $taxAmount);
+    }
+    /**
+     * Add amount and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
+    private function _addAmountElementDirect($orderXml, $currencyCode, $exponent, $amount)
+    {
+        $amountElement = $orderXml->addChild('amount');
+        $amountElement['currencyCode'] = $this->currencyCode;
+        $amountElement['exponent'] = $this->exponent;
+        $amountElement['value'] = $this->_amountAsInt($amount);
     }
 }

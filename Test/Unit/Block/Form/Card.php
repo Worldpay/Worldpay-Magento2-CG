@@ -65,7 +65,7 @@ class CardTest extends \PHPUnit\Framework\TestCase
      */
     private $storeId = '1';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initCcTypeMock();
         $this->initSessionQuoteMock();

@@ -195,7 +195,7 @@ class KlarnaCountries
      * @return float|null
      */
     public function getConfigValue($countrycode, $store = null)
-   {
+    {
         $value = $this->scopeConfig->getValue(
             'worldpay/klarna_config/paylater_config/paylater_days_config/subscription_days',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
