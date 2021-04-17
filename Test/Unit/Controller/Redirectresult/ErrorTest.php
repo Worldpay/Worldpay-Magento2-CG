@@ -17,10 +17,12 @@ use Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory;
 use \PHPUnit\Framework\TestCase;
 use Sapient\Worldpay\Controller\Redirectresult\Error;
 
-class ErrorTest extends TestCase {
+class ErrorTest extends TestCase
+{
     
     protected $errorObj;
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $context = $this->getMockBuilder(Context::class)
                         ->disableOriginalConstructor()->getMock();
         $page = $this->getMockBuilder(PageFactory::class)
@@ -38,13 +40,20 @@ class ErrorTest extends TestCase {
         $wplogger = $this->getMockBuilder(WorldpayLogger::class)
                         ->disableOriginalConstructor()->getMock();
 
-        $this->errorObj = new Error($context, $page, $orderservice, $wplogger,
-                $subscriptionFactory, $transactionsFactory, $checkoutSession, $helper);
+        $this->errorObj = new Error(
+            $context,
+            $page,
+            $orderservice,
+            $wplogger,
+            $subscriptionFactory,
+            $transactionsFactory,
+            $checkoutSession,
+            $helper
+        );
     }
     
     public function testExecute()
     {
         $this->assertInstanceOf(Error::class, $this->errorObj);
     }
-    
 }

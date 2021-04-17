@@ -34,7 +34,7 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Framework\Session\SessionManagerInterface $session,
         \Magento\Framework\UrlInterface $urlBuilder,
-		\Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
+        \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
         CreditCardException $helper
     ) {
         $this->wplogger = $wplogger;
@@ -46,7 +46,7 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
         $this->threedscredirectresponse = $threedcredirectresponse;
         $this->session = $session;
         $this->urlBuilders    = $urlBuilder;
-		$this->resultRedirectFactory = $resultRedirectFactory;
+        $this->resultRedirectFactory = $resultRedirectFactory;
         $this->helper = $helper;
         parent::__construct($context);
     }
@@ -70,7 +70,7 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
         } catch (\Exception $e) {
             $this->wplogger->error($e->getMessage());
             $this->wplogger->error('3DS2 Failed');
-            if($e->getMessage()=== 'Unique constraint violation found') {
+            if ($e->getMessage()=== 'Unique constraint violation found') {
                 $this->messageManager
                         ->addError(__($this->paymentservicerequest
                                 ->getCreditCardSpecificException('CCAM22')));
@@ -85,7 +85,9 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
             } elseif ($this->checkoutSession->getIavCall()) {
                 $this->checkoutSession->unsIavCall();
                 $this->getResponse()->setRedirect($this->urlBuilders->getUrl(
-                  'worldpay/savedcard/addnewcard', ['_secure' => true]));
+                    'worldpay/savedcard/addnewcard',
+                    ['_secure' => true]
+                ));
             } else {
                 $this->getResponse()->setRedirect($this->urlBuilders->getUrl('checkout/cart', ['_secure' => true]));
             }
@@ -101,8 +103,8 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
             }
             return $this->resultRedirectFactory->create()->setUrl($redirectUrl);
         } elseif ($this->checkoutSession->getIavCall()) {
-                $this->checkoutSession->unsIavCall();
-                $this->getResponse()->setRedirect($this->urlBuilders->getUrl('worldpay/savedcard', ['_secure' => true]));
+            $this->checkoutSession->unsIavCall();
+            $this->getResponse()->setRedirect($this->urlBuilders->getUrl('worldpay/savedcard', ['_secure' => true]));
         } else {
             $redirectUrl = $this->checkoutSession->getWpResponseForwardUrl();
             $this->checkoutSession->unsWpResponseForwardUrl();

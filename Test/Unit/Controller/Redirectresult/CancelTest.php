@@ -1,5 +1,4 @@
 <?php
-
 //
 
 /**
@@ -18,11 +17,13 @@ use Sapient\Worldpay\Model\Request\AuthenticationService;
 use \PHPUnit\Framework\TestCase;
 use Sapient\Worldpay\Controller\Redirectresult\Cancel;
 
-class CancelTest extends TestCase {
+class CancelTest extends TestCase
+{
 
     protected $cancelObj;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $context = $this->getMockBuilder(Context::class)
                         ->disableOriginalConstructor()->getMock();
         $page = $this->getMockBuilder(PageFactory::class)
@@ -37,14 +38,19 @@ class CancelTest extends TestCase {
                         ->disableOriginalConstructor()->getMock();
         $wplogger = $this->getMockBuilder(WorldpayLogger::class)
                         ->disableOriginalConstructor()->getMock();
-
-
-        $this->cancelObj = new Cancel($context, $page, $orderservice, $checkoutservice,
-                $paymentservice, $authenticatinservice, $wplogger);
+        $this->cancelObj = new Cancel(
+            $context,
+            $page,
+            $orderservice,
+            $checkoutservice,
+            $paymentservice,
+            $authenticatinservice,
+            $wplogger
+        );
     }
 
-    public function testExecute() {
+    public function testExecute()
+    {
         $this->assertInstanceOf(Cancel::class, $this->cancelObj);
     }
-
 }

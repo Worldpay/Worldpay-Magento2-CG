@@ -15,14 +15,16 @@ use Magento\Framework\App\Request\Http;
 use \PHPUnit\Framework\TestCase;
 use Sapient\Worldpay\Controller\Applepay\Index;
 
-class IndexTest extends TestCase {
+class IndexTest extends TestCase
+{
 
     protected $scopeConfig;
     protected $request;
     protected $indexObj;
     protected $objectManagerMock;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $context = $this->getMockBuilder(Context::class)
                         ->disableOriginalConstructor()->getMock();
         $jsonFactory = $this->getMockBuilder(JsonFactory::class)
@@ -37,17 +39,40 @@ class IndexTest extends TestCase {
                         ->disableOriginalConstructor()->getMock();
         $this->objectManagerMock = $this->getMockBuilder(\Magento\Framework\ObjectManagerInterface::class)
                 ->disableOriginalConstructor()->getMock();
-
-        $this->indexObj = new Index($context, $jsonFactory, $wplogger, $paymentservice, $this->scopeConfig, $this->request);
+        $this->indexObj = new Index(
+            $context,
+            $jsonFactory,
+            $wplogger,
+            $paymentservice,
+            $this->scopeConfig,
+            $this->request
+        );
     }
 
-    public function testExecute() {
+    public function testExecute()
+    {
         $this->scopeConfig
                 ->expects($this->any())
                 ->method('getValue')
-                ->withConsecutive(['worldpay/wallets_config/apple_pay_wallets_config/certification_key', \Magento\Store\Model\ScopeInterface::SCOPE_STORE], ['worldpay/wallets_config/apple_pay_wallets_config/certification_crt', \Magento\Store\Model\ScopeInterface::SCOPE_STORE], ['worldpay/wallets_config/apple_pay_wallets_config/certification_password', \Magento\Store\Model\ScopeInterface::SCOPE_STORE], ['worldpay/wallets_config/apple_pay_wallets_config/merchant_name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE], ['worldpay/wallets_config/apple_pay_wallets_config/domain_name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE])
+                ->withConsecutive(
+                    ['worldpay/wallets_config/apple_pay_wallets_config/certification_key',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/wallets_config/apple_pay_wallets_config/certification_crt',
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/wallets_config/apple_pay_wallets_config/certification_password',
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/wallets_config/apple_pay_wallets_config/merchant_name',
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/wallets_config/apple_pay_wallets_config/domain_name',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+                )
                 ->will($this->onConsecutiveCalls(
-                                '/var/www/html/webroot-apple/publicis_ecom_live_merchant_identity.key.pem', '/var/www/html/webroot-apple/publicis_ecom_live_merchant_identity.crt.pem', '', 'merchant.com.publicissapient.ecom.live', 'wpgqa.wpmage.uk'));
+                    '/var/www/html/webroot-apple/publicis_ecom_live_merchant_identity.key.pem',
+                    '/var/www/html/webroot-apple/publicis_ecom_live_merchant_identity.crt.pem',
+                    '',
+                    'merchant.com.publicissapient.ecom.live',
+                    'wpgqa.wpmage.uk'
+                ));
         $validation_url = $this->request
                 ->expects($this->any())
                 ->method('getParam')
@@ -62,5 +87,4 @@ class IndexTest extends TestCase {
 
         $this->assertInstanceOf(Index::class, $this->indexObj);
     }
-
 }

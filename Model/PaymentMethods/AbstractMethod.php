@@ -244,6 +244,19 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                         throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
                     }
                 }
+                if ($method == self::WORLDPAY_MOTO_TYPE && $mode == self::DIRECT_MODEL) {
+                    $selectedCardType = $data['cc_type'];
+                    $errorCamMsg = $this->worlpayhelper->getCreditCardSpecificexception('CTYP01');
+                    $errorMsg = $errorCamMsg?$errorCamMsg:'Card number entered does not match with card type selected';
+                    if ($selectedCardType !== 'savedcard') {
+                        $cardTypeFromCardNum = $this -> getCardTypeFromCreditCardNumber($data['cc_number']);
+                        $checkCbCarteBlue = $data['cc_type'] == 'CB-SSL' || $data['cc_type'] == 'CARTEBLEUE-SSL';
+                        $selectedModifiedCardType = $checkCbCarteBlue?'ECMC-SSL':$selectedCardType;
+                        if ($cardTypeFromCardNum != $selectedModifiedCardType) {
+                            throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
+                        }
+                    }
+                }
                 if ($mode == 'redirect') {
                     if (!isset($data['cc_type'])) {
                         throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
@@ -359,19 +372,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Worldpay Plugin is not available')
             );
-            return false;
         }
-        
+                   
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
         $autoInvoice = $this->_scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
         $partialCapture = $this->_scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
- 
-        //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
-        if ($partialCapture && !$autoInvoice) {
-            return $this;
-        }
-            
+          
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
@@ -385,11 +392,23 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
               
         $paymenttype = $worldPayPayment->getPaymentType();
         if ($this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype)) {
+            //total amount from invoice and order should not be same for partial capture
+            if (floatval($amount) !=floatval($payment->getOrder()->getGrandTotal()) && $partialCapture) {  
+                $this->paymentservicerequest->partialCapture(
+                    $payment->getOrder(),
+                    $worldPayPayment,
+                    $amount
+                );
+            }
+            if(floatval($amount) == floatval($payment->getOrder()->getGrandTotal())){
+            //normal capture
             $this->paymentservicerequest->capture(
                 $payment->getOrder(),
                 $worldPayPayment,
                 $payment->getMethod()
             );
+        }
+
         }
         $payment->setTransactionId(time());
         return $this;
@@ -401,7 +420,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Worldpay Plugin is not available')
             );
-            return false;
         }
         
         $this->_wplogger->info('refund payment model function executed');
@@ -615,6 +633,50 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             throw new \Magento\Framework\Exception\LocalizedException(__('Cancel operation was already executed on '
                    . 'this order. '
                    . 'Please check Payment Status or Order Status below for confirmation.'));
+        }
+    }
+    
+    public function updateOrderStatusForCancelOrder($order)
+    {
+        $payment = $order->getPayment();
+        $mageOrder = $order->getOrder();
+        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
+        $paymentStatus = $worldPayPayment->getPaymentStatus();
+       
+        if ($paymentStatus === 'CANCELLED') {
+            $mageOrder->setState(\Magento\Sales\Model\Order::STATE_CANCELED, true);
+            $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
+            $mageOrder->save();
+        }
+    }
+    
+    public function getCardTypeFromCreditCardNumber($ccnumber)
+    {
+        $visaRegex = '/^4[0-9]{0,15}$/';
+        $mastercardRegex =
+                '/^(?:5[1-5][0-9]{0,2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{0,2}|27[01][0-9]|2720)[0-9]{0,12}$/';
+        $amexRegex = '/^3$|^3[47][0-9]{0,13}$/';
+        $discoverRegex = '/^6[05]$|^601[1]?$|^65[0-9][0-9]?$|^6(?:011|5[0-9]{2})[0-9]{0,12}$/';
+        $jcbRegex = '/^35(2[89]|[3-8][0-9])/';
+        $dinersRegex = '/^36/';
+        $maestroRegex = '/^(5018|5020|5038|6304|679|6759|676[1-3])/';
+        $dankortRegex = '/^(5019)/';
+        if (preg_match($visaRegex, $ccnumber)) {
+            return 'VISA-SSL';
+        } elseif (preg_match($mastercardRegex, $ccnumber)) {
+            return 'ECMC-SSL';
+        } elseif (preg_match($amexRegex, $ccnumber)) {
+            return 'AMEX-SSL';
+        } elseif (preg_match($discoverRegex, $ccnumber)) {
+            return 'DISCOVER-SSL';
+        } elseif (preg_match($jcbRegex, $ccnumber)) {
+            return 'JCB-SSL';
+        } elseif (preg_match($dinersRegex, $ccnumber)) {
+            return 'DINERS-SSL';
+        } elseif (preg_match($maestroRegex, $ccnumber)) {
+            return 'MAESTRO-SSL';
+        } elseif (preg_match($dankortRegex, $ccnumber)) {
+            return 'DANKORT-SSL';
         }
     }
 }

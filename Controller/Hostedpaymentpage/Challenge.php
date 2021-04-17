@@ -14,17 +14,17 @@ class Challenge extends \Magento\Framework\App\Action\Action
 
     public function execute()
     {
-         if(isset($_COOKIE['PHPSESSID'])){
-          $phpsessId = $_COOKIE['PHPSESSID'];
-          $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
-          setcookie("PHPSESSID", $phpsessId, [
-         'expires' => time() + 3600,
-         'path' => '/',
-         'domain' => $domain,
-         'secure' => true,
-         'httponly' => true,
-         'samesite' => 'None',
-          ]);
+        if (isset($_COOKIE['PHPSESSID'])) {
+            $phpsessId = $_COOKIE['PHPSESSID'];
+            $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+            setcookie("PHPSESSID", $phpsessId, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'domain' => $domain,
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'None',
+            ]);
         }
 
         return $this->_pageFactory->create();

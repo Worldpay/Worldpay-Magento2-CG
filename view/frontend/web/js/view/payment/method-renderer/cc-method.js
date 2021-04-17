@@ -18,7 +18,8 @@ define(
         'Magento_Checkout/js/model/full-screen-loader',
         'hmacSha256',
         'encBase64',
-        'Magento_Checkout/js/view/summary/abstract-total'
+        'Magento_Checkout/js/view/summary/abstract-total',
+        'jquery/ui'
     ],
     
     function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64) {
@@ -55,6 +56,47 @@ define(
         $.validator.addMethod('worldpay-cardnumber-valid', function (value) {
             return doLuhnCheck(value);
         }, $.mage.__(getCreditCardExceptions('CCAM0')));
+        
+        var typeErrorMsg = 'Card number entered does not match with card type selected';
+        var cardTypeErrorDisplay = getCreditCardExceptions('CTYP01') ? getCreditCardExceptions('CTYP01') : typeErrorMsg;
+        $.validator.addMethod('worldpay-validate-card-type', function (value) {
+                if (value) {
+                    return (checkForCcTypeValidation());
+                }
+            }, $.mage.__(cardTypeErrorDisplay));
+
+            function checkForCcTypeValidation() {
+                var inputName = 'payment[cc_type]';
+                var cc_type_selected = $("input[name='"+inputName+"']:checked").val();
+                var typeclasslist = document.getElementsByClassName('ccnumber_withcardtype')[0].classList;
+                if (cc_type_selected !== 'savedcard') {
+                    if (cc_type_selected === 'VISA-SSL' && typeclasslist.contains('is_visa')) {
+                        return true;
+                    } else if (cc_type_selected === 'ECMC-SSL' && typeclasslist.contains('is_mastercard')
+                            || (cc_type_selected === 'CB-SSL' && typeclasslist.contains('is_mastercard'))
+                            || (cc_type_selected === 'CARTEBLEUE-SSL' && typeclasslist.contains('is_mastercard'))) {
+                        return true;
+                    } else if (cc_type_selected === 'AMEX-SSL' && typeclasslist.contains('is_amex')) {
+                        return true;
+                    } else if (cc_type_selected === 'DISCOVER-SSL' && typeclasslist.contains('is_discover')) {
+                        return true;
+                    }else if (cc_type_selected === 'DINERS-SSL' && typeclasslist.contains('is_diners')) {
+                        return true;
+                    }else if (cc_type_selected === 'MAESTRO-SSL' && typeclasslist.contains('is_maestro')) {
+                        return true;
+                    }else if (cc_type_selected === 'JCB-SSL' && typeclasslist.contains('is_jcb')) {
+                        return true;
+                    }else if (cc_type_selected === 'DANKORT-SSL' && typeclasslist.contains('is_dankort')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+
+
+
 
         //Regex for valid card number.
         function evaluateRegex(data, re) {
@@ -409,13 +451,22 @@ define(
                 discoverRegex = new RegExp('^6[05]$|^601[1]?$|^65[0-9][0-9]?$|^6(?:011|5[0-9]{2})[0-9]{0,12}$'),
                 jcbRegex = new RegExp('^35(2[89]|[3-8][0-9])'),
                 dinersRegex = new RegExp('^36'),
-                maestroRegex = new RegExp('^(5018|5020|5038|6304|6759|676[1-3])'),
-                unionpayRegex = new RegExp('^62[0-9]{0,14}$|^645[0-9]{0,13}$|^65[0-9]{0,14}$');
+                maestroRegex = new RegExp('^(5018|5020|5038|6304|679|6759|676[1-3])'),
+                unionpayRegex = new RegExp('^62[0-9]{0,14}$|^645[0-9]{0,13}$|^65[0-9]{0,14}$'),
+                dankortRegex = new RegExp('^(5019)');
 
                 // get rid of spaces and dashes before using the regular expression
                 curVal = curVal.replace(/ /g, '').replace(/-/g, '');
 
                 // checks per each, as their could be multiple hits
+                if (curVal.match(dankortRegex)) {
+                    //console.log("enetered dankort");
+                    piCardType = 'dankort';
+                    $ccNumberContain.addClass('is_dankort');
+                } else {
+                    $ccNumberContain.removeClass('is_dankort');
+                }
+                
                 if (curVal.match(visaRegex)) {
                     piCardType = 'visa';
                     $ccNumberContain.addClass('is_visa');
@@ -482,7 +533,8 @@ define(
                     !curVal.match(jcbRegex) &&
                     !curVal.match(dinersRegex) &&
                     !curVal.match(maestroRegex) &&
-                    !curVal.match(unionpayRegex)
+                    !curVal.match(unionpayRegex) &&
+                    !curVal.match(dankortRegex)
                 ) {
                     $ccNumberContain.addClass('is_nothing');
                 } else {

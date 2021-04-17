@@ -35,10 +35,10 @@ EOD;
     protected $userAgentHeader;
     
      /**
-     * Constructor
-     *
-     * @param array $args
-     */
+      * Constructor
+      *
+      * @param array $args
+      */
     public function __construct(array $args = [])
     {
         $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure(
@@ -105,14 +105,14 @@ EOD;
     }
 
      /**
-     * Build xml for 3ds2 processing Request
-     *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param array $paymentDetails
-     * @param $dfReferenceId
-     * @return SimpleXMLElement $xml
-     */
+      * Build xml for 3ds2 processing Request
+      *
+      * @param string $merchantCode
+      * @param string $orderCode
+      * @param array $paymentDetails
+      * @param $dfReferenceId
+      * @return SimpleXMLElement $xml
+      */
     public function build3Ds2Secure(
         $merchantCode,
         $orderCode,
@@ -312,10 +312,10 @@ EOD;
         }
     }
       /**
-     * Add dynamicInteractionType and its attribute tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
+       * Add dynamicInteractionType and its attribute tag to xml
+       *
+       * @param SimpleXMLElement $order
+       */
     private function _addDynamic3DSElement($order)
     {
         if (! $this->threeDSecureConfig->isDynamic3DEnabled()) {

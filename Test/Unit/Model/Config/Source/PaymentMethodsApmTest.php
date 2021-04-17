@@ -13,12 +13,14 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use \PHPUnit\Framework\TestCase;
 
-class PaymentMethodsApmTest extends TestCase {
+class PaymentMethodsApmTest extends TestCase
+{
 
     /** @var PaymentMethodsApm  */
     protected $model;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $contextMock = $this->getMockBuilder(Context::class)
                         ->disableOriginalConstructor()->getMock();
         $registryMock = $this->getMockBuilder(Registry::class)
@@ -30,7 +32,8 @@ class PaymentMethodsApmTest extends TestCase {
         $this->model = new PaymentMethodsApm($contextMock, $registryMock, $configMock, $cacheTypeListMock);
     }
 
-    public function testToOptionArray() {
+    public function testToOptionArray()
+    {
         $expectedResult = [
             ['value' => 'CHINAUNIONPAY-SSL', 'label' => __('Union Pay')],
             ['value' => 'IDEAL-SSL', 'label' => __('IDEAL')],
@@ -49,5 +52,4 @@ class PaymentMethodsApmTest extends TestCase {
         ];
         $this->assertEquals($expectedResult, $this->model->toOptionArray());
     }
-
 }

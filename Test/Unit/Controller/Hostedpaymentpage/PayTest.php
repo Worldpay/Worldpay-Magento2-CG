@@ -16,7 +16,8 @@ use Sapient\Worldpay\Logger\WorldpayLogger;
 use Magento\Framework\ObjectManagerInterface;
 use \Magento\Framework\View\Result\Page;
 
-class PayTest extends TestCase {
+class PayTest extends TestCase
+{
 
     /**
      *
@@ -28,7 +29,8 @@ class PayTest extends TestCase {
     protected $hppstate;
     protected $dataHelper;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $this->context = $this->getMockBuilder(Context::class)
                 ->disableOriginalConstructor()
                 ->getMock();
@@ -47,7 +49,8 @@ class PayTest extends TestCase {
         $this->payObj = new Pay($this->context, $this->pageFactory, $this->hppstate, $this->dataHelper, $wplogger);
     }
 
-    public function testExecuteIsIframe() {
+    public function testExecuteIsIframe()
+    {
         $this->dataHelper->expects($this->any())
                 ->method('isIframeIntegration')
                 ->willReturn(true);
@@ -70,5 +73,4 @@ class PayTest extends TestCase {
                 ->willReturn($page);
         $this->assertInstanceOf(Pay::class, $this->payObj);
     }
-
 }

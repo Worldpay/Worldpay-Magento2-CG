@@ -21,11 +21,12 @@ use Sapient\Worldpay\Model\Utilities\PaymentMethods;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 
-class MotoRedirectServiceTest extends TestCase {
+class MotoRedirectServiceTest extends TestCase
+{
 
     /**
      *
-     * @var HostedPaymentPageService 
+     * @var HostedPaymentPageService
      */
     protected $motoObj;
     protected $checkoutsession;
@@ -33,7 +34,8 @@ class MotoRedirectServiceTest extends TestCase {
     protected $paymentservicerequest;
     protected $registryhelper;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $this->mappingservice = $this->getMockBuilder(Service::class)
                 ->disableOriginalConstructor()
                 ->setMethods(['collectRedirectOrderParameters'])
@@ -61,10 +63,22 @@ class MotoRedirectServiceTest extends TestCase {
         $paymentMethods = $this->getMockBuilder(PaymentMethods::class)
                         ->disableOriginalConstructor()->getMock();
 
-        $this->motoObj = new MotoRedirectService($this->mappingservice, $this->paymentservicerequest, $wplogger, $paymentService, $redirectresponse, $this->registryhelper, $this->datahelper, $this->checkoutsession, $urlInterface, $paymentMethods);
+        $this->motoObj = new MotoRedirectService(
+            $this->mappingservice,
+            $this->paymentservicerequest,
+            $wplogger,
+            $paymentService,
+            $redirectresponse,
+            $this->registryhelper,
+            $this->datahelper,
+            $this->checkoutsession,
+            $urlInterface,
+            $paymentMethods
+        );
     }
 
-    public function testAuthorizePayment() {
+    public function testAuthorizePayment()
+    {
 
         $payment = $this->getMockBuilder(InfoInterface::class)
                 ->disableOriginalConstructor()->setMethods(['setIsTransactionPending', 'getOrder'])
@@ -130,5 +144,4 @@ class MotoRedirectServiceTest extends TestCase {
                 ->willReturn($response);
         $this->assertInstanceOf(MotoRedirectService::class, $this->motoObj);
     }
-
 }

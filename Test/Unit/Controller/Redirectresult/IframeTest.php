@@ -13,10 +13,12 @@ use Sapient\Worldpay\Model\Checkout\Hpp\State;
 use \PHPUnit\Framework\TestCase;
 use Sapient\Worldpay\Controller\Redirectresult\Iframe;
 
-class IframeTest extends TestCase {
+class IframeTest extends TestCase
+{
     
     protected $iframeObj;
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $context = $this->getMockBuilder(Context::class)
                         ->disableOriginalConstructor()->getMock();
         $page = $this->getMockBuilder(PageFactory::class)
@@ -33,5 +35,4 @@ class IframeTest extends TestCase {
     {
         $this->assertInstanceOf(Iframe::class, $this->iframeObj);
     }
-    
 }

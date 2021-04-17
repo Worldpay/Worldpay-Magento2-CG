@@ -72,7 +72,7 @@ class FraudisightMessage extends Column
         parent::prepare();
         if ($this->helper->isWorldPayEnable()) {
             $this->_data['config']['componentDisabled'] = false;
-        }else{
+        } else {
             $this->_data['config']['componentDisabled'] = true;
         }
     }

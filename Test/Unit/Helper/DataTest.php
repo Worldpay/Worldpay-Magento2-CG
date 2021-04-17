@@ -23,8 +23,10 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Sapient\Worldpay\Helper\KlarnaCountries;
 use \PHPUnit\Framework\TestCase;
 use Sapient\Worldpay\Helper\Data;
-use  Magento\Quote\Model\Quote;
-class DataTest extends TestCase {
+use Magento\Quote\Model\Quote;
+
+class DataTest extends TestCase
+{
 
     protected $scopeConfigMock;
     protected $wploggerMock;
@@ -65,50 +67,47 @@ class DataTest extends TestCase {
             'ACH_DIRECT_DEBIT-SSL' => 'ACH Pay'
         ];
     protected $ALL_MOTO_METHODS = [
-                'AMEX-SSL' => 'American Express', 
+                'AMEX-SSL' => 'American Express',
                 'VISA-SSL' => 'Visa',
-                'ECMC-SSL' => 'MasterCard', 
+                'ECMC-SSL' => 'MasterCard',
                 'DISCOVER-SSL' => 'Discover',
-                'DINERS-SSL' => 'Diners', 
-                'MAESTRO-SSL' => 'Maestro', 
+                'DINERS-SSL' => 'Diners',
+                'MAESTRO-SSL' => 'Maestro',
                 'AIRPLUS-SSL' => 'AirPlus',
-                'AURORE-SSL' => 'Aurore', 
+                'AURORE-SSL' => 'Aurore',
                 'CB-SSL' => 'Carte Bancaire',
-                'CARTEBLEUE-SSL' => 'Carte Bleue', 
+                'CARTEBLEUE-SSL' => 'Carte Bleue',
                 'DANKORT-SSL' => 'Dankort',
-                'GECAPITAL-SSL' => 'GE Capital', 
+                'GECAPITAL-SSL' => 'GE Capital',
                 'JCB-SSL' => 'Japanese Credit Bank',
-                'LASER-SSL' => 'Laser Card', 
+                'LASER-SSL' => 'Laser Card',
                 'UATP-SSL' => 'UATP'
         ];
     protected $GOOGLE_PAYMENT_METHODS = 'AMEX,VISA,DISCOVER,JCB,MASTERCARD';
     protected $GOOGLE_AUTH_METHODS = 'PAN_ONLY,CRYPTOGRAM_3DS';
-
-    
     protected $CC_TYPES = 'AMEX-SSL,VISA-SSL,ECMC-SSL,DISCOVER-SSL,DINERS-SSL,'
             . 'MAESTRO-SSL,AIRPLUS-SSL,AURORE-SSL,CB-SSL,CARTEBLEUE-SSL,'
             . 'DANKORT-SSL,GECAPITAL-SSL,JCB-SSL,LASER-SSL,UATP-SSL';
-    
     protected $ALL_CC_METHODS = [
-                'AMEX-SSL' => 'American Express', 
+                'AMEX-SSL' => 'American Express',
                 'VISA-SSL' => 'Visa',
-                'ECMC-SSL' => 'MasterCard', 
+                'ECMC-SSL' => 'MasterCard',
                 'DISCOVER-SSL' => 'Discover',
-                'DINERS-SSL' => 'Diners', 
-                'MAESTRO-SSL' => 'Maestro', 
+                'DINERS-SSL' => 'Diners',
+                'MAESTRO-SSL' => 'Maestro',
                 'AIRPLUS-SSL' => 'AirPlus',
-                'AURORE-SSL' => 'Aurore', 
+                'AURORE-SSL' => 'Aurore',
                 'CB-SSL' => 'Carte Bancaire',
-                'CARTEBLEUE-SSL' => 'Carte Bleue', 
+                'CARTEBLEUE-SSL' => 'Carte Bleue',
                 'DANKORT-SSL' => 'Dankort',
-                'GECAPITAL-SSL' => 'GE Capital', 
+                'GECAPITAL-SSL' => 'GE Capital',
                 'JCB-SSL' => 'Japanese Credit Bank',
-                'LASER-SSL' => 'Laser Card', 
+                'LASER-SSL' => 'Laser Card',
                 'UATP-SSL' => 'UATP'
         ];
 
-
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $this->scopeConfigMock = $this->getMockBuilder(ScopeConfigInterface::class)
                         ->disableOriginalConstructor()->getMock();
         $this->wploggerMock = $this->getMockBuilder(WorldpayLogger::class)
@@ -141,25 +140,43 @@ class DataTest extends TestCase {
                         ->getMock();
         $this->klarnaCountries = $this->getMockBuilder(KlarnaCountries::class)
                         ->disableOriginalConstructor()
-                        ->setMethods(['unserializeValue', 'isEncodedArrayFieldValue', 'decodeArrayFieldValue', 'getConfigValue'])
+                        ->setMethods(['unserializeValue', 'isEncodedArrayFieldValue',
+                            'decodeArrayFieldValue', 'getConfigValue'])
                         ->getMock();
 
-        $this->dataObj = new Data($this->wploggerMock, $this->scopeConfigMock, 
-                $localeCurrency, $this->paymentlist, $merchantprofile, $this->checkoutSession,
-                $orderFactory, $this->recurringHelper, $extendedResponseCodes, $instalmentconfig,
-                $orderCollectionFactory, $savecard, $currencyexponents, $this->serializer, $this->klarnaCountries);
+        $this->dataObj = new Data(
+            $this->wploggerMock,
+            $this->scopeConfigMock,
+            $localeCurrency,
+            $this->paymentlist,
+            $merchantprofile,
+            $this->checkoutSession,
+            $orderFactory,
+            $this->recurringHelper,
+            $extendedResponseCodes,
+            $instalmentconfig,
+            $orderCollectionFactory,
+            $savecard,
+            $currencyexponents,
+            $this->serializer,
+            $this->klarnaCountries
+        );
     }
     
-    public function testIsWorldPayEnable() {
+    public function testIsWorldPayEnable()
+    {
         $this->scopeConfigMock->expects($this->once())
                 ->method('getValue')
-                ->with('worldpay/general_config/enable_worldpay',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->with(
+                    'worldpay/general_config/enable_worldpay',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
                 ->willReturn(true);
         $this->assertEquals(true, $this->dataObj->isWorldPayEnable());
     }
     
-    public function testIsApmEnabled() {
+    public function testIsApmEnabled()
+    {
         $this->scopeConfigMock->expects($this->once())
                 ->method('getValue')
                 ->with('worldpay/apm_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -167,7 +184,8 @@ class DataTest extends TestCase {
         $this->assertEquals(true, $this->dataObj->isApmEnabled());
     }
 
-    public function testGetApmTitle() {
+    public function testGetApmTitle()
+    {
         $this->scopeConfigMock->expects($this->once())
                 ->method('getValue')
                 ->with('worldpay/apm_config/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -175,7 +193,8 @@ class DataTest extends TestCase {
         $this->assertEquals('Alternative Payment Methods', $this->dataObj->getApmTitle());
     }
 
-    public function testGetApmPaymentMethods() {
+    public function testGetApmPaymentMethods()
+    {
         $this->scopeConfigMock->expects($this->once())
                 ->method('getValue')
                 ->with('worldpay/apm_config/paymentmethods', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -183,7 +202,8 @@ class DataTest extends TestCase {
         $this->assertEquals($this->APM_TYPES, $this->dataObj->getApmPaymentMethods());
     }
 
-    public function testIsKlarnaEnabled() {
+    public function testIsKlarnaEnabled()
+    {
         $this->scopeConfigMock->expects($this->once())
                 ->method('getValue')
                 ->with('worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -191,177 +211,219 @@ class DataTest extends TestCase {
         $this->assertEquals(true, $this->dataObj->isKlarnaEnabled());
     }
 
-    public function testGetKlarnaSliceitType() {
+    public function testGetKlarnaSliceitType()
+    {
         $this->scopeConfigMock->expects($this->exactly(2))
                 ->method('getValue')
-                ->withConsecutive(['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/sliceit_config/klarna_sliceit', \Magento\Store\Model\ScopeInterface::SCOPE_STORE])
+                ->withConsecutive(
+                    ['worldpay/klarna_config/enabled',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/sliceit_config/klarna_sliceit',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+                )
                 ->will($this->onConsecutiveCalls(true, $this->KLARNA_SLICEIT_TYPE));
         $this->assertEquals($this->KLARNA_SLICEIT_TYPE, $this->dataObj->getKlarnaSliceitType());
     }
 
-    public function testGetKlarnaPayLaterType() {
+    public function testGetKlarnaPayLaterType()
+    {
         $this->scopeConfigMock->expects($this->exactly(2))
                 ->method('getValue')
-                ->withConsecutive(['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/paylater_config/klarna_paylater', \Magento\Store\Model\ScopeInterface::SCOPE_STORE])
+                ->withConsecutive(
+                    ['worldpay/klarna_config/enabled',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/paylater_config/klarna_paylater',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+                )
                 ->will($this->onConsecutiveCalls(true, $this->KLARNA_PAYLATER_TYPE));
         $this->assertEquals($this->KLARNA_PAYLATER_TYPE, $this->dataObj->getKlarnaPayLaterType());
     }
 
-    public function testGetKlarnaPayNowType() {
+    public function testGetKlarnaPayNowType()
+    {
         $this->scopeConfigMock->expects($this->exactly(2))
                 ->method('getValue')
-                ->withConsecutive(['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/paynow_config/klarna_paynow', \Magento\Store\Model\ScopeInterface::SCOPE_STORE])
+                ->withConsecutive(
+                    ['worldpay/klarna_config/enabled',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/paynow_config/klarna_paynow',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+                )
                 ->will($this->onConsecutiveCalls(true, $this->KLARNA_PAYNOW_TYPE));
         $this->assertEquals($this->KLARNA_PAYNOW_TYPE, $this->dataObj->getKlarnaPayNowType());
     }
 
-    public function testGetKlarnaSliceitContries() {
+    public function testGetKlarnaSliceitContries()
+    {
         $this->scopeConfigMock->expects($this->exactly(4))
                 ->method('getValue')
-                ->withConsecutive(['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/sliceit_config/klarna_sliceit', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/sliceit_config/sliceit_contries', \Magento\Store\Model\ScopeInterface::SCOPE_STORE])
-                ->will($this->onConsecutiveCalls(true, true, $this->KLARNA_SLICEIT_TYPE, $this->KLARNA_SLICEIT_COUNTRIES));
+                ->withConsecutive(
+                    ['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/sliceit_config/klarna_sliceit',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/sliceit_config/sliceit_contries',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+                )
+         ->will($this->onConsecutiveCalls(true, true, $this->KLARNA_SLICEIT_TYPE, $this->KLARNA_SLICEIT_COUNTRIES));
         $this->assertEquals($this->KLARNA_SLICEIT_COUNTRIES, $this->dataObj->getKlarnaSliceitContries());
     }
 
-    public function testGetKlarnaPayLaterContries() {
+    public function testGetKlarnaPayLaterContries()
+    {
         $this->scopeConfigMock->expects($this->exactly(4))
                 ->method('getValue')
-                ->withConsecutive(['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/paylater_config/klarna_paylater', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/paylater_config/paylater_contries', \Magento\Store\Model\ScopeInterface::SCOPE_STORE])
-                ->will($this->onConsecutiveCalls(true, true, $this->KLARNA_PAYLATER_TYPE, $this->KLARNA_PAYLATER_COUNTRIES));
+                ->withConsecutive(
+                    ['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/paylater_config/klarna_paylater',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/paylater_config/paylater_contries',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+                )
+        ->will($this->onConsecutiveCalls(true, true, $this->KLARNA_PAYLATER_TYPE, $this->KLARNA_PAYLATER_COUNTRIES));
         $this->assertEquals($this->KLARNA_PAYLATER_COUNTRIES, $this->dataObj->getKlarnaPayLaterContries());
     }
 
-    public function testGetKlarnaPayNowContries() {
+    public function testGetKlarnaPayNowContries()
+    {
         $this->scopeConfigMock->expects($this->exactly(4))
                 ->method('getValue')
-                ->withConsecutive(['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/paynow_config/klarna_paynow', \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        , ['worldpay/klarna_config/paynow_config/paynow_contries', \Magento\Store\Model\ScopeInterface::SCOPE_STORE])
-                ->will($this->onConsecutiveCalls(true, true, $this->KLARNA_PAYNOW_TYPE, $this->KLARNA_PAYNOW_COUNTRIES));
+                ->withConsecutive(
+                    ['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/paynow_config/klarna_paynow',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/klarna_config/paynow_config/paynow_contries',
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+                )
+            ->will($this->onConsecutiveCalls(true, true, $this->KLARNA_PAYNOW_TYPE, $this->KLARNA_PAYNOW_COUNTRIES));
         $this->assertEquals($this->KLARNA_PAYNOW_COUNTRIES, $this->dataObj->getKlarnaPayNowContries());
     }
     
-     public function testGetKlarnaSubscriptionDays() {
-         $array = ['subscription_days' => 30];
-         $this->klarnaCountries->expects($this->once())
-                 ->method('getConfigValue')
-                 ->with('US')
-                 ->willReturn($array);
-         $this->assertEquals($array['subscription_days'], $this->dataObj->getKlarnaSubscriptionDays('US'));
-     }
+    public function testGetKlarnaSubscriptionDays()
+    {
+        $array = ['subscription_days' => 30];
+        $this->klarnaCountries->expects($this->once())
+                ->method('getConfigValue')
+                ->with('US')
+                ->willReturn($array);
+        $this->assertEquals($array['subscription_days'], $this->dataObj->getKlarnaSubscriptionDays('US'));
+    }
      
-     public function testGetApmTypes(){
+    public function testGetApmTypes()
+    {
         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/apm_config/paymentmethods',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn($this->APM_TYPES);
-         $this->paymentlist->expects($this->any())
-                 ->method('checkCurrency')
-                 ->withConsecutive(['worldpay_apm','CHINAUNIONPAY-SSL']
-                         ,['worldpay_apm','IDEAL-SSL']
-                         ,['worldpay_apm','QIWI-SSL']
-                        // ,['worldpay_apm','YANDEXMONEY-SSL']
-                         ,['worldpay_apm','PAYPAL-EXPRESS']
-                         ,['worldpay_apm','SOFORT-SSL']
-                         ,['worldpay_apm','GIROPAY-SSL']
-                        // ,['worldpay_apm','BOLETO-SSL']
-                         ,['worldpay_apm','ALIPAY-SSL']
-                         ,['worldpay_apm','SEPA_DIRECT_DEBIT-SSL']
-                         ,['worldpay_apm','KLARNA-SSL']
-                         ,['worldpay_apm','PRZELEWY-SSL']
-                         ,['worldpay_apm','MISTERCASH-SSL']
-                         ,['worldpay_apm','ACH_DIRECT_DEBIT-SSL'])
-                 ->willReturn(true);
-         $this->assertEquals($this->ALL_APM_METHODS, $this->dataObj->getApmTypes('worldpay_apm'));
-     }
+                ->method('getValue')
+                ->with('worldpay/apm_config/paymentmethods', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->willReturn($this->APM_TYPES);
+        $this->paymentlist->expects($this->any())
+                ->method('checkCurrency')
+                ->withConsecutive(
+                    ['worldpay_apm','CHINAUNIONPAY-SSL'],
+                    ['worldpay_apm','IDEAL-SSL'],
+                    ['worldpay_apm','QIWI-SSL'],
+                    ['worldpay_apm','PAYPAL-EXPRESS'],
+                    ['worldpay_apm','SOFORT-SSL'],
+                    ['worldpay_apm','GIROPAY-SSL'],
+                    ['worldpay_apm','ALIPAY-SSL'],
+                    ['worldpay_apm','SEPA_DIRECT_DEBIT-SSL'],
+                    ['worldpay_apm','KLARNA-SSL'],
+                    ['worldpay_apm','PRZELEWY-SSL'],
+                    ['worldpay_apm','MISTERCASH-SSL'],
+                    ['worldpay_apm','ACH_DIRECT_DEBIT-SSL']
+                )
+                ->willReturn(true);
+        $this->assertEquals($this->ALL_APM_METHODS, $this->dataObj->getApmTypes('worldpay_apm'));
+    }
 
-     public function testGetACHDetails(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->withConsecutive(['worldpay/cc_config/integration_mode',\Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        ,['worldpay/apm_config/paymentmethods',\Magento\Store\Model\ScopeInterface::SCOPE_STORE]
-                        ,['worldpay/apm_config/achaccounttypes',\Magento\Store\Model\ScopeInterface::SCOPE_STORE])
-                 ->will($this->onConsecutiveCalls('Direct',$this->APM_TYPES,$this->ACH_BANK_ACC_TYPES));
+    public function testGetACHDetails()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->withConsecutive(
+                    ['worldpay/cc_config/integration_mode',\Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/apm_config/paymentmethods',\Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/apm_config/achaccounttypes',\Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+                )
+                ->will($this->onConsecutiveCalls('Direct', $this->APM_TYPES, $this->ACH_BANK_ACC_TYPES));
          
-         $this->paymentlist->expects($this->any())
-                 ->method('checkCurrency')
-                 ->withConsecutive(['worldpay_apm','CHINAUNIONPAY-SSL']
-                         ,['worldpay_apm','IDEAL-SSL']
-                         ,['worldpay_apm','QIWI-SSL']
-                         //,['worldpay_apm','YANDEXMONEY-SSL']
-                         ,['worldpay_apm','PAYPAL-EXPRESS']
-                         ,['worldpay_apm','SOFORT-SSL']
-                         ,['worldpay_apm','GIROPAY-SSL']
-                         //,['worldpay_apm','BOLETO-SSL']
-                         ,['worldpay_apm','ALIPAY-SSL']
-                         ,['worldpay_apm','SEPA_DIRECT_DEBIT-SSL']
-                         ,['worldpay_apm','KLARNA-SSL']
-                         ,['worldpay_apm','PRZELEWY-SSL']
-                         ,['worldpay_apm','MISTERCASH-SSL']
-                         ,['worldpay_apm','ACH_DIRECT_DEBIT-SSL'])
-                 ->willReturn(true);
-         $this->assertEquals(explode(",", $this->ACH_BANK_ACC_TYPES), $this->dataObj->getACHDetails());
-     }
+        $this->paymentlist->expects($this->any())
+                ->method('checkCurrency')
+                ->withConsecutive(
+                    ['worldpay_apm','CHINAUNIONPAY-SSL'],
+                    ['worldpay_apm','IDEAL-SSL'],
+                    ['worldpay_apm','QIWI-SSL'],
+                    ['worldpay_apm','PAYPAL-EXPRESS'],
+                    ['worldpay_apm','SOFORT-SSL'],
+                    ['worldpay_apm','GIROPAY-SSL'],
+                    ['worldpay_apm','ALIPAY-SSL'],
+                    ['worldpay_apm','SEPA_DIRECT_DEBIT-SSL'],
+                    ['worldpay_apm','KLARNA-SSL'],
+                    ['worldpay_apm','PRZELEWY-SSL'],
+                    ['worldpay_apm','MISTERCASH-SSL'],
+                    ['worldpay_apm','ACH_DIRECT_DEBIT-SSL']
+                )
+                ->willReturn(true);
+        $this->assertEquals(explode(",", $this->ACH_BANK_ACC_TYPES), $this->dataObj->getACHDetails());
+    }
      
-     public function testGetACHBankAccountTypes(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/apm_config/achaccounttypes',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn($this->ACH_BANK_ACC_TYPES);
-         $this->assertEquals($this->ACH_BANK_ACC_TYPES, $this->dataObj->getACHBankAccountTypes());
-     }
+    public function testGetACHBankAccountTypes()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with('worldpay/apm_config/achaccounttypes', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->willReturn($this->ACH_BANK_ACC_TYPES);
+        $this->assertEquals($this->ACH_BANK_ACC_TYPES, $this->dataObj->getACHBankAccountTypes());
+    }
      
-     public function testIsIframeIntegration(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/hpp_config/hpp_integration',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn('iframe');
-         $this->assertEquals(true, $this->dataObj->isIframeIntegration());
-     }
+    public function testIsIframeIntegration()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with('worldpay/hpp_config/hpp_integration', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->willReturn('iframe');
+        $this->assertEquals(true, $this->dataObj->isIframeIntegration());
+    }
      
-     public function testGetRedirectIntegrationMode(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/hpp_config/hpp_integration',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn('Redirect');
-         $this->assertEquals('Redirect', $this->dataObj->getRedirectIntegrationMode());
-     }
+    public function testGetRedirectIntegrationMode()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with('worldpay/hpp_config/hpp_integration', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->willReturn('Redirect');
+        $this->assertEquals('Redirect', $this->dataObj->getRedirectIntegrationMode());
+    }
      
-     public function testGetCustomPaymentEnabled(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/hpp_config/enabled',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn(true);
-         $this->assertEquals(true, $this->dataObj->getCustomPaymentEnabled());
-     }
+    public function testGetCustomPaymentEnabled()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with('worldpay/hpp_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->willReturn(true);
+        $this->assertEquals(true, $this->dataObj->getCustomPaymentEnabled());
+    }
      
-     public function testGetInstallationId(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/hpp_config/installation_id',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn(1074624);
-         $this->assertEquals(1074624, $this->dataObj->getInstallationId());
-     }
+    public function testGetInstallationId()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with('worldpay/hpp_config/installation_id', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->willReturn(1074624);
+        $this->assertEquals(1074624, $this->dataObj->getInstallationId());
+    }
      
-     public function testGetHideAddress(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/hpp_config/hideaddress',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn(true);
-         $this->assertEquals(true, $this->dataObj->getHideAddress());
-     }
+    public function testGetHideAddress()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with('worldpay/hpp_config/hideaddress', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->willReturn(true);
+        $this->assertEquals(true, $this->dataObj->getHideAddress());
+    }
     
-    public function testIsMotoEnabled() {
+    public function testIsMotoEnabled()
+    {
         $this->scopeConfigMock->expects($this->once())
                 ->method('getValue')
                 ->with('worldpay/moto_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -369,28 +431,32 @@ class DataTest extends TestCase {
         $this->assertEquals(true, $this->dataObj->isMotoEnabled());
     }
     
-    public function testGetMotoTypes(){
+    public function testGetMotoTypes()
+    {
         $this->scopeConfigMock->expects($this->any())
                  ->method('getValue')
-                 ->with('worldpay/moto_config/paymentmethods',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                 ->with('worldpay/moto_config/paymentmethods', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
                  ->willReturn($this->MOTO_TYPES);
          $this->paymentlist->expects($this->any())
                  ->method('checkCurrency')
-                 ->withConsecutive(['worldpay_cc','AMEX-SSL']
-                         ,['worldpay_cc','VISA-SSL']
-                         ,['worldpay_cc','ECMC-SSL']
-                         ,['worldpay_cc','CB-SSL']
-                         ,['worldpay_cc','CARTEBLEUE-SSL']
-                         ,['worldpay_cc','DANKORT-SSL']
-                         ,['worldpay_cc','DINERS-SSL']
-                         ,['worldpay_cc','DISCOVER-SSL']
-                         ,['worldpay_cc','JCB-SSL']
-                         ,['worldpay_cc','MAESTRO-SSL'])
+                 ->withConsecutive(
+                     ['worldpay_cc','AMEX-SSL'],
+                     ['worldpay_cc','VISA-SSL'],
+                     ['worldpay_cc','ECMC-SSL'],
+                     ['worldpay_cc','CB-SSL'],
+                     ['worldpay_cc','CARTEBLEUE-SSL'],
+                     ['worldpay_cc','DANKORT-SSL'],
+                     ['worldpay_cc','DINERS-SSL'],
+                     ['worldpay_cc','DISCOVER-SSL'],
+                     ['worldpay_cc','JCB-SSL'],
+                     ['worldpay_cc','MAESTRO-SSL']
+                 )
                  ->willReturn(true);
          $this->assertEquals($this->ALL_MOTO_METHODS, $this->dataObj->getCcTypes('moto_config'));
     }
     
-    public function testGetMotoTitle() {
+    public function testGetMotoTitle()
+    {
         $this->scopeConfigMock->expects($this->once())
                 ->method('getValue')
                 ->with('worldpay/moto_config/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
@@ -398,135 +464,183 @@ class DataTest extends TestCase {
         $this->assertEquals('Mail Order Telephone Order', $this->dataObj->getMotoTitle());
     }
      
-      public function testIsGooglePayEnable(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/wallets_config/google_pay_wallets_config/enabled',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn(true);
-         $this->assertEquals(true, $this->dataObj->isGooglePayEnable());
-     }
+    public function testIsGooglePayEnable()
+    {
+        $this->scopeConfigMock->expects($this->any())
+               ->method('getValue')
+               ->with(
+                   'worldpay/wallets_config/google_pay_wallets_config/enabled',
+                   \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+               )
+               ->willReturn(true);
+        $this->assertEquals(true, $this->dataObj->isGooglePayEnable());
+    }
      
-     public function testGooglePaymentMethods(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/wallets_config/google_pay_wallets_config/paymentmethods',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn($this->GOOGLE_PAYMENT_METHODS);
-         $this->assertEquals($this->GOOGLE_PAYMENT_METHODS, $this->dataObj->googlePaymentMethods());
-     }
-     
-     public function testGoogleAuthMethods(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/wallets_config/google_pay_wallets_config/authmethods',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn($this->GOOGLE_AUTH_METHODS);
-         $this->assertEquals($this->GOOGLE_AUTH_METHODS, $this->dataObj->googleAuthMethods());
-     }
-     
-     public function testGoogleGatewayMerchantname(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/wallets_config/google_pay_wallets_config/gateway_merchantname', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn('worldpay');
-         $this->assertEquals('worldpay', $this->dataObj->googleGatewayMerchantname());
-     }
-     
-     public function testGoogleMerchantname(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/wallets_config/google_pay_wallets_config/google_merchantname',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn('worldpay');
-         $this->assertEquals('worldpay', $this->dataObj->googleMerchantname());
-     }
-     
-     public function testGoogleMerchantid(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/wallets_config/google_pay_wallets_config/google_merchantname',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn('');
-         $this->assertEquals('', $this->dataObj->googleMerchantname());
-     }
-     
-     public function testGetWalletsTypesGooglePay() {
-        $activeMethods = ['PAYWITHGOOGLE-SSL' => 'Google Pay',
-            'SAMSUNGPAY-SSL' => 'Samsung Pay',
-            'APPLEPAY-SSL' => 'Apple Pay'];
+    public function testGooglePaymentMethods()
+    {
         $this->scopeConfigMock->expects($this->any())
                 ->method('getValue')
-                ->withConsecutive(['worldpay/wallets_config/google_pay_wallets_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE], ['worldpay/wallets_config/samsung_pay_wallets_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE], ['worldpay/wallets_config/apple_pay_wallets_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE])
-                ->willReturn(true);
+                ->with(
+                    'worldpay/wallets_config/google_pay_wallets_config/paymentmethods',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
+                ->willReturn($this->GOOGLE_PAYMENT_METHODS);
+        $this->assertEquals($this->GOOGLE_PAYMENT_METHODS, $this->dataObj->googlePaymentMethods());
+    }
+     
+    public function testGoogleAuthMethods()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with(
+                    'worldpay/wallets_config/google_pay_wallets_config/authmethods',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
+                ->willReturn($this->GOOGLE_AUTH_METHODS);
+        $this->assertEquals($this->GOOGLE_AUTH_METHODS, $this->dataObj->googleAuthMethods());
+    }
+     
+    public function testGoogleGatewayMerchantname()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with(
+                    'worldpay/wallets_config/google_pay_wallets_config/gateway_merchantname',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
+                ->willReturn('worldpay');
+        $this->assertEquals('worldpay', $this->dataObj->googleGatewayMerchantname());
+    }
+     
+    public function testGoogleMerchantname()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with(
+                    'worldpay/wallets_config/google_pay_wallets_config/google_merchantname',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
+                ->willReturn('worldpay');
+        $this->assertEquals('worldpay', $this->dataObj->googleMerchantname());
+    }
+     
+    public function testGoogleMerchantid()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with(
+                    'worldpay/wallets_config/google_pay_wallets_config/google_merchantname',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
+                ->willReturn('');
+        $this->assertEquals('', $this->dataObj->googleMerchantname());
+    }
+     
+    public function testGetWalletsTypesGooglePay()
+    {
+        $activeMethods = ['PAYWITHGOOGLE-SSL' => 'Google Pay',
+           'SAMSUNGPAY-SSL' => 'Samsung Pay',
+           'APPLEPAY-SSL' => 'Apple Pay'];
+        $this->scopeConfigMock->expects($this->any())
+               ->method('getValue')
+               ->withConsecutive(
+                   ['worldpay/wallets_config/google_pay_wallets_config/enabled',
+                   \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                   ['worldpay/wallets_config/samsung_pay_wallets_config/enabled',
+                           \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                   ['worldpay/wallets_config/apple_pay_wallets_config/enabled',
+                   \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+               )
+               ->willReturn(true);
         $this->assertEquals($activeMethods, $this->dataObj->getWalletsTypes(''));
     }
     
-    public function testIsWalletsEnabled(){
+    public function testIsWalletsEnabled()
+    {
          $this->scopeConfigMock->expects($this->any())
                  ->method('getValue')
-                 ->with('worldpay/wallets_config/enabled',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                 ->with('worldpay/wallets_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
                  ->willReturn(true);
          $this->assertEquals(true, $this->dataObj->isWalletsEnabled());
-     }
+    }
      
-     public function testGetWalletsTitle(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/wallets_config/title',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn('wallet');
-         $this->assertEquals('wallet', $this->dataObj->getWalletsTitle());
-     }
-     
-     public function testIsApplePayEnable(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/wallets_config/apple_pay_wallets_config/enabled',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn(true);
-         $this->assertEquals(true, $this->dataObj->isApplePayEnable());
-     }
-     
-     public function testAppleMerchantId(){
-         $this->scopeConfigMock->expects($this->any())
-                 ->method('getValue')
-                 ->with('worldpay/wallets_config/apple_pay_wallets_config/merchant_name',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                 ->willReturn('');
-         $this->assertEquals('', $this->dataObj->appleMerchantId());
-     }
-
-     public function testisCreditCardEnabled() {
-        $this->scopeConfigMock->expects($this->once())
+    public function testGetWalletsTitle()
+    {
+        $this->scopeConfigMock->expects($this->any())
                 ->method('getValue')
-                ->with('worldpay/cc_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->with('worldpay/wallets_config/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->willReturn('wallet');
+        $this->assertEquals('wallet', $this->dataObj->getWalletsTitle());
+    }
+     
+    public function testIsApplePayEnable()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with(
+                    'worldpay/wallets_config/apple_pay_wallets_config/enabled',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
                 ->willReturn(true);
+        $this->assertEquals(true, $this->dataObj->isApplePayEnable());
+    }
+     
+    public function testAppleMerchantId()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with(
+                    'worldpay/wallets_config/apple_pay_wallets_config/merchant_name',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
+                ->willReturn('');
+        $this->assertEquals('', $this->dataObj->appleMerchantId());
+    }
+
+    public function testisCreditCardEnabled()
+    {
+        $this->scopeConfigMock->expects($this->once())
+               ->method('getValue')
+               ->with('worldpay/cc_config/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+               ->willReturn(true);
         $this->assertEquals(true, $this->dataObj->isCreditCardEnabled());
     }
     
-     public function testGetCcTitle() {
+    public function testGetCcTitle()
+    {
         $this->scopeConfigMock->expects($this->once())
-                ->method('getValue')
-                ->with('worldpay/cc_config/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
-                ->willReturn('Alternative Payment Methods');
+               ->method('getValue')
+               ->with('worldpay/cc_config/title', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+               ->willReturn('Alternative Payment Methods');
         $this->assertEquals('Alternative Payment Methods', $this->dataObj->getCcTitle());
     }
     
-    public function testGetCcTypes(){
+    public function testGetCcTypes()
+    {
         $this->scopeConfigMock->expects($this->any())
                  ->method('getValue')
-                 ->with('worldpay/cc_config/paymentmethods',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                 ->with('worldpay/cc_config/paymentmethods', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
                  ->willReturn($this->CC_TYPES);
          $this->paymentlist->expects($this->any())
                  ->method('checkCurrency')
-                 ->withConsecutive(['worldpay_cc','AMEX-SSL']
-                         ,['worldpay_cc','VISA-SSL']
-                         ,['worldpay_cc','ECMC-SSL']
-                         ,['worldpay_cc','CB-SSL']
-                         ,['worldpay_cc','CARTEBLEUE-SSL']
-                         ,['worldpay_cc','DANKORT-SSL']
-                         ,['worldpay_cc','DINERS-SSL']
-                         ,['worldpay_cc','DISCOVER-SSL']
-                         ,['worldpay_cc','JCB-SSL']
-                         ,['worldpay_cc','MAESTRO-SSL'])
+                 ->withConsecutive(
+                     ['worldpay_cc','AMEX-SSL'],
+                     ['worldpay_cc','VISA-SSL'],
+                     ['worldpay_cc','ECMC-SSL'],
+                     ['worldpay_cc','CB-SSL'],
+                     ['worldpay_cc','CARTEBLEUE-SSL'],
+                     ['worldpay_cc','DANKORT-SSL'],
+                     ['worldpay_cc','DINERS-SSL'],
+                     ['worldpay_cc','DISCOVER-SSL'],
+                     ['worldpay_cc','JCB-SSL'],
+                     ['worldpay_cc','MAESTRO-SSL']
+                 )
                  ->willReturn(true);
          $this->assertEquals($this->ALL_CC_METHODS, $this->dataObj->getCcTypes('cc_config'));
     }
     
-    public function testGetsubscriptionStatus() {
+    public function testGetsubscriptionStatus()
+    {
         $this->quote = $this->getMockBuilder(Quote::class)
                         ->disableOriginalConstructor()->getMock();
         $this->checkoutSession->expects($this->any())
@@ -538,5 +652,4 @@ class DataTest extends TestCase {
                 ->willReturn(true);
         $this->assertEquals(true, $this->dataObj->getsubscriptionStatus());
     }
-     
 }
