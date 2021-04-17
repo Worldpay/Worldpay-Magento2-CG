@@ -330,9 +330,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $redirectOrderParams['installationId'],
             $redirectOrderParams['hideAddress'],
             $redirectOrderParams['orderLineItems'],
-            $redirectOrderParams['exponent'],
-            $redirectOrderParams['sessionData'],
-            $redirectOrderParams['orderContent']
+            $redirectOrderParams['exponent']
         );
 
         return $this->_sendRequest(
@@ -467,24 +465,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     protected function _sendRequest($xml, $username, $password)
     {
         $response = $this->_request->sendRequest($xml, $username, $password);
-       
-        /*
-        $response = '<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE paymentService PUBLIC "-//WorldPay//DTD WorldPay PaymentService v1//EN"
-                                "http://dtd.worldpay.com/paymentService_v1.dtd">
-<paymentService version="1.4" merchantCode="SAPIENTNITROECOMMERCEV1"><reply><orderStatus orderCode="sp-2"><payment><paymentMethod>ECMC-SSL</paymentMethod><paymentMethodDetail><card number="5445********6985" type="creditcard"><expiryDate><date month="10" year="2023"/></expiryDate></card></paymentMethodDetail><amount value="100" currencyCode="USD" exponent="2" debitCreditIndicator="credit"/><lastEvent>AUTHORISED</lastEvent><AuthorisationId id="164818"/><CVCResultCode description="NOT SUPPLIED BY SHOPPER"/><AVSResultCode description="NOT SUPPLIED BY SHOPPER"/><AAVAddressResultCode description="UNKNOWN"/><AAVPostcodeResultCode description="UNKNOWN"/><AAVCardholderNameResultCode description="UNKNOWN"/><AAVTelephoneResultCode description="UNKNOWN"/><AAVEmailResultCode description="UNKNOWN"/><issuerCountryCode>IT</issuerCountryCode><balance accountType="IN_PROCESS_AUTHORISED"><amount value="100" currencyCode="USD" exponent="2" debitCreditIndicator="credit"/></balance><riskScore value="20"/><instalments>1</instalments></payment></orderStatus></reply></paymentService>
-';
-
-       */
-       
-       
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/worldpay.log');
-            $logger = new \Zend\Log\Logger();
-            $logger->addWriter($writer);
-            $logger->info('after req sent.........');
-            
-            
-        
+          
         $this->_checkForError($response);
         return $response;
     }

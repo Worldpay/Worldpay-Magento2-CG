@@ -293,7 +293,6 @@ class Service
     ) {
         $reservedOrderId = $quote->getReservedOrderId();
         $stmtNarrative = '';
-        $orderContent = '';
        
         $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
         if (array_key_exists($paymentDetails['additional_data']['cc_type'], $apmPaymentTypes) &&
@@ -302,7 +301,6 @@ class Service
         }
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
-        $countryCode = $quote->getBillingAddress()->getCountryId();
         return [
             'orderCode' => $orderCode,
             'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -321,17 +319,15 @@ class Service
                 FILTER_SANITIZE_STRING,
                 FILTER_FLAG_STRIP_LOW
             ) : '',
-            'shippingAddress' => $this->_getKlarnaShippingAddress($quote),
-            'billingAddress' => $this->_getKlarnaBillingAddress($quote),
+            'shippingAddress' => $this->_getShippingAddress($quote),
+            'billingAddress' => $this->_getBillingAddress($quote),
             'method' => $paymentDetails['method'],
             'paymentPagesEnabled' => $this->worldpayHelper->getCustomPaymentEnabled(),
             'installationId' => $this->worldpayHelper->getInstallationId(),
             'hideAddress' => $this->worldpayHelper->getHideAddress(),
             'orderLineItems' => $this->_getOrderLineItems($quote, 'KLARNA-SSL'),
             'orderStoreId' => $orderStoreId,
-            'exponent' => $exponent,
-            'sessionData' => $this->_getSessionDetails($paymentDetails, $countryCode),
-            'orderContent' => $orderContent
+            'exponent' => $exponent
         ];
     }
 
@@ -496,24 +492,12 @@ class Service
         return $shippingaddress;
     }
     
-    private function _getKlarnaShippingAddress($quote)
-    {
-        $shippingaddress = $this->_getKlarnaAddress($quote->getShippingAddress());
-        if (!array_filter($shippingaddress)) {
-            $shippingaddress = $this->_getKlarnaAddress($quote->getBillingAddress());
-        }
-        return $shippingaddress;
-    }
 
     private function _getBillingAddress($quote)
     {
         return $this->_getAddress($quote->getBillingAddress());
     }
     
-    private function _getKlarnaBillingAddress($quote)
-    {
-        return $this->_getKlarnaAddress($quote->getBillingAddress());
-    }
 
     private function _getOrderLineItems($quote, $paymentType = null)
     {
@@ -537,8 +521,8 @@ class Service
                 $lineitem['name'] = $_item->getName();
                 $lineitem['quantity'] = (int) $_item->getQty();
                 $lineitem['quantityUnit'] = $this->worldpayHelper->getQuantityUnit($_item->getProduct());
-                $lineitem['unitPrice'] = $rowtotal / $_item->getQty();
-                $lineitem['taxRate'] = $totaltax;
+                $lineitem['unitPrice'] = ($rowtotal / $_item->getQty()) + ($totaltax / $_item->getQty());
+                $lineitem['taxRate'] = (int) $_item->getTaxPercent();
                 $lineitem['totalAmount'] = $totalamount + $totaltax;
                 $lineitem['totalTaxAmount'] = $totaltax;
                 if ($discountamount > 0) {
@@ -569,8 +553,7 @@ class Service
         if (!empty($paymentType) && $paymentType == "KLARNA-SSL" && $orderitems['orderTaxAmount'] == 0) {
             $orderitems['orderTaxAmount'] = $totaltax;
         }
-        $orderitems['urls'] = $this->getReturnUrls();
-        $orderitems['locale_code'] = $this->worldpayHelper->getLocaleDefault();
+
         return $orderitems;
     }
 
@@ -586,19 +569,6 @@ class Service
         ];
     }
     
-    private function _getKlarnaAddress($address)
-    {
-        return [
-            'firstName' => $address->getFirstname(),
-            'lastName' => $address->getLastname(),
-            'address1' => $address->getData('street'),
-            'postalCode' => $address->getPostcode(),
-            'city' => $address->getCity(),
-            'state' => $address->getData('region'),
-            'countryCode' => $address->getCountryId(),
-            'telephoneNumber' => $address->getData('telephone'),
-        ];
-    }
 
     private function _getCardAddress($quote)
     {
@@ -674,10 +644,7 @@ class Service
         if ('CARTEBLEUE-SSL' == $paymentDetails['additional_data']['cc_type']) {
             return 'ECMC-SSL';
         }
-        if ($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL' &&
-            isset($paymentDetails['additional_data']['klarna_type'])) {
-            return $paymentDetails['additional_data']['klarna_type'];
-        }
+        
         return $paymentDetails['additional_data']['cc_type'];
     }
 
@@ -1041,33 +1008,6 @@ class Service
         }
     }
     
-    /**
-     * getReturnUrls to return from the payment page
-     *
-     * return array
-     */
-    public function getReturnUrls()
-    {
-        $urls = [];
-        $urls['successURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/success');
-        $urls['pendingURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/pending');
-        $urls['cancelURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/cancel');
-        $urls['failureURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/failure');
-        return $urls;
-    }
-    
-    private function _getSessionDetails($paymentDetails, $countryCode)
-    {
-        $sessionDetails = [];
-        if ($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL' &&
-            isset($paymentDetails['additional_data']['klarna_type'])) {
-            $sessionDetails['sessionId'] = $this->session->getSessionId();
-            $sessionDetails['shopperIpAddress'] = $this->_getClientIPAddress();
-            $sessionDetails['subscriptionDays'] = $this->worldpayHelper->getKlarnaSubscriptionDays($countryCode);
-            return $sessionDetails;
-        }
-        return $sessionDetails;
-    }
     
     public function getCustomerDOB($customer)
     {

@@ -480,75 +480,7 @@
                     <label>Title</label>
                 </field>
             </group>
-            <!-- KLARNA -->
-            <group id="klarna_config" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>KLARNA</label>
-                <!--Klarna enabled-->
-                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <group id="klarna_countries_config" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Klarna Allowed Countries</label>
-                    <field id="klarna_contries" translate="label" type="multiselect" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Klarna General Country list</label>
-                        <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
-                    </field>
-                    <depends>
-                        <field id="worldpay/klarna_config/enabled">1</field>
-                    </depends>
-                </group>
-                <group id="sliceit_config" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Configure Klarna Sliceit</label>
-                    <field id="klarna_sliceit" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Type</label>
-                        <frontend_model>Sapient\Worldpay\Block\Adminhtml\Form\Field\Disable</frontend_model>
-                    </field>
-                    <field id="sliceit_contries" translate="label" type="multiselect" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Klarna Sliceit Country list</label>
-                        <source_model>Sapient\Worldpay\Model\Config\Source\KlarnaCountries</source_model>
-                    </field>
-                    <depends>
-                        <field id="worldpay/klarna_config/enabled">1</field>
-                    </depends>
-                </group>
-                <group id="paylater_config" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Configure Klarna PayLater</label>
-                    <field id="klarna_paylater" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Type</label>
-                        <frontend_model>Sapient\Worldpay\Block\Adminhtml\Form\Field\Disable</frontend_model>
-                    </field>
-                    <field id="paylater_contries" translate="label" type="multiselect" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Klarna PayLater Country list</label>
-                        <source_model>Sapient\Worldpay\Model\Config\Source\KlarnaCountries</source_model>
-                    </field>                    
-                    <group id="paylater_days_config" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Klarna Paylater Subscription Configuration</label>
-                        <field id="subscription_days" translate="label" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Subscription Days</label>
-                            <frontend_model>Sapient\Worldpay\Block\Adminhtml\Form\Field\KlarnaCountries</frontend_model>
-                            <backend_model>Sapient\Worldpay\Model\System\Config\Backend\KlarnaCountries</backend_model>
-                        </field>
-                    </group>
-                    <depends>
-                        <field id="worldpay/klarna_config/enabled">1</field>
-                    </depends>
-                </group>
-                <group id="paynow_config" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Configure Klarna PayNow</label>
-                    <field id="klarna_paynow" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Type</label>
-                        <frontend_model>Sapient\Worldpay\Block\Adminhtml\Form\Field\Disable</frontend_model>
-                    </field>
-                    <field id="paynow_contries" translate="label" type="multiselect" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Klarna PayNow Country list</label>
-                        <source_model>Sapient\Worldpay\Model\Config\Source\KlarnaCountries</source_model>
-                    </field>
-                    <depends>
-                        <field id="worldpay/klarna_config/enabled">1</field>
-                    </depends>
-                </group>     
-            </group>
+
             <!-- Instant Purchase with Worldpay -->
             <group id="quick_checkout_config" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Instant Purchase with Worldpay</label>                

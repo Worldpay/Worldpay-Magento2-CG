@@ -31,8 +31,6 @@ EOD;
     private $exponent;
     private $threeDSecureConfig;
     private $tokenRequestConfig;
-    private $sessionData;
-    private $orderContent;
 
     public function __construct()
     {
@@ -58,9 +56,7 @@ EOD;
         $installationId,
         $hideAddress,
         $orderlineitems,
-        $exponent,
-        $sessionData,
-        $orderContent
+        $exponent
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -79,8 +75,6 @@ EOD;
         $this->hideAddress = $hideAddress;
         $this->orderlineitems = $orderlineitems;
         $this->exponent = $exponent;
-        $this->sessionData = $sessionData;
-        $this->orderContent = $orderContent;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -116,11 +110,12 @@ EOD;
 
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
-        $this->_addOrderContentElement($order);
         $this->_addPaymentMethodMaskElement($order);
         $this->_addShopperElement($order);
         $this->_addShippingElement($order);
         $this->_addBillingElement($order);
+        $this->_addOrderLineItemElement($order);
+        $this->_addDynamic3DSElement($order);
         if (!empty($this->statementNarrative)) {
             $this->_addStatementNarrativeElement($order);
         }
@@ -144,11 +139,6 @@ EOD;
         $amountElement['value'] = $this->_amountAsInt($this->_roundOfTotal($order));
     }
     
-    private function _addOrderContentElement($order)
-    {
-        $orderContent = $order->addChild('orderContent');
-        $this->_addCDATA($orderContent, $this->orderDescription);
-    }
 
     private function _addDynamic3DSElement($order)
     {
