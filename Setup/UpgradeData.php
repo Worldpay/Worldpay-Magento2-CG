@@ -36,20 +36,18 @@ class UpgradeData implements UpgradeDataInterface
     public function __construct(
         CategorySetupFactory $categorySetupFactory,
         EavSetupFactory $eavSetupFactory,
-        \Magento\Config\Model\Config\Factory $configFactory,
-        \Magento\Framework\App\State $state
+        \Magento\Config\Model\Config\Factory $configFactory
     ) {
         $this->categorySetupFactory = $categorySetupFactory;
         $this->eavSetupFactory = $eavSetupFactory;
         $this->configFactory = $configFactory;
-        $state->setAreaCode('adminhtml');
     }
 
     /**
      * {@inheritdoc}
      */
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
-    {
+    {        
         /** @var \Magento\Catalog\Setup\CategorySetup $catalogSetup */
         $catalogSetup = $this->categorySetupFactory->create(['setup' => $setup]);
         if (version_compare($context->getVersion(), '1.2.7', '<')) {
@@ -1500,7 +1498,6 @@ class UpgradeData implements UpgradeDataInterface
         
         
         if (version_compare($context->getVersion(), '1.4.3', '<')) {
-             $logger->info('got it from inside upgradeData.php');
              
             $groupName = 'Level23 Data Configuration';
             $catalogSetup->addAttributeGroup(Product::ENTITY, 'Default', $groupName, 16);
