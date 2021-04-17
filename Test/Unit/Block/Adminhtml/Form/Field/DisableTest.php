@@ -1,4 +1,4 @@
-<? php
+<?php
 /** * @copyright 2017 Sapient */
 namespace Sapient\Worldpay\Test\Unit\Block\Adminhtml\Form\Field;
 use \PHPUnit\Framework\TestCase;
