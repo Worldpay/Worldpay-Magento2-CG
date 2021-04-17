@@ -12,10 +12,12 @@ use Sapient\Worldpay\Logger\WorldpayLogger;
 use \PHPUnit\Framework\TestCase;
 use Sapient\Worldpay\Controller\Wallets\Success;
 
-class SuccessTest extends TestCase {
+class SuccessTest extends TestCase
+{
     
     protected $successObj;
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $context = $this->getMockBuilder(Context::class)
                         ->disableOriginalConstructor()->getMock();
         
@@ -32,5 +34,4 @@ class SuccessTest extends TestCase {
     {
         $this->assertInstanceOf(Success::class, $this->successObj);
     }
-    
 }

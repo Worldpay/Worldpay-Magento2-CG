@@ -56,28 +56,28 @@ class Auth extends \Magento\Framework\App\Action\Action
         $iframe = false;
         // Chrome 84 releted updates for 3DS
         
-        if(isset($_COOKIE['PHPSESSID'])){
-          $phpsessId = $_COOKIE['PHPSESSID'];
-          $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
-          setcookie("PHPSESSID", $phpsessId, [
-         'expires' => time() + 3600,
-         'path' => '/',
-         'domain' => $domain,
-         'secure' => true,
-         'httponly' => true,
-         'samesite' => 'None',
-          ]);
+        if (isset($_COOKIE['PHPSESSID'])) {
+            $phpsessId = $_COOKIE['PHPSESSID'];
+            $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+            setcookie("PHPSESSID", $phpsessId, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'domain' => $domain,
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'None',
+            ]);
         }
 
         //setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
         
         
         
-        if (!$threeDSecureChallengeConfig == NULL){
+        if (!$threeDSecureChallengeConfig == null) {
         
-        if ($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe') {
-            $iframe = true;
-        }
+            if ($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe') {
+                $iframe = true;
+            }
         }
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
             // Chrome 84 releted updates for 3DS

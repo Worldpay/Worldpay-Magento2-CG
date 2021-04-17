@@ -2,7 +2,7 @@
 
 namespace Sapient\Worldpay\Model\PaymentMethods;
 
-class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod 
+class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
 {
     public function updateOrderStatusForVoidSale($order)
     {

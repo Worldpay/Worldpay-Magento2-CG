@@ -23,11 +23,12 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory;
 use Magento\Framework\DataObject\Copy;
 
-class DirectServiceTest extends TestCase {
+class DirectServiceTest extends TestCase
+{
 
     /**
      *
-     * @var DirectService 
+     * @var DirectService
      */
     protected $dirctccObj;
     protected $checkoutsession;
@@ -37,7 +38,8 @@ class DirectServiceTest extends TestCase {
     protected $checkoutSession;
     protected $updateWorldPayPayment;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $this->mappingservice = $this->getMockBuilder(Service::class)
                 ->disableOriginalConstructor()
                 ->setMethods(['collectDirectOrderParameters'])
@@ -62,7 +64,7 @@ class DirectServiceTest extends TestCase {
                         ->getMock();
         $this->datahelper = $this->getMockBuilder(Data::class)
                         ->disableOriginalConstructor()->getMock();
-       $checkoutSession = $this->checkoutsession = $this->getMockBuilder(Session::class)
+        $checkoutSession = $this->checkoutsession = $this->getMockBuilder(Session::class)
                 ->disableOriginalConstructor()
                 ->getMock();
         $urlInterface = $this->getMockBuilder(UrlInterface::class)
@@ -71,11 +73,23 @@ class DirectServiceTest extends TestCase {
         $objectCopyService = $this->getMockBuilder(Copy::class)
                         ->disableOriginalConstructor()->getMock();
 
-        $this->dirctccObj = new DirectService($this->mappingservice, $this->paymentservicerequest, $wplogger, $directresponse, 
-                $updateWorldPayPayment, $paymentService, $this->registryhelper, $urlInterface,$checkoutSession, $this->datahelper , $objectCopyService);
+        $this->dirctccObj = new DirectService(
+            $this->mappingservice,
+            $this->paymentservicerequest,
+            $wplogger,
+            $directresponse,
+            $updateWorldPayPayment,
+            $paymentService,
+            $this->registryhelper,
+            $urlInterface,
+            $checkoutSession,
+            $this->datahelper,
+            $objectCopyService
+        );
     }
 
-    public function testAuthorizePayment() {
+    public function testAuthorizePayment()
+    {
 
         $payment = $this->getMockBuilder(InfoInterface::class)
                 ->disableOriginalConstructor()->setMethods(['setIsTransactionPending', 'getOrder'])
@@ -133,5 +147,4 @@ class DirectServiceTest extends TestCase {
 
         $this->assertInstanceOf(DirectService::class, $this->dirctccObj);
     }
-
 }

@@ -13,12 +13,14 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use \PHPUnit\Framework\TestCase;
 
-class ACHAccountTypesTest extends TestCase {
+class ACHAccountTypesTest extends TestCase
+{
 
     /** @var ACHAccountTypes  */
     protected $model;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $contextMock = $this->getMockBuilder(Context::class)
                         ->disableOriginalConstructor()->getMock();
         $registryMock = $this->getMockBuilder(Registry::class)
@@ -30,7 +32,8 @@ class ACHAccountTypesTest extends TestCase {
         $this->model = new ACHAccountTypes($contextMock, $registryMock, $configMock, $cacheTypeListMock);
     }
 
-    public function testToOptionArray() {
+    public function testToOptionArray()
+    {
         $expectedResult = [
             ['value' => 'Checking', 'label' => __('Checking')],
             ['value' => 'Savings', 'label' => __('Savings')],
@@ -39,5 +42,4 @@ class ACHAccountTypesTest extends TestCase {
         ];
         $this->assertEquals($expectedResult, $this->model->toOptionArray());
     }
-
 }

@@ -87,10 +87,10 @@ class SimplePlugin
         $product->addCustomOption('worldpay_subscription_plan_id', $planId);
         $startDateDisplay='';
         $displayToday = '';
-        if ($product->getWorldpayRecurringAllowStart() ) {
+        if ($product->getWorldpayRecurringAllowStart()) {
             $startDate= '';
             if ($buyRequest->getSubscriptionDate()) {
-            $startDate = ($buyRequest->getSubscriptionDate())
+                $startDate = ($buyRequest->getSubscriptionDate())
                 ? $buyRequest->getSubscriptionDate() : date('d-m-yy');
             }
             $today = date('d-m-Y');
@@ -98,7 +98,7 @@ class SimplePlugin
             $modifyTodaydate = date_create($today);
             $displayToday = date('d-m-Y', strtotime("+ 1 day"));
             
-            $startDateDisplay = $this->modifyStartDate($startDate,$modifyStartdate,$modifyTodaydate)?
+            $startDateDisplay = $this->modifyStartDate($startDate, $modifyStartdate, $modifyTodaydate)?
                     $startDate:$displayToday;
 
             $product->addCustomOption(
@@ -116,10 +116,7 @@ class SimplePlugin
                 ? $buyRequest->getSubscriptionEndDate() : date('d-m-yy');
             
             }
-            
-            
-        
-            $endDateDisplay = $this->showModifiedEndDate($startDateDisplay,$displayToday,$endDate) ? 
+            $endDateDisplay = $this->showModifiedEndDate($startDateDisplay, $displayToday, $endDate) ?
                     date('d-m-Y', strtotime("+1 year", strtotime($displayToday))) : $endDate;
             $product->addCustomOption(
                 'subscription_end_date',
@@ -307,19 +304,19 @@ class SimplePlugin
         return $product->getWorldpayRecurringEnabled() && $this->recurringHelper->getProductSubscriptionPlans($product);
     }
     
-    public function showModifiedEndDate($startDateDisplay,$displayToday,$endDate)
+    public function showModifiedEndDate($startDateDisplay, $displayToday, $endDate)
     {
         $result = false;
-        if(!empty($startDateDisplay)) {
-           if ($startDateDisplay === $displayToday && ($endDate<=$displayToday || empty($endDate))) {
-               $result = true;
-           }
+        if (!empty($startDateDisplay)) {
+            if ($startDateDisplay === $displayToday && ($endDate<=$displayToday || empty($endDate))) {
+                $result = true;
+            }
         }
         
         return $result;
     }
     
-    public function modifyStartDate ($startDate,$modifyStartdate,$modifyTodaydate)
+    public function modifyStartDate($startDate, $modifyStartdate, $modifyTodaydate)
     {
         $result = false;
         if (!empty($startDate) && $modifyStartdate>=$modifyTodaydate) {

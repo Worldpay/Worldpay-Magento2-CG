@@ -81,6 +81,22 @@
                     </select>
                 </div>
                 
+                <div class="field type required klarna-block" data-bind="visible: false">
+                    <select name="klarna_types" class="select select-ccytpe" id="klarna_types"
+                        data-bind="
+                            attr: {'data-validate': JSON.stringify({required:true})},
+                            options: availableKlarnaTypes(),
+                            optionsText: 'klarnaCode',
+                            value: selectedKlarnaType,
+                            optionsValue: 'klarnaLabel',
+                            optionsCaption: 'Select Your Payment Method'">
+                    </select> 
+                    <div id="klarna-msg" data-bind="visible: isKlarnaPayLater()">
+                        <div><small><strong>US/UK - </strong>You need to make the payment within 30 days for the selected billing country.</small></div>
+                        <div><small><strong>ALL Other Eurpoe - </strong>You need to make the payment within 14 days for the selected billing country.</small></div>
+                    </div>
+                </div>
+
                 <div class="control field type required ach-block" data-bind="visible: false">
                     <label data-bind="attr: {for: getCode() + '_ach_account_type'}" class="label">
                         <span><!-- ko i18n: getCheckoutLabels('CO15')--><!-- /ko --></span> 

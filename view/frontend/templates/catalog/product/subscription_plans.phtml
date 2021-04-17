@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright Â© 2020 Worldpay, LLC. All rights reserved.
+ * Copyright © 2020 Worldpay, LLC. All rights reserved.
  * See LICENSE.txt for license details.
  */
 
@@ -41,7 +41,7 @@
             <span><?php echo $block->getStartDateLabel() ?></span>
         </legend>
         <div class="field-control ">
-            <input class="control-text" style="width: calc(50% - 33px);" name="subscription_date" 
+            <input class="control-text" style="width: calc(50% - 33px);" name="subscription_date"
                    id="subscription_date" type="text" readonly="true" value="<?php echo $block->getStartDate();?>">
             <?php //echo $block->getDateHtml() ?>
         </div>
@@ -72,26 +72,36 @@
     {
         if(jQuery('#worldpay-add-plan').is(":checked")){
             jQuery('#instant-purchase').hide();
+            jQuery('#product-updatecart-button').hide();
         }
         else{
             jQuery('#instant-purchase').show();
+            jQuery('#product-updatecart-button').show();
         }
     }
-    
+
     function valueRadioChanged()
     {
-        if(jQuery('#subscription_date').val()) {
-            document.getElementById('subscription_date').value = '';
-        }
-        if(jQuery('#subscription_end_date').val()) {
-           document.getElementById('subscription_end_date').value = ''; 
-        }
+      if(jQuery('#subscription_date').val()) {
+          document.getElementById('subscription_date').value = '';
+            jQuery('#product-updatecart-button').show();
+      } else{
+            jQuery('#product-updatecart-button').show();
+      }
+      if(jQuery('#subscription_end_date').val()) {
+         document.getElementById('subscription_end_date').value = '';
+         jQuery('#product-updatecart-button').show();
+      } else {
+         jQuery('#product-updatecart-button').show();
+      }
     }
-       
+
     require([
     "jquery",
     "mage/calendar"
     ], function($){
+        var formDate = $("#subscription_date").val();
+        var toDate = $('#subscription_end_date').val();
         var dateFormat= "d-m-yy", from = $("#subscription_date")
          .datepicker({
          minDate: new Date(),
@@ -105,17 +115,18 @@
          to = $("#subscription_end_date").datepicker({
          changeMonth: true,
          numberOfMonths: 1,
-         dateFormat: "d-m-yy"
+         dateFormat: "d-m-yy",
+         minDate: formDate,
          })
          .on( "change", function() {
          from.datepicker( "option", "maxDate", getDate(this));
          });
-
+         
          function getDate(element) {
          var date;
          try {
             date = $.datepicker.parseDate( dateFormat, element.value );
-           if(document.getElementById('worldpay_subscription_plan_weekly')!==null 
+           if(document.getElementById('worldpay_subscription_plan_weekly')!==null
                     && document.getElementById('worldpay_subscription_plan_weekly').checked) {
                 date.setDate(date.getDate() + 7);
             } else if(document.getElementById('worldpay_subscription_plan_monthly')!==null
@@ -137,7 +148,9 @@
 
          return date;
          }
+         
+         $("#subscription_date")
+         .datepicker().change();
       });
-    
-</script>
 
+</script>

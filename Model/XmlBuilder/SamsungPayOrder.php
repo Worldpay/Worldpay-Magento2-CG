@@ -53,9 +53,7 @@ EOD;
         $this->amount = $amount;
         $this->paymentType = $paymentType;
         $this->shopperEmail = $shopperEmail;
-       
         $this->data = $data;
-
         $this->exponent = $exponent;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -63,9 +61,6 @@ EOD;
 
         $submit = $this->_addSubmitElement($xml);
         $this->_addOrderElement($submit);
-        
-       
-
         return $xml;
     }
 
@@ -131,14 +126,9 @@ EOD;
     private function _addPaymentDetailsElement($order)
     {
         $paymentDetails = $order->addChild('paymentDetails');
-
         $paymentType = $paymentDetails->addChild($this->paymentType);
-        
         $paymentThreeDS = $paymentType->addChild('ThreeDS');
-        
-       
         $paymentThreeDS->addChild('data', $this->data);
-        
         $paymentThreeDS->addChild('version', 100);
     }
 

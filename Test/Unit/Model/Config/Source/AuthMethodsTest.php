@@ -13,12 +13,14 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Cache\TypeListInterface;
 use \PHPUnit\Framework\TestCase;
 
-class AuthMethodsTest extends TestCase {
+class AuthMethodsTest extends TestCase
+{
 
     /** @var AuthMethods  */
     protected $model;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $contextMock = $this->getMockBuilder(Context::class)
                         ->disableOriginalConstructor()->getMock();
         $registryMock = $this->getMockBuilder(Registry::class)
@@ -30,12 +32,12 @@ class AuthMethodsTest extends TestCase {
         $this->model = new AuthMethods($contextMock, $registryMock, $configMock, $cacheTypeListMock);
     }
 
-    public function testToOptionArray() {
+    public function testToOptionArray()
+    {
         $expectedResult = [
             ['value' => 'PAN_ONLY', 'label' => __('Pan Only')],
             ['value' => 'CRYPTOGRAM_3DS', 'label' => __('Cryptogram 3ds')]
         ];
         $this->assertEquals($expectedResult, $this->model->toOptionArray());
     }
-
 }

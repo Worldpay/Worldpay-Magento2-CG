@@ -10,4 +10,8 @@
         <attribute name="worldpay_recurring_enabled"/>
         <attribute name="worldpay_recurring_allow_start"/>
     </group>
+    <group name="level23_data">
+        <attribute name="commodity_code"/>
+        <attribute name="unit_of_measure"/>
+    </group>
 </config>

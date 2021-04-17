@@ -12,11 +12,13 @@ use Magento\Sales\Model\Order;
 use \PHPUnit\Framework\TestCase;
 use Sapient\Worldpay\Controller\Redirectresult\Redirect;
 
-class RedirectTest extends TestCase {
+class RedirectTest extends TestCase
+{
 
     protected $redirectObj;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $context = $this->getMockBuilder(Context::class)
                         ->disableOriginalConstructor()->getMock();
         $page = $this->getMockBuilder(PageFactory::class)
@@ -29,8 +31,8 @@ class RedirectTest extends TestCase {
         $this->redirectObj = new Redirect($context, $page, $checkoutsession, $mageOrder);
     }
 
-    public function testExecute() {
+    public function testExecute()
+    {
         $this->assertInstanceOf(Redirect::class, $this->redirectObj);
     }
-
 }

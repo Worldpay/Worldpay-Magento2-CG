@@ -19,11 +19,12 @@ use Magento\Framework\UrlInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 
-class HostedPaymentPageServiceTest extends TestCase {
+class HostedPaymentPageServiceTest extends TestCase
+{
 
     /**
      *
-     * @var HostedPaymentPageService 
+     * @var HostedPaymentPageService
      */
     protected $hppObj;
     protected $checkoutsession;
@@ -31,7 +32,8 @@ class HostedPaymentPageServiceTest extends TestCase {
     protected $paymentservicerequest;
     protected $registryhelper;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $this->mappingservice = $this->getMockBuilder(Service::class)
                 ->disableOriginalConstructor()
                 ->setMethods(['collectRedirectOrderParameters'])
@@ -55,10 +57,20 @@ class HostedPaymentPageServiceTest extends TestCase {
         $urlInterface = $this->getMockBuilder(UrlInterface::class)
                         ->disableOriginalConstructor()->getMock();
 
-        $this->hppObj = new HostedPaymentPageService($this->mappingservice, $this->paymentservicerequest, $wplogger, $redirectresponse, $this->registryhelper, $hppstate, $this->checkoutsession, $urlInterface);
+        $this->hppObj = new HostedPaymentPageService(
+            $this->mappingservice,
+            $this->paymentservicerequest,
+            $wplogger,
+            $redirectresponse,
+            $this->registryhelper,
+            $hppstate,
+            $this->checkoutsession,
+            $urlInterface
+        );
     }
 
-    public function testAuthorizePayment() {
+    public function testAuthorizePayment()
+    {
 
         $payment = $this->getMockBuilder(InfoInterface::class)
                 ->disableOriginalConstructor()->setMethods(['setIsTransactionPending', 'getOrder'])
@@ -135,5 +147,4 @@ class HostedPaymentPageServiceTest extends TestCase {
 
         $this->assertInstanceOf(HostedPaymentPageService::class, $this->hppObj);
     }
-
 }
