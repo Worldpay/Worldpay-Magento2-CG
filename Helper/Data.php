@@ -33,8 +33,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         \Sapient\Worldpay\Model\SavedTokenFactory $savecard,
         \Sapient\Worldpay\Helper\Currencyexponents $currencyexponents,
-        SerializerInterface $serializer,
-        \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries
+        SerializerInterface $serializer
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->wplogger = $wplogger;
@@ -50,7 +49,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_savecard = $savecard;
         $this->currencyexponents = $currencyexponents;
         $this->serializer = $serializer;
-        $this->klarnaCountries = $klarnaCountries;
     }
 
     public function isWorldPayEnable()
@@ -1209,101 +1207,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
-    
-    public function isKlarnaEnabled()
-    {
-        return (bool) $this->_scopeConfig->getValue(
-            'worldpay/klarna_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-    }
-
-    public function getKlarnaSliceitType()
-    {
-        $isKlarnaEnabled = $this->isKlarnaEnabled();
-        if ($isKlarnaEnabled) {
-            return $this->_scopeConfig->getValue(
-                'worldpay/klarna_config/sliceit_config/klarna_sliceit',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-            );
-        }
-    }
-
-    public function getKlarnaSliceitContries()
-    {
-        $isKlarnaEnabled = $this->isKlarnaEnabled();
-        if ($isKlarnaEnabled && $this->getKlarnaSliceitType() !== null) {
-            $sliceitContries = $this->_scopeConfig->getValue(
-                'worldpay/klarna_config/sliceit_config/sliceit_contries',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-            );
-            if (strlen($sliceitContries) > 0) {
-                return $sliceitContries;
-            }
-        }
-    }
-
-    public function getKlarnaPayLaterType()
-    {
-        $isKlarnaEnabled = $this->isKlarnaEnabled();
-        if ($isKlarnaEnabled) {
-            return $this->_scopeConfig->getValue(
-                'worldpay/klarna_config/paylater_config/klarna_paylater',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-            );
-        }
-    }
-
-    public function getKlarnaPayLaterContries()
-    {
-        $isKlarnaEnabled = $this->isKlarnaEnabled();
-        if ($isKlarnaEnabled && $this->getKlarnaPayLaterType() !== null) {
-            $payLaterContries = $this->_scopeConfig->getValue(
-                'worldpay/klarna_config/paylater_config/paylater_contries',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-            );
-            if (strlen($payLaterContries) > 0) {
-                return $payLaterContries;
-            }
-        }
-    }
-
-    public function getKlarnaPayNowType()
-    {
-        $isKlarnaEnabled = $this->isKlarnaEnabled();
-        if ($isKlarnaEnabled) {
-            return $this->_scopeConfig->getValue(
-                'worldpay/klarna_config/paynow_config/klarna_paynow',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-            );
-        }
-    }
-
-    public function getKlarnaPayNowContries()
-    {
-        $isKlarnaEnabled = $this->isKlarnaEnabled();
-        if ($isKlarnaEnabled && $this->getKlarnaPayNowType() !== null) {
-            $paynowContries = $this->_scopeConfig->getValue(
-                'worldpay/klarna_config/paynow_config/paynow_contries',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-            );
-
-            if (strlen($paynowContries) > 0) {
-                return $paynowContries;
-            }
-        }
-    }
-    
-    public function getKlarnaSubscriptionDays($countryCode)
-    {
-        if ($countryCode) {
-            $subscription_detail = $this->klarnaCountries->getConfigValue($countryCode);
-
-            $subscriptionDays = $subscription_detail ? $subscription_detail['subscription_days'] : '';
-            if (!empty($subscriptionDays)) {
-                return $subscriptionDays;
-            }
-        }
-    }
+  
 }
 
