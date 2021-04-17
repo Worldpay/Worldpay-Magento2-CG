@@ -1498,13 +1498,8 @@ class UpgradeData implements UpgradeDataInterface
             $configModel->save();
         }
         
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/worldpay.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-        $logger->info('got it from upgradeData.php');
-        $logger->info(print_r($context->getVersion(), true));
         
-        if (version_compare($context->getVersion(), '1.4.1', '<')) {
+        if (version_compare($context->getVersion(), '1.4.3', '<')) {
              $logger->info('got it from inside upgradeData.php');
              
             $groupName = 'Level23 Data Configuration';
