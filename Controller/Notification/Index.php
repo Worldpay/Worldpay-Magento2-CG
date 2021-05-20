@@ -36,7 +36,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
-     * @param \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod $abstractMethod
+     * @param \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod
      * @param \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
      */
     public function __construct(
@@ -46,7 +46,7 @@ class Index extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
-        \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod $abstractMethod,
+        \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod,
         \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
     ) {
         parent::__construct($context);
