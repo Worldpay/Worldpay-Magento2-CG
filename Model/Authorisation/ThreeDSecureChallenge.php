@@ -205,6 +205,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
                 );
             }
         } else {
+            $this->orderservice->redirectOrderSuccess();
             $this->orderservice->removeAuthorisedOrder();
             $this->_handleAuthoriseSuccess();
             $this->_updateTokenData($this->response->getXml());
