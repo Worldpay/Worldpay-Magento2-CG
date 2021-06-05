@@ -44,7 +44,7 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         $this->orderSender = $orderSender;
         $this->threedsredirectresponse = $threedsredirectresponse;
         $this->urlBuilders    = $urlBuilder;
-		$this->resultRedirectFactory = $resultRedirectFactory;
+	$this->resultRedirectFactory = $resultRedirectFactory;
         $this->helper = $helper;
         parent::__construct($context);
     }
@@ -55,17 +55,42 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+	$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/3ds.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+	$logger->info('Before $directOrderParams - AuthResponse.php');
+        
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
+        
+	$logger->info('After $directOrderParams - AuthResponse.php --'.print_r($directOrderParams['orderCode'],true));
+	$logger->info('Before $threeDSecureParams - AuthResponse.php--'.print_r($directOrderParams['orderCode'],true));
+        
         $threeDSecureParams = $this->checkoutSession->get3DSecureParams();
+        
+	$logger->info('After $threeDSecureParams--'.print_r($directOrderParams['orderCode'],true));
+	$logger->info('Before unsDirectOrderParams() - AuthResponse.php--'.print_r($directOrderParams['orderCode'],true));
+        
         $this->checkoutSession->unsDirectOrderParams();
+	$logger->info('After unsDirectOrderParams() - AuthResponse.php--'.print_r($directOrderParams['orderCode'],true));
+	$logger->info('Before uns3DSecureParams() - AuthResponse.php--'.print_r($directOrderParams['orderCode'],true));
+        
         $this->checkoutSession->uns3DSecureParams();
+        
+	$logger->info('After uns3DSecureParams() - AuthResponse.php--'.print_r($directOrderParams['orderCode'],true));
         try {
+            $logger->info('Step2 - Logging the action before forming the PARes--'.print_r($directOrderParams['orderCode'],true));
+            $logger->info('Pay response --'.print_r($this->getRequest()->getParam('PaRes'),true));
+            $logger->info('Direct order code --'.print_r($directOrderParams['orderCode'],true));
+	    
             $this->threedsredirectresponse->continuePost3dSecureAuthorizationProcess(
                 $this->getRequest()->getParam('PaRes'),
                 $directOrderParams,
                 $threeDSecureParams
             );
         } catch (\Exception $e) {
+            $logger->info('Before $this->wplogger->error($e->getMessage()) - AuthResponse.php--'.print_r($directOrderParams['orderCode'],true));
+            $logger->info($e->getMessage() . ' - AuthResponse.php');
+	    
             $this->wplogger->error($e->getMessage());
             $this->wplogger->error('3DS Failed');
             $this->messageManager->addError(__($this->helper->getConfigValue('CCAM9')));

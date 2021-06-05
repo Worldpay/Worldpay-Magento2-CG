@@ -48,13 +48,31 @@ class Auth extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/3ds.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('Step1 - Log before receiving PAReq from Worldpay');
+	$logger->info('Before $threeDSecureChallengeParams - Auth.php');
+        
         $threeDSecureChallengeParams = $this->checkoutSession->get3Ds2Params();
+        
+	$logger->info('After $threeDSecureChallengeParams - Auth.php');
+        
+	$logger->info('Before $threeDSecureChallengeConfig - Auth.php');
         
         $threeDSecureChallengeConfig = $this->checkoutSession->get3DS2Config();
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
+        
+	$logger->info('After $threeDSecureChallengeConfig - Auth.php');
+	$logger->info('Before $orderId - Auth.php');
+        
         $orderId = $this->checkoutSession->getAuthOrderId();
+        
+	$logger->info('After $orderId - Auth.php--'.print_r($orderId,true));
+        
         $iframe = false;
         // Chrome 84 releted updates for 3DS
+        $logger->info('Before Cookie set - Auth.php --'.print_r($orderId,true));
         
         if(isset($_COOKIE['PHPSESSID'])){
           $phpsessId = $_COOKIE['PHPSESSID'];
@@ -68,7 +86,7 @@ class Auth extends \Magento\Framework\App\Action\Action
          'samesite' => 'None',
           ]);
         }
-
+	$logger->info('After Cookie set - Auth.php--'.print_r($orderId,true));
         //setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
         
         
@@ -83,6 +101,8 @@ class Auth extends \Magento\Framework\App\Action\Action
             // Chrome 84 releted updates for 3DS
 //            $phpsessId = $_COOKIE['PHPSESSID'];
 //          setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
+	$logger->info('3DS parameters--'.print_r($redirectData->getData(),true));
+        
             $responseUrl = $this->_url->getUrl('worldpay/threedsecure/authresponse', ['_secure' => true]);
             print_r('
                 <form name="theForm" id="form" method="POST" action=' . $redirectData->getUrl() . '>
@@ -192,8 +212,16 @@ class Auth extends \Magento\Framework\App\Action\Action
                         } 
                     </script>');
 
+                $logger->info('Before $this->checkoutSession->uns3DS2Params() - Auth.php --'.print_r($orderId,true));
+                
                 $this->checkoutSession->uns3DS2Params();
+                
+		$logger->info('After $this->checkoutSession->uns3DS2Params() - Auth.php--'.print_r($orderId,true));
+		$logger->info('Before $this->checkoutSession->uns3DS2Config() - Auth.php--'.print_r($orderId,true));
+                
                 $this->checkoutSession->uns3DS2Config();
+                
+		$logger->info('After $this->checkoutSession->uns3DS2Config() - Auth.php--'.print_r($orderId,true));
             }
         } elseif ($this->checkoutSession->getIavCall()) {
             $this->checkoutSession->unsIavCall();
