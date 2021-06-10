@@ -78,7 +78,7 @@ class Auth extends \Magento\Framework\App\Action\Action
           $phpsessId = $_COOKIE['PHPSESSID'];
           $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
           setcookie("PHPSESSID", $phpsessId, [
-         'expires' => time() + 3600,
+         'expires' => time() + 86400,
          'path' => '/',
          'domain' => $domain,
          'secure' => true,
@@ -102,6 +102,8 @@ class Auth extends \Magento\Framework\App\Action\Action
 //            $phpsessId = $_COOKIE['PHPSESSID'];
 //          setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
 	$logger->info('3DS parameters--'.print_r($redirectData->getData(),true));
+	$logger->info('Print Cookie info--Auth.php ');
+        $logger->info(print_r($_COOKIE['PHPSESSID'],true));
         
             $responseUrl = $this->_url->getUrl('worldpay/threedsecure/authresponse', ['_secure' => true]);
             print_r('

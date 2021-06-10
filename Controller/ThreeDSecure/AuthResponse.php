@@ -58,6 +58,27 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
 	$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/3ds.log');
         $logger = new \Zend\Log\Logger();
         $logger->addWriter($writer);
+	
+	$logger->info('Step 1.5 -entered AuthResponse.php');
+        $logger->info('cookie value before isset -in AuthResponse.php ');
+        $logger->info(print_r($_COOKIE['PHPSESSID'],true));
+
+         if(isset($_COOKIE['PHPSESSID'])){
+          $phpsessId = $_COOKIE['PHPSESSID'];
+          $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+          setcookie("PHPSESSID", $phpsessId, [
+         'expires' => time() + 86400,
+         'path' => '/',
+         'domain' => $domain,
+         'secure' => true,
+         'httponly' => true,
+         'samesite' => 'None',
+          ]);
+        }
+
+      $logger->info('cookie value after isset -in AuthResponse.php ');
+      $logger->info(print_r($_COOKIE['PHPSESSID'],true));
+	
 	$logger->info('Before $directOrderParams - AuthResponse.php');
         
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
