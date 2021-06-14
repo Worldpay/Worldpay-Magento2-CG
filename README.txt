@@ -13,3 +13,4 @@ This version is compatible with Magento 2.4.2 with following key features:
 12. Intelligent Account Verification
 13. Multi store and multi merchant support
 14. US and Canada domestic acquiring - Issure Insights, Prime Routing, ACH Pay and Level 2/3 Data
+15. Klarna PayNow, PayLater and SLICEIT
