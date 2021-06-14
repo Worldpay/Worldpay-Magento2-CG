@@ -210,7 +210,6 @@ class PaymentMethods
      */
     public function checkCaptureRequest($type, $method)
     {
-
         if ($xml = $this->_readXML()) {
             $node = $xml->xpath(self::PAYMENT_METHOD_PATH . $type . self::TYPE_PATH . $method);
             if ($node) {

@@ -29,7 +29,7 @@ EOD;
      * @param float $amount
      * @return SimpleXMLElement $xml
      */
-    public function build($merchantCode, $orderCode, $currencyCode, $amount, $exponent, $paymentType = null, $order, $captureType)
+    public function build($merchantCode, $orderCode, $currencyCode, $amount, $exponent, $paymentType = null, $order, $captureType, $invoicedItems = null)
     {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -38,6 +38,7 @@ EOD;
         $this->exponent = $exponent;
         $this->order = $order;
         $this->captureType = $captureType;
+        $this->invoicedItems = $invoicedItems;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -60,13 +61,13 @@ EOD;
         if ($level23DataEnabled
            && ($paymentType === 'ECMC-SSL' || $paymentType === 'VISA-SSL')
            && ($countryCode === 'US' || $countryCode === 'CA')) {
-            
             $this->_addBranchSpecificExtension($order, $capture);
         }
         
-   
-        if (!empty($paymentType) && $paymentType == "KLARNA-SSL") {
-            $this->_addShippingElement($capture);
+        if (!empty($paymentType) && strpos($paymentType, "KLARNA") !== false
+            && is_array($this->invoicedItems) && !empty($this->invoicedItems['trackingId'])) {
+            $this->_addShippingElement($capture, $order, $this->invoicedItems);
+            $this->_addKlarnaOrderLineItemElement($order, $capture, $this->invoicedItems);
         }
 
         return $xml;
@@ -170,12 +171,12 @@ EOD;
      *
      * Descrition : Adding additional shipping tag for Klarna
      */
-    private function _addShippingElement($capture)
+    private function _addShippingElement($capture, $order, $invoicedItems)
     {
         // data
         $shippingElement = $capture->addChild('shipping');
         $shippingInfoElement = $shippingElement->addChild('shippingInfo');
-        $shippingInfoElement['trackingId'] = "";
+        $shippingInfoElement['trackingId'] = $invoicedItems['trackingId'];
     }
     
      /**
@@ -184,9 +185,7 @@ EOD;
       * @param SimpleXMLElement $order
       */
     private function _addBranchSpecificExtension($order, $capture)
-    {
-        
-   
+    { 
        // $this->paymentDetails['salesTax'] = 2022;
         //$order_details = $this->cusDetails['order_details'];
         $branchSpecificExtension = $capture->addChild('branchSpecificExtension');
@@ -207,9 +206,6 @@ EOD;
         $dutyAmount = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
                         ->getValue('worldpay/level23_config/duty_amount', $storeScope);
         
-        
-       
-               
          $taxAmount = $order->getTaxAmount();
          $taxAmountNew = abs($taxAmount);
          
@@ -251,11 +247,11 @@ EOD;
         //$purchase->addChild('shipFromPostalCode', '');
         $purchase->addChild('destinationPostalCode', $billingpostcode);
         
-        $countryCode = $order->getShippingAddress()->getCountryId();
-                
-               
-        $purchase->addChild('destinationCountryCode', $countryCode);
-        
+        if (!is_null($order->getShippingAddress())) {
+            $countryCode = $order->getShippingAddress()->getCountryId();
+            $purchase->addChild('destinationCountryCode', $countryCode);
+        }
+
         $orderDate = $purchase->addChild('orderDate');
         $dateElement = $orderDate->addChild('date');
         $today = new \DateTime();
@@ -347,6 +343,103 @@ EOD;
         if ($taxAmount) {
             $taxAmountElement = $item->addChild('taxAmount');
             $this->_addAmountElement($taxAmountElement, $this->currencyCode, $this->exponent, $taxAmount);
+        }
+    }
+    
+    private function _addKlarnaOrderLineItemElement($order, $capture, $invoicedItems)
+    {
+        $orderLinesElement = $capture->addChild('orderLines');
+        
+        //orderTaxAmount
+        $orderTaxAmountElement = $orderLinesElement->addChild('orderTaxAmount');
+        $this->_addCDATA($orderTaxAmountElement, $this->_amountAsInt($order->getTaxAmount()));
+        
+        //terms url
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $store = $objectManager->get('\Magento\Store\Model\StoreManagerInterface')->getStore();
+        $termsURLElement = $orderLinesElement->addChild('termsURL');
+        $this->_addCDATA($termsURLElement, $store->getBaseUrl());
+        
+        foreach ($invoicedItems['invoicedItems'] as $lineitem) {
+            $rowtotal = $lineitem['row_total'];
+            $unitTaxAmount = $this->truncate_number($lineitem['tax_amount'] / $lineitem['qty_ordered']);
+            $totaltax = ($unitTaxAmount * $lineitem['qty_invoiced']) + $lineitem['weee_tax_applied_row_amount'];
+            $unitPrice = $rowtotal / $lineitem['qty_ordered'];
+            $unitDiscountAmount = $this->truncate_number($lineitem['discount_amount'] / $lineitem['qty_ordered']);
+            $totalamount = ($unitPrice * $lineitem['qty_invoiced']) - ($unitDiscountAmount * $lineitem['qty_invoiced']);
+            
+            $this->_addKlarnaLineItemElement(
+                $orderLinesElement,
+                $lineitem['product_id'],                            //reference
+                $lineitem['name'],                                  //name
+                $lineitem['product_type'],                          //productType
+                $lineitem['qty_invoiced'],                          //quantity
+                'product',                                          //quantityUnit
+                $unitPrice,                                         //unitPrice
+                $totaltax,                                          //taxRate
+                $totalamount + $totaltax,                           //totalAmount
+                $totaltax,                                          //totalTaxAmount
+                $unitDiscountAmount * $lineitem['qty_invoiced']     //totalDiscountAmount
+            );
+        }
+    }
+    
+    private function truncate_number($number){
+        return (floor($number * pow(10, 2)))/100;
+    }
+
+
+    private function _addKlarnaLineItemElement(
+        $parentElement,
+        $reference,
+        $name,
+        $productType,
+        $quantity,
+        $quantityUnit,
+        $unitPrice,
+        $taxRate,
+        $totalAmount,
+        $totalTaxAmount,
+        $totalDiscountAmount = 0
+    ) {
+        $unitPrice = sprintf('%0.2f', $unitPrice);
+        $lineitem = $parentElement->addChild('lineItem');
+        
+        if($productType === 'shipping'){
+            $lineitem->addChild('shippingFee');
+        }elseif($productType === 'downloadable' || $productType === 'virtual' || $productType === 'giftcard'){
+            $lineitem->addChild('digital');
+        }else{
+            $lineitem->addChild('physical');
+        }
+        
+        $referenceElement = $lineitem->addChild('reference');
+        $this->_addCDATA($referenceElement, $reference);
+
+        $nameElement = $lineitem->addChild('name');
+        $this->_addCDATA($nameElement, $name);
+
+        $quantityElement = $lineitem->addChild('quantity');
+        $this->_addCDATA($quantityElement, $quantity);
+        
+        $quantityUnitElement = $lineitem->addChild('quantityUnit');
+        $this->_addCDATA($quantityUnitElement, $quantityUnit);
+        
+        $unitPriceElement = $lineitem->addChild('unitPrice');
+        $this->_addCDATA($unitPriceElement, $this->_amountAsInt($unitPrice));
+        
+        $taxRateElement = $lineitem->addChild('taxRate');
+        $this->_addCDATA($taxRateElement, $this->_amountAsInt($taxRate));
+
+        $totalAmountElement = $lineitem->addChild('totalAmount');
+        $this->_addCDATA($totalAmountElement, $this->_amountAsInt($totalAmount));
+
+        $totalTaxAmountElement = $lineitem->addChild('totalTaxAmount');
+        $this->_addCDATA($totalTaxAmountElement, $this->_amountAsInt($totalTaxAmount));
+
+        if ($totalDiscountAmount > 0) {
+            $totalDiscountAmountElement = $lineitem->addChild('totalDiscountAmount');
+            $this->_addCDATA($totalDiscountAmountElement, $this->_amountAsInt($totalDiscountAmount));
         }
     }
     
