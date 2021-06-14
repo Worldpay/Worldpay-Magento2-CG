@@ -111,6 +111,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
         \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentutils,
         \Sapient\Worldpay\Model\Payment\PaymentTypes $paymenttypes,
+        \Magento\Framework\App\RequestInterface $request,
         \Magento\Backend\Model\Auth\Session $authSession,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
@@ -150,6 +151,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->motoredirectservice = $motoredirectservice;
         $this->paymenttypes = $paymenttypes;
         $this->registry = $registry;
+        $this->_request = $request;
     }
     public function initialize($paymentAction, $stateObject)
     {
@@ -389,15 +391,22 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             $orderId = $mageOrder->getIncrementId();
         }
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($orderId);
-              
-        $paymenttype = $worldPayPayment->getPaymentType();
+        $captureArray = '';
+        //added Klarna check
+        if(strpos($worldPayPayment->getPaymentType(), "KLARNA") !== false ){
+            $paymenttype = "KLARNA-SSL";
+            $captureArray = $this->_request->getParams();
+        }else{
+            $paymenttype = $worldPayPayment->getPaymentType();
+        }
         if ($this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype)) {
             //total amount from invoice and order should not be same for partial capture
             if (floatval($amount) !=floatval($payment->getOrder()->getGrandTotal()) && $partialCapture) {  
                 $this->paymentservicerequest->partialCapture(
                     $payment->getOrder(),
                     $worldPayPayment,
-                    $amount
+                    $amount,
+                    $captureArray
                 );
             }
             if(floatval($amount) == floatval($payment->getOrder()->getGrandTotal())){
@@ -405,7 +414,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             $this->paymentservicerequest->capture(
                 $payment->getOrder(),
                 $worldPayPayment,
-                $payment->getMethod()
+                $payment->getMethod(),
+                $captureArray
             );
         }
 

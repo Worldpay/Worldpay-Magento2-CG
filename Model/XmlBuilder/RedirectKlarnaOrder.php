@@ -113,7 +113,6 @@ EOD;
                 $order['hideContact'] = 'false';
             }
         }
-
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
         $this->_addOrderContentElement($order);
@@ -140,8 +139,8 @@ EOD;
         $amountElement = $order->addChild('amount');
         $amountElement['currencyCode'] = $this->currencyCode;
         $amountElement['exponent'] = $this->exponent;
-        //$amountElement['value'] = $this->_amountAsInt($this->amount);
-        $amountElement['value'] = $this->_amountAsInt($this->_roundOfTotal($order));
+        $amountElement['value'] = $this->_amountAsInt($this->amount);
+        //$amountElement['value'] = $this->_amountAsInt($this->_roundOfTotal($order));
     }
     
     private function _addOrderContentElement($order)
@@ -278,6 +277,12 @@ EOD;
 
     private function _addOrderLineItemElement($order)
     {
+        $diffAmt = 0;
+        $totalAmount = 0;
+        if ($this->amount < $this->_roundOfTotal($order)) {
+            $diffAmt = $this->_roundOfTotal($order) - $this->amount;
+        }
+
         $orderLinesElement = $order->addChild('orderLines');
 
         $orderlineitems = $this->orderlineitems;
@@ -285,20 +290,29 @@ EOD;
         $orderTaxAmountElement = $orderLinesElement->addChild('orderTaxAmount');
         $this->_addCDATA($orderTaxAmountElement, $this->_amountAsInt($orderlineitems['orderTaxAmount']));
 
-         $termsURLElement = $orderLinesElement->addChild('termsURL');
+        $termsURLElement = $orderLinesElement->addChild('termsURL');
         $this->_addCDATA($termsURLElement, $orderlineitems['termsURL']);
 
         foreach ($orderlineitems['lineItem'] as $lineitem) {
+            
             $totaldiscountamount = (isset($lineitem['totalDiscountAmount'])) ? $lineitem['totalDiscountAmount'] : 0;
+            if($lineitem['productType'] === 'bundle' && $diffAmt > 0){
+                $totaldiscountamount = $diffAmt;
+                $totalAmount = $lineitem['totalAmount'] - $diffAmt;
+            }else{
+                $totalAmount = 0;
+            }
+            
             $this->_addLineItemElement(
                 $orderLinesElement,
                 $lineitem['reference'],
                 $lineitem['name'],
+                $lineitem['productType'],
                 $lineitem['quantity'],
                 $lineitem['quantityUnit'],
                 $lineitem['unitPrice'],
                 $lineitem['taxRate'],
-                $lineitem['totalAmount'],
+                ($totalAmount > 0 ? $totalAmount : $lineitem['totalAmount']),
                 $lineitem['totalTaxAmount'],
                 $totaldiscountamount
             );
@@ -309,6 +323,7 @@ EOD;
         $parentElement,
         $reference,
         $name,
+        $productType,
         $quantity,
         $quantityUnit,
         $unitPrice,
@@ -321,8 +336,17 @@ EOD;
 
         $lineitem = $parentElement->addChild('lineItem');
 
-        $lineitem->addChild('physical');
-
+        if($productType === 'shipping'){
+            $lineitem->addChild('shippingFee');
+        }elseif($productType === 'downloadable' || $productType === 'virtual' || $productType === 'giftcard'){
+            $lineitem->addChild('digital');
+        }elseif($productType === 'Store Credit'){
+            $lineitem->addChild('storeCredit');
+        }elseif($productType === 'Gift Card'){
+            $lineitem->addChild('giftCard');
+        }else{
+            $lineitem->addChild('physical');
+        }
         $referenceElement = $lineitem->addChild('reference');
         $this->_addCDATA($referenceElement, $reference);
 

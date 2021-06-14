@@ -28,11 +28,13 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Request $request,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
+        \Sapient\Worldpay\Helper\GeneralException $exceptionHelper,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService
     ) {
         $this->_wplogger = $wplogger;
         $this->_request = $request;
         $this->worldpayhelper = $worldpayhelper;
+        $this->exceptionHelper = $exceptionHelper;
         $this->_invoiceService = $invoiceService;
     }
 
@@ -353,39 +355,51 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      */
     public function redirectKlarnaOrder($redirectOrderParams)
     {
-        $loggerMsg = '########## Submitting klarna redirect order request. OrderCode: ';
-        $this->_wplogger->info($loggerMsg . $redirectOrderParams['orderCode'] . ' ##########');
-        if (empty($redirectOrderParams['statementNarrative'])) {
-            $redirectOrderParams['statementNarrative']='';
-        }
-        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectKlarnaOrder();
-        $redirectSimpleXml = $this->xmlredirectorder->build(
-            $redirectOrderParams['merchantCode'],
-            $redirectOrderParams['orderCode'],
-            $redirectOrderParams['orderDescription'],
-            $redirectOrderParams['currencyCode'],
-            $redirectOrderParams['amount'],
-            $redirectOrderParams['paymentType'],
-            $redirectOrderParams['shopperEmail'],
-            $redirectOrderParams['statementNarrative'],
-            $redirectOrderParams['acceptHeader'],
-            $redirectOrderParams['userAgentHeader'],
-            $redirectOrderParams['shippingAddress'],
-            $redirectOrderParams['billingAddress'],
-            $redirectOrderParams['paymentPagesEnabled'],
-            $redirectOrderParams['installationId'],
-            $redirectOrderParams['hideAddress'],
-            $redirectOrderParams['orderLineItems'],
-            $redirectOrderParams['exponent'],
-            $redirectOrderParams['sessionData'],
-            $redirectOrderParams['orderContent']
-        );
+        try{
+            $loggerMsg = '########## Submitting klarna redirect order request. OrderCode: ';
+            $this->_wplogger->info($loggerMsg . $redirectOrderParams['orderCode'] . ' ##########');
+            if (empty($redirectOrderParams['statementNarrative'])) {
+                $redirectOrderParams['statementNarrative']='';
+            }
+            $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectKlarnaOrder();
+            $redirectSimpleXml = $this->xmlredirectorder->build(
+                $redirectOrderParams['merchantCode'],
+                $redirectOrderParams['orderCode'],
+                $redirectOrderParams['orderDescription'],
+                $redirectOrderParams['currencyCode'],
+                $redirectOrderParams['amount'],
+                $redirectOrderParams['paymentType'],
+                $redirectOrderParams['shopperEmail'],
+                $redirectOrderParams['statementNarrative'],
+                $redirectOrderParams['acceptHeader'],
+                $redirectOrderParams['userAgentHeader'],
+                $redirectOrderParams['shippingAddress'],
+                $redirectOrderParams['billingAddress'],
+                $redirectOrderParams['paymentPagesEnabled'],
+                $redirectOrderParams['installationId'],
+                $redirectOrderParams['hideAddress'],
+                $redirectOrderParams['orderLineItems'],
+                $redirectOrderParams['exponent'],
+                $redirectOrderParams['sessionData'],
+                $redirectOrderParams['orderContent']
+            );
 
-        return $this->_sendRequest(
-            dom_import_simplexml($redirectSimpleXml)->ownerDocument,
-            $this->worldpayhelper->getXmlUsername($redirectOrderParams['paymentType']),
-            $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentType'])
-        );
+            return $this->_sendRequest(
+                dom_import_simplexml($redirectSimpleXml)->ownerDocument,
+                $this->worldpayhelper->getXmlUsername($redirectOrderParams['paymentType']),
+                $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentType'])
+            );
+        }catch(Exception $ex){
+            $this->_wplogger->error($ex->getMessage());
+            if($ex->getMessage() == 'Payment Method KLARNA_PAYNOW-SSL is unknown; The Payment Method is not available.'
+               || $ex->getMessage() == 'Payment Method KLARNA_SLICEIT-SSL is unknown; The Payment Method is not available.'
+               || $ex->getMessage() == 'Payment Method KLARNA_PAYLATER-SSL is unknown; The Payment Method is not available.'){
+                $codeErrorMessage = 'Klarna payment method is currently not available for this country.';
+                $camErrorMessage = $this->getCreditCardSpecificException('AKLR01');
+                $errorMessage = $camErrorMessage? $camErrorMessage : $codeErrorMessage;
+                throw new \Magento\Framework\Exception\LocalizedException(__($errorMessage));
+            }
+        }
     }
 
     /**
@@ -444,33 +458,46 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param string $paymentMethodCode
      * @return mixed
      */
-    public function capture(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode)
+    public function capture(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode, $capturedItems = null)
     {
-        $orderCode = $wp->getWorldpayOrderId();
-        $loggerMsg = '########## Submitting capture request. Order: ';
-        $this->_wplogger->info($loggerMsg . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
-        $this->xmlcapture = new \Sapient\Worldpay\Model\XmlBuilder\Capture();
-        $currencyCode = $order->getOrderCurrencyCode();
-        $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
-        
-        $captureType = 'full';
-        
-        $captureSimpleXml = $this->xmlcapture->build(
-            $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
-            $orderCode,
-            $order->getOrderCurrencyCode(),
-            $order->getGrandTotal(),
-            $exponent,
-            $wp->getPaymentType(),
-            $order,
-            $captureType
-        );
+        try{
+            $orderCode = $wp->getWorldpayOrderId();
+            $loggerMsg = '########## Submitting capture request. Order: ';
+            $this->_wplogger->info($loggerMsg . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
+            $this->xmlcapture = new \Sapient\Worldpay\Model\XmlBuilder\Capture();
+            $currencyCode = $order->getOrderCurrencyCode();
+            $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
 
-        return $this->_sendRequest(
-            dom_import_simplexml($captureSimpleXml)->ownerDocument,
-            $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
-            $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
-        );
+            if(strpos($wp->getPaymentType(), "KLARNA") !== false && !empty($capturedItems)){
+                $invoicedItems = $this->getInvoicedItemsDetails($capturedItems);
+            }else{
+                $invoicedItems = '';
+            }
+            $captureType = 'full';
+        
+            $captureSimpleXml = $this->xmlcapture->build(
+                $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
+                $orderCode,
+                $order->getOrderCurrencyCode(),
+                $order->getGrandTotal(),
+                $exponent,
+                $wp->getPaymentType(),
+                $order,
+                $captureType,
+                $invoicedItems
+            );
+
+            return $this->_sendRequest(
+                dom_import_simplexml($captureSimpleXml)->ownerDocument,
+                $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
+                $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
+            );
+        }catch(Exception $e){
+            $this->_wplogger->error($e->getMessage());
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($e->getMessage())
+            );
+        }
     }
        
     /**
@@ -481,32 +508,46 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param string $paymentMethodCode
      * @return mixed
      */
-    public function partialCapture(\Magento\Sales\Model\Order $order, $wp, $grandTotal)
+    public function partialCapture(\Magento\Sales\Model\Order $order, $wp, $grandTotal, $capturedItems = null)
     {
-        $orderCode = $wp->getWorldpayOrderId();
-        $loggerMsg = '########## Submitting Partial capture request. Order: ';
-        $this->_wplogger->info($loggerMsg . $orderCode . ' Amount:' . $grandTotal . ' ##########');
-        $this->xmlcapture = new \Sapient\Worldpay\Model\XmlBuilder\Capture();
-        $currencyCode = $order->getOrderCurrencyCode();
-        $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
-        
-        $captureType = 'partial';
-        $captureSimpleXml = $this->xmlcapture->build(
-            $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
-            $orderCode,
-            $order->getOrderCurrencyCode(),
-            $grandTotal,
-            $exponent,
-            $wp->getPaymentType(),
-            $order,
-            $captureType
-        );
+        try{
+            $orderCode = $wp->getWorldpayOrderId();
+            $loggerMsg = '########## Submitting Partial capture request. Order: ';
+            $this->_wplogger->info($loggerMsg . $orderCode . ' Amount:' . $grandTotal . ' ##########');
+            $this->xmlcapture = new \Sapient\Worldpay\Model\XmlBuilder\Capture();
+            $currencyCode = $order->getOrderCurrencyCode();
+            $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
 
-        return $this->_sendRequest(
-            dom_import_simplexml($captureSimpleXml)->ownerDocument,
-            $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
-            $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
-        );
+            if(strpos($wp->getPaymentType(), "KLARNA") !== false && !empty($capturedItems)){
+                $invoicedItems = $this->getInvoicedItemsDetails($capturedItems);
+            }else{
+                $invoicedItems = '';
+            }
+        
+            $captureType = 'partial';
+            $captureSimpleXml = $this->xmlcapture->build(
+                $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
+                $orderCode,
+                $order->getOrderCurrencyCode(),
+                $grandTotal,
+                $exponent,
+                $wp->getPaymentType(),
+                $order,
+                $captureType,
+                $invoicedItems
+            );
+
+            return $this->_sendRequest(
+                dom_import_simplexml($captureSimpleXml)->ownerDocument,
+                $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
+                $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
+            );
+        }catch(Exception $e){
+            $this->_wplogger->error($e->getMessage());
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($e->getMessage())
+            );
+        }
     }
     
     /**
@@ -1009,4 +1050,55 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
         );
     }
+    
+    public function getInvoicedItemsDetails($capturedItems)
+ {
+        $items = $this->getItemDetails($capturedItems);
+
+        if ($items['is_bundle_item_present'] > 0 || 
+           (count($items['invoicedItems']) == 1 && 
+                (in_array("downloadable", $items['invoicedItems']['0']) || 
+                 in_array("giftcard", $items['invoicedItems']['0'])))){
+            $items['trackingId'] = '';
+            return $items;
+        } else {
+            if (array_key_exists('tracking', $capturedItems)
+                && count($capturedItems['tracking']) < 2
+                && !empty($capturedItems['tracking']['1']['number'])) {
+                $items['trackingId'] = $capturedItems['tracking']['1']['number'];
+                return $items;
+            } else {
+                $codeErrorMessage = 'Please create Shippment with single tracking number.';
+                $camErrorMessage = $this->exceptionHelper->getConfigValue('AAKL01');
+                if (array_key_exists('tracking', $capturedItems) && count($capturedItems['tracking']) > 1) {
+                    $codeErrorMessage = 'Multi shipping is currently not available, please add single tracking number.';
+                    $camErrorMessage = $this->exceptionHelper->getConfigValue('AAKL02');
+                } else if (array_key_exists('tracking', $capturedItems) && empty($capturedItems['tracking']['1']['number'])) {
+                    $codeErrorMessage = 'Tracking number can not be blank, please add.';
+                    $camErrorMessage = $this->exceptionHelper->getConfigValue('AAKL03');
+                }
+                $errorMessage = $camErrorMessage ? $camErrorMessage : $codeErrorMessage;
+                throw new \Magento\Framework\Exception\LocalizedException(__($errorMessage));
+            }
+        }
+    }
+
+    public function getItemDetails($capturedItems)
+    {
+        $items = [];
+        $count = 0;
+        $bundleCount = 0;
+        $filteredItems = array_filter($capturedItems['invoice']['items']);
+        foreach ($filteredItems as $key => $val) {
+            $items['invoicedItems'][] = $this->worldpayhelper->getInvoicedItemsData($key);
+            $items['invoicedItems'][$count]['qty_invoiced'] = $val;
+            if($items['invoicedItems'][$count]['product_type'] == 'bundle'){
+                $bundleCount++;
+            }
+            $count++;
+        }
+        $items['is_bundle_item_present'] = $bundleCount;
+        return $items;
+    }
+
 }

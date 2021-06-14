@@ -342,10 +342,10 @@ class Service
         $reservedOrderId = $quote->getReservedOrderId();
         $stmtNarrative = '';
         $orderContent = '';
-       
-        $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
-        if (array_key_exists($paymentDetails['additional_data']['cc_type'], $apmPaymentTypes) &&
-                (isset($paymentDetails['additional_data']['statementNarrative']))) {
+        
+        $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');  
+        if ($paymentDetails['additional_data']['cc_type'] === "KLARNA-SSL"
+                && (isset($paymentDetails['additional_data']['statementNarrative']))) {
             $stmtNarrative = $paymentDetails['additional_data']['statementNarrative'];
         }
         $currencyCode = $quote->getQuoteCurrencyCode();
@@ -377,6 +377,7 @@ class Service
             'hideAddress' => $this->worldpayHelper->getHideAddress(),
             'orderLineItems' => $this->_getOrderLineItems($quote, 'KLARNA-SSL'),
             'orderStoreId' => $orderStoreId,
+            'shopperId' => $quote->getCustomerId(),
             'exponent' => $exponent,
             'sessionData' => $this->_getSessionDetails($paymentDetails, $countryCode),
             'orderContent' => $orderContent
@@ -595,6 +596,7 @@ class Service
 
                 $lineitem['reference'] = $_item->getProductId();
                 $lineitem['name'] = $_item->getName();
+                $lineitem['productType'] = $_item->getProductType();
                 $lineitem['quantity'] = (int) $_item->getQty();
                 $lineitem['quantityUnit'] = $this->worldpayHelper->getQuantityUnit($_item->getProduct());
                 $lineitem['unitPrice'] = $rowtotal / $_item->getQty();
@@ -603,6 +605,9 @@ class Service
                 $lineitem['totalTaxAmount'] = $totaltax;
                 if ($discountamount > 0) {
                     $lineitem['totalDiscountAmount'] = $discountamount;
+                }
+                if($orderitems['orderTaxAmount'] == 0){
+                    $orderitems['orderTaxAmount'] = $totaltax;
                 }
                 $orderitems['lineItem'][] = $lineitem;
             }
@@ -615,6 +620,7 @@ class Service
             $totaltax = $address->getShippingTaxAmount() + $address->getShippingHiddenTaxAmount();
             $lineitem['reference'] = 'Shipid';
             $lineitem['name'] = 'Shipping amount';
+            $lineitem['productType'] = 'shipping';
             $lineitem['quantity'] = 1;
             $lineitem['quantityUnit'] = 'shipping';
             $lineitem['unitPrice'] = $address->getShippingAmount() + $totaltax;
@@ -626,8 +632,36 @@ class Service
             }
             $orderitems['lineItem'][] = $lineitem;
         }
-        if (!empty($paymentType) && $paymentType == "KLARNA-SSL" && $orderitems['orderTaxAmount'] == 0) {
-            $orderitems['orderTaxAmount'] = $totaltax;
+        
+        if($quote->getBaseCustomerBalAmountUsed() > 0) {
+            $storelineitem = [];
+            $storelineitem['reference'] = 0;
+            $storelineitem['name'] = 'Store Credit Amount';
+            $storelineitem['productType'] = 'Store Credit';
+            $storelineitem['quantity'] = 1;
+            $storelineitem['quantityUnit'] = 'credit';
+            $storelineitem['unitPrice'] = 0 - (double) $quote->getBaseCustomerBalAmountUsed();
+            $storelineitem['taxRate'] = 0;
+            $storelineitem['totalAmount'] = 0 - (double) $quote->getBaseCustomerBalAmountUsed();
+            $storelineitem['totalTaxAmount'] = 0;
+            $orderitems['lineItem'][] = $storelineitem;
+        }
+
+        $giftCards = json_decode($quote->getGiftCards(), true);
+        if (!empty($giftCards) && count($giftCards) > 0) {
+            $giftcardlineitem = [];
+            foreach ($giftCards as $giftCard) {
+                $giftcardlineitem['reference'] = $giftCard['i'];
+                $giftcardlineitem['name'] = $giftCard['c'];
+                $giftcardlineitem['productType'] = 'Gift Card';
+                $giftcardlineitem['quantity'] = 1;
+                $giftcardlineitem['quantityUnit'] = 'credit';
+                $giftcardlineitem['unitPrice'] = 0 - $giftCard['ba'];
+                $giftcardlineitem['taxRate'] = 0;
+                $giftcardlineitem['totalAmount'] = 0 - $giftCard['ba'];
+                $giftcardlineitem['totalTaxAmount'] = 0;
+                $orderitems['lineItem'][] = $giftcardlineitem;
+            }
         }
         $orderitems['urls'] = $this->getReturnUrls();
         $orderitems['locale_code'] = $this->worldpayHelper->getLocaleDefault();
@@ -1206,3 +1240,5 @@ class Service
         return $orderitems;
     }
 }
+
+
