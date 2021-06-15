@@ -1,34 +1,53 @@
 <?php
-/**
- * @copyright 2018 Sapient
- */
+declare(strict_types=1);
+
 namespace Sapient\Worldpay\Model\Observer;
 
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Sapient\Worldpay\Model\WorldpaymentFactory;
 
+/**
+ * Class AddExtraDataToTransport
+ * @package Sapient\Worldpay\Model\Observer
+ */
 class AddExtraDataToTransport implements ObserverInterface
 {
+    /**
+     * @var WorldpaymentFactory
+     */
+    protected $worldpayPayment;
 
-    protected $worldpaypayment;
-
+    /**
+     * AddExtraDataToTransport constructor.
+     * @param WorldpaymentFactory $worldpaypayment
+     */
     public function __construct(
-        \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
+        WorldpaymentFactory $worldpayPayment
     ) {
-        $this->worldpaypayment = $worldpaypayment;
+        $this->worldpayPayment = $worldpayPayment;
     }
 
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    /**
+     * @param Observer $observer
+     */
+    public function execute(Observer $observer)
     {
+        $allowedPaymentMethods = [
+            "worldpay_apm",
+            "worldpay_cc",
+            "worldpay_cc_vault",
+            "worldpay_moto",
+            "worldpay_wallets"
+        ];
         $transport = $observer->getEvent()->getTransport();
-        // Order info
         $order = $transport['order'];
         $paymentCode = $order->getPayment()->getMethod();
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $helper = $objectManager->get(\Sapient\Worldpay\Helper\Data::class);
-        // Full payment method name
-        $paymentMethod = $helper->getPaymentTitleForOrders($order, $paymentCode, $this->worldpaypayment);
-        if ($paymentMethod) {
-            $transport['payment_html'] = $paymentMethod;
+        if (in_array($paymentCode, $allowedPaymentMethods)) {
+            $paymentMethod = $this->data->getPaymentTitleForOrders($order, $paymentCode, $this->worldpaypayment);
+            if ($paymentMethod) {
+                $transport['payment_html'] = $paymentMethod;
+            }
         }
     }
 }
