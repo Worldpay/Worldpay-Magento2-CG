@@ -61,7 +61,6 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
 	
 	$logger->info('Step 1.5 -entered AuthResponse.php');
         $logger->info('cookie value before isset -in AuthResponse.php ');
-        $logger->info(print_r($_COOKIE['PHPSESSID'],true));
 
          if(isset($_COOKIE['PHPSESSID'])){
           $phpsessId = $_COOKIE['PHPSESSID'];
@@ -76,8 +75,7 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
           ]);
         }
 
-      $logger->info('cookie value after isset -in AuthResponse.php ');
-      $logger->info(print_r($_COOKIE['PHPSESSID'],true));
+      
 	
 	$logger->info('Before $directOrderParams - AuthResponse.php');
         
