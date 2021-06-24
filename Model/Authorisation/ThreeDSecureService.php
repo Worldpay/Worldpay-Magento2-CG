@@ -66,53 +66,26 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
     }
     public function continuePost3dSecureAuthorizationProcess($paResponse, $directOrderParams, $threeDSecureParams)
     {
-	$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/3ds.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-        $logger->info('Step-3: '.print_r($directOrderParams['orderCode'],true));
-        $logger->info('Pay response'.print_r($paResponse,true));
         
         $directOrderParams['paResponse'] = $paResponse;
 	
-	$logger->info('Before - $threeDSecureParams->getEchoData() - ThreeDSecureService.php --'.print_r($directOrderParams['orderCode'],true));
-        $logger->info('Value Of $threeDSecureParams EchoData: ');
-        $logger->info(print_r($threeDSecureParams->getEchoData(),true));
-	
         if (!empty($threeDSecureParams) && $threeDSecureParams->getEchoData()) {
             $directOrderParams['echoData'] = $threeDSecureParams->getEchoData();
-	 $logger->info('After - $threeDSecureParams->getEchoData() - ThreeDSecureService.php--'.print_r($directOrderParams['orderCode'],true));
         }
         // @setIs3DSRequest flag set to ensure whether it is 3DS request or not.
         // To add cookie for 3DS second request.
-        $logger->info('Before - $this->checkoutSession->setIs3DSRequest(true); - ThreeDSecureService.php--'.print_r($directOrderParams['orderCode'],true));
-
         $this->checkoutSession->setIs3DSRequest(true);
-	
-	$logger->info('After - $this->checkoutSession->setIs3DSRequest(true); - ThreeDSecureService.php--'.print_r($directOrderParams['orderCode'],true));
 	
         try {
             if (isset($directOrderParams['echoData'])) {
-	    $logger->info('Trying to send request to worldpay--'.print_r($directOrderParams['orderCode'],true));
 	    
                 $response = $this->paymentservicerequest->order3DSecure($directOrderParams);
-                
-            $logger->info('Response--'.print_r($response,true));
-	    $logger->info('Before - $this->response = $this->directResponse->setResponse($response) - ThreeDSecureService.php');
-            
                 $this->response = $this->directResponse->setResponse($response);
-                
-	    $logger->info('After - $this->response = $this->directResponse->setResponse($response) - ThreeDSecureService.php');
-            $logger->info('Before - $this->checkoutSession->unsIs3DSRequest() - ThreeDSecureService.php');
             
                 // @setIs3DSRequest flag is unset from checkout session.
                 $this->checkoutSession->unsIs3DSRequest();
-                
-	$logger->info('After - $this->checkoutSession->unsIs3DSRequest() - ThreeDSecureService.php');
-	$logger->info('Before - $orderIncrementId = current(explode($directOrderParams[orderCode])); - ThreeDSecureService.php');
 	
                 $orderIncrementId = current(explode('-', $directOrderParams['orderCode']));
-		
-	$logger->info('After - $orderIncrementId = current(explode($directOrderParams[orderCode])); - ThreeDSecureService.php--'.print_r($orderIncrementId,true));
 	
                 if ($this->checkoutSession->getIavCall()) {
                     $responseXml = $this->response->getXml();
@@ -154,9 +127,6 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
                     $this->_abortIfPaymentError($this->_paymentUpdate, $orderIncrementId);
                 }
             } else {
-	    $logger->info('Entered else block');
-	    $logger->info('Verify echo data ---'.print_r($directOrderParams['echoData'],true));
-            
                 $errormessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM15');
                 $this->wplogger->info($errormessage);
                 $this->_messageManager->addError(__($errormessage?$errormessage:$e->getMessage()));
