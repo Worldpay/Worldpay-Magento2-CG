@@ -398,12 +398,14 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      */
     public function capture(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode)
     {
+        try{
         $orderCode = $wp->getWorldpayOrderId();
         $loggerMsg = '########## Submitting capture request. Order: ';
         $this->_wplogger->info($loggerMsg . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
         $this->xmlcapture = new \Sapient\Worldpay\Model\XmlBuilder\Capture();
         $currencyCode = $order->getOrderCurrencyCode();
         $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
+         $captureType = 'full';
          
         $captureSimpleXml = $this->xmlcapture->build(
             $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
@@ -411,7 +413,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $order->getOrderCurrencyCode(),
             $order->getGrandTotal(),
             $exponent,
-            $wp->getPaymentType()
+                $wp->getPaymentType(),
+                $order,
+                $captureType
         );
 
         return $this->_sendRequest(
@@ -419,6 +423,12 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
             $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
         );
+        }catch(Exception $e){
+            $this->_wplogger->error($e->getMessage());
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($e->getMessage())
+            );
+        }
     }
        
     /**
@@ -431,6 +441,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      */
     public function partialCapture(\Magento\Sales\Model\Order $order, $wp, $grandTotal)
     {
+        try{
         $orderCode = $wp->getWorldpayOrderId();
         $loggerMsg = '########## Submitting Partial capture request. Order: ';
         $this->_wplogger->info($loggerMsg . $orderCode . ' Amount:' . $grandTotal . ' ##########');
@@ -438,13 +449,16 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $currencyCode = $order->getOrderCurrencyCode();
         $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
         
+        $captureType = 'partial';
         $captureSimpleXml = $this->xmlcapture->build(
             $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
             $orderCode,
             $order->getOrderCurrencyCode(),
             $grandTotal,
             $exponent,
-            $wp->getPaymentType()
+                $wp->getPaymentType(),
+                $order,
+                $captureType
         );
 
         return $this->_sendRequest(
@@ -452,6 +466,12 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
             $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
         );
+        }catch(Exception $e){
+            $this->_wplogger->error($e->getMessage());
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __($e->getMessage())
+            );
+        }
     }
     
     /**

@@ -29,13 +29,16 @@ EOD;
      * @param float $amount
      * @return SimpleXMLElement $xml
      */
-    public function build($merchantCode, $orderCode, $currencyCode, $amount, $exponent, $paymentType = null)
+    public function build($merchantCode, $orderCode, $currencyCode, $amount, $exponent, $paymentType = null, $order, $captureType)
     {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
         $this->currencyCode = $currencyCode;
         $this->amount = $amount;
         $this->exponent = $exponent;
+        $this->order = $order;
+        $this->captureType = $captureType;
+        
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -94,8 +97,8 @@ EOD;
                 ->getValue('worldpay/general_config/capture_automatically', $storeScope);
         $partialCapture = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
                 ->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
-        //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
-        if ($partialCapture && !$autoInvoice) {
+        //check the partial capture 
+        if ($this->captureType == 'partial' && $partialCapture) {
             $capture['reference']= 'Partial Capture';
         }
         return $capture;
@@ -128,8 +131,8 @@ EOD;
         $partialCapture = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
                         ->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
        
-        //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
-        if ($partialCapture && !$autoInvoice) {
+        //check the partial capture 
+        if ($this->captureType == 'partial' && $partialCapture) {
             $amountElement['debitCreditIndicator'] = 'credit';
         }
     }

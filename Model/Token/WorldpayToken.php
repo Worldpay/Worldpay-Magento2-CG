@@ -130,7 +130,7 @@ class WorldpayToken
             $tokenModel->setTokenExpiryDate($tokenState->getTokenExpiryDate()->format('Y-m-d'));
             $tokenModel->setCardNumber($tokenState->getObfuscatedCardNumber());
             $tokenModel->setCardholderName($tokenState->getCardholderName());
-            $tokenModel->setMethod(str_replace("_CREDIT", "", $tokenState->getPaymentMethod()));
+            $tokenModel->setMethod(str_replace(["_CREDIT","_DEBIT"], "", $tokenState->getPaymentMethod()));
             $tokenModel->setCardBrand($tokenState->getCardBrand());
             $tokenModel->setCardSubBrand($tokenState->getCardSubBrand());
             $tokenModel->setCardIssuerCountryCode($tokenState->getCardIssuerCountryCode());
