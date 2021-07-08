@@ -38,7 +38,8 @@ class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements \
     {
         return [
             \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION,
-            \Sapient\Worldpay\Model\Payment\State::STATUS_AUTHORISED
+            \Sapient\Worldpay\Model\Payment\State::STATUS_AUTHORISED,
+            \Sapient\Worldpay\Model\Payment\State::STATUS_CAPTURED
         ];
     }
 }

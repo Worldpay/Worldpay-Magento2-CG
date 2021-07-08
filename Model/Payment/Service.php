@@ -52,6 +52,35 @@ class Service
         return $this->_getPaymentUpdateFactory()
             ->create($state);
     }
+    public function getPaymentUpdateXmlForNotification($xml)
+    {
+        $paymentNotifyService = new \SimpleXmlElement($xml);
+        $lastEvent = $paymentNotifyService->xpath('//lastEvent');
+        $journal = $paymentNotifyService->xpath('//journal/journalReference');
+        if (!empty($journal) && $lastEvent[0] == 'CAPTURED') {
+            $partialCaptureReference = (array) $journal[0]->attributes()['reference'][0];
+            $ordercodenode = $paymentNotifyService->xpath('//orderStatusEvent');
+            $ordercode = (array) $ordercodenode[0]->attributes()['orderCode'][0];
+            $nodes = $paymentNotifyService->xpath('//payment/balance');
+            $getNodeValue = '';
+            $getAttibute = '';
+            if (isset($nodes, $lastEvent[0], $partialCaptureReference[0])) {
+                if ($nodes && $lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture') {
+                    $getAttibute = (array) $nodes[0]->attributes()['accountType'];
+                    $getNodeValue = $getAttibute[0];
+                }
+                if ($lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture' && $getNodeValue == 'IN_PROCESS_AUTHORISED') {
+                    $worldpaypayment = $this->worldpayPayment->loadByWorldpayOrderId($ordercode[0]);
+                    if (isset($worldpaypayment)) {
+                        $worldpaypayment->setData('payment_status', $lastEvent[0]);
+                        $worldpaypayment->save();
+                    }
+                    $gatewayError = 'Notification received for Partial Captutre';
+                    throw new \Magento\Framework\Exception\CouldNotDeleteException(__($gatewayError));
+                }
+            }
+        }
+    }
 
     public function getPaymentUpdateXmlForOrder(\Sapient\Worldpay\Model\Order $order)
     {
@@ -71,6 +100,8 @@ class Service
         $paymentService = new \SimpleXmlElement($rawXml);
         $lastEvent = $paymentService->xpath('//lastEvent');
         $partialCaptureReference = $paymentService->xpath('//reference');
+        $ordercodenode = $paymentService->xpath('//orderStatus');
+        $ordercode = (array)$ordercodenode[0]->attributes()['orderCode'][0];
     
         $nodes = $paymentService->xpath('//payment/balance');
         $getNodeValue ='';
@@ -83,6 +114,10 @@ class Service
             }
             if ($lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture'
             && $getNodeValue == 'IN_PROCESS_AUTHORISED') {
+                $worldpaypayment= $this->worldpayPayment->loadByWorldpayOrderId($ordercode[0]);
+                $worldpaypayment->setData('payment_status', $lastEvent[0]);
+                $worldpaypayment->save();
+                //$order->setOrderAsProcessing();
                 $gatewayError = 'Sync status action not possible for this Partial Captutre Order.';
                 throw new \Magento\Framework\Exception\CouldNotDeleteException(__($gatewayError));
             }
