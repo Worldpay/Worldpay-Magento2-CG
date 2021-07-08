@@ -48,7 +48,7 @@ class WalletService extends \Magento\Framework\DataObject
         $paymentDetails,
         $payment
     ) {
-        $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
+        //$this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
         if ($paymentDetails['additional_data']['cc_type'] == 'PAYWITHGOOGLE-SSL') {
             $walletOrderParams = $this->mappingservice->collectWalletOrderParameters(
                 $orderCode,

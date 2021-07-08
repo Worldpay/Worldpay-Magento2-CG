@@ -527,7 +527,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 ->addFieldToFilter('token_type', ['eq' => $tokenType])
                 ->getData();
             if ($savedCard) {
-                return str_replace(["_CREDIT","_DEBIT"], "", $savedCard[0]['method']);
+                return str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $savedCard[0]['method']);
                 //return $savedCard[0]['method'];
             } else {
                 throw new \Magento\Framework\Exception\LocalizedException(
