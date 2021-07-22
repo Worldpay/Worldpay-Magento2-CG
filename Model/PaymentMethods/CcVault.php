@@ -135,7 +135,17 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         try {
+            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/OrderCodeIssue.log');
+            $logger = new \Zend\Log\Logger();
+            $logger->addWriter($writer);
+            $logger->info('Entered Class:CcVault function :authorize');
+            $logger->info('Next step to generate ordercode');
+            
             $orderCode = $this->_generateOrderCode($quote);
+            
+            $logger->info('Print generated ordercode from CCVault authorize function-');
+            $logger->info(print_r($orderCode,true));
+            
              $this->_createWorldPayPayment($payment, $orderCode, $quote->getStoreId(), $quote->getReservedOrderId());
              $authorisationService = $this->getAuthorisationService($quote->getStoreId());
              $authorisationService->authorizePayment(

@@ -180,16 +180,24 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
 
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/OrderCodeIssue.log');
+            $logger = new \Zend\Log\Logger();
+            $logger->addWriter($writer);
+            $logger->info('Entered Class:AbstractMethod function :authorize');
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         if ($this->authSession->isLoggedIn()) {
+            $logger->info('Entered authsession loggedin condition');
             $adminquote = $this->adminsessionquote->getQuote();
             if (empty($quote->getReservedOrderId()) && !empty($adminquote->getReservedOrderId())) {
+                $logger->info('Entered condition to assign adminquote as quote');
                 $quote = $adminquote;
             }
         }
-
+        $logger->info('Next step to generate ordercode');
         $orderCode = $this->_generateOrderCode($quote);
+        $logger->info('Print generated ordercode from authorize function-');
+        $logger->info(print_r($orderCode,true));
         $this->authSession->setCurrencyCode($quote->getQuoteCurrencyCode());
         $this->paymentdetailsdata = self::$paymentDetails;
         try {
@@ -298,6 +306,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      */
     private function _generateOrderCode($quote)
     {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/OrderCodeIssue.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('Entered class: AbstractMethod, function:_generateOrderCode');
+        $logger->info('Final ordercode generated-');
+        $logger->info(print_r(($quote->getReservedOrderId() . '-' . time()),true));
         return $quote->getReservedOrderId() . '-' . time();
     }
 

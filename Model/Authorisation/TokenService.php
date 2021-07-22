@@ -48,6 +48,13 @@ class TokenService extends \Magento\Framework\DataObject
             $paymentDetails
         );
 
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/OrderCodeIssue.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('Entered class: TokenService, function:authorizePayment');
+        $logger->info('Entered class: TokenService, function:authorizePayment--checking ordercode received-');
+        $logger->info(print_r($orderCode,true));
+        
         $response = $this->paymentservicerequest->orderToken($tokenOrderParams);
         $directResponse = $this->directResponse->setResponse($response);
         $threeDSecureParams = $directResponse->get3dSecureParams();
