@@ -367,4 +367,9 @@ class Webpayment extends Template
     {
         return $this->session->getSessionId();
     }
+    
+    public function is3DsEnabled()
+    {
+      return $this->_helper->is3DSecureEnabled() ||  $this->_helper->isDynamic3DEnabled(); 
+    }
 }

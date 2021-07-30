@@ -403,14 +403,17 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $this->xmlcapture = new \Sapient\Worldpay\Model\XmlBuilder\Capture();
         $currencyCode = $order->getOrderCurrencyCode();
         $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
-         
+        
+        $captureType = 'full';
+        
         $captureSimpleXml = $this->xmlcapture->build(
             $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
             $orderCode,
             $order->getOrderCurrencyCode(),
             $order->getGrandTotal(),
             $exponent,
-            $wp->getPaymentType()
+            $wp->getPaymentType(),
+	    $captureType
         );
 
         return $this->_sendRequest(
@@ -437,13 +440,15 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $currencyCode = $order->getOrderCurrencyCode();
         $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
         
+        $captureType = 'partial';
         $captureSimpleXml = $this->xmlcapture->build(
             $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
             $orderCode,
             $order->getOrderCurrencyCode(),
             $grandTotal,
             $exponent,
-            $wp->getPaymentType()
+            $wp->getPaymentType(),
+	    $captureType
         );
 
         return $this->_sendRequest(

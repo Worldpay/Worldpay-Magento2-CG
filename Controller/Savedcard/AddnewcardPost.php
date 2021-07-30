@@ -226,9 +226,12 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                     'cardHolderName' => $fullRequest->payment->cardHolderName,
                     'expiryMonth' => $fullRequest->payment->expiryMonth,
                     'expiryYear' => $fullRequest->payment->expiryYear,
-                    'cvc' => $fullRequest->payment->cvc,
                     'cseEnabled' => $fullRequest->payment->cseEnabled
                 ];
+                if (isset($fullRequest->payment->cvc) &&
+                        !$fullRequest->payment->cvc == '' && !empty($fullRequest->payment->cvc)) {
+                    $payment['cvc'] = $fullRequest->payment->cvc;
+                }
                 if ($this->worldpayHelper->isDynamic3DS2Enabled() && $fullRequest->payment->dfReferenceId) {
                     $payment['dfReferenceId']  = $fullRequest->payment->dfReferenceId;
                     $this->checkoutSession->setIavCall(true);
@@ -246,11 +249,12 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 $payment['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($paymentType);
                 $orderParams = [];
                 $incrementId = $this->_generateOrderCode();
+                $isNominalAmount = $payment['paymentType'] =='DINERS-SSL' || $payment['paymentType'] == 'DANKORT-SSL' ;
                 $orderParams['orderCode'] = $incrementId. '-' . time();
                 $orderParams['merchantCode'] = $merchantCode;
                 $orderParams['orderDescription'] = 'Add new card in My account';
                 $orderParams['currencyCode'] = $currencyCode;
-                $orderParams['amount'] = 0;
+                $orderParams['amount'] = $isNominalAmount?1: 0;
                 $orderParams['paymentDetails'] = $payment;
                 $orderParams['cardAddress'] = $billingadd;
                 $orderParams['billingAddress'] = $billingadd;
@@ -292,6 +296,14 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 $directResponse = $this->directResponse->setResponse($response);
                 $threeDSecureParams = $directResponse->get3dSecureParams();
                 $threeDSecureChallengeParams = $directResponse->get3ds2Params();
+                if(!$this->worldpayHelper->is3dsEnabled() && isset($threeDSecureParams)) {
+                  $this->wplogger->info("3Ds attempted but 3DS is not enabled for the store. Please contact merchant.");
+                  $this->messageManager->addErrorMessage(
+                "3Ds attempted but 3DS is not enabled for the store. Please contact merchant. ");
+                  //return $this->resultRedirectFactory->create()->setPath('worldpay/savedcard', ['_current' => true]);
+                  return  $this->resultJsonFactory->create()->setData(['success' => false]);
+               
+                }
                 $threeDSecureConfig = [];
                 $disclaimerFlag = isset($fullRequest->payment->disclaimerFlag)?$fullRequest->payment->disclaimerFlag:0 ;
 
@@ -360,6 +372,8 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                                 ->getCreditCardSpecificException('CCAM22')));
                 } else {
                     $this->messageManager->addException($e, __('Error: ').$e->getMessage());
+			return  $this->resultJsonFactory->create()
+                        ->setData(['threeDError' => true]);
                 }
                 return  $this->resultJsonFactory->create()
                        ->setData(['success' => false]);

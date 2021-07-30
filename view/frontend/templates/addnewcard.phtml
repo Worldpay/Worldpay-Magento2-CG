@@ -122,35 +122,30 @@ $storeCode = $block->getStoreCode();
                     ?></span>
         <!--            <span>CVV</span>-->
                 </label>
-<div class="field savecc cc-Visibility-Enabled" id:"_save-card_div'", visible: false">                
                 <div class="control">
                     <input type="number" autocomplete="off" length="4" id="cvv"
                            class="input-text required cvv saved-cvv-number required-entry 
                            validate-card-cvv validate-length maximum-length-4"
                            name="cvc"
                            value="" style="width:12%"/>
-               
+                </div>
                 <div id="cvv_msg" style="color:red;font-size: 1.2rem;"></div>
-                
-                 
+            </div> 
+<?php endif; ?>
+        <!-- Disclaimer -->
                 <label for="save-card" class="label">
                   <?php if ($block->getStoredCredentialsEnabledValue() && $block->getDisclaimerMessageEnable()): ?> 
                     <span>(<a href="javascript:void(0)" id="btnShow">Important Disclaimer!</a>)</span>
                     <?php endif; ?>
                 </label>
-                 </div>
-                
-                    </div>
-  <div title="Disclaimer!" id="dialog" style="display: none" align ="center" >
-    <form id="disclaimer" name="disclaimer">
-            <div><?php echo $block->getDisclaimerText(); ?></div>
-        </form>
-</div>
- <div class="mage-error" generated="true" id="disclaimer-error"></div>
- </div>
-            
-            
-<?php endif; ?>
+                    
+        <div title="Disclaimer!" id="dialog" style="display: none" align ="center" >
+            <form id="disclaimer" name="disclaimer">
+                <div><?php echo $block->getDisclaimerText(); ?></div>
+            </form>
+        </div>
+        <div class="mage-error" generated="true" id="disclaimer-error"></div>
+        
         <div class="field billing-address">
             <label class="label" for="billing-address">
                 <span><?php
@@ -235,7 +230,9 @@ $storeCode = $block->getStoreCode();
         
         
         function onConfirmBtn() {
-            var cvvValid = validateCVV();
+            var isCvcRequired =  <?php echo !empty($block->requireCvcEnabled())?$block->requireCvcEnabled(): 0; ?>;
+            var isCvvValid = isCvcRequired == true ? validateCVV() : true;
+            var cvvValid = isCvvValid;
             
              mandatoryMessage= parseInt("<?php echo !empty($block->getDisclaimerMessageMandatory())?$block->getDisclaimerMessageMandatory():0; ?>");
        disclaimerMessageEnabled = parseInt("<?php echo !empty($block->getDisclaimerMessageEnable())?$block->getDisclaimerMessageEnable():0; ?>");
@@ -252,8 +249,11 @@ $storeCode = $block->getStoreCode();
                             $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
 			return false;
                     } 
-
+                if((window.is3DsEnabled)) {
+                createPayment3DS();
+                }else {
                 createPayment();
+            }
             } else if (cvvValid && jQuery('#form_add_card').valid() && window.isDynamic3DS2Enabled) {
                 document.getElementById('save_newcard').disabled=true;
 
@@ -313,8 +313,11 @@ $storeCode = $block->getStoreCode();
                     success: function (data, status, jqXHR) {
                         response = JSON.stringify(data);
                         var result = JSON.parse(response);
+                        console.log(result);
                         if (result.threeD) {
+                            console.log("enetered 3d consition");
                             window.location.href = baseUrl + 'worldpay/savedcard/redirect';
+                            //window.location.replace(urlBuilder.build('worldpay/savedcard/redirect'));
                         }
                         if (result.success) {
                             window.location.replace(urlBuilder.build('worldpay/savedcard'));
@@ -354,7 +357,15 @@ $storeCode = $block->getStoreCode();
                     data: jsonPaymentDetails,
                     type: 'post',
                     success: function (data) {
+			response = JSON.stringify(data);
+                        var result = JSON.parse(response);
+                        console.log(result);
+			if(result.threeDError) {
+			 window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));
+			}else {
+			console.log("entered success case to go to auth");
                         window.location.replace(urlBuilder.build('worldpay/threedsecure/auth'));
+			}
                     },
                     error: function (data) {
                         window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));

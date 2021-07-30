@@ -149,10 +149,16 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
      * help to build url if payment is success
      */
     private function _handleAuthoriseSuccess()
-    {
-        $this->checkoutSession->setWpResponseForwardUrl(
-            $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
-        );
+    { 
+
+        if ($this->checkoutSession->getInstantPurchaseOrder()) {
+            $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+            $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+        } else {
+            $this->checkoutSession->setWpResponseForwardUrl(
+                    $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
+            );
+        }
     }
 
     /**
@@ -205,6 +211,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
                 );
             }
         } else {
+            $this->orderservice->redirectOrderSuccess();
             $this->orderservice->removeAuthorisedOrder();
             $this->_handleAuthoriseSuccess();
             $this->_updateTokenData($this->response->getXml());

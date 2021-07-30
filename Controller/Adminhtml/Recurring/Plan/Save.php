@@ -47,7 +47,13 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
     public function execute()
     {
         $data = $this->getRequest()->getPostValue();
-        $productId = $this->getRequest()->getParam('product_id');
+        //$productId = $this->getRequest()->getParam('product_id');
+        $url = parse_url($this->_redirect->getRefererUrl());
+        $path_parts=explode('/', $url['path']);
+        if (in_array('id', $path_parts)) {
+            $key = array_search('id', $path_parts);
+            $productId = $path_parts[$key+1];
+        }
         $store=$this->storeManager->getWebsite($data['website_id'])->getCode();
         if ($data && $productId) {
             $data['code'] = $this->buildCode(

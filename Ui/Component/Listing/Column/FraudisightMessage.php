@@ -49,9 +49,9 @@ class FraudisightMessage extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
 
-                $order  = $this->_orderRepository->get($item["entity_id"]);
-                $mageOrder = $order->getIncrementId();
-                $worldpaypayment=$this->_worldpaypayment->loadByPaymentId($mageOrder);
+                //$order  = $this->_orderRepository->get($item["entity_id"]);
+                //$mageOrder = $order->getIncrementId();
+               $worldpaypayment=$this->_worldpaypayment->loadByPaymentId($item["increment_id"]);
                 $fraudsightMessage = $worldpaypayment->getFraudsightMessage();
                 if (strtolower($fraudsightMessage) === 'review') {
                     $fraudsightMessage=  '<font color="red">'.$fraudsightMessage.'</font>';

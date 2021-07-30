@@ -86,7 +86,7 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
             }
         }
         if ($this->checkoutSession->getInstantPurchaseOrder()) {
-            $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+	    $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
             $this->checkoutSession->unsInstantPurchaseRedirectUrl();
             $this->checkoutSession->unsInstantPurchaseOrder();
             $message=$this->checkoutSession->getInstantPurchaseMessage();

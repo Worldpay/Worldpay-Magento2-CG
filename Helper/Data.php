@@ -93,10 +93,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getMerchantCode($paymentType)
     {
-        $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-        $merchantCodeValue = $merchat_detail['merchant_code'];
-        if (!empty($merchantCodeValue)) {
-            return $merchantCodeValue;
+        if ($paymentType) {
+            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_code']: '';
+            if (!empty($merchantCodeValue)) {
+                return $merchantCodeValue;
+            }
         }
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/merchant_code',
@@ -106,10 +108,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getXmlUsername($paymentType)
     {
-        $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-        $merchantCodeValue = $merchat_detail['merchant_username'];
-        if (!empty($merchantCodeValue)) {
-            return $merchantCodeValue;
+        if ($paymentType) {
+            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_username']:'';
+            if (!empty($merchantCodeValue)) {
+                return $merchantCodeValue;
+            }
         }
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/xml_username',
@@ -119,10 +123,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function getXmlPassword($paymentType)
     {
-        $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-        $merchantCodeValue = $merchat_detail['merchant_password'];
-        if (!empty($merchantCodeValue)) {
-            return $merchantCodeValue;
+        if ($paymentType) {
+            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_password']:'';
+            if (!empty($merchantCodeValue)) {
+                return $merchantCodeValue;
+            }
         }
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/xml_password',
@@ -172,6 +178,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'worldpay/3ds_config/do_3Dsecure',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
+    }
+    
+    public function is3dsEnabled()
+    {
+        return $this->isDynamic3DEnabled() || $this->is3DSecureEnabled();
     }
 
     public function isLoggerEnable()
@@ -1038,7 +1049,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                         ->addFieldToSelect(['id'])
                         ->addFieldToFilter('customer_id', ['eq' => $customerId])
                         ->addFieldToFilter('created_at', ['lteq' => $now->format('Y-m-d H:i:s')])
-                        ->addFieldToFilter('created_at', ['gteq' => $lastDay->format('Y-m-d H:i:s')]);
+                       // ->addFieldToFilter('created_at', ['gteq' => $lastDay->format('Y-m-d H:i:s')]
+                       ;
         return count($savedCards->getData());
     }
     public function getGlobalCurrencyExponent()

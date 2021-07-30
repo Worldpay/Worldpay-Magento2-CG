@@ -20,14 +20,16 @@ var sdkJs;
         }
         break;
     }
-               
+ 
+var sdkJs = 'https://d35p4vvdul393k.cloudfront.net/sdk_library/us/stg/ops/pc_gsmpi_web_sdk.js';
+
 if(environmentMode == 'Test Mode') {
     var sdkJs = 'https://d35p4vvdul393k.cloudfront.net/sdk_library/us/stg/ops/pc_gsmpi_web_sdk.js';
 }else{
     var sdkJs = 'https://d16i99j5zwwv51.cloudfront.net/sdk_library/us/prd/ops/pc_gsmpi_web_sdk.js';
 }
 
-var sdkJs = 'https://d35p4vvdul393k.cloudfront.net/sdk_library/us/stg/ops/pc_gsmpi_web_sdk.js';
+
 
 var config = {
     map: {

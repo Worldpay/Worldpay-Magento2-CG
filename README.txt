@@ -1,3 +1,6 @@
+This patch is added on top of release 2.3.5-p1220 with following updates - 
+1. PHP 7.4 Support
+
 This version is compatible with Magento 2.3.5 with following key features:
 1. Credit card payment
 2. Hosted payment page solution

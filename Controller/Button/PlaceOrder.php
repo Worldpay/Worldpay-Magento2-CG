@@ -136,6 +136,7 @@ class PlaceOrder extends Action
             if ($dfReferenceId) {
                 $this->checkoutSession->setDfReferenceId($dfReferenceId);
                 $this->checkoutSession->setInstantPurchaseOrder(true);
+		$this->checkoutSession->setInstantPurchaseRedirectUrl($this->_redirect->getRefererUrl());
             }
         }
         try {
@@ -175,7 +176,8 @@ class PlaceOrder extends Action
         $threeDSecureChallengeParams = $this->checkoutSession->get3Ds2Params();
         $this->messageManager->getMessages(true);
         if ($threeDSecureChallengeParams || ($redirectData = $this->checkoutSession->get3DSecureParams())) {
-            $this->checkoutSession->setInstantPurchaseMessage($message);
+	$this->checkoutSession->setInstantPurchaseRedirectUrl($this->_redirect->getRefererUrl());
+	$this->checkoutSession->setInstantPurchaseMessage($message);
             $message = __('');
         } else {
             return $this->createResponse($message, true);

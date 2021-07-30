@@ -56,7 +56,20 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
      * authorised, update order and redirect to the checkout success page.
      */
     public function execute()
-    {
+   {
+        if (isset($_COOKIE['PHPSESSID'])) {
+            $phpsessId = $_COOKIE['PHPSESSID'];
+            $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+            setcookie("PHPSESSID", $phpsessId, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'domain' => $domain,
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'None',
+            ]);
+        }
+        
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
         $threeDSecureParams = $this->checkoutSession->get3Ds2Params();
         $this->checkoutSession->unsDirectOrderParams();
@@ -79,6 +92,7 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
             }
             if ($this->checkoutSession->getInstantPurchaseOrder()) {
                 $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+
                 $this->checkoutSession->unsInstantPurchaseRedirectUrl();
                 $this->checkoutSession->unsInstantPurchaseOrder();
                 //$this->getResponse()->setRedirect($redirectUrl);

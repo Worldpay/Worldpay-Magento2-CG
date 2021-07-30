@@ -8,7 +8,7 @@
       "magento/module-quote": ">=100.0.0",
       "magento/module-vault": ">=100.0.0"
    },
-   "version": "2.3.5-p1220",
+   "version": "2.3.5-p0721",
    "license":"proprietary",
    "autoload":{
       "files":[

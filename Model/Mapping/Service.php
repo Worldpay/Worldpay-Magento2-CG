@@ -743,12 +743,12 @@ class Service
                     $paymentDetails['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
                     $environmentMode = $this->_scopeConfig->
                         getValue('worldpay/general_config/environment_mode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-//                    if ($environmentMode == 'Test Mode') {
-//                        $orderDescription =   $this->_scopeConfig->getValue(
-//                            'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
-//                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-//                        );
-//                    }
+                    if ($environmentMode == 'Test Mode') {
+                        $orderDescription =   $this->_scopeConfig->getValue(
+                            'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        );
+                    }
                 } else {
                     $orderDescription = $this->_getOrderDescription($reservedOrderId);
                 }

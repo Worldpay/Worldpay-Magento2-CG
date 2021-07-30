@@ -36,7 +36,7 @@ class Index extends \Magento\Backend\App\Action
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Sapient\Worldpay\Helper\GeneralException $helper,
-        \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod $abstractMethod
+        \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod
     ) {
 
         parent::__construct($context);
