@@ -39,6 +39,7 @@ class PluginBefore
             if ($order->getPayment()->getMethod()=='worldpay_cc'
                 || $order->getPayment()->getMethod()=='worldpay_apm'
                 || $order->getPayment()->getMethod()=='worldpay_moto'
+                || $order->getPayment()->getMethod()=='worldpay_wallets'
                 || $order->getPayment()->getMethod()=='worldpay_cc_vault') {
                 $buttonList->add(
                     'sync_status',

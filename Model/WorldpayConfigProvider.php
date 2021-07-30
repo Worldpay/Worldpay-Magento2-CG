@@ -532,4 +532,16 @@ class WorldpayConfigProvider implements ConfigProviderInterface
             return [];
         }
     }
+	
+	public function getSaveCardListForMyAccount()
+    {
+        $savedCardsList = [];
+        $tokenType = $this->worldpayHelper->getMerchantTokenization() ? 'merchant' : 'shopper';
+        if ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn()) {
+            $savedCardsList = $this->savedTokenFactory->create()->getCollection()
+            ->addFieldToFilter('customer_id', $this->customerSession->getCustomerId())
+            ->addFieldToFilter('token_type', $tokenType)->getData();
+        }
+        return $savedCardsList;
+    }
 }

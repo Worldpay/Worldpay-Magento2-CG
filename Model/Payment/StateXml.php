@@ -101,9 +101,9 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
         $statusNode = $this->_getStatusNode();
         if (isset($statusNode->payment->cardNumber)) {
             return (string) $statusNode->payment->cardNumber;
+        } elseif (isset($statusNode->payment->paymentMethodDetail->card)) {
+            return (string) $statusNode->payment->paymentMethodDetail->card['number'];
         }
-
-        return (string) $statusNode->payment->paymentMethodDetail->card['number'];
     }
 
     /**

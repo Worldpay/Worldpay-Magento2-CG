@@ -28,6 +28,9 @@ define(
         var appleResponse = "";
         var paymentToken = "";
         var merchantId = '';
+        var response = '';
+        var response1 = '';
+        var dfReferenceId = "";
         if(window.checkoutConfig.payment.general.environmentMode == 'PRODUCTION'){
             merchantId = "merchantId:"+window.checkoutConfig.payment.ccform.googleMerchantid;
         }
@@ -238,6 +241,7 @@ define(
                     'additional_data': {
                         'cc_type': this.getselectedCCType(),
                         'walletResponse' : googleResponse,
+                        'dfReferenceId': window.sessionId,
                         'appleResponse' : appleResponse
                     }
                 };
@@ -259,7 +263,36 @@ define(
                     .then(function(paymentData) {
                         googleResponse = JSON.stringify(paymentData);
                         if($form.validation() && $form.validation('isValid')){
-                            self.placeOrder();
+                            fullScreenLoader.startLoader();
+                            if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
+                                createJwt();
+                                window.addEventListener("message", function(event) {
+                                    var data = JSON.parse(event.data);
+                                    var envUrl;
+                                    if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
+                                        envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
+                                    }
+                                    if (event.origin === envUrl) {
+                                        var data = JSON.parse(event.data);
+                                        //console.warn('Merchant received a message:', data);
+                                        if (data !== undefined && data.Status) {
+                                            //window.sessionId = data.SessionId;
+                                            var sessionId = data.SessionId;
+                                            if(sessionId){
+                                                this.dfReferenceId = sessionId;
+                                            }
+                                            window.sessionId = this.dfReferenceId;
+                                            //place order with direct CSE method
+                                            fullScreenLoader.stopLoader();
+                                            self.placeOrder();
+                                        }
+                                    }
+                                }, false);
+                            } else {
+                                fullScreenLoader.stopLoader();
+                                self.placeOrder();
+                            }
+                            //self.placeOrder();
                         }else {
                             return $form.validation() && $form.validation('isValid');
                         }
@@ -343,7 +376,11 @@ define(
                 } //esle end       
             },
             afterPlaceOrder: function (data, event) {
+            if (this.getselectedCCType()=='PAYWITHGOOGLE-SSL') {
+                window.location.replace(url.build('worldpay/savedcard/redirect'));
+            } else{
             window.location.replace(url.build('worldpay/wallets/success'));
+	}
         }
     }); //return ends
            
@@ -376,7 +413,11 @@ define(
         var finalTotal = xhttp.responseText;
 
     }
-
+    function createJwt(){
+            var encryptedBin = "";
+            var jwtUrl = url.build('worldpay/hostedpaymentpage/jwt');
+            $('body').append('<iframe src="'+jwtUrl+'?instrument='+encryptedBin+'" name="jwt_frm" id="jwt_frm" style="display: none"></iframe>');
+    }
     function sendPaymentToken(paymentToken) {
         return new Promise(function(resolve, reject) {
             var appleResponse = paymentToken;

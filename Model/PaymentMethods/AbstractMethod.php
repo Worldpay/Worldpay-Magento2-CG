@@ -363,13 +363,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
 
         $autoInvoice = $this->_scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
         $partialCapture = $this->_scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
-
- 
-        //check the partial capture is enabled and auto invocie is disabled. if so do the partial capture.
-        if ($partialCapture && !$autoInvoice) {
-            return $this;
-        }
-            
+          
         $mageOrder = $payment->getOrder();
         $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
@@ -383,11 +377,30 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
               
         $paymenttype = $worldPayPayment->getPaymentType();
         if ($this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype)) {
+            //total amount from invoice and order should not be same for partial capture
+            if (floatval($amount) !=floatval($payment->getOrder()->getGrandTotal()) ) {
+                if ($partialCapture) {
+                $this->paymentservicerequest->partialCapture(
+                    $payment->getOrder(),
+                    $worldPayPayment,
+                    $amount
+                );
+                }else {
+                    $this->_wplogger->info("Partial Capture is disabled.");
+                throw new \Magento\Framework\Exception\LocalizedException(
+                __("Partial Capture is disabled.")
+            );
+                }
+            }
+            if(floatval($amount) == floatval($payment->getOrder()->getGrandTotal())){
+            //normal capture
             $this->paymentservicerequest->capture(
                 $payment->getOrder(),
                 $worldPayPayment,
                 $payment->getMethod()
             );
+        }
+
         }
         $payment->setTransactionId(time());
         return $this;
@@ -520,7 +533,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 ->addFieldToFilter('token_type', ['eq' => $tokenType])
                 ->getData();
             if ($savedCard) {
-                return $savedCard[0]['method'];
+                return str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $savedCard[0]['method']);
+                //return $savedCard[0]['method'];
             } else {
                 throw new \Magento\Framework\Exception\LocalizedException(
                     __('Inavalid Card deatils. Please Refresh and check again')

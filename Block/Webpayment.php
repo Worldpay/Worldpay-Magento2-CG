@@ -12,6 +12,7 @@ use Magento\Customer\Model\Session;
 use Magento\Framework\Message\ManagerInterface;
 use Sapient\Worldpay\Helper\Recurring;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Session\SessionManagerInterface;
 
 /**
  * Webpayment block
@@ -79,6 +80,7 @@ class Webpayment extends Template
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         Recurring $recurringHelper,
+        SessionManagerInterface $session,
         SerializerInterface $serializer,
         array $data = []
     ) {
@@ -96,6 +98,7 @@ class Webpayment extends Template
         $this->_storeManager = $storeManager;
         $this->recurringHelper = $recurringHelper;
         $this->serializer = $serializer;
+        $this->session = $session;
     }
     
     /**
@@ -252,6 +255,13 @@ class Webpayment extends Template
         return $this->scopeConfig->getValue('worldpay/cc_config/integration_mode', $storeScope);
     }
     
+    public function getEnvMode()
+    {
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+
+        return $this->scopeConfig->getValue('worldpay/general_config/environment_mode', $storeScope);
+    }
+    
     public function checkSubscriptionItems()
     {
         if ($this->recurringHelper->quoteContainsSubscription($this->_cart->getQuote())) {
@@ -263,6 +273,24 @@ class Webpayment extends Template
     public function getGeneralException()
     {
         $generaldata=$this->serializer->unserialize($this->_helper->getGeneralException());
+        $result=[];
+        $data=[];
+        if (is_array($generaldata) || is_object($generaldata)) {
+            foreach ($generaldata as $key => $value) {
+
+                $result['exception_code']=$key;
+                $result['exception_messages'] = $value['exception_messages'];
+                $result['exception_module_messages'] = $value['exception_module_messages'];
+                array_push($data, $result);
+            
+            }
+        }
+        //$output=implode(',', $data);
+        return json_encode($data);
+    }
+    public function getCreditCardException()
+    {
+        $generaldata=$this->serializer->unserialize($this->_helper->getCreditCardException());
         $result=[];
         $data=[];
         if (is_array($generaldata) || is_object($generaldata)) {
@@ -309,5 +337,39 @@ class Webpayment extends Template
                 }
             }
         }
+    }
+    public function getCreditCardSpecificException($exceptioncode)
+    {
+        return $this->_helper->getCreditCardSpecificexception($exceptioncode);
+    }
+    
+    public function getDiscountRate()
+    {
+        $discountamount=0;
+        $quote = $this->_cart->getTotalsCache();
+        if (isset($quote['discount'])) {
+            $discountamount =  $quote['discount']->getData('value');
+        }
+        
+        return $discountamount;
+    }
+    
+    public function isDynamic3DS2Enabled()
+    {
+        return $this->_helper->isDynamic3DS2Enabled();
+    }
+    public function getJwtEventUrl()
+    {
+        return $this->_helper->getJwtEventUrl();
+    }
+    
+    public function getSessionId()
+    {
+        return $this->session->getSessionId();
+    }
+    
+    public function is3DsEnabled()
+    {
+      return $this->_helper->is3DSecureEnabled() ||  $this->_helper->isDynamic3DEnabled(); 
     }
 }

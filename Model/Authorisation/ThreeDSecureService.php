@@ -80,9 +80,15 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
                 $errormessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM15');
                 $this->wplogger->info($errormessage);
                 $this->_messageManager->addError(__($errormessage?$errormessage:$e->getMessage()));
+                if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                    $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                    $this->checkoutSession->unsInstantPurchaseMessage();
+                    $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+                } else {
                 $this->checkoutSession->setWpResponseForwardUrl(
                     $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
                 );
+              }
                 return;
             }
         } catch (Exception $e) {
@@ -91,10 +97,22 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
             if (strpos($e->getMessage(), "Parse error")!==false) {
                 $errormessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM23');
             }
+            if ($e->getMessage()=== 'Unique constraint violation found') {
+                $this->_messageManager
+                        ->addError(__($this->paymentservicerequest
+                                ->getCreditCardSpecificException('CCAM22')));
+            } else {
             $this->_messageManager->addError(__($errormessage?$errormessage:$e->getMessage()));
+            }
+            if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                    $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                    $this->checkoutSession->unsInstantPurchaseMessage();
+                    $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+            } else {
             $this->checkoutSession->setWpResponseForwardUrl(
                 $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );
+           }
             return;
         }
     }
@@ -104,9 +122,14 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
      */
     private function _handleAuthoriseSuccess()
     {
-        $this->checkoutSession->setWpResponseForwardUrl(
-            $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
-        );
+        if ($this->checkoutSession->getInstantPurchaseOrder()) {
+            $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+            $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+        }else {
+            $this->checkoutSession->setWpResponseForwardUrl(
+                    $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
+            );
+        }
     }
 
     /**
@@ -124,15 +147,28 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
             $responseMessage = !empty($message) ? $message :
             $this->paymentservicerequest->getCreditCardSpecificException('CCAM9');
             $this->_messageManager->addError(__($responseMessage));
+            if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                $this->checkoutSession->unsInstantPurchaseMessage();
+                $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+            } else {
              $this->checkoutSession->setWpResponseForwardUrl(
                  $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
              );
+          }
         } elseif ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
             $this->_messageManager->addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM9')));
+            if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                $this->checkoutSession->unsInstantPurchaseMessage();
+                $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+            } else {
             $this->checkoutSession->setWpResponseForwardUrl(
                 $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );
+          }
         } else {
+            $this->orderservice->redirectOrderSuccess();
             $this->orderservice->removeAuthorisedOrder();
             $this->_handleAuthoriseSuccess();
             $this->_updateTokenData($this->response->getXml());

@@ -73,7 +73,8 @@ class Index extends \Magento\Framework\App\Action\Action
             }
         } catch (Exception $e) {
             $this->wplogger->error($e->getMessage());
-            if ($e->getMessage() == 'invalid state transition' || $e->getMessage() == 'same state') {
+            if ($e->getMessage() == 'invalid state transition' || $e->getMessage() == 'same state'
+                    || $e->getMessage() == 'Notification received for Partial Captutre') {
                 return $this->_returnOk();
             } else {
                 return $this->_returnFailure();
@@ -100,6 +101,9 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     private function _createPaymentUpdate($xmlRequest)
     {
+        $this->wplogger->info('########## Received notification ##########');
+        $this->wplogger->info($this->_getRawBody());
+        $this->paymentservice->getPaymentUpdateXmlForNotification($this->_getRawBody());
         $this->_paymentUpdate = $this->paymentservice
             ->createPaymentUpdateFromWorldPayXml($xmlRequest);
 
@@ -108,8 +112,8 @@ class Index extends \Magento\Framework\App\Action\Action
 
     private function _logNotification()
     {
-        $this->wplogger->info('########## Received notification ##########');
-        $this->wplogger->info($this->_getRawBody());
+//        $this->wplogger->info('########## Received notification ##########');
+//        $this->wplogger->info($this->_getRawBody());
         $this->wplogger->info('########## Payment update of type: ' .
                 get_class($this->_paymentUpdate). ' created ##########');
     }

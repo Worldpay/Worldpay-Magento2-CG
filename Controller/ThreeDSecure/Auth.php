@@ -15,7 +15,7 @@ class Auth extends \Magento\Framework\App\Action\Action
     protected $checkoutSession;
     
     protected $_assetRepo;
-    
+     
     /**
      * Constructor
      *
@@ -48,23 +48,42 @@ class Auth extends \Magento\Framework\App\Action\Action
     {
         $threeDSecureChallengeParams = $this->checkoutSession->get3Ds2Params();
         $threeDSecureChallengeConfig = $this->checkoutSession->get3DS2Config();
+        $directOrderParams = $this->checkoutSession->getDirectOrderParams();
         $orderId = $this->checkoutSession->getAuthOrderId();
         $iframe = false;
         // Chrome 84 releted updates for 3DS
-        $cookies = $this->worldpayHelper->getWorldpayAuthCookie();
-        $cookie_name = "machine";
-        $matches = [];
-        $cookie = preg_match('/machine=(.*?)\;/s', $cookies, $matches);
-        if (is_array($matches)) {
-            setcookie($cookie_name, $matches[1], time() + 3600, "/");
-        }
-        $phpsessId = $_COOKIE['PHPSESSID'];
-        setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
         
-        if ($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe') {
-            $iframe = true;
+        if (isset($_COOKIE['PHPSESSID'])) {
+            $phpsessId = $_COOKIE['PHPSESSID'];
+            if (phpversion() < '7.3.0') {
+                setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
+            } else {
+            $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+            setcookie("PHPSESSID", $phpsessId, [
+            'expires' => time() + 3600,
+            'path' => '/',
+            'domain' => $domain,
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'None',
+            ]);
+        }
+	}
+
+        //setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
+        
+        
+        
+        if (!$threeDSecureChallengeConfig == null) {
+        
+            if ($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe') {
+                $iframe = true;
+            }
         }
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
+            // Chrome 84 releted updates for 3DS
+//            $phpsessId = $_COOKIE['PHPSESSID'];
+//          setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
             $responseUrl = $this->_url->getUrl('worldpay/threedsecure/authresponse', ['_secure' => true]);
             print_r('
                 <form name="theForm" id="form" method="POST" action='.$redirectData->getUrl().'>
@@ -85,7 +104,7 @@ class Auth extends \Magento\Framework\App\Action\Action
                             <img src='.$imageurl.' alt="WorldPay"/>
                         </div>
                         <div class="iframe-content">
-                            <iframe src="'.$challengeUrl.'" name="jwt_frm" id="jwt_frm"
+                            <iframe src="' . $challengeUrl . '" name="jwt_frm" id="jwt_frm"
                                 style="text-align: center; vertical-align: middle; height: 50%;
                                 display: table-cell; margin: 0 25%;
                                 width: -webkit-fill-available; z-index:999999;">
@@ -95,11 +114,12 @@ class Auth extends \Magento\Framework\App\Action\Action
                     </script>
                 ');
             } else {
+                ob_start();
                 $authUrl = $this->_url->getUrl('worldpay/threedsecure/ChallengeAuthResponse', ['_secure' => true]);
                 print_r(' 
                     <form name= "challengeForm" id="challengeForm"
                     method= "POST"
-                    action="'.$threeDSecureChallengeConfig["challengeurl"].'" >
+                    action="' . $threeDSecureChallengeConfig["challengeurl"] . '" >
                     <!-- Use the above Challenge URL for test, 
                     we will provide a static Challenge URL for production once you go live -->
                         <input type = "hidden" name= "JWT" id= "second_jwt" value= "" />
@@ -125,24 +145,23 @@ class Auth extends \Magento\Framework\App\Action\Action
                         var data = {
                             "jti": jti,
                             "iat": iat,
-                            "iss": "'.$threeDSecureChallengeConfig["jwtIssuer"].'",
-                            "OrgUnitId": "'.$threeDSecureChallengeConfig["organisationalUnitId"].'",
-                            "ReturnUrl": "'.$authUrl.'",
+                            "iss": "' . $threeDSecureChallengeConfig["jwtIssuer"] . '",
+                            "OrgUnitId": "' . $threeDSecureChallengeConfig["organisationalUnitId"] . '",
+                            "ReturnUrl": "' . $authUrl . '",
                             "Payload": {
-                                "ACSUrl": "'.$threeDSecureChallengeParams['acsURL'].'",
-                                "Payload": "'.$threeDSecureChallengeParams['payload'].'",
-                                "TransactionId": "'.$threeDSecureChallengeParams['transactionId3DS'].'"
+                                "ACSUrl": "' . $threeDSecureChallengeParams['acsURL'] . '",
+                                "Payload": "' . $threeDSecureChallengeParams['payload'] . '",
+                                "TransactionId": "' . $threeDSecureChallengeParams['transactionId3DS'] . '"
                                 },
                             "ObjectifyPayload": true
                         };
-                        var secret = "'.$threeDSecureChallengeConfig["jwtApiKey"].'";
+                        var secret = "' . $threeDSecureChallengeConfig["jwtApiKey"] . '";
 
                         var stringifiedHeader = CryptoJS.enc.Utf8.parse(JSON.stringify(header));
                         var encodedHeader = base64url(stringifiedHeader);
 
                         var stringifiedData = CryptoJS.enc.Utf8.parse(JSON.stringify(data));
                         var encodedData = base64url(stringifiedData);
-
                         var signature = encodedHeader + "." + encodedData;
                         signature = CryptoJS.HmacSHA256(signature, secret);
                         signature = base64url(signature);

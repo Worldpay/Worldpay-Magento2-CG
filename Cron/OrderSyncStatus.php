@@ -156,7 +156,7 @@ class OrderSyncStatus
         try {
             $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
         } catch (Exception $e) {
-            throw new \Magento\Framework\Exception\LocalizedException($e->getMessage());
+            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
         }
     }
 

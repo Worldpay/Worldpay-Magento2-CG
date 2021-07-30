@@ -32,6 +32,8 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender,
         \Sapient\Worldpay\Model\Authorisation\ThreeDSecureService $threedsredirectresponse,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        \Magento\Framework\UrlInterface $urlBuilder,
+        \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
         CreditCardException $helper
     ) {
         $this->wplogger = $wplogger;
@@ -41,6 +43,8 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         $this->orderFactory = $orderFactory;
         $this->orderSender = $orderSender;
         $this->threedsredirectresponse = $threedsredirectresponse;
+        $this->urlBuilders    = $urlBuilder;
+        $this->resultRedirectFactory = $resultRedirectFactory;
         $this->helper = $helper;
         parent::__construct($context);
     }
@@ -65,10 +69,29 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
             $this->wplogger->error($e->getMessage());
             $this->wplogger->error('3DS Failed');
             $this->_messageManager->addError(__($this->helper->getConfigValue('CCAM9')));
-            $this->getResponse()->setRedirect($this->urlBuilders->getUrl('checkout/cart', ['_secure' => true]));
+            if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                $this->checkoutSession->unsInstantPurchaseRedirectUrl();
+                $this->checkoutSession->unsInstantPurchaseOrder();
+                return $this->resultRedirectFactory->create()->setUrl($redirectUrl);
+            }else {
+                $this->getResponse()->setRedirect($this->urlBuilders->getUrl('checkout/cart', ['_secure' => true]));
+            }
         }
+        if ($this->checkoutSession->getInstantPurchaseOrder()) {
+            $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+            $this->checkoutSession->unsInstantPurchaseRedirectUrl();
+            $this->checkoutSession->unsInstantPurchaseOrder();
+            $message=$this->checkoutSession->getInstantPurchaseMessage();
+            if ($message) {
+                $this->checkoutSession->unsInstantPurchaseMessage();
+                $this->messageManager->addSuccessMessage($message);
+            }
+            return $this->resultRedirectFactory->create()->setUrl($redirectUrl);
+        } else {
         $redirectUrl = $this->checkoutSession->getWpResponseForwardUrl();
         $this->checkoutSession->unsWpResponseForwardUrl();
         $this->getResponse()->setRedirect($redirectUrl);
+       }
     }
 }

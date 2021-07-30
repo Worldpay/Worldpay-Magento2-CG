@@ -53,6 +53,11 @@ class TokenService extends \Magento\Framework\DataObject
         $threeDSecureParams = $directResponse->get3dSecureParams();
         $threeDsEnabled = $this->worldpayHelper->is3DSecureEnabled();
         $threeDSecureChallengeParams = $directResponse->get3ds2Params();
+        $isRecurringOrder = 0;
+        if (isset($paymentDetails['additional_data']['isRecurringOrder'])) {
+            $isRecurringOrder =  $paymentDetails['additional_data']['isRecurringOrder'];
+        }
+        $payment->setIsRecurringOrder($isRecurringOrder);
         $threeDSecureConfig = [];
         if ($threeDSecureParams) {
             // Handles success response with 3DS & redirect for varification.
@@ -68,7 +73,8 @@ class TokenService extends \Magento\Framework\DataObject
         } else {
             
             // Normal order goes here.(without 3DS).
-            $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment);
+            $tokenId = isset($tokenOrderParams['id'])? $tokenOrderParams['id'] : '';
+            $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment, $tokenId);
             $this->_applyPaymentUpdate($directResponse, $payment);
         }
         $quote->setActive(false);

@@ -76,9 +76,10 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
         } catch (Exception $e) {
             $this->wplogger->info($e->getMessage());
             if ($e->getMessage() === 'Asymmetric transaction rollback.') {
-                $this->_messageManager->addError(__($this->paymentservice->getCreditCardSpecificException('CCAM16')));
+                $this->_messageManager->addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM16')));
             } else {
-                $this->_messageManager->addError(__($e->getMessage()));
+                $this->_messageManager->getMessages(true);
+                $this->_messageManager->addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM10')));
             }
             $this->checkoutSession->setWpResponseForwardUrl(
                 $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
@@ -92,9 +93,14 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
      */
     private function _handleAuthoriseSuccess()
     {
-        $this->checkoutSession->setWpResponseForwardUrl(
-            $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
-        );
+        if ($this->checkoutSession->getInstantPurchaseOrder()) {
+            $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+            $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+        } else {
+            $this->checkoutSession->setWpResponseForwardUrl(
+                    $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
+            );
+        }
     }
 
     /**
@@ -108,19 +114,34 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
         $payment = $orderStatus->payment;
         $wpayCode = $payment->ISO8583ReturnCode['code'] ? $payment->ISO8583ReturnCode['code'] : '';
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Refused) {
-            $message = $this->worldpayHelper()->getExtendedResponse($wpayCode, $orderId);
+            $message = $this->worldpayHelper->getExtendedResponse($wpayCode, $orderId);
             $responseMessage = !empty($message) ? $message :
-            $this->paymentservice->getCreditCardSpecificException('CCAM9');
+            $this->paymentservicerequest->getCreditCardSpecificException('CCAM9');
             $this->_messageManager->addError(__($responseMessage));
+            if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                $this->checkoutSession->unsInstantPurchaseMessage();
+                $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+            } else {
              $this->checkoutSession->setWpResponseForwardUrl(
                  $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
              );
+           }
         } elseif ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
-            $this->_messageManager->addError(__($this->paymentservice->getCreditCardSpecificException('CCAM9')));
+            $this->_messageManager
+                    ->addError(__($this->paymentservicerequest
+                            ->getCreditCardSpecificException('CCAM9')));
+            if ($this->checkoutSession->getInstantPurchaseOrder()) {
+                $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+                $this->checkoutSession->unsInstantPurchaseMessage();
+                $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+            } else {
             $this->checkoutSession->setWpResponseForwardUrl(
                 $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
             );
+          }
         } else {
+            $this->orderservice->redirectOrderSuccess();
             $this->orderservice->removeAuthorisedOrder();
             $this->_handleAuthoriseSuccess();
             $this->_updateTokenData($this->response->getXml());

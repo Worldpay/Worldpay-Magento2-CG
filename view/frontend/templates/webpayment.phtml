@@ -14,8 +14,13 @@ if (array_key_exists('chromepay', $param)) {
 }
 
 $myaccountexception = $block->getMyAccountSpecificException('MCAM8') ;
+$ccexception = $block->getCreditCardSpecificException('CCAM12');
 if (array_key_exists('error', $param)) {
-    $block->_messageManager->addError(__($myaccountexception));
+    if (array_key_exists('message', $param)) {
+        $block->_messageManager->addError(__($ccexception));
+    } else {
+        $block->_messageManager->addError(__($myaccountexception));
+    }
 }
 
 $cusToken = 'Bearer ' . $block->getCustomerToken();
@@ -30,8 +35,23 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     window.SubscriptionStatus = '<?= /* @noEscape */ $block->checkSubscriptionItems() ?>'
     window.GeneralExceptions = '<?= /* @noEscape */ $block->getGeneralException() ?>'
     window.MyAccountExceptions = '<?= /* @noEscape */ $block->MyAccountExceptions() ?>';
+    window.CreditCardException = '<?= /* @noEscape */ $block->getCreditCardException() ?>';
+    window.isDynamic3DS2Enabled = '<?= /* @noEscape */ $block->isDynamic3DS2Enabled() ?>';
+    window.is3DsEnabled = '<?= /* @noEscape */ $block->is3DsEnabled() ?>';
+    window.jwtEventUrl = '<?= /* @noEscape */ $block->getJwtEventUrl() ?>';
     
-    if(typeof window.chrome != "undefined") {
+    var envMode = '<?= /* @noEscape */ $block->getEnvMode() ?>';
+    
+    if(envMode == 'Test Mode') {
+        document.cookie = "envMode=Test Mode";
+    }else{
+        document.cookie = "envMode=Live Mode";
+    }
+    
+    var browserType = window.navigator.userAgent.match(/chrome/i);
+    var browserEdge = window.navigator.userAgent.match(/edge/i);
+
+    if((browserType && browserType[0] == 'Chrome') && !browserEdge) {
         window.ChromepayAvailable = '1';
     }else{
         window.ChromepayAvailable = '0';
@@ -49,6 +69,8 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var baseCurrency = '<?= /* @noEscape */ $block->getCurrency() ?>';
     var orderCode;
     var reqShipping = '<?= /* @noEscape */ $block->getshippingRequired() ?>';
+    var session ='';
+    var cseData = {};
     function initPaymentRequest() {
 
     const networks = [
@@ -93,6 +115,12 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
                 value: '<?= /* @noEscape */ $block->getTaxRate() ?>'},
             pending: true,
     },
+    {
+    label: 'Discount',
+            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+                value: '<?= /* @noEscape */ $block->getDiscountRate() ?>'},
+            pending: true,
+    },
     ],
             total: {
             label: 'Total',
@@ -123,9 +151,10 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         var k;
         var selectedOptIndex;
         for (k = 0; k < details.shippingOptions.length; k++) {
+         details.shippingOptions[k].selected = false;
         if (details.shippingOptions[k].id == shippingOption) {
         selectedOptIndex = k;
-        break;
+        //break;
         }
         }
 
@@ -139,7 +168,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         totalAmount = newTotal;
         details.displayItems[shippingPosition].amount.value = newShippingAmount;
         selectedShippingOption.selected = true;
-        var totals = updateTotals(carrierCode, shippingAddress);
+        var totals = updateTotals(carrierCode, shippingAddress,shippingOption);
         if(totals){            
             var taxPosition = Number(productCount + 2);
             details.displayItems[taxPosition].amount.value = totals.base_tax_amount;
@@ -149,16 +178,16 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         resolve(details);
     }  // end of updateDetails fn
     
-    function updateTotals(carrierCode, shippingAddress){
+    function updateTotals(carrierCode, shippingAddress,shippingOption){
         var countryCode = shippingAddress.country;
         var req = {
             'addressInformation' : {
                 'address' : {
                     'countryId' : countryCode,
-                    'region':"",
-                    'postcode':null
+                    'region': shippingAddress.region,
+                    'postcode':shippingAddress.postalCode
                 },
-                'shipping_method_code' : carrierCode,
+                'shipping_method_code' : shippingOption,
                 'shipping_carrier_code' : carrierCode
             }
         }
@@ -238,6 +267,37 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     return request;
     } // ------------- End of initPaymentRequest fn ---------------
 
+    var jwtUrl = baseUrl +'worldpay/hostedpaymentpage/jwt';
+        
+        function createJwt(cardNumber){
+            var bin = cardNumber;
+            var encryptedBin = btoa(bin);
+            var iframe = document.createElement('iframe');
+            iframe.src =jwtUrl+'?instrument='+encryptedBin;
+            iframe.name="jwt_frm";
+            iframe.id="jwt_frm";
+            iframe.style.display = "none";
+            document.body.appendChild(iframe);
+        }
+        
+        function isClientSideEncryptionEnabled() {
+                if (getCsePublicKey()) {
+                    return window.checkoutConfig.payment.ccform.cseEnabled;
+                }
+                return false;
+            }
+    
+        function getCsePublicKey (){
+                return window.checkoutConfig.payment.ccform.csePublicKey;
+            }
+        
+        function placeOrder(instrumentResponse) {
+            orderCode = createOrder(instrumentResponse);
+            if (instrumentResponse && orderCode){
+           // window.location.href = baseUrl + 'checkout/onepage/success';
+            window.location.href = baseUrl + 'worldpay/threedsecure/auth';
+        }
+        }
     /**
      * Invokes PaymentRequest for credit cards.
      *
@@ -254,14 +314,89 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     }
 
     request.show().then(function(instrumentResponse) {
-        orderCode = createOrder(instrumentResponse);
+       //Client-Side encryption 
+        if(isClientSideEncryptionEnabled()){
+            require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.2.min.js"], function (worldpay) {
+                worldpay.setPublicKey(getCsePublicKey());
+                cseData = {
+                            cardNumber : instrumentResponse.details.cardNumber,
+                            cvc : instrumentResponse.details.cardSecurityCode,
+                            cardHolderName : instrumentResponse.details.cardholderName,
+                            expiryMonth : instrumentResponse.details.expiryMonth,
+                            expiryYear : instrumentResponse.details.expiryYear
+                            };
+                var encryptedData = worldpay.encrypt(cseData);
+                cseData = encryptedData;
+                if (window.isDynamic3DS2Enabled) {
+                    var bin = instrumentResponse.details.cardNumber;;
+                    var binNew = bin.substring(0,6);
+                    createJwt(binNew);
+                    window.sessionId ='<?= /* @noEscape */ $block->getSessionId(); ?>';
+        
+                    window.addEventListener("message", function(event) {
+                    var data = JSON.parse(event.data);
+
+                    var envUrl;
+                    if(window.jwtEventUrl !== '') {
+                        envUrl = window.jwtEventUrl;
+                        }
+                    if (event.origin === envUrl) {
+                                        
+                        var data = JSON.parse(event.data);
+                            //console.warn('Merchant received a message:', data);
+                            if (data !== undefined && data.Status) {
+                                //window.sessionId = data.SessionId;
+                                var sessionId = data.SessionId;
+                                if(sessionId) {
+                                    dfReferenceId = sessionId;
+                                    }
+                                window.sessionId = dfReferenceId;
+                                placeOrder(instrumentResponse);
+                                            
+                                    }
+                                }
+                            }, false);          
+                        } else {
+                                placeOrder(instrumentResponse);
+                            }
+                    } );
+       } else if (window.isDynamic3DS2Enabled) {
+        var bin = instrumentResponse.details.cardNumber;;
+        var binNew = bin.substring(0,6);
+        createJwt(binNew);
+        window.sessionId ='<?= /* @noEscape */ $block->getSessionId(); ?>';
+        
+        window.addEventListener("message", function(event) {
+            var data = JSON.parse(event.data);
+
+            var envUrl;
+            if(window.jwtEventUrl !== '') {
+                envUrl = window.jwtEventUrl;
+            }
+            if (event.origin === envUrl) {
+                                        
+                var data = JSON.parse(event.data);
+                    //console.warn('Merchant received a message:', data);
+                if (data !== undefined && data.Status) {
+                    //window.sessionId = data.SessionId;
+                    var sessionId = data.SessionId;
+                    if(sessionId) {
+                        dfReferenceId = sessionId;
+                    }
+                    window.sessionId = dfReferenceId;
+                    //place order with direct CSE method
+                    placeOrder(instrumentResponse);
+                                            
+                    }
+                }
+            }, false);
+    }else {
+         placeOrder(instrumentResponse);
+    }
         //console.log('order created');
         //console.log(orderCode);
         //console.log('REDIRECTING');
-        if (instrumentResponse && orderCode){
-           // window.location.href = baseUrl + 'checkout/onepage/success';
-            window.location.href = baseUrl + 'worldpay/threedsecure/auth';
-        }
+
     }).catch(function(err) {
         throw(err);
     });
@@ -277,6 +412,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var guestMaskedQuoteId = window.checkoutConfig.quoteData.entity_id;
     var apiUrl;
     var orderResponse;
+    var dfReferenceId = "";
     if (isCustomerLoggedIn) { //Api for logged in customer
         apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/shipping-information';
     } else { // Api for guest customer
@@ -316,7 +452,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     },
             "billing_address": {
             "email": instrumentResponse.payerEmail,
-                    "region": instrumentResponse.details.billingAddress.city,
+                    "region": instrumentResponse.details.billingAddress.region,
                     "region_id": 0,
                     "region_code": instrumentResponse.details.billingAddress.region,
                     "country_id": instrumentResponse.details.billingAddress.country,
@@ -332,11 +468,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     }
     }
 
-   
-
     if (instrumentResponse.shippingAddress) {
     //shipping information
-    customerDetails.addressInformation.shipping_address.region = instrumentResponse.shippingAddress.city;
+    customerDetails.addressInformation.shipping_address.region = instrumentResponse.shippingAddress.region;
     customerDetails.addressInformation.shipping_address.region_id = 0;
     customerDetails.addressInformation.shipping_address.region_code = instrumentResponse.shippingAddress.region;
     customerDetails.addressInformation.shipping_address.country_id = instrumentResponse.shippingAddress.country;
@@ -364,13 +498,15 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     xhttp.setRequestHeader("Authorization", token);
     xhttp.send(jsonCustomerDetails);
     }
-
+ 
     //card details
     let cardNumber = instrumentResponse.details.cardNumber;
     let cvc = instrumentResponse.details.cardSecurityCode;
     let cardholderName = instrumentResponse.details.cardholderName;
     let expiryMonth = instrumentResponse.details.expiryMonth;
     let expiryYear = instrumentResponse.details.expiryYear;
+    let encyptedCseData = cseData.length>0 ? cseData : null;
+     
     //Add payment information and place the order
     var paymentDetails = {
     "paymentMethod": {
@@ -383,11 +519,12 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
                     "cc_number" : cardNumber,
                     "cc_name" : cardholderName,
                     "save_my_card" : false,
-                    "cse_enabled" : false,
-                    "encryptedData" : null,
+                    "cse_enabled" : isClientSideEncryptionEnabled(),
+                    "encryptedData" : encyptedCseData,
                     "tokenCode" : null,
                     "isSavedCardPayment" : false,
-                    "isChromePay" : "1"
+                    "isChromePay" : "1",
+                    "dfReferenceId": window.sessionId
             }
     },
             "billing_address": {
@@ -422,9 +559,13 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     xhttp.setRequestHeader("Authorization", token);
     xhttp.send(jsonPaymentDetails);
     var orderResponse = JSON.parse(xhttp.responseText);
-    //console.log(orderResponse);
+    //console.log("Response-->"+orderResponse['message']);
    
    if(isNaN(orderResponse)){
+       if(orderResponse.hasOwnProperty("message") && orderResponse['message'].indexOf('3DS2')!==-1) {
+         window.location.href = baseUrl + 'checkout/cart?error=true&message=error';
+           exit;
+       }
         window.location.href = baseUrl + 'checkout/cart?error=true';
         exit;
     }

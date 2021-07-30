@@ -32,6 +32,7 @@ class Service
         \Sapient\Worldpay\Model\SavedToken $savedtoken,
         \Magento\Framework\UrlInterface $urlBuilder,
         \Magento\Customer\Model\Session $customerSession,
+        \Sapient\Worldpay\Helper\Recurring $recurringHelper,
         SessionManagerInterface $session,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
@@ -39,6 +40,7 @@ class Service
         $this->savedTokenFactory = $savedTokenFactory;
         $this->worldpayHelper = $worldpayHelper;
         $this->customerSession = $customerSession;
+        $this->recurringHelper = $recurringHelper;
         $this->savedtoken = $savedtoken;
         $this->_urlBuilder = $urlBuilder;
         $this->session = $session;
@@ -64,7 +66,7 @@ class Service
             'cardAddress' => $this->_getCardAddress($quote),
             'shopperEmail' => $quote->getCustomerEmail(),
             'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
-            'tokenRequestConfig' => $this->_getTokenRequestConfig($paymentDetails),
+            'tokenRequestConfig' => 0,
             'acceptHeader' => php_sapi_name() !== "cli" ? filter_input(INPUT_SERVER, 'HTTP_ACCEPT') : '',
             'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
                 INPUT_SERVER,
@@ -327,7 +329,11 @@ class Service
     ) {
         $reservedOrderId = $quote->getReservedOrderId();
         $updatedPaymentDetails = $this->_getPaymentDetailsUsingToken($paymentDetails, $quote);
-
+        
+        $id = '';
+        if ($this->recurringHelper->quoteContainsSubscription($quote)) {
+             $id = isset($updatedPaymentDetails['id'])? $updatedPaymentDetails['id'] : '';
+        }
         $savemyCard = isset($paymentDetails['additional_data']['save_my_card'])
                 ? $paymentDetails['additional_data']['save_my_card'] : '';
         $tokenizationEnabled = isset($paymentDetails['additional_data']['tokenization_enabled'])
@@ -348,6 +354,7 @@ class Service
         return [
             'orderCode' => $orderCode,
                 'merchantCode' => $this->worldpayHelper->getMerchantCode($updatedPaymentDetails['brand']),
+                'id' => $id,
                 'orderDescription' => $this->_getOrderDescription($reservedOrderId),
                 'currencyCode' => $quote->getQuoteCurrencyCode(),
                 'amount' => $quote->getGrandTotal(),
@@ -394,6 +401,8 @@ class Service
     {
         if (isset($paymentDetails['additional_data']['save_my_card'])) {
             return $paymentDetails['additional_data']['save_my_card'];
+        } else {
+            return false;
         }
     }
 
@@ -406,8 +415,8 @@ class Service
             ];
         } elseif ($method == 'worldpay_cc_vault') {
             return [
-                'isDynamic3D' => true,
-                'is3DSecure' => false
+                'isDynamic3D' => (bool) $this->worldpayHelper->isDynamic3DEnabled(),
+                'is3DSecure' => (bool) $this->worldpayHelper->is3DSecureEnabled()
             ];
         } else {
             return [
@@ -586,6 +595,7 @@ class Service
             }
         }
         $details['sessionId'] = $this->session->getSessionId();
+        $details['id'] = $savedCardData->getId();
         $details['shopperIpAddress'] = $this->_getClientIPAddress();
         $details['dynamicInteractionType'] = $this->worldpayHelper->
                 getDynamicIntegrationType($paymentDetails['method']);
@@ -616,6 +626,11 @@ class Service
                                                 getDynamicIntegrationType($paymentDetails['method']);
         // Check for Merchant Token
         $details['token_type'] = $this->worldpayHelper->getMerchantTokenization();
+        //3ds changes for vault
+        if (isset($paymentDetails['dfReferenceId'])) {
+            $details['dfReferenceId'] = $paymentDetails['dfReferenceId'];
+        }
+        
         return $details;
     }
 
@@ -643,21 +658,51 @@ class Service
                 $paymentMethodData = (array) $walletResponse['paymentMethodData'];
                 $tokenizationData = (array) $paymentMethodData['tokenizationData'];
                 $token = (array) json_decode($tokenizationData['token']);
-
+                // 3DS2 value
+                $sessionId = $this->session->getSessionId();
+                $paymentDetails['sessionId'] = $sessionId;
+                $dfReferenceId = '';
+                $orderDescription = $this->_getOrderDescription($reservedOrderId);
+                if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
+                    $paymentDetails['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
+                    $environmentMode = $this->_scopeConfig->
+                        getValue('worldpay/general_config/environment_mode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+                    if ($environmentMode == 'Test Mode') {
+                        $orderDescription =   $this->_scopeConfig->getValue(
+                            'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        );
+                    }
+                } else {
+                    $orderDescription = $this->_getOrderDescription($reservedOrderId);
+                }
                 return [
                     'orderCode' => $orderCode,
                     'merchantCode' => $this->worldpayHelper->
                         getMerchantCode($paymentDetails['additional_data']['cc_type']),
-                    'orderDescription' => $this->_getOrderDescription($reservedOrderId),
+                    'orderDescription' => $orderDescription,
                     'currencyCode' => $quote->getQuoteCurrencyCode(),
                     'amount' => $quote->getGrandTotal(),
                     'paymentType' => $this->_getRedirectPaymentType($paymentDetails),
                     'shopperEmail' => $quote->getCustomerEmail(),
+                    'acceptHeader' => php_sapi_name() !== "cli" ? filter_input(INPUT_SERVER, 'HTTP_ACCEPT') : '',
+                    'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
+                        INPUT_SERVER,
+                        'HTTP_USER_AGENT',
+                        FILTER_SANITIZE_STRING,
+                        FILTER_FLAG_STRIP_LOW
+                    ) : '',
                     'method' => $paymentDetails['method'],
                     'orderStoreId' => $orderStoreId,
                     'protocolVersion' => $token['protocolVersion'],
                     'signature' => $token['signature'],
                     'signedMessage' => $token['signedMessage'],
+                    'shippingAddress' => $this->_getShippingAddress($quote),
+                    'billingAddress' => $this->_getBillingAddress($quote),
+                    'cusDetails' => $this->getCustomerDetailsfor3DS2($quote),
+                    'paymentDetails' => $paymentDetails,
+                    'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
+                    'shopperIpAddress' => $this->_getClientIPAddress(),
                     'exponent' => $exponent
                 ];
             }

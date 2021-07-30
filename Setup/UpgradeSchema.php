@@ -120,6 +120,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '1.3.3', '<')) {
             $this->addColumnLatAmInstalments($installer);
         }
+        if (version_compare($context->getVersion(), '1.3.7', '<')) {
+            $this->addColumnIsRecurringOrder($installer);
+        }
         $installer->endSetup();
     }
     /**
@@ -1096,6 +1099,22 @@ class UpgradeSchema implements UpgradeSchemaInterface
                ]
         );
     }
+    
+    private function addColumnIsRecurringOrder(SchemaSetupInterface $installer)
+    {
+        $connection = $installer->getConnection();
+        $connection->addColumn(
+            $installer->getTable(self::WORLDPAY_PAYMENT),
+            'is_recurring_order',
+            [
+            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+            'nullable' => false,
+            'comment' => 'Check Recurring Order',
+            'after' => 'latam_instalments'
+             ]
+        );
+    }
+    
     /**
      * @param SchemaSetupInterface $installer
      * @return void

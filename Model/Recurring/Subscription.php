@@ -31,6 +31,10 @@ use Sapient\Worldpay\Model\Config\Source\SubscriptionStatus;
  * @method \Sapient\Worldpay\Model\Recurring\Subscription setOriginalOrderId(int $value)
  * @method string getOriginalOrderIncrementId()
  * @method \Sapient\Worldpay\Model\Recurring\Subscription setOriginalOrderIncrementId(string $value)
+ * @method string getWorldpayOrderId()
+ * @method \Sapient\Worldpay\Model\Recurring\Subscription setWorldpayOrderId(string $value)
+ * @method string getWorldpayTokenId()
+ * @method \Sapient\Worldpay\Model\Recurring\Subscription setWorldpayTokenId(string $value)
  * @method int getProductId()
  * @method \Sapient\Worldpay\Model\Recurring\Subscription setProductId(int $value)
  * @method string getProductName()
@@ -182,6 +186,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory,
         \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\CollectionFactory
         $addressCollectionFactory,
+        \Sapient\Worldpay\Helper\Recurring $recurringHelper,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder,
@@ -195,6 +200,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $this->storeManager = $storeManager;
         $this->statusSource = $statusSource;
         $this->planFactory = $planFactory;
+        $this->recurringHelper = $recurringHelper;
         $this->addressCollectionFactory = $addressCollectionFactory;
         $this->orderRepository = $orderRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
@@ -750,6 +756,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $transactions->setData('subscription_id', $this->getId());
         $transactions->setData('customer_id', $this->getCustomerId());
         $transactions->setData('original_order_id', $this->getOriginalOrderId());
+        $transactions->setData('original_order_increment_id', $this->getOriginalOrderIncrementId());
         $transactions->setData('plan_id', $this->getPlanId());
         $transactions->setData('recurring_date', $startDate);
         $transactions->setData('recurring_end_date', $date);
