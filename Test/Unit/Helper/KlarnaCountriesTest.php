@@ -15,12 +15,14 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Sapient\Worldpay\Model\Config\Source\KlarnaCountries as KlarnaSourceCountries;
 use \PHPUnit\Framework\TestCase;
 
-class KlarnaCountriesTest extends TestCase {
+class KlarnaCountriesTest extends TestCase
+{
     protected $scopeConfig;
      /** @var KlarnaCountries  */
     protected $model;
     
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $this->scopeConfig = $this->getMockBuilder(ScopeConfigInterface::class)
                         ->disableOriginalConstructor()->getMock();
         $mathRandom = $this->getMockBuilder(Random::class)
@@ -32,7 +34,8 @@ class KlarnaCountriesTest extends TestCase {
         $this->model = new KlarnaCountries($this->scopeConfig, $mathRandom, $serializer, $klarnaCountries);
     }
     
-    public function testGetConfigValue() {
+    public function testGetConfigValue()
+    {
         $value = ['Sweden' => 14, 'Norway' => 14,
             'Finland' => 14, 'Germany' => 14,
             'United Kingdom' => 30,
@@ -40,10 +43,12 @@ class KlarnaCountriesTest extends TestCase {
             'Netherlands' => 14, 'Switzerland' => 14];
         $this->scopeConfig->expects($this->once())
                 ->method('getValue')
-                ->with('worldpay/klarna_config/paylater_config/paylater_days_config/subscription_days', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->with(
+                    'worldpay/klarna_config/paylater_config/paylater_days_config/subscription_days',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
                 ->willReturn($value);
 
         $this->assertNull($this->model->getConfigValue('US'));
     }
-
 }

@@ -7,8 +7,9 @@
         <?= /* @noEscape */ $block->getBlockHtml('formkey')?>
         <legend class="legend">
             <span>
-                <?php print /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?
-                        $block->getAccountLabelbyCode('AC8') :'Card Information' ?>
+                <?= /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?
+                        $block->getAccountLabelbyCode('AC8') :
+                        $block->escapeHtml(__('Card Information')) ?>
             </span></legend><br>
 
         <input type="hidden" name="token[id]" value="<?= /* @noEscape */ $carddeatils->getTokenCode() ?>" />
@@ -16,8 +17,9 @@
         <div class="field card Number">
             <label class="label" for="card number">
                 <span>
-                    <?php print /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
-                            $block->getAccountLabelbyCode('AC3') :'Card Number' ?>
+                    <?= /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
+                            $block->getAccountLabelbyCode('AC3') :
+                            $block->escapeHtml(__('Card Number')) ?>
                 </span>
             </label>
             <div class="control">
@@ -28,16 +30,17 @@
         <div class="field card holder name">
             <label class="label" for="card holder name">
                 <span>
-                    <?php print /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
-                            $block->getCheckoutLabelbyCode('CO4') :'Card Holder Name' ?>
+                    <?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
+                            $block->getCheckoutLabelbyCode('CO4') :
+                            $block->escapeHtml(__('Card Holder Name')) ?>
                 </span>
             </label>
             <div class="control">
                 <input type="text" name="token[cardholder_name]" required='true' id="card-holder-name" 
-                       title="<?php print /* @noEscape */
+                       title="<?= /* @noEscape */
                         $block->getCheckoutLabelbyCode('CO4') ?
-                               $block->getCheckoutLabelbyCode('CO4') :
-                           'Card Holder Name' ?>"
+                        $block->getCheckoutLabelbyCode('CO4') :
+                        $block->escapeHtml(__('Card Holder Name')) ?>"
                 value="<?= /* @noEscape */ $block->escapeHtml($carddeatils->getCardholderName()) ?>"
                 class="input-text required cardholder_name worldpay-cardholdername-length">
             </div>
@@ -46,10 +49,10 @@
         <div class="field card expiry month">
             <label class="label" for="card holder name">
                 <span>
-                    <?php print /* @noEscape */
+                    <?= /* @noEscape */
                     $block->getAccountLabelbyCode('AC10') ?
                             $block->getAccountLabelbyCode('AC10') :
-                        'Expiry Month/Year' ?>
+                            $block->escapeHtml(__('Expiry Month/Year')) ?>
                 </span>
             </label>
             <div class="fields group group-2">
@@ -87,13 +90,13 @@
         <div class="actions-toolbar">
             <div class="primary">
                 <button type="submit" class="action save primary"
-                        title="<?php print /* @noEscape */
+                        title="<?= /* @noEscape */
                         $block->getAccountLabelbyCode('AC39') ?
-                                $block->getAccountLabelbyCode('AC39') :'Save' ?>">
+                        $block->getAccountLabelbyCode('AC39') : $block->escapeHtml(__('Save')) ?>">
                     <span>
-                        <?php print /* @noEscape */
+                        <?= /* @noEscape */
                         $block->getAccountLabelbyCode('AC39') ?
-                                $block->getAccountLabelbyCode('AC39') :'Save' ?>
+                        $block->getAccountLabelbyCode('AC39') : $block->escapeHtml(__('Save')) ?>
                     </span>
                 </button>
             </div>

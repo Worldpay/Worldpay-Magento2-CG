@@ -56,13 +56,25 @@ class Service
         $reservedOrderId = $quote->getReservedOrderId();
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
+        
+        //Level23 data changes
+        $billingAddr = $this->_getBillingAddress($quote);
+        $orderLineItems = null;
+        $vaultPaymentDetails = $this->_getVaultPaymentDetails($paymentDetails);
+        if ($this->worldpayHelper->isLevel23Enabled()
+           && ($vaultPaymentDetails['brand'] === 'ECMC' || $vaultPaymentDetails['brand'] === 'VISA')
+           && ($billingAddr['countryCode'] === 'US' || $billingAddr['countryCode'] === 'CA')) {
+            $orderLineItems = $this->_getL23OrderLineItems($quote, $vaultPaymentDetails['brand'].'-SSL');
+            $vaultPaymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
+        }
+        
         return [
             'orderCode' => $orderCode,
             'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['cc_type']),
             'orderDescription' => $this->_getOrderDescription($reservedOrderId),
             'currencyCode' => $quote->getQuoteCurrencyCode(),
             'amount' => $quote->getGrandTotal(),
-            'paymentDetails' => $this->_getVaultPaymentDetails($paymentDetails),
+            'paymentDetails' => $vaultPaymentDetails,
             'cardAddress' => $this->_getCardAddress($quote),
             'shopperEmail' => $quote->getCustomerEmail(),
             'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
@@ -82,7 +94,8 @@ class Service
             'orderStoreId' => $orderStoreId,
             'shopperId' => $quote->getCustomerId(),
             'exponent' => $exponent,
-            'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote)
+            'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote),
+            'orderLineItems' => $orderLineItems
         ];
     }
 
@@ -103,6 +116,18 @@ class Service
         $paymentDetails['additional_data']['disclaimerFlag'] =
                 isset($paymentDetails['additional_data']['disclaimerFlag'])
                 ? $paymentDetails['additional_data']['disclaimerFlag'] : 0;
+        //level23 data
+        $billingAddr = $this->_getBillingAddress($quote);
+        $orderLineItems = null;
+        $paymentType = $paymentDetails['additional_data']['cc_type'];
+        if ($this->worldpayHelper->isLevel23Enabled()
+           && ($paymentType === 'ECMC-SSL' || $paymentType === 'VISA-SSL')
+           && ($billingAddr['countryCode'] === 'US' || $billingAddr['countryCode'] === 'CA')) {
+            $orderLineItems = $this->_getL23OrderLineItems($quote, $paymentType);
+            $paymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
+
+        }
+        
         $thirdPartyData = '';
         $shippingFee = '';
         if ((isset($paymentDetails['additional_data']['cpf']) && $paymentDetails['additional_data']['cpf'] == true)
@@ -113,7 +138,7 @@ class Service
         }
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
-        
+          
         return [
                 'orderCode' => $orderCode,
                 'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -145,7 +170,8 @@ class Service
                 'thirdPartyData' => $thirdPartyData,
                 'shippingfee' => $shippingFee,
                 'exponent' => $exponent,
-                'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote)
+                'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote),
+                'orderLineItems' => $orderLineItems
             ];
     }
 
@@ -158,6 +184,11 @@ class Service
         $cusDetails['updated_at'] = !empty($this->customerSession->getCustomer()->getUpdatedAt())
                 ? $this->customerSession->getCustomer()->getUpdatedAt() : $now->format('Y-m-d H:i:s');
         $orderDetails = $this->worldpayHelper->getOrderDetailsByEmailId($quote->getCustomerEmail());
+        
+        $cusDetails['shipping_amount'] = $quote->getShippingAddress()->getShippingAmount();
+        $cusDetails['discount_amount'] = ($quote->getOrigData()['subtotal']) -
+            ($quote->getOrigData()['subtotal_with_discount']);
+        
         $orderDetails['created_at'] = !empty($orderDetails['created_at'])
                 ? $orderDetails['created_at'] : $now->format('Y-m-d H:i:s');
         $orderDetails['updated_at'] = !empty($orderDetails['updated_at'])
@@ -232,6 +263,21 @@ class Service
             $paymentType = $this->_getRedirectPaymentType($paymentDetails);
             $updatedPaymentDetails = ['token_type' => $this->worldpayHelper->getMerchantTokenization()];
         }
+        
+        //level23 data
+        $billingAddr = $this->_getBillingAddress($quote);
+        $orderLineItems = null;
+        if ($this->worldpayHelper->isLevel23Enabled()
+           && ($paymentType === 'ECMC-SSL' || $paymentType === 'VISA-SSL')
+           && ($billingAddr['countryCode'] === 'US' || $billingAddr['countryCode'] === 'CA')) {
+            $orderLineItems = $this->_getL23OrderLineItems($quote, $paymentType);
+            $updatedPaymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
+        }
+             
+        if ($paymentDetails['additional_data']['cc_type'] !== 'savedcard') {
+            $updatedPaymentDetails['cardType'] = $paymentType;
+        }
+                    
         $thirdPartyData = '';
         $shippingFee = '';
         if ((isset($paymentDetails['additional_data']['cpf'])
@@ -281,7 +327,8 @@ class Service
                 'thirdPartyData' => $thirdPartyData,
                 'shippingfee' => $shippingFee,
                 'exponent' => $exponent,
-                'cusDetails' => $this->getCustomerDetailsfor3DS2($quote)
+                'cusDetails' => $this->getCustomerDetailsfor3DS2($quote),
+                'orderLineItems' => $orderLineItems
             ];
     }
 
@@ -294,10 +341,10 @@ class Service
         $reservedOrderId = $quote->getReservedOrderId();
         $stmtNarrative = '';
         $orderContent = '';
-       
+        
         $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
-        if (array_key_exists($paymentDetails['additional_data']['cc_type'], $apmPaymentTypes) &&
-                (isset($paymentDetails['additional_data']['statementNarrative']))) {
+        if ($paymentDetails['additional_data']['cc_type'] === "KLARNA-SSL"
+                && (isset($paymentDetails['additional_data']['statementNarrative']))) {
             $stmtNarrative = $paymentDetails['additional_data']['statementNarrative'];
         }
         $currencyCode = $quote->getQuoteCurrencyCode();
@@ -329,6 +376,7 @@ class Service
             'hideAddress' => $this->worldpayHelper->getHideAddress(),
             'orderLineItems' => $this->_getOrderLineItems($quote, 'KLARNA-SSL'),
             'orderStoreId' => $orderStoreId,
+            'shopperId' => $quote->getCustomerId(),
             'exponent' => $exponent,
             'sessionData' => $this->_getSessionDetails($paymentDetails, $countryCode),
             'orderContent' => $orderContent
@@ -365,6 +413,17 @@ class Service
         }
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
+        /* Level 23 DATA */
+        $paymentType = $updatedPaymentDetails['cardType'];
+        $billingAddr = $this->_getBillingAddress($quote);
+        $orderLineItems = null;
+        if ($this->worldpayHelper->isLevel23Enabled()
+           && ($paymentType === 'ECMC-SSL' || $paymentType === 'VISA-SSL')
+           && ($billingAddr['countryCode'] === 'US' || $billingAddr['countryCode'] === 'CA')) {
+            $orderLineItems = $this->_getL23OrderLineItems($quote, $paymentType);
+            $updatedPaymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
+        }
+
         return [
             'orderCode' => $orderCode,
                 'merchantCode' => $this->worldpayHelper->getMerchantCode($updatedPaymentDetails['brand']),
@@ -397,7 +456,8 @@ class Service
                 'thirdPartyData' => $thirdPartyData,
                 'shippingfee' => $shippingFee,
                 'exponent' => $exponent,
-                'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote)
+                'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote),
+                'orderLineItems' => $orderLineItems
             ];
     }
     
@@ -535,6 +595,7 @@ class Service
 
                 $lineitem['reference'] = $_item->getProductId();
                 $lineitem['name'] = $_item->getName();
+                $lineitem['productType'] = $_item->getProductType();
                 $lineitem['quantity'] = (int) $_item->getQty();
                 $lineitem['quantityUnit'] = $this->worldpayHelper->getQuantityUnit($_item->getProduct());
                 $lineitem['unitPrice'] = $rowtotal / $_item->getQty();
@@ -543,6 +604,9 @@ class Service
                 $lineitem['totalTaxAmount'] = $totaltax;
                 if ($discountamount > 0) {
                     $lineitem['totalDiscountAmount'] = $discountamount;
+                }
+                if ($orderitems['orderTaxAmount'] == 0) {
+                    $orderitems['orderTaxAmount'] = $totaltax;
                 }
                 $orderitems['lineItem'][] = $lineitem;
             }
@@ -555,6 +619,7 @@ class Service
             $totaltax = $address->getShippingTaxAmount() + $address->getShippingHiddenTaxAmount();
             $lineitem['reference'] = 'Shipid';
             $lineitem['name'] = 'Shipping amount';
+            $lineitem['productType'] = 'shipping';
             $lineitem['quantity'] = 1;
             $lineitem['quantityUnit'] = 'shipping';
             $lineitem['unitPrice'] = $address->getShippingAmount() + $totaltax;
@@ -566,8 +631,36 @@ class Service
             }
             $orderitems['lineItem'][] = $lineitem;
         }
-        if (!empty($paymentType) && $paymentType == "KLARNA-SSL" && $orderitems['orderTaxAmount'] == 0) {
-            $orderitems['orderTaxAmount'] = $totaltax;
+        
+        if ($quote->getBaseCustomerBalAmountUsed() > 0) {
+            $storelineitem = [];
+            $storelineitem['reference'] = 0;
+            $storelineitem['name'] = 'Store Credit Amount';
+            $storelineitem['productType'] = 'Store Credit';
+            $storelineitem['quantity'] = 1;
+            $storelineitem['quantityUnit'] = 'credit';
+            $storelineitem['unitPrice'] = 0 - (double) $quote->getBaseCustomerBalAmountUsed();
+            $storelineitem['taxRate'] = 0;
+            $storelineitem['totalAmount'] = 0 - (double) $quote->getBaseCustomerBalAmountUsed();
+            $storelineitem['totalTaxAmount'] = 0;
+            $orderitems['lineItem'][] = $storelineitem;
+        }
+
+        $giftCards = json_decode($quote->getGiftCards(), true);
+        if (!empty($giftCards) && count($giftCards) > 0) {
+            $giftcardlineitem = [];
+            foreach ($giftCards as $giftCard) {
+                $giftcardlineitem['reference'] = $giftCard['i'];
+                $giftcardlineitem['name'] = $giftCard['c'];
+                $giftcardlineitem['productType'] = 'Gift Card';
+                $giftcardlineitem['quantity'] = 1;
+                $giftcardlineitem['quantityUnit'] = 'credit';
+                $giftcardlineitem['unitPrice'] = 0 - $giftCard['ba'];
+                $giftcardlineitem['taxRate'] = 0;
+                $giftcardlineitem['totalAmount'] = 0 - $giftCard['ba'];
+                $giftcardlineitem['totalTaxAmount'] = 0;
+                $orderitems['lineItem'][] = $giftcardlineitem;
+            }
         }
         $orderitems['urls'] = $this->getReturnUrls();
         $orderitems['locale_code'] = $this->worldpayHelper->getLocaleDefault();
@@ -659,6 +752,11 @@ class Service
         $details['sessionId'] = $this->session->getSessionId();
         $details['shopperIpAddress'] = $this->_getClientIPAddress();
         $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($method);
+        $details['salesTax'] = '';
+        
+        if (isset($paymentDetails['salesTax'])) {
+            $details['salesTax'] = $paymentDetails['salesTax'];
+        }
 
         // 3DS2 value
         if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
@@ -666,6 +764,8 @@ class Service
         }
         // Check for Merchant Token
         $details['token_type'] = $this->worldpayHelper->getMerchantTokenization();
+        //level23 data
+        $details['cardType'] = $paymentDetails['additional_data']['cc_type'];
         return $details;
     }
 
@@ -723,6 +823,11 @@ class Service
         $details['paymentPagesEnabled'] = $this->worldpayHelper->getCustomPaymentEnabled();
         // Check for Merchant Token
         $details['token_type'] = $this->worldpayHelper->getMerchantTokenization();
+        //Level23 data
+        $details['cardType'] = $savedCardData->getCardBrand().'-SSL';
+        if (isset($paymentDetails['salesTax'])) {
+            $details['salesTax'] = $paymentDetails['salesTax'];
+        }
         return $details;
     }
 
@@ -733,6 +838,7 @@ class Service
             'paymentType' => 'TOKEN-SSL',
             'customerId' => $paymentDetails['customer_id'],
             'tokenCode' => $paymentDetails['token'],
+            'cardType' => $paymentDetails['card_brand'].'-SSL'
         ];
         $details['sessionId'] = $this->session->getSessionId();
         $details['shopperIpAddress'] = $this->_getClientIPAddress();
@@ -744,7 +850,10 @@ class Service
         if (isset($paymentDetails['dfReferenceId'])) {
             $details['dfReferenceId'] = $paymentDetails['dfReferenceId'];
         }
-        
+        //Level23 data
+        if (isset($paymentDetails['salesTax'])) {
+            $details['salesTax'] = $paymentDetails['salesTax'];
+        }
         return $details;
     }
 
@@ -780,7 +889,10 @@ class Service
                 if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
                     $paymentDetails['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
                     $environmentMode = $this->_scopeConfig->
-                        getValue('worldpay/general_config/environment_mode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+                        getValue(
+                            'worldpay/general_config/environment_mode',
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        );
 //                    if ($environmentMode == 'Test Mode') {
 //                        $orderDescription =   $this->_scopeConfig->getValue(
 //                            'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
@@ -788,7 +900,7 @@ class Service
 //                        );
 //                    }
                 } else {
-                   $orderDescription = $this->_getOrderDescription($reservedOrderId); 
+                    $orderDescription = $this->_getOrderDescription($reservedOrderId);
                 }
                 return [
                     'orderCode' => $orderCode,
@@ -801,10 +913,10 @@ class Service
                     'shopperEmail' => $quote->getCustomerEmail(),
                     'acceptHeader' => php_sapi_name() !== "cli" ? filter_input(INPUT_SERVER, 'HTTP_ACCEPT') : '',
                     'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
-                    INPUT_SERVER,
-                    'HTTP_USER_AGENT',
-                    FILTER_SANITIZE_STRING,
-                    FILTER_FLAG_STRIP_LOW
+                        INPUT_SERVER,
+                        'HTTP_USER_AGENT',
+                        FILTER_SANITIZE_STRING,
+                        FILTER_FLAG_STRIP_LOW
                     ) : '',
                     'method' => $paymentDetails['method'],
                     'orderStoreId' => $orderStoreId,
@@ -1077,5 +1189,49 @@ class Service
             $dob = date('Y-m-d', strtotime($dob));
             return $dob;
         }
+    }
+    
+    private function _getL23OrderLineItems($quote, $paymentType = null)
+    {
+        $orderitems = [];
+        $lineitem = [];
+        $orderItems = $quote->getAllItems();
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        
+        foreach ($orderItems as $_item) {
+            $lineitem = [];
+            $_product ='';
+            
+            if ($_item->getParentItem()) {
+                continue;
+            }
+
+            $_product = $objectManager->create(\Magento\Catalog\Model\Product::class)->load($_item->getProductId());
+
+                $rowtotal = $_item->getRowTotal();
+                $totalamount = $rowtotal - $_item->getDiscountAmount();
+                $totaltax = $_item->getTaxAmount() + $_item->getHiddenTaxAmount()
+                        + $_item->getWeeeTaxAppliedRowAmount();
+                $discountamount = $_item->getDiscountAmount();
+                
+                $unitOfMeasure = $_product->getData('unit_of_measure');
+            if ($unitOfMeasure == '') {
+                $unitOfMeasure = $this->worldpayHelper->getUnitOfMeasure();
+            }
+                $lineitem['description'] = substr($_item->getName(), 0, 12);
+                $lineitem['productCode'] = substr($_item->getProductId(), 0, 12);
+                $lineitem['commodityCode'] = substr($_product->getData('commodity_code'), 0, 12);
+                $lineitem['quantity'] = (int) substr($_item->getQty(), 0, 12);
+                $lineitem['unitCost'] = $rowtotal / $_item->getQty();
+                $lineitem['unitOfMeasure'] = substr($unitOfMeasure, 0, 12);
+                $lineitem['itemTotal'] = $totalamount;
+                $lineitem['itemTotalWithTax'] = $totalamount + $totaltax;
+                $lineitem['itemDiscountAmount'] = $discountamount;
+                $lineitem['taxAmount'] = $totaltax;
+                $orderitems['lineItem'][] = $lineitem;
+                
+        }
+        
+        return $orderitems;
     }
 }

@@ -62,7 +62,9 @@ class Factory
      */
     public function create($javascriptObjectVariable, $containerId)
     {
+        // @codingStandardsIgnoreLine
         $parts = parse_url($this->state->getRedirectUrl());
+        // @codingStandardsIgnoreLine
         parse_str($parts['query'], $orderparams);
         $orderkey = $orderparams['OrderKey'];
         $magentoincrementid = $this->_extractOrderId($orderkey);
@@ -115,6 +117,7 @@ class Factory
         return substr($locale, 0, 2);
     }
 
+    // @codingStandardsIgnoreLine
     private static function _extractOrderId($orderKey)
     {
         $array = explode('^', $orderKey);

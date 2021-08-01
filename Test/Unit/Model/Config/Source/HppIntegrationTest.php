@@ -8,15 +8,18 @@ namespace Sapient\Worldpay\Test\Unit\Model\Config\Source;
 use \PHPUnit\Framework\TestCase;
 use Sapient\Worldpay\Model\Config\Source\HppIntegration;
 
-class HppIntegrationTest extends TestCase {
+class HppIntegrationTest extends TestCase
+{
     /** @var HppIntegration  */
     protected $model;
     
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $this->model = new HppIntegration();
     }
     
-    public function testToOptionArray() {
+    public function testToOptionArray()
+    {
         $expectedResult = [
             ['value' => 'full_page', 'label' => __('Full page')],
             ['value' => 'iframe', 'label' => __('Iframe')],

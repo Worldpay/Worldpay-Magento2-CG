@@ -15,10 +15,12 @@ use Sapient\Worldpay\Model\Payment\Service as PaymentService;
 use \PHPUnit\Framework\TestCase;
 use Sapient\Worldpay\Controller\Redirectresult\Pending;
 
-class PendingTest extends TestCase {
+class PendingTest extends TestCase
+{
     
     protected $pendingObj;
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $context = $this->getMockBuilder(Context::class)
                         ->disableOriginalConstructor()->getMock();
         $page = $this->getMockBuilder(PageFactory::class)
@@ -32,13 +34,18 @@ class PendingTest extends TestCase {
         $wplogger = $this->getMockBuilder(WorldpayLogger::class)
                         ->disableOriginalConstructor()->getMock();
 
-        $this->pendingObj = new Pending($context, $page, $orderservice, $checkoutservice,
-                $paymentservice, $wplogger);
+        $this->pendingObj = new Pending(
+            $context,
+            $page,
+            $orderservice,
+            $checkoutservice,
+            $paymentservice,
+            $wplogger
+        );
     }
     
     public function testExecute()
     {
         $this->assertInstanceOf(Pending::class, $this->pendingObj);
     }
-    
 }

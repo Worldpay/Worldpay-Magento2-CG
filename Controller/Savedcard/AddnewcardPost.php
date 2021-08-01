@@ -226,31 +226,35 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                     'cardHolderName' => $fullRequest->payment->cardHolderName,
                     'expiryMonth' => $fullRequest->payment->expiryMonth,
                     'expiryYear' => $fullRequest->payment->expiryYear,
-                    'cvc' => $fullRequest->payment->cvc,
                     'cseEnabled' => $fullRequest->payment->cseEnabled
                 ];
+                if (isset($fullRequest->payment->cvc) &&
+                        !$fullRequest->payment->cvc == '' && !empty($fullRequest->payment->cvc)) {
+                    $payment['cvc'] = $fullRequest->payment->cvc;
+                }
                 if ($this->worldpayHelper->isDynamic3DS2Enabled() && $fullRequest->payment->dfReferenceId) {
                     $payment['dfReferenceId']  = $fullRequest->payment->dfReferenceId;
                     $this->checkoutSession->setIavCall(true);
-                    $this->customerSession->setIavCall(true); 
+                    $this->customerSession->setIavCall(true);
                 }
                 $payment['sessionId'] = $this->session->getSessionId();
                 $payment['myaccountSave'] = 1;
                 if ($this->isIAVEnabled()) {
                     $payment['isIAVEnabled'] = 1;
                     $this->checkoutSession->setIavCall(true);
-                    $this->customerSession->setIavCall(true); 
+                    $this->customerSession->setIavCall(true);
                 }
                 $payment['shopperIpAddress'] = $this->_getClientIPAddress();
                 $payment['token_type'] = $this->worldpayHelper->getMerchantTokenization();
                 $payment['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($paymentType);
                 $orderParams = [];
                 $incrementId = $this->_generateOrderCode();
+                $isNominalAmount = $payment['paymentType'] =='DINERS-SSL' || $payment['paymentType'] == 'DANKORT-SSL' ;
                 $orderParams['orderCode'] = $incrementId. '-' . time();
                 $orderParams['merchantCode'] = $merchantCode;
                 $orderParams['orderDescription'] = 'Add new card in My account';
                 $orderParams['currencyCode'] = $currencyCode;
-                $orderParams['amount'] = 0;
+                $orderParams['amount'] = $isNominalAmount?1: 0;
                 $orderParams['paymentDetails'] = $payment;
                 $orderParams['cardAddress'] = $billingadd;
                 $orderParams['billingAddress'] = $billingadd;
@@ -292,8 +296,17 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 $directResponse = $this->directResponse->setResponse($response);
                 $threeDSecureParams = $directResponse->get3dSecureParams();
                 $threeDSecureChallengeParams = $directResponse->get3ds2Params();
+                if (!$this->worldpayHelper->is3dsEnabled() && isset($threeDSecureParams)) {
+                    $this->wplogger->info("3Ds attempted but 3DS is not enabled for the store. "
+                            . "Please contact merchant.");
+                    $this->messageManager->addErrorMessage(
+                        "3Ds attempted but 3DS is not enabled for the store. Please contact merchant. "
+                    );
+                  //return $this->resultRedirectFactory->create()->setPath('worldpay/savedcard', ['_current' => true]);
+                    return  $this->resultJsonFactory->create()->setData(['success' => false]);
+                }
                 $threeDSecureConfig = [];
-                $disclaimerFlag = isset($fullRequest->payment->disclaimerFlag)?$fullRequest->payment->disclaimerFlag:0 ;
+                $disclaimerFlag = isset($fullRequest->payment->disclaimerFlag)?$fullRequest->payment->disclaimerFlag:0;
 
                 if (!empty($orderParams['primeRoutingData'])) {
                     $payment['additional_data']['worldpay_primerouting_enabled'] = true;
@@ -305,7 +318,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                     // Handles success response with 3DS & redirect for varification.
                     $this->checkoutSession->setauthenticatedOrderId($incrementId);
                      $this->checkoutSession->setIavCall(true);
-                     $this->customerSession->setIavCall(true); 
+                     $this->customerSession->setIavCall(true);
                     $this->_handle3DSecure($threeDSecureParams, $orderParams, $incrementId);
                     return  $this->resultJsonFactory->create()
                         ->setData(['threeD' => true]);
@@ -332,19 +345,21 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                          ($riskScore < 100 || $riskProviderFinalScore < 100))) {
                         $this->messageManager->getMessages(true);
                         $this->updateWorldPayPayment->create()
-                        ->updateWorldpayPaymentForMyAccount($directResponse, $payment, '',$disclaimerFlag);
+                        ->updateWorldpayPaymentForMyAccount($directResponse, $payment, '', $disclaimerFlag);
                         $this->messageManager->addSuccess(
-                                $this->worldpayHelper->getMyAccountSpecificexception('IAVMA3')
+                            $this->worldpayHelper->getMyAccountSpecificexception('IAVMA3')
                                 ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA3')
-                                : 'The card has been added');
+                            : 'The card has been added'
+                        );
                         return  $this->resultJsonFactory->create()
                         ->setData(['success' => true]);
                     } else {
                         $this->messageManager->getMessages(true);
                         $this->messageManager->addError(
-                                $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
+                            $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
                                 ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
-                                : 'Your card could not be saved');
+                            : 'Your card could not be saved'
+                        );
                         return  $this->resultJsonFactory->create()
                         ->setData(['success' => false]);
                     }
@@ -352,12 +367,14 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
             } catch (Exception $e) {
                 $this->wplogger->error($e->getMessage());
                 $this->messageManager->getMessages(true);
-                if($e->getMessage()=== 'Unique constraint violation found') {
-                $this->messageManager
+                if ($e->getMessage()=== 'Unique constraint violation found') {
+                    $this->messageManager
                         ->addError(__($this->worldpayHelper
                                 ->getCreditCardSpecificException('CCAM22')));
                 } else {
-                $this->messageManager->addException($e, __('Error: ').$e->getMessage());
+                    $this->messageManager->addException($e, __('Error: ').$e->getMessage());
+                    return  $this->resultJsonFactory->create()
+                        ->setData(['threeDError' => true]);
                 }
                 return  $this->resultJsonFactory->create()
                        ->setData(['success' => false]);
@@ -561,6 +578,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
     public function createEmptyQuote($tokenKey)
     {
         $token = 'Bearer '.$tokenKey;
+        // @codingStandardsIgnoreStart
         $curl = curl_init();
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine');
         curl_setopt_array($curl, [
@@ -585,6 +603,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         ]);
         $response = curl_exec($curl);
         curl_close($curl);
+        // @codingStandardsIgnoreEnd
         return $response;
     }
 }

@@ -94,18 +94,24 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
                     $this->updateWorldPayPayment->create()
                     ->updateWorldpayPaymentForMyAccount($this->response, $payment);
                      $this->_messageManager->addSuccess(
-                                $this->worldpayHelper->getMyAccountSpecificexception('IAVMA3')
+                         $this->worldpayHelper->getMyAccountSpecificexception('IAVMA3')
                                 ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA3')
-                                : 'The card has been added');
+                         : 'The card has been added'
+                     );
                      $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(
-                    'worldpay/savedcard', ['_secure' => true]));
+                         'worldpay/savedcard',
+                         ['_secure' => true]
+                     ));
                 } else {
                      $this->_messageManager->addError(
-                                $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
+                         $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
                                 ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
-                                : 'Your card could not be saved');
+                         : 'Your card could not be saved'
+                     );
                     $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(
-                    'worldpay/savedcard', ['_secure' => true]));
+                        'worldpay/savedcard',
+                        ['_secure' => true]
+                    ));
                 }
                     
             } else {
@@ -123,8 +129,9 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
                 $errorMessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM16');
                 $this->_messageManager->addError(__($errorMessage));
             } else {
-				$this->_messageManager->getMessages(true);
-                $this->_messageManager->addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM10')));
+                $this->_messageManager->getMessages(true);
+                $this->_messageManager->
+                        addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM10')));
             }
             $this->checkoutSession->setWpResponseForwardUrl(
                 $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
@@ -132,7 +139,9 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
             if ($this->checkoutSession->getIavCall()) {
                 $this->checkoutSession->unsIavCall();
                 $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(
-                    'worldpay/savedcard/addnewcard', ['_secure' => true]));
+                    'worldpay/savedcard/addnewcard',
+                    ['_secure' => true]
+                ));
             }
             return;
         }
@@ -143,9 +152,14 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
      */
     private function _handleAuthoriseSuccess()
     {
-        $this->checkoutSession->setWpResponseForwardUrl(
-            $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
-        );
+        if ($this->checkoutSession->getInstantPurchaseOrder()) {
+            $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+            $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+        } else {
+            $this->checkoutSession->setWpResponseForwardUrl(
+                $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
+            );
+        }
     }
 
     /**
@@ -170,7 +184,9 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
             } elseif ($this->checkoutSession->getIavCall()) {
                 $this->checkoutSession->unsIavCall();
                 $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(
-                'worldpay/savedcard/addnewcard', ['_secure' => true]));
+                    'worldpay/savedcard/addnewcard',
+                    ['_secure' => true]
+                ));
             } else {
                 $this->checkoutSession->setWpResponseForwardUrl(
                     $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
@@ -187,13 +203,16 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
             } elseif ($this->checkoutSession->getIavCall()) {
                 $this->checkoutSession->unsIavCall();
                 $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(
-                'worldpay/savedcard/addnewcard', ['_secure' => true]));
+                    'worldpay/savedcard/addnewcard',
+                    ['_secure' => true]
+                ));
             } else {
                 $this->checkoutSession->setWpResponseForwardUrl(
                     $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
                 );
             }
         } else {
+            $this->orderservice->redirectOrderSuccess();
             $this->orderservice->removeAuthorisedOrder();
             $this->_handleAuthoriseSuccess();
             $this->_updateTokenData($this->response->getXml());

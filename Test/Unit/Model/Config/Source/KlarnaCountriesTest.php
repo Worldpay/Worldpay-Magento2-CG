@@ -13,7 +13,8 @@ use Magento\Directory\Model\ResourceModel\Country\Collection;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 use \PHPUnit\Framework\TestCase;
 
-class KlarnaCountriesTest extends TestCase {
+class KlarnaCountriesTest extends TestCase
+{
     
     /** @var KlarnaCountries  */
     protected $model;
@@ -21,7 +22,8 @@ class KlarnaCountriesTest extends TestCase {
     protected $abstractCollection;
     protected $collection;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $countryCollectionFactory = $this->getMockBuilder(CollectionFactory::class)
                         ->disableOriginalConstructor()->getMock();
         $this->collection = $this->getMockBuilder(Collection::class)
@@ -34,13 +36,16 @@ class KlarnaCountriesTest extends TestCase {
         $this->model = new KlarnaCountries($countryCollectionFactory, $this->scopeConfig);
     }
     
-    public function testGetTopDestinations(){
+    public function testGetTopDestinations()
+    {
         $destinations = 'SE,NO,FI,DE,AT,GB,DK,US,NL,CH';
         $this->scopeConfig->expects($this->once())
                 ->method('getValue')
-                ->with('worldpay/klarna_config/klarna_countries_config/klarna_contries',\Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->with(
+                    'worldpay/klarna_config/klarna_countries_config/klarna_contries',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                )
                 ->willReturn($destinations);
-        $this->assertEquals(explode(',', $destinations) , $this->model->getTopDestinations());
+        $this->assertEquals(explode(',', $destinations), $this->model->getTopDestinations());
     }
-    
 }

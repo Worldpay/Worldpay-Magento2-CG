@@ -7,6 +7,7 @@ namespace Sapient\Worldpay\Model\Payment;
 /**
  * Describe what can be read from WP's xml response
  */
+// @codingStandardsIgnoreLine
 interface State
 {
     const STATUS_SENT_FOR_AUTHORISATION = 'SENT_FOR_AUTHORISATION';

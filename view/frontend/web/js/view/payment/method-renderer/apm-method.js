@@ -188,9 +188,9 @@ define(
                              'klarnaCode': value
                             };
                         });
-					
+			
                         fullScreenLoader.stopLoader();
-                        ccTypesArr(ccTypesArr1);
+                        ccTypesArr(ccTypesArr1.filter((set => f => !set.has(f.ccValue) && set.add(f.ccValue))(new Set)));
 			klarnaTypesArr(klarnaTypesArr1);
                     }
                 ).fail(

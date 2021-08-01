@@ -32,6 +32,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Sapient\Worldpay\Helper\Instalmentconfig $instalmentconfig,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         \Sapient\Worldpay\Model\SavedTokenFactory $savecard,
+        \Magento\Sales\Model\Order\ItemFactory $itemFactory,
         \Sapient\Worldpay\Helper\Currencyexponents $currencyexponents,
         SerializerInterface $serializer,
         \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries
@@ -48,6 +49,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->extendedResponseCodes = $extendedResponseCodes;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->_savecard = $savecard;
+        $this->_itemFactory = $itemFactory;
         $this->currencyexponents = $currencyexponents;
         $this->serializer = $serializer;
         $this->klarnaCountries = $klarnaCountries;
@@ -88,11 +90,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getMerchantCode($paymentType)
     {
         if ($paymentType) {
-        $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-        $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_code']: '';
-        if (!empty($merchantCodeValue)) {
-            return $merchantCodeValue;
-        }
+            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_code']: '';
+            if (!empty($merchantCodeValue)) {
+                return $merchantCodeValue;
+            }
         }
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/merchant_code',
@@ -103,11 +105,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getXmlUsername($paymentType)
     {
         if ($paymentType) {
-        $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-        $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_username']:'';
-        if (!empty($merchantCodeValue)) {
-            return $merchantCodeValue;
-        }
+            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_username']:'';
+            if (!empty($merchantCodeValue)) {
+                return $merchantCodeValue;
+            }
         }
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/xml_username',
@@ -118,11 +120,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getXmlPassword($paymentType)
     {
         if ($paymentType) {
-        $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-        $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_password']:'';
-        if (!empty($merchantCodeValue)) {
-            return $merchantCodeValue;
-        }
+            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_password']:'';
+            if (!empty($merchantCodeValue)) {
+                return $merchantCodeValue;
+            }
         }
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/xml_password',
@@ -160,6 +162,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'worldpay/3ds_config/do_3Dsecure',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
+    }
+    public function is3dsEnabled()
+    {
+        return $this->isDynamic3DEnabled() || $this->is3DSecureEnabled();
     }
 
     public function isLoggerEnable()
@@ -564,7 +570,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($paymentCode == 'worldpay_cc' || $paymentCode == 'worldpay_cc_vault') {
             return $this->getCcTitle() . "\n" . $item->getPaymentType();
         } elseif ($paymentCode == 'worldpay_apm') {
-            return $this->getApmTitle() . "\n" . $item->getPaymentType();
+            //Klarna sliceit check
+            if (strpos($item->getPaymentType(), "KLARNA_SLICEIT-SSL") !== false
+               && strlen($item->getPaymentType()) > 18) {
+                return $apmTitle . "\n" . $item->getPaymentType() . "\r\n" . "Installments: "
+                    . rtrim(rtrim(substr($item->getPaymentType(), 15, 5), '_'), 'MOS') . " months";
+            } else {
+                return $this->getApmTitle() . "\n" . $item->getPaymentType();
+            }
         } elseif ($paymentCode == 'worldpay_wallets') {
             return $this->getWalletsTitle() . "\n" . $item->getPaymentType();
         } elseif ($paymentCode == 'worldpay_moto') {
@@ -1305,5 +1318,46 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
+    
+    public function isLevel23Enabled()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/level23_config/level23',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    public function getCardAcceptorTaxId()
+    {
+            return $this->_scopeConfig->getValue(
+                'worldpay/level23_config/CardAcceptorTaxId',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+    }
+    
+    public function getDutyAmount()
+    {
+           return $this->_scopeConfig->getValue(
+               'worldpay/level23_config/duty_amount',
+               \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+           );
+    }
+    
+    public function getUnitOfMeasure()
+    {
+           return $this->_scopeConfig->getValue(
+               'worldpay/level23_config/unit_of_measure',
+               \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+           );
+    }
+    
+    public function getInvoicedItemsData($itemId)
+    {
+        $invoicedItems = $this->_itemFactory->create()->getCollection()
+                ->addFieldToSelect(['product_id', 'name', 'product_type', 'tax_amount',
+                    'parent_item_id', 'discount_amount', 'row_total', 'qty_ordered',
+                    'row_total_incl_tax', 'weee_tax_applied_row_amount'])
+                ->addFieldToFilter('item_id', ['eq' => $itemId]);
+        return $invoicedItems->getData()[0];
+    }
 }
-

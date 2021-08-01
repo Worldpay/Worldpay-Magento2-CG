@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2020 Worldpay. All rights reserved.
+ * Copyright � 2020 Worldpay. All rights reserved.
  */
 
 namespace Sapient\Worldpay\Setup;
@@ -12,6 +12,7 @@ use Magento\Catalog\Setup\CategorySetupFactory;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Eav\Setup\EavSetupFactory;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class UpgradeData implements UpgradeDataInterface
 {
@@ -37,12 +38,12 @@ class UpgradeData implements UpgradeDataInterface
         CategorySetupFactory $categorySetupFactory,
         EavSetupFactory $eavSetupFactory,
         \Magento\Config\Model\Config\Factory $configFactory,
-        \Magento\Framework\App\State $state
+        SerializerInterface $serializer
     ) {
         $this->categorySetupFactory = $categorySetupFactory;
         $this->eavSetupFactory = $eavSetupFactory;
         $this->configFactory = $configFactory;
-        $state->setAreaCode('adminhtml');
+        $this->serializer = $serializer;
     }
 
     /**
@@ -52,7 +53,6 @@ class UpgradeData implements UpgradeDataInterface
     {
         /** @var \Magento\Catalog\Setup\CategorySetup $catalogSetup */
         $catalogSetup = $this->categorySetupFactory->create(['setup' => $setup]);
-
         if (version_compare($context->getVersion(), '1.2.7', '<')) {
             $groupName = 'Subscriptions';
             $catalogSetup->addAttributeGroup(Product::ENTITY, 'Default', $groupName, 16);
@@ -108,16 +108,7 @@ class UpgradeData implements UpgradeDataInterface
         }
         if (version_compare($context->getVersion(), '1.3.4', '<')) {
             $index = time();
-            $configData = [
-                'section' => 'worldpay_exceptions',
-                'website' => null,
-                'store'   => null,
-                'groups'  => [
-                    'extended_response_codes' => [
-                        'fields' => [
-                            'response_codes' => [
-                                'value' => [
-                                    $index.'_0' => ["wpay_code" => "0",
+             $responseValue  = [$index.'_0' => ["wpay_code" => "0",
                                         "wpay_desc" => "Approved",
                                         "custom_msg" => ""],
                                     $index.'_1' => ["wpay_code" => "1",
@@ -741,18 +732,141 @@ class UpgradeData implements UpgradeDataInterface
                                     $index.'_198' => ["wpay_code" => "1295",
                                         "wpay_desc" => "Unknown",
                                         "custom_msg" => ""],
-                                ],
+                                ];
+             $resultArray = [];
+             foreach ($responseValue as $row) {
+                 $payment_type = $row['wpay_code'];
+                 $rs['wpay_desc'] = $row['wpay_desc'];
+                 $rs['custom_msg'] = $row['custom_msg'];
+                 $resultArray[$payment_type] = $rs;
+             }
+             $responseCodes = $this->serializer->serialize($resultArray);
+             $configData = [
+                'section' => 'worldpay_exceptions',
+                'website' => null,
+                'store'   => null,
+                'groups'  => [
+                    'extended_response_codes' => [
+                        'fields' => [
+                            'response_codes' => [
+                                'value' => $responseCodes
+                                    
                             ],
                         ],
                     ],
                 ],
-            ];
+             ];
             /** @var \Magento\Config\Model\Config $configModel */
-            $configModel = $this->configFactory->create(['data' => $configData]);
-            $configModel->save();
+             $configModel = $this->configFactory->create(['data' => $configData]);
+             $configModel->save();
         }
         if (version_compare($context->getVersion(), '1.3.5', '<')) {
             $index = time();
+            $exceptionValues = [$index . '_0' => ["exception_code" => "CCAM0",
+                    "exception_messages" => "The card number entered is invalid.",
+                    "exception_module_messages" => ""],
+                $index . '_1' => ["exception_code" => "CCAM1",
+                    "exception_messages" => "Card number should contain between 12 and "
+                    . "20 numeric characters.",
+                    "exception_module_messages" => ""],
+                $index . '_2' => ["exception_code" => "CCAM2",
+                    "exception_messages" => "This card number cannot be used to place "
+                    . "3DS2 order now, please go and update this from My account first.",
+                    "exception_module_messages" => ""],
+                $index . '_3' => ["exception_code" => "CCAM3",
+                    "exception_messages" => "Please, enter valid Card Verification Number",
+                    "exception_module_messages" => ""],
+                $index . '_4' => ["exception_code" => "CCAM4",
+                    "exception_messages" => "Please, Save the card before placing "
+                    . "subscription order",
+                    "exception_module_messages" => ""],
+                $index . '_5' => ["exception_code" => "CCAM5",
+                    "exception_messages" => "Please, Verify the disclaimer! before saving"
+                    . " the card",
+                    "exception_module_messages" => ""],
+                $index . '_6' => ["exception_code" => "CCAM6",
+                    "exception_messages" => "Please select one of the options",
+                    "exception_module_messages" => ""],
+                $index . '_7' => ["exception_code" => "CCAM7",
+                    "exception_messages" => "Failed due to unrecoverable error",
+                    "exception_module_messages" => ""],
+                $index . '_8' => ["exception_code" => "CCAM8",
+                    "exception_messages" => "3DS Failed",
+                    "exception_module_messages" => ""],
+                $index . '_9' => ["exception_code" => "CCAM9",
+                    "exception_messages" => "Unfortunately the order could not be processed. "
+                    . "Please contact us or try again later.",
+                    "exception_module_messages" => ""],
+                $index . '_10' => ["exception_code" => "CCAM10",
+                    "exception_messages" => "An error occurred",
+                    "exception_module_messages" => ""],
+                $index . '_11' => ["exception_code" => "CCAM11",
+                    "exception_messages" => "An error occurred on the server. Please try to "
+                    . "place the order again.",
+                    "exception_module_messages" => ""],
+                $index . '_12' => ["exception_code" => "CCAM12",
+                    "exception_messages" => "3DS2 services are disabled, please contact "
+                    . "system administrator.",
+                    "exception_module_messages" => ""],
+                $index . '_13' => ["exception_code" => "CCAM13",
+                    "exception_messages" => "Invalid Payment Type. Please Refresh and "
+                    . "check again",
+                    "exception_module_messages" => ""],
+                $index . '_14' => ["exception_code" => "CCAM14",
+                    "exception_messages" => "WorldPay refund ERROR: Credit Memo does not "
+                    . "match Order. Reference",
+                    "exception_module_messages" => ""],
+                $index . '_15' => ["exception_code" => "CCAM15",
+                    "exception_messages" => "Unfortunately the order could not be processed."
+                    . " Please contact us or try again later",
+                    "exception_module_messages" => ""],
+                $index . '_16' => ["exception_code" => "CCAM16",
+                    "exception_messages" => "Duplicate Entry, This card number is already "
+                    . "saved.",
+                    "exception_module_messages" => ""],
+                $index . '_17' => ["exception_code" => "CCAM17",
+                    "exception_messages" => "Order %s has been declined, please check your "
+                    . "details and try again",
+                    "exception_module_messages" => ""],
+                $index . '_18' => ["exception_code" => "CCAM18",
+                    "exception_messages" => "An unexpected error occurred, Please try to "
+                    . "place the order again",
+                    "exception_module_messages" => ""],
+                $index . '_19' => ["exception_code" => "CCAM19",
+                    "exception_messages" => "There appears to be an issue with your stored "
+                    . "data, please review in your account and update details as applicable.",
+                    "exception_module_messages" => ""],
+                $index . '_20' => ["exception_code" => "CCAM20",
+                    "exception_messages" => "CPF is 11 digits and CNPJ is 14 digits.",
+                    "exception_module_messages" => ""],
+                $index . '_21' => ["exception_code" => "CCAM21",
+                    "exception_messages" => "Only alphabet,number or space is allowed",
+                    "exception_module_messages" => ""],
+                $index . '_22' => ["exception_code" => "CCAM22",
+                    "exception_messages" => "You already appear to have this card number "
+                    . "stored, if your card details have changed, you can update these via"
+                    . " the my cards section", "exception_module_messages" => ""],
+                $index . '_23' => ["exception_code" => "CCAM23",
+                    "exception_messages" => "Parse error with PaRes: Error parsing pARes",
+                    "exception_module_messages" => ""],
+                $index . '_24' => ["exception_code" => "CCAM24",
+                    "exception_messages" => "Invalid Configuration. Please Refresh and check again",
+                    "exception_module_messages" => ""],
+                $index . '_25' => ["exception_code" => "CCAM25",
+                    "exception_messages" => "Invalid Expiry Year. Please Refresh and check again",
+                    "exception_module_messages" => ""],
+                $index . '_26' => ["exception_code" => "CCAM26",
+                    "exception_messages" => "Invalid Expiry Month. Please Refresh and check again",
+                    "exception_module_messages" => ""],
+                $index . '_27' => ["exception_code" => "CCAM27",
+                    "exception_messages" => "Invalid Card Number. Please Refresh and check again",
+                    "exception_module_messages" => ""],
+                $index . '_28' => ["exception_code" => "CCAM28",
+                    "exception_messages" => "Invalid Card Holder Name.Please Refresh and check again",
+                    "exception_module_messages" => ""],
+            ];
+
+            $exceptionCodes = $this->convertArrayToString($exceptionValues);
             $configData = [
                 'section' => 'worldpay_exceptions',
                 'website' => null,
@@ -761,110 +875,7 @@ class UpgradeData implements UpgradeDataInterface
                     'ccexceptions' => [
                         'fields' => [
                             'cc_exception' => [
-                                'value' => [
-                                        $index.'_0' => ["exception_code" => "CCAM0",
-                                            "exception_messages" => "The card number entered is invalid.",
-                                            "exception_module_messages" => ""],
-                                        $index.'_1' => ["exception_code" => "CCAM1",
-                                            "exception_messages" => "Card number should contain between 12 and "
-                                            . "20 numeric characters.",
-                                            "exception_module_messages" => ""],
-                                        $index.'_2' => ["exception_code" => "CCAM2",
-                                            "exception_messages" => "This card number cannot be used to place "
-                                            . "3DS2 order now, please go and update this from My account first.",
-                                            "exception_module_messages" => ""],
-                                        $index.'_3' => ["exception_code" => "CCAM3",
-                                            "exception_messages" => "Please, enter valid Card Verification Number",
-                                            "exception_module_messages" => ""],
-                                        $index.'_4' => ["exception_code" => "CCAM4",
-                                            "exception_messages" => "Please, Save the card before placing "
-                                            . "subscription order",
-                                            "exception_module_messages" => ""],
-                                        $index.'_5' => ["exception_code" => "CCAM5",
-                                            "exception_messages" => "Please, Verify the disclaimer! before saving"
-                                            . " the card",
-                                            "exception_module_messages" => ""],
-                                        $index.'_6' => ["exception_code" => "CCAM6",
-                                            "exception_messages" => "Please select one of the options",
-                                            "exception_module_messages" => ""],
-                                        $index.'_7' => ["exception_code" => "CCAM7",
-                                            "exception_messages" => "Failed due to unrecoverable error",
-                                            "exception_module_messages" => ""],
-                                        $index.'_8' => ["exception_code" => "CCAM8",
-                                            "exception_messages" => "3DS Failed",
-                                            "exception_module_messages" => ""],
-                                        $index.'_9' => ["exception_code" => "CCAM9",
-                                            "exception_messages" => "Unfortunately the order could not be processed. "
-                                            . "Please contact us or try again later.",
-                                            "exception_module_messages" => ""],
-                                        $index.'_10' => ["exception_code" => "CCAM10",
-                                            "exception_messages" => "An error occurred",
-                                            "exception_module_messages" => ""],
-                                        $index.'_11' => ["exception_code" => "CCAM11",
-                                            "exception_messages" => "An error occurred on the server. Please try to "
-                                            . "place the order again.",
-                                            "exception_module_messages" => ""],
-                                        $index.'_12' => ["exception_code" => "CCAM12",
-                                            "exception_messages" => "3DS2 services are disabled, please contact "
-                                            . "system administrator.",
-                                            "exception_module_messages" => ""],
-                                        $index.'_13' => ["exception_code" => "CCAM13",
-                                            "exception_messages" => "Invalid Payment Type. Please Refresh and "
-                                            . "check again",
-                                            "exception_module_messages" => ""],
-                                        $index.'_14' => ["exception_code" => "CCAM14",
-                                            "exception_messages" => "WorldPay refund ERROR: Credit Memo does not "
-                                            . "match Order. Reference",
-                                            "exception_module_messages" => ""],
-                                        $index.'_15' => ["exception_code" => "CCAM15",
-                                            "exception_messages" => "Unfortunately the order could not be processed."
-                                            . " Please contact us or try again later",
-                                            "exception_module_messages" => ""],
-                                        $index.'_16' => ["exception_code" => "CCAM16",
-                                            "exception_messages" => "Duplicate Entry, This card number is already "
-                                            . "saved.",
-                                            "exception_module_messages" => ""],
-                                        $index.'_17' => ["exception_code" => "CCAM17",
-                                            "exception_messages" => "Order %s has been declined, please check your "
-                                            . "details and try again",
-                                            "exception_module_messages" => ""],
-                                        $index.'_18' => ["exception_code" => "CCAM18",
-                                            "exception_messages" => "An unexpected error occurred, Please try to "
-                                            . "place the order again",
-                                            "exception_module_messages" => ""],
-                                        $index.'_19' => ["exception_code" => "CCAM19",
-                                            "exception_messages" => "There appears to be an issue with your stored "
-                                            . "data, please review in your account and update details as applicable.",
-                                            "exception_module_messages" => ""],
-                                        $index.'_20' => ["exception_code" => "CCAM20",
-                                            "exception_messages" => "CPF is 11 digits and CNPJ is 14 digits.",
-                                            "exception_module_messages" => ""],
-                                        $index.'_21' => ["exception_code" => "CCAM21",
-                                            "exception_messages" => "Only alphabet,number or space is allowed",
-                                            "exception_module_messages" => ""],
-                                        $index.'_22' => ["exception_code" => "CCAM22",
-                                            "exception_messages" => "You already appear to have this card number "
-                                            . "stored, if your card details have changed, you can update these via"
-                                            . " the my cards section", "exception_module_messages" => ""],
-                                        $index.'_23' => ["exception_code" => "CCAM23",
-                                            "exception_messages" => "Parse error with PaRes: Error parsing pARes",
-                                            "exception_module_messages" => ""],
-                                        $index.'_24' => ["exception_code" => "CCAM24",
-                                        "exception_messages" =>"Invalid Configuration. Please Refresh and check again",
-                                            "exception_module_messages" => ""],
-                                        $index.'_25' => ["exception_code" => "CCAM25",
-                                        "exception_messages" => "Invalid Expiry Year. Please Refresh and check again",
-                                            "exception_module_messages" => ""],
-                                        $index.'_26' => ["exception_code" => "CCAM26",
-                                        "exception_messages" => "Invalid Expiry Month. Please Refresh and check again",
-                                            "exception_module_messages" => ""],
-                                        $index.'_27' => ["exception_code" => "CCAM27",
-                                        "exception_messages" => "Invalid Card Number. Please Refresh and check again",
-                                            "exception_module_messages" => ""],
-                                        $index.'_28' => ["exception_code" => "CCAM28",
-                                        "exception_messages"=>"Invalid Card Holder Name.Please Refresh and check again",
-                                            "exception_module_messages" => ""],
-                                    ],
+                                'value' => $exceptionCodes
                                  ],
                         ],
                     ],
@@ -877,6 +888,80 @@ class UpgradeData implements UpgradeDataInterface
 
         if (version_compare($context->getVersion(), '1.3.5', '<')) {
             $index = time();
+            $exceptionValues = [ $index.'_0' => ["exception_code" => "MCAM0",
+                    "exception_messages" => "You should login or register "
+                    . "to buy a subscription.",
+                    "exception_module_messages" => ""],
+                $index . '_1' => ["exception_code" => "MCAM1",
+                    "exception_messages" => "Choose any of the plan!",
+                    "exception_module_messages" => ""],
+                $index . '_2' => ["exception_code" => "MCAM2",
+                    "exception_messages" => "Choose plan start date!",
+                    "exception_module_messages" => ""],
+                $index . '_3' => ["exception_code" => "MCAM3",
+                    "exception_messages" => "Are you sure you would like to remove this item "
+                    . "from the shopping cart?", "exception_module_messages" => ""],
+                $index . '_4' => ["exception_code" => "MCAM4",
+                    "exception_messages" => "An error has occurred. Please try again.",
+                    "exception_module_messages" => ""],
+                $index . '_5' => ["exception_code" => "MCAM5",
+                    "exception_messages" => "Item is deleted successfully",
+                    "exception_module_messages" => ""],
+                $index . '_6' => ["exception_code" => "MCAM6",
+                    "exception_messages" => "Please try after some time",
+                    "exception_module_messages" => ""],
+                $index . '_7' => ["exception_code" => "MCAM7",
+                    "exception_messages" => "Error: the card has not been updated.",
+                    "exception_module_messages" => ""],
+                $index . '_8' => ["exception_code" => "MCAM8",
+                    "exception_messages" => "Error occurred, please check your card details.",
+                    "exception_module_messages" => ""],
+                $index . '_9' => ["exception_code" => "MCAM9",
+                    "exception_messages" => "The card has been updated.",
+                    "exception_module_messages" => ""],
+                $index . '_10' => ["exception_code" => "MCAM10",
+                    "exception_messages" => "Subscription has been updated.",
+                    "exception_module_messages" => ""],
+                $index . '_11' => ["exception_code" => "MCAM11",
+                    "exception_messages" => "Failed to update subscription.",
+                    "exception_module_messages" => ""],
+                $index . '_12' => ["exception_code" => "MCAM12",
+                    "exception_messages" => "Are you sure you want to cancel "
+                    . "this subscription?",
+                    "exception_module_messages" => ""],
+                $index . '_13' => ["exception_code" => "MCAM13",
+                    "exception_messages" => "You have not purchased any subscriptions yet.",
+                    "exception_module_messages" => ""],
+                $index . '_14' => ["exception_code" => "MCAM14",
+                    "exception_messages" => "Subscription has been cancelled.",
+                    "exception_module_messages" => ""],
+                $index . '_15' => ["exception_code" => "MCAM15",
+                    "exception_messages" => "Subscription no longer exists.",
+                    "exception_module_messages" => ""],
+                $index . '_16' => ["exception_code" => "MCAM16",
+                    "exception_messages" => "Subscription is no longer active.",
+                    "exception_module_messages" => ""],
+                $index . '_17' => ["exception_code" => "MCAM17",
+                    "exception_messages" => "Subscription is not found",
+                    "exception_module_messages" => ""],
+                $index . '_18' => ["exception_code" => "MCAM18",
+                    "exception_messages" => "Failed to cancel subscription.",
+                    "exception_module_messages" => ""],
+                $index . '_19' => ["exception_code" => "MCAM19",
+                    "exception_messages" => "Subscriptions can be bought only separately,"
+                    . "one subscription at a time.",
+                    "exception_module_messages" => ""],
+                $index . '_20' => ["exception_code" => "MCAM20",
+                    "exception_messages" => "Selected subscription plan is not available.",
+                    "exception_module_messages" => ""],
+                $index . '_21' => ["exception_code" => "MCAM21",
+                    "exception_messages" => "Subscription already in the cart",
+                    "exception_module_messages" => ""],
+                $index . '_22' => ["exception_code" => "MCAM22",
+                    "exception_messages" => "Choose plan end date!",
+                    "exception_module_messages" => ""],
+            ];
+            $exceptionCodes = $this->convertArrayToString($exceptionValues);
             $configData = [
                 'section' => 'worldpay_exceptions',
                 'website' => null,
@@ -885,80 +970,7 @@ class UpgradeData implements UpgradeDataInterface
                     'my_account_alert_codes' => [
                         'fields' => [
                             'response_codes' => [
-                                'value' => [
-                                    $index.'_0' => ["exception_code" => "MCAM0",
-                                        "exception_messages" => "You should login or register "
-                                        . "to buy a subscription.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_1' => ["exception_code" => "MCAM1",
-                                        "exception_messages" => "Choose any of the plan!",
-                                        "exception_module_messages" => ""],
-                                    $index.'_2' => ["exception_code" => "MCAM2",
-                                        "exception_messages" => "Choose plan start date!",
-                                        "exception_module_messages" => ""],
-                                    $index.'_3' => ["exception_code" => "MCAM3",
-                                        "exception_messages" => "Are you sure you would like to remove this item "
-                                        . "from the shopping cart?", "exception_module_messages" => ""],
-                                    $index.'_4' => ["exception_code" => "MCAM4",
-                                        "exception_messages" => "An error has occurred. Please try again.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_5' => ["exception_code" => "MCAM5",
-                                        "exception_messages" => "Item is deleted successfully",
-                                        "exception_module_messages" => ""],
-                                    $index.'_6' => ["exception_code" => "MCAM6",
-                                        "exception_messages" => "Please try after some time",
-                                        "exception_module_messages" => ""],
-                                    $index.'_7' => ["exception_code" => "MCAM7",
-                                        "exception_messages" => "Error: the card has not been updated.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_8' => ["exception_code" => "MCAM8",
-                                        "exception_messages" => "Error occurred, please check your card details.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_9' => ["exception_code" => "MCAM9",
-                                        "exception_messages" => "The card has been updated.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_10' => ["exception_code" => "MCAM10",
-                                        "exception_messages" => "Subscription has been updated.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_11' => ["exception_code" => "MCAM11",
-                                        "exception_messages" => "Failed to update subscription.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_12' => ["exception_code" => "MCAM12",
-                                        "exception_messages" => "Are you sure you want to cancel "
-                                        . "this subscription?",
-                                        "exception_module_messages" => ""],
-                                    $index.'_13' => ["exception_code" => "MCAM13",
-                                        "exception_messages" => "You have not purchased any subscriptions yet.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_14' => ["exception_code" => "MCAM14",
-                                        "exception_messages" => "Subscription has been cancelled.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_15' => ["exception_code" => "MCAM15",
-                                        "exception_messages" => "Subscription no longer exists.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_16' => ["exception_code" => "MCAM16",
-                                        "exception_messages" => "Subscription is no longer active.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_17' => ["exception_code" => "MCAM17",
-                                        "exception_messages" => "Subscription is not found",
-                                        "exception_module_messages" => ""],
-                                    $index.'_18' => ["exception_code" => "MCAM18",
-                                        "exception_messages" => "Failed to cancel subscription.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_19' => ["exception_code" => "MCAM19",
-                                        "exception_messages" => "Subscriptions can be bought only separately,"
-                                        . "one subscription at a time.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_20' => ["exception_code" => "MCAM20",
-                                        "exception_messages" => "Selected subscription plan is not available.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_21' => ["exception_code" => "MCAM21",
-                                        "exception_messages" => "Subscription already in the cart",
-                                        "exception_module_messages" => ""],
-                                    $index.'_22' => ["exception_code" => "MCAM22",
-                                        "exception_messages" => "Choose plan end date!",
-                                        "exception_module_messages" => ""],
-                                ]
+                                'value' => $exceptionCodes
                             ],
                         ],
                     ],
@@ -970,6 +982,52 @@ class UpgradeData implements UpgradeDataInterface
         }
         if (version_compare($context->getVersion(), '1.3.5', '<')) {
             $index = time();
+            $exceptionValues = [ $index.'_0' => ["exception_code" => "ACAM0",
+            "exception_messages" => "Something went wrong, please reload the page",
+            "exception_module_messages" => ""],
+            $index.'_1' => ["exception_code" => "ACAM1",
+            "exception_messages" => "Plan code should not exceed 25 characters.",
+            "exception_module_messages" => ""],
+            $index.'_2' => ["exception_code" => "ACAM2",
+            "exception_messages" => "Plan with such code already exists",
+            "exception_module_messages" => ""],
+            $index.'_3' => ["exception_code" => "ACAM3",
+            "exception_messages" => "Payment synchronized successfully!!",
+            "exception_module_messages" => ""],
+            $index.'_4' => ["exception_code" => "ACAM4",
+            "exception_messages" => "Synchronising Payment Status failed",
+            "exception_module_messages" => ""],
+            $index.'_5' => ["exception_code" => "ACAM5",
+            "exception_messages" => "WorldPay refund ERROR: Credit Memo "
+            . "does not match Order. Reference", "exception_module_messages" => ""],
+            $index.'_6' => ["exception_code" => "ACAM6",
+            "exception_messages" => "Subscription is no longer active.",
+            "exception_module_messages" => ""],
+            $index.'_7' => ["exception_code" => "ACAM7",
+            "exception_messages" => "Subscription is not found.",
+            "exception_module_messages" => ""],
+            $index.'_8' => ["exception_code" => "ACAM8",
+            "exception_messages" => "Failed to cancel subscription.",
+            "exception_module_messages" => ""],
+            $index.'_9' => ["exception_code" => "ACAM9",
+            "exception_messages" => "Subscription not found.",
+            "exception_module_messages" => ""],
+            $index.'_10' => ["exception_code" => "ACAM10",
+            "exception_messages" => "Unable to update subscription plan "
+            . "with code %1: %2",
+            "exception_module_messages" => ""],
+            $index.'_11' => ["exception_code" => "ACAM11",
+            "exception_messages" => "The value %s is a required field.",
+            "exception_module_messages" => ""],
+            $index.'_12' => ["exception_code" => "ACAM12",
+            "exception_messages" => "Error Code %s already exist!",
+            "exception_module_messages" => ""],
+            $index.'_13' => ["exception_code" => "ACAM13",
+            "exception_messages" => "Detected only whitespace character for code",
+            "exception_module_messages" => ""],
+            ];
+            
+            $exceptionCodes = $this->convertArrayToString($exceptionValues);
             $configData = [
                 'section' => 'worldpay_exceptions',
                 'website' => null,
@@ -978,51 +1036,7 @@ class UpgradeData implements UpgradeDataInterface
                     'adminexceptions' => [
                         'fields' => [
                             'general_exception' => [
-                                'value' => [
-                                    $index.'_0' => ["exception_code" => "ACAM0",
-                                        "exception_messages" => "Something went wrong, please reload the page",
-                                        "exception_module_messages" => ""],
-                                    $index.'_1' => ["exception_code" => "ACAM1",
-                                        "exception_messages" => "Plan code should not exceed 25 characters.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_2' => ["exception_code" => "ACAM2",
-                                        "exception_messages" => "Plan with such code already exists",
-                                        "exception_module_messages" => ""],
-                                    $index.'_3' => ["exception_code" => "ACAM3",
-                                        "exception_messages" => "Payment synchronized successfully!!",
-                                        "exception_module_messages" => ""],
-                                    $index.'_4' => ["exception_code" => "ACAM4",
-                                        "exception_messages" => "Synchronising Payment Status failed",
-                                        "exception_module_messages" => ""],
-                                    $index.'_5' => ["exception_code" => "ACAM5",
-                                        "exception_messages" => "WorldPay refund ERROR: Credit Memo "
-                                        . "does not match Order. Reference", "exception_module_messages" => ""],
-                                    $index.'_6' => ["exception_code" => "ACAM6",
-                                        "exception_messages" => "Subscription is no longer active.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_7' => ["exception_code" => "ACAM7",
-                                        "exception_messages" => "Subscription is not found.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_8' => ["exception_code" => "ACAM8",
-                                        "exception_messages" => "Failed to cancel subscription.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_9' => ["exception_code" => "ACAM9",
-                                        "exception_messages" => "Subscription not found.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_10' => ["exception_code" => "ACAM10",
-                                        "exception_messages" => "Unable to update subscription plan "
-                                        . "with code %1: %2",
-                                        "exception_module_messages" => ""],
-                                    $index.'_11' => ["exception_code" => "ACAM11",
-                                        "exception_messages" => "The value %s is a required field.",
-                                        "exception_module_messages" => ""],
-                                    $index.'_12' => ["exception_code" => "ACAM12",
-                                        "exception_messages" => "Error Code %s already exist!",
-                                        "exception_module_messages" => ""],
-                                    $index.'_13' => ["exception_code" => "ACAM13",
-                                        "exception_messages" => "Detected only whitespace character for code",
-                                        "exception_module_messages" => ""],
-                                ]
+                                'value' => $exceptionCodes
                             ],
                         ],
                     ],
@@ -1035,6 +1049,99 @@ class UpgradeData implements UpgradeDataInterface
         
         if (version_compare($context->getVersion(), '1.3.6', '<')) {
             $index = time();
+            $currencyExponentValues = [$index . '_0' => ["currency_code" => "BEF",
+                    "currency" => "Belgian Franc",
+                    "exponent" => "0"],
+                $index . '_1' => ["currency_code" => "XOF",
+                    "currency" => "CFA Franc BCEAO",
+                    "exponent" => "0"],
+                $index . '_2' => ["currency_code" => "XAF",
+                    "currency" => "CFA Franc BEAC",
+                    "exponent" => "0"],
+                $index . '_3' => ["currency_code" => "XPF",
+                    "currency" => "CFP Franc",
+                    "exponent" => "0"],
+                $index . '_4' => ["currency_code" => "KMF",
+                    "currency" => "Comoro Franc",
+                    "exponent" => "0"],
+                $index . '_5' => ["currency_code" => "GRD",
+                    "currency" => "Greek Drachma",
+                    "exponent" => "0"],
+                $index . '_6' => ["currency_code" => "GNF",
+                    "currency" => "Guinea Franc",
+                    "exponent" => "0"],
+                $index . '_7' => ["currency_code" => "HUF",
+                    "currency" => "Hungarian Forint",
+                    "exponent" => "0"],
+                $index . '_8' => ["currency_code" => "IDR",
+                    "currency" => "Indonesian Rupiah",
+                    "exponent" => "0"],
+                $index . '_9' => ["currency_code" => "ITL",
+                    "currency" => "Italian Lira",
+                    "exponent" => "0"],
+                $index . '_10' => ["currency_code" => "JPY",
+                    "currency" => "Japanese Yen",
+                    "exponent" => "0"],
+                $index . '_11' => ["currency_code" => "LUF",
+                    "currency" => "Luxembourg Franc",
+                    "exponent" => "0"],
+                $index . '_12' => ["currency_code" => "MGA",
+                    "currency" => "Malagasy Ariary",
+                    "exponent" => "0"],
+                $index . '_13' => ["currency_code" => "MGF",
+                    "currency" => "Malagasy Franc",
+                    "exponent" => "0"],
+                $index . '_14' => ["currency_code" => "PYG",
+                    "currency" => "Paraguayan Guarani",
+                    "exponent" => "0"],
+                $index . '_15' => ["currency_code" => "PTE",
+                    "currency" => "Portugese Escudo",
+                    "exponent" => "0"],
+                $index . '_16' => ["currency_code" => "RWF",
+                    "currency" => "Rwanda Franc",
+                    "exponent" => "0"],
+                $index . '_17' => ["currency_code" => "KRW",
+                    "currency" => "South-Korean Won",
+                    "exponent" => "0"],
+                $index . '_18' => ["currency_code" => "ESP",
+                    "currency" => "Spanish Peseta",
+                    "exponent" => "0"],
+                $index . '_19' => ["currency_code" => "TRL",
+                    "currency" => "Turkish Lira",
+                    "exponent" => "0"],
+                $index . '_20' => ["currency_code" => "VND",
+                    "currency" => "Vietnamese New Dong",
+                    "exponent" => "0"],
+                $index . '_21' => ["currency_code" => "BHD",
+                    "currency" => "Bahraini Dinar",
+                    "exponent" => "3"],
+                $index . '_22' => ["currency_code" => "IQD",
+                    "currency" => "Iraqi Dinar",
+                    "exponent" => "3"],
+                $index . '_23' => ["currency_code" => "JOD",
+                    "currency" => "Jordanian Dinar",
+                    "exponent" => "3"],
+                $index . '_24' => ["currency_code" => "KWD",
+                    "currency" => "Kuwaiti Dinar",
+                    "exponent" => "3"],
+                $index . '_25' => ["currency_code" => "LYD",
+                    "currency" => "Libyan Dinar",
+                    "exponent" => "3"],
+                $index . '_26' => ["currency_code" => "OMR",
+                    "currency" => "Rial Omani",
+                    "exponent" => "3"],
+                $index . '_27' => ["currency_code" => "TND",
+                    "currency" => "Tunisian Dinar",
+                    "exponent" => "3"],
+            ];
+            $resultArray = [];
+            foreach ($currencyExponentValues as $row) {
+                $payment_type = $row['currency_code'];
+                $rs['currency'] = $row['currency'];
+                $rs['exponent'] = $row['exponent'];
+                $resultArray[$payment_type] = $rs;
+            }
+            $currencyExponentCodes = $this->serializer->serialize($resultArray);
             $configData = [
                 'section' => 'worldpay',
                 'website' => null,
@@ -1043,92 +1150,7 @@ class UpgradeData implements UpgradeDataInterface
                     'miscellaneous' => [
                         'fields' => [
                             'currency_codes' => [
-                                'value' => [
-                                    $index.'_0' => ["currency_code" => "BEF",
-                                        "currency" => "Belgian Franc",
-                                        "exponent" => "0"],
-                                    $index.'_1' => ["currency_code" => "XOF",
-                                        "currency" => "CFA Franc BCEAO",
-                                        "exponent" => "0"],
-                                    $index.'_2' => ["currency_code" => "XAF",
-                                        "currency" => "CFA Franc BEAC",
-                                        "exponent" => "0"],
-                                    $index.'_3' => ["currency_code" => "XPF",
-                                        "currency" => "CFP Franc",
-                                        "exponent" => "0"],
-                                    $index.'_4' => ["currency_code" => "KMF",
-                                        "currency" => "Comoro Franc",
-                                        "exponent" => "0"],
-                                    $index.'_5' => ["currency_code" => "GRD",
-                                        "currency" => "Greek Drachma",
-                                        "exponent" => "0"],
-                                    $index.'_6' => ["currency_code" => "GNF",
-                                        "currency" => "Guinea Franc",
-                                        "exponent" => "0"],
-                                    $index.'_7' => ["currency_code" => "HUF",
-                                        "currency" => "Hungarian Forint",
-                                        "exponent" => "0"],
-                                    $index.'_8' => ["currency_code" => "IDR",
-                                        "currency" => "Indonesian Rupiah",
-                                        "exponent" => "0"],
-                                    $index.'_9' => ["currency_code" => "ITL",
-                                        "currency" => "Italian Lira",
-                                        "exponent" => "0"],
-                                    $index.'_10' => ["currency_code" => "JPY",
-                                        "currency" => "Japanese Yen",
-                                        "exponent" => "0"],
-                                    $index.'_11' => ["currency_code" => "LUF",
-                                        "currency" => "Luxembourg Franc",
-                                        "exponent" => "0"],
-                                    $index.'_12' => ["currency_code" => "MGA",
-                                        "currency" => "Malagasy Ariary",
-                                        "exponent" => "0"],
-                                    $index.'_13' => ["currency_code" => "MGF",
-                                        "currency" => "Malagasy Franc",
-                                        "exponent" => "0"],
-                                    $index.'_14' => ["currency_code" => "PYG",
-                                        "currency" => "Paraguayan Guarani",
-                                        "exponent" => "0"],
-                                    $index.'_15' => ["currency_code" => "PTE",
-                                        "currency" => "Portugese Escudo",
-                                        "exponent" => "0"],
-                                    $index.'_16' => ["currency_code" => "RWF",
-                                        "currency" => "Rwanda Franc",
-                                        "exponent" => "0"],
-                                    $index.'_17' => ["currency_code" => "KRW",
-                                        "currency" => "South-Korean Won",
-                                        "exponent" => "0"],
-                                    $index.'_18' => ["currency_code" => "ESP",
-                                        "currency" => "Spanish Peseta",
-                                        "exponent" => "0"],
-                                    $index.'_19' => ["currency_code" => "TRL",
-                                        "currency" => "Turkish Lira",
-                                        "exponent" => "0"],
-                                    $index.'_20' => ["currency_code" => "VND",
-                                        "currency" => "Vietnamese New Dong",
-                                        "exponent" => "0"],
-                                    $index.'_21' => ["currency_code" => "BHD",
-                                        "currency" => "Bahraini Dinar",
-                                        "exponent" => "3"],
-                                    $index.'_22' => ["currency_code" => "IQD",
-                                        "currency" => "Iraqi Dinar",
-                                        "exponent" => "3"],
-                                    $index.'_23' => ["currency_code" => "JOD",
-                                        "currency" => "Jordanian Dinar",
-                                        "exponent" => "3"],
-                                    $index.'_24' => ["currency_code" => "KWD",
-                                        "currency" => "Kuwaiti Dinar",
-                                        "exponent" => "3"],
-                                    $index.'_25' => ["currency_code" => "LYD",
-                                        "currency" => "Libyan Dinar",
-                                        "exponent" => "3"],
-                                    $index.'_26' => ["currency_code" => "OMR",
-                                        "currency" => "Rial Omani",
-                                        "exponent" => "3"],
-                                    $index.'_27' => ["currency_code" => "TND",
-                                        "currency" => "Tunisian Dinar",
-                                        "exponent" => "3"],
-                                ]
+                                'value' => $currencyExponentCodes
                             ],
                         ],
                     ],
@@ -1140,16 +1162,7 @@ class UpgradeData implements UpgradeDataInterface
         }
         if (version_compare($context->getVersion(), '1.3.8', '<')) {
             $index = time();
-            $configData = [
-                'section' => 'worldpay_custom_labels',
-                'website' => null,
-                'store'   => null,
-                'groups'  => [
-                    'checkout_labels' => [
-                        'fields' => [
-                            'checkout_label' => [
-                                'value' => [
-                                    $index.'_0' => ["wpay_label_code" => "CO1",
+            $labelsValue = [ $index.'_0' => ["wpay_label_code" => "CO1",
                                         "wpay_label_desc" => "Credit Card Type",
                                         "wpay_custom_label" => ""],
                                     $index.'_1' => ["wpay_label_code" => "CO2",
@@ -1225,7 +1238,17 @@ class UpgradeData implements UpgradeDataInterface
                                     $index.'_24' => ["wpay_label_code" => "CO25",
                                         "wpay_label_desc" => "Saved cards",
                                         "wpay_custom_label" => ""],
-                                ]
+                                ];
+            $labelsCodes = $this->convertArrayToStringForLabels($labelsValue);
+            $configData = [
+                'section' => 'worldpay_custom_labels',
+                'website' => null,
+                'store'   => null,
+                'groups'  => [
+                    'checkout_labels' => [
+                        'fields' => [
+                            'checkout_label' => [
+                                'value' => $labelsCodes
                             ],
                         ],
                     ],
@@ -1237,16 +1260,7 @@ class UpgradeData implements UpgradeDataInterface
         }
         if (version_compare($context->getVersion(), '1.3.8', '<')) {
             $index = time();
-            $configData = [
-                'section' => 'worldpay_custom_labels',
-                'website' => null,
-                'store'   => null,
-                'groups'  => [
-                    'my_account_labels' => [
-                        'fields' => [
-                            'my_account_label' => [
-                                'value' => [
-                                    $index.'_0' => ["wpay_label_code" => "AC2",
+            $labelsValue = [ $index.'_0' => ["wpay_label_code" => "AC2",
                                         "wpay_label_desc" => "Card Brand #",
                                         "wpay_custom_label" => ""],
                                     $index.'_1' => ["wpay_label_code" => "AC3",
@@ -1357,7 +1371,17 @@ class UpgradeData implements UpgradeDataInterface
                                     $index.'_36' => ["wpay_label_code" => "AC39",
                                         "wpay_label_desc" => "Save",
                                         "wpay_custom_label" => ""],
-                                ]
+                                ];
+            $labelsCodes = $this->convertArrayToStringForLabels($labelsValue);
+            $configData = [
+                'section' => 'worldpay_custom_labels',
+                'website' => null,
+                'store'   => null,
+                'groups'  => [
+                    'my_account_labels' => [
+                        'fields' => [
+                            'my_account_label' => [
+                                'value' => $labelsCodes
                             ],
                         ],
                     ],
@@ -1369,16 +1393,7 @@ class UpgradeData implements UpgradeDataInterface
         }
         if (version_compare($context->getVersion(), '1.3.8', '<')) {
             $index = time();
-            $configData = [
-                'section' => 'worldpay_custom_labels',
-                'website' => null,
-                'store'   => null,
-                'groups'  => [
-                    'admin_labels' => [
-                        'fields' => [
-                            'admin_label' => [
-                                'value' => [
-                                    $index.'_0' => ["wpay_label_code" => "AD3",
+            $labelsValue = [ $index.'_0' => ["wpay_label_code" => "AD3",
                                         "wpay_label_desc" => "Payment Plans",
                                         "wpay_custom_label" => ""],
                                     $index.'_1' => ["wpay_label_code" => "AD4",
@@ -1411,7 +1426,17 @@ class UpgradeData implements UpgradeDataInterface
                                     $index.'_10' => ["wpay_label_code" => "AD14",
                                         "wpay_label_desc" => "Save Plan",
                                         "wpay_custom_label" => ""],
-                                ]
+                                ];
+            $labelsCodes = $this->convertArrayToStringForLabels($labelsValue);
+            $configData = [
+                'section' => 'worldpay_custom_labels',
+                'website' => null,
+                'store'   => null,
+                'groups'  => [
+                    'admin_labels' => [
+                        'fields' => [
+                            'admin_label' => [
+                                'value' => $labelsCodes
                             ],
                         ],
                     ],
@@ -1423,52 +1448,7 @@ class UpgradeData implements UpgradeDataInterface
         }
         if (version_compare($context->getVersion(), '1.3.9', '<')) {
             $index = time();
-            $configData = [
-                'section' => 'worldpay',
-                'website' => null,
-                'store'   => null,
-                'groups'  => [
-                    'klarna_config/klarna_countries_config' => [
-                        'fields' => [
-                            'klarna_contries' => [
-                                'value' => [
-                                    $index.'_0' => "AT,CH,NO,DE,DK,US,FI,GB,NL,SE",
-                                ]
-                            ],
-                        ],
-                    ],
-                    'klarna_config/sliceit_config' => [
-                        'fields' => [
-                            'sliceit_contries' => [
-                                'value' => [
-                                    $index.'_0' => "SE,NO,FI,DE,AT,GB,DK,US",
-                                ]
-                            ],
-                        ],
-                    ],
-                    'klarna_config/paylater_config' => [
-                        'fields' => [
-                            'paylater_contries' => [
-                                'value' => [
-                                    $index.'_0' => "SE,NO,FI,DE,NL,AT,CH,GB,DK,US",
-                                ]
-                            ],
-                        ],
-                    ],
-                    'klarna_config/paynow_config' => [
-                        'fields' => [
-                            'paynow_contries' => [
-                                'value' => [
-                                    $index.'_0' => "SE,DE,NL,AT",
-                                ]
-                            ],
-                        ],
-                    ],
-                    'klarna_config/paylater_config/paylater_days_config' => [
-                        'fields' => [
-                            'subscription_days' => [
-                                'value' => [
-                                    $index.'_0' => ["worldpay_klarna_subscription" => "SE",
+             $subscriptionConfigs= [ $index.'_0' => ["worldpay_klarna_subscription" => "SE",
                                             "subscription_days" => "14"],
                                     $index.'_1' => ["worldpay_klarna_subscription" => "NO",
                                             "subscription_days" => "14"],
@@ -1488,15 +1468,158 @@ class UpgradeData implements UpgradeDataInterface
                                             "subscription_days" => "14"],
                                     $index.'_9' => ["worldpay_klarna_subscription" => "CH",
                                             "subscription_days" => "14"],
+                                ];
+             $resultArray = [];
+             foreach ($subscriptionConfigs as $row) {
+                 $payment_type = $row['worldpay_klarna_subscription'];
+                 $rs['subscription_days'] = $row['subscription_days'];
+                 $resultArray[$payment_type] = $rs;
+             }
+             $subscriptionConfigData= $this->serializer->serialize($resultArray);
+             
+             $configData = [
+                'section' => 'worldpay',
+                'website' => null,
+                'store'   => null,
+               'groups'  => [
+                    'klarna_config'=>['klarna_countries_config' => [
+                        'fields' => [
+                            'klarna_contries' => [
+                               'value' => [
+                                    $index.'_0' => "AT,CH,NO,DE,DK,US,FI,GB,NL,SE",
                                 ]
+                                
+                            ],
+                        ],
+                        ]
+                    ],
+                    'klarna_config' =>['sliceit_config' => [
+                        'fields' => [
+                            'sliceit_contries' => [
+                                'value' => [
+                                    $index.'_0' => "SE,NO,FI,DE,AT,GB,DK,US",
+                                ]
+                                
+                            ],
+                        ],
+                        ]
+                    ],
+                    'klarna_config' =>['paylater_config' => [
+                        'fields' => [
+                            'paylater_contries' => [
+                                'value' => [
+                                    $index.'_0' => "SE,NO,FI,DE,NL,AT,CH,GB,DK,US",
+                                ]
+                                
+                            ],
+                        ],
+                        ]
+                    ],
+                    'klarna_config'=>['paynow_config' => [
+                        'fields' => [
+                            'paynow_contries' => [
+                                'value' => [
+                                    $index.'_0' => "SE,DE,NL,AT",
+                                ]
+                                
+                            ],
+                        ],
+                        ]
+                    ],
+                    'klarna_config'=>['paylater_config'=>['paylater_days_config' => [
+                        'fields' => [
+                            'subscription_days' => [
+                                'value' => $subscriptionConfigData
                             ],
                         ],
                     ],
-                ],
-            ];
+                    ],
+                        ]
+                    ]
+             ];
             /** @var \Magento\Config\Model\Config $configModel */
-            $configModel = $this->configFactory->create(['data' => $configData]);
-            $configModel->save();
+             $configModel = $this->configFactory->create(['data' => $configData]);
+             $configModel->save();
         }
+        
+        if (version_compare($context->getVersion(), '1.4.3', '<')) {
+             
+            $groupName = 'Level23 Data Configuration';
+            $catalogSetup->addAttributeGroup(Product::ENTITY, 'Default', $groupName, 16);
+
+            $catalogSetup->addAttribute(
+                \Magento\Catalog\Model\Product::ENTITY,
+                'commodity_code',
+                [
+                    'group' => $groupName,
+                    'type' => 'varchar',
+                    'frontend' => '',
+                    'label' => 'commodity code',
+                    'input' => 'text',
+                    'class' => '',
+                    'source' => '',
+                    'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_WEBSITE,
+                    'visible' => true,
+                    'required' => false,
+                    'user_defined' => true,
+                    'default' => '',
+                    'apply_to' => '',
+                    'visible_on_front' => false,
+                    'is_used_in_grid' => true,
+                    'is_visible_in_grid' => false,
+                    'is_filterable_in_grid' => false,
+                    'used_in_product_listing' => true
+                ]
+            );
+
+            $catalogSetup->addAttribute(
+                \Magento\Catalog\Model\Product::ENTITY,
+                'unit_of_measure',
+                [
+                    'group' => $groupName,
+                    'type' => 'varchar',
+                    'frontend' => '',
+                    'label' => 'Unit of Measure',
+                    'input' => 'text',
+                    'class' => '',
+                    'source' => '',
+                    'global' => \Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface::SCOPE_WEBSITE,
+                    'visible' => true,
+                    'required' => false,
+                    'user_defined' => true,
+                    'default' => '',
+                    'apply_to' => '',
+                    'visible_on_front' => false,
+                    'is_used_in_grid' => false,
+                    'is_visible_in_grid' => false,
+                    'is_filterable_in_grid' => false
+                ]
+            );
+            
+        }
+    }
+    
+    public function convertArrayToString($exceptionValues)
+    {
+        $resultArray = [];
+        foreach ($exceptionValues as $row) {
+             $payment_type = $row['exception_code'];
+            $rs['exception_messages'] = $row['exception_messages'];
+            $rs['exception_module_messages'] = $row['exception_module_messages'];
+            $resultArray[$payment_type] = $rs;
+        }
+        return $this->serializer->serialize($resultArray);
+    }
+    
+    public function convertArrayToStringForLabels($exceptionValues)
+    {
+        $resultArray = [];
+        foreach ($exceptionValues as $row) {
+            $payment_type = $row['wpay_label_code'];
+            $rs['wpay_label_desc'] = $row['wpay_label_desc'];
+            $rs['wpay_custom_label'] = $row['wpay_custom_label'];
+            $resultArray[$payment_type] = $rs;
+        }
+         return $this->serializer->serialize($resultArray);
     }
 }

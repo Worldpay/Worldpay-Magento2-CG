@@ -24,6 +24,9 @@
                 <order_status>pending,processing,canceled,complete</order_status>
                 <order_sync_interval>24</order_sync_interval>
             </order_sync_status>
+            <level23_config>
+                <unit_of_measure>each</unit_of_measure>
+            </level23_config>
             <tokenization>
                 <saved_card>0</saved_card>
                 <save_tokenization>0</save_tokenization>

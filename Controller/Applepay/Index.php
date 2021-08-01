@@ -65,7 +65,7 @@ class Index extends \Magento\Framework\App\Action\Action
         if ($validation_url == 'getTotal') {
              
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $cart = $objectManager->get('\Magento\Checkout\Model\Cart');
+            $cart = $objectManager->get(\Magento\Checkout\Model\Cart::class);
 
             $subTotal = $cart->getQuote()->getSubtotal();
             $grandTotal = $cart->getQuote()->getGrandTotal();
@@ -83,6 +83,7 @@ class Index extends \Magento\Framework\App\Action\Action
         define('PRODUCTION_CERTIFICATE_KEY_PASS', $certificationPassword);
 
         define('PRODUCTION_MERCHANTIDENTIFIER', openssl_x509_parse(
+            // @codingStandardsIgnoreLine
             file_get_contents(PRODUCTION_CERTIFICATE_PATH)
         )['subject']['UID']);
         define('PRODUCTION_DOMAINNAME', $domainName);
@@ -92,18 +93,18 @@ class Index extends \Magento\Framework\App\Action\Action
         try {
           
             $validation_url = $this->request->getParam('u');
-
+            // @codingStandardsIgnoreStart
             if ("https" == parse_url($validation_url, PHP_URL_SCHEME) && substr(
                 parse_url($validation_url, PHP_URL_HOST),
                 -10
             )  == ".apple.com") {
-               
+                
                 // create a new cURL resource
                 $ch = curl_init();
 
                 $data = '{"merchantIdentifier":"'.PRODUCTION_MERCHANTIDENTIFIER.'", '
                         . '"domainName":"'.PRODUCTION_DOMAINNAME.'", "displayName":"'.PRODUCTION_DISPLAYNAME.'"}';
-
+                
                 curl_setopt($ch, CURLOPT_URL, $validation_url);
                 curl_setopt($ch, CURLOPT_SSLCERT, PRODUCTION_CERTIFICATE_PATH);
                 curl_setopt($ch, CURLOPT_SSLKEY, PRODUCTION_CERTIFICATE_KEY);
@@ -115,6 +116,7 @@ class Index extends \Magento\Framework\App\Action\Action
                 $result = curl_exec($ch);
                 //var_dump($result);
                 curl_close($ch);
+            // @codingStandardsIgnoreEnd
                 
                 $resultJson = '';
                 

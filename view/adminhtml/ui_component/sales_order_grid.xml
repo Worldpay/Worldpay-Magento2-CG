@@ -15,6 +15,9 @@ and open the template in the editor.
                     <item name="label" xsi:type="string" translate="true">Worldpay Fraudsight Message</item>
                 </item>
             </argument>
+            <settings>
+                <sortable>false</sortable>
+            </settings>
         </column>
     </columns>
 </listing>

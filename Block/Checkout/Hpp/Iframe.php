@@ -12,6 +12,7 @@ class Iframe extends \Magento\Framework\View\Element\Template
      * @param \Magento\Backend\Block\Template\Context $context
      * @param array $data
      */
+    // @codingStandardsIgnoreLine
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         array $data = []
@@ -22,6 +23,7 @@ class Iframe extends \Magento\Framework\View\Element\Template
     /**
      * Disable block output when integration mode is other than iframe
      */
+    // @codingStandardsIgnoreLine
     protected function _beforeToHtml()
     {
         return parent::_beforeToHtml();

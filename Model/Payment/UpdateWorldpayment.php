@@ -23,6 +23,7 @@ class UpdateWorldpayment
     protected $worldpaypayment;
     protected $paymentMethodType;
     
+    public $apmMethods = ['ACH_DIRECT_DEBIT-SSL','SEPA_DIRECT_DEBIT-SSL'];
     /**
      * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
      */
@@ -81,11 +82,10 @@ class UpdateWorldpayment
         $orderCode=$orderStatus['orderCode'];
         $payment=$orderStatus->payment;
         $cardDetail=$payment->paymentMethodDetail->card;
-         if(isset($cardDetail)){
-        $cardNumber= $cardDetail['number'];
-        }else
-        {
-          $cardNumber='';
+        if (isset($cardDetail)) {
+            $cardNumber= $cardDetail['number'];
+        } else {
+            $cardNumber='';
         }
         $paymentStatus=$payment->lastEvent;
         $cvcnumber=$payment->CVCResultCode['description'];
@@ -109,8 +109,24 @@ class UpdateWorldpayment
         $wpp->setData('card_number', $cardNumber);
         $wpp->setData('payment_status', $paymentStatus);
         if ($payment->paymentMethod[0]) {
-            $this->paymentMethodType = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
-            $wpp->setData('payment_type', str_replace("_CREDIT", "", $this->paymentMethodType));
+            if (!in_array(
+                strtoupper($payment->paymentMethod[0]),
+                $this->apmMethods
+            )) {
+                $this->paymentMethodType = str_replace(
+                    ["_CREDIT","_DEBIT","_ELECTRON"],
+                    "",
+                    $payment->paymentMethod[0]
+                );
+                $wpp->setData('payment_type', str_replace(
+                    ["_CREDIT","_DEBIT","_ELECTRON"],
+                    "",
+                    $this->paymentMethodType
+                ));
+            } else {
+                $this->paymentMethodType = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
+                $wpp->setData('payment_type', str_replace("_CREDIT", "", $this->paymentMethodType));
+            }
         }
         $wpp->setData('avs_result', $avsnumber);
         $wpp->setData('cvc_result', $cvcnumber);
@@ -132,26 +148,26 @@ class UpdateWorldpayment
         $wpp->setData('is_primerouting_enabled', $primeRoutingEnabled);
         $wpp->setData('primerouting_networkused', $networkUsed);
         if ($issureInsightresponse) {
-        $wpp->setData('source_type', $issureInsightresponse['sourceType']);
-        $wpp->setData('available_balance', $issureInsightresponse['availableBalance']);
-        $wpp->setData('prepaid_card_type', $issureInsightresponse['prepaidCardType']);
-        $wpp->setData('reloadable', $issureInsightresponse['reloadable']);
-        $wpp->setData('card_product_type', $issureInsightresponse['cardProductType']);
-        $wpp->setData('affluence', $issureInsightresponse['affluence']);
-        $wpp->setData('account_range_id', $issureInsightresponse['accountRangeId']);
-        $wpp->setData('issuer_country', $issureInsightresponse['issuerCountry']);
-        $wpp->setData('virtual_account_number', $issureInsightresponse['virtualAccountNumber']);
+            $wpp->setData('source_type', $issureInsightresponse['sourceType']);
+            $wpp->setData('available_balance', $issureInsightresponse['availableBalance']);
+            $wpp->setData('prepaid_card_type', $issureInsightresponse['prepaidCardType']);
+            $wpp->setData('reloadable', $issureInsightresponse['reloadable']);
+            $wpp->setData('card_product_type', $issureInsightresponse['cardProductType']);
+            $wpp->setData('affluence', $issureInsightresponse['affluence']);
+            $wpp->setData('account_range_id', $issureInsightresponse['accountRangeId']);
+            $wpp->setData('issuer_country', $issureInsightresponse['issuerCountry']);
+            $wpp->setData('virtual_account_number', $issureInsightresponse['virtualAccountNumber']);
         }
         $wpp->setData('risk_provider', $riskProvider);
         
         if ($fraudsightData) {
-        $wpp->setData('fraudsight_message', $fraudsightData['message']);
-        if (isset($fraudsightData['score'])) {
-            $wpp->setData('fraudsight_score', $fraudsightData['score']);
-        }
-        if (isset($fraudsightData['reasonCode'])) {
-            $wpp->setData('fraudsight_reasoncode', $fraudsightData['reasonCode']);
-        }
+            $wpp->setData('fraudsight_message', $fraudsightData['message']);
+            if (isset($fraudsightData['score'])) {
+                $wpp->setData('fraudsight_score', $fraudsightData['score']);
+            }
+            if (isset($fraudsightData['reasonCode'])) {
+                $wpp->setData('fraudsight_reasoncode', $fraudsightData['reasonCode']);
+            }
         }
         
         $wpp->save();
@@ -206,7 +222,7 @@ class UpdateWorldpayment
         $riskProviderFinalScore=$payment->riskScore['finalScore'];
         $refusalcode=$payment->issueResponseCode['code'] ? : $payment->ISO8583ReturnCode['code'];
         $refusaldescription=$payment->issueResponseCode['description'] ? : $payment->ISO8583ReturnCode['description'];
-        if(!is_null($payment->instalments[0])) {
+        if (($payment->instalments[0]) !== null) {
             $lataminstalments=$payment->instalments[0];
         }
         $wpp = $this->worldpaypayment->create();
@@ -215,8 +231,8 @@ class UpdateWorldpayment
         $wpp->setData('card_number', $cardNumber);
         $wpp->setData('payment_status', $paymentStatus);
         if ($payment->paymentMethod[0]) {
-            $this->paymentMethodType = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
-            $wpp->setData('payment_type', str_replace("_CREDIT", "", $this->paymentMethodType));
+            $this->paymentMethodType = str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $payment->paymentMethod[0]);
+            $wpp->setData('payment_type', str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $this->paymentMethodType));
         }
         $wpp->setData('avs_result', $avsnumber);
         $wpp->setData('cvc_result', $cvcnumber);
@@ -297,7 +313,7 @@ class UpdateWorldpayment
                     ->cardDetails->expiryDate->date['month']);
             $savedTokenFactory->setCardExpiryYear((int)$tokenElement[0]->paymentInstrument
                     ->cardDetails->expiryDate->date['year']);
-            $paymentmethodmethod = str_replace(["_CREDIT","_DEBIT"], "", $payment->paymentMethod[0]);
+            $paymentmethodmethod = str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $payment->paymentMethod[0]);
             $savedTokenFactory->setMethod($paymentmethodmethod);
             $savedTokenFactory->setCardBrand($tokenElement[0]->paymentInstrument[0]
                     ->cardDetails[0]->derived[0]->cardBrand[0]);
@@ -322,8 +338,8 @@ class UpdateWorldpayment
         } else {
             $tokenId = $tokenDataExist['id'];
             $this->saveTokenDataToTransactions($tokenId, $orderCode);
-            if(!$this->customerSession->getIavCall()) {
-            $this->_messageManager->addNotice(__($this->worldpayHelper->getCreditCardSpecificexception('CCAM22')));
+            if (!$this->customerSession->getIavCall()) {
+                $this->_messageManager->addNotice(__($this->worldpayHelper->getCreditCardSpecificexception('CCAM22')));
             }
             return;
         }
@@ -487,7 +503,8 @@ class UpdateWorldpayment
     private function getFraudsightData($payment)
     {
         $fraudsightData = [];
-        $frausdightProvider = $payment->riskScore?$payment->riskScore['Provider']:'';;
+        $frausdightProvider = $payment->riskScore?$payment->riskScore['Provider']:'';
+        ;
         if (strtoupper($frausdightProvider) === 'FRAUDSIGHT') {
             $fraudsightData['message'] = $payment->riskScore['message'];
             if (isset($payment->FraudSight)) {
@@ -510,4 +527,3 @@ class UpdateWorldpayment
         return ltrim($savereasoncode, ",");
     }
 }
-
