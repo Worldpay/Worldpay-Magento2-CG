@@ -260,16 +260,13 @@ EOD;
         }
         $this->_addBillingElement($order);
         
-       
-
-
         //Level 23 data request body
         if (!empty($this->paymentDetails['isLevel23Enabled']) && $this->paymentDetails['isLevel23Enabled']
-            && (($this->paymentDetails['paymentType'] === 'ECMC-SSL' || $this->paymentDetails['paymentType'] === 'VISA-SSL')
-                || (($this->paymentDetails['cardType'] === 'ECMC-SSL' || $this->paymentDetails['cardType'] === 'VISA-SSL')))
-           && ($this->paymentDetails['countryCode'] === 'US' || $this->paymentDetails['countryCode'] === 'CA')) {
-            
-            
+            && (($this->paymentDetails['paymentType'] === 'ECMC-SSL'
+                || $this->paymentDetails['paymentType'] === 'VISA-SSL')
+                || (($this->paymentDetails['cardType'] === 'ECMC-SSL'
+                    || $this->paymentDetails['cardType'] === 'VISA-SSL')))
+            && ($this->paymentDetails['countryCode'] === 'US' || $this->paymentDetails['countryCode'] === 'CA')) {
             $this->_addBranchSpecificExtension($order);
         }
         
@@ -889,14 +886,13 @@ EOD;
 
         $branchSpecificExtension = $order->addChild('branchSpecificExtension');
         $purchase = $branchSpecificExtension->addChild('purchase');
-        //$purchase->addChild('invoiceReferenceNumber',null);
         
         $customerId = '';
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $customerSession = $objectManager->get('Magento\Customer\Model\Session');
-           if($customerSession->isLoggedIn()) {
-              $customerId =  $customerSession->getCustomer()->getId();
-           }
+        $customerSession = $objectManager->get(\Magento\Customer\Model\Session::class);
+        if ($customerSession->isLoggedIn()) {
+            $customerId =  $customerSession->getCustomer()->getId();
+        }
            
         if (!empty($customerId)) {
             $purchase->addChild('customerReference', $customerId);
@@ -908,22 +904,41 @@ EOD;
         
         $salesTax = $purchase->addChild('salesTax');
  
-         $this->_addAmountElementDirect($salesTax, $this->currencyCode, $this->exponent, $this->paymentDetails['salesTax']);
+        $this->_addAmountElementDirect(
+            $salesTax,
+            $this->currencyCode,
+            $this->exponent,
+            $this->paymentDetails['salesTax']
+        );
                   
         if (isset($this->cusDetails['discount_amount'])) {
-              $discountAmount = $purchase->addChild('discountAmount');
-              $this->_addAmountElementDirect($discountAmount, $this->currencyCode, $this->exponent, $this->cusDetails['discount_amount']);
+            $discountAmount = $purchase->addChild('discountAmount');
+            $this->_addAmountElementDirect(
+                $discountAmount,
+                $this->currencyCode,
+                $this->exponent,
+                $this->cusDetails['discount_amount']
+            );
         }
                  
         if (isset($this->cusDetails['shipping_amount'])) {
-                $shippingAmount = $purchase->addChild('shippingAmount');
-               $this->_addAmountElementDirect($shippingAmount, $this->currencyCode, $this->exponent, $this->cusDetails['shipping_amount']);
+            $shippingAmount = $purchase->addChild('shippingAmount');
+            $this->_addAmountElementDirect(
+                $shippingAmount,
+                $this->currencyCode,
+                $this->exponent,
+                $this->cusDetails['shipping_amount']
+            );
         }
-            
         
         if (isset($this->paymentDetails['dutyAmount'])) {
             $dutyAmount = $purchase->addChild('dutyAmount');
-            $this->_addAmountElementDirect($dutyAmount, $this->currencyCode, $this->exponent, $this->paymentDetails['dutyAmount']);
+            $this->_addAmountElementDirect(
+                $dutyAmount,
+                $this->currencyCode,
+                $this->exponent,
+                $this->paymentDetails['dutyAmount']
+            );
         }
         
         //$purchase->addChild('shipFromPostalCode', '');
@@ -1005,10 +1020,20 @@ EOD;
         $this->_addAmountElementDirect($itemTotalElement, $this->currencyCode, $this->exponent, $itemTotal);
 
         $itemTotalWithTaxElement = $item->addChild('itemTotalWithTax');
-        $this->_addAmountElementDirect($itemTotalWithTaxElement, $this->currencyCode, $this->exponent, $itemTotalWithTax);
+        $this->_addAmountElementDirect(
+            $itemTotalWithTaxElement,
+            $this->currencyCode,
+            $this->exponent,
+            $itemTotalWithTax
+        );
 
         $itemDiscountAmountElement = $item->addChild('itemDiscountAmount');
-        $this->_addAmountElementDirect($itemDiscountAmountElement, $this->currencyCode, $this->exponent, $itemDiscountAmount);
+        $this->_addAmountElementDirect(
+            $itemDiscountAmountElement,
+            $this->currencyCode,
+            $this->exponent,
+            $itemDiscountAmount
+        );
 
         $taxAmountElement = $item->addChild('taxAmount');
         $this->_addAmountElementDirect($taxAmountElement, $this->currencyCode, $this->exponent, $taxAmount);

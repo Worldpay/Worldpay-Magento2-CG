@@ -50,7 +50,7 @@ class UpgradeData implements UpgradeDataInterface
      * {@inheritdoc}
      */
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
-    {        
+    {
         /** @var \Magento\Catalog\Setup\CategorySetup $catalogSetup */
         $catalogSetup = $this->categorySetupFactory->create(['setup' => $setup]);
         if (version_compare($context->getVersion(), '1.2.7', '<')) {
@@ -733,15 +733,15 @@ class UpgradeData implements UpgradeDataInterface
                                         "wpay_desc" => "Unknown",
                                         "custom_msg" => ""],
                                 ];
-            $resultArray = [];		
-            foreach ($responseValue as $row) {
+             $resultArray = [];
+             foreach ($responseValue as $row) {
                  $payment_type = $row['wpay_code'];
-                $rs['wpay_desc'] = $row['wpay_desc'];
-                $rs['custom_msg'] = $row['custom_msg'];
-                $resultArray[$payment_type] = $rs;
+                 $rs['wpay_desc'] = $row['wpay_desc'];
+                 $rs['custom_msg'] = $row['custom_msg'];
+                 $resultArray[$payment_type] = $rs;
              }
-            $responseCodes = $this->serializer->serialize($resultArray);
-            $configData = [
+             $responseCodes = $this->serializer->serialize($resultArray);
+             $configData = [
                 'section' => 'worldpay_exceptions',
                 'website' => null,
                 'store'   => null,
@@ -755,10 +755,10 @@ class UpgradeData implements UpgradeDataInterface
                         ],
                     ],
                 ],
-            ];
+             ];
             /** @var \Magento\Config\Model\Config $configModel */
-            $configModel = $this->configFactory->create(['data' => $configData]);
-            $configModel->save();
+             $configModel = $this->configFactory->create(['data' => $configData]);
+             $configModel->save();
         }
         if (version_compare($context->getVersion(), '1.3.5', '<')) {
             $index = time();
@@ -1134,14 +1134,14 @@ class UpgradeData implements UpgradeDataInterface
                     "currency" => "Tunisian Dinar",
                     "exponent" => "3"],
             ];
-            $resultArray = [];		
+            $resultArray = [];
             foreach ($currencyExponentValues as $row) {
                 $payment_type = $row['currency_code'];
                 $rs['currency'] = $row['currency'];
                 $rs['exponent'] = $row['exponent'];
                 $resultArray[$payment_type] = $rs;
-             }
-         $currencyExponentCodes = $this->serializer->serialize($resultArray);
+            }
+            $currencyExponentCodes = $this->serializer->serialize($resultArray);
             $configData = [
                 'section' => 'worldpay',
                 'website' => null,
@@ -1469,15 +1469,15 @@ class UpgradeData implements UpgradeDataInterface
                                     $index.'_9' => ["worldpay_klarna_subscription" => "CH",
                                             "subscription_days" => "14"],
                                 ];
-            $resultArray = [];		
-            foreach ($subscriptionConfigs as $row) {
+             $resultArray = [];
+             foreach ($subscriptionConfigs as $row) {
                  $payment_type = $row['worldpay_klarna_subscription'];
-                $rs['subscription_days'] = $row['subscription_days'];
-                $resultArray[$payment_type] = $rs;
+                 $rs['subscription_days'] = $row['subscription_days'];
+                 $resultArray[$payment_type] = $rs;
              }
-        $subscriptionConfigData= $this->serializer->serialize($resultArray);
+             $subscriptionConfigData= $this->serializer->serialize($resultArray);
              
-            $configData = [
+             $configData = [
                 'section' => 'worldpay',
                 'website' => null,
                 'store'   => null,
@@ -1533,15 +1533,14 @@ class UpgradeData implements UpgradeDataInterface
                             ],
                         ],
                     ],
-                ],
+                    ],
                         ]
                     ]
-            ];
+             ];
             /** @var \Magento\Config\Model\Config $configModel */
-            $configModel = $this->configFactory->create(['data' => $configData]);
-            $configModel->save();
+             $configModel = $this->configFactory->create(['data' => $configData]);
+             $configModel->save();
         }
-        
         
         if (version_compare($context->getVersion(), '1.4.3', '<')) {
              
@@ -1602,25 +1601,25 @@ class UpgradeData implements UpgradeDataInterface
     
     public function convertArrayToString($exceptionValues)
     {
-        $resultArray = [];		
-            foreach ($exceptionValues as $row) {
-                 $payment_type = $row['exception_code'];
-                $rs['exception_messages'] = $row['exception_messages'];
-                $rs['exception_module_messages'] = $row['exception_module_messages'];
-                $resultArray[$payment_type] = $rs;
-             }
+        $resultArray = [];
+        foreach ($exceptionValues as $row) {
+             $payment_type = $row['exception_code'];
+            $rs['exception_messages'] = $row['exception_messages'];
+            $rs['exception_module_messages'] = $row['exception_module_messages'];
+            $resultArray[$payment_type] = $rs;
+        }
         return $this->serializer->serialize($resultArray);
     }
     
-     public function convertArrayToStringForLabels($exceptionValues)
+    public function convertArrayToStringForLabels($exceptionValues)
     {
-        $resultArray = [];		
-            foreach ($exceptionValues as $row) {
-                 $payment_type = $row['wpay_label_code'];
-                $rs['wpay_label_desc'] = $row['wpay_label_desc'];
-                $rs['wpay_custom_label'] = $row['wpay_custom_label'];
-                $resultArray[$payment_type] = $rs;
-             }
-        return $this->serializer->serialize($resultArray);
+        $resultArray = [];
+        foreach ($exceptionValues as $row) {
+            $payment_type = $row['wpay_label_code'];
+            $rs['wpay_label_desc'] = $row['wpay_label_desc'];
+            $rs['wpay_custom_label'] = $row['wpay_custom_label'];
+            $resultArray[$payment_type] = $rs;
+        }
+         return $this->serializer->serialize($resultArray);
     }
 }

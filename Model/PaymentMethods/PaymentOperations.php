@@ -6,15 +6,25 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
 {
     public function updateOrderStatusForVoidSale($order)
     {
-        $payment = $order->getPayment();
-        $mageOrder = $order->getOrder();
-        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
-        $paymentStatus = $worldPayPayment->getPaymentStatus();
-       
-        if ($paymentStatus === 'VOIDED') {
-            $mageOrder->setState(\Magento\Sales\Model\Order::STATE_CLOSED, true);
-            $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_CLOSED);
-            $mageOrder->save();
+        if (!empty($order)) {
+            $payment = $order->getPayment();
+            $mageOrder = $order->getOrder();
+            $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
+        
+            if (isset($worldPayPayment)) {
+                $paymentStatus = $worldPayPayment->getPaymentStatus();
+                if ($paymentStatus === 'VOIDED') {
+                    $mageOrder->setState(\Magento\Sales\Model\Order::STATE_CLOSED, true);
+                    $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_CLOSED);
+                    $mageOrder->save();
+                }
+            } else {
+                $this->_wplogger->info('No Payment');
+                throw new \Magento\Framework\Exception\LocalizedException(__('No Payment'));
+            }
+        } else {
+            $this->_wplogger->info('No Payment');
+            throw new \Magento\Framework\Exception\LocalizedException(__('No Payment'));
         }
     }
     
@@ -74,15 +84,24 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
     
     public function updateOrderStatusForCancelOrder($order)
     {
-        $payment = $order->getPayment();
-        $mageOrder = $order->getOrder();
-        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
-        $paymentStatus = $worldPayPayment->getPaymentStatus();
-       
-        if ($paymentStatus === 'CANCELLED') {
-            $mageOrder->setState(\Magento\Sales\Model\Order::STATE_CANCELED, true);
-            $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
-            $mageOrder->save();
+        if (!empty($order)) {
+            $payment = $order->getPayment();
+            $mageOrder = $order->getOrder();
+            $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
+            if (isset($worldPayPayment)) {
+                $paymentStatus = $worldPayPayment->getPaymentStatus();
+                if ($paymentStatus === 'CANCELLED') {
+                    $mageOrder->setState(\Magento\Sales\Model\Order::STATE_CANCELED, true);
+                    $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
+                    $mageOrder->save();
+                }
+            } else {
+                $this->_wplogger->info('No Payment');
+                throw new \Magento\Framework\Exception\LocalizedException(__('No Payment'));
+            }
+        } else {
+            $this->_wplogger->info('No Payment');
+            throw new \Magento\Framework\Exception\LocalizedException(__('No Payment'));
         }
     }
 }

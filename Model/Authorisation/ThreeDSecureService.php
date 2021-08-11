@@ -183,9 +183,14 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
      */
     private function _handleAuthoriseSuccess()
     {
-        $this->checkoutSession->setWpResponseForwardUrl(
-            $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
-        );
+        if ($this->checkoutSession->getInstantPurchaseOrder()) {
+            $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
+            $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
+        } else {
+            $this->checkoutSession->setWpResponseForwardUrl(
+                $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
+            );
+        }
     }
 
     /**

@@ -55,10 +55,16 @@ class VaultService extends \Magento\Framework\DataObject
                 );
         }
         $threeDSecureParams = $directResponse->get3dSecureParams();
-        $threeDsEnabled = $this->worldpayHelper->is3DSecureEnabled();
+        $threeDsEnabled = $this->worldpayHelper->is3dsEnabled();
         $threeDSecureChallengeParams = $directResponse->get3ds2Params();
         $threeDSecureConfig = [];
         if ($threeDSecureParams) {
+            if (!$threeDsEnabled) {
+                $this->wplogger->info("3Ds attempted but 3DS is not enabled for the store. Please contact merchant.");
+                throw new \Magento\Framework\Exception\LocalizedException(
+                    __("3Ds attempted but 3DS is not enabled for the store. Please contact merchant.")
+                );
+            }
             // Handles success response with 3DS & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
             $payment->setIsTransactionPending(1);
@@ -100,6 +106,7 @@ class VaultService extends \Magento\Framework\DataObject
         $this->checkoutSession->set3DSecureParams($threeDSecureParams);
         $this->checkoutSession->setDirectOrderParams($directOrderParams);
         $this->checkoutSession->setAuthOrderId($mageOrderId);
+        $this->checkoutSession->setInstantPurchaseOrder(true);
     }
     
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)

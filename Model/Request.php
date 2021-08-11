@@ -88,7 +88,6 @@ class Request
 
         $request->setOption(CURLINFO_HEADER_OUT, true);
         
-        
         $result = $request->execute();
 
         // logging Headder for 3DS request to check Cookie.

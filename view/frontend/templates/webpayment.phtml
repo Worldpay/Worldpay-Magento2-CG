@@ -37,6 +37,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     window.MyAccountExceptions = '<?= /* @noEscape */ $block->MyAccountExceptions() ?>';
     window.CreditCardException = '<?= /* @noEscape */ $block->getCreditCardException() ?>';
     window.isDynamic3DS2Enabled = '<?= /* @noEscape */ $block->isDynamic3DS2Enabled() ?>';
+    window.is3DsEnabled = '<?= /* @noEscape */ $block->is3DsEnabled() ?>';
     window.jwtEventUrl = '<?= /* @noEscape */ $block->getJwtEventUrl() ?>';
     var envMode = '<?= /* @noEscape */ $block->getEnvMode() ?>';
     

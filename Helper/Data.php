@@ -163,6 +163,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    public function is3dsEnabled()
+    {
+        return $this->isDynamic3DEnabled() || $this->is3DSecureEnabled();
+    }
 
     public function isLoggerEnable()
     {
@@ -567,11 +571,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return $this->getCcTitle() . "\n" . $item->getPaymentType();
         } elseif ($paymentCode == 'worldpay_apm') {
             //Klarna sliceit check
-            if(strpos($item->getPaymentType(), "KLARNA_SLICEIT-SSL") !== false  
-               && strlen($item->getPaymentType()) > 18){
+            if (strpos($item->getPaymentType(), "KLARNA_SLICEIT-SSL") !== false
+               && strlen($item->getPaymentType()) > 18) {
                 return $apmTitle . "\n" . $item->getPaymentType() . "\r\n" . "Installments: "
-                    . chop(chop(substr($item->getPaymentType(),15,5),'_'),'MOS') . " months";
-            }else{
+                    . rtrim(rtrim(substr($item->getPaymentType(), 15, 5), '_'), 'MOS') . " months";
+            } else {
                 return $this->getApmTitle() . "\n" . $item->getPaymentType();
             }
         } elseif ($paymentCode == 'worldpay_wallets') {
@@ -580,7 +584,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return $this->getMotoTitle() . "\n" . $item->getPaymentType();
         }
     }
-    
 
     public function getOrderByOrderId($orderId)
     {
@@ -1357,5 +1360,4 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 ->addFieldToFilter('item_id', ['eq' => $itemId]);
         return $invoicedItems->getData()[0];
     }
-
 }

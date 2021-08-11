@@ -31,8 +31,16 @@ EOD;
      * @param string $refundReference
      * @return SimpleXMLElement $xml
      */
-    public function build($merchantCode, $orderCode, $currencyCode, $amount, $refundReference, $exponent, $order, $paymentType = null)
-    {
+    public function build(
+        $merchantCode,
+        $orderCode,
+        $currencyCode,
+        $amount,
+        $refundReference,
+        $exponent,
+        $order,
+        $paymentType = null
+    ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
         $this->currencyCode = $currencyCode;
@@ -85,8 +93,7 @@ EOD;
         $amountElement['currencyCode'] = $this->currencyCode;
         $amountElement['exponent'] = $this->exponent;
         
-        
-         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
         
         $level23DataEnabled = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
@@ -119,13 +126,8 @@ EOD;
       */
     private function _addBranchSpecificExtension($order, $refund)
     {
-        
-   
-       // $this->paymentDetails['salesTax'] = 2022;
-        //$order_details = $this->cusDetails['order_details'];
         $branchSpecificExtension = $refund->addChild('branchSpecificExtension');
         $purchase = $branchSpecificExtension->addChild('purchase');
-        //$purchase->addChild('invoiceReferenceNumber',null);
         if ($order->getCustomerIsGuest()) {
             $purchase->addChild('customerReference', 'guest');
         } else {
@@ -156,10 +158,14 @@ EOD;
          
          $orderDiscountAmount = abs($order->getDiscountAmount());
          
-         
         if ($orderDiscountAmount) {
             $discountAmountXml = $purchase->addChild('discountAmount');
-            $this->_addAmountElementCapture($discountAmountXml, $this->currencyCode, $this->exponent, $order->getDiscountAmount());
+            $this->_addAmountElementCapture(
+                $discountAmountXml,
+                $this->currencyCode,
+                $this->exponent,
+                $order->getDiscountAmount()
+            );
         }
         
         $shippingAmnt = (float)$order->getShippingAmount();
@@ -180,7 +186,6 @@ EOD;
         $purchase->addChild('destinationPostalCode', $billingpostcode);
         
         $countryCode = $order->getShippingAddress()->getCountryId();
-                
                
         $purchase->addChild('destinationCountryCode', $countryCode);
         
@@ -231,7 +236,6 @@ EOD;
     ) {
         
         $item = $parentElement->addChild('item');
-        
         
         if ($description) {
             $descriptionElement = $item->addChild('description');
@@ -300,7 +304,6 @@ EOD;
         $amountElement['exponent'] = $this->exponent;
         $amountElement['value'] = $this->_amountAsInt($discountAmount);
     }
-    
     
      /**
       * @param SimpleXMLElement $element

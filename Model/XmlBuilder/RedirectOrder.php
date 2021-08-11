@@ -186,12 +186,10 @@ EOD;
         $this->_addShippingElement($order);
         $this->_addBillingElement($order);
         
-           
         //Level 23 data request body
-        if(!empty($this->paymentDetails['isLevel23Enabled']) && $this->paymentDetails['isLevel23Enabled']
-            && ($this->paymentDetails['cardType'] === 'ECMC-SSL' || $this->paymentDetails['cardType'] === 'VISA-SSL') 
-           && ($this->paymentDetails['countryCode'] === 'US' || $this->paymentDetails['countryCode'] === 'CA'))
-            {
+        if (!empty($this->paymentDetails['isLevel23Enabled']) && $this->paymentDetails['isLevel23Enabled']
+            && ($this->paymentDetails['cardType'] === 'ECMC-SSL' || $this->paymentDetails['cardType'] === 'VISA-SSL')
+           && ($this->paymentDetails['countryCode'] === 'US' || $this->paymentDetails['countryCode'] === 'CA')) {
             $this->_addBranchSpecificExtension($order);
         }
         
@@ -516,7 +514,6 @@ EOD;
         $order_details = $this->cusDetails['order_details'];
         $branchSpecificExtension = $order->addChild('branchSpecificExtension');
         $purchase = $branchSpecificExtension->addChild('purchase');
-        //$purchase->addChild('invoiceReferenceNumber',null);
         if (!empty($order_details['customer_id'])) {
             $purchase->addChild('customerReference', $order_details['customer_id']);
         } else {
@@ -526,24 +523,43 @@ EOD;
         
         $salesTax = $purchase->addChild('salesTax');
         $salesTaxElement = $salesTax->addChild('amount');
-        $this->_addAmountElement($salesTaxElement, $this->currencyCode, $this->exponent, $this->paymentDetails['salesTax']);
+        $this->_addAmountElement(
+            $salesTaxElement,
+            $this->currencyCode,
+            $this->exponent,
+            $this->paymentDetails['salesTax']
+        );
         
         if (isset($this->cusDetails['discount_amount'])) {
             $discountAmount = $purchase->addChild('discountAmount');
             $discountAmountElement = $discountAmount->addChild('amount');
-            $this->_addAmountElement($discountAmountElement, $this->currencyCode, $this->exponent, $this->cusDetails['discount_amount']);
+            $this->_addAmountElement(
+                $discountAmountElement,
+                $this->currencyCode,
+                $this->exponent,
+                $this->cusDetails['discount_amount']
+            );
         }
         if (isset($this->cusDetails['shipping_amount'])) {
             $shippingAmount = $purchase->addChild('shippingAmount');
             $shippingAmountElement = $shippingAmount->addChild('amount');
-            $this->_addAmountElement($shippingAmountElement, $this->currencyCode, $this->exponent, $this->cusDetails['shipping_amount']);
+            $this->_addAmountElement(
+                $shippingAmountElement,
+                $this->currencyCode,
+                $this->exponent,
+                $this->cusDetails['shipping_amount']
+            );
         }
-        
         
         if (isset($this->paymentDetails['dutyAmount'])) {
             $dutyAmount = $purchase->addChild('dutyAmount');
             $dutyAmountElement = $dutyAmount->addChild('amount');
-            $this->_addAmountElement($dutyAmountElement, $this->currencyCode, $this->exponent, $this->paymentDetails['dutyAmount']);
+            $this->_addAmountElement(
+                $dutyAmountElement,
+                $this->currencyCode,
+                $this->exponent,
+                $this->paymentDetails['dutyAmount']
+            );
         }
         
         //$purchase->addChild('shipFromPostalCode', '');
@@ -627,7 +643,12 @@ EOD;
 
         $itemTotalWithTaxElement = $item->addChild('itemTotalWithTax');
         $itemTotalWithTaxElementAmount = $itemTotalWithTaxElement->addChild('amount');
-        $this->_addAmountElement($itemTotalWithTaxElementAmount, $this->currencyCode, $this->exponent, $itemTotalWithTax);
+        $this->_addAmountElement(
+            $itemTotalWithTaxElementAmount,
+            $this->currencyCode,
+            $this->exponent,
+            $itemTotalWithTax
+        );
 
         $itemDiscountAmountElement = $item->addChild('itemDiscountAmount');
         $itemDiscountElementAmount = $itemDiscountAmountElement->addChild('amount');

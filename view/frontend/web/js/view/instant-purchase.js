@@ -152,7 +152,7 @@ define([
                             type: 'post',
                             dataType: 'json',
                             success: function (data) {
-								if(window.isDynamic3DS2Enabled) {
+				if(window.isDynamic3DS2Enabled || window.is3DsEnabled) {
                                 window.location.replace(urlBuilder.build('worldpay/savedcard/instantredirect'));
 								}
                             },

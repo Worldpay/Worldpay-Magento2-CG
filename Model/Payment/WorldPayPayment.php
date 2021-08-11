@@ -35,7 +35,7 @@ class WorldPayPayment
         $wpp = $wpp->loadByWorldpayOrderId($paymentState->getOrderCode());
 
         $wpp->setData('payment_status', $paymentState->getPaymentStatus());
-        if(strpos($paymentState->getPaymentStatus(), "KLARNA") !== false){
+        if (strpos($paymentState->getPaymentStatus(), "KLARNA") !== false) {
             $wpp->setData('payment_type', $paymentState->getPaymentMethod());
         }
         $wpp->setData('card_number', $paymentState->getCardNumber());

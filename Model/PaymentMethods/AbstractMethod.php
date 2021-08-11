@@ -393,31 +393,38 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($orderId);
         $captureArray = '';
         //added Klarna check
-        if(strpos($worldPayPayment->getPaymentType(), "KLARNA") !== false ){
+        if (strpos($worldPayPayment->getPaymentType(), "KLARNA") !== false) {
             $paymenttype = "KLARNA-SSL";
             $captureArray = $this->_request->getParams();
-        }else{
+        } else {
             $paymenttype = $worldPayPayment->getPaymentType();
         }
         if ($this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype)) {
             //total amount from invoice and order should not be same for partial capture
-            if (floatval($amount) !=floatval($payment->getOrder()->getGrandTotal()) && $partialCapture) {  
-                $this->paymentservicerequest->partialCapture(
+            if (floatval($amount) !=floatval($payment->getOrder()->getGrandTotal())) {
+                if ($partialCapture) {
+                    $this->paymentservicerequest->partialCapture(
+                        $payment->getOrder(),
+                        $worldPayPayment,
+                        $amount,
+                        $captureArray
+                    );
+                } else {
+                    $this->_wplogger->info("Partial Capture is disabled.");
+                    throw new \Magento\Framework\Exception\LocalizedException(
+                        __("Partial Capture is disabled.")
+                    );
+                }
+            }
+            if (floatval($amount) == floatval($payment->getOrder()->getGrandTotal())) {
+            //normal capture
+                $this->paymentservicerequest->capture(
                     $payment->getOrder(),
                     $worldPayPayment,
-                    $amount,
+                    $payment->getMethod(),
                     $captureArray
                 );
             }
-            if(floatval($amount) == floatval($payment->getOrder()->getGrandTotal())){
-            //normal capture
-            $this->paymentservicerequest->capture(
-                $payment->getOrder(),
-                $worldPayPayment,
-                $payment->getMethod(),
-                $captureArray
-            );
-        }
 
         }
         $payment->setTransactionId(time());
@@ -550,7 +557,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 ->addFieldToFilter('token_type', ['eq' => $tokenType])
                 ->getData();
             if ($savedCard) {
-                return $savedCard[0]['method'];
+                return str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $savedCard[0]['method']);
             } else {
                 throw new \Magento\Framework\Exception\LocalizedException(
                     __('Inavalid Card deatils. Please Refresh and check again')
@@ -662,7 +669,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     
     public function getCardTypeFromCreditCardNumber($ccnumber)
     {
-        $visaRegex = '/^4[0-9]{0,15}$/';
+        $visaRegex = '/^4[0-9]{0,20}$/';
         $mastercardRegex =
                 '/^(?:5[1-5][0-9]{0,2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{0,2}|27[01][0-9]|2720)[0-9]{0,12}$/';
         $amexRegex = '/^3$|^3[47][0-9]{0,13}$/';
