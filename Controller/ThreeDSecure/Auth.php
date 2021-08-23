@@ -58,7 +58,27 @@ class Auth extends \Magento\Framework\App\Action\Action
         
         $iframe = false;
         // Chrome 84 releted updates for 3DS
+        $skipSameSiteForIOs = $this->worldpayHelper->shouldSkipSameSiteNone($directOrderParams);
+	//$this->wplogger->info("SKIP same site value--->".print_r($skipSameSiteForIOs,true));
+
         
+        if($skipSameSiteForIOs) {
+	$this->wplogger->info("Inside skip same site block");
+          if(isset($_COOKIE['PHPSESSID'])){
+          $phpsessId = $_COOKIE['PHPSESSID'];
+          $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+          setcookie("PHPSESSID", $phpsessId, [
+         'expires' => time() + 86400,
+         'path' => '/',
+         'domain' => $domain,
+         'secure' => true,
+         'httponly' => true,
+          ]);
+        }
+            
+        }else {
+	$this->wplogger->info("Outside skip same site block");
+
         if(isset($_COOKIE['PHPSESSID'])){
           $phpsessId = $_COOKIE['PHPSESSID'];
           $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
@@ -70,6 +90,7 @@ class Auth extends \Magento\Framework\App\Action\Action
          'httponly' => true,
          'samesite' => 'None',
           ]);
+        }
         }
         //setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
         

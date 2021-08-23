@@ -55,8 +55,27 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        $directOrderParams = $this->checkoutSession->getDirectOrderParams();
 
-         if(isset($_COOKIE['PHPSESSID'])){
+        $threeDSecureParams = $this->checkoutSession->get3DSecureParams();
+        
+        $skipSameSiteForIOs = $this->shouldSkipSameSiteNone($directOrderParams);
+        
+        if($skipSameSiteForIOs) {
+          if(isset($_COOKIE['PHPSESSID'])){
+          $phpsessId = $_COOKIE['PHPSESSID'];
+          $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+          setcookie("PHPSESSID", $phpsessId, [
+         'expires' => time() + 86400,
+         'path' => '/',
+         'domain' => $domain,
+         'secure' => true,
+         'httponly' => true,
+          ]);
+        }
+            
+        }else {
+        if(isset($_COOKIE['PHPSESSID'])){
           $phpsessId = $_COOKIE['PHPSESSID'];
           $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
           setcookie("PHPSESSID", $phpsessId, [
@@ -68,10 +87,9 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
          'samesite' => 'None',
           ]);
         }
+        }
 
-        $directOrderParams = $this->checkoutSession->getDirectOrderParams();
         
-        $threeDSecureParams = $this->checkoutSession->get3DSecureParams();
         
         $this->checkoutSession->unsDirectOrderParams();
         
@@ -119,5 +137,29 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
             $this->checkoutSession->unsWpResponseForwardUrl();
             $this->getResponse()->setRedirect($redirectUrl);
         }
+    }
+    
+     private function shouldSkipSameSiteNone($directOrderParams)
+    {
+         if(isset($directOrderParams)) {
+         $useragent = $directOrderParams['userAgentHeader'] ;
+           $iosDeviceRegex = "/\(iP.+; CPU .*OS (\d+)[_\d]*.*\) AppleWebKit\//";
+           $macDeviceRegex = "/\(Macintosh;.*Mac OS X (\d+)_(\d+)[_\d]*.*\) AppleWebKit\//";
+           $iosVersionRegex = '/OS 12./';
+           $macVersionRegex ='/OS X 10./';
+           $macLatestVersionRegex = '/OS X 10_15_7/';
+           if (preg_match($iosDeviceRegex,$useragent) && preg_match($iosVersionRegex,$useragent) ) {
+               $this->wplogger->info('Passed regex check for ios');
+              return true; 
+           }elseif ((preg_match($macDeviceRegex,$useragent) && preg_match($macVersionRegex,$useragent)) 
+                   &&(!preg_match($macLatestVersionRegex,$useragent))) {
+              $this->wplogger->info('Passed regex check for mac'); 
+              return true;
+           }
+           $this->wplogger->info(print_r($useragent,true));
+           $this->wplogger->info('Outside regex check');
+           return false;
+         }
+         return false;
     }
 }
