@@ -48,6 +48,7 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
     {
         $data = $this->getRequest()->getPostValue();
         //$productId = $this->getRequest()->getParam('product_id');
+        // @codingStandardsIgnoreLine
         $url = parse_url($this->_redirect->getRefererUrl());
         $path_parts=explode('/', $url['path']);
         if (in_array('id', $path_parts)) {

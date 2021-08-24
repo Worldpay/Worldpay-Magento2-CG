@@ -29,8 +29,17 @@ EOD;
      * @param float $amount
      * @return SimpleXMLElement $xml
      */
-    public function build($merchantCode, $orderCode, $currencyCode, $amount, $exponent, $paymentType = null, $order, $captureType, $invoicedItems = null)
-    {
+    public function build(
+        $merchantCode,
+        $orderCode,
+        $currencyCode,
+        $amount,
+        $exponent,
+        $order,
+        $captureType,
+        $paymentType = null,
+        $invoicedItems = null
+    ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
         $this->currencyCode = $currencyCode;
@@ -115,7 +124,7 @@ EOD;
                 ->getValue('worldpay/general_config/capture_automatically', $storeScope);
         $partialCapture = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
                 ->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
-        //check the partial capture 
+        //check the partial capture
         if ($this->captureType == 'partial' && $partialCapture) {
             $capture['reference']= 'Partial Capture';
         }
@@ -149,7 +158,7 @@ EOD;
         $partialCapture = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
                         ->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
        
-        //check the partial capture 
+        //check the partial capture
         if ($this->captureType == 'partial' && $partialCapture) {
             $amountElement['debitCreditIndicator'] = 'credit';
         }
@@ -185,12 +194,9 @@ EOD;
       * @param SimpleXMLElement $order
       */
     private function _addBranchSpecificExtension($order, $capture)
-    { 
-       // $this->paymentDetails['salesTax'] = 2022;
-        //$order_details = $this->cusDetails['order_details'];
+    {
         $branchSpecificExtension = $capture->addChild('branchSpecificExtension');
         $purchase = $branchSpecificExtension->addChild('purchase');
-        //$purchase->addChild('invoiceReferenceNumber',null);
         if ($order->getCustomerIsGuest()) {
             $purchase->addChild('customerReference', 'guest');
         } else {
@@ -214,8 +220,8 @@ EOD;
             $taxApplied = 'true';
         }
         
-        if($taxApplied == 'true') {
-         $purchase->addChild('cardAcceptorTaxId', $cardAcceptorTaxId);
+        if ($taxApplied == 'true') {
+            $purchase->addChild('cardAcceptorTaxId', $cardAcceptorTaxId);
         }
          
         if ($taxAmountNew) {
@@ -226,16 +232,25 @@ EOD;
          $orderDiscountAmount = abs($order->getDiscountAmount());
         if (($orderDiscountAmount)) {
             $discountAmountXml = $purchase->addChild('discountAmount');
-            $this->_addAmountElementCapture($discountAmountXml, $this->currencyCode, $this->exponent, $order->getDiscountAmount());
+            $this->_addAmountElementCapture(
+                $discountAmountXml,
+                $this->currencyCode,
+                $this->exponent,
+                $order->getDiscountAmount()
+            );
         }
         
          $shippingAmnt = (float)$order->getShippingAmount();
          
         if (($shippingAmnt)) {
             $shippingAmountXml = $purchase->addChild('shippingAmount');
-            $this->_addAmountElementCapture($shippingAmountXml, $this->currencyCode, $this->exponent, $shippingAmnt);
+            $this->_addAmountElementCapture(
+                $shippingAmountXml,
+                $this->currencyCode,
+                $this->exponent,
+                $shippingAmnt
+            );
         }
-        
 
         if ($dutyAmount) {
             $dutyAmountXml = $purchase->addChild('dutyAmount');
@@ -247,7 +262,7 @@ EOD;
         //$purchase->addChild('shipFromPostalCode', '');
         $purchase->addChild('destinationPostalCode', $billingpostcode);
         
-        if (!is_null($order->getShippingAddress())) {
+        if ($order->getShippingAddress() != null) {
             $countryCode = $order->getShippingAddress()->getCountryId();
             $purchase->addChild('destinationCountryCode', $countryCode);
         }
@@ -337,7 +352,12 @@ EOD;
 
         if ($itemDiscountAmount) {
             $itemDiscountAmountElement = $item->addChild('itemDiscountAmount');
-            $this->_addAmountElement($itemDiscountAmountElement, $this->currencyCode, $this->exponent, $itemDiscountAmount);
+            $this->_addAmountElement(
+                $itemDiscountAmountElement,
+                $this->currencyCode,
+                $this->exponent,
+                $itemDiscountAmount
+            );
         }
         
         if ($taxAmount) {
@@ -356,16 +376,16 @@ EOD;
         
         //terms url
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $store = $objectManager->get('\Magento\Store\Model\StoreManagerInterface')->getStore();
+        $store = $objectManager->get(\Magento\Store\Model\StoreManagerInterface::class)->getStore();
         $termsURLElement = $orderLinesElement->addChild('termsURL');
         $this->_addCDATA($termsURLElement, $store->getBaseUrl());
         
         foreach ($invoicedItems['invoicedItems'] as $lineitem) {
             $rowtotal = $lineitem['row_total'];
-            $unitTaxAmount = $this->truncate_number($lineitem['tax_amount'] / $lineitem['qty_ordered']);
+            $unitTaxAmount = $this->truncateNumber($lineitem['tax_amount'] / $lineitem['qty_ordered']);
             $totaltax = ($unitTaxAmount * $lineitem['qty_invoiced']) + $lineitem['weee_tax_applied_row_amount'];
             $unitPrice = $rowtotal / $lineitem['qty_ordered'];
-            $unitDiscountAmount = $this->truncate_number($lineitem['discount_amount'] / $lineitem['qty_ordered']);
+            $unitDiscountAmount = $this->truncateNumber($lineitem['discount_amount'] / $lineitem['qty_ordered']);
             $totalamount = ($unitPrice * $lineitem['qty_invoiced']) - ($unitDiscountAmount * $lineitem['qty_invoiced']);
             
             $this->_addKlarnaLineItemElement(
@@ -384,10 +404,10 @@ EOD;
         }
     }
     
-    private function truncate_number($number){
+    private function truncateNumber($number)
+    {
         return (floor($number * pow(10, 2)))/100;
     }
-
 
     private function _addKlarnaLineItemElement(
         $parentElement,
@@ -405,11 +425,11 @@ EOD;
         $unitPrice = sprintf('%0.2f', $unitPrice);
         $lineitem = $parentElement->addChild('lineItem');
         
-        if($productType === 'shipping'){
+        if ($productType === 'shipping') {
             $lineitem->addChild('shippingFee');
-        }elseif($productType === 'downloadable' || $productType === 'virtual' || $productType === 'giftcard'){
+        } elseif ($productType === 'downloadable' || $productType === 'virtual' || $productType === 'giftcard') {
             $lineitem->addChild('digital');
-        }else{
+        } else {
             $lineitem->addChild('physical');
         }
         
@@ -468,7 +488,6 @@ EOD;
         $amountElement['exponent'] = $this->exponent;
         $amountElement['value'] = $this->_amountAsInt($discountAmount);
     }
-    
     
      /**
       * @param SimpleXMLElement $element

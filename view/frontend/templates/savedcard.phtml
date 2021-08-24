@@ -8,20 +8,25 @@
             <thead>
                 <tr>
                     <th scope="col" class="col id">
-                        <?php print /* @noEscape */ $block->getMyAccountLabels('AC2') ?
-                                $block->getMyAccountLabels('AC2') : 'Card Brand #'?></th>
+                        <?= /* @noEscape */ $block->getMyAccountLabels('AC2') ?
+                                $block->getMyAccountLabels('AC2') :
+                                $block->escapeHtml(__('Card Brand #'))?></th>
                     <th scope="col" class="col date">
-                        <?php print /* @noEscape */ $block->getMyAccountLabels('AC3') ?
-                                $block->getMyAccountLabels('AC3') : 'Card Number'?></th>
+                        <?= /* @noEscape */ $block->getMyAccountLabels('AC3') ?
+                                $block->getMyAccountLabels('AC3') :
+                                $block->escapeHtml(__('Card Number'))?></th>
                     <th scope="col" class="col shipping">
-                        <?php print /* @noEscape */ $block->getCheckoutLabels('CO4') ?
-                                $block->getCheckoutLabels('CO4') : 'Card Holder Name'?></th>
+                        <?= /* @noEscape */ $block->getCheckoutLabels('CO4') ?
+                                $block->getCheckoutLabels('CO4') :
+                                $block->escapeHtml(__('Card Holder Name'))?></th>
                     <th scope="col" class="col total">
-                        <?php print /* @noEscape */ $block->getMyAccountLabels('AC4') ?
-                                $block->getMyAccountLabels('AC4') : 'Card Expiry Month'?></th>
+                        <?=/* @noEscape */ $block->getMyAccountLabels('AC4') ?
+                                $block->getMyAccountLabels('AC4') :
+                                $block->escapeHtml(__('Card Expiry Month'))?></th>
                     <th scope="col" class="col status">
-                        <?php print /* @noEscape */ $block->getMyAccountLabels('AC5') ?
-                                $block->getMyAccountLabels('AC5') : 'Card Expiry Year'?></th>
+                        <?= /* @noEscape */ $block->getMyAccountLabels('AC5') ?
+                                $block->getMyAccountLabels('AC5') :
+                                $block->escapeHtml(__('Card Expiry Year'))?></th>
                     <th scope="col" class="col actions">&nbsp;</th>
                 </tr>
             </thead>
@@ -61,8 +66,9 @@
                                     ?>
                             <a href="<?= /* @noEscape */ $block->getEditUrl($_savecard) ?>" class="action view">
                                 <span>
-                                    <?php print/* @noEscape */ $block->getMyAccountLabels('AC6')?
-                                            $block->getMyAccountLabels('AC6') : 'Update'?>
+                                    <?=/* @noEscape */ $block->getMyAccountLabels('AC6')?
+                                        $block->getMyAccountLabels('AC6') :
+                                        $block->escapeHtml(__('Update'))?>
                                 </span>
                             </a>
                                     <?php
@@ -70,15 +76,16 @@
                                 ?>
                             
                         </td>
-                        <td data-th="<?php print /* @noEscape */
+                        <td data-th="<?= /* @noEscape */
                         $block->escapeHtml($block->getMyAccountLabels('AC21')?
                                 $block->getMyAccountLabels('AC21') : 'Actions') ?>" 
                             class="col actions">
                         <a href="javascript:void(0)" data-delete-url="
                         <?= /* @noEscape */ $block->getDeleteUrl($_savecard); ?>" class="action delete">
                             <span>
-                                <?php print /* @noEscape */ $block->getMyAccountLabels('AC11')?
-                                        $block->getMyAccountLabels('AC11') : 'Delete'?>
+                                <?= /* @noEscape */ $block->getMyAccountLabels('AC11')?
+                                        $block->getMyAccountLabels('AC11') :
+                                        $block->escapeHtml(__('Delete'))?>
                             </span></a>
                         </td>
                     </tr>
@@ -92,8 +99,9 @@
             ], function($, confirm) {
                 $(".action.delete").on("click", function(event) {   
                     confirm({
-                        title: "<?php print $block->getMyAccountLabels('AC11')?
-                                $block->getMyAccountLabels('AC11') : 'Delete'?>",
+                        title: "<?= /* @noEscape */ $block->getMyAccountLabels('AC11')?
+                                $block->getMyAccountLabels('AC11') :
+                                $block->escapeHtml(__('Delete'))?>",
                         content: getMyAccountExceptions('IAVMA2') ?
                 getMyAccountExceptions('IAVMA2') : 'Are you sure you want to delete the card? \n\
 Once the card is deleted, subscriptions associated with it will be cancelled',
@@ -123,8 +131,9 @@ Once the card is deleted, subscriptions associated with it will be cancelled',
 <?php else: ?>
     <div class="message info empty">
         <span>
-            <?php print /* @noEscape */ $block->getMyAccountLabels('AC30')?
-                    $block->getMyAccountLabels('AC30') :'You have no Saved Card.'; ?>
+            <?= /* @noEscape */ $block->getMyAccountLabels('AC30')?
+                    $block->getMyAccountLabels('AC30') :
+                    $block->escapeHtml(__('You have no Saved Card.')); ?>
         </span>
     </div>
 <?php endif ?>

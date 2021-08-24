@@ -115,15 +115,15 @@ class Service
                 ? $paymentDetails['additional_data']['stored_credentials_enabled'] : '';
         $paymentDetails['additional_data']['disclaimerFlag'] =
                 isset($paymentDetails['additional_data']['disclaimerFlag'])
-                ? $paymentDetails['additional_data']['disclaimerFlag'] : 0;       
+                ? $paymentDetails['additional_data']['disclaimerFlag'] : 0;
         //level23 data
         $billingAddr = $this->_getBillingAddress($quote);
         $orderLineItems = null;
         $paymentType = $paymentDetails['additional_data']['cc_type'];
         if ($this->worldpayHelper->isLevel23Enabled()
            && ($paymentType === 'ECMC-SSL' || $paymentType === 'VISA-SSL')
-           && ($billingAddr['countryCode'] === 'US' || $billingAddr['countryCode'] === 'CA')) { 
-            $orderLineItems = $this->_getL23OrderLineItems($quote, $paymentType);  
+           && ($billingAddr['countryCode'] === 'US' || $billingAddr['countryCode'] === 'CA')) {
+            $orderLineItems = $this->_getL23OrderLineItems($quote, $paymentType);
             $paymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
 
         }
@@ -185,10 +185,9 @@ class Service
                 ? $this->customerSession->getCustomer()->getUpdatedAt() : $now->format('Y-m-d H:i:s');
         $orderDetails = $this->worldpayHelper->getOrderDetailsByEmailId($quote->getCustomerEmail());
         
-     
         $cusDetails['shipping_amount'] = $quote->getShippingAddress()->getShippingAmount();
-        $cusDetails['discount_amount'] = ($quote->getOrigData()['subtotal']) - ($quote->getOrigData()['subtotal_with_discount']);
-
+        $cusDetails['discount_amount'] = ($quote->getOrigData()['subtotal']) -
+            ($quote->getOrigData()['subtotal_with_discount']);
         
         $orderDetails['created_at'] = !empty($orderDetails['created_at'])
                 ? $orderDetails['created_at'] : $now->format('Y-m-d H:i:s');
@@ -275,7 +274,7 @@ class Service
             $updatedPaymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
         }
              
-        if($paymentDetails['additional_data']['cc_type'] !== 'savedcard'){   
+        if ($paymentDetails['additional_data']['cc_type'] !== 'savedcard') {
             $updatedPaymentDetails['cardType'] = $paymentType;
         }
                     
@@ -343,7 +342,7 @@ class Service
         $stmtNarrative = '';
         $orderContent = '';
         
-        $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');  
+        $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
         if ($paymentDetails['additional_data']['cc_type'] === "KLARNA-SSL"
                 && (isset($paymentDetails['additional_data']['statementNarrative']))) {
             $stmtNarrative = $paymentDetails['additional_data']['statementNarrative'];
@@ -606,7 +605,7 @@ class Service
                 if ($discountamount > 0) {
                     $lineitem['totalDiscountAmount'] = $discountamount;
                 }
-                if($orderitems['orderTaxAmount'] == 0){
+                if ($orderitems['orderTaxAmount'] == 0) {
                     $orderitems['orderTaxAmount'] = $totaltax;
                 }
                 $orderitems['lineItem'][] = $lineitem;
@@ -633,7 +632,7 @@ class Service
             $orderitems['lineItem'][] = $lineitem;
         }
         
-        if($quote->getBaseCustomerBalAmountUsed() > 0) {
+        if ($quote->getBaseCustomerBalAmountUsed() > 0) {
             $storelineitem = [];
             $storelineitem['reference'] = 0;
             $storelineitem['name'] = 'Store Credit Amount';
@@ -758,7 +757,6 @@ class Service
         if (isset($paymentDetails['salesTax'])) {
             $details['salesTax'] = $paymentDetails['salesTax'];
         }
-        
 
         // 3DS2 value
         if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
@@ -1198,20 +1196,17 @@ class Service
         $orderitems = [];
         $lineitem = [];
         $orderItems = $quote->getAllItems();
-         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         
         foreach ($orderItems as $_item) {
             $lineitem = [];
             $_product ='';
-                
             
             if ($_item->getParentItem()) {
                 continue;
-            } else {
-                
             }
 
-            $_product = $objectManager->create('Magento\Catalog\Model\Product')->load($_item->getProductId());
+            $_product = $objectManager->create(\Magento\Catalog\Model\Product::class)->load($_item->getProductId());
 
                 $rowtotal = $_item->getRowTotal();
                 $totalamount = $rowtotal - $_item->getDiscountAmount();
@@ -1220,9 +1215,9 @@ class Service
                 $discountamount = $_item->getDiscountAmount();
                 
                 $unitOfMeasure = $_product->getData('unit_of_measure');
-                if($unitOfMeasure == '') {
-                    $unitOfMeasure = $this->worldpayHelper->getUnitOfMeasure();
-                }
+            if ($unitOfMeasure == '') {
+                $unitOfMeasure = $this->worldpayHelper->getUnitOfMeasure();
+            }
                 $lineitem['description'] = substr($_item->getName(), 0, 12);
                 $lineitem['productCode'] = substr($_item->getProductId(), 0, 12);
                 $lineitem['commodityCode'] = substr($_product->getData('commodity_code'), 0, 12);
@@ -1240,5 +1235,3 @@ class Service
         return $orderitems;
     }
 }
-
-

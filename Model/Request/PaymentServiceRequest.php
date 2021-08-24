@@ -103,12 +103,15 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         
         //$directOrderParams['paymentDetails']['cardType'] ='';
         //Level 23 data validation
-        if ($this->worldpayhelper->isLevel23Enabled() && isset($directOrderParams['paymentDetails']['cardType']) && ($directOrderParams['paymentDetails']['cardType'] === 'ECMC-SSL' || $directOrderParams['paymentDetails']['cardType'] === 'VISA-SSL')
-           && ($directOrderParams['billingAddress']['countryCode'] === 'US' || $directOrderParams['billingAddress']['countryCode'] === 'CA')) {
-             $directOrderParams['paymentDetails']['isLevel23Enabled'] = true;
-             $directOrderParams['paymentDetails']['cardAcceptorTaxId'] = $this->worldpayhelper->getCardAcceptorTaxId();
-             $directOrderParams['paymentDetails']['dutyAmount'] = $this->worldpayhelper->getDutyAmount();
-             $directOrderParams['paymentDetails']['countryCode'] = $directOrderParams['billingAddress']['countryCode'];
+        if ($this->worldpayhelper->isLevel23Enabled() && isset($directOrderParams['paymentDetails']['cardType'])
+            && ($directOrderParams['paymentDetails']['cardType'] === 'ECMC-SSL'
+                || $directOrderParams['paymentDetails']['cardType'] === 'VISA-SSL')
+           && ($directOrderParams['billingAddress']['countryCode'] === 'US'
+                || $directOrderParams['billingAddress']['countryCode'] === 'CA')) {
+            $directOrderParams['paymentDetails']['isLevel23Enabled'] = true;
+            $directOrderParams['paymentDetails']['cardAcceptorTaxId'] = $this->worldpayhelper->getCardAcceptorTaxId();
+            $directOrderParams['paymentDetails']['dutyAmount'] = $this->worldpayhelper->getDutyAmount();
+            $directOrderParams['paymentDetails']['countryCode'] = $directOrderParams['billingAddress']['countryCode'];
         }
 
         $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
@@ -293,12 +296,15 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         
         //Level 23 data validation
         if ($this->worldpayhelper->isLevel23Enabled()
-           && ($redirectOrderParams['paymentType'] === 'ECMC-SSL' || $redirectOrderParams['paymentType'] === 'VISA-SSL')
-           && ($redirectOrderParams['billingAddress']['countryCode'] === 'US' || $redirectOrderParams['billingAddress']['countryCode'] === 'CA')) {
-             $redirectOrderParams['paymentDetails']['isLevel23Enabled'] = true;
-             $redirectOrderParams['paymentDetails']['cardAcceptorTaxId'] = $this->worldpayhelper->getCardAcceptorTaxId();
-             $redirectOrderParams['paymentDetails']['dutyAmount'] = $this->worldpayhelper->getDutyAmount();
-             $redirectOrderParams['paymentDetails']['countryCode'] = $redirectOrderParams['billingAddress']['countryCode'];
+           && ($redirectOrderParams['paymentType'] === 'ECMC-SSL'
+               || $redirectOrderParams['paymentType'] === 'VISA-SSL')
+           && ($redirectOrderParams['billingAddress']['countryCode'] === 'US'
+               || $redirectOrderParams['billingAddress']['countryCode'] === 'CA')) {
+            $redirectOrderParams['paymentDetails']['isLevel23Enabled'] = true;
+            $redirectOrderParams['paymentDetails']['cardAcceptorTaxId'] = $this->worldpayhelper->getCardAcceptorTaxId();
+            $redirectOrderParams['paymentDetails']['dutyAmount'] = $this->worldpayhelper->getDutyAmount();
+            $redirectOrderParams['paymentDetails']['countryCode'] =
+                $redirectOrderParams['billingAddress']['countryCode'];
         }
         
         $requestConfiguration = [
@@ -355,7 +361,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      */
     public function redirectKlarnaOrder($redirectOrderParams)
     {
-        try{
+        try {
             $loggerMsg = '########## Submitting klarna redirect order request. OrderCode: ';
             $this->_wplogger->info($loggerMsg . $redirectOrderParams['orderCode'] . ' ##########');
             if (empty($redirectOrderParams['statementNarrative'])) {
@@ -389,11 +395,13 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $this->worldpayhelper->getXmlUsername($redirectOrderParams['paymentType']),
                 $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentType'])
             );
-        }catch(Exception $ex){
+        } catch (Exception $ex) {
             $this->_wplogger->error($ex->getMessage());
-            if($ex->getMessage() == 'Payment Method KLARNA_PAYNOW-SSL is unknown; The Payment Method is not available.'
-               || $ex->getMessage() == 'Payment Method KLARNA_SLICEIT-SSL is unknown; The Payment Method is not available.'
-               || $ex->getMessage() == 'Payment Method KLARNA_PAYLATER-SSL is unknown; The Payment Method is not available.'){
+            if ($ex->getMessage() == 'Payment Method KLARNA_PAYNOW-SSL is unknown; The Payment Method is not available.'
+               || $ex->getMessage() == 'Payment Method KLARNA_SLICEIT-SSL is unknown; '
+                    . 'The Payment Method is not available.'
+               || $ex->getMessage() == 'Payment Method KLARNA_PAYLATER-SSL is unknown; '
+                    . 'The Payment Method is not available.') {
                 $codeErrorMessage = 'Klarna payment method is currently not available for this country.';
                 $camErrorMessage = $this->getCreditCardSpecificException('AKLR01');
                 $errorMessage = $camErrorMessage? $camErrorMessage : $codeErrorMessage;
@@ -460,7 +468,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      */
     public function capture(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode, $capturedItems = null)
     {
-        try{
+        try {
             $orderCode = $wp->getWorldpayOrderId();
             $loggerMsg = '########## Submitting capture request. Order: ';
             $this->_wplogger->info($loggerMsg . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
@@ -468,9 +476,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $currencyCode = $order->getOrderCurrencyCode();
             $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
 
-            if(strpos($wp->getPaymentType(), "KLARNA") !== false && !empty($capturedItems)){
+            if (strpos($wp->getPaymentType(), "KLARNA") !== false && !empty($capturedItems)) {
                 $invoicedItems = $this->getInvoicedItemsDetails($capturedItems);
-            }else{
+            } else {
                 $invoicedItems = '';
             }
             $captureType = 'full';
@@ -481,9 +489,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $order->getOrderCurrencyCode(),
                 $order->getGrandTotal(),
                 $exponent,
-                $wp->getPaymentType(),
                 $order,
                 $captureType,
+                $wp->getPaymentType(),
                 $invoicedItems
             );
 
@@ -492,7 +500,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
                 $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
             );
-        }catch(Exception $e){
+        } catch (Exception $e) {
             $this->_wplogger->error($e->getMessage());
             throw new \Magento\Framework\Exception\LocalizedException(
                 __($e->getMessage())
@@ -510,7 +518,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      */
     public function partialCapture(\Magento\Sales\Model\Order $order, $wp, $grandTotal, $capturedItems = null)
     {
-        try{
+        try {
             $orderCode = $wp->getWorldpayOrderId();
             $loggerMsg = '########## Submitting Partial capture request. Order: ';
             $this->_wplogger->info($loggerMsg . $orderCode . ' Amount:' . $grandTotal . ' ##########');
@@ -518,9 +526,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $currencyCode = $order->getOrderCurrencyCode();
             $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
 
-            if(strpos($wp->getPaymentType(), "KLARNA") !== false && !empty($capturedItems)){
+            if (strpos($wp->getPaymentType(), "KLARNA") !== false && !empty($capturedItems)) {
                 $invoicedItems = $this->getInvoicedItemsDetails($capturedItems);
-            }else{
+            } else {
                 $invoicedItems = '';
             }
         
@@ -531,9 +539,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $order->getOrderCurrencyCode(),
                 $grandTotal,
                 $exponent,
-                $wp->getPaymentType(),
                 $order,
                 $captureType,
+                $wp->getPaymentType(),
                 $invoicedItems
             );
 
@@ -542,7 +550,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
                 $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
             );
-        }catch(Exception $e){
+        } catch (Exception $e) {
             $this->_wplogger->error($e->getMessage());
             throw new \Magento\Framework\Exception\LocalizedException(
                 __($e->getMessage())
@@ -561,25 +569,6 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     protected function _sendRequest($xml, $username, $password)
     {
         $response = $this->_request->sendRequest($xml, $username, $password);
-       
-        /*
-        $response = '<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE paymentService PUBLIC "-//WorldPay//DTD WorldPay PaymentService v1//EN"
-                                "http://dtd.worldpay.com/paymentService_v1.dtd">
-<paymentService version="1.4" merchantCode="SAPIENTNITROECOMMERCEV1">
-         * <reply><orderStatus orderCode="sp-2"><payment><paymentMethod>ECMC-SSL</paymentMethod><paymentMethodDetail>
-         * <card number="5445********6985" type="creditcard"><expiryDate><date month="10" year="2023"/></expiryDate>
-         * </card></paymentMethodDetail> <amount value="100" currencyCode="USD" exponent="2"
-         * debitCreditIndicator="credit"/><lastEvent>AUTHORISED</lastEvent><AuthorisationId
-         * id="164818"/><CVCResultCode description="NOT SUPPLIED BY SHOPPER"/>
-         * <AVSResultCode description="NOT SUPPLIED BY SHOPPER"/><AAVAddressResultCode description="UNKNOWN"/>
-         * <AAVPostcodeResultCode description="UNKNOWN"/><AAVCardholderNameResultCode description="UNKNOWN"/>
-         * <AAVTelephoneResultCode description="UNKNOWN"/><AAVEmailResultCode description="UNKNOWN"/>
-         * <issuerCountryCode>IT</issuerCountryCode><balance accountType="IN_PROCESS_AUTHORISED">
-         * <amount value="100" currencyCode="USD" exponent="2" debitCreditIndicator="credit"/></balance><riskScore value="20"/>
-         * <instalments>1</instalments></payment></orderStatus></reply></paymentService>
-';
-       */
         $this->_checkForError($response);
         return $response;
     }
@@ -1052,13 +1041,13 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     }
     
     public function getInvoicedItemsDetails($capturedItems)
- {
+    {
         $items = $this->getItemDetails($capturedItems);
 
-        if ($items['is_bundle_item_present'] > 0 || 
-           (count($items['invoicedItems']) == 1 && 
-                (in_array("downloadable", $items['invoicedItems']['0']) || 
-                 in_array("giftcard", $items['invoicedItems']['0'])))){
+        if ($items['is_bundle_item_present'] > 0 ||
+           (count($items['invoicedItems']) == 1 &&
+                (in_array("downloadable", $items['invoicedItems']['0']) ||
+                 in_array("giftcard", $items['invoicedItems']['0'])))) {
             $items['trackingId'] = '';
             return $items;
         } else {
@@ -1073,7 +1062,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 if (array_key_exists('tracking', $capturedItems) && count($capturedItems['tracking']) > 1) {
                     $codeErrorMessage = 'Multi shipping is currently not available, please add single tracking number.';
                     $camErrorMessage = $this->exceptionHelper->getConfigValue('AAKL02');
-                } else if (array_key_exists('tracking', $capturedItems) && empty($capturedItems['tracking']['1']['number'])) {
+                } elseif (array_key_exists('tracking', $capturedItems)
+                        && empty($capturedItems['tracking']['1']['number'])) {
                     $codeErrorMessage = 'Tracking number can not be blank, please add.';
                     $camErrorMessage = $this->exceptionHelper->getConfigValue('AAKL03');
                 }
@@ -1092,7 +1082,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         foreach ($filteredItems as $key => $val) {
             $items['invoicedItems'][] = $this->worldpayhelper->getInvoicedItemsData($key);
             $items['invoicedItems'][$count]['qty_invoiced'] = $val;
-            if($items['invoicedItems'][$count]['product_type'] == 'bundle'){
+            if ($items['invoicedItems'][$count]['product_type'] == 'bundle') {
                 $bundleCount++;
             }
             $count++;
@@ -1100,5 +1090,4 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $items['is_bundle_item_present'] = $bundleCount;
         return $items;
     }
-
 }

@@ -4,6 +4,7 @@
  */
 namespace Sapient\Worldpay\Model\Payment;
 
+// @codingStandardsIgnoreLine
 interface Update
 {
     public function apply($payment);

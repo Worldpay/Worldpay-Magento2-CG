@@ -442,6 +442,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $asset = $this->createAsset('Sapient_Worldpay::images/cc/' . strtolower($code) . '.png');
                 $placeholder = $this->assetSource->findSource($asset);
                 if ($placeholder) {
+                    // @codingStandardsIgnoreLine
                     list($width, $height) = getimagesize($asset->getSourceFile());
                     $this->icons[$code] = [
                         'url' => $asset->getUrl(),

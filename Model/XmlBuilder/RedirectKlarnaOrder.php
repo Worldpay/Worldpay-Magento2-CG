@@ -296,10 +296,10 @@ EOD;
         foreach ($orderlineitems['lineItem'] as $lineitem) {
             
             $totaldiscountamount = (isset($lineitem['totalDiscountAmount'])) ? $lineitem['totalDiscountAmount'] : 0;
-            if($lineitem['productType'] === 'bundle' && $diffAmt > 0){
+            if ($lineitem['productType'] === 'bundle' && $diffAmt > 0) {
                 $totaldiscountamount = $diffAmt;
                 $totalAmount = $lineitem['totalAmount'] - $diffAmt;
-            }else{
+            } else {
                 $totalAmount = 0;
             }
             
@@ -336,15 +336,15 @@ EOD;
 
         $lineitem = $parentElement->addChild('lineItem');
 
-        if($productType === 'shipping'){
+        if ($productType === 'shipping') {
             $lineitem->addChild('shippingFee');
-        }elseif($productType === 'downloadable' || $productType === 'virtual' || $productType === 'giftcard'){
+        } elseif ($productType === 'downloadable' || $productType === 'virtual' || $productType === 'giftcard') {
             $lineitem->addChild('digital');
-        }elseif($productType === 'Store Credit'){
+        } elseif ($productType === 'Store Credit') {
             $lineitem->addChild('storeCredit');
-        }elseif($productType === 'Gift Card'){
+        } elseif ($productType === 'Gift Card') {
             $lineitem->addChild('giftCard');
-        }else{
+        } else {
             $lineitem->addChild('physical');
         }
         $referenceElement = $lineitem->addChild('reference');

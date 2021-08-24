@@ -6,16 +6,18 @@ $storeCode = $block->getStoreCode();
     <fieldset class="fieldset info">
         <?= /* @noEscape */ $block->getBlockHtml('formkey') ?>
         <legend class="legend">
-            <span><?php print /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?
-                        $block->getAccountLabelbyCode('AC8') : 'Card Information'
+            <span><?= /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?
+                    $block->getAccountLabelbyCode('AC8') :
+                    $block->escapeHtml(__('Card Information'))
             ?>
             </span>
         </legend><br>
 
         <div class="field card type required">
             <label class="label" for="card_type">
-                <span><?php print $block->getCheckoutSpecificLabel('CO1') ?
-                                $block->getCheckoutSpecificLabel('CO1') : 'Credit Card Type';
+                <span><?= /* @noEscape */$block->getCheckoutSpecificLabel('CO1') ?
+                          $block->getCheckoutSpecificLabel('CO1') :
+                          $block->escapeHtml(__('Credit Card Type'));
                 ?>
                 </span>
      <!--       <span>Credit Card Type</span>-->
@@ -27,8 +29,8 @@ $storeCode = $block->getStoreCode();
                         class="required-entry validate-cc-type-select control-select-new-card">
                     <option value="" selected="selected">
                         <!--                Card type-->
-                    <?php print $block->getAccountLabelbyCode('IAVAC2') ?
-                                    $block->getAccountLabelbyCode('IAVAC2') : 'Card type';
+                    <?= /* @noEscape */ $block->getAccountLabelbyCode('IAVAC2') ?
+                        $block->getAccountLabelbyCode('IAVAC2') : $block->escapeHtml(__('Card type'));
                     ?>
                     </option>
                     <?php
@@ -36,7 +38,8 @@ $storeCode = $block->getStoreCode();
                     foreach ($cctypes as $k => $v) {
                         $options .= '<option value="' . $k . '">' . $v . '</option>';
                     }
-                    echo /** @noEscape */ $options;
+                    // @codingStandardsIgnoreLine
+                    echo /* @noEscape */ $options;
                     ?>
                 </select>
             </div>
@@ -46,16 +49,17 @@ $storeCode = $block->getStoreCode();
         <div class="field card Number">
             <label class="label" for="card number">
                 <span>
-<?php print /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
-                $block->getAccountLabelbyCode('AC3') : 'Card Number'
+<?= /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
+    $block->getAccountLabelbyCode('AC3') : $block->escapeHtml(__('Card Number'))
 ?>
                 </span>
             </label>
             <div class="control">
                 <input type="number" name="cardNumber" required='true' id="card_number" 
                        title="
-                            <?php print /* @noEscape */ $block->getCheckoutLabelbyCode('CO4')
-                                   ? $block->getCheckoutLabelbyCode('CO4') : 'Card Holder Name'?>"
+                            <?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4')
+                                   ? $block->getCheckoutLabelbyCode('CO4') :
+                                     $block->escapeHtml(__('Card Holder Name'))?>"
                        class="input-text required cardholder_name validate-cc-number 
                        worldpay-cardholdername-length worldpay-cardnumber-valid">
             </div>
@@ -65,16 +69,16 @@ $storeCode = $block->getStoreCode();
         <div class="field card holder name">
             <label class="label" for="card holder name">
                 <span>
-<?php print /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
-                $block->getCheckoutLabelbyCode('CO4') : 'Card Holder Name'
+<?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
+    $block->getCheckoutLabelbyCode('CO4') : $block->escapeHtml(__('Card Holder Name'))
 ?>
                 </span>
             </label>
             <div class="control">
                 <input type="text" name="cardHolderName" required='true' id="card-holder-name" 
-                       title="<?php print /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
-                        $block->getCheckoutLabelbyCode('CO4') : 'Card Holder Name'
-                        ?>"
+                       title="<?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
+                        $block->getCheckoutLabelbyCode('CO4') :
+                        $block->escapeHtml(__('Card Holder Name'))?>"
                        class="input-text required cardholder_name worldpay-cardholdername-length">
             </div>
         </div>
@@ -82,8 +86,9 @@ $storeCode = $block->getStoreCode();
         <div class="field card expiry month">
             <label class="label" for="expiry">
                 <span>
-                    <?php print /* @noEscape */ $block->getAccountLabelbyCode('AC10')
-                            ? $block->getAccountLabelbyCode('AC10') : 'Expiry Month/Year'?>
+                    <?= /* @noEscape */ $block->getAccountLabelbyCode('AC10')
+                            ? $block->getAccountLabelbyCode('AC10') :
+                              $block->escapeHtml(__('Expiry Month/Year'))?>
                 </span>
             </label>
             <div class="fields group group-2">
@@ -118,8 +123,8 @@ $storeCode = $block->getStoreCode();
 <?php if ($block->requireCvcEnabled()): ?>
             <div class="field required _required cvv">
                 <label for="cvv" class="label">
-                    <span><?php print $block->getCheckoutSpecificLabel('CO5') ?
-                    $block->getCheckoutSpecificLabel('CO5') : 'CVV';
+                    <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO5') ?
+                    $block->getCheckoutSpecificLabel('CO5') : $block->escapeHtml(__('CVV'));
                     ?></span>
                 <!--  <span>CVV</span> -->
                 </label>
@@ -142,7 +147,7 @@ $storeCode = $block->getStoreCode();
                     
         <div title="Disclaimer!" id="dialog" style="display: none" align ="center" >
             <form id="disclaimer" name="disclaimer">
-                <div><?php echo $block->getDisclaimerText(); ?></div>
+                <div><?= /* @noEscape */ $block->escapeHtml($block->getDisclaimerText()); ?></div>
             </form>
         </div>
         <div class="mage-error" generated="true" id="disclaimer-error"></div>
@@ -177,11 +182,11 @@ $storeCode = $block->getStoreCode();
                         onclick="javascript:onConfirmBtn(); return false;"
                         id ="save_newcard"
                         title="
-                            <?php print /* @noEscape */ $block->getAccountLabelbyCode('AC39')
-                                    ? $block->getAccountLabelbyCode('AC39') : 'Save'?>">
+                            <?= /* @noEscape */ $block->getAccountLabelbyCode('AC39') ?
+                            $block->getAccountLabelbyCode('AC39') : $block->escapeHtml(__('Save'))?>">
                     <span>
-                        <?php print /* @noEscape */ $block->getAccountLabelbyCode('AC39')
-                                ? $block->getAccountLabelbyCode('AC39') : 'Save'?>
+                        <?= /* @noEscape */ $block->getAccountLabelbyCode('AC39') ?
+                            $block->getAccountLabelbyCode('AC39') : $block->escapeHtml(__('Save'))?>
                     </span>
                 </button>
             </div>
@@ -232,7 +237,7 @@ $storeCode = $block->getStoreCode();
         
         function getCardType() {
             var cardnumber=document.getElementById('card_number').value
-            var visaRegex = new RegExp('^4[0-9]{0,15}$'),
+            var visaRegex = new RegExp('^4[0-9]{0,20}$'),
                 mastercardRegex = new RegExp(
                 '^(?:5[1-5][0-9]{0,2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{0,2}|27[01][0-9]|2720)[0-9]{0,12}$'
                 ),
@@ -285,33 +290,41 @@ $storeCode = $block->getStoreCode();
         }
         
         function onConfirmBtn() {
-            var isCvcRequired =  <?php echo !empty($block->requireCvcEnabled())?$block->requireCvcEnabled(): 0; ?>;
+            var isCvcRequired =  <?= /* @noEscape */
+                $block->escapeHtml(!empty($block->requireCvcEnabled())
+                ?$block->requireCvcEnabled(): 0); ?>;
             var isCvvValid = isCvcRequired == true ? validateCVV() : true;
             var cvvValid = isCvvValid && checkCardTypeValidity();
             
-             mandatoryMessage= parseInt("<?php echo !empty($block->getDisclaimerMessageMandatory())
-                ?$block->getDisclaimerMessageMandatory():0; ?>");
-       disclaimerMessageEnabled = parseInt("<?php echo !empty($block->getDisclaimerMessageEnable())
-             ?$block->getDisclaimerMessageEnable():0; ?>");
-        storedCredentials = parseInt("<?php echo !empty($block->getStoredCredentialsEnabledValue())
-             ?$block->getStoredCredentialsEnabledValue():0; ?>");
+            mandatoryMessage= parseInt("<?= /* @noEscape */
+                $block->escapeHtml(!empty($block->getDisclaimerMessageMandatory())
+                ?$block->getDisclaimerMessageMandatory():0); ?>");
+            disclaimerMessageEnabled = parseInt("<?= /* @noEscape */
+                $block->escapeHtml(!empty($block->getDisclaimerMessageEnable())
+                ?$block->getDisclaimerMessageEnable():0); ?>");
+            storedCredentials = parseInt("<?= /* @noEscape */
+                $block->escapeHtml(!empty($block->getStoredCredentialsEnabledValue())
+                ?$block->getStoredCredentialsEnabledValue():0); ?>");
             if (cvvValid && jQuery('#form_add_card').valid() && !(window.isDynamic3DS2Enabled)) {
                 document.getElementById('save_newcard').disabled=true;
-    if(mandatoryMessage && disclaimerMessageEnabled && window.disclaimerDialogue === null){
+                if(mandatoryMessage && disclaimerMessageEnabled && window.disclaimerDialogue === null){
                         $('#disclaimer-error').css('display', 'block');
                             $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
             return false;
                     } 
-
+                if((window.is3DsEnabled)) {
+                createPayment3DS();
+                }else {
                 createPayment();
+            }
             } else if (cvvValid && jQuery('#form_add_card').valid() && window.isDynamic3DS2Enabled) {
                 document.getElementById('save_newcard').disabled=true;
 
-    if(mandatoryMessage && disclaimerMessageEnabled && window.disclaimerDialogue === null){
-                        $('#disclaimer-error').css('display', 'block');
-                            $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
-            return false;
-                    } 
+                if(mandatoryMessage && disclaimerMessageEnabled && window.disclaimerDialogue === null){
+                    $('#disclaimer-error').css('display', 'block');
+                    $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
+                    return false;
+                } 
 
                 var bin = jQuery('[name=cardNumber]').val();
                 var binNew = bin.substring(0, 6);
@@ -404,7 +417,15 @@ $storeCode = $block->getStoreCode();
                     data: jsonPaymentDetails,
                     type: 'post',
                     success: function (data) {
+                        response = JSON.stringify(data);
+                        var result = JSON.parse(response);
+                        console.log(result);
+                        if(result.threeDError) {
+             window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));
+            }else {
+            console.log("entered success case to go to auth");
                         window.location.replace(urlBuilder.build('worldpay/threedsecure/auth'));
+                    }
                     },
                     error: function (data) {
                         window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));
@@ -426,12 +447,15 @@ $storeCode = $block->getStoreCode();
           
         });
          $("#btnShow").click(function (){
-            mandatoryMessage= parseInt("<?php echo !empty($block->getDisclaimerMessageMandatory())
-                ?$block->getDisclaimerMessageMandatory():0; ?>"); 
-           disclaimerMessageEnabled = parseInt("<?php echo !empty($block->getDisclaimerMessageEnable())
-                ?$block->getDisclaimerMessageEnable():0; ?>");
-           storedCredentials = parseInt("<?php echo !empty($block->getStoredCredentialsEnabledValue())
-                ?$block->getStoredCredentialsEnabledValue():0; ?>");
+            mandatoryMessage= parseInt("<?= /* @noEscape */
+                $block->escapeHtml(!empty($block->getDisclaimerMessageMandatory())
+                ?$block->getDisclaimerMessageMandatory():0); ?>"); 
+            disclaimerMessageEnabled = parseInt("<?= /* @noEscape */
+                $block->escapeHtml(!empty($block->getDisclaimerMessageEnable())
+                ?$block->getDisclaimerMessageEnable():0); ?>");
+            storedCredentials = parseInt("<?= /* @noEscape */
+                $block->escapeHtml(!empty($block->getStoredCredentialsEnabledValue())
+                ?$block->getStoredCredentialsEnabledValue():0); ?>");
             that=this;     
         $("#dialog").dialog({
                     autoResize: true,

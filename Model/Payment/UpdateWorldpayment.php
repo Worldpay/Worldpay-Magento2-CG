@@ -23,6 +23,7 @@ class UpdateWorldpayment
     protected $worldpaypayment;
     protected $paymentMethodType;
     
+    public $apmMethods = ['ACH_DIRECT_DEBIT-SSL','SEPA_DIRECT_DEBIT-SSL'];
     /**
      * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
      */
@@ -108,8 +109,24 @@ class UpdateWorldpayment
         $wpp->setData('card_number', $cardNumber);
         $wpp->setData('payment_status', $paymentStatus);
         if ($payment->paymentMethod[0]) {
-            $this->paymentMethodType = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
-            $wpp->setData('payment_type', str_replace("_CREDIT", "", $this->paymentMethodType));
+            if (!in_array(
+                strtoupper($payment->paymentMethod[0]),
+                $this->apmMethods
+            )) {
+                $this->paymentMethodType = str_replace(
+                    ["_CREDIT","_DEBIT","_ELECTRON"],
+                    "",
+                    $payment->paymentMethod[0]
+                );
+                $wpp->setData('payment_type', str_replace(
+                    ["_CREDIT","_DEBIT","_ELECTRON"],
+                    "",
+                    $this->paymentMethodType
+                ));
+            } else {
+                $this->paymentMethodType = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
+                $wpp->setData('payment_type', str_replace("_CREDIT", "", $this->paymentMethodType));
+            }
         }
         $wpp->setData('avs_result', $avsnumber);
         $wpp->setData('cvc_result', $cvcnumber);
@@ -214,8 +231,8 @@ class UpdateWorldpayment
         $wpp->setData('card_number', $cardNumber);
         $wpp->setData('payment_status', $paymentStatus);
         if ($payment->paymentMethod[0]) {
-            $this->paymentMethodType = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
-            $wpp->setData('payment_type', str_replace("_CREDIT", "", $this->paymentMethodType));
+            $this->paymentMethodType = str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $payment->paymentMethod[0]);
+            $wpp->setData('payment_type', str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $this->paymentMethodType));
         }
         $wpp->setData('avs_result', $avsnumber);
         $wpp->setData('cvc_result', $cvcnumber);
@@ -296,7 +313,7 @@ class UpdateWorldpayment
                     ->cardDetails->expiryDate->date['month']);
             $savedTokenFactory->setCardExpiryYear((int)$tokenElement[0]->paymentInstrument
                     ->cardDetails->expiryDate->date['year']);
-            $paymentmethodmethod = str_replace(["_CREDIT","_DEBIT"], "", $payment->paymentMethod[0]);
+            $paymentmethodmethod = str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $payment->paymentMethod[0]);
             $savedTokenFactory->setMethod($paymentmethodmethod);
             $savedTokenFactory->setCardBrand($tokenElement[0]->paymentInstrument[0]
                     ->cardDetails[0]->derived[0]->cardBrand[0]);

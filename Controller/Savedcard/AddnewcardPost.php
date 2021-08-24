@@ -296,8 +296,17 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 $directResponse = $this->directResponse->setResponse($response);
                 $threeDSecureParams = $directResponse->get3dSecureParams();
                 $threeDSecureChallengeParams = $directResponse->get3ds2Params();
+                if (!$this->worldpayHelper->is3dsEnabled() && isset($threeDSecureParams)) {
+                    $this->wplogger->info("3Ds attempted but 3DS is not enabled for the store. "
+                            . "Please contact merchant.");
+                    $this->messageManager->addErrorMessage(
+                        "3Ds attempted but 3DS is not enabled for the store. Please contact merchant. "
+                    );
+                  //return $this->resultRedirectFactory->create()->setPath('worldpay/savedcard', ['_current' => true]);
+                    return  $this->resultJsonFactory->create()->setData(['success' => false]);
+                }
                 $threeDSecureConfig = [];
-                $disclaimerFlag = isset($fullRequest->payment->disclaimerFlag)?$fullRequest->payment->disclaimerFlag:0 ;
+                $disclaimerFlag = isset($fullRequest->payment->disclaimerFlag)?$fullRequest->payment->disclaimerFlag:0;
 
                 if (!empty($orderParams['primeRoutingData'])) {
                     $payment['additional_data']['worldpay_primerouting_enabled'] = true;
@@ -364,6 +373,8 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                                 ->getCreditCardSpecificException('CCAM22')));
                 } else {
                     $this->messageManager->addException($e, __('Error: ').$e->getMessage());
+                    return  $this->resultJsonFactory->create()
+                        ->setData(['threeDError' => true]);
                 }
                 return  $this->resultJsonFactory->create()
                        ->setData(['success' => false]);
@@ -567,6 +578,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
     public function createEmptyQuote($tokenKey)
     {
         $token = 'Bearer '.$tokenKey;
+        // @codingStandardsIgnoreStart
         $curl = curl_init();
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine');
         curl_setopt_array($curl, [
@@ -591,6 +603,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         ]);
         $response = curl_exec($curl);
         curl_close($curl);
+        // @codingStandardsIgnoreEnd
         return $response;
     }
 }

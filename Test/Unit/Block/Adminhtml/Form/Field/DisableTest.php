@@ -1,6 +1,7 @@
 <?php
 /** * @copyright 2017 Sapient */
 namespace Sapient\Worldpay\Test\Unit\Block\Adminhtml\Form\Field;
+
 use \PHPUnit\Framework\TestCase;
 use Sapient\Worldpay\Block\Adminhtml\Form\Field\Disable;
 use Magento\Framework\Data\Form\Element\Factory;
@@ -9,11 +10,13 @@ use Magento\Framework\Escaper;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
+
 class DisableTest extends TestCase
 {
     protected $disbaleObj;
     protected $element;
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
             $context = $this->getMockBuilder(Context::class)
                 ->disableOriginalConstructor()
                 ->getMock();
@@ -29,18 +32,18 @@ class DisableTest extends TestCase
             $escaper = $this->getMockBuilder(Escaper::class)
                 ->disableOriginalConstructor()
                 ->getMock();
-            $this->disbaleObj = new Disable($context, array() , $secureHtmlRenderer, $escaper);
+            $this->disbaleObj = new Disable($context, [], $secureHtmlRenderer, $escaper);
             $this->element = $this->getMockBuilder(AbstractElement::class)
                 ->disableOriginalConstructor()
                 ->getMock();
-        }
-        public function testgetElementHtml()
-        {
-            $this->assertNull($this
-                ->element
-                ->setData('readonly', 1));
-            $this->assertNull($this
-                ->element
-                ->getElementHtml());
-        }
     }
+    public function testgetElementHtml()
+    {
+        $this->assertNull($this
+            ->element
+            ->setData('readonly', 1));
+        $this->assertNull($this
+            ->element
+            ->getElementHtml());
+    }
+}

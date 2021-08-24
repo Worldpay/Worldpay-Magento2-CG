@@ -27,6 +27,7 @@ class Instantredirect extends \Magento\Framework\App\Action\Action
         $instantRedirectUrl = $this->_redirect->getRefererUrl();
 //      $this->messageManager->getMessages(true);
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
+            $this->checkoutSession->setInstantPurchaseOrder(true);
             $this->checkoutSession->setInstantPurchaseRedirectUrl($instantRedirectUrl);
             return $this->resultRedirectFactory->create()->setPath('worldpay/threedsecure/auth', ['_current' => true]);
         } elseif ($threeDSecureChallengeParams) {

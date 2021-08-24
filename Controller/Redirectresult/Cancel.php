@@ -53,7 +53,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
 
         $this->wplogger->info('worldpay returned cancel url');
         if (!$this->orderservice->getAuthorisedOrder()) {
-            return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
+              return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
         }
         $order = $this->orderservice->getAuthorisedOrder();
         $magentoorder = $order->getOrder();
@@ -72,7 +72,6 @@ class Cancel extends \Magento\Framework\App\Action\Action
     {
 
         $incrementId = $order->getIncrementId();
-
         $message = $incrementId === null
             ? __('Order Cancelled')
             : __('Order #'. $incrementId.' Cancelled');

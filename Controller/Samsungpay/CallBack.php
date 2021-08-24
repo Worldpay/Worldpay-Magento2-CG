@@ -85,11 +85,12 @@ class CallBack extends \Magento\Framework\App\Action\Action
         $environmentMode = $this->scopeConfig->
                 getValue('worldpay/general_config/environment_mode', $storeScope);
 
-      
         if ($environmentMode == 'Test Mode') {
-            $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId;
+            $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions/paymentCredentials/"
+                    . $refId . '?serviceId=' . $serviceId;
         } else {
-            $serviceUrl = "https://api-ops.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId;
+            $serviceUrl = "https://api-ops.mpay.samsung.com/ops/v1/transactions/paymentCredentials/"
+                    . $refId . '?serviceId=' . $serviceId;
         }
 
         $orderCode = $order->getIncrementId();
@@ -99,10 +100,11 @@ class CallBack extends \Magento\Framework\App\Action\Action
         $item = $wpp->loadByPaymentId($orderCode);
       
         $worldpayOrderId = $item->getWorldpayOrderId();
+        $this->_checkoutSession->setauthenticatedOrderId($orderCode);
 
         if ($refId != '') {
             try {
-
+                // @codingStandardsIgnoreStart
                 $curl = curl_init();
 
                 curl_setopt_array($curl, [
@@ -119,17 +121,17 @@ class CallBack extends \Magento\Framework\App\Action\Action
                         "serviceId: $serviceId"
                     ],
                 ]);
-
-                $json = curl_exec($curl);
-
-                curl_close($curl);
                 
-
+                $json = curl_exec($curl);
+                curl_close($curl);
+                // @codingStandardsIgnoreEnd
+                
                 $response = json_decode($json, true);
 
                 if ($response['resultMessage'] == 'SUCCESS') {
 
-                    //response is success, collect the order details and send request to worldpay with this reponse from samsung
+                    //response is success, collect the order details and
+                    //send request to worldpay with this reponse from samsung
                     
                     //$order = $this->orderFactory->create()->loadByIncrementId($orderId);
                     //$orderDetails = $order->getData();
@@ -158,11 +160,13 @@ class CallBack extends \Magento\Framework\App\Action\Action
                     if ($lastEvent[0] == 'AUTHORISED') {
                         $resultRedirect = $this->resultRedirectFactory->create();
                         $resultRedirect->setPath('worldpay/wallets/success');
+                        $this->_checkoutSession->unsauthenticatedOrderId();
                         return $resultRedirect;
                     } else {
                         $resultRedirect = $this->resultRedirectFactory->create();
                         $resultRedirect->setPath('worldpay/Redirectresult/cancel');
                         $this->orderManagement->cancel($orderId);
+                        $this->_checkoutSession->restoreQuote();
                         return $resultRedirect;
                     }
                 }
@@ -173,6 +177,7 @@ class CallBack extends \Magento\Framework\App\Action\Action
              $this->orderManagement->cancel($orderId);
             $resultRedirect = $this->resultRedirectFactory->create();
             $resultRedirect->setPath('worldpay/Redirectresult/cancel');
+            $this->_checkoutSession->restoreQuote();
             return $resultRedirect;
         }
     }
