@@ -48,34 +48,30 @@ class Auth extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        
         $threeDSecureChallengeParams = $this->checkoutSession->get3Ds2Params();
         
         $threeDSecureChallengeConfig = $this->checkoutSession->get3DS2Config();
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
-        
         $orderId = $this->checkoutSession->getAuthOrderId();
-        
         $iframe = false;
         // Chrome 84 releted updates for 3DS
+        // @codingStandardsIgnoreStart
         $skipSameSiteForIOs = $this->worldpayHelper->shouldSkipSameSiteNone($directOrderParams);
 	//$this->wplogger->info("SKIP same site value--->".print_r($skipSameSiteForIOs,true));
-
-        
         if($skipSameSiteForIOs) {
 	$this->wplogger->info("Inside skip same site block");
-          if(isset($_COOKIE['PHPSESSID'])){
-          $phpsessId = $_COOKIE['PHPSESSID'];
-          $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
-          setcookie("PHPSESSID", $phpsessId, [
-         'expires' => time() + 86400,
+        if (isset($_COOKIE['PHPSESSID'])) {
+            $phpsessId = $_COOKIE['PHPSESSID'];
+            $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+            setcookie("PHPSESSID", $phpsessId, [
+        // @codingStandardsIgnoreEnd
+	 'expires' => time() + 3600,
          'path' => '/',
          'domain' => $domain,
          'secure' => true,
          'httponly' => true,
           ]);
         }
-            
         }else {
 	$this->wplogger->info("Outside skip same site block");
 
@@ -83,36 +79,35 @@ class Auth extends \Magento\Framework\App\Action\Action
           $phpsessId = $_COOKIE['PHPSESSID'];
           $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
           setcookie("PHPSESSID", $phpsessId, [
-         'expires' => time() + 86400,
-         'path' => '/',
-         'domain' => $domain,
-         'secure' => true,
-         'httponly' => true,
-         'samesite' => 'None',
-          ]);
+            'expires' => time() + 3600,
+            'path' => '/',
+            'domain' => $domain,
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'None',
+            ]);
         }
         }
         //setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
         
+        if (!$threeDSecureChallengeConfig == null) {
         
-        
-        if (!$threeDSecureChallengeConfig == NULL){
-        
-        if ($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe') {
-            $iframe = true;
-        }
+            if ($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe') {
+                $iframe = true;
+            }
         }
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
             // Chrome 84 releted updates for 3DS
 //            $phpsessId = $_COOKIE['PHPSESSID'];
 //          setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
-        
             $responseUrl = $this->_url->getUrl('worldpay/threedsecure/authresponse', ['_secure' => true]);
+            // @codingStandardsIgnoreLine
             print_r('
                 <form name="theForm" id="form" method="POST" action=' . $redirectData->getUrl() . '>
                     <input type="hidden" name="PaReq" value=' . $redirectData->getPaRequest() . ' />
                     <input type="hidden" name="TermUrl" value=' . $responseUrl . ' />
                 </form>');
+            // @codingStandardsIgnoreLine
             print_r('
                 <script language="Javascript">
                     document.getElementById("form").submit();
@@ -121,6 +116,7 @@ class Auth extends \Magento\Framework\App\Action\Action
             if ($iframe) {
                 $challengeUrl = $this->_url->getUrl("worldpay/hostedpaymentpage/challenge");
                 $imageurl = $this->_assetRepo->getUrl("Sapient_Worldpay::images/cc/worldpay_logo.png");
+                // @codingStandardsIgnoreLine
                 print_r('
                     <div id="challenge_window">                        
                         <div class="image-content" style="text-align: center;">
@@ -138,6 +134,7 @@ class Auth extends \Magento\Framework\App\Action\Action
                 ');
             } else {
                 $authUrl = $this->_url->getUrl('worldpay/threedsecure/ChallengeAuthResponse', ['_secure' => true]);
+                // @codingStandardsIgnoreLine
                 print_r(' 
                     <form name= "challengeForm" id="challengeForm"
                     method= "POST"
@@ -153,6 +150,7 @@ class Auth extends \Magento\Framework\App\Action\Action
                         back to the return URL after challenge complete 
                         -->
                     </form>');
+                // @codingStandardsIgnoreLine
                 print_r('
                     <script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js"></script>
                     <script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js">
@@ -218,7 +216,6 @@ class Auth extends \Magento\Framework\App\Action\Action
 
                 $this->checkoutSession->uns3DS2Params();
                 $this->checkoutSession->uns3DS2Config();
-                
             }
         } elseif ($this->checkoutSession->getIavCall()) {
             $this->checkoutSession->unsIavCall();
