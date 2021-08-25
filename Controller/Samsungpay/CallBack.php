@@ -104,7 +104,7 @@ class CallBack extends \Magento\Framework\App\Action\Action
 
         if ($refId != '') {
             try {
-                // @codingStandardsIgnoreStart
+                
                 $curl = curl_init();
 
                 curl_setopt_array($curl, [
@@ -124,7 +124,6 @@ class CallBack extends \Magento\Framework\App\Action\Action
                 
                 $json = curl_exec($curl);
                 curl_close($curl);
-                // @codingStandardsIgnoreEnd
                 
                 $response = json_decode($json, true);
 

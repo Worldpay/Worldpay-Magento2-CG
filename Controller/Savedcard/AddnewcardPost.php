@@ -578,7 +578,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
     public function createEmptyQuote($tokenKey)
     {
         $token = 'Bearer '.$tokenKey;
-        // @codingStandardsIgnoreStart
+        
         $curl = curl_init();
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine');
         curl_setopt_array($curl, [
@@ -603,7 +603,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         ]);
         $response = curl_exec($curl);
         curl_close($curl);
-        // @codingStandardsIgnoreEnd
+        
         return $response;
     }
 }

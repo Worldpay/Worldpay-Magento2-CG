@@ -103,7 +103,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $postFieldsJson = (json_encode($postFields));
               
         try {
-            // @codingStandardsIgnoreStart
+            
             $curl = curl_init();
             curl_setopt_array($curl, [
               CURLOPT_URL => $serviceUrl,
@@ -123,7 +123,7 @@ class Index extends \Magento\Framework\App\Action\Action
             $response = curl_exec($curl);
 
             curl_close($curl);
-            // @codingStandardsIgnoreEnd
+            
                 $resultJson = '';
                 $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
                 $resultJson->setData($response);

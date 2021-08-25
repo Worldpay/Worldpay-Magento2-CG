@@ -28,7 +28,6 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
         $this->amount = $amount;
     }
     
-    // @codingStandardsIgnoreLine
     public static function createFromCancelledResponse($params)
     {
         $orderkey = $params['orderKey'];
@@ -42,8 +41,7 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
             null
         );
     }
-
-    // @codingStandardsIgnoreLine
+    
     public static function createFromPendingResponse($params, $paymentType = null)
     {
         $orderkey = $params['orderKey'];
@@ -66,7 +64,6 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
         }
     }
     
-    // @codingStandardsIgnoreLine
     public static function createFrom3DError($orderCode, $merchantCode, $paymentStatus)
     {
         return new self(
@@ -192,7 +189,7 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     /**
      * @return string
      */
-    // @codingStandardsIgnoreLine
+    
     private static function _extractOrderCode($orderKey)
     {
         $array = explode('^', $orderKey);
@@ -202,7 +199,7 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     /**
      * @return string
      */
-    // @codingStandardsIgnoreLine
+    
     private static function _extractMerchantCode($orderKey)
     {
         $array = explode('^', $orderKey);
