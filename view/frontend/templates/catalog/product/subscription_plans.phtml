@@ -1,10 +1,10 @@
 <?php
 /**
- * Copyright © 2020 Worldpay, LLC. All rights reserved.
+ * Copyright ï¿½ 2020 Worldpay, LLC. All rights reserved.
  * See LICENSE.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
+
 /** @var Sapient\Worldpay\Block\Catalog\Product\SubscriptionPlans $block */
 ?>
 
@@ -14,7 +14,8 @@
         <input type="checkbox" id="worldpay-add-plan" name="worldpay_add_plan" onchange="valueChanged()">
         <label for="worldpay-add-plan"><span><?php echo $block->getSubscribeCheckboxLabel() ?></span></label>
     </div>
-    <div class="control" id="worldpay-subscription-plans-list" style="display: none;" data-mage-init='{"worldpayPriceSubscription":{
+    <div class="control" id="worldpay-subscription-plans-list"
+         style="display: none;" data-mage-init='{"worldpayPriceSubscription":{
              "addPlanElement":"#worldpay-add-plan",
              "planElement":"input:radio[value]",
              "startDateContainerElement":"#product-options-wrapper .worldpay-subscriptions-start-date-container",
@@ -26,7 +27,9 @@
                 <input type="radio" onchange="valueRadioChanged()"
                        name="worldpay_subscription_plan"
                        id="worldpay_subscription_plan_<?php echo $block->buildPlanOptionId($plan) ?>"
-                       value="<?php echo $block->escapeHtml($plan->getId()) ?>" <?php if ($block->isPlanSelected($plan)): ?>checked<?php endif; ?>/>
+                       value="<?php echo $block->escapeHtml($plan->getId()) ?>"
+                        <?php if ($block->isPlanSelected($plan)): ?>checked
+                        <?php endif; ?>/>
                 <label class="label" for="worldpay_subscription_plan_<?php echo $block->buildPlanOptionId($plan) ?>">
                     <span><?php /* @noEscape */ echo $block->getPlanTitle($plan); ?></span>
                 </label>
@@ -54,7 +57,8 @@
         </legend>
         <div class="field-control ">
             <input class="control-text" style="width: 44%;"
-                   name="subscription_end_date" id="subscription_end_date" type="text" readonly="true" value="<?php echo $block->getEndDate();?>">
+                   name="subscription_end_date" id="subscription_end_date" type="text" readonly="true" 
+                   value="<?php echo $block->getEndDate();?>">
             <input type="hidden" id="show_endDate" value="1">
             <?php //echo $block->getDateHtml() ?>
         </div>

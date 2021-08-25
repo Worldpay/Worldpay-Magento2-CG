@@ -59,32 +59,32 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         $threeDSecureParams = $this->checkoutSession->get3DSecureParams();
         $skipSameSiteForIOs = $this->shouldSkipSameSiteNone($directOrderParams);
         
-        if($skipSameSiteForIOs) {
-          if(isset($_COOKIE['PHPSESSID'])){
-          $phpsessId = $_COOKIE['PHPSESSID'];
-          $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
-          setcookie("PHPSESSID", $phpsessId, [
-         'expires' => time() + 3600,
-         'path' => '/',
-         'domain' => $domain,
-         'secure' => true,
-         'httponly' => true,
-          ]);
-        }
+        if ($skipSameSiteForIOs) {
+            if (isset($_COOKIE['PHPSESSID'])) {
+                $phpsessId = $_COOKIE['PHPSESSID'];
+                $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+                setcookie("PHPSESSID", $phpsessId, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'domain' => $domain,
+                'secure' => true,
+                'httponly' => true,
+                ]);
+            }
             
-        }else {
-        if(isset($_COOKIE['PHPSESSID'])){
-          $phpsessId = $_COOKIE['PHPSESSID'];
-          $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
-          setcookie("PHPSESSID", $phpsessId, [
-         'expires' => time() + 3600,
-         'path' => '/',
-         'domain' => $domain,
-         'secure' => true,
-         'httponly' => true,
-         'samesite' => 'None',
-          ]);
-        }
+        } else {
+            if (isset($_COOKIE['PHPSESSID'])) {
+                $phpsessId = $_COOKIE['PHPSESSID'];
+                $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+                setcookie("PHPSESSID", $phpsessId, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'domain' => $domain,
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'None',
+                ]);
+            }
         }
         $this->checkoutSession->unsDirectOrderParams();
         $this->checkoutSession->uns3DSecureParams();
@@ -133,27 +133,27 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         }
     }
     
-     private function shouldSkipSameSiteNone($directOrderParams)
+    private function shouldSkipSameSiteNone($directOrderParams)
     {
-         if(isset($directOrderParams)) {
-         $useragent = $directOrderParams['userAgentHeader'] ;
-           $iosDeviceRegex = "/\(iP.+; CPU .*OS (\d+)[_\d]*.*\) AppleWebKit\//";
-           $macDeviceRegex = "/\(Macintosh;.*Mac OS X (\d+)_(\d+)[_\d]*.*\) AppleWebKit\//";
-           $iosVersionRegex = '/OS 12./';
-           $macVersionRegex ='/OS X 10./';
-           $macLatestVersionRegex = '/OS X 10_15_7/';
-           if (preg_match($iosDeviceRegex,$useragent) && preg_match($iosVersionRegex,$useragent) ) {
-               $this->wplogger->info('Passed regex check for ios');
-              return true; 
-           }elseif ((preg_match($macDeviceRegex,$useragent) && preg_match($macVersionRegex,$useragent)) 
-                   &&(!preg_match($macLatestVersionRegex,$useragent))) {
-              $this->wplogger->info('Passed regex check for mac'); 
-              return true;
-           }
-           $this->wplogger->info(print_r($useragent,true));
-           $this->wplogger->info('Outside regex check');
-           return false;
-         }
-         return false;
+        if (isset($directOrderParams)) {
+            $useragent = $directOrderParams['userAgentHeader'] ;
+            $iosDeviceRegex = "/\(iP.+; CPU .*OS (\d+)[_\d]*.*\) AppleWebKit\//";
+            $macDeviceRegex = "/\(Macintosh;.*Mac OS X (\d+)_(\d+)[_\d]*.*\) AppleWebKit\//";
+            $iosVersionRegex = '/OS 12./';
+            $macVersionRegex ='/OS X 10./';
+            $macLatestVersionRegex = '/OS X 10_15_7/';
+            if (preg_match($iosDeviceRegex, $useragent) && preg_match($iosVersionRegex, $useragent)) {
+                $this->wplogger->info('Passed regex check for ios');
+                return true;
+            } elseif ((preg_match($macDeviceRegex, $useragent) && preg_match($macVersionRegex, $useragent))
+                  && (!preg_match($macLatestVersionRegex, $useragent))) {
+                $this->wplogger->info('Passed regex check for mac');
+                return true;
+            }
+            $this->wplogger->info(print_r($useragent, true));
+            $this->wplogger->info('Outside regex check');
+            return false;
+        }
+        return false;
     }
 }

@@ -55,7 +55,7 @@ class Iframe extends \Magento\Framework\App\Action\Action
             $currenturl = $this->_url->getCurrentUrl();
             $redirecturl = str_replace("iframe/status/", "", $currenturl);
         }
-        // @codingStandardsIgnoreLine
+        
         print_r('<script>window.top.location.href = "'.$redirecturl.'";</script>');
     }
 

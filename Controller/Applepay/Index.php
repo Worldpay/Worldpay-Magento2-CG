@@ -83,7 +83,6 @@ class Index extends \Magento\Framework\App\Action\Action
         define('PRODUCTION_CERTIFICATE_KEY_PASS', $certificationPassword);
 
         define('PRODUCTION_MERCHANTIDENTIFIER', openssl_x509_parse(
-            // @codingStandardsIgnoreLine
             file_get_contents(PRODUCTION_CERTIFICATE_PATH)
         )['subject']['UID']);
         define('PRODUCTION_DOMAINNAME', $domainName);
@@ -93,7 +92,7 @@ class Index extends \Magento\Framework\App\Action\Action
         try {
           
             $validation_url = $this->request->getParam('u');
-            // @codingStandardsIgnoreStart
+            
             if ("https" == parse_url($validation_url, PHP_URL_SCHEME) && substr(
                 parse_url($validation_url, PHP_URL_HOST),
                 -10
@@ -116,7 +115,6 @@ class Index extends \Magento\Framework\App\Action\Action
                 $result = curl_exec($ch);
                 //var_dump($result);
                 curl_close($ch);
-            // @codingStandardsIgnoreEnd
                 
                 $resultJson = '';
                 

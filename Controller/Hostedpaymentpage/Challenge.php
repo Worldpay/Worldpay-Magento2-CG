@@ -22,35 +22,34 @@ class Challenge extends \Magento\Framework\App\Action\Action
         $skipSameSiteForIOs = $this->worldpayHelper->shouldSkipSameSiteNone($directOrderParams);
         
         //$this->wplogger->info("SKIP same site value--->".print_r($skipSameSiteForIOs,true));
-        // @codingStandardsIgnoreStart
-        if($skipSameSiteForIOs) {
-        if (isset($_COOKIE['PHPSESSID'])) {
-            $phpsessId = $_COOKIE['PHPSESSID'];
-            $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
-            setcookie("PHPSESSID", $phpsessId, [
-        // @codingStandardsIgnoreEnd
-	 'expires' => time() + 3600,
-         'path' => '/',
-         'domain' => $domain,
-         'secure' => true,
-         'httponly' => true,
-          ]);
+        
+        if ($skipSameSiteForIOs) {
+            if (isset($_COOKIE['PHPSESSID'])) {
+                $phpsessId = $_COOKIE['PHPSESSID'];
+                $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+                setcookie("PHPSESSID", $phpsessId, [
+        
+                'expires' => time() + 3600,
+                'path' => '/',
+                'domain' => $domain,
+                'secure' => true,
+                'httponly' => true,
+                ]);
+            }
+        } else {
+            if (isset($_COOKIE['PHPSESSID'])) {
+                $phpsessId = $_COOKIE['PHPSESSID'];
+                $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+                setcookie("PHPSESSID", $phpsessId, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'domain' => $domain,
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'None',
+                ]);
+            }
         }
-        }else {
-        if(isset($_COOKIE['PHPSESSID'])){
-          $phpsessId = $_COOKIE['PHPSESSID'];
-          $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
-          setcookie("PHPSESSID", $phpsessId, [
-            'expires' => time() + 3600,
-            'path' => '/',
-            'domain' => $domain,
-            'secure' => true,
-            'httponly' => true,
-            'samesite' => 'None',
-            ]);
-        }
-        }
-        // @codingStandardsIgnoreEnd
 
         return $this->_pageFactory->create();
     }

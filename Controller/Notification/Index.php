@@ -91,7 +91,7 @@ class Index extends \Magento\Framework\App\Action\Action
     public function _getRawBody()
     {
         if (null === $this->_rawBody) {
-            // @codingStandardsIgnoreLine
+            
             $body = file_get_contents('php://input');
 
             if (strlen(trim($body)) > 0) {

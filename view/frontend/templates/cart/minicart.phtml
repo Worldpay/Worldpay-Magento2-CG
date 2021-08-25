@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
+
 
 /** @var $block \Magento\Checkout\Block\Cart\Sidebar */
 ?>
@@ -52,7 +52,8 @@
             "Magento_Ui/js/core/app": <?= /* @escapeNotVerified */ $block->getJsLayout() ?>
         },
         "*": {
-            "Magento_Ui/js/block-loader": "<?= /* @escapeNotVerified */ $block->getViewFileUrl('images/loader-1.gif') ?>"
+            "Magento_Ui/js/block-loader": 
+            "<?= /* @escapeNotVerified */ $block->getViewFileUrl('images/loader-1.gif') ?>"
         }
     }
     </script>

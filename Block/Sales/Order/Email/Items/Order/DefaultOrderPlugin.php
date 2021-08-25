@@ -29,7 +29,7 @@ class DefaultOrderPlugin
     public function afterGetItemOptions(\Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder $subject, $result)
     {
         
-        foreach ($subject->getOrder()->getAllItems()  as $item) {
+        foreach ($subject->getOrder()->getAllItems() as $item) {
             if ($item->getProductType() == 'grouped') {
                 return;
             }
