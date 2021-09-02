@@ -98,6 +98,8 @@ class Index extends \Magento\Framework\App\Action\Action
                 $this->_rawBody = false;
             }
         }
+        $this->wplogger->info("Printing Notication body received by Worldpay");
+        $this->wplogger->info(print_r($this->_rawBody,true));
         return $this->_rawBody;
     }
 
