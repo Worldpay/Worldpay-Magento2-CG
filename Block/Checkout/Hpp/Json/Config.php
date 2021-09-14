@@ -6,7 +6,7 @@ namespace Sapient\Worldpay\Block\Checkout\Hpp\Json;
 
 class Config extends \Magento\Framework\View\Element\Template
 {
-
+    
     /**
      * Constructor
      *

@@ -14,7 +14,7 @@ class View extends \Magento\Backend\Block\Template
      * @var \Sapient\Worldpay\Model\WorldpaymentFactory
      */
     protected $_worldpaymentFactory;
-
+    
     /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
@@ -77,7 +77,7 @@ class View extends \Magento\Backend\Block\Template
 
         $paymentMethod= $this->getPaymentMethod();
         if ($paymentMethod=='worldpay_cc' || $paymentMethod=='worldpay_apm'
-                || $paymentMethod=='worldpay_moto' || 
+                || $paymentMethod=='worldpay_moto' ||
                 $paymentMethod=='worldpay_cc_vault' || $paymentMethod=='worldpay_wallets') {
             return true;
         }

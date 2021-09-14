@@ -13,6 +13,8 @@ abstract class AbstractArraySource implements \Magento\Framework\Option\ArrayInt
     abstract public function toOptionArray();
 
     /**
+     * Convert to hash
+     *
      * @return array
      */
     public function toOptionHash()

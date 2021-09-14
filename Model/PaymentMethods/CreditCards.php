@@ -32,7 +32,7 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         parent::authorize($payment, $amount);
         return $this;
     }
-
+    
     public function getAuthorisationService($storeId)
     {
         $integrationModel = $this->worlpayhelper->getCcIntegrationMode($storeId);
@@ -51,9 +51,11 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         }
         return $this->directservice;
     }
-
+    
     /**
-     * @param int storeId
+     * Method to check if integration mode is redirect
+     *
+     * @param int $storeId
      * @return bool
      */
     private function _isRedirectIntegrationModeEnabled($storeId)
@@ -64,6 +66,9 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
     }
 
     /**
+     * Method to check if Worldpay is enabled
+     *
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
@@ -76,7 +81,9 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
     }
 
     /**
-     * @param int storeId
+     * Method to check EmbeddedIntegrationMode
+     *
+     * @param int $storeId
      * @return bool
      */
     private function _isEmbeddedIntegrationModeEnabled($storeId)
@@ -84,6 +91,11 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return $this->worlpayhelper->isIframeIntegration($storeId);
     }
 
+    /**
+     * Method to return payment title
+     *
+     * @return string
+     */
     public function getTitle()
     {
         if ($order = $this->registry->registry('current_order')) {

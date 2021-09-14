@@ -47,7 +47,7 @@ class Config
     private $preferredPaymentMethod;
 
     private $urlConfig;
-
+    
     public function __construct(
         $type,
         $iframeIntegrationID,
@@ -102,6 +102,8 @@ class Config
     }
 
     /**
+     * Return type
+     *
      * @return string
      */
     public function getType()
@@ -110,6 +112,8 @@ class Config
     }
 
     /**
+     * Retrieve integration id
+     *
      * @return string
      */
     public function getIframeIntegrationID()
@@ -118,6 +122,8 @@ class Config
     }
 
     /**
+     * Return iframe helper url
+     *
      * @return string
      */
     public function getIframeHelperURL()
@@ -126,6 +132,8 @@ class Config
     }
 
     /**
+     * Return iframe base url
+     *
      * @return string
      */
     public function getIframeBaseURL()
@@ -134,6 +142,8 @@ class Config
     }
 
     /**
+     * Return url
+     *
      * @return string
      */
     public function getUrl()
@@ -142,6 +152,8 @@ class Config
     }
 
     /**
+     * Return Target value
+     *
      * @return string
      */
     public function getTarget()
@@ -150,6 +162,8 @@ class Config
     }
 
     /**
+     * Return config value
+     *
      * @return boolean
      */
     public function isDebug()
@@ -158,6 +172,8 @@ class Config
     }
 
     /**
+     * Return language configured
+     *
      * @return string
      */
     public function getLanguage()
@@ -166,6 +182,8 @@ class Config
     }
 
     /**
+     * Return Country value
+     *
      * @return string
      */
     public function getCountry()
@@ -173,12 +191,19 @@ class Config
         return $this->country;
     }
     
+    /**
+     * Return config url
+     *
+     * @return string
+     */
     public function getUrlConfig()
     {
         return $this->urlConfig;
     }
 
     /**
+     * Return preferred payment method
+     *
      * @return string
      */
     public function getPreferredPaymentMethod()

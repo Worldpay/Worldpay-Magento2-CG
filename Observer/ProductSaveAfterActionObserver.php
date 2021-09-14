@@ -21,7 +21,7 @@ class ProductSaveAfterActionObserver implements ObserverInterface
     private $messageManager;
     
     private $helper;
-
+    
     /**
      * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan\CollectionFactory $plansCollection
      */

@@ -9,6 +9,7 @@ namespace Sapient\Worldpay\Model\Utilities;
  */
 class PaymentMethods
 {
+    
     /**
      * @var SimpleXMLElement
      */
@@ -70,6 +71,8 @@ class PaymentMethods
     }
 
     /**
+     * Get config code
+     *
      * @param string $type
      * @return String
      */
@@ -88,9 +91,12 @@ class PaymentMethods
     }
 
     /**
-     * load enable payment type
-     * $type is worldpay_apm $paymentType is CHINAUNIONPAY-SSL,YANDEXMONEY-SSL
+     * Load enable payment type
+     *
+     * Variable $type is worldpay_apm $paymentType is CHINAUNIONPAY-SSL,YANDEXMONEY-SSL
+     *
      * @param string $type
+     * @param string $paymentType
      * @return array $methods
      */
     public function loadEnabledByType($type, $paymentType)
@@ -118,6 +124,8 @@ class PaymentMethods
     }
 
     /**
+     * Get Available Methods
+     *
      * @return SimpleXMLElement $methods
      */
     public function getAvailableMethods()
@@ -127,6 +135,8 @@ class PaymentMethods
     }
 
     /**
+     * Read xml
+     *
      * @return SimpleXMLElement
      */
     protected function _readXML()
@@ -140,7 +150,10 @@ class PaymentMethods
     }
 
     /**
-     * check if paymentmethod is allowed for country
+     * Check if paymentmethod is allowed for country
+     *
+     * @param string $type
+     * @param SimpleXMLElement $paymentMethodNode
      * @return bool
      */
     private function _methodAllowedForCountry($type, \SimpleXMLElement $paymentMethodNode)
@@ -155,7 +168,9 @@ class PaymentMethods
     }
 
     /**
-     * check if payment is placed through worldpay
+     * Check if payment is placed through worldpay
+     *
+     * @param string $type
      * @return bool
      */
     private function _paymentMethodFiltersByCountry($type)
@@ -168,6 +183,7 @@ class PaymentMethods
 
     /**
      * Get allowed country Id
+     *
      * @return array
      */
     private function _getAllowedCountryIds()
@@ -186,6 +202,8 @@ class PaymentMethods
     }
 
     /**
+     * Get available country ids
+     *
      * @param \SimpleXMLElement $paymentMethodNode
      * @return array
      */
@@ -196,6 +214,13 @@ class PaymentMethods
         return is_array($areas['area']) ? $areas['area'] : [$areas['area']];
     }
 
+    /**
+     * Is Country Allowed
+     *
+     * @param array $allowedCountryIds
+     * @param array $availableCountryIds
+     * @return bool
+     */
     private function _isCountryAllowed($allowedCountryIds, $availableCountryIds)
     {
         $matchingCountries = array_intersect($allowedCountryIds, $availableCountryIds);
@@ -204,8 +229,10 @@ class PaymentMethods
     }
 
     /**
-     * check capture request is enabled or not
+     * Check capture request is enabled or not
+     *
      * @param string $type
+     * @param string $method
      * @return bool
      */
     public function checkCaptureRequest($type, $method)
@@ -224,6 +251,8 @@ class PaymentMethods
     }
 
     /**
+     * Get capture request
+     *
      * @param \SimpleXMLElement $paymentMethodNode
      * @return string|bool
      */
@@ -234,6 +263,13 @@ class PaymentMethods
         return $capturerequest;
     }
 
+    /**
+     * Check currency
+     *
+     * @param string $code
+     * @param string $type
+     * @return boolean
+     */
     public function checkCurrency($code, $type)
     {
         if ($xml = $this->_readXML()) {
@@ -308,6 +344,11 @@ class PaymentMethods
         );
     }
 
+    /**
+     * Get Allowed shipping Countries
+     *
+     * @return array
+     */
     private function _getAllowedShippingCountries()
     {
         $quote = $this->checkoutsession->getQuote();
@@ -317,13 +358,19 @@ class PaymentMethods
         return [$countryid,'GLOBAL'];
     }
 
+    /**
+     * Get Available ShippingCountries
+     *
+     * @param \SimpleXMLElement $node
+     * @return bool
+     */
     private function _getAvailableShippingCountries(\SimpleXMLElement $node)
     {
         $areas = (array) $node;
 
         return is_array($areas['ship']) ? $areas['ship'] : [$areas['ship']];
     }
-
+    
     private function _isShippingAllowed($allowedShippingCountries, $availableShippingCountries)
     {
         $matchingCountries = array_intersect($allowedShippingCountries, $availableShippingCountries);
@@ -350,11 +397,22 @@ class PaymentMethods
         return $node && count($node);
     }
 
+    /**
+     *
+     * @param \SimpleXMLElement $node
+     * @return string
+     */
     private function _getStopAutoInvoice(\SimpleXMLElement $node)
     {
         $stopautoinvoice = (string) $node;
         return $stopautoinvoice;
     }
+    
+    /**
+     * List of ideal banks
+     *
+     * @return array
+     */
     public function idealBanks()
     {
         $banks = [];
@@ -373,6 +431,11 @@ class PaymentMethods
         }
     }
 
+    /**
+     * Payment Type Countries
+     *
+     * @return string
+     */
     public function getPaymentTypeCountries()
     {
         $codes = ['worldpay_cc','worldpay_apm','worldpay_moto', 'worldpay_cc_vault'];

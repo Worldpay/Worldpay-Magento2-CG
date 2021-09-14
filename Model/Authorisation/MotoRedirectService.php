@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ * MotoRedirectService @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Authorisation;
 
@@ -11,6 +11,20 @@ class MotoRedirectService extends \Magento\Framework\DataObject
     protected $_session;
     protected $_redirectResponseModel;
 
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Model\Mapping\Service $mappingservice
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Sapient\Worldpay\Model\Response\RedirectResponse $redirectresponse
+     * @param \Sapient\Worldpay\Helper\Registry $registryhelper
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param \Magento\Checkout\Model\Session $checkoutsession
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist
+     */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
@@ -34,7 +48,7 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         $this->_urlBuilder = $urlBuilder;
         $this->worldpayhelper = $worldpayhelper;
     }
-
+    
     public function authorizePayment(
         $mageOrder,
         $quote,
@@ -120,6 +134,11 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return $this->worldpayhelper->getDefaultCountry();
     }
 
+    /**
+     * Get the locale for selected language
+     *
+     * @return string
+     */
     protected function _getLanguageForLocale()
     {
         $locale = $this->worldpayhelper->getLocaleDefault();

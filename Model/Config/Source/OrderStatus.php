@@ -13,6 +13,8 @@ class OrderStatus implements \Magento\Framework\Option\ArrayInterface
     protected $_orderConfig;
 
     /**
+     * Constructor
+     *
      * @param \Magento\Sales\Model\Order\Config $orderConfig
      */
     public function __construct(\Magento\Sales\Model\Order\Config $orderConfig)
@@ -21,6 +23,8 @@ class OrderStatus implements \Magento\Framework\Option\ArrayInterface
     }
 
     /**
+     * Configuration for order status
+     *
      * @return array
      */
     public function toOptionArray()

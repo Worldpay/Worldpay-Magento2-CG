@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ * InstallSchema @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Setup;
 
@@ -16,6 +16,12 @@ class InstallSchema implements InstallSchemaInterface
     const WORLDPAY_TOKEN = 'worldpay_token';
     const WORLDPAY_RECURRING = 'worldpay_recurring';
 
+    /**
+     * Install
+     *
+     * @param SchemaSetupInterface $setup
+     * @param ModuleContextInterface $context
+     */
     public function install(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $installer = $setup;

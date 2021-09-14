@@ -8,6 +8,7 @@ namespace Sapient\Worldpay\Block\Sales\Order\Email\Items;
 
 class DefaultItemsPlugin
 {
+    
     /**
      * @var \Sapient\Worldpay\Helper\Recurring
      */

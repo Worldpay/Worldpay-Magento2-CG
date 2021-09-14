@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ * Redirect @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Controller\Savedcard;
 
@@ -10,7 +10,7 @@ use Exception;
 class Redirect extends \Magento\Framework\App\Action\Action
 {
     protected $checkoutSession;
-
+    
     public function __construct(
         Context $context,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,

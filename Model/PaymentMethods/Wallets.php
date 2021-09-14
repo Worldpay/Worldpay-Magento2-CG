@@ -33,13 +33,21 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return $this;
     }
 
+    /**
+     * Method to return the authorisation service
+     *
+     * @param int $storeId
+     * @return \Sapient\Worldpay\Model\Authorisation\WalletService
+     */
     public function getAuthorisationService($storeId)
     {
         return $this->walletService;
     }
 
     /**
-     * check if apm is enabled
+     * Check if apm is enabled
+     *
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
@@ -51,6 +59,11 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return false;
     }
 
+    /**
+     * Method to return payment title
+     *
+     * @return string
+     */
     public function getTitle()
     {
         if ($order = $this->registry->registry('current_order')) {

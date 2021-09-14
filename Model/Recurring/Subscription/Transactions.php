@@ -21,6 +21,8 @@ class Transactions extends AbstractModel
     private $subscription;
 
     /**
+     * Constructor
+     *
      * @return void
      */
     protected function _construct()
@@ -29,6 +31,8 @@ class Transactions extends AbstractModel
     }
 
     /**
+     * Set subscription data
+     *
      * @param Subscription $subscription
      * @return $this
      */
@@ -39,6 +43,8 @@ class Transactions extends AbstractModel
     }
 
     /**
+     * Get Subscription
+     *
      * @return Subscription
      */
     public function getSubscription()
@@ -59,7 +65,7 @@ class Transactions extends AbstractModel
         }
         return $value;
     }
-
+    
     /**
      * Load order Details
      *

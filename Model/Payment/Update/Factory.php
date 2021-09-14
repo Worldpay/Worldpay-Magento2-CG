@@ -11,7 +11,7 @@ class Factory
     /**
      * Constructor
      * @param \Sapient\Worldpay\Helper\Data $configHelper
-     * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
+     * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldpaymentmodel
      */
     public function __construct(
         \Sapient\Worldpay\Helper\Data $configHelper,
@@ -22,6 +22,8 @@ class Factory
     }
 
     /**
+     * Create payment update
+     *
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @return object
      */

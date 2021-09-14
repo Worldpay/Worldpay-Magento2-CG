@@ -38,6 +38,7 @@ class GuestPaymentInformationManagement
     
     /**
      * GuestPaymentInformationManagement constructor.
+     *
      * @param GuestCartManagementInterface $cartManagement
      * @param LoggerInterface $logger
      * @param MethodList $methodList
@@ -54,6 +55,7 @@ class GuestPaymentInformationManagement
         $this->methodList = $methodList;
         $this->checkMethods = $checkMethods;
     }
+    
     /**
      * @param CheckoutGuestPaymentInformationManagement $subject
      * @param \Closure $proceed

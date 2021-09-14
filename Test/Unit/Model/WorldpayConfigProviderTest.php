@@ -56,7 +56,7 @@ class WorldpayConfigProviderTest extends TestCase
         'TRIODOS' => 'Triodos',
         'VAN_LANSCHOT' => 'Van Lanschot',
         'KNAB' => 'Knab'
-    ];    
+    ];
     protected $ALL_CC_METHODS = [
                 'AMEX-SSL' => 'American Express',
                 'VISA-SSL' => 'Visa',
@@ -156,7 +156,8 @@ class WorldpayConfigProviderTest extends TestCase
         $this->assertEquals($this->IDEAL_BANKS_INFO, $this->worldpayConfigObj->getApmIdealBankList());
     }
         
-    public function testGetWalletstitle() {
+    public function testGetWalletstitle()
+    {
         $this->dataHelper->expects($this->any())
                 ->method('getWalletstitle')
                 ->willReturn('wallet');

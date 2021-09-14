@@ -43,6 +43,30 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
      const DIRECT_MODEL = 'direct';
     protected static $paymentDetails;
 
+    /**
+     * Constructor
+     *
+     * @param ConfigInterface $config
+     * @param ConfigFactoryInterface $configFactory
+     * @param ObjectManagerInterface $objectManager
+     * @param MethodInterface $vaultProvider
+     * @param ManagerInterface $eventManager
+     * @param ValueHandlerPoolInterface $valueHandlerPool
+     * @param \Magento\Payment\Gateway\Command\CommandManagerPoolInterface $commandManagerPool
+     * @param PaymentTokenManagementInterface $tokenManagement
+     * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
+     * @param string $code
+     * @param WorldpayLogger $logger
+     * @param \Sapient\Worldpay\Model\Authorisation\VaultService $vaultService
+     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
+     * @param \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
+     * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentutils
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Model\Response\AdminhtmlResponse $adminhtmlresponse
+     * @param \Magento\Framework\Registry $registry
+     */
     public function __construct(
         ConfigInterface $config,
         ConfigFactoryInterface $configFactory,
@@ -88,7 +112,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $this->adminhtmlresponse = $adminhtmlresponse;
         $this->registry = $registry;
     }
-
+    
     public function initialize($paymentAction, $stateObject)
     {
         $payment = $this->getInfoInstance();
@@ -127,6 +151,14 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         return $quote->getReservedOrderId() . '-' . time();
     }
 
+    /**
+     * Authorize function
+     *
+     * @param InfoInterface $payment
+     * @param float $amount
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         $this->logger->info('Vault Authorize function executed');
@@ -158,11 +190,17 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
          return $this;
     }
 
+    /**
+     * Method to get authorization service
+     *
+     * @param int $storeId
+     * @return \Sapient\Worldpay\Model\Authorisation\VaultService
+     */
     public function getAuthorisationService($storeId)
     {
         return $this->vaultService;
     }
-
+    
     private function _createWorldPayPayment(
         \Magento\Payment\Model\InfoInterface $payment,
         $orderCode,
@@ -185,6 +223,13 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $wpp->save();
     }
 
+    /**
+     * Method to perform capture operation
+     *
+     * @param InfoInterface $payment
+     * @param float $amount
+     * @return $this
+     */
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         $this->logger->info('Vault capture function executed');
@@ -202,7 +247,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $payment->setTransactionId(time());
         return $this;
     }
-
+    
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         $this->logger->info('Vault refund payment model function executed');
@@ -231,6 +276,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
             __($gatewayError.' '.$errorMsg)
         );
     }
+    
     public function canRefund()
     {
         $payment = $this->getInfoInstance()->getOrder()->getPayment();
@@ -244,6 +290,13 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
 
         return parent::canRefund();
     }
+    
+    /**
+     * Method to check if refund is allowed
+     *
+     * @param string $state
+     * @return bool
+     */
     private function _isRefundAllowed($state)
     {
         $allowed = in_array(
@@ -261,6 +314,11 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         return $allowed;
     }
 
+    /**
+     * Method to get payment title
+     *
+     * @return string
+     */
     public function getTitle()
     {
         if ($order = $this->registry->registry('current_order')) {

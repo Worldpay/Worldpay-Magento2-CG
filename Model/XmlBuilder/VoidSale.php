@@ -19,7 +19,7 @@ EOD;
     private $currencyCode;
     private $amount;
     private $exponent;
-
+    
     /**
      * Build xml for processing Request
      *

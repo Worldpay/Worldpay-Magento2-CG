@@ -46,6 +46,7 @@ EOD;
             $args['threeDSecureConfig']['is3DSecure']
         );
     }
+    
     /**
      * Build xml for processing Request
      *
@@ -102,6 +103,7 @@ EOD;
         $this->_addOrderElement($submit);
         return $xml;
     }
+    
     /**
      * Build xml for 3ds2 processing Request
      *
@@ -128,6 +130,7 @@ EOD;
         $this->_addOrderElement($submit);
         return $xml;
     }
+    
     /**
      * Add submit tag to xml
      *
@@ -138,6 +141,7 @@ EOD;
     {
         return $xml->addChild('submit');
     }
+    
     /**
      * Build xml for 3dsecure processing Request
      *
@@ -167,6 +171,7 @@ EOD;
         $this->_addOrderElement($submit);
         return $xml;
     }
+    
     /**
      * Add order tag to xml
      *
@@ -203,6 +208,7 @@ EOD;
     }
  /**
   * Add Customer Risk Data  and its child tag to xml
+  *
   * @param SimpleXMLElement $order
   */
     protected function _addCustomerRiskData($order)
@@ -294,6 +300,7 @@ EOD;
     }
     /**
      * Add Additional3Ds data and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     protected function _addAdditional3DsElement($order)
@@ -392,6 +399,8 @@ EOD;
     }
 
     /**
+     * Add cdata element
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */
@@ -403,6 +412,8 @@ EOD;
     }
 
     /**
+     * Retrieve amount value
+     *
      * @param float $amount
      * @return int
      */

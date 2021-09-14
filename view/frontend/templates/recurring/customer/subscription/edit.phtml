@@ -4,36 +4,42 @@
  * See LICENSE.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
+
 ?>
 <?php
 /**
  * @var $block \Sapient\Worldpay\Block\Recurring\Customer\Subscriptions\Edit
  */
 ?>
-<form class="worldpay-subscription-edit" action="<?php echo $block->getSaveUrl() ?>" method="post" id="worldpay-subscription-edit" enctype="multipart/form-data" data-hasrequired="<?php echo __('* Required Fields') ?>">
+<form class="worldpay-subscription-edit" action="<?= /* @noEscape */ $block->getSaveUrl() ?>"
+      method="post" id="worldpay-subscription-edit" enctype="multipart/form-data"
+      data-hasrequired="<?= /* @noEscape */ __('* Required Fields') ?>">
     <fieldset class="fieldset subscription">
-        <?php echo $block->getBlockHtml('formkey')?>
-        <legend class="legend"><span><?php echo $block->getMyAccountLabels('AC25') ?></span></legend>
+        <?= /* @noEscape */ $block->getBlockHtml('formkey')?>
+        <legend class="legend"><span><?= /* @noEscape */ $block->getMyAccountLabels('AC25') ?></span></legend>
         <div class="field product-name">
-            <label class="label" for="product_name"><span><?php echo $this->escapeHtml($block->getMyAccountLabels('AC26')) ?></span></label>
+            <label class="label" for="product_name">
+                <span><?= /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC26')) ?></span>
+            </label>
             <div class="control">
-                <span><?= $this->escapeHtml(__($block->getSubscription()->getProductName())); ?></span>
+                <span><?= $block->escapeHtml(__($block->getSubscription()->getProductName())); ?></span>
             </div>
         </div>
-        <?php if($block->getPlans()) : ?>
+        <?php if ($block->getPlans()): ?>
             <div class="field plan">
-                <label class="label" for="plan"><span><?php echo $this->escapeHtml($block->getMyAccountLabels('AC27')) ?></span></label>
+                <label class="label" for="plan">
+                    <span><?= /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC27')) ?></span>
+                </label>
                 <?php foreach ($block->getPlans() as $plan): ?>
                     <div class="field choice">
                         <?php if ($block->isPlanSelected($plan)): ?>
                         <input type="radio"
                                name="plan_id"
-                               id="plan_id_<?php echo $plan->getId() ?>"
-                               value="<?php echo $plan->getId() ?>"
+                               id="plan_id_<?= /* @noEscape */ $plan->getId() ?>"
+                               value="<?= /* @noEscape */ $plan->getId() ?>"
                                checked />
-                        <label class="label" for="plan_id_<?php echo $plan->getId() ?>">
-                            <span><?php echo $block->getPlanTitle($plan); ?></span>
+                        <label class="label" for="plan_id_<?= /* @noEscape */ $plan->getId() ?>">
+                            <span><?= /* @noEscape */ $block->getPlanTitle($plan); ?></span>
                         </label>
                         <?php endif; ?>
                     </div>
@@ -43,50 +49,89 @@
         <?php endif; ?>
     </fieldset>
     <fieldset class="fieldset billing">
-       <legend class="legend"><span><?php echo $block->getMyAccountLabels('AC31') ?></span></legend>
+       <legend class="legend"><span><?= /* @noEscape */ $block->getMyAccountLabels('AC31') ?></span></legend>
         <div class="field firstname required">
-            <label class="label" for="firstname"><span><?php echo $this->escapeHtml($block->getMyAccountLabels('AC32')) ?></span></label>
+            <label class="label" for="firstname">
+                <span><?= /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC32')) ?></span>
+            </label>
             <div class="control">
-                <input type="text" name="firstname" data-validate="{required : true, maxlength : 25}" value="<?php echo $block->escapeHtml($block->getSubscription()->getBillingAddress()->getFirstname()) ?>" id="firstname" class="input-text" title="<?php echo $this->escapeHtml(__('First Name')) ?>"/>
+                <input type="text" name="firstname" 
+                       data-validate="{required : true, maxlength : 25}"
+                       value="<?= /* @noEscape */ $block->escapeHtml($block->getSubscription()->
+                               getBillingAddress()->getFirstname()) ?>" id="firstname" class="input-text"
+                        title="<?= /* @noEscape */ $block->escapeHtml(__('First Name')) ?>"/>
             </div>
         </div>
         <div class="field lastname required">
-            <label class="label" for="lastname"><span><?php echo $this->escapeHtml($block->getMyAccountLabels('AC33')) ?></span></label>
+            <label class="label" for="lastname">
+                <span><?= /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC33')) ?></span>
+            </label>
             <div class="control">
-                <input type="text" name="lastname" data-validate="{required : true, maxlength : 25}" value="<?php echo $block->escapeHtml($block->getSubscription()->getBillingAddress()->getLastname()) ?>" id="lastname" class="input-text" title="<?php echo $this->escapeHtml(__('Last Name')) ?>"/>
+                <input type="text"
+                       name="lastname"
+                       data-validate="{required : true, maxlength : 25}"
+                       value="<?= /* @noEscape */
+                            $block->escapeHtml($block->getSubscription()->getBillingAddress()->getLastname())?>"
+                       id="lastname"
+                       class="input-text"
+                       title="<?= /* @noEscape */ $block->escapeHtml(__('Last Name')) ?>"/>
             </div>
         </div>
         <div class="field street required">
-            <label class="label" for="street"><span><?php echo $this->escapeHtml($block->getMyAccountLabels('AC34')) ?></span></label>
+            <label class="label" for="street">
+                <span><?= /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC34')) ?>
+                </span>
+            </label>
             <div class="control">
-                <input type="text" name="street" data-validate="{required : true, maxlength : 35}" value="<?php echo $block->escapeHtml($block->getSubscription()->getBillingAddress()->getStreet()) ?>" id="street" class="input-text" title="<?php echo $this->escapeHtml(__('Address')) ?>"/>
+                <input type="text" name="street" data-validate="{required : true, maxlength : 35}"
+                       value="<?= /* @noEscape */ $block->escapeHtml($block->getSubscription()->
+                               getBillingAddress()->getStreet()) ?>"
+                               id="street" class="input-text"
+                               title="<?= /* @noEscape */ $block->escapeHtml(__('Address')) ?>"/>
             </div>
         </div>
         <div class="field city required">
-            <label class="label" for="city"><span><?php echo $block->getMyAccountLabels('AC35') ?></span></label>
+            <label class="label" for="city"><span>
+                <?= /* @noEscape */ $block->getMyAccountLabels('AC35') ?></span></label>
             <div class="control">
-                <input type="text" name="city" data-validate="{required : true, maxlength : 35}" value="<?php echo $block->escapeHtml($block->getSubscription()->getBillingAddress()->getCity()) ?>" title="<?php echo __('City') ?>" class="input-text" id="city" title="<?php echo __('City') ?>"/>
+                <input type="text" name="city" data-validate="{required : true, maxlength : 35}" 
+                       value="<?= /* @noEscape */ $block->escapeHtml($block->getSubscription()->
+                               getBillingAddress()->getCity()) ?>" title="<?= /* @noEscape */ __('City') ?>"
+                               class="input-text" id="city" title="<?= /* @noEscape */ __('City') ?>"/>
             </div>
         </div>
         <div class="field region required">
-            <label class="label" for="region_id"><span><?php echo __('State/Province') ?></span></label>
+            <label class="label" for="region_id"><span><?= /* @noEscape */ __('State/Province') ?></span></label>
             <div class="control">
-                <select id="region_id" name="region_id" title="<?php echo $block->getMyAccountLabels('AC38') ?>" class="validate-select">
-                    <option value=""><?php echo __('Please select a region, state or province.') ?></option>
+                <select id="region_id" name="region_id"
+                        title="<?= /* @noEscape */ $block->getMyAccountLabels('AC38') ?>"
+                        class="validate-select">
+                    <option value=""><?= /* @noEscape */ __('Please select a region, state or province.') ?></option>
                 </select>
-                <input type="text" id="region" name="region" value="<?php echo $block->escapeHtml($block->getSubscription()->getBillingAddress()->getRegion()) ?>"  title="<?php echo __('State/Province') ?>" class="input-text required-entry"/>
+                <input type="text" id="region" name="region" 
+                       value="<?= /* @noEscape */ $block->escapeHtml($block->getSubscription()->
+                               getBillingAddress()->getRegion()) ?>"  
+                               title="<?= /* @noEscape */ __('State/Province') ?>" 
+                               class="input-text required-entry"/>
             </div>
         </div>
         <div class="field zip required">
-            <label class="label" for="zip"><span><?php echo $block->getMyAccountLabels('AC36') ?></span></label>
+            <label class="label" for="zip">
+                <span><?= /* @noEscape */ $block->getMyAccountLabels('AC36') ?></span></label>
             <div class="control">
-                <input type="text" name="postcode" data-validate="{required : true, maxlength : 20}" value="<?php echo $block->escapeHtml($block->getSubscription()->getBillingAddress()->getPostcode()) ?>" title="<?php echo __('Zip/Postal Code') ?>" id="zip" class="input-text validate-zip-international"/>
+                <input type="text" name="postcode" data-validate="{required : true, maxlength : 20}"
+                       value="<?= /* @noEscape */ $block->escapeHtml($block->getSubscription()->
+                               getBillingAddress()->getPostcode()) ?>" 
+                               title="<?= /* @noEscape */ __('Zip/Postal Code') ?>" 
+                               id="zip" class="input-text validate-zip-international"/>
             </div>
         </div>
         <div class="field country required">
-            <label class="label" for="country"><span><?php echo $block->getMyAccountLabels('AC37') ?></span></label>
+            <label class="label" for="country">
+                <span><?= /* @noEscape */ $block->getMyAccountLabels('AC37') ?></span></label>
             <div class="control">
-                <?php echo $this->getLayout()->createBlock('\Magento\Directory\Block\Data')->getCountryHtmlSelect($block->getSubscription()->getBillingAddress()->getCountryId()) ?>
+                <?= /* @noEscape */ $block->getLayout()->createBlock(\Magento\Directory\Block\Data::class)->
+                        getCountryHtmlSelect($block->getSubscription()->getBillingAddress()->getCountryId()) ?>
             </div>
         </div>
     </fieldset>
@@ -97,9 +142,9 @@
                     type="submit"
                     class="action save primary"
                     data-action="save-subscription"
-                    title="<?php echo $block->escapeHtml($block->getMyAccountLabels('AC28')); ?>"
+                    title="<?= /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC28')); ?>"
             >
-                <span><?php echo $block->escapeHtml($block->getMyAccountLabels('AC28')); ?></span>
+                <span><?= /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC28')); ?></span>
             </button>
         </div>
     </div>
@@ -111,14 +156,15 @@
         },
         "#country": {
             "regionUpdater": {
-                "optionalRegionAllowed": <?php echo($block->getConfig('general/region/display_all') ? 'true' : 'false'); ?>,
+                "optionalRegionAllowed": <?= /* @noEscape */($block->getConfig('general/region/display_all') ?
+                        'true' : 'false'); ?>,
                 "regionListId": "#region_id",
                 "regionInputId": "#region",
                 "postcodeId": "#zip",
                 "form": "#worldpay-subscription-edit",
-                "regionJson": <?php echo $this->helper('Magento\Directory\Helper\Data')->getRegionJson() ?>,
-                "defaultRegion": "<?php echo $block->getSubscription()->getBillingAddress()->getRegionId() ?>",
-                "countriesWithOptionalZip": <?php echo $this->helper('Magento\Directory\Helper\Data')->getCountriesWithOptionalZip(true) ?>
+                "regionJson": <?= /* @noEscape */ $block->getRegionJson() ?>,
+                "defaultRegion": "<?= /* @noEscape */ $block->getSubscription()->getBillingAddress()->getRegionId() ?>",
+                "countriesWithOptionalZip": <?= /* @noEscape */ $block->getCountriesWithOptionalZip(true) ?>
             }
         }
     }

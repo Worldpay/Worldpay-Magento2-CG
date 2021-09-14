@@ -1,11 +1,16 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ * Service @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Adminhtml\Order;
 
 class Service
 {
+    /**
+     * Constructor
+     * @param \Magento\Backend\Model\Session\Quote $adminsessionquote
+     * @param \Magento\Sales\Model\AdminOrder\Create $adminordercreate
+     */
     public function __construct(
         \Magento\Backend\Model\Session\Quote $adminsessionquote,
         \Magento\Sales\Model\AdminOrder\Create $adminordercreate
@@ -14,6 +19,11 @@ class Service
         $this->adminordercreate = $adminordercreate;
     }
 
+    /**
+     * Reactivate quote for order
+     *
+     * @param \Sapient\Worldpay\Model\Order $worldPayOrder
+     */
     public function reactivateAdminQuoteForOrder($worldPayOrder)
     {
         $mageOrder = $worldPayOrder->getOrder();

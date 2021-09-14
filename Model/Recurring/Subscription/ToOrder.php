@@ -44,6 +44,7 @@ class ToOrder
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
      * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
      */
     public function __construct(
         \Magento\Sales\Api\Data\OrderInterfaceFactory $orderFactory,

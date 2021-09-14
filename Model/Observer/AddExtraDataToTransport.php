@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2018 Sapient
+ * Copyright@ 2018 Sapient
  */
 namespace Sapient\Worldpay\Model\Observer;
 
@@ -11,12 +11,22 @@ class AddExtraDataToTransport implements ObserverInterface
 
     protected $worldpaypayment;
 
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
+     */
     public function __construct(
         \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
     ) {
         $this->worldpaypayment = $worldpaypayment;
     }
 
+    /**
+     * Execute function of observer
+     *
+     * @param \Magento\Framework\Event\Observer $observer
+     */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $transport = $observer->getEvent()->getTransport();

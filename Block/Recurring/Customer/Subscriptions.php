@@ -10,6 +10,7 @@ use Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\CollectionFactor
 
 class Subscriptions extends \Magento\Framework\View\Element\Template
 {
+    
     /**
      * @var \Magento\Customer\Model\Session
      */

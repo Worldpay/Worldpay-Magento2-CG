@@ -47,7 +47,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $this->authenticatinservice = $authenticatinservice;
         return parent::__construct($context);
     }
-
+    
     public function execute()
     {
 

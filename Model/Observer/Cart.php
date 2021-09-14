@@ -30,6 +30,8 @@ class Cart implements ObserverInterface
 
    /**
     * Load the shopping cart from the latest authorized, but not completed order
+    *
+    * @param \Magento\Framework\Event\Observer $observer
     */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {

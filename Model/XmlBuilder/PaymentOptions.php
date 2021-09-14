@@ -22,7 +22,7 @@ EOD;
      * Build xml for processing Request
      *
      * @param string $merchantCode
-     * @param string $orderCode
+     * @param string $countryCode
      * @return SimpleXMLElement $xml
      */
     public function build($merchantCode, $countryCode)

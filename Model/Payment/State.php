@@ -7,6 +7,7 @@ namespace Sapient\Worldpay\Model\Payment;
 /**
  * Describe what can be read from WP's xml response
  */
+
 interface State
 {
     const STATUS_SENT_FOR_AUTHORISATION = 'SENT_FOR_AUTHORISATION';
@@ -29,7 +30,7 @@ interface State
     const STATUS_INFORMATION_REQUESTED = 'INFORMATION_REQUESTED';
     const STATUS_REFUNDED_BY_MERCHANT = 'REFUNDED_BY_MERCHANT';
     const STATUS_VOIDED = 'VOIDED';
-   
+    
     public function getPaymentStatus();
     public function getOrderCode();
     public function getAmount();

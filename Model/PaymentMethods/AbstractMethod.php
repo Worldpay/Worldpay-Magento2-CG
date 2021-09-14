@@ -49,6 +49,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     const WORLDPAY_APM_TYPE = 'worldpay_apm';
     const WORLDPAY_WALLETS_TYPE = 'worldpay_wallets';
     const WORLDPAY_MOTO_TYPE = 'worldpay_moto';
+    
     /**
      * Constructor
      *
@@ -359,7 +360,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Worldpay Plugin is not available')
             );
-            return false;
         }
         
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
@@ -382,27 +382,27 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         if ($this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype)) {
             //total amount from invoice and order should not be same for partial capture
             if (floatval($amount) !=floatval($payment->getOrder()->getGrandTotal())) {
-                if($partialCapture) {
-                $this->paymentservicerequest->partialCapture(
-                    $payment->getOrder(),
-                    $worldPayPayment,
-                    $amount
-                );
-                }else {
+                if ($partialCapture) {
+                    $this->paymentservicerequest->partialCapture(
+                        $payment->getOrder(),
+                        $worldPayPayment,
+                        $amount
+                    );
+                } else {
                      $this->_wplogger->info("Partial Capture is disabled.");
                     throw new \Magento\Framework\Exception\LocalizedException(
-                    __("Partial Capture is disabled.")
+                        __("Partial Capture is disabled.")
                     );
                 }
             }
-            if(floatval($amount) == floatval($payment->getOrder()->getGrandTotal())){
+            if (floatval($amount) == floatval($payment->getOrder()->getGrandTotal())) {
             //normal capture
-            $this->paymentservicerequest->capture(
-                $payment->getOrder(),
-                $worldPayPayment,
-                $payment->getMethod()
-            );
-        }
+                $this->paymentservicerequest->capture(
+                    $payment->getOrder(),
+                    $worldPayPayment,
+                    $payment->getMethod()
+                );
+            }
 
         }
         $payment->setTransactionId(time());
@@ -415,7 +415,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Worldpay Plugin is not available')
             );
-            return false;
         }
         
         $this->_wplogger->info('refund payment model function executed');
@@ -537,7 +536,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 ->getData();
             if ($savedCard) {
                 return str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $savedCard[0]['method']);
-                //return $savedCard[0]['method'];
             } else {
                 throw new \Magento\Framework\Exception\LocalizedException(
                     __('Inavalid Card deatils. Please Refresh and check again')

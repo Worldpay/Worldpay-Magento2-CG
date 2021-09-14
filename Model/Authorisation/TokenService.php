@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ * TokenService @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Authorisation;
 
@@ -11,6 +11,19 @@ class TokenService extends \Magento\Framework\DataObject
     protected $_session;
     protected $updateWorldPayPayment;
 
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Model\Mapping\Service $mappingservice
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Sapient\Worldpay\Helper\Registry $registryhelper
+     */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
@@ -32,7 +45,7 @@ class TokenService extends \Magento\Framework\DataObject
         $this->worldpayHelper = $worldpayHelper;
         $this->registryhelper = $registryhelper;
     }
-
+    
     public function authorizePayment(
         $mageOrder,
         $quote,
@@ -133,7 +146,11 @@ class TokenService extends \Magento\Framework\DataObject
         }
     }
     
-    // get 3ds2 params from the configuration and set to checkout session
+    /**
+     * Get 3ds2 params from the configuration and set to checkout session
+     *
+     * @return array
+     */
     public function get3DS2ConfigValues()
     {
         $data = [];

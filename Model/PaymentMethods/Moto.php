@@ -18,6 +18,8 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
     protected $_formBlockType = \Sapient\Worldpay\Block\Form\Card::class;
 
     /**
+     * Method to get payment method types
+     *
      * @return string
      */
     public function getPaymentMethodsType()
@@ -26,6 +28,8 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
     }
 
     /**
+     * Method to get payment title
+     *
      * @return string
      */
     public function getTitle()
@@ -42,7 +46,7 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
             return $this->worlpayhelper->getMotoTitle();
         }
     }
-
+    
     public function getAuthorisationService($storeId)
     {
         $checkoutpaymentdata = $this->paymentdetailsdata;
@@ -61,7 +65,11 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
         }
         return $this->directservice;
     }
+    
     /**
+     * Method to check if Worldpay is enabled
+     *
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
@@ -74,6 +82,9 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
     }
 
     /**
+     * Check if integration mode is redirect
+     *
+     * @param int $storeId
      * @return bool
      */
     private function _isRedirectIntegrationModeEnabled($storeId)

@@ -57,9 +57,16 @@ class HostedPaymentPageServiceTest extends TestCase
         $urlInterface = $this->getMockBuilder(UrlInterface::class)
                         ->disableOriginalConstructor()->getMock();
 
-        $this->hppObj = new HostedPaymentPageService($this->mappingservice, 
-                $this->paymentservicerequest, $wplogger, $redirectresponse, 
-                $this->registryhelper, $hppstate, $this->checkoutsession, $urlInterface);
+        $this->hppObj = new HostedPaymentPageService(
+            $this->mappingservice,
+            $this->paymentservicerequest,
+            $wplogger,
+            $redirectresponse,
+            $this->registryhelper,
+            $hppstate,
+            $this->checkoutsession,
+            $urlInterface
+        );
     }
 
     public function testAuthorizePayment()

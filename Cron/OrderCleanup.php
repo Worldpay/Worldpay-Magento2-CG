@@ -3,12 +3,15 @@
  * @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Cron;
+
 use \Magento\Framework\App\ObjectManager;
 use \Magento\Sales\Model\ResourceModel\Order\CollectionFactoryInterface;
+
 /**
  * Model for cancel the order based on configuration set by admin
  */
-class OrderCleanup {
+class OrderCleanup
+{
 
     /**
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
@@ -24,7 +27,7 @@ class OrderCleanup {
      *
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
-     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper     
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -34,9 +37,8 @@ class OrderCleanup {
         $this->_logger = $wplogger;
         $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->worldpayhelper = $worldpayhelper;
-
     }
-
+    
     /**
      * Get the list of orders to be Cleanup and cancel the order
      */
@@ -51,7 +53,7 @@ class OrderCleanup {
             $implodeorder = implode(",", $cleanupids);
             $orders = $this->getOrderCollectionFactory()->create();
             $orders->distinct(true);
-            $orders->addFieldToFilter('main_table.entity_id', array('in' => $implodeorder));
+            $orders->addFieldToFilter('main_table.entity_id', ['in' => $implodeorder]);
             foreach ($orders as $order) {
                 if ($order->canCancel()) {
                     $order->cancel();
@@ -73,12 +75,12 @@ class OrderCleanup {
     {
         $orders = $this->getOrderCollectionFactory()->create();
         $orders->distinct(true);
-        $orders->addFieldToSelect(array('entity_id','increment_id','created_at'));
-        $orders->addFieldToFilter('main_table.status', array('in' => $this->worldpayhelper->cleanOrderStatus()));
-        $orders->join(array('wp' => 'worldpay_payment'), 'wp.order_id=main_table.increment_id', array('payment_type'));
-        $orders->join(array('og' => 'sales_order_grid'), 'og.entity_id=main_table.entity_id', '');
+        $orders->addFieldToSelect(['entity_id','increment_id','created_at']);
+        $orders->addFieldToFilter('main_table.status', ['in' => $this->worldpayhelper->cleanOrderStatus()]);
+        $orders->join(['wp' => 'worldpay_payment'], 'wp.order_id=main_table.increment_id', ['payment_type']);
+        $orders->join(['og' => 'sales_order_grid'], 'og.entity_id=main_table.entity_id', '');
 
-        $orderIds = array_reduce($orders->getItems(), array($this, '_filterOrder'));
+        $orderIds = array_reduce($orders->getItems(), [$this, '_filterOrder']);
         return $orderIds;
     }
 
@@ -101,7 +103,7 @@ class OrderCleanup {
      * @param \Magento\Sales\Model\Order
      *
      * @return array List of order IDs
-     */       
+     */
     protected function _filterOrder($carry, \Magento\Sales\Model\Order $order)
     {
 
@@ -141,7 +143,7 @@ class OrderCleanup {
 
     /**
      * Computes the latest valid date
-     *@return DateTime
+     * @return DateTime
      */
     protected function getLimitDate()
     {
@@ -151,7 +153,4 @@ class OrderCleanup {
         $date->sub($interval);
         return $date;
     }
-
-
-
 }

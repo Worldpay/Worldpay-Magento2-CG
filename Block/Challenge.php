@@ -15,7 +15,7 @@ class Challenge extends \Magento\Framework\View\Element\Template
      * @var \Magento\Checkout\Model\Session
      */
     protected $checkoutSession;
-       
+    
     /**
      * Jwt constructor.
      * @param \Magento\Backend\Block\Template\Context $context

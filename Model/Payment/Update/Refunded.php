@@ -11,6 +11,7 @@ class Refunded extends \Sapient\Worldpay\Model\Payment\Update\Base implements \S
     const REFUND_COMMENT = 'Refund request PROCESSED by the bank.';
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
@@ -24,7 +25,7 @@ class Refunded extends \Sapient\Worldpay\Model\Payment\Update\Base implements \S
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
     }
-
+    
     public function apply($payment, $order = null)
     {
         $reference = $this->_paymentState->getJournalReference(

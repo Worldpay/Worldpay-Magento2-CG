@@ -59,7 +59,7 @@ EOD;
         );
         $this->shopperId = $args['shopperId'];
     }
-
+    
     /**
      * Build xml for processing Request
      *
@@ -207,6 +207,8 @@ EOD;
     }
 
     /**
+     * Add dynamic 3ds element attribute
+     *
      * @param SimpleXMLElement $order
      */
     private function _addDynamic3DSElement($order)
@@ -224,6 +226,8 @@ EOD;
     }
 
     /**
+     * Add token element attribute
+     *
      * @param SimpleXMLElement $order
      */
     private function _addCreateTokenElement($order)
@@ -242,7 +246,7 @@ EOD;
             );
         }
     }
-
+    
     private function _addOrderContentElement($order)
     {
           $ordercontent = $order->addChild('orderContent');
@@ -349,6 +353,8 @@ EOD;
     }
   
     /**
+     * Add cdata element
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */
@@ -360,6 +366,8 @@ EOD;
     }
 
     /**
+     * Retrieve amount value
+     *
      * @param float $amount
      * @return int
      */

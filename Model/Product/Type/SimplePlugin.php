@@ -34,6 +34,7 @@ class SimplePlugin
     private $logger;
 
     /**
+     * Constructor
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
@@ -53,7 +54,7 @@ class SimplePlugin
         $this->localeDate = $localeDate;
         $this->logger = $logger;
     }
-
+    
     /**
      * Plugin for:
      * Initialize product(s) for add to cart process.
@@ -116,8 +117,6 @@ class SimplePlugin
                 ? $buyRequest->getSubscriptionEndDate() : date('d-m-yy');
             
             }
-            
-            
         
             $endDateDisplay = $this->showModifiedEndDate($startDateDisplay, $displayToday, $endDate) ?
                     date('d-m-Y', strtotime("+1 year", strtotime($displayToday))) : $endDate;
@@ -283,6 +282,7 @@ class SimplePlugin
 
     /**
      * Plugin for:
+     *
      * Check if product can be configured
      *
      * @param \Magento\Catalog\Model\Product\Type\AbstractType $subject

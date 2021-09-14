@@ -58,6 +58,8 @@ class Collection extends SubscriptionCollection implements SearchResultInterface
     }
 
     /**
+     * Getter function
+     *
      * @return AggregationInterface
      */
     public function getAggregations()
@@ -66,6 +68,8 @@ class Collection extends SubscriptionCollection implements SearchResultInterface
     }
 
     /**
+     * Setter function
+     *
      * @param AggregationInterface $aggregations
      * @return $this
      */

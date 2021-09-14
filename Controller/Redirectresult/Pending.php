@@ -43,7 +43,7 @@ class Pending extends \Magento\Framework\App\Action\Action
         $this->paymentservice = $paymentservice;
         return parent::__construct($context);
     }
-
+    
     public function execute()
     {
         $paymentType = '';

@@ -43,8 +43,16 @@ class IndexTest extends TestCase
         $this->_storeManager = $this->getMockBuilder(StoreManagerInterface::class)
                         ->disableOriginalConstructor()->getMock();
 
-        $this->indexObj = new Index($context, $jsonFactory, $wplogger, $paymentservice, 
-           $this->scopeConfig, $this->request, $this->quoteFactory, $this->_storeManager);
+        $this->indexObj = new Index(
+            $context,
+            $jsonFactory,
+            $wplogger,
+            $paymentservice,
+            $this->scopeConfig,
+            $this->request,
+            $this->quoteFactory,
+            $this->_storeManager
+        );
     }
 
     public function testExecute()
@@ -52,13 +60,16 @@ class IndexTest extends TestCase
         $this->scopeConfig
                 ->expects($this->any())
                 ->method('getValue')
-                ->withConsecutive(['worldpay/wallets_config/samsung_pay_wallets_config/service_id', 
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE], 
-                 ['worldpay/wallets_config/samsung_pay_wallets_config/samsung_merchant_shop_name',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE], 
-                     ['worldpay/wallets_config/samsung_pay_wallets_config/samsung_merchant_shop_url', 
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE], ['worldpay/general_config/environment_mode', 
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE])
+                ->withConsecutive(
+                    ['worldpay/wallets_config/samsung_pay_wallets_config/service_id',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/wallets_config/samsung_pay_wallets_config/samsung_merchant_shop_name',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/wallets_config/samsung_pay_wallets_config/samsung_merchant_shop_url',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/general_config/environment_mode',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+                )
                 ->willReturn('SamsungRespone');
 
         $this->assertInstanceOf(Index::class, $this->indexObj);

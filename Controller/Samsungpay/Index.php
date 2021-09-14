@@ -30,6 +30,8 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\Request\Http $request
+     * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      */
     public function __construct(
         Context $context,
@@ -50,7 +52,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->quoteFactory = $quoteFactory;
         $this->_storeManager = $storeManager;
     }
-
+    
     public function execute()
     {
  

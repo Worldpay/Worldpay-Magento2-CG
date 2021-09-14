@@ -20,6 +20,7 @@ class Savedcard extends \Magento\Framework\View\Element\Template
       * @var SerializerInterface
       */
     private $serializer;
+    
     /**
      * constructor
      *

@@ -29,9 +29,12 @@ class ToOrderPayment
     private $eventManager;
 
     /**
+     * Constructor
+     *
      * @param \Magento\Sales\Api\OrderPaymentRepositoryInterface $orderPaymentRepository
      * @param \Magento\Framework\DataObject\Copy $objectCopyService
      * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
+     * @param \Magento\Framework\Event\ManagerInterface $eventManager
      */
     public function __construct(
         \Magento\Sales\Api\OrderPaymentRepositoryInterface $orderPaymentRepository,

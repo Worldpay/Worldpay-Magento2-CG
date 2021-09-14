@@ -11,7 +11,7 @@ class TrialInterval extends AbstractArraySource
     const MONTH = 'MONTH';
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function toOptionArray()
     {

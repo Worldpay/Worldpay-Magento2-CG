@@ -77,6 +77,8 @@ class PlaceOrder extends Action
     private $orderRepository;
 
     /**
+     * Constructor
+     *
      * @param Context $context
      * @param StoreManagerInterface $storeManager
      * @param Session $customerSession
@@ -84,6 +86,7 @@ class PlaceOrder extends Action
      * @param InstantPurchaseOptionLoadingFactory $instantPurchaseOptionLoadingFactory
      * @param ProductRepositoryInterface $productRepository
      * @param PlaceOrderModel $placeOrder
+     * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param OrderRepositoryInterface $orderRepository
      */
     public function __construct(
@@ -136,7 +139,7 @@ class PlaceOrder extends Action
             if ($dfReferenceId) {
                 $this->checkoutSession->setDfReferenceId($dfReferenceId);
                 $this->checkoutSession->setInstantPurchaseOrder(true);
-		$this->checkoutSession->setInstantPurchaseRedirectUrl($this->_redirect->getRefererUrl());
+                $this->checkoutSession->setInstantPurchaseRedirectUrl($this->_redirect->getRefererUrl());
             }
         }
         try {
@@ -176,8 +179,8 @@ class PlaceOrder extends Action
         $threeDSecureChallengeParams = $this->checkoutSession->get3Ds2Params();
         $this->messageManager->getMessages(true);
         if ($threeDSecureChallengeParams || ($redirectData = $this->checkoutSession->get3DSecureParams())) {
-	$this->checkoutSession->setInstantPurchaseRedirectUrl($this->_redirect->getRefererUrl());
-	$this->checkoutSession->setInstantPurchaseMessage($message);
+            $this->checkoutSession->setInstantPurchaseRedirectUrl($this->_redirect->getRefererUrl());
+            $this->checkoutSession->setInstantPurchaseMessage($message);
             $message = __('');
         } else {
             return $this->createResponse($message, true);
@@ -187,6 +190,7 @@ class PlaceOrder extends Action
     /**
      * Creates error message without exposing error details.
      * ########## Payment update of type:
+     *
      * @return string
      */
     private function createGenericErrorMessage(): string

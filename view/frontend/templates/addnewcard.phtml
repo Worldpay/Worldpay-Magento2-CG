@@ -6,7 +6,7 @@ $storeCode = $block->getStoreCode();
     <fieldset class="fieldset info">
         <?= /* @noEscape */ $block->getBlockHtml('formkey') ?>
         <legend class="legend">
-            <span><?= print /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?
+            <span><?=  /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?
                         $block->getAccountLabelbyCode('AC8') : 'Card Information'
             ?>
             </span>
@@ -14,7 +14,7 @@ $storeCode = $block->getStoreCode();
 
         <div class="field card type required">
             <label class="label" for="card_type">
-                <span><?= print $block->getCheckoutSpecificLabel('CO1') ?
+                <span><?= /* @noEscape */$block->getCheckoutSpecificLabel('CO1') ?
                                 $block->getCheckoutSpecificLabel('CO1') : 'Credit Card Type';
                 ?>
                 </span>
@@ -27,7 +27,7 @@ $storeCode = $block->getStoreCode();
                         class="required-entry validate-cc-type-select control-select-new-card">
                     <option value="" selected="selected">
                         <!--                Card type-->
-                    <?= print $block->getAccountLabelbyCode('IAVAC2') ?
+                    <?= /* @noEscape */ $block->getAccountLabelbyCode('IAVAC2') ?
                                     $block->getAccountLabelbyCode('IAVAC2') : 'Card type';
                     ?>
                     </option>
@@ -46,7 +46,7 @@ $storeCode = $block->getStoreCode();
         <div class="field card Number">
             <label class="label" for="card number">
                 <span>
-<?= print /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
+<?=  /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
                 $block->getAccountLabelbyCode('AC3') : 'Card Number'
 ?>
                 </span>
@@ -54,7 +54,7 @@ $storeCode = $block->getStoreCode();
             <div class="control">
                 <input type="number" name="cardNumber" required='true' id="card_number" 
                        title="
-                            <?= print /* @noEscape */ $block->getCheckoutLabelbyCode('CO4')
+                            <?=  /* @noEscape */ $block->getCheckoutLabelbyCode('CO4')
                                    ? $block->getCheckoutLabelbyCode('CO4') : 'Card Holder Name'?>"
                        class="input-text required cardholder_name validate-cc-number 
                        worldpay-cardholdername-length worldpay-cardnumber-valid">
@@ -64,14 +64,14 @@ $storeCode = $block->getStoreCode();
         <div class="field card holder name">
             <label class="label" for="card holder name">
                 <span>
-<?= print /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
+<?=  /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
                 $block->getCheckoutLabelbyCode('CO4') : 'Card Holder Name'
 ?>
                 </span>
             </label>
             <div class="control">
                 <input type="text" name="cardHolderName" required='true' id="card-holder-name" 
-                       title="<?= print /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
+                       title="<?=  /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
                         $block->getCheckoutLabelbyCode('CO4') : 'Card Holder Name'
                         ?>"
                        class="input-text required cardholder_name worldpay-cardholdername-length">
@@ -81,7 +81,7 @@ $storeCode = $block->getStoreCode();
         <div class="field card expiry month">
             <label class="label" for="expiry">
                 <span>
-                    <?= print /* @noEscape */ $block->getAccountLabelbyCode('AC10')
+                    <?=  /* @noEscape */ $block->getAccountLabelbyCode('AC10')
                             ? $block->getAccountLabelbyCode('AC10') : 'Expiry Month/Year'?>
                 </span>
             </label>
@@ -117,7 +117,7 @@ $storeCode = $block->getStoreCode();
 <?php if ($block->requireCvcEnabled()): ?>
             <div class="field required _required cvv">
                 <label for="cvv" class="label">
-                    <span><?= print $block->getCheckoutSpecificLabel('CO5') ?
+                    <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO5') ?
                     $block->getCheckoutSpecificLabel('CO5') : 'CVV';
                     ?></span>
         <!--            <span>CVV</span>-->
@@ -134,14 +134,14 @@ $storeCode = $block->getStoreCode();
 <?php endif; ?>
         <!-- Disclaimer -->
                 <label for="save-card" class="label">
-                  <?php if ($block->getStoredCredentialsEnabledValue() && $block->getDisclaimerMessageEnable()): ?> 
+                    <?php if ($block->getStoredCredentialsEnabledValue() && $block->getDisclaimerMessageEnable()): ?> 
                     <span>(<a href="javascript:void(0)" id="btnShow">Important Disclaimer!</a>)</span>
                     <?php endif; ?>
                 </label>
                     
         <div title="Disclaimer!" id="dialog" style="display: none" align ="center" >
             <form id="disclaimer" name="disclaimer">
-                <div><?php echo $block->getDisclaimerText(); ?></div>
+                <div><?=  /* @noEscape */ $block->getDisclaimerText(); ?></div>
             </form>
         </div>
         <div class="mage-error" generated="true" id="disclaimer-error"></div>
@@ -176,10 +176,10 @@ $storeCode = $block->getStoreCode();
                         onclick="javascript:onConfirmBtn(); return false;"
                         id ="save_newcard"
                         title="
-                            <?= print /* @noEscape */ $block->getAccountLabelbyCode('AC39')
+                            <?=  /* @noEscape */ $block->getAccountLabelbyCode('AC39')
                                     ? $block->getAccountLabelbyCode('AC39') : 'Save'?>">
                     <span>
-                        <?= print /* @noEscape */ $block->getAccountLabelbyCode('AC39')
+                        <?=  /* @noEscape */ $block->getAccountLabelbyCode('AC39')
                                 ? $block->getAccountLabelbyCode('AC39') : 'Save'?>
                     </span>
                 </button>
@@ -230,13 +230,17 @@ $storeCode = $block->getStoreCode();
         
         
         function onConfirmBtn() {
-            var isCvcRequired =  <?php echo !empty($block->requireCvcEnabled())?$block->requireCvcEnabled(): 0; ?>;
+            var isCvcRequired =  <?=  /* @noEscape */ !empty($block->requireCvcEnabled())?
+            $block->requireCvcEnabled(): 0; ?>;
             var isCvvValid = isCvcRequired == true ? validateCVV() : true;
             var cvvValid = isCvvValid;
             
-             mandatoryMessage= parseInt("<?php echo !empty($block->getDisclaimerMessageMandatory())?$block->getDisclaimerMessageMandatory():0; ?>");
-       disclaimerMessageEnabled = parseInt("<?php echo !empty($block->getDisclaimerMessageEnable())?$block->getDisclaimerMessageEnable():0; ?>");
-        storedCredentials = parseInt("<?php echo !empty($block->getStoredCredentialsEnabledValue())?$block->getStoredCredentialsEnabledValue():0; ?>");
+             mandatoryMessage= parseInt("<?=  /* @noEscape */ !empty($block->getDisclaimerMessageMandatory())?
+                $block->getDisclaimerMessageMandatory():0; ?>");
+       disclaimerMessageEnabled = parseInt("<?=  /* @noEscape */ !empty($block->getDisclaimerMessageEnable())?
+        $block->getDisclaimerMessageEnable():0; ?>");
+        storedCredentials = parseInt("<?=  /* @noEscape */ !empty($block->getStoredCredentialsEnabledValue())?
+        $block->getStoredCredentialsEnabledValue():0; ?>");
      
         
         
@@ -247,7 +251,7 @@ $storeCode = $block->getStoreCode();
     if(mandatoryMessage && disclaimerMessageEnabled && window.disclaimerDialogue === null){
                         $('#disclaimer-error').css('display', 'block');
                             $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
-			return false;
+            return false;
                     } 
                 if((window.is3DsEnabled)) {
                 createPayment3DS();
@@ -260,7 +264,7 @@ $storeCode = $block->getStoreCode();
     if(mandatoryMessage && disclaimerMessageEnabled && window.disclaimerDialogue === null){
                         $('#disclaimer-error').css('display', 'block');
                             $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
-			return false;
+            return false;
                     } 
 
                 var bin = jQuery('[name=cardNumber]').val();
@@ -357,15 +361,15 @@ $storeCode = $block->getStoreCode();
                     data: jsonPaymentDetails,
                     type: 'post',
                     success: function (data) {
-			response = JSON.stringify(data);
+            response = JSON.stringify(data);
                         var result = JSON.parse(response);
                         console.log(result);
-			if(result.threeDError) {
-			 window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));
-			}else {
-			console.log("entered success case to go to auth");
+            if(result.threeDError) {
+             window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));
+            }else {
+            console.log("entered success case to go to auth");
                         window.location.replace(urlBuilder.build('worldpay/threedsecure/auth'));
-			}
+            }
                     },
                     error: function (data) {
                         window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));
@@ -389,9 +393,12 @@ $storeCode = $block->getStoreCode();
         
         
          $("#btnShow").click(function (){
-            mandatoryMessage= parseInt("<?php echo !empty($block->getDisclaimerMessageMandatory())?$block->getDisclaimerMessageMandatory():0; ?>"); 
-           disclaimerMessageEnabled = parseInt("<?php echo !empty($block->getDisclaimerMessageEnable())?$block->getDisclaimerMessageEnable():0; ?>");
-           storedCredentials = parseInt("<?php echo !empty($block->getStoredCredentialsEnabledValue())?$block->getStoredCredentialsEnabledValue():0; ?>");
+            mandatoryMessage= parseInt("<?=  /* @noEscape */ !empty($block->getDisclaimerMessageMandatory())?
+            $block->getDisclaimerMessageMandatory():0; ?>"); 
+           disclaimerMessageEnabled = parseInt("<?=  /* @noEscape */ !empty($block->getDisclaimerMessageEnable())?
+            $block->getDisclaimerMessageEnable():0; ?>");
+           storedCredentials = parseInt("<?=  /* @noEscape */ !empty($block->getStoredCredentialsEnabledValue())?
+            $block->getStoredCredentialsEnabledValue():0; ?>");
             
          
             that=this;     

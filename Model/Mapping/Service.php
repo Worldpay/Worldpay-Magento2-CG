@@ -12,6 +12,8 @@ class Service
     protected $savedTokenFactory;
     protected $_scopeConfig;
     /**
+     * Declare varaible
+     *
      * @var SessionManagerInterface
      */
     protected $session;
@@ -25,6 +27,19 @@ class Service
     const NO_ACCOUNT = 'noAccount';
     const NO_CHANGE = 'noChange';
 
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param SavedTokenFactory $savedTokenFactory
+     * @param \Sapient\Worldpay\Model\SavedToken $savedtoken
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
+     * @param SessionManagerInterface $session
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Helper\Data $worldpayHelper,
@@ -46,7 +61,7 @@ class Service
         $this->session = $session;
         $this->_scopeConfig = $scopeConfig;
     }
-
+    
     public function collectVaultOrderParameters(
         $orderCode,
         $quote,
@@ -147,6 +162,12 @@ class Service
             ];
     }
 
+    /**
+     * Customer additional details for 3ds2
+     *
+     * @param Object $quote
+     * @return array
+     */
     public function getCustomerDetailsfor3DS2($quote)
     {
         $cusDetails = [];
@@ -194,6 +215,11 @@ class Service
         return $cusDetails;
     }
 
+    /**
+     * Exemption engine details
+     *
+     * @return array
+     */
     public function getExemptionEngineDetails()
     {
         $exemptionEngine = [];
@@ -214,7 +240,7 @@ class Service
                 );
         return $exemptionEngine;
     }
-
+     
     public function collectRedirectOrderParameters(
         $orderCode,
         $quote,
@@ -443,6 +469,13 @@ class Service
         ];
     }
 
+    /**
+     * Collect payment options
+     *
+     * @param string $countryId
+     * @param string $paymenttype
+     * @return array
+     */
     public function collectPaymentOptionsParameters(
         $countryId,
         $paymenttype
@@ -454,6 +487,12 @@ class Service
         ];
     }
 
+    /**
+     * Token request config details
+     *
+     * @param array $paymentDetails
+     * @return boolean
+     */
     private function _getTokenRequestConfig($paymentDetails)
     {
         if (isset($paymentDetails['additional_data']['save_my_card'])) {
@@ -463,6 +502,12 @@ class Service
         }
     }
 
+    /**
+     * ThreeDs config details
+     *
+     * @param string $method
+     * @return array
+     */
     private function _getThreeDSecureConfig($method = null)
     {
         if ($method == 'worldpay_moto') {
@@ -483,6 +528,12 @@ class Service
         }
     }
 
+    /**
+     * Shipping address
+     *
+     * @param Object $quote
+     * @return array
+     */
     private function _getShippingAddress($quote)
     {
         $shippingaddress = $this->_getAddress($quote->getShippingAddress());
@@ -492,11 +543,24 @@ class Service
         return $shippingaddress;
     }
     
+    /**
+     * Billing address
+     *
+     * @param Object $quote
+     * @return array
+     */
     private function _getBillingAddress($quote)
     {
         return $this->_getAddress($quote->getBillingAddress());
     }
     
+    /**
+     * Collect order line items
+     *
+     * @param Object $quote
+     * @param string $paymentType
+     * @return array
+     */
     private function _getOrderLineItems($quote, $paymentType = null)
     {
         $orderitems = [];
@@ -554,6 +618,12 @@ class Service
         return $orderitems;
     }
 
+    /**
+     * Address
+     *
+     * @param Object $address
+     * @return array
+     */
     private function _getAddress($address)
     {
         return [
@@ -566,11 +636,23 @@ class Service
         ];
     }
     
+    /**
+     * Card Address
+     *
+     * @param Object $quote
+     * @return array
+     */
     private function _getCardAddress($quote)
     {
         return $this->_getAddress($quote->getBillingAddress());
     }
 
+    /**
+     * Payment Details
+     *
+     * @param array $paymentDetails
+     * @return array
+     */
     private function _getPaymentDetails($paymentDetails)
     {
         $method = $paymentDetails['method'];
@@ -635,6 +717,12 @@ class Service
         return $details;
     }
 
+    /**
+     * Payment type
+     *
+     * @param array $paymentDetails
+     * @return string
+     */
     private function _getRedirectPaymentType($paymentDetails)
     {
         if ('CARTEBLEUE-SSL' == $paymentDetails['additional_data']['cc_type']) {
@@ -643,11 +731,24 @@ class Service
         return $paymentDetails['additional_data']['cc_type'];
     }
 
+    /**
+     * Order Description
+     *
+     * @param string $reservedOrderId
+     * @return string
+     */
     private function _getOrderDescription($reservedOrderId)
     {
         return $this->worldpayHelper->getOrderDescription();
     }
 
+    /**
+     * Get payment details for Token
+     *
+     * @param array $paymentDetails
+     * @param Object $quote
+     * @return array
+     */
     private function _getPaymentDetailsUsingToken($paymentDetails, $quote)
     {
         $savedCardData = $this->savedtoken->loadByTokenCode($paymentDetails['additional_data']['tokenCode']);
@@ -688,6 +789,12 @@ class Service
         return $details;
     }
 
+    /**
+     * Collect Vault payment details
+     *
+     * @param array $paymentDetails
+     * @return array
+     */
     private function _getVaultPaymentDetails($paymentDetails)
     {
         $details = [
@@ -710,13 +817,18 @@ class Service
         return $details;
     }
 
+    /**
+     * Client IP address
+     *
+     * @return string
+     */
     private function _getClientIPAddress()
     {
         $REMOTE_ADDR = filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_VALIDATE_IP);
         $remoteAddresses = explode(',', $REMOTE_ADDR);
         return trim($remoteAddresses[0]);
     }
-
+    
     public function collectWalletOrderParameters(
         $orderCode,
         $quote,
@@ -742,7 +854,10 @@ class Service
                 if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
                     $paymentDetails['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
                     $environmentMode = $this->_scopeConfig->
-                        getValue('worldpay/general_config/environment_mode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+                        getValue(
+                            'worldpay/general_config/environment_mode',
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        );
                     if ($environmentMode == 'Test Mode') {
                         $orderDescription =   $this->_scopeConfig->getValue(
                             'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
@@ -824,6 +939,13 @@ class Service
         }
     }
 
+    /**
+     * Collect third party details
+     *
+     * @param array $paymentDetails
+     * @param Object $quote
+     * @return array
+     */
     public function getThirdPartyDetails($paymentDetails, $quote)
     {
 
@@ -845,6 +967,13 @@ class Service
         }
     }
 
+    /**
+     * Shipping details for Brazil
+     *
+     * @param array $paymentDetails
+     * @param Object $quote
+     * @return array
+     */
     public function getShippingFeeForBrazil($paymentDetails, $quote)
     {
         if ($this->belongsToLACountryBr($paymentDetails, $quote)) {
@@ -861,6 +990,13 @@ class Service
         }
     }
     
+    /**
+     * Check if country is Brazil
+     *
+     * @param array $paymentDetails
+     * @param Object $quote
+     * @return boolean
+     */
     public function belongsToLACountryBr($paymentDetails, $quote)
     {
         $billingAdress = $this->_getBillingAddress($quote);
@@ -871,6 +1007,13 @@ class Service
         return false;
     }
 
+    /**
+     * Check if selected country belongs to LA
+     *
+     * @param array $paymentDetails
+     * @param Object $quote
+     * @return boolean
+     */
     public function belongsToLACountries($paymentDetails, $quote)
     {
         $billingAdress = $this->_getBillingAddress($quote);
@@ -983,6 +1126,13 @@ class Service
         }
     }
     
+    /**
+     * Collect prime routing details
+     *
+     * @param array $paymentDetails
+     * @param Object $quote
+     * @return array
+     */
     public function getPrimeRoutingDetails($paymentDetails, $quote)
     {
         $billingAdress = $this->_getBillingAddress($quote);
@@ -1002,6 +1152,11 @@ class Service
             }
         }
     }
+    
+    /**
+     *
+     * Get customer DOB
+     */
     public function getCustomerDOB($customer)
     {
         $now = new \DateTime();

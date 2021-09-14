@@ -19,7 +19,7 @@ EOD;
     private $currencyCode;
     private $amount;
     private $exponent;
-
+    
     /**
      * Build xml for processing Request
      *
@@ -27,10 +27,20 @@ EOD;
      * @param string $orderCode
      * @param string $currencyCode
      * @param float $amount
+     * @param $exponent
+     * @param $paymentType
+     * @param $captureType
      * @return SimpleXMLElement $xml
      */
-    public function build($merchantCode, $orderCode, $currencyCode, $amount, $exponent, $paymentType = null,$captureType)
-    {
+    public function build(
+        $merchantCode,
+        $orderCode,
+        $currencyCode,
+        $amount,
+        $exponent,
+        $captureType,
+        $paymentType = null
+    ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
         $this->currencyCode = $currencyCode;
@@ -95,7 +105,7 @@ EOD;
                 ->getValue('worldpay/general_config/capture_automatically', $storeScope);
         $partialCapture = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
                 ->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
-        //check the partial capture 
+        //check the partial capture
         if ($this->captureType == 'partial' && $partialCapture) {
             $capture['reference']= 'Partial Capture';
         }
@@ -129,13 +139,15 @@ EOD;
         $partialCapture = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
                         ->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
        
-        //check the partial capture 
+        //check the partial capture
         if ($this->captureType == 'partial' && $partialCapture) {
             $amountElement['debitCreditIndicator'] = 'credit';
         }
     }
 
     /**
+     * Retrieve amount value
+     *
      * @param float $amount
      * @return int
      */

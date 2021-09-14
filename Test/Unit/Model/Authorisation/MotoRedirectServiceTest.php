@@ -63,10 +63,18 @@ class MotoRedirectServiceTest extends TestCase
         $paymentMethods = $this->getMockBuilder(PaymentMethods::class)
                         ->disableOriginalConstructor()->getMock();
 
-        $this->motoObj = new MotoRedirectService($this->mappingservice, 
-                $this->paymentservicerequest, $wplogger, $paymentService, 
-                $redirectresponse, $this->registryhelper, $this->datahelper, 
-                $this->checkoutsession, $urlInterface, $paymentMethods);
+        $this->motoObj = new MotoRedirectService(
+            $this->mappingservice,
+            $this->paymentservicerequest,
+            $wplogger,
+            $paymentService,
+            $redirectresponse,
+            $this->registryhelper,
+            $this->datahelper,
+            $this->checkoutsession,
+            $urlInterface,
+            $paymentMethods
+        );
     }
 
     public function testAuthorizePayment()

@@ -1,6 +1,7 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ * Copyright © 2020 Worldpay, LLC. All rights reserved.
+ * See COPYING.txt for license details.
  */
 namespace Sapient\Worldpay\Model\Checkout;
 
@@ -9,6 +10,13 @@ use Magento\Checkout\Model\Cart as CustomerCart;
 class Service
 {
 
+    /**
+     * Service constructor
+     *
+     * @param \Magento\Checkout\Model\Session $checkoutsession
+     * @param CustomerCart $cart
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutsession,
         CustomerCart $cart,

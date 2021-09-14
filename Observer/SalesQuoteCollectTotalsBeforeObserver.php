@@ -13,7 +13,7 @@ class SalesQuoteCollectTotalsBeforeObserver implements ObserverInterface
      * @var \Sapient\Worldpay\Helper\Recurring
      */
     private $recurringHelper;
-
+    
     /**
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      */

@@ -20,6 +20,8 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
     }
     
     /**
+     * Retrieve redirect location
+     *
      * @param SimpleXmlElement $xml
      * @return string $url
      */
@@ -36,6 +38,8 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
     }
 
     /**
+     * Get redirect url
+     *
      * @param SimpleXmlElement $xml
      * @return string $url
      */
@@ -47,6 +51,11 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
         return trim($url[0]);
     }
 
+    /**
+     * Get call back url
+     *
+     * @return array $callbackurl
+     */
     public function getCallBackUrl()
     {
         $callbackurl = [];

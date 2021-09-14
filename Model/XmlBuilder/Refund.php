@@ -21,7 +21,7 @@ EOD;
     private $amount;
     private $refundReference;
     private $exponent;
-
+    
     /**
      * Build xml for processing Request
      * @param string $merchantCode
@@ -52,6 +52,8 @@ EOD;
     }
 
     /**
+     * Code to add modify tag
+     *
      * @param SimpleXMLElement $xml
      * @return SimpleXMLElement
      */
@@ -61,6 +63,8 @@ EOD;
     }
 
     /**
+     * Add order modification element
+     *
      * @param SimpleXMLElement $modify
      * @return SimpleXMLElement $orderModification
      */
@@ -73,6 +77,8 @@ EOD;
     }
 
     /**
+     * Add refund element details
+     *
      * @param SimpleXMLElement $orderModification
      */
     private function _addRefundElement($orderModification)
@@ -87,6 +93,8 @@ EOD;
     }
 
     /**
+     * Retrieve amount value
+     *
      * @param float $amount
      * @return int
      */

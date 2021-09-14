@@ -25,6 +25,8 @@ class Auth extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Framework\View\Asset\Repository $assetRepo
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      */
     public function __construct(
         Context $context,
@@ -41,7 +43,7 @@ class Auth extends \Magento\Framework\App\Action\Action
         $this->worldpayHelper = $worldpayHelper;
         parent::__construct($context);
     }
-
+    
     /**
      * Renders the 3D Secure  page, responsible for forwarding
      * all necessary order data to worldpay.
@@ -60,21 +62,19 @@ class Auth extends \Magento\Framework\App\Action\Action
             if (phpversion() < '7.3.0') {
                 setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
             } else {
-            $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
-            setcookie("PHPSESSID", $phpsessId, [
-            'expires' => time() + 3600,
-            'path' => '/',
-            'domain' => $domain,
-            'secure' => true,
-            'httponly' => true,
-            'samesite' => 'None',
-            ]);
+                $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
+                setcookie("PHPSESSID", $phpsessId, [
+                'expires' => time() + 3600,
+                'path' => '/',
+                'domain' => $domain,
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'None',
+                ]);
+            }
         }
-	}
 
         //setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
-        
-        
         
         if (!$threeDSecureChallengeConfig == null) {
         

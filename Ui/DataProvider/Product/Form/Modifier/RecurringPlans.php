@@ -52,7 +52,7 @@ class RecurringPlans extends AbstractModifier
      * @var RecurringHelper
      */
     private $recurringHelper;
-
+    
     /**
      * @param LocatorInterface $locator
      * @param ArrayManager $arrayManager

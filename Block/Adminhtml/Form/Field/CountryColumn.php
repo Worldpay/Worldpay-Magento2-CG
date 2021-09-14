@@ -12,7 +12,7 @@ use Sapient\Worldpay\Model\Config\Source\InstalmentCountries;
 class CountryColumn extends Select
 {
     private $instalmentcountries;
-
+     
     public function __construct(
         Context $context,
         InstalmentCountries $instalmentcountries,

@@ -29,7 +29,7 @@ class RecurringPlans
      * @var \Sapient\Worldpay\Helper\Recurring
      */
     private $recurringHelper;
-
+    
     /**
      * @param Escaper $escaper
      * @param LocatorInterface $locator

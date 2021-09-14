@@ -49,6 +49,7 @@ class Cancel extends \Magento\Backend\App\Action
         $this->adminorderservice = $adminorderservice;
         $this->authenticatinservice = $authenticatinservice;
     }
+    
     /**
      * Execute if payment is canceled
      */

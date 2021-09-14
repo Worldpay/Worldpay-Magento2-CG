@@ -47,7 +47,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
      * @var MyAccountException
      */
     protected $helper;
-
+    
     /**
      * @param Context $context
      * @param Session $customerSession

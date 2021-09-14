@@ -36,6 +36,7 @@ class PaymentInformationManagement
     
     /**
      * PaymentInformationManagement constructor.
+     *
      * @param CartManagementInterface $cartManagement
      * @param LoggerInterface $logger
      * @param MethodList $methodList
@@ -52,6 +53,7 @@ class PaymentInformationManagement
         $this->methodList = $methodList;
         $this->checkMethods = $checkMethods;
     }
+    
     /**
      * @param CheckoutPaymentInformationManagement $subject
      * @param \Closure $proceed

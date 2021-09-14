@@ -46,7 +46,7 @@ class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     {
         $this->_init('worldpay_subscriptions', 'subscription_id');
     }
-
+    
     /**
      * Update subscription id in order table
      *

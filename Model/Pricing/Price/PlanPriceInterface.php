@@ -11,6 +11,8 @@ use Sapient\Worldpay\Model\Recurring\Plan;
 interface PlanPriceInterface
 {
     /**
+     * Get plan amount
+     *
      * @param Plan $plan
      * @return \Magento\Framework\Pricing\Amount\AmountInterface
      */

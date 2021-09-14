@@ -7,6 +7,8 @@ namespace Sapient\Worldpay\Model\Config\Source;
 class ExemptionPlacement implements \Magento\Framework\Option\ArrayInterface
 {
     /**
+     * Exemption configuration
+     *
      * @return array
      */
     public function toOptionArray()

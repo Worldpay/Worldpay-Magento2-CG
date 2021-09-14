@@ -32,6 +32,13 @@ class TokenFormatter implements PaymentTokenFormatterInterface
         'DINERS-SSL' => 'Diners',
     ];
 
+    /**
+     * Constructor
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\SavedTokenFactory $savedWPFactory
+     * @param \Sapient\Worldpay\Helper\Data $wpdata
+     * @param SavedToken $savedtoken
+     */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\SavedTokenFactory $savedWPFactory,

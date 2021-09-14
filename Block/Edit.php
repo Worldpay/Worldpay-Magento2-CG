@@ -22,6 +22,7 @@ class Edit extends \Magento\Framework\View\Element\Template
       * @var array
       */
     protected static $_expiryYears;
+    
     /**
      * Constructor
      *

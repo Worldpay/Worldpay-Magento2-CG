@@ -7,7 +7,7 @@
         <?= /* @noEscape */ $block->getBlockHtml('formkey')?>
         <legend class="legend">
             <span>
-                <?= print /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?
+                <?=  /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?
                         $block->getAccountLabelbyCode('AC8') :'Card Information' ?>
             </span></legend><br>
 
@@ -16,7 +16,7 @@
         <div class="field card Number">
             <label class="label" for="card number">
                 <span>
-                    <?= print /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
+                    <?=  /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
                             $block->getAccountLabelbyCode('AC3') :'Card Number' ?>
                 </span>
             </label>
@@ -28,13 +28,13 @@
         <div class="field card holder name">
             <label class="label" for="card holder name">
                 <span>
-                    <?= print /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
+                    <?=  /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
                             $block->getCheckoutLabelbyCode('CO4') :'Card Holder Name' ?>
                 </span>
             </label>
             <div class="control">
                 <input type="text" name="token[cardholder_name]" required='true' id="card-holder-name" 
-                       title="<?= print /* @noEscape */
+                       title="<?=  /* @noEscape */
                         $block->getCheckoutLabelbyCode('CO4') ?
                                $block->getCheckoutLabelbyCode('CO4') :
                            'Card Holder Name' ?>"
@@ -46,7 +46,7 @@
         <div class="field card expiry month">
             <label class="label" for="card holder name">
                 <span>
-                    <?= print /* @noEscape */
+                    <?=  /* @noEscape */
                     $block->getAccountLabelbyCode('AC10') ?
                             $block->getAccountLabelbyCode('AC10') :
                         'Expiry Month/Year' ?>
@@ -87,11 +87,11 @@
         <div class="actions-toolbar">
             <div class="primary">
                 <button type="submit" class="action save primary"
-                        title="<?= print /* @noEscape */
+                        title="<?=  /* @noEscape */
                         $block->getAccountLabelbyCode('AC39') ?
                                 $block->getAccountLabelbyCode('AC39') :'Save' ?>">
                     <span>
-                        <?= print /* @noEscape */
+                        <?=  /* @noEscape */
                         $block->getAccountLabelbyCode('AC39') ?
                                 $block->getAccountLabelbyCode('AC39') :'Save' ?>
                     </span>

@@ -67,6 +67,12 @@ class WorldPayPayment
         $wpp->save();
     }
     
+    /**
+     * Update prime routing data
+     *
+     * @param InfoInterface $payment
+     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
+     */
     public function updatePrimeroutingData(InfoInterface $payment, \Sapient\Worldpay\Model\Payment\State $paymentState)
     {
         $wpp = $this->worldpaypayment->create();
@@ -76,6 +82,12 @@ class WorldPayPayment
         $wpp->save();
     }
     
+    /**
+     * Check if request fell under prime routing
+     *
+     * @param InfoInterface $paymentObject
+     * @return bool
+     */
     private function getPrimeRoutingEnabled(InfoInterface $paymentObject)
     {
         $paymentAditionalInformation = $paymentObject->getAdditionalInformation();

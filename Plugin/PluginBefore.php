@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ * PluginBefore @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Plugin;
 
@@ -13,6 +13,14 @@ use Sapient\Worldpay\Helper\Data;
 class PluginBefore
 {
 
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Sales\Model\Order $order
+     * @param RequestInterface $request
+     * @param Data $worldpayHelper
+     */
     public function __construct(
         \Magento\Framework\UrlInterface $urlBuilder,
         \Magento\Sales\Model\Order $order,

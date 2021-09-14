@@ -4,31 +4,34 @@
  * See LICENSE.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
+
 /** @var Sapient\Worldpay\Block\Catalog\Product\SubscriptionPlans $block */
 ?>
 
 <div class="field worldpay-subscriptions">
-    <label class="label"><span><?php echo $block->getBuyOneTimelabel() ?></span></label>
+    <label class="label"><span><?= /* @noEscape */ $block->getBuyOneTimelabel() ?></span></label>
     <div>
         <input type="checkbox" id="worldpay-add-plan" name="worldpay_add_plan" onchange="valueChanged()">
-        <label for="worldpay-add-plan"><span><?php echo $block->getSubscribeCheckboxLabel() ?></span></label>
+        <label for="worldpay-add-plan"><span><?= /* @noEscape */ $block->getSubscribeCheckboxLabel() ?></span></label>
     </div>
-    <div class="control" id="worldpay-subscription-plans-list" style="display: none;" data-mage-init='{"worldpayPriceSubscription":{
+    <div class="control" id="worldpay-subscription-plans-list" style="display: none;"
+         data-mage-init='{"worldpayPriceSubscription":{
              "addPlanElement":"#worldpay-add-plan",
              "planElement":"input:radio[value]",
              "startDateContainerElement":"#product-options-wrapper .worldpay-subscriptions-start-date-container",
              "endDateContainerElement":"#product-options-wrapper .worldpay-subscriptions-end-date-container",
              "instantPurchaseButton":"#instant-purchase",
-             "config":<?php /* @noEscape */ echo $block->getJsonConfig() ?>}}'>
-        <?php foreach ($this->getPlans() as $plan): ?>
+             "config":<?= /* @noEscape */ $block->getJsonConfig() ?>}}'>
+        <?php foreach ($block->getPlans() as $plan): ?>
             <div class="field choice">
                 <input type="radio" onchange="valueRadioChanged()"
                        name="worldpay_subscription_plan"
-                       id="worldpay_subscription_plan_<?php echo $block->buildPlanOptionId($plan) ?>"
-                       value="<?php echo $block->escapeHtml($plan->getId()) ?>" <?php if ($block->isPlanSelected($plan)): ?>checked<?php endif; ?>/>
-                <label class="label" for="worldpay_subscription_plan_<?php echo $block->buildPlanOptionId($plan) ?>">
-                    <span><?php /* @noEscape */ echo $block->getPlanTitle($plan); ?></span>
+                       id="worldpay_subscription_plan_<?= /* @noEscape */ $block->buildPlanOptionId($plan) ?>"
+                       value="<?= /* @noEscape */ $block->escapeHtml($plan->getId()) ?>"
+                           <?php if ($block->isPlanSelected($plan)): ?>checked<?php endif; ?>/>
+                <label class="label"
+                       for="worldpay_subscription_plan_<?= /* @noEscape */ $block->buildPlanOptionId($plan) ?>">
+                    <span><?= /* @noEscape */ $block->getPlanTitle($plan); ?></span>
                 </label>
             </div>
         <?php endforeach; ?>
@@ -38,11 +41,13 @@
 <?php if ($block->getProduct()->getWorldpayRecurringAllowStart()): ?>
     <div class="field required date worldpay-subscriptions-start-date-container" style="display: none;">
         <legend class="label">
-            <span><?php echo $block->getStartDateLabel() ?></span>
+            <span><?= /* @noEscape */ $block->getStartDateLabel() ?></span>
         </legend>
         <div class="field-control ">
             <input class="control-text" style="width: calc(50% - 33px);" name="subscription_date" 
-                   id="subscription_date" type="text" readonly="true" value="<?php echo $block->getStartDate();?>">
+                   id="subscription_date"
+                   type="text" readonly="true"
+                   value="<?= /* @noEscape */ $block->getStartDate();?>">
             <?php //echo $block->getDateHtml() ?>
         </div>
     </div>
@@ -50,11 +55,13 @@
 <?php if ($block->isEndDateEnabled()): ?>
     <div class="field required date worldpay-subscriptions-end-date-container" style="display: none;">
         <legend class="label">
-            <span><?php echo $block->getEndDateLabel() ?></span>
+            <span><?= /* @noEscape */ $block->getEndDateLabel() ?></span>
         </legend>
         <div class="field-control ">
             <input class="control-text" style="width: 44%;"
-                   name="subscription_end_date" id="subscription_end_date" type="text" readonly="true" value="<?php echo $block->getEndDate();?>">
+                   name="subscription_end_date" id="subscription_end_date"
+                   type="text" readonly="true" 
+                   value="<?= /* @noEscape */ $block->getEndDate();?>">
             <input type="hidden" id="show_endDate" value="1">
             <?php //echo $block->getDateHtml() ?>
         </div>

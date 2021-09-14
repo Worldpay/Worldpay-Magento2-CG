@@ -36,6 +36,9 @@ class Failure extends \Magento\Framework\App\Action\Action
      * @param PageFactory $pageFactory
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param SubscriptionFactory $subscriptionFactory
+     * @param TransactionsFactory $transactionsFactory
+     * @param \Magento\Checkout\Model\Session $checkoutSession
      */
     public function __construct(
         Context $context,
@@ -54,7 +57,7 @@ class Failure extends \Magento\Framework\App\Action\Action
         $this->checkoutSession = $checkoutSession;
         return parent::__construct($context);
     }
-
+    
     public function execute()
     {
         $this->wplogger->info('worldpay returned failure url');

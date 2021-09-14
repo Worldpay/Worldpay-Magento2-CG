@@ -42,6 +42,10 @@ class Error extends \Magento\Framework\App\Action\Action
      * @param PageFactory $pageFactory
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param SubscriptionFactory $subscriptionFactory
+     * @param TransactionsFactory $transactionsFactory
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param CreditCardException $helper
      */
     public function __construct(
         Context $context,
@@ -62,7 +66,7 @@ class Error extends \Magento\Framework\App\Action\Action
         $this->helper = $helper;
         return parent::__construct($context);
     }
-
+    
     public function execute()
     {
         $this->wplogger->info('worldpay returned error url');

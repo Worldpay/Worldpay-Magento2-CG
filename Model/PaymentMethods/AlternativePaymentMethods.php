@@ -32,7 +32,7 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
         parent::authorize($payment, $amount);
         return $this;
     }
-
+    
     public function getAuthorisationService($storeId)
     {
         $apmmethods = $this->paymentdetailsdata['additional_data']['cc_type'];
@@ -43,7 +43,9 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
     }
 
     /**
-     * check if apm is enabled
+     * Check if Worldpay is enabled
+     *
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
@@ -55,6 +57,11 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
         return false;
     }
 
+    /**
+     * Method to get payment title
+     *
+     * @return string
+     */
     public function getTitle()
     {
         if ($order = $this->registry->registry('current_order')) {

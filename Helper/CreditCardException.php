@@ -28,7 +28,7 @@ class CreditCardException
       * @var SerializerInterface
       */
     private $serializer;
-
+    
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Math\Random $mathRandom

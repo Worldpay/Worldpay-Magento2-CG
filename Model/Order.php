@@ -45,7 +45,7 @@ class Order
         $this->ordercreditmemo = $creditmemo;
         $this->creditmemoRepository = $creditmemoRepository;
     }
-
+    
     public function getOrder()
     {
         return $this->_order;
@@ -334,6 +334,13 @@ class Order
         }
     }
 
+    /**
+     * Cancel Magento Credit memo
+     *
+     * @param int $id
+     * @return boolean
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function cancelMagentoCreditMemo($id)
     {
         try {
@@ -352,6 +359,12 @@ class Order
         return true;
     }
 
+    /**
+     * Deduct order totals
+     *
+     * @param object $order
+     * @param object $creditmemo
+     */
     private function _deductOrderTotals($order, $creditmemo)
     {
 

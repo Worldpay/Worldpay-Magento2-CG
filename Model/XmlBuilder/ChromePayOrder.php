@@ -40,7 +40,7 @@ EOD;
      * @var Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration
      */
     protected $tokenRequestConfig;
-
+    
     /**
      * Build xml for processing Request
      *
@@ -334,7 +334,6 @@ EOD;
      *
      * @param SimpleXMLElement $parentElement
      * @param string $firstName
-     * @param string $lastName
      * @param string $street
      * @param string $postalCode
      * @param string $city
@@ -364,6 +363,8 @@ EOD;
     }
 
     /**
+     * Add cdata element
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */
@@ -375,6 +376,8 @@ EOD;
     }
 
     /**
+     * Retrieve amount value
+     *
      * @param float $amount
      * @return int
      */

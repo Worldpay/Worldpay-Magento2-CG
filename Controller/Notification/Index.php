@@ -26,7 +26,7 @@ class Index extends \Magento\Framework\App\Action\Action
 
     const RESPONSE_OK = '[OK]';
     const RESPONSE_FAILED = '[FAILED]';
-
+    
     /**
      * Constructor
      *

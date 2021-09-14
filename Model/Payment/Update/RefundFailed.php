@@ -12,6 +12,7 @@ class RefundFailed extends \Sapient\Worldpay\Model\Payment\Update\Base implement
     const REFUND_EXPIRED_COMMENT = 'The attempted refund request EXPIRED.';
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
@@ -25,7 +26,7 @@ class RefundFailed extends \Sapient\Worldpay\Model\Payment\Update\Base implement
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
     }
-
+    
     public function apply($payment, $order = null)
     {
         $paymentStatus = $this->_paymentState->getPaymentStatus();

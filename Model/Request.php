@@ -44,6 +44,7 @@ class Request
         $this->curlrequest = $curlrequest;
         $this->helper = $helper;
     }
+    
      /**
       * Process the request
       *
@@ -154,6 +155,8 @@ class Request
     }
 
     /**
+     * Get request
+     *
      * @return object
      */
     private function _getRequest()

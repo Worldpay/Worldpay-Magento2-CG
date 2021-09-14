@@ -23,6 +23,8 @@ class ThreeDSecure
     }
 
     /**
+     * Check if dynamic 3ds is enabled
+     *
      * @return bool
      */
     public function isDynamic3DEnabled()
@@ -31,6 +33,8 @@ class ThreeDSecure
     }
 
     /**
+     * Check if 3ds is enabled
+     *
      * @return bool
      */
     public function is3DSecureCheckEnabled()

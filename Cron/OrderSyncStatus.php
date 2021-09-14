@@ -31,12 +31,12 @@ class OrderSyncStatus
     /**
      * Constructor
      *
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param JsonFactory $resultJsonFactory
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
-     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice,
-     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      */
     public function __construct(
@@ -56,7 +56,7 @@ class OrderSyncStatus
         $this->resultJsonFactory = $resultJsonFactory;
         $this->worldpaytoken = $worldpaytoken;
     }
-
+    
     /**
      * Get the list of orders to be sync the status
      */

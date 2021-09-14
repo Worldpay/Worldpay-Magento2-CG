@@ -18,7 +18,7 @@ class Worldpayment extends \Magento\Framework\Model\AbstractModel
     {
         $this->_init(\Sapient\Worldpay\Model\ResourceModel\Worldpayment::class);
     }
-
+    
     /**
      * Retrieve worldpay payment Details
      *

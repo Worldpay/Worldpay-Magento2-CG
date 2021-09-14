@@ -33,7 +33,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
     private $customerSession;
     
     private $helper;
-
+    
     /**
      * @param Context $context
      * @param Session $customerSession

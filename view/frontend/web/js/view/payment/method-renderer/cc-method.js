@@ -766,7 +766,9 @@ define(
                     }
                     //Direct form handle
                     this.saveMyCard = $('#' + this.getCode() + '_save_card').is(":checked");
-                    if(this.saveMyCard && this.isDisclaimerMessageMandatory() && this.isDisclaimerMessageEnabled() && window.disclaimerDialogue === null){
+                    if(this.saveMyCard && !this.isDisclaimerMessageMandatory()){
+                        this.saveMyCard = '1';
+                    } else if(this.saveMyCard && this.isDisclaimerMessageMandatory() && this.isDisclaimerMessageEnabled() && window.disclaimerDialogue === null){
                         $('#disclaimer-error').css('display', 'block');
                             $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));
 			return false;

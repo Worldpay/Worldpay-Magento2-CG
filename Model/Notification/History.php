@@ -20,6 +20,7 @@ class History implements HistoryInterface
     }
     /**
      * Returns Order Notification
+     *
      * @api
      * @param Integer $order
      * @return json $result.

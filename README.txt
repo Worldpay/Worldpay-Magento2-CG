@@ -1,7 +1,4 @@
-This patch is added on top of release 2.3.5-p1220 with following updates - 
-1. PHP 7.4 Support
-
-This version is compatible with Magento 2.3.5 with following key features:
+This version is compatible with Magento 2.3.7 with following key features:
 1. Credit card payment
 2. Hosted payment page solution
 3. Alternative payment methods like Paypal, AliPay, Klarna, ACH Pay etc.
@@ -15,3 +12,5 @@ This version is compatible with Magento 2.3.5 with following key features:
 11. Shopper tokens and Merchant tokens
 12. Intelligent Account Verification
 13. Multi store and multi merchant support
+14. 3DS Flex support for Google Pay, Instant Purchase and Chrome Payment Service API
+15. PHP 7.4 Support

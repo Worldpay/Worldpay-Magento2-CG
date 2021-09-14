@@ -33,7 +33,7 @@ class Currencyexponents
      * @var SerializerInterface
      */
     private $serializer;
-
+    
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Math\Random $mathRandom,

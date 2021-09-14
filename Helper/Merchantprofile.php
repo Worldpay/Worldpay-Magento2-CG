@@ -25,11 +25,6 @@ class Merchantprofile
     protected $mathRandom;
 
     /**
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Framework\Math\Random $mathRandom
-     */
-    
-    /**
      * @var SerializerInterface
      */
     private $serializer;

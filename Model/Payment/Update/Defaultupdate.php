@@ -11,6 +11,7 @@ class Defaultupdate extends \Sapient\Worldpay\Model\Payment\Update\Base implemen
     private $_configHelper;
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
@@ -24,7 +25,7 @@ class Defaultupdate extends \Sapient\Worldpay\Model\Payment\Update\Base implemen
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
     }
-
+    
     public function apply($payment, $order = null)
     {
         if (!empty($order)) {

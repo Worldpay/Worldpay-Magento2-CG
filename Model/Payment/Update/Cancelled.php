@@ -10,6 +10,7 @@ class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements \
     private $_configHelper;
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
@@ -23,6 +24,7 @@ class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements \
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
     }
+    
     public function apply($payment, $order = null)
     {
         if (!empty($order)) {
@@ -31,7 +33,10 @@ class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements \
             $this->_worldPayPayment->updateWorldPayPayment($this->_paymentState);
         }
     }
+    
     /**
+     * Allowed Payment Statuses
+     *
      * @return array
      */
     protected function _getAllowedPaymentStatuses()

@@ -11,6 +11,7 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
 
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
@@ -24,7 +25,7 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
     }
-
+    
     /**
      * @param $payment
      * @param $order
@@ -64,6 +65,8 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
     }
 
     /**
+     * Allowed payment statuses
+     *
      * @param \Sapient\Worldpay\Model\Order $order
      * @return array
      */
@@ -117,7 +120,9 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
     }
 
     /**
-     * check if integration mode is direct
+     * Check if integration mode is direct
+     *
+     * @param \Sapient\Worldpay\Model\Order $order
      * @return bool
      */
     private function _isDirectIntegrationMode(\Sapient\Worldpay\Model\Order $order)
@@ -130,7 +135,9 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
     }
     
     /**
-     * check if integration mode is wallet
+     * Check if integration mode is wallet
+     *
+     * @param \Sapient\Worldpay\Model\Order $order
      * @return bool
      */
     private function _isWalletIntegrationMode(\Sapient\Worldpay\Model\Order $order)
@@ -143,7 +150,9 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
     }
 
     /**
-     * check if integration mode is redirect
+     * Check if integration mode is redirect
+     *
+     * @param \Sapient\Worldpay\Model\Order $order
      * @return bool
      */
     private function _isRedirectIntegrationMode(\Sapient\Worldpay\Model\Order $order)
@@ -156,7 +165,9 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
     }
     
     /**
-     * check if integration mode is ach
+     * Check if integration mode is ach
+     *
+     * @param \Sapient\Worldpay\Model\Order $order
      * @return bool
      */
     private function _isACHIntegrationMode(\Sapient\Worldpay\Model\Order $order)

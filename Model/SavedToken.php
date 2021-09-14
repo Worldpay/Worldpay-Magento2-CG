@@ -20,7 +20,7 @@ class SavedToken extends AbstractModel
     {
         $this->_init(\Sapient\Worldpay\Model\ResourceModel\SavedToken::class);
     }
-
+    
     /**
      * Load worldpay token Details
      *

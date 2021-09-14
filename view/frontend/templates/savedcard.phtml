@@ -8,19 +8,19 @@
             <thead>
                 <tr>
                     <th scope="col" class="col id">
-                        <?= print /* @noEscape */ $block->getMyAccountLabels('AC2') ?
+                        <?=  /* @noEscape */ $block->getMyAccountLabels('AC2') ?
                           $block->getMyAccountLabels('AC2') : 'Card Brand #'?></th>
                     <th scope="col" class="col date">
-                        <?= print /* @noEscape */ $block->getMyAccountLabels('AC3') ?
+                        <?=  /* @noEscape */ $block->getMyAccountLabels('AC3') ?
                           $block->getMyAccountLabels('AC3') : 'Card Number'?></th>
                     <th scope="col" class="col shipping">
-                        <?= print /* @noEscape */ $block->getCheckoutLabels('CO4') ?
+                        <?=  /* @noEscape */ $block->getCheckoutLabels('CO4') ?
                           $block->getCheckoutLabels('CO4') : 'Card Holder Name'?></th>
                     <th scope="col" class="col total">
-                        <?= print /* @noEscape */ $block->getMyAccountLabels('AC4') ?
+                        <?=  /* @noEscape */ $block->getMyAccountLabels('AC4') ?
                           $block->getMyAccountLabels('AC4') : 'Card Expiry Month'?></th>
                     <th scope="col" class="col status">
-                        <?= print /* @noEscape */ $block->getMyAccountLabels('AC5') ?
+                        <?=  /* @noEscape */ $block->getMyAccountLabels('AC5') ?
                           $block->getMyAccountLabels('AC5') : 'Card Expiry Year'?></th>
                     <th scope="col" class="col actions">&nbsp;</th>
                 </tr>
@@ -61,7 +61,7 @@
                                     ?>
                             <a href="<?= /* @noEscape */ $block->getEditUrl($_savecard) ?>" class="action view">
                                 <span>
-                                    <?= print/* @noEscape */ $block->getMyAccountLabels('AC6')?
+                                    <?= /* @noEscape */ $block->getMyAccountLabels('AC6')?
                                             $block->getMyAccountLabels('AC6') : 'Update'?>
                                 </span>
                             </a>
@@ -77,7 +77,7 @@
                         <a href="javascript:void(0)" data-delete-url="
                         <?= /* @noEscape */ $block->getDeleteUrl($_savecard); ?>" class="action delete">
                             <span>
-                                <?= print /* @noEscape */ $block->getMyAccountLabels('AC11')?
+                                <?=  /* @noEscape */ $block->getMyAccountLabels('AC11')?
                                         $block->getMyAccountLabels('AC11') : 'Delete'?>
                             </span></a>
                         </td>
@@ -92,7 +92,7 @@
             ], function($, confirm) {
                 $(".action.delete").on("click", function(event) {   
                     confirm({
-                        title: "<?= print $block->getMyAccountLabels('AC11')?
+                        title: "<?= /* @noEscape */  $block->getMyAccountLabels('AC11')?
                                 $block->getMyAccountLabels('AC11') : 'Delete'?>",
                         content: getMyAccountExceptions('IAVMA2') ?
                 getMyAccountExceptions('IAVMA2') : 'Are you sure you want to delete the card? \n\
@@ -123,7 +123,7 @@ Once the card is deleted, subscriptions associated with it will be cancelled',
 <?php else: ?>
     <div class="message info empty">
         <span>
-            <?php print /* @noEscape */ $block->getMyAccountLabels('AC30')?
+            <?= /* @noEscape */ $block->getMyAccountLabels('AC30')?
                     $block->getMyAccountLabels('AC30') :'You have no Saved Card.'; ?>
         </span>
     </div>
@@ -153,4 +153,3 @@ Once the card is deleted, subscriptions associated with it will be cancelled',
         }
     }
 </script>
-

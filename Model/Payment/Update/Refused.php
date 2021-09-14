@@ -10,6 +10,7 @@ class Refused extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sa
     private $_configHelper;
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
@@ -23,6 +24,7 @@ class Refused extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sa
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
     }
+    
     public function apply($payment, $order = null)
     {
         if (!empty($order)) {
@@ -33,6 +35,8 @@ class Refused extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sa
     }
 
     /**
+     * Get allowed payment statuses
+     *
      * @return array
      */
     protected function _getAllowedPaymentStatuses()

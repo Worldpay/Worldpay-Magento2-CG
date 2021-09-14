@@ -11,7 +11,21 @@ class WalletService extends \Magento\Framework\DataObject
 
     protected $checkoutSession;
     protected $updateWorldPayPayment;
-
+    
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Model\Mapping\Service $mappingservice
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Sapient\Worldpay\Helper\Registry $registryhelper
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
@@ -35,7 +49,7 @@ class WalletService extends \Magento\Framework\DataObject
         $this->registryhelper = $registryhelper;
         $this->urlBuilders    = $urlBuilder;
     }
-
+    
     /**
      * handles provides authorization data for redirect
      * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
@@ -133,6 +147,13 @@ class WalletService extends \Magento\Framework\DataObject
         $this->checkoutSession->setAuthOrderId($mageOrderId);
         $this->checkoutSession->set3DS2Config($threeDSecureConfig);
     }
+    
+    /**
+     * Method to apply payment update
+     *
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     */
     private function _applyPaymentUpdate(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
         $payment

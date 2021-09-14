@@ -7,6 +7,8 @@ namespace Sapient\Worldpay\Model\Config\Source;
 class IntegrationMode implements \Magento\Framework\Option\ArrayInterface
 {
     /**
+     * Configurations for integration mode
+     *
      * @return array
      */
     public function toOptionArray()

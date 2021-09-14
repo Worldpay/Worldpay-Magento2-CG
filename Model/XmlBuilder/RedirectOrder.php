@@ -62,7 +62,7 @@ EOD;
         );
         $this->shopperId = $args['shopperId'];
     }
-
+    
     /**
      * Build xml for processing Request
      *
@@ -222,6 +222,8 @@ EOD;
     }
 
     /**
+     * Add dynamic 3ds element
+     *
      * @param SimpleXMLElement $order
      */
     private function _addDynamic3DSElement($order)
@@ -239,6 +241,8 @@ EOD;
     }
 
     /**
+     * Add token element attribute
+     *
      * @param SimpleXMLElement $order
      */
     private function _addCreateTokenElement($order)
@@ -392,6 +396,8 @@ EOD;
     }
 
     /**
+     * Add cdata element
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */

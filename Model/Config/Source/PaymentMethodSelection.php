@@ -6,11 +6,15 @@ namespace Sapient\Worldpay\Model\Config\Source;
 
 class PaymentMethodSelection implements \Magento\Framework\Option\ArrayInterface
 {
-    /**
-     * @return array
-     */
+    
     const RADIO_BUTTONS = 'radio';
     const DROPDOWN_MENU = 'dropdown';
+    
+    /**
+     * Payment selection type
+     *
+     * @return array
+     */
     public function toOptionArray()
     {
 

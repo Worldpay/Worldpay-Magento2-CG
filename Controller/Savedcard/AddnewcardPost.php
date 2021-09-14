@@ -38,7 +38,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
     protected $formKeyValidator;
     
     protected $helper;
-
+     
     /**
      * Constructor
      *
@@ -296,12 +296,14 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 $directResponse = $this->directResponse->setResponse($response);
                 $threeDSecureParams = $directResponse->get3dSecureParams();
                 $threeDSecureChallengeParams = $directResponse->get3ds2Params();
-                if(!$this->worldpayHelper->is3dsEnabled() && isset($threeDSecureParams)) {
-                  $this->wplogger->info("3Ds attempted but 3DS is not enabled for the store. Please contact merchant.");
-                  $this->messageManager->addErrorMessage(
-                "3Ds attempted but 3DS is not enabled for the store. Please contact merchant. ");
+                if (!$this->worldpayHelper->is3dsEnabled() && isset($threeDSecureParams)) {
+                    $this->wplogger->info("3Ds attempted but 3DS is not enabled for the store. "
+                            . "Please contact merchant.");
+                    $this->messageManager->addErrorMessage(
+                        "3Ds attempted but 3DS is not enabled for the store. Please contact merchant. "
+                    );
                   //return $this->resultRedirectFactory->create()->setPath('worldpay/savedcard', ['_current' => true]);
-                  return  $this->resultJsonFactory->create()->setData(['success' => false]);
+                    return  $this->resultJsonFactory->create()->setData(['success' => false]);
                
                 }
                 $threeDSecureConfig = [];
@@ -344,7 +346,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                          ($riskScore < 100 || $riskProviderFinalScore < 100))) {
                         $this->messageManager->getMessages(true);
                         $this->updateWorldPayPayment->create()
-                        ->updateWorldpayPaymentForMyAccount($directResponse, $payment, '',$disclaimerFlag);
+                        ->updateWorldpayPaymentForMyAccount($directResponse, $payment, '', $disclaimerFlag);
                         $this->messageManager->addSuccess(
                             $this->worldpayHelper->getMyAccountSpecificexception('IAVMA3')
                                 ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA3')
@@ -372,7 +374,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                                 ->getCreditCardSpecificException('CCAM22')));
                 } else {
                     $this->messageManager->addException($e, __('Error: ').$e->getMessage());
-			return  $this->resultJsonFactory->create()
+                    return  $this->resultJsonFactory->create()
                         ->setData(['threeDError' => true]);
                 }
                 return  $this->resultJsonFactory->create()

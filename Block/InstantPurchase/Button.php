@@ -27,7 +27,7 @@ class Button extends Template
      * @var SessionManagerInterface
      */
     protected $session;
-
+    
     /**
      * Button constructor.
      * @param Context $context

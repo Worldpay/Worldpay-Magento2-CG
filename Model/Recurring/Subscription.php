@@ -171,6 +171,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
      * @param \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
      * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\CollectionFactory
      * $addressCollectionFactory
+     * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      * @param \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder
@@ -212,6 +213,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Construct
+     *
      * @return void
      */
     protected function _construct()
@@ -312,6 +315,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Get plan
+     *
      * @return Plan
      */
     public function getPlan()
@@ -331,6 +336,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Set plan
+     *
      * @param Plan $plan
      * @return $this
      */
@@ -356,6 +363,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Get address collection
+     *
      * @return \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\Collection
      */
     public function getAddressesCollection()
@@ -370,6 +379,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Get address
+     *
      * @return \Sapient\Worldpay\Model\Recurring\Subscription\Address[]
      */
     public function getAddresses()
@@ -381,6 +392,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Set address
+     *
      * @param array $addresses
      * @return $this
      */
@@ -499,6 +512,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
 //    }
 
     /**
+     * Set discount list
+     *
      * @param array $discountList
      * @return $this
      */
@@ -509,6 +524,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Add discount
+     *
      * @param Subscription\Discount $discount
      */
     public function addDiscount(Subscription\Discount $discount)

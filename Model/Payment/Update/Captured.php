@@ -10,6 +10,7 @@ class Captured extends \Sapient\Worldpay\Model\Payment\Update\Base implements \S
     private $_configHelper;
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
@@ -23,7 +24,7 @@ class Captured extends \Sapient\Worldpay\Model\Payment\Update\Base implements \S
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
     }
-
+    
     public function apply($payment, $order = null)
     {
 
@@ -36,6 +37,8 @@ class Captured extends \Sapient\Worldpay\Model\Payment\Update\Base implements \S
     }
 
     /**
+     * Allowed payment statuses
+     *
      * @return array
      */
     protected function _getAllowedPaymentStatuses()

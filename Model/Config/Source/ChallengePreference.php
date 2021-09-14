@@ -7,6 +7,8 @@ namespace Sapient\Worldpay\Model\Config\Source;
 class ChallengePreference extends \Magento\Framework\App\Config\Value
 {
     /**
+     * Configurations for 3ds2 challenge preference
+     *
      * @return array
      */
     public function toOptionArray()

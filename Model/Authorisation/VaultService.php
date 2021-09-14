@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ * VaultService @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Authorisation;
 
@@ -9,6 +9,20 @@ use Exception;
 class VaultService extends \Magento\Framework\DataObject
 {
     protected $checkoutSession;
+    
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Model\Mapping\Service $mappingservice
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Helper\Registry $registryhelper
+     */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
@@ -30,6 +44,7 @@ class VaultService extends \Magento\Framework\DataObject
         $this->wplogger = $wplogger;
         $this->registryhelper = $registryhelper;
     }
+    
     public function authorizePayment(
         $mageOrder,
         $quote,
@@ -59,11 +74,11 @@ class VaultService extends \Magento\Framework\DataObject
         $threeDSecureChallengeParams = $directResponse->get3ds2Params();
         $threeDSecureConfig = [];
         if ($threeDSecureParams) {
-            if(!$threeDsEnabled) {
+            if (!$threeDsEnabled) {
                 $this->wplogger->info("3Ds attempted but 3DS is not enabled for the store. Please contact merchant.");
                 throw new \Magento\Framework\Exception\LocalizedException(
-                __("3Ds attempted but 3DS is not enabled for the store. Please contact merchant.")
-            );
+                    __("3Ds attempted but 3DS is not enabled for the store. Please contact merchant.")
+                );
             }
             // Handles success response with 3DS & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
@@ -106,7 +121,7 @@ class VaultService extends \Magento\Framework\DataObject
         $this->checkoutSession->set3DSecureParams($threeDSecureParams);
         $this->checkoutSession->setDirectOrderParams($directOrderParams);
         $this->checkoutSession->setAuthOrderId($mageOrderId);
-	$this->checkoutSession->setInstantPurchaseOrder(true);
+        $this->checkoutSession->setInstantPurchaseOrder(true);
     }
     
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)

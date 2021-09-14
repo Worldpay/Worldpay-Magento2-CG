@@ -10,6 +10,8 @@ class InstalmentCountryType extends \Magento\Framework\App\Config\Value
 {
 
     /**
+     * Types of instalments
+     *
      * @return array
      */
     public function toOptionArray()

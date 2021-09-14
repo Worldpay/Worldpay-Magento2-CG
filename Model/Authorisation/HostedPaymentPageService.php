@@ -44,6 +44,7 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
         $this->hppstate = $hppstate;
         $this->_urlInterface = $urlInterface;
     }
+    
     /**
      * handles provides authorization data for Hosted Payment Page integration
      * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
@@ -79,6 +80,8 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
     }
 
     /**
+     * Get response model
+     *
      * @return  \Sapient\Worldpay\Model\Response\RedirectResponse
      */
     protected function _getRedirectResponseModel()
@@ -91,6 +94,8 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
     }
 
     /**
+     * Method to retrieve status
+     *
      * @return  \Sapient\Worldpay\Model\Checkout\Hpp\State
      */
     protected function _getStatus()

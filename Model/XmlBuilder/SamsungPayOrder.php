@@ -23,7 +23,7 @@ EOD;
     private $amount;
     private $paymentType;
     private $exponent;
-
+    
     /**
      * Build xml for processing Request
      *
@@ -146,6 +146,8 @@ EOD;
     }
 
     /**
+     * Add cdata element
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */
@@ -157,6 +159,8 @@ EOD;
     }
 
     /**
+     * Retrieve amount value
+     *
      * @param float $amount
      * @return int
      */

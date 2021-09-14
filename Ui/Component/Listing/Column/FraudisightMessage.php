@@ -51,7 +51,7 @@ class FraudisightMessage extends Column
 
                 //$order  = $this->_orderRepository->get($item["entity_id"]);
                 //$mageOrder = $order->getIncrementId();
-               $worldpaypayment=$this->_worldpaypayment->loadByPaymentId($item["increment_id"]);
+                $worldpaypayment=$this->_worldpaypayment->loadByPaymentId($item["increment_id"]);
                 $fraudsightMessage = $worldpaypayment->getFraudsightMessage();
                 if (strtolower($fraudsightMessage) === 'review') {
                     $fraudsightMessage=  '<font color="red">'.$fraudsightMessage.'</font>';

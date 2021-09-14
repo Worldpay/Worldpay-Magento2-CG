@@ -10,6 +10,7 @@ class Error extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sapi
     private $_configHelper;
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
@@ -23,7 +24,7 @@ class Error extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sapi
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
     }
-
+    
     public function apply($payment, $order = null)
     {
         if (!empty($order)) {
@@ -34,6 +35,8 @@ class Error extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sapi
     }
 
     /**
+     * Allowed Payment Statuses
+     *
      * @return array
      */
     protected function _getAllowedPaymentStatuses()

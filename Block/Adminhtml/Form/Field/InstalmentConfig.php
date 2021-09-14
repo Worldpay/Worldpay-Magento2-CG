@@ -15,7 +15,7 @@ class InstalmentConfig extends \Magento\Config\Block\System\Config\Form\Field\Fi
      * @var countryRenderer
      */
     private $countryRenderer;
-
+    
     /**
      * Get activation options.
      *

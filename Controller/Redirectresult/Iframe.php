@@ -28,7 +28,6 @@ class Iframe extends \Magento\Framework\App\Action\Action
      * @param Context $context
      * @param PageFactory $pageFactory
      * @param \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate
-     * @param \Magento\Framework\UrlInterface $urlInterface
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      */
     public function __construct(
@@ -42,7 +41,7 @@ class Iframe extends \Magento\Framework\App\Action\Action
         $this->hppstate = $hppstate;
         return parent::__construct($context);
     }
- 
+    
     public function execute()
     {
         $this->_getStatus()->reset();

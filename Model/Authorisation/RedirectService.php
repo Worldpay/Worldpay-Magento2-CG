@@ -45,8 +45,9 @@ class RedirectService extends \Magento\Framework\DataObject
         $this->paymentlist = $paymentlist;
         $this->worldpayhelper = $worldpayhelper;
     }
+    
     /**
-     * handles provides authorization data for redirect
+     * Handles provides authorization data for redirect
      * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
      */
     public function authorizePayment(
@@ -127,6 +128,7 @@ class RedirectService extends \Magento\Framework\DataObject
 
     /**
      * Get local language code
+     *
      * @return string
      */
     protected function _getLanguageForLocale()
@@ -139,6 +141,8 @@ class RedirectService extends \Magento\Framework\DataObject
     }
 
     /**
+     * Function to return response model
+     *
      * @return \Sapient\Worldpay\Model\Response\RedirectResponse
      */
     protected function _getRedirectResponseModel()

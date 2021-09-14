@@ -26,13 +26,15 @@ abstract class ResponseAbstract
     protected $_wpOrderId;
 
     /**
+     * Get response xml
+     *
      * @return SimpleXMLElement
      */
     public function getXml()
     {
         return $this->_responseXml;
     }
-
+    
     /**
      * @param $response
      * @return  $this

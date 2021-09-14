@@ -7,6 +7,8 @@ namespace Sapient\Worldpay\Model\Config\Source;
 class AuthenticationMethods extends \Magento\Framework\App\Config\Value
 {
     /**
+     * Configurations
+     *
      * @return array
      */
     public function toOptionArray()

@@ -23,6 +23,10 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
      * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
      * @param \Sapient\Worldpay\Model\Authorisation\ThreeDSecureChallenge $threedcredirectresponse
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Framework\Session\SessionManagerInterface $session
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory
+     * @param CreditCardException $helper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -50,13 +54,13 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
         $this->helper = $helper;
         parent::__construct($context);
     }
-
+    
     /**
      * Accepts callback from worldpay's 3DS2 Secure page. If payment has been
      * authorised, update order and redirect to the checkout success page.
      */
     public function execute()
-   {
+    {
         if (isset($_COOKIE['PHPSESSID'])) {
             $phpsessId = $_COOKIE['PHPSESSID'];
             $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
@@ -95,7 +99,7 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
 
                 $this->checkoutSession->unsInstantPurchaseRedirectUrl();
                 $this->checkoutSession->unsInstantPurchaseOrder();
-                //$this->getResponse()->setRedirect($redirectUrl);
+                
                 return $this->resultRedirectFactory->create()->setUrl($redirectUrl);
             } elseif ($this->checkoutSession->getIavCall()) {
                 $this->checkoutSession->unsIavCall();
@@ -120,7 +124,8 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
         } elseif ($this->checkoutSession->getIavCall()) {
                 $this->checkoutSession->unsIavCall();
                 $this->getResponse()->setRedirect(
-                        $this->urlBuilders->getUrl('worldpay/savedcard', ['_secure' => true]));
+                    $this->urlBuilders->getUrl('worldpay/savedcard', ['_secure' => true])
+                );
         } else {
             $redirectUrl = $this->checkoutSession->getWpResponseForwardUrl();
             $this->checkoutSession->unsWpResponseForwardUrl();

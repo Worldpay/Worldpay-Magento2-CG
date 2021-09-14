@@ -32,7 +32,7 @@ EOD;
      * @var string
      */
     protected $merchantCode;
-
+    
     public function __construct(array $args = [])
     {
         if (isset($args['tokenModel']) && $args['tokenModel'] instanceof \Sapient\WorldPay\Model\SavedToken) {
@@ -50,6 +50,7 @@ EOD;
 
     /**
      * Build xml for processing Request
+     *
      * @return SimpleXMLElement $xml
      */
     public function build()
@@ -65,6 +66,8 @@ EOD;
     }
 
     /**
+     * Add inquiry element
+     *
      * @param SimpleXMLElement $xml
      * @return SimpleXMLElement
      */
@@ -74,6 +77,8 @@ EOD;
     }
 
     /**
+     * Add token inquiry element
+     *
      * @param SimpleXMLElement $inquiry
      * @return SimpleXMLElement $xml
      */

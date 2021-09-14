@@ -12,9 +12,11 @@ class SubscriptionStatus extends AbstractArraySource
     const SUSPENDED = 'suspended';
     const CANCELLED = 'cancelled';
     const EXPIRED = 'expired';
-
+    
     /**
-     * {@inheritdoc}
+     * Configurations
+     *
+     * @return array
      */
     public function toOptionArray()
     {

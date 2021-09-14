@@ -43,7 +43,7 @@ class CompositeConfigProviderPlugin
      * Retrieve assoc array of checkout configuration
      *
      * @param \Magento\Checkout\Model\CompositeConfigProvider $subject
-     * @param $result
+     * @param array $result
      * @return array
      */
     public function afterGetConfig(\Magento\Checkout\Model\CompositeConfigProvider $subject, $result)

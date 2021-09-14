@@ -24,7 +24,21 @@ use Magento\Framework\Event\ManagerInterface;
 
 class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
 {
-
+    
+    /**
+     * Constructor
+     *
+     * @param Template $templateContainer
+     * @param OrderIdentity $identityContainer
+     * @param \Magento\Sales\Model\Order\Email\SenderBuilderFactory $senderBuilderFactory
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param Renderer $addressRenderer
+     * @param PaymentHelper $paymentHelper
+     * @param \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
+     * @param OrderResource $orderResource
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $globalConfig
+     * @param ManagerInterface $eventManager
+     */
     public function __construct(
         Template $templateContainer,
         OrderIdentity $identityContainer,

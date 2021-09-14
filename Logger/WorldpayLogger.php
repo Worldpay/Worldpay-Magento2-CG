@@ -1,11 +1,13 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ * Copyright © 2021 Worldpay, LLC. All rights reserved.
+ * See COPYING.txt for license details.
  */
 namespace Sapient\Worldpay\Logger;
 
 class WorldpayLogger extends \Monolog\Logger
 {
+    
     public function addRecord($level, $message, array $context = [])
     {
         $ObjectManager = \Magento\Framework\App\ObjectManager::getInstance();

@@ -7,7 +7,7 @@ class Chromepay extends \Magento\Framework\App\Action\Action
     protected $_request;
     protected $_paymentservicerequest;
     protected $_authSession;
-
+    
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $pageFactory,

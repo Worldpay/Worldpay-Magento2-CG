@@ -7,6 +7,8 @@ namespace Sapient\Worldpay\Model\Config\Source;
 class PaymentMethods extends \Magento\Framework\App\Config\Value
 {
     /**
+     * Configuration for payment types
+     *
      * @return array
      */
     public function toOptionArray()

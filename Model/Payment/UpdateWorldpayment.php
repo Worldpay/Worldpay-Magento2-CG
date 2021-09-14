@@ -35,6 +35,13 @@ class UpdateWorldpayment
      * @param SavedTokenFactory $savedTokenFactory
      * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
+     * @param CreditCardTokenFactory $paymentTokenFactory
+     * @param \Magento\Backend\Model\Session\Quote $session
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param EncryptorInterface $encryptor
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
      */
     public function __construct(
@@ -69,6 +76,9 @@ class UpdateWorldpayment
      * Updating Risk gardian
      *
      * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param \Magento\Payment\Model\InfoInterface $paymentObject
+     * @param string $tokenId
+     * @param bool $disclaimerFlag
      */
     public function updateWorldpayPaymentForMyAccount(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
@@ -142,6 +152,9 @@ class UpdateWorldpayment
      * Updating Risk gardian
      *
      * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param \Magento\Payment\Model\InfoInterface $paymentObject
+     * @param string $tokenId
+     * @param bool $disclaimerFlag
      */
     public function updateWorldpayPayment(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
@@ -182,13 +195,23 @@ class UpdateWorldpayment
         $wpp->setData('card_number', $cardNumber);
         $wpp->setData('payment_status', $paymentStatus);
         if ($payment->paymentMethod[0]) {
-            if(!in_array(strtoupper($payment->paymentMethod[0]),
-            $this->apmMethods )) {
-            $this->paymentMethodType = str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $payment->paymentMethod[0]);
-            $wpp->setData('payment_type', str_replace(["_CREDIT","_DEBIT","_ELECTRON"], "", $this->paymentMethodType));
-            }else {
-            $this->paymentMethodType = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
-            $wpp->setData('payment_type', str_replace("_CREDIT", "", $this->paymentMethodType));   
+            if (!in_array(
+                strtoupper($payment->paymentMethod[0]),
+                $this->apmMethods
+            )) {
+                $this->paymentMethodType = str_replace(
+                    ["_CREDIT","_DEBIT","_ELECTRON"],
+                    "",
+                    $payment->paymentMethod[0]
+                );
+                $wpp->setData('payment_type', str_replace(
+                    ["_CREDIT","_DEBIT","_ELECTRON"],
+                    "",
+                    $this->paymentMethodType
+                ));
+            } else {
+                $this->paymentMethodType = str_replace("_CREDIT", "", $payment->paymentMethod[0]);
+                $wpp->setData('payment_type', str_replace("_CREDIT", "", $this->paymentMethodType));
             }
         }
         $wpp->setData('avs_result', $avsnumber);
@@ -211,15 +234,15 @@ class UpdateWorldpayment
         $wpp->setData('is_primerouting_enabled', $primeRoutingEnabled);
         $wpp->setData('primerouting_networkused', $networkUsed);
         if ($issureInsightresponse) {
-        $wpp->setData('source_type', $issureInsightresponse['sourceType']);
-        $wpp->setData('available_balance', $issureInsightresponse['availableBalance']);
-        $wpp->setData('prepaid_card_type', $issureInsightresponse['prepaidCardType']);
-        $wpp->setData('reloadable', $issureInsightresponse['reloadable']);
-        $wpp->setData('card_product_type', $issureInsightresponse['cardProductType']);
-        $wpp->setData('affluence', $issureInsightresponse['affluence']);
-        $wpp->setData('account_range_id', $issureInsightresponse['accountRangeId']);
-        $wpp->setData('issuer_country', $issureInsightresponse['issuerCountry']);
-        $wpp->setData('virtual_account_number', $issureInsightresponse['virtualAccountNumber']);
+            $wpp->setData('source_type', $issureInsightresponse['sourceType']);
+            $wpp->setData('available_balance', $issureInsightresponse['availableBalance']);
+            $wpp->setData('prepaid_card_type', $issureInsightresponse['prepaidCardType']);
+            $wpp->setData('reloadable', $issureInsightresponse['reloadable']);
+            $wpp->setData('card_product_type', $issureInsightresponse['cardProductType']);
+            $wpp->setData('affluence', $issureInsightresponse['affluence']);
+            $wpp->setData('account_range_id', $issureInsightresponse['accountRangeId']);
+            $wpp->setData('issuer_country', $issureInsightresponse['issuerCountry']);
+            $wpp->setData('virtual_account_number', $issureInsightresponse['virtualAccountNumber']);
         }
         $wpp->setData('risk_provider', $riskProvider);
         
@@ -255,7 +278,7 @@ class UpdateWorldpayment
             }
         }
     }
-
+    
     /**
      * Saved token data
      * @param $tokenElement
@@ -332,6 +355,7 @@ class UpdateWorldpayment
             return;
         }
     }
+    
     protected function setVaultPaymentTokenMyAccount($tokenElement)
     {
         // Check token existing in gateway response
@@ -437,6 +461,11 @@ class UpdateWorldpayment
         return $extensionAttributes;
     }
     
+    /**
+     * Get additional payment information
+     *
+     * @param InfoInterface $payment
+     */
     private function getAdditionalInformation(InfoInterface $payment)
     {
         $additionalInformation = $payment->getAdditionalInformation();
@@ -447,6 +476,12 @@ class UpdateWorldpayment
         $payment->setAdditionalInformation($additionalInformation);
     }
     
+    /**
+     * Save data to worldpay_recurring_transactions
+     *
+     * @param string $tokenId
+     * @param string $worldpayOrderCode
+     */
     public function saveTokenDataToTransactions($tokenId, $worldpayOrderCode)
     {
         $orderId = explode('-', $worldpayOrderCode);
@@ -457,6 +492,12 @@ class UpdateWorldpayment
         $transactions->save();
     }
     
+    /**
+     * Check prime routing request
+     *
+     * @param InfoInterface $paymentObject
+     * @return bool
+     */
     private function getPrimeRoutingEnabled(InfoInterface $paymentObject)
     {
         $paymentAditionalInformation = $paymentObject->getAdditionalInformation();
@@ -467,6 +508,12 @@ class UpdateWorldpayment
         }
     }
     
+    /**
+     * Issuer Insights
+     *
+     * @param object $payment
+     * @return array
+     */
     private function getIssuerInsightResponseData($payment)
     {
         $issuerInsightData = [];
@@ -486,6 +533,12 @@ class UpdateWorldpayment
         }
     }
     
+    /**
+     * FraudSight data
+     *
+     * @param object $payment
+     * @return array
+     */
     private function getFraudsightData($payment)
     {
         $fraudsightData = [];
@@ -504,6 +557,12 @@ class UpdateWorldpayment
         }
     }
     
+    /**
+     * Retrieve reason codes
+     *
+     * @param object $reasoncodes
+     * @return string
+     */
     private function getReasoncodes($reasoncodes)
     {
         $savereasoncode = '';

@@ -27,6 +27,8 @@ class Refund implements ObserverInterface
 
     /**
      * Process the credit memo
+     *
+     * @param \Magento\Framework\Event\Observer $observer
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {

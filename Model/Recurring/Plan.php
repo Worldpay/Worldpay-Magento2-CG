@@ -42,12 +42,15 @@ class Plan extends \Magento\Framework\Model\AbstractModel
 {
 
     /**
+     * Constructor
+     *
      * @return void
      */
     protected function _construct()
     {
         $this->_init(\Sapient\Worldpay\Model\ResourceModel\Recurring\Plan::class);
     }
+    
     /**
      * Load plan Details
      *

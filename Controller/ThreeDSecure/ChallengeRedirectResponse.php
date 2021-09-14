@@ -16,6 +16,7 @@ class ChallengeRedirectResponse extends \Magento\Framework\App\Action\Action
      * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
      * @param \Sapient\Worldpay\Model\Authorisation\ThreeDSecureChallenge $threedcredirectresponse
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -37,7 +38,7 @@ class ChallengeRedirectResponse extends \Magento\Framework\App\Action\Action
         $this->_resultPageFactory = $resultPageFactory;
         parent::__construct($context);
     }
-
+    
     /**
      * Accepts callback from worldpay's 3DS2 challenge iframe page.
      */

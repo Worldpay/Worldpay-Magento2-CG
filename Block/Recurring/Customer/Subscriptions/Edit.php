@@ -16,11 +16,13 @@ use Sapient\Worldpay\Helper\Recurring;
 use Sapient\Worldpay\Model\Recurring\Plan;
 use Sapient\Worldpay\Model\Recurring\Subscription;
 use Sapient\Worldpay\Model\Recurring\SubscriptionFactory;
+use Magento\Directory\Helper\Data;
 
 //use Sapient\Worldpay\Model\Ui\CcConfigProvider;
 
 class Edit extends \Magento\Framework\View\Element\Template
 {
+    
     /**
      * @var \Sapient\Worldpay\Model\Recurring\Subscription|null
      */
@@ -62,7 +64,7 @@ class Edit extends \Magento\Framework\View\Element\Template
      * @param IconsProvider $iconsProvider
      * @param PaymentTokenManagementInterface $tokenManager
      * @param Session $customerSession
-     * @param CcConfigProvider $ccConfigProvider
+     * @param Data $helper,
      * @param array $data
      */
     public function __construct(
@@ -73,7 +75,7 @@ class Edit extends \Magento\Framework\View\Element\Template
         IconsProvider $iconsProvider,
         PaymentTokenManagementInterface $tokenManager,
         Session $customerSession,
-        //CcConfigProvider $ccConfigProvider,
+        Data $helper,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -83,6 +85,7 @@ class Edit extends \Magento\Framework\View\Element\Template
         $this->tokenManager = $tokenManager;
         $this->customerSession = $customerSession;
         //$this->ccConfigProvider = $ccConfigProvider;
+        $this->helper = $helper;
         $this->iconsProvider = $iconsProvider;
     }
 
@@ -293,5 +296,24 @@ class Edit extends \Magento\Framework\View\Element\Template
         $icon = (isset($iconList[$details['ccType']])) ? $iconList[$details['ccType']] : [];
 
         return $icon;
+    }
+    
+    /**
+     *
+     * @return string
+     */
+    public function getRegionJson()
+    {
+        return $this->helper->getRegionJson();
+    }
+    
+    /**
+     *
+     * @param type $asJson
+     * @return array|string
+     */
+    public function getCountriesWithOptionalZip($asJson)
+    {
+        return $this->helper->getCountriesWithOptionalZip($asJson);
     }
 }

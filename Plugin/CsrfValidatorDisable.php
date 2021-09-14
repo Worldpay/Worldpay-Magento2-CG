@@ -4,6 +4,8 @@ namespace Sapient\Worldpay\Plugin;
 class CsrfValidatorDisable
 {
     /**
+     * Constructor
+     *
      * @param \Magento\Framework\App\Request\CsrfValidator $subject
      * @param \Closure $proceed
      * @param \Magento\Framework\App\RequestInterface $request

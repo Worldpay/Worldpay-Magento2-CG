@@ -32,6 +32,8 @@ class UpgradeData implements UpgradeDataInterface
      *
      * @param CategorySetupFactory $categorySetupFactory
      * @param EavSetupFactory $eavSetupFactory
+     * @param \Magento\Config\Model\Config\Factory $configFactory
+     * @param \Magento\Framework\App\State $state
      */
     public function __construct(
         CategorySetupFactory $categorySetupFactory,
@@ -46,7 +48,7 @@ class UpgradeData implements UpgradeDataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {

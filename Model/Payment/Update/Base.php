@@ -24,6 +24,7 @@ class Base
 
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      */
@@ -37,6 +38,8 @@ class Base
     }
 
     /**
+     * Target order code
+     *
      * @return string ordercode
      */
     public function getTargetOrderCode()
@@ -45,7 +48,8 @@ class Base
     }
 
     /**
-     * check payment Status
+     * Check payment Status
+     *
      * @param object $order
      * @param array $allowedPaymentStatuses
      * @return null
@@ -69,7 +73,9 @@ class Base
     }
 
     /**
-     * check if order is not placed throgh worldpay payment
+     * Check if order is not placed throgh worldpay payment
+     *
+     * @param object $order
      * @throws Exception
      */
     private function _assertPaymentExists($order)
@@ -79,8 +85,11 @@ class Base
         }
     }
 
-    /*
-     * convert worldpay amount to magento amount
+    /**
+     * Convert worldpay amount to magento amount
+     *
+     * @param float $amount
+     * @return float
      */
     protected function _amountAsInt($amount)
     {

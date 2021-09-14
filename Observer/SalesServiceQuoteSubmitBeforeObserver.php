@@ -26,6 +26,8 @@ class SalesServiceQuoteSubmitBeforeObserver implements ObserverInterface
     private $orderAddressToSubscriptionAddress;
 
     /**
+     * Constructor
+     *
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param \Sapient\Worldpay\Model\Recurring\Order\Item\ToSubscription $orderItemToSubscription
      * @param \Sapient\Worldpay\Model\Recurring\Order\Address\ToSubscriptionAddress $orderAddressToSubscriptionAddress
@@ -42,7 +44,7 @@ class SalesServiceQuoteSubmitBeforeObserver implements ObserverInterface
         $this->orderAddressToSubscriptionAddress = $orderAddressToSubscriptionAddress;
         $this->objectCopyService = $objectCopyService;
     }
-
+    
     /**
      * Set corresponding flag to order if quote contains subscription items
      *

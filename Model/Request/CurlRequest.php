@@ -5,13 +5,13 @@
 namespace Sapient\Worldpay\Model\Request;
 
 /**
- * set curl param request
+ * Set curl param request
  */
 class CurlRequest
 {
     private $_handle;
     private $_url;
-
+    
     public function setUrl($url)
     {
         $this->_url = $url;

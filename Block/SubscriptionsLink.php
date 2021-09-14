@@ -24,7 +24,7 @@ class SubscriptionsLink extends \Magento\Framework\View\Element\Html\Link\Curren
 {
 
     protected $_scopeConfig = null;
-
+    
     public function __construct(
         Context $context,
         Subscriptions $subscriptionconfig,

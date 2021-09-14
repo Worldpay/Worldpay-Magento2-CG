@@ -31,12 +31,12 @@ class Index extends \Magento\Backend\App\Action
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice,
-     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-       @param \Sapient\Worldpay\Helper\GeneralException $helper
-       @param \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod
+     * @param \Sapient\Worldpay\Helper\GeneralException $helper
+     * @param \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod
      */
     public function __construct(
         Context $context,
@@ -60,7 +60,7 @@ class Index extends \Magento\Backend\App\Action
         $this->storeManager = $storeManager;
         $this->abstractMethod = $abstractMethod;
     }
-
+    
     public function execute()
     {
         $this->_loadOrder();

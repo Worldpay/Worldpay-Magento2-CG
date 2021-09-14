@@ -22,6 +22,7 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
       * @var array
       */
     protected static $_expiryYears;
+    
     /**
      * Constructor
      *
@@ -161,19 +162,17 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
         return self::$_expiryYears;
     }
     
-      public function getDisclaimerMessageEnable()
+    public function getDisclaimerMessageEnable()
     {
         
-            return (bool) $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer'
-                    . '/stored_credentials_message_enable', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        
+          return (bool) $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer'
+                  . '/stored_credentials_message_enable', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
     public function getDisclaimerText()
     {
         
             return $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer/'
                     . 'stored_credentials_disclaimer_message', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-     
     }
     
     public function getDisclaimerMessageMandatory()
@@ -181,7 +180,6 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
         
             return (bool) $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer/'
                     . 'stored_credentials_flag', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-       
     }
     
     public function getStoredCredentialsEnabledValue()
@@ -191,6 +189,4 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
-    
 }

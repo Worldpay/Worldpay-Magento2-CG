@@ -42,7 +42,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->scopeConfig = $scopeConfig;
         $this->request = $request;
     }
-
+    
     public function execute()
     {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;

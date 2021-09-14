@@ -53,16 +53,20 @@ class RecurringOrders
     /**
      * Constructor
      *
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param JsonFactory $resultJsonFactory
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
-     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice,
-     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
-     * @param \Sapient\Worldpay\Model\Order\Service $orderservice,
-     * @param \Sapient\Worldpay\Model\Recurring\Subscription $subscriptions,
-     * @param \Sapient\Worldpay\Model\Recurring\Subscription\Transactions $recurringTransactions,
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
+     * @param \Sapient\Worldpay\Model\Order\Service $orderservice
+     * @param \Sapient\Worldpay\Model\Recurring\Subscription $subscriptions
+     * @param \Sapient\Worldpay\Model\Recurring\Subscription\Transactions $recurringTransactions
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\Address $subscriptionAddress
+     * @param \Sapient\Worldpay\Helper\Recurring $recurringhelper
+     * @param SubscriptionFactory $subscriptionFactory
+     * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
+     * @param \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
      */
     public function __construct(
         JsonFactory $resultJsonFactory,
@@ -95,7 +99,7 @@ class RecurringOrders
         $this->transactionFactory = $transactionsFactory;
         $this->planFactory = $planFactory;
     }
-
+    
     /**
      * Get the list of orders to be sync the status
      */

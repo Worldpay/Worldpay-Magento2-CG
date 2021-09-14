@@ -42,7 +42,7 @@ class Service
      *
      * @param Sapient\Worldpay\Model\Token $tokenModel
      * @param \Magento\Customer\Model\Customer $customer
-     * @param $storeId
+     * @param int $storeId
      * @return Sapient\Worldpay\Model\Token\UpdateXml
      */
     public function getTokenUpdate(
@@ -60,7 +60,7 @@ class Service
      *
      * @param Sapient\Worldpay\Model\Token $tokenModel
      * @param \Magento\Customer\Model\Customer $customer
-     * @param $storeId
+     * @param int $storeId
      * @return Sapient\Worldpay\Model\Token\DeleteXml
      */
     public function getTokenDelete(
@@ -78,7 +78,7 @@ class Service
      *
      * @param Sapient\Worldpay\Model\Token $tokenModel
      * @param \Magento\Customer\Model\Customer $customer
-     * @param $storeId
+     * @param int $storeId
      * @return Sapient\Worldpay\Model\Token\InquiryXml
      */
     public function getTokenInquiry(

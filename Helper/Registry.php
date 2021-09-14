@@ -1,12 +1,13 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ * Registry @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Helper;
 
 class Registry extends \Magento\Framework\App\Helper\AbstractHelper
 {
     protected $_registry;
+    
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\Registry $registry

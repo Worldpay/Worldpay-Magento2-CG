@@ -29,7 +29,7 @@ class Delete extends \Magento\Framework\App\Action\Action
     protected $customerSession;
         
     protected $helper;
-
+    
     /**
      * Constructor
      *

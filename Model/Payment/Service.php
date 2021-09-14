@@ -18,9 +18,10 @@ class Service
     protected $_helper;
     /**
      * Constructor
-     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
-     * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
-     * @param \Sapient\Worldpay\Helper\Data $configHelper
+     *
+     * @param \Sapient\Worldpay\Model\Payment\Update\Factory $paymentupdatefactory
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Model\Worldpayment $worldpayPayment
      */
     public function __construct(
         \Sapient\Worldpay\Model\Payment\Update\Factory $paymentupdatefactory,
@@ -31,7 +32,7 @@ class Service
         $this->paymentservicerequest = $paymentservicerequest;
         $this->worldpayPayment = $worldpayPayment;
     }
-
+    
     public function createPaymentUpdateFromWorldPayXml($xml)
     {
         return $this->_getPaymentUpdateFactory()
@@ -52,6 +53,13 @@ class Service
         return $this->_getPaymentUpdateFactory()
             ->create($state);
     }
+    
+    /**
+     * Getter for Payment update xml from notification
+     *
+     * @param type $xml
+     * @throws \Magento\Framework\Exception\CouldNotDeleteException
+     */
     public function getPaymentUpdateXmlForNotification($xml)
     {
         $paymentNotifyService = new \SimpleXmlElement($xml);
@@ -69,7 +77,8 @@ class Service
                     $getAttibute = (array) $nodes[0]->attributes()['accountType'];
                     $getNodeValue = $getAttibute[0];
                 }
-                if ($lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture' && $getNodeValue == 'IN_PROCESS_AUTHORISED') {
+                if ($lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture'
+                        && $getNodeValue == 'IN_PROCESS_AUTHORISED') {
                     $worldpaypayment = $this->worldpayPayment->loadByWorldpayOrderId($ordercode[0]);
                     if (isset($worldpaypayment)) {
                         $worldpaypayment->setData('payment_status', $lastEvent[0]);
@@ -82,6 +91,13 @@ class Service
         }
     }
 
+    /**
+     * Payment update xml for order
+     *
+     * @param \Sapient\Worldpay\Model\Order $order
+     * @return SimpleXMLElement
+     * @throws \Magento\Framework\Exception\CouldNotDeleteException
+     */
     public function getPaymentUpdateXmlForOrder(\Sapient\Worldpay\Model\Order $order)
     {
         $worldPayPayment = $order->getWorldPayPayment();
@@ -116,10 +132,9 @@ class Service
             && $getNodeValue == 'IN_PROCESS_AUTHORISED') {
                 $worldpaypayment= $this->worldpayPayment->loadByWorldpayOrderId($ordercode[0]);
                 if (isset($worldpaypayment)) {
-                $worldpaypayment->setData('payment_status', $lastEvent[0]);
-                $worldpaypayment->save();
+                    $worldpaypayment->setData('payment_status', $lastEvent[0]);
+                    $worldpaypayment->save();
                 }
-                //$order->setOrderAsProcessing();
                 $gatewayError = 'Sync status action not possible for this Partial Captutre Order.';
                 throw new \Magento\Framework\Exception\CouldNotDeleteException(__($gatewayError));
             }
@@ -127,6 +142,11 @@ class Service
         return simplexml_load_string($rawXml);
     }
 
+    /**
+     * Set global payment data
+     *
+     * @param object $paymentUpdate
+     */
     public function setGlobalPaymentByPaymentUpdate($paymentUpdate)
     {
         $this->worldpayPayment->loadByWorldpayOrderId($paymentUpdate->getTargetOrderCode());

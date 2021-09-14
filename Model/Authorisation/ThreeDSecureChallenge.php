@@ -15,16 +15,18 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
 
     /**
      * Constructor
-     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
-     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
-     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice,
-     * @param \Magento\Checkout\Model\Session $checkoutSession,
-     * @param \Magento\Framework\UrlInterface $urlBuilder,
-     * @param \Sapient\Worldpay\Model\Order\Service $orderservice,
-     * @param \Magento\Framework\Message\ManagerInterface $messageManager,
-     * @param \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment,
+     *
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Sapient\Worldpay\Model\Order\Service $orderservice
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
+     * @param \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment
      * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      */
     public function __construct(
@@ -54,6 +56,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
         $this->worldpaytoken = $worldpaytoken;
         $this->worldpayHelper = $worldpayHelper;
     }
+    
     public function continuePost3dSecure2AuthorizationProcess($directOrderParams, $threeDSecureParams)
     {
         //$directOrderParams['response'] = $responseParams;
@@ -119,7 +122,9 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
                 $this->_messageManager->addError(__($errorMessage));
             } else {
                 $this->_messageManager->getMessages(true);
-                $this->_messageManager->addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM10')));
+                $this->_messageManager->addError(
+                    __($this->paymentservicerequest->getCreditCardSpecificException('CCAM10'))
+                );
             }
             $this->checkoutSession->setWpResponseForwardUrl(
                 $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
@@ -134,6 +139,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
             return;
         }
     }
+    
     /**
      * Get order id column value
      *
@@ -146,23 +152,23 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
     }
 
     /**
-     * help to build url if payment is success
+     * Help to build url if payment is success
      */
     private function _handleAuthoriseSuccess()
-    { 
+    {
 
         if ($this->checkoutSession->getInstantPurchaseOrder()) {
             $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
             $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
         } else {
             $this->checkoutSession->setWpResponseForwardUrl(
-                    $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
+                $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
             );
         }
     }
-
+    
     /**
-     * it handles if payment is refused or cancelled
+     * It handles if payment is refused or cancelled
      * @param  Object $paymentUpdate
      */
     private function _abortIfPaymentError($paymentUpdate, $orderId)
@@ -220,6 +226,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
 
     /**
      * This will Save card
+     *
      * @param xml $xmlResponseData
      */
     private function _updateTokenData($xmlResponseData)
@@ -235,6 +242,11 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
         }
     }
 
+    /**
+     * Update token data
+     *
+     * @param xml $xmlRequest
+     */
     private function _applyTokenUpdate($xmlRequest)
     {
         $tokenService = $this->worldpaytoken;

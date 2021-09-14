@@ -22,7 +22,7 @@ class IndexTest extends TestCase
     protected $request;
     protected $indexObj;
     protected $objectManagerMock;
-
+    
     protected function setUp()
     {
         $context = $this->getMockBuilder(Context::class)
@@ -40,7 +40,14 @@ class IndexTest extends TestCase
         $this->objectManagerMock = $this->getMockBuilder(\Magento\Framework\ObjectManagerInterface::class)
                 ->disableOriginalConstructor()->getMock();
 
-        $this->indexObj = new Index($context, $jsonFactory, $wplogger, $paymentservice, $this->scopeConfig, $this->request);
+        $this->indexObj = new Index(
+            $context,
+            $jsonFactory,
+            $wplogger,
+            $paymentservice,
+            $this->scopeConfig,
+            $this->request
+        );
     }
 
     public function testExecute()
@@ -48,16 +55,18 @@ class IndexTest extends TestCase
         $this->scopeConfig
                 ->expects($this->any())
                 ->method('getValue')
-                ->withConsecutive(['worldpay/wallets_config/apple_pay_wallets_config/certification_key',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE], 
-                        ['worldpay/wallets_config/apple_pay_wallets_config/certification_crt',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE], 
-                        ['worldpay/wallets_config/apple_pay_wallets_config/certification_password', 
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE], 
-                        ['worldpay/wallets_config/apple_pay_wallets_config/merchant_name', 
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE], 
-                        ['worldpay/wallets_config/apple_pay_wallets_config/domain_name', 
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE])
+                ->withConsecutive(
+                    ['worldpay/wallets_config/apple_pay_wallets_config/certification_key',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/wallets_config/apple_pay_wallets_config/certification_crt',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/wallets_config/apple_pay_wallets_config/certification_password',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/wallets_config/apple_pay_wallets_config/merchant_name',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/wallets_config/apple_pay_wallets_config/domain_name',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+                )
                 ->will($this->onConsecutiveCalls(
                     '/var/www/html/webroot-apple/publicis_ecom_live_merchant_identity.key.pem',
                     '/var/www/html/webroot-apple/publicis_ecom_live_merchant_identity.crt.pem',

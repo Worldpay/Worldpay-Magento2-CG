@@ -4,26 +4,28 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
+
 ?>
 <?php if ($block->isPossibleOnepageCheckout()):?>
     <button type="button"
             data-role="proceed-to-checkout"
-            title="<?= /* @escapeNotVerified */ __('Proceed to Checkout') ?>"
-            data-mage-init='{"Magento_Checkout/js/proceed-to-checkout":{"checkoutUrl":"<?= /* @escapeNotVerified */ $block->getCheckoutUrl() ?>"}}'
+            title="<?= /* @noEscape */ __('Proceed to Checkout') ?>"
+            data-mage-init='{"Magento_Checkout/js/proceed-to-checkout":{"checkoutUrl":"<?= /* @noEscape */
+            $block->getCheckoutUrl() ?>"}}'
             class="action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
             <?php if ($block->isDisabled()):?>disabled="disabled"<?php endif; ?>>
-        <span><?= /* @escapeNotVerified */ __('Proceed to Checkout') ?></span>
+        <span><?= /* @noEscape */ __('Proceed to Checkout') ?></span>
     </button>
 <?php endif?>
 
 <br> <br>
 <button type="button" id='checkout-now-bottom'
-    title="<?= /* @escapeNotVerified */ __('Checkout Now') ?>"    
-    data-mage-init='{"Magento_Checkout/js/proceed-to-checkout":{"checkoutNowUrl":"<?= /* @escapeNotVerified */ $block->getCheckoutUrl() ?>"}}'
+    title="<?= /* @noEscape */ __('Checkout Now') ?>"    
+    data-mage-init='{"Magento_Checkout/js/proceed-to-checkout":{"checkoutNowUrl":"<?= /* @noEscape */
+    $block->getCheckoutUrl() ?>"}}'
     class="action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
     <?php if ($block->isDisabled()):?>disabled="disabled"<?php endif; ?>>
-    <span><?= /* @escapeNotVerified */ __('Checkout Now') ?></span>
+    <span><?= /* @noEscape */ __('Checkout Now') ?></span>
 </button>
     
 

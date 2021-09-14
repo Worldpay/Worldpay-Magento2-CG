@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ * UpgradeSchema @copyright 2017 Sapient
  */
 namespace Sapient\Worldpay\Setup;
 
@@ -19,6 +19,12 @@ class UpgradeSchema implements UpgradeSchemaInterface
     const WORLDPAY_SUBSCRIPTIONS_ADDRESS = 'worldpay_subscription_address';
     const WORLDPAY_RECURRING_TRANSACTIONS = 'worldpay_recurring_transactions';
 
+    /**
+     * Upgrade function
+     *
+     * @param SchemaSetupInterface $setup
+     * @param ModuleContextInterface $context
+     */
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $installer = $setup;
@@ -138,6 +144,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $installer->endSetup();
     }
     /**
+     * Column cse
+     *
      * @param SchemaSetupInterface $installer
      * @return void
      */
@@ -156,6 +164,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
     }
 
     /**
+     * Worldpay column
+     *
      * @param SchemaSetupInterface $installer
      * @return void
      */
@@ -235,6 +245,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
     }
 
     /**
+     * Token column
+     *
      * @param SchemaSetupInterface $installer
      * @return void
      */
@@ -254,6 +266,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
     }
 
     /**
+     * Bin column
+     *
      * @param SchemaSetupInterface $installer
      * @return void
      */
@@ -274,6 +288,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
     }
     
     /**
+     * Modify column order id
+     *
      * @param SchemaSetupInterface $installer
      * @return void
      */
@@ -294,6 +310,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
     }
     
     /**
+     * Disclaimer column
+     *
      * @param SchemaSetupInterface $installer
      * @return void
      */
@@ -768,6 +786,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
     }
     
     /**
+     * Subscription column
+     *
      * @param SchemaSetupInterface $setup
      * @return $this
      */
@@ -816,7 +836,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
      /**
       * Create subscription address table
       *
-      * @param SchemaSetupInterface $setup
+      * @param SchemaSetupInterface $installer
       * @return $this
       */
     private function addColumnSubscriptionEndDate(SchemaSetupInterface $installer)
@@ -1119,6 +1139,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
         return $this;
     }
     
+    /**
+     * Latam columns
+     *
+     * @param SchemaSetupInterface $installer
+     */
     private function addColumnLatAmInstalments(SchemaSetupInterface $installer)
     {
         $connection = $installer->getConnection();
@@ -1134,6 +1159,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
         );
     }
     
+    /**
+     * Recurring order column
+     *
+     * @param SchemaSetupInterface $installer
+     */
     private function addColumnIsRecurringOrder(SchemaSetupInterface $installer)
     {
         $connection = $installer->getConnection();
@@ -1149,6 +1179,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
         );
     }
     /**
+     * Worldpay token column
+     *
      * @param SchemaSetupInterface $installer
      * @return void
      */
@@ -1168,6 +1200,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
         );
     }
     
+    /**
+     * Prime Routing columns
+     *
+     * @param SchemaSetupInterface $installer
+     */
     private function addColumnPrimeRouting(SchemaSetupInterface $installer)
     {
         $connection = $installer->getConnection();
@@ -1194,6 +1231,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
         );
     }
     
+    /**
+     * Issuer insights column
+     *
+     * @param SchemaSetupInterface $installer
+     */
     private function addColumnIssuerInsightResponse(SchemaSetupInterface $installer)
     {
         $connection = $installer->getConnection();
@@ -1289,6 +1331,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
         );
     }
     
+    /**
+     * Add fraudsight column
+     *
+     * @param SchemaSetupInterface $installer
+     */
     public function addFraudsightToWp(SchemaSetupInterface $installer)
     {
         $connection = $installer->getConnection();

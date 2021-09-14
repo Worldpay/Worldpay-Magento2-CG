@@ -8,6 +8,7 @@ namespace Sapient\Worldpay\Block\Sales\Order\Item\Renderer;
 
 class DefaultRendererPlugin
 {
+    
     /**
      * @var \Sapient\Worldpay\Helper\Recurring
      */

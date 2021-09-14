@@ -34,6 +34,13 @@ class CallBack extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\Request\Http $request
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Magento\Backend\Model\Auth\Session $authSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Magento\Sales\Model\OrderFactory $orderFactory
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Sales\Api\OrderManagementInterface $orderManagement
+     * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory
      */
     public function __construct(
         Context $context,
@@ -64,7 +71,7 @@ class CallBack extends \Magento\Framework\App\Action\Action
         $this->orderManagement = $orderManagement;
         $this->_worldpaymentFactory= $worldpaymentFactory;
     }
-
+    
     public function execute()
     {
 
@@ -85,14 +92,14 @@ class CallBack extends \Magento\Framework\App\Action\Action
       
         $environmentMode = $this->scopeConfig->
                 getValue('worldpay/general_config/environment_mode', $storeScope);
-
       
         if ($environmentMode == 'Test Mode') {
-            $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId;
+            $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" .
+                    $refId . '?serviceId=' . $serviceId;
         } else {
-            $serviceUrl = "https://api-ops.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" . $refId . '?serviceId=' . $serviceId;
+            $serviceUrl = "https://api-ops.mpay.samsung.com/ops/v1/transactions/paymentCredentials/" .
+                    $refId . '?serviceId=' . $serviceId;
         }
-        
         
         $orderCode = $order->getIncrementId();
         $orderId = $order->getId();
@@ -125,13 +132,13 @@ class CallBack extends \Magento\Framework\App\Action\Action
                 $json = curl_exec($curl);
 
                 curl_close($curl);
-                
 
                 $response = json_decode($json, true);
 
                 if ($response['resultMessage'] == 'SUCCESS') {
                   
-                    //response is success, collect the order details and send request to worldpay with this reponse from samsung
+                    //response is success, collect the order details and send request
+                    //to worldpay with this reponse from samsung
                     
                     //$order = $this->orderFactory->create()->loadByIncrementId($orderId);
                     //$orderDetails = $order->getData();

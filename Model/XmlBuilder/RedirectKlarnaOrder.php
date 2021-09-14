@@ -31,7 +31,7 @@ EOD;
     private $exponent;
     private $threeDSecureConfig;
     private $tokenRequestConfig;
-
+    
     public function __construct()
     {
          $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure();

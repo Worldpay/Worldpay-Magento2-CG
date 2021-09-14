@@ -6,6 +6,7 @@ namespace Sapient\Worldpay\Block\Checkout\Hpp;
  
 class ChallengeIframe extends \Magento\Framework\View\Element\Template
 {
+    
     /**
      * Constructor
      *

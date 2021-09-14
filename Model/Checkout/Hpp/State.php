@@ -1,6 +1,7 @@
 <?php
 /**
- * @copyright 2017 Sapient
+ *
+ * Copyright © 2017 Sapient
  */
 namespace Sapient\Worldpay\Model\Checkout\Hpp;
 
@@ -11,18 +12,23 @@ class State
     const SESSION_KEY_STATE = 'worldpay_hpp_state';
     const SESSION_KEY_URL = 'worldpay_hpp_redirect_url';
 
+    /**
+     * State constructor
+     *
+     * @param \Magento\Checkout\Model\Session $checkoutsession
+     */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutsession
     ) {
 
         $this->session = $checkoutsession;
     }
-
+    
     public function isUninitialised()
     {
         return !$this->session->hasData(self::SESSION_KEY_STATE);
     }
-
+    
     public function isInitialised()
     {
         return $this->session->getData(self::SESSION_KEY_STATE) === 'initialised';
@@ -87,7 +93,7 @@ class State
 
         return $this->session->getData(self::SESSION_KEY_URL);
     }
-
+    
     private function validateInitializesState()
     {
         if (!$this->isInitialised()) {

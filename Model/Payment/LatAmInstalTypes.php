@@ -16,7 +16,12 @@ class LatAmInstalTypes implements LatAmInstalInterface
     protected $scopeConfig;
     
     protected $configHelper;
-
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Sapient\Worldpay\Helper\Instalmentconfig $configHelper
+     */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Sapient\Worldpay\Helper\Instalmentconfig $configHelper
@@ -24,7 +29,7 @@ class LatAmInstalTypes implements LatAmInstalInterface
         $this->scopeConfig = $scopeConfig;
         $this->configHelper = $configHelper;
     }
-   
+    
     public function getInstalmentType($countryid)
     {
         $value = $this->configHelper->getConfigTypeForCountry($countryid);

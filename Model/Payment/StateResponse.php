@@ -15,6 +15,7 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Constructor
+     *
      * @param string $orderCode
      * @param string $merchantCode
      * @param string $paymentStatus
@@ -75,6 +76,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return string
      */
     public function getOrderCode()
@@ -83,6 +86,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return string
      */
     public function getPaymentStatus()
@@ -91,6 +96,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return float
      */
     public function getAmount()
@@ -99,6 +106,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return string
      */
     public function getMerchantCode()
@@ -107,6 +116,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getRiskScore()
@@ -115,6 +126,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getAdvancedRiskProvider()
@@ -123,6 +136,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getAdvancedRiskProviderId()
@@ -131,6 +146,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getAdvancedRiskProviderThreshold()
@@ -139,6 +156,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getAdvancedRiskProviderScore()
@@ -147,6 +166,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getAdvancedRiskProviderFinalScore()
@@ -155,6 +176,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getPaymentMethod()
@@ -163,6 +186,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getCardNumber()
@@ -171,6 +196,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getAvsResultCode()
@@ -179,6 +206,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getCvcResultCode()
@@ -187,6 +216,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return string
      */
     private static function _extractOrderCode($orderKey)
@@ -196,6 +227,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return string
      */
     private static function _extractMerchantCode($orderKey)
@@ -205,6 +238,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getPaymentRefusalCode()
@@ -213,6 +248,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getPaymentRefusalDescription()
@@ -221,6 +258,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getJournalReference($state)
@@ -229,6 +268,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getFullRefundAmount()
@@ -257,6 +298,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getAAVAddressResultCode()
@@ -265,6 +308,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getAAVPostcodeResultCode()
@@ -273,6 +318,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getAAVCardholderNameResultCode()
@@ -281,6 +328,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getAAVTelephoneResultCode()
@@ -289,6 +338,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
     
     /**
+     * Getter
+     *
      * @return null
      */
     public function getAAVEmailResultCode()
@@ -297,6 +348,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Getter
+     *
      * @return null
      */
     public function getCurrency()
@@ -304,55 +357,131 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
         return null;
     }
     
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getNetworkUsed()
     {
         return null;
     }
     
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getSourceType()
     {
         return null;
     }
+    
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getAvailableBalance()
     {
         return null;
     }
+    
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getPrepaidCardType()
     {
         return null;
     }
+    
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getReloadable()
     {
         return null;
     }
+    
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getCardProductType()
     {
         return null;
     }
+    
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getAffluence()
     {
         return null;
     }
+    
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getAccountRangeId()
     {
         return null;
     }
+    
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getIssuerCountry()
     {
         return null;
     }
+    
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getVirtualAccountNumber()
     {
         return null;
     }
+    
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getFraudsightMessage()
     {
         return null;
     }
+    
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getFraudsightScore()
     {
         return null;
     }
+    
+    /**
+     * Getter
+     *
+     * @return null
+     */
     public function getFraudsightReasonCode()
     {
         return null;

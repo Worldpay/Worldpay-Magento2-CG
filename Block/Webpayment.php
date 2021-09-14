@@ -370,6 +370,6 @@ class Webpayment extends Template
     
     public function is3DsEnabled()
     {
-      return $this->_helper->is3DSecureEnabled() ||  $this->_helper->isDynamic3DEnabled(); 
+        return $this->_helper->is3DSecureEnabled() || $this->_helper->isDynamic3DEnabled();
     }
 }

@@ -20,16 +20,25 @@ class WorldpayToken
 {
     protected $paymentTokenManagement;
     protected $encryptor;
+    /**
+     * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
+     */
+    private $transactionsFactory;
 
     /**
      * Constructor
      *
      * @param SavedToken $savedtoken
      * @param Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
+     * @param CreditCardTokenFactory $paymentTokenFactory
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         SavedToken $savedtoken,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
         CreditCardTokenFactory $paymentTokenFactory,
         PaymentTokenManagementInterface $paymentTokenManagement,
@@ -41,6 +50,7 @@ class WorldpayToken
         $this->paymentExtensionFactory = $paymentExtensionFactory;
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->encryptor = $encryptor;
+        $this->transactionFactory = $transactionsFactory;
     }
 
     /**
@@ -57,6 +67,8 @@ class WorldpayToken
     }
 
     /**
+     * Check access for token
+     *
      * @param Sapient\WorldPay\Model\Token $token
      * @param \Magento\Customer\Model\Customer $customer
      * @throws Sapient\WorldPay\Model\Token\AccessDeniedException
@@ -85,6 +97,7 @@ class WorldpayToken
 
     /**
      * Delete token from a given customer
+     *
      * Throws exception if customer has no access to the given token (if token is not owned by the customer)
      *
      * @param Sapient\WorldPay\Model\Token $token
@@ -96,7 +109,7 @@ class WorldpayToken
         $this->_assertAccessForToken($token, $customer);
         $token->delete();
     }
-
+    
     /**
      * Update token of the given customer
      *
@@ -148,6 +161,7 @@ class WorldpayToken
             $tokenModel->setTokenType($tokenScope);
             $tokenModel->save();
             $tokenModel->getResource()->commit();
+            $this->saveTokenDataToTransactions($tokenState->getOrderCode(), $tokenState->getTokenCode());
             if ('worldpay_cc' == $paymentObject->getMethod()) {
                 // vault and instant purchase configuration goes here
                 $this->_updateToVault($tokenState, $paymentObject, $authenticatedShopperId);
@@ -163,7 +177,21 @@ class WorldpayToken
             throw $e;
         }
     }
-
+    
+    public function saveTokenDataToTransactions($worldpayOrderId, $getTokenCode)
+    {
+        $tokenModel = $this->savedtoken;
+        $tokenModel->loadByTokenCode($getTokenCode);
+        $tokenId = $tokenModel->getId();
+        $orderId = explode('-', $worldpayOrderId);
+        $order_increment_id = $orderId[0];
+        $transactions = $this->transactionFactory->create()->load($order_increment_id, 'original_order_increment_id');
+        $transactions->setData('worldpay_order_id', $worldpayOrderId);
+        $transactions->setData('worldpay_token_id', $tokenId);
+        $transactions->setData('original_order_increment_id', $orderId[0]);
+        $transactions->save();
+    }
+    
     private function _updateToVault(TokenStateInterface $tokenState, $paymentObject, $authenticatedShopperId)
     {
         $paymentToken = $this->getVaultPaymentToken($tokenState);
@@ -191,7 +219,7 @@ class WorldpayToken
         $this->paymentTokenManagement->saveTokenWithPaymentLink($paymentToken, $paymentObject);
         $extensionAttributes->setVaultPaymentToken($paymentToken);
     }
-
+    
     protected function generatePublicHash(PaymentTokenInterface $paymentToken)
     {
         $hashKey = $paymentToken->getGatewayToken();
@@ -204,7 +232,7 @@ class WorldpayToken
 
         return $this->encryptor->getHash($hashKey);
     }
-
+    
     private function getExtensionAttributes($payment)
     {
         $extensionAttributes = $payment->getExtensionAttributes();
@@ -214,7 +242,7 @@ class WorldpayToken
         }
         return $extensionAttributes;
     }
-
+    
     protected function getVaultPaymentToken(TokenStateInterface $tokenElement)
     {
         // Check token existing in gateway response
@@ -236,21 +264,39 @@ class WorldpayToken
         return $paymentToken;
     }
 
+    /**
+     * Retrieve Last digits
+     *
+     * @param string $number
+     * @return string
+     */
     public function getLastFourNumbers($number)
     {
         return substr($number, -4);
     }
 
+    /**
+     * Retrieve expiry MM/YY
+     *
+     * @param TokenStateInterface $tokenElement
+     * @return string
+     */
     public function getExpirationMonthAndYear(TokenStateInterface $tokenElement)
     {
         return $tokenElement->getCardExpiryMonth().'/'.$tokenElement->getCardExpiryYear();
     }
-
+    
     private function getExpirationDate(TokenStateInterface $tokenElement)
     {
         return $tokenElement->getTokenExpiryDate()->format('Y-m-d H:i:s');
     }
 
+    /**
+     * Retrieve Token code
+     *
+     * @param array $details
+     * @return \Zend\Json\Json
+     */
     private function convertDetailsToJSON($details)
     {
         $json = \Zend_Json::encode($details);

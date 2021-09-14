@@ -34,6 +34,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     }
 
     /**
+     * Method to set subscription filter
+     *
      * @param \Sapient\Worldpay\Model\Recurring\Subscription $subscription
      * @return $this
      */

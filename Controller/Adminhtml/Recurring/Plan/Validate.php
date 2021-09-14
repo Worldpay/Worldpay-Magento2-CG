@@ -13,6 +13,15 @@ class Validate extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
 
     protected $helper;
     protected $storeManager;
+    
+    /**
+     * Constructor
+     *
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param GeneralException $helper
+     */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory,

@@ -22,7 +22,7 @@ class AuthenticationService extends \Magento\Framework\DataObject
         $this->_wplogger = $wplogger;
         $this->worldpayhelper = $worldpayhelper;
     }
-
+    
     /**
      * @return bool
      */

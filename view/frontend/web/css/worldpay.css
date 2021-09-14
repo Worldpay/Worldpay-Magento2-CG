@@ -50,6 +50,7 @@ vertical-align: middle;
 
 .paymentmethods-radio-wrapper label img {
 max-width: 69px;
+height: 30px;
 }
 
 .checkout-payment-method .payment-method+.payment-method .payment-method-title {

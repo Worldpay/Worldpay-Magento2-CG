@@ -12,7 +12,7 @@ class TokenConfiguration
     private $createTokenBeforeAuth = false;
     private $createTokenAndAuthTogether = false;
     private $createTokenEnabled = false;
-
+    
     /**
      * @param bool $isDynamic3D
      * @param bool $is3DSecure
@@ -23,6 +23,8 @@ class TokenConfiguration
     }
 
     /**
+     * Check if save card is requested
+     *
      * @return bool
      */
     public function isSaveCreditCardReqested()
@@ -31,6 +33,8 @@ class TokenConfiguration
     }
 
     /**
+     * Get token reason
+     *
      * @return string
      */
     public function getTokenReason($orderCode = null)
@@ -39,6 +43,8 @@ class TokenConfiguration
     }
     
     /**
+     * Check if tokennization is enable
+     *
      * @return bool
      */
     public function istokenizationIsEnabled()

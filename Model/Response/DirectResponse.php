@@ -14,6 +14,8 @@ class DirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
     protected $_responseXml;
 
     /**
+     * Get 3ds params
+     *
      * @return \Magento\Framework\DataObject
      */
     public function get3dSecureParams()
@@ -29,6 +31,8 @@ class DirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
     }
     
     /**
+     * Get 3ds2 params
+     *
      * @return \Magento\Framework\DataObject
      */
     public function get3ds2Params()

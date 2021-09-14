@@ -11,6 +11,7 @@ class Card extends \Magento\Payment\Block\Form
     const MOTO_CONFIG = 'moto_config';
    
     private $worldpayPaymentsMoto;
+    
     /**
      * Constructor
      *

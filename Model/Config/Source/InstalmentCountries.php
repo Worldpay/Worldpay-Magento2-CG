@@ -7,6 +7,8 @@ namespace Sapient\Worldpay\Model\Config\Source;
 class InstalmentCountries extends \Magento\Framework\App\Config\Value
 {
     /**
+     * Instalment countries configurations
+     *
      * @return array
      */
     public function toOptionArray()

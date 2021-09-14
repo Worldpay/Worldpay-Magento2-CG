@@ -10,6 +10,8 @@ namespace Sapient\Worldpay\Model\Config\Source;
 class DebitNetworks extends \Magento\Framework\App\Config\Value
 {
      /**
+      * Configurations for debit networks
+      *
       * @return array
       */
     public function toOptionArray()
