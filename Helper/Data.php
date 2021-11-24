@@ -10,7 +10,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     protected $_scopeConfig;
     protected $wplogger;
-    
     /**
      * @var SerializerInterface
      */
@@ -1383,5 +1382,37 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return false;
         }
          return false;
+    }
+    
+    public function getMotoMerchantCode()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/moto_config/moto_merchant_code',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    public function getMotoUsername()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/moto_config/moto_username',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    public function getMotoPassword()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/moto_config/moto_password',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    public function getMotoIntegrationMode()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/moto_config/moto_integration_mode',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
     }
 }

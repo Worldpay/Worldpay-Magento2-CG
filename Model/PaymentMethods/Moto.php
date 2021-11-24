@@ -53,12 +53,15 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
                 );
         }
         if (!empty($checkoutpaymentdata['additional_data']['tokenCode'])
-                && !$this->_isRedirectIntegrationModeEnabled($storeId)) {
+             // uncomment to enable moto redirect
+             //   && !$this->_isRedirectIntegrationModeEnabled($storeId)
+                        ) {
             return $this->tokenservice;
         }
-        if ($this->_isRedirectIntegrationModeEnabled($storeId)) {
-            return $this->motoredirectservice;
-        }
+        // uncomment to enable moto redirect
+//        if ($this->_isRedirectIntegrationModeEnabled($storeId)) {
+//            return $this->motoredirectservice;
+//        }
         return $this->directservice;
     }
     /**

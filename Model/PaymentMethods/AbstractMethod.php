@@ -259,13 +259,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                         }
                     }
                 }
-                if ($mode == 'redirect') {
+                if ($mode == 'redirect' && $method != self::WORLDPAY_MOTO_TYPE) {
                     if (!isset($data['cc_type'])) {
                         throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
                     }
                     if (isset($data['cc_number']) && $data['cc_number'] != null) {
                         $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM24');
-                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
                     }
                 } elseif ($mode == self::DIRECT_MODEL) {
                     if (!isset($data['cc_type'])) {
@@ -337,7 +337,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $mode = $this->worlpayhelper->getCcIntegrationMode();
         $method = $paymentdetails['method'];
         if (($mode == 'redirect') && $method == self::WORLDPAY_MOTO_TYPE) {
-            $integrationType = 'redirect';
+             $integrationType = 'direct';
+        //      $integrationType = 'redirect'; uncomment to support moto redirect
         }
         $wpp = $this->worldpaypayment->create();
         $wpp->setData('order_id', $orderId);
@@ -375,7 +376,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 __('Worldpay Plugin is not available')
             );
         }
-                   
+        
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
         $autoInvoice = $this->_scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
@@ -401,8 +402,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
         if ($this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype)) {
             //total amount from invoice and order should not be same for partial capture
-            if (floatval($amount) !=floatval($payment->getOrder()->getGrandTotal())) {
-                if ($partialCapture) {
+            if (floatval($amount) != floatval($payment->getOrder()->getGrandTotal())) {
+                // to restrict Partical capture call for AMP's
+                $isAPM = $this->checkAPMforPartialCapture($paymenttype) ? false : true;
+                if ($partialCapture && $isAPM) {
                     $this->paymentservicerequest->partialCapture(
                         $payment->getOrder(),
                         $worldPayPayment,
@@ -410,9 +413,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                         $captureArray
                     );
                 } else {
-                    $this->_wplogger->info("Partial Capture is disabled.");
+                    $this->_wplogger->info("Partial Capture is disabled or not supported.");
                     throw new \Magento\Framework\Exception\LocalizedException(
-                        __("Partial Capture is disabled.")
+                        __("Partial Capture is disabled or not supported.")
                     );
                 }
             }
@@ -695,5 +698,17 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         } elseif (preg_match($dankortRegex, $ccnumber)) {
             return 'DANKORT-SSL';
         }
+    }
+    
+    private function checkAPMforPartialCapture($paymenttype)
+    {
+        $activeAPMs = $this->worlpayhelper->getApmTypes(self::WORLDPAY_APM_TYPE);
+        $typePresent = false;
+        foreach ($activeAPMs as $key => $value) {
+            if (stristr($key, strtoupper(strtok($paymenttype, '-'))) !== false) {
+                $typePresent = true;
+            }
+        }
+        return $typePresent;
     }
 }

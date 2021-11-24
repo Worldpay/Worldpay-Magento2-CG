@@ -86,7 +86,7 @@ class Service
     public function getPaymentUpdateXmlForOrder(\Sapient\Worldpay\Model\Order $order)
     {
         $worldPayPayment = $order->getWorldPayPayment();
-
+        
         if (!$worldPayPayment) {
             return false;
         }
@@ -95,7 +95,8 @@ class Service
             $worldPayPayment->getWorldpayOrderId(),
             $worldPayPayment->getStoreId(),
             $order->getPaymentMethodCode(),
-            $worldPayPayment->getPaymentType()
+            $worldPayPayment->getPaymentType(),
+            $worldPayPayment->getInteractionType()
         );
         
         $paymentService = new \SimpleXmlElement($rawXml);

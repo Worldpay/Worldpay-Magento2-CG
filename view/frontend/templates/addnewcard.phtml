@@ -38,9 +38,8 @@ $storeCode = $block->getStoreCode();
                     foreach ($cctypes as $k => $v) {
                         $options .= '<option value="' . $k . '">' . $v . '</option>';
                     }
-                    
-                    echo /* @noEscape */ $options;
                     ?>
+                    <?= /* @noEscape */  $options; ?>
                 </select>
             </div>
         </div>

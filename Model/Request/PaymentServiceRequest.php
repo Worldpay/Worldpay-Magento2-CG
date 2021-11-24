@@ -48,6 +48,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     {
         $loggerMsg = '########## Submitting direct 3DSecure order request. OrderCode: ';
         $this->_wplogger->info($loggerMsg . $directOrderParams['orderCode'] . ' ##########');
+        
         if (isset($directOrderParams['tokenRequestConfig'])) {
             $requestConfiguration = [
             'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
@@ -113,6 +114,20 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $directOrderParams['paymentDetails']['dutyAmount'] = $this->worldpayhelper->getDutyAmount();
             $directOrderParams['paymentDetails']['countryCode'] = $directOrderParams['billingAddress']['countryCode'];
         }
+        
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($directOrderParams['paymentDetails']['paymentType']);
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($directOrderParams['paymentDetails']['paymentType']);
+        $merchantCode = $directOrderParams['merchantCode'];
+        
+        if ($directOrderParams['method'] == 'worldpay_moto'
+           && $directOrderParams['paymentDetails']['dynamicInteractionType'] == 'MOTO') {
+            $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
+                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+            $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
+                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+            $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
+                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+        }
 
         $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
               
@@ -146,7 +161,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         }
         
         $orderSimpleXml = $this->xmldirectorder->build(
-            $directOrderParams['merchantCode'],
+            $merchantCode,
             $directOrderParams['orderCode'],
             $directOrderParams['orderDescription'],
             $directOrderParams['currencyCode'],
@@ -170,11 +185,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $directOrderParams['primeRoutingData'],
             $directOrderParams['orderLineItems']
         );
-        
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
-            $this->worldpayhelper->getXmlUsername($directOrderParams['paymentDetails']['paymentType']),
-            $this->worldpayhelper->getXmlPassword($directOrderParams['paymentDetails']['paymentType'])
+            $xmlUsername,
+            $xmlPassword
         );
     }
     
@@ -240,6 +254,21 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             'threeDSecureConfig' => $tokenOrderParams['threeDSecureConfig'],
             'tokenRequestConfig' => $tokenOrderParams['tokenRequestConfig']
         ];
+        
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($tokenOrderParams['paymentDetails']['brand']);
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($tokenOrderParams['paymentDetails']['brand']);
+        $merchantCode = $tokenOrderParams['merchantCode'];
+        
+        if ($tokenOrderParams['method'] == 'worldpay_moto'
+           && $tokenOrderParams['paymentDetails']['dynamicInteractionType'] == 'MOTO') {
+            $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
+                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+            $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
+                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+            $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
+                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+        }
+        
         $this->xmltokenorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
         if (empty($tokenOrderParams['thirdPartyData']) && empty($tokenOrderParams['shippingfee'])) {
             $tokenOrderParams['thirdPartyData']='';
@@ -252,7 +281,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $tokenOrderParams['orderLineItems'] = '';
         }
         $orderSimpleXml = $this->xmltokenorder->build(
-            $tokenOrderParams['merchantCode'],
+            $merchantCode,
             $tokenOrderParams['orderCode'],
             $tokenOrderParams['orderDescription'],
             $tokenOrderParams['currencyCode'],
@@ -278,8 +307,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
-            $this->worldpayhelper->getXmlUsername($tokenOrderParams['paymentDetails']['brand']),
-            $this->worldpayhelper->getXmlPassword($tokenOrderParams['paymentDetails']['brand'])
+            $xmlUsername,
+            $xmlPassword
         );
     }
 
@@ -312,6 +341,21 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             'tokenRequestConfig' => $redirectOrderParams['tokenRequestConfig'],
             'shopperId' => $redirectOrderParams['shopperId']
         ];
+       
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($redirectOrderParams['paymentDetails']['cardType']);
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentDetails']['cardType']);
+        $merchantCode = $redirectOrderParams['merchantCode'];
+        
+        if ($redirectOrderParams['method'] == 'worldpay_moto') {
+            $redirectOrderParams['paymentDetails']['PaymentMethod'] = $redirectOrderParams['method'];
+            $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
+                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+            $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
+                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+            $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
+                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+        }
+        
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectOrder($requestConfiguration);
         if (empty($redirectOrderParams['thirdPartyData']) && empty($redirectOrderParams['shippingfee'])) {
             $redirectOrderParams['thirdPartyData']='';
@@ -324,7 +368,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $redirectOrderParams['orderLineItems'] = '';
         }
         $redirectSimpleXml = $this->xmlredirectorder->build(
-            $redirectOrderParams['merchantCode'],
+            $merchantCode,
             $redirectOrderParams['orderCode'],
             $redirectOrderParams['orderDescription'],
             $redirectOrderParams['currencyCode'],
@@ -348,8 +392,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
         return $this->_sendRequest(
             dom_import_simplexml($redirectSimpleXml)->ownerDocument,
-            $this->worldpayhelper->getXmlUsername($redirectOrderParams['paymentType']),
-            $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentType'])
+            $xmlUsername,
+            $xmlPassword
         );
     }
 
@@ -482,9 +526,22 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $invoicedItems = '';
             }
             $captureType = 'full';
-        
+
+            $xmlUsername = $this->worldpayhelper->getXmlUsername($wp->getPaymentType());
+            $xmlPassword = $this->worldpayhelper->getXmlPassword($wp->getPaymentType());
+            $merchantCode = $this->worldpayhelper->getMerchantCode($wp->getPaymentType());
+
+            if ($wp->getInteractionType() === 'MOTO') {
+                $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
+                        ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+                $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
+                        ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+                $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
+                        ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+            }
+
             $captureSimpleXml = $this->xmlcapture->build(
-                $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
+                $merchantCode,
                 $orderCode,
                 $order->getOrderCurrencyCode(),
                 $order->getGrandTotal(),
@@ -497,8 +554,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
             return $this->_sendRequest(
                 dom_import_simplexml($captureSimpleXml)->ownerDocument,
-                $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
-                $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
+                $xmlUsername,
+                $xmlPassword
             );
         } catch (Exception $e) {
             $this->_wplogger->error($e->getMessage());
@@ -533,8 +590,22 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             }
         
             $captureType = 'partial';
+            
+            $xmlUsername = $this->worldpayhelper->getXmlUsername($wp->getPaymentType());
+            $xmlPassword = $this->worldpayhelper->getXmlPassword($wp->getPaymentType());
+            $merchantCode = $this->worldpayhelper->getMerchantCode($wp->getPaymentType());
+
+            if ($wp->getInteractionType() === 'MOTO') {
+                $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
+                        ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+                $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
+                        ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+                $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
+                        ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+            }
+            
             $captureSimpleXml = $this->xmlcapture->build(
-                $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
+                $merchantCode,
                 $orderCode,
                 $order->getOrderCurrencyCode(),
                 $grandTotal,
@@ -547,8 +618,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
             return $this->_sendRequest(
                 dom_import_simplexml($captureSimpleXml)->ownerDocument,
-                $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
-                $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
+                $xmlUsername,
+                $xmlPassword
             );
         } catch (Exception $e) {
             $this->_wplogger->error($e->getMessage());
@@ -624,8 +695,20 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $currencyCode = $order->getOrderCurrencyCode();
         $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
         
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($wp->getPaymentType());
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($wp->getPaymentType());
+        $merchantCode = $this->worldpayhelper->getMerchantCode($wp->getPaymentType());
+        if ($wp->getInteractionType() === 'MOTO') {
+            $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
+                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+            $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
+                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+            $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
+                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+        }
+        
         $refundSimpleXml = $this->xmlrefund->build(
-            $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
+            $merchantCode,
             $orderCode,
             $order->getOrderCurrencyCode(),
             $amount,
@@ -637,8 +720,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         return $this->_sendRequest(
             dom_import_simplexml($refundSimpleXml)->ownerDocument,
-            $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
-            $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
+            $xmlUsername,
+            $xmlPassword
         );
     }
 
@@ -652,19 +735,33 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param string $paymenttype
      * @return mixed
      */
-    public function inquiry($merchantCode, $orderCode, $storeId, $paymentMethodCode, $paymenttype)
+    public function inquiry($merchantCode, $orderCode, $storeId, $paymentMethodCode, $paymenttype, $interactionType)
     {
         $this->_wplogger->info('########## Submitting order inquiry. OrderCode: (' . $orderCode . ') ##########');
+        
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($paymenttype);
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($paymenttype);
+        $merchantcode = $merchantCode;
+        
+        if ($interactionType === 'MOTO') {
+            $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
+                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+            $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
+                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+            $merchantcode = !empty($this->worldpayhelper->getMotoMerchantCode())
+                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantcode;
+        }
+
         $this->xmlinquiry = new \Sapient\Worldpay\Model\XmlBuilder\Inquiry();
         $inquirySimpleXml = $this->xmlinquiry->build(
-            $merchantCode,
+            $merchantcode,
             $orderCode
         );
 
         return $this->_sendRequest(
             dom_import_simplexml($inquirySimpleXml)->ownerDocument,
-            $this->worldpayhelper->getXmlUsername($paymenttype),
-            $this->worldpayhelper->getXmlPassword($paymenttype)
+            $xmlUsername,
+            $xmlPassword
         );
     }
 
@@ -998,8 +1095,20 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $currencyCode = $order->getOrderCurrencyCode();
         $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
         
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($wp->getPaymentType());
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($wp->getPaymentType());
+        $merchantCode = $this->worldpayhelper->getMerchantCode($wp->getPaymentType());
+        if ($wp->getInteractionType() === 'MOTO') {
+            $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
+                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+            $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
+                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+            $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
+                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+        }
+        
         $voidSaleSimpleXml = $this->xmlvoidsale->build(
-            $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
+            $merchantCode,
             $orderCode,
             $order->getOrderCurrencyCode(),
             $order->getGrandTotal(),
@@ -1009,8 +1118,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         return $this->_sendRequest(
             dom_import_simplexml($voidSaleSimpleXml)->ownerDocument,
-            $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
-            $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
+            $xmlUsername,
+            $xmlPassword
         );
     }
     
@@ -1023,8 +1132,20 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $currencyCode = $order->getOrderCurrencyCode();
         $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
         
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($wp->getPaymentType());
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($wp->getPaymentType());
+        $merchantCode = $this->worldpayhelper->getMerchantCode($wp->getPaymentType());
+        if ($wp->getInteractionType() === 'MOTO') {
+            $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
+                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+            $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
+                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+            $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
+                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+        }
+        
         $cancelSimpleXml = $this->xmlcancel->build(
-            $this->worldpayhelper->getMerchantCode($wp->getPaymentType()),
+            $merchantCode,
             $orderCode,
             $order->getOrderCurrencyCode(),
             $order->getGrandTotal(),
@@ -1035,8 +1156,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         return $this->_sendRequest(
             dom_import_simplexml($cancelSimpleXml)->ownerDocument,
-            $this->worldpayhelper->getXmlUsername($wp->getPaymentType()),
-            $this->worldpayhelper->getXmlPassword($wp->getPaymentType())
+            $xmlUsername,
+            $xmlPassword
         );
     }
     

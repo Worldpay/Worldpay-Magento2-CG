@@ -112,19 +112,19 @@ class Card extends \Magento\Payment\Block\Form
 
     public function getIntegrationMode()
     {
-        return $this->worldpayhelper->getCcIntegrationMode();
+        return $this->worldpayhelper->getMotoIntegrationMode();
     }
 
     public function isDirectIntegration()
     {
         $integrationmode = $this->getIntegrationMode();
-        return $integrationmode === 'direct';
+        return $integrationmode === 'moto_direct';
     }
     
     public function isRedirectIntegration()
     {
         $integrationmode = $this->getIntegrationMode();
-        return $integrationmode === 'redirect';
+        return $integrationmode === 'moto_redirect';
     }
     
     public function cpfEnabled()

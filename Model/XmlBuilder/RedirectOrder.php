@@ -237,12 +237,20 @@ EOD;
      */
     private function _addDynamic3DSElement($order)
     {
+        if (isset($this->paymentDetails['PaymentMethod'])
+            && $this->paymentDetails['PaymentMethod'] == 'worldpay_moto') {
+            $threeDSElement = $order->addChild('dynamic3DS');
+            $threeDSElement['overrideAdvice'] = self::DYNAMIC3DS_NO3DS;
+        }
+        
         if ($this->threeDSecureConfig->isDynamic3DEnabled() === false) {
             return;
         }
 
         $threeDSElement = $order->addChild('dynamic3DS');
-        if ($this->threeDSecureConfig->is3DSecureCheckEnabled()) {
+        if ($this->threeDSecureConfig->is3DSecureCheckEnabled()
+            && (isset($this->paymentDetails['PaymentMethod'])
+                && $this->paymentDetails['PaymentMethod'] !== 'worldpay_moto')) {
             $threeDSElement['overrideAdvice'] = self::DYNAMIC3DS_DO3DS;
         } else {
             $threeDSElement['overrideAdvice'] = self::DYNAMIC3DS_NO3DS;
