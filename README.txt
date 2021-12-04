@@ -20,7 +20,7 @@ For Magento 2.3.5
 Worldpay Plugin version: 2.3.5-p0721
 1. PHP 7.4 Support
 
-This release (2.4.3-rc1121) is compatible with Magento 2.4.3 with following key features:
+This release (2.4.3-rc1221) is compatible with Magento 2.4.3 with following key features:
 1. Credit card payment
 2. Hosted payment page solution
 3. Alternative payment methods like Paypal, AliPay, Klarna, ACH Pay etc.
