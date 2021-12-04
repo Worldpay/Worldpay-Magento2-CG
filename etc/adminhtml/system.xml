@@ -474,11 +474,32 @@
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="paymentmethods" translate="label" type="multiselect" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="moto_integration_mode" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Moto Integration Mode</label>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\MotoIntegrationMode</source_model>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>For MOTO, we only support direct integration eventhough HPP/redirect integration is enabled for shopper`s credit card journey.</comment>
+                </field>
+                <field id="moto_merchant_code" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Moto Merchant Code</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>Enter the merchant code for MOTO orders. If it is blank, global merchnat code entered under General configuration will be applicable.</comment>
+                </field>
+                <field id="moto_username" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Moto Username</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>Enter the username for this MOTO specific Merchant code. If it is blank, global XML username entered under General configuration will be applicable.</comment>
+                </field>
+                <field id="moto_password" translate="label" type="password" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Moto Password</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>Enter the password for this MOTO specific Merchant code. If it is blank, global XML password entered under General configuration will be applicable.</comment>
+                </field>
+                <field id="paymentmethods" translate="label" type="multiselect" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Methods</label>
                     <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethodsCC</source_model>
                 </field>
-                <field id="title" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="title" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Title</label>
                 </field>
             </group>

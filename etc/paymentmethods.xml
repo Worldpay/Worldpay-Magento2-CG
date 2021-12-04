@@ -16,7 +16,7 @@
                     <area>KR</area>
                     <area>TH</area>
                 </areas>
-                <capture_request>0</capture_request>
+                <capture_request>1</capture_request>
                 <stop_auto_invoice>1</stop_auto_invoice>
             </CHINAUNIONPAY-SSL>
             <IDEAL-SSL>
@@ -53,7 +53,7 @@
                         <code>KNAB</code><value>Knab</value>
                     </bank>
                 </banks>
-                <capture_request>0</capture_request>
+                <capture_request>1</capture_request>
             </IDEAL-SSL>
             <PAYPAL-EXPRESS>
                 <title>PayPal</title>
@@ -127,14 +127,14 @@
                     <area>IT</area>
                     <area>ES</area>
                 </areas>
-                <capture_request>0</capture_request>
+                <capture_request>1</capture_request>
             </SOFORT-SSL>
             <GIROPAY-SSL>
                 <title>GiroPay</title>
                 <areas>
                     <area>DE</area>
                 </areas>
-                <capture_request>0</capture_request>
+                <capture_request>1</capture_request>
             </GIROPAY-SSL>
 <!--            <BOLETO-SSL>
                 <title>Boleto Bancairo</title>
@@ -149,7 +149,7 @@
                 <areas>
                     <area>CN</area>
                 </areas>
-                <capture_request>0</capture_request>
+                <capture_request>1</capture_request>
             </ALIPAY-SSL>
             <QIWI-SSL>
                 <title>Qiwi</title>
@@ -157,7 +157,7 @@
                     <area>KZ</area>
                     <area>RU</area>
                 </areas>
-                <capture_request>0</capture_request>
+                <capture_request>1</capture_request>
             </QIWI-SSL>
              <SEPA_DIRECT_DEBIT-SSL>
                 <title>SEPA (One off transactions)</title>
@@ -171,7 +171,7 @@
                     <area>NL</area>
                     <area>ES</area>
                 </areas>
-                <capture_request>0</capture_request>
+                <capture_request>1</capture_request>
                 <stop_auto_invoice>1</stop_auto_invoice>
             </SEPA_DIRECT_DEBIT-SSL>
              <KLARNA-SSL>
@@ -208,14 +208,14 @@
                <areas>
                     <area>PL</area>
                 </areas>
-                <capture_request>0</capture_request>
+                <capture_request>1</capture_request>
             </PRZELEWY-SSL>
              <MISTERCASH-SSL>
                 <title>Mistercash/Bancontact</title>
                 <areas>
                     <area>BE</area>
                 </areas>
-                <capture_request>0</capture_request>
+                <capture_request>1</capture_request>
             </MISTERCASH-SSL>
             <ACH_DIRECT_DEBIT-SSL>
                 <title>ACH Pay</title>

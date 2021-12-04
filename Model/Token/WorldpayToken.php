@@ -20,6 +20,10 @@ class WorldpayToken
 {
     protected $paymentTokenManagement;
     protected $encryptor;
+     /**
+      * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
+      */
+    private $transactionsFactory;
 
     /**
      * Constructor
@@ -30,6 +34,7 @@ class WorldpayToken
     public function __construct(
         SavedToken $savedtoken,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
         CreditCardTokenFactory $paymentTokenFactory,
         PaymentTokenManagementInterface $paymentTokenManagement,
@@ -41,6 +46,7 @@ class WorldpayToken
         $this->paymentExtensionFactory = $paymentExtensionFactory;
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->encryptor = $encryptor;
+        $this->transactionFactory = $transactionsFactory;
     }
 
     /**
@@ -148,6 +154,7 @@ class WorldpayToken
             $tokenModel->setTokenType($tokenScope);
             $tokenModel->save();
             $tokenModel->getResource()->commit();
+            $this->saveTokenDataToTransactions($tokenState->getOrderCode(), $tokenState->getTokenCode());
             if ('worldpay_cc' == $paymentObject->getMethod()) {
                 // vault and instant purchase configuration goes here
                 $this->_updateToVault($tokenState, $paymentObject, $authenticatedShopperId);
@@ -162,6 +169,21 @@ class WorldpayToken
             $tokenModel->getResource()->rollBack();
             throw $e;
         }
+    }
+
+    public function saveTokenDataToTransactions($worldpayOrderId, $getTokenCode)
+    {
+        $tokenModel = $this->savedtoken;
+        $tokenModel->loadByTokenCode($getTokenCode);
+        $tokenId = $tokenModel->getId();
+        $orderId = explode('-', $worldpayOrderId);
+        $order_increment_id = $orderId[0];
+        $transactions = $this->transactionFactory->create();
+        $transactions = $this->transactionFactory->create()->load($order_increment_id, 'original_order_increment_id');
+        $transactions->setData('worldpay_order_id', $worldpayOrderId);
+        $transactions->setData('worldpay_token_id', $tokenId);
+        $transactions->setData('original_order_increment_id', $orderId[0]);
+        $transactions->save();
     }
 
     private function _updateToVault(TokenStateInterface $tokenState, $paymentObject, $authenticatedShopperId)

@@ -12,18 +12,15 @@ Worldpay Plugin version: 2.4.1-p0821
 3. Klarna Installment (Beta)
 4. PHP 7.4 Support
 
+For Magento 2.3.7
+Worldpay Plugin version: 2.3.7-rc0921
+1. PHP 7.4 Support
+
 For Magento 2.3.5
 Worldpay Plugin version: 2.3.5-p0721
 1. PHP 7.4 Support
 
-For Magento 2.3.4
-Worldpay Plugin version: 2.3.4-p0721
-1. 3DS2 support for Google Pay
-2. 3DS2 support for Instant purchase
-3. 3DS2 support for Chrome Payment Request API
-4. PHP 7.4 Support
-
-This release is compatible with Magento 2.4.2 with following key features:
+This release (2.4.3-rc1221) is compatible with Magento 2.4.3 with following key features:
 1. Credit card payment
 2. Hosted payment page solution
 3. Alternative payment methods like Paypal, AliPay, Klarna, ACH Pay etc.
@@ -39,3 +36,4 @@ This release is compatible with Magento 2.4.2 with following key features:
 13. Multi store and multi merchant support
 14. US and Canada domestic acquiring - Issure Insights, Prime Routing, ACH Pay and Level 2/3 Data
 15. Klarna PayNow, PayLater and SLICEIT
+16. MOTO supports new Merchant code for supporting non-3DS payment.

@@ -828,6 +828,10 @@ class Service
         if (isset($paymentDetails['salesTax'])) {
             $details['salesTax'] = $paymentDetails['salesTax'];
         }
+        if (isset($paymentDetails['additional_data']['isRecurringOrder'])
+           && !empty($paymentDetails['additional_data']['isRecurringOrder'])) {
+            $details['isRecurringOrder'] = $paymentDetails['additional_data']['isRecurringOrder'];
+        }
         return $details;
     }
 

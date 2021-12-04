@@ -338,12 +338,19 @@ EOD;
      */
     private function _addDynamic3DSElement($order)
     {
+        $isRecurringOrder =  isset($this->paymentDetails['isRecurringOrder'])? true : false;
+        if ($this->paymentDetails['dynamicInteractionType'] == 'MOTO') {
+            $threeDSElement = $order->addChild('dynamic3DS');
+            $threeDSElement['overrideAdvice'] = self::DYNAMIC3DS_NO3DS;
+        }
         if (! $this->threeDSecureConfig->isDynamic3DEnabled()) {
             return;
         }
 
         $threeDSElement = $order->addChild('dynamic3DS');
-        if ($this->threeDSecureConfig->is3DSecureCheckEnabled()) {
+        if ($this->threeDSecureConfig->is3DSecureCheckEnabled()
+            && $this->paymentDetails['dynamicInteractionType'] !== 'MOTO'
+            && !$isRecurringOrder) {
             $threeDSElement['overrideAdvice'] = self::DYNAMIC3DS_DO3DS;
         } else {
             $threeDSElement['overrideAdvice'] = self::DYNAMIC3DS_NO3DS;

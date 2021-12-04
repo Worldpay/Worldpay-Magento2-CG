@@ -38,9 +38,10 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         $integrationModel = $this->worlpayhelper->getCcIntegrationMode($storeId);
         
         $checkoutpaymentdata = $this->paymentdetailsdata;
-        if (!empty($checkoutpaymentdata['additional_data']['isSavedCardPayment'])
-                && !empty($checkoutpaymentdata['additional_data']['tokenCode'])
-                && $integrationModel == 'direct') {
+        if ((!empty($checkoutpaymentdata['additional_data']['isSavedCardPayment'])
+             && !empty($checkoutpaymentdata['additional_data']['tokenCode'])
+             && $integrationModel == 'direct')
+                || (!empty($checkoutpaymentdata['additional_data']['isRecurringOrder']))) {
             return $this->tokenservice;
         }
         if ($this->_isRedirectIntegrationModeEnabled($storeId)) {
