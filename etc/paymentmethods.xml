@@ -243,7 +243,7 @@
                 <capture_request>1</capture_request>
             </VISA-SSL>
             <VISA_COMMERCIAL-SSL>
-                <title>Visa</title>
+                <title>Visa Commercial</title>
                 <areas>
                     <area>GLOBAL</area>
                 </areas>
@@ -257,7 +257,7 @@
                 <capture_request>1</capture_request>
             </ECMC-SSL>
             <ECMC_COMMERCIAL-SSL>
-                <title>MasterCard</title>
+                <title>MasterCard Commercial</title>
                 <areas>
                     <area>GLOBAL</area>
                 </areas>
