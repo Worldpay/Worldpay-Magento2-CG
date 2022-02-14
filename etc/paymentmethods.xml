@@ -330,6 +330,13 @@
                 </areas>
                 <capture_request>1</capture_request>
             </VISA-SSL>
+            <VISA_COMMERCIAL-SSL>
+                <title>Visa Commercial</title>
+                <areas>
+                    <area>GLOBAL</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </VISA_COMMERCIAL-SSL>
             <ECMC-SSL>
                 <title>MasterCard</title>
                 <areas>
@@ -337,6 +344,13 @@
                 </areas>
                 <capture_request>1</capture_request>
             </ECMC-SSL>
+            <ECMC_COMMERCIAL-SSL>
+                <title>MasterCard Commercial</title>
+                <areas>
+                    <area>GLOBAL</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </ECMC_COMMERCIAL-SSL>
             <CB-SSL>
                 <title>Carte Bancaire</title>
                 <areas>
