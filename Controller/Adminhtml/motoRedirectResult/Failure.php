@@ -66,7 +66,7 @@ class Failure extends \Magento\Backend\App\Action
      */
     private function _getFailureNoticeForOrder($order)
     {
-        return __('Order #'.$order->getIncrementId().' failed');
+        return __('Order #%1 failed', $order->getIncrementId());
     }
 
     /**
