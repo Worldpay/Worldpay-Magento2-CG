@@ -2,16 +2,31 @@
 <div class="field savecc">
     <div class="control">
         <div class="paymentmethods-radio-wrapper">
-        <input type="radio"
-               name="payment[token_to_use]"
-               id=""
-               value=""
-               class="checkbox"
-               data-bind="value: token_code,
-                   checked: $parent.paymentToken,
-                   attr: {id: 'saved_card_' + id,
-                   'data-validate': JSON.stringify({'required':true})}
-               "/>
+            <!--ko if:($parent.getIntigrationMode() == 'direct')-->
+                <input type="radio"
+                name="payment[token_to_use]"
+                id=""
+                value=""
+                class="checkbox"
+                data-bind="value: token_code,
+                    checked: $parent.paymentToken,
+                    attr: {id: 'saved_card_' + id,
+                    'data-validate': JSON.stringify({'required':true})}
+                "/>
+            <!--/ko-->
+            <!--ko if:($parent.getIntigrationMode() == 'redirect')-->
+                <input type="radio"
+                name="payment[token_to_use]"
+                id=""
+                value=""
+                class="checkbox"
+                data-bind="value: token_code,
+                    checked: $parent.paymentToken,
+                    click: $parent.onSelectSavedCards.bind(this,$parent),
+                    attr: {id: 'saved_card_' + id,
+                    'data-validate': JSON.stringify({'required':true})}
+                "/>
+            <!--/ko-->
         
         <label class="label" for="wp_save_card" data-bind='attr: {for: "saved_card_" + id}'>
             <!--ko if: $parent.getIcons(method) -->

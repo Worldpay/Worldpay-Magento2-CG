@@ -10,6 +10,7 @@ use \Sapient\Worldpay\Model\Checkout\Hpp\State as HppState;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\App\RequestInterface;
+use Laminas\Uri\UriFactory;
 use Exception;
 
 class Factory
@@ -62,10 +63,9 @@ class Factory
      */
     public function create($javascriptObjectVariable, $containerId)
     {
-        
-        $parts = parse_url($this->state->getRedirectUrl());
-        
-        parse_str($parts['query'], $orderparams);
+        $parts = UriFactory::factory($this->state->getRedirectUrl());
+
+        $orderparams = $parts->getQueryAsArray();
         $orderkey = $orderparams['OrderKey'];
         $magentoincrementid = $this->_extractOrderId($orderkey);
         $mageOrder = $this->mageorder->loadByIncrementId($magentoincrementid);
@@ -117,7 +117,7 @@ class Factory
         return substr($locale, 0, 2);
     }
     
-    private static function _extractOrderId($orderKey)
+    private function _extractOrderId($orderKey)
     {
         $array = explode('^', $orderKey);
         $ordercode = end($array);

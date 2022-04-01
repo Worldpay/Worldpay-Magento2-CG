@@ -86,6 +86,11 @@
                     <paynow_contries>SE,DE,NL,AT</paynow_contries>
                 </paynow_config>
             </klarna_config>
+            <wp_error_alerts>
+                <enable_error_alerts>0</enable_error_alerts>
+                <send_email_to_worldpay>0</send_email_to_worldpay>
+                <wp_team_email>adobe@fisglobal.com</wp_team_email>
+            </wp_error_alerts>
         </worldpay>
         <payment>
             <worldpay_cc>

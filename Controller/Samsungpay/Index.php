@@ -16,7 +16,8 @@ class Index extends \Magento\Framework\App\Action\Action
     protected $quoteFactory;
     
     protected $_storeManager;
-    
+   
+    protected $curlHelper;
     /**
      * @var Magento\Framework\View\Result\PageFactory
      */
@@ -39,7 +40,8 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Sapient\Worldpay\Helper\CurlHelper $curlHelper
     ) {
         parent::__construct($context);
         $this->wplogger = $wplogger;
@@ -49,6 +51,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->request = $request;
         $this->quoteFactory = $quoteFactory;
         $this->_storeManager = $storeManager;
+        $this->curlHelper = $curlHelper;
     }
 
     public function execute()
@@ -104,25 +107,23 @@ class Index extends \Magento\Framework\App\Action\Action
               
         try {
             
-            $curl = curl_init();
-            curl_setopt_array($curl, [
-              CURLOPT_URL => $serviceUrl,
-              CURLOPT_RETURNTRANSFER => true,
-              CURLOPT_ENCODING => "",
-              CURLOPT_MAXREDIRS => 10,
-              CURLOPT_TIMEOUT => 0,
-              CURLOPT_FOLLOWLOCATION => true,
-              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-              CURLOPT_CUSTOMREQUEST => "POST",
-              CURLOPT_POSTFIELDS =>$postFieldsJson,
-              CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json"
-              ],
-            ]);
-
-            $response = curl_exec($curl);
-
-            curl_close($curl);
+            $response = $this->curlHelper->sendCurlRequest(
+                $serviceUrl,
+                [
+                    CURLOPT_URL => $serviceUrl,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "POST",
+                    CURLOPT_POSTFIELDS =>$postFieldsJson,
+                    CURLOPT_HTTPHEADER => [
+                      "Content-Type: application/json"
+                    ],
+                ]
+            );
             
                 $resultJson = '';
                 $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);

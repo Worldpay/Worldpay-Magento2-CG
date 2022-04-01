@@ -56,26 +56,24 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
         $paymentDetails,
         $payment
     ) {
-
         $this->checkoutsession->setauthenticatedOrderId($mageOrder->getIncrementId());
-
-        $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
-            $orderCode,
-            $quote,
-            $orderStoreId,
-            $paymentDetails
-        );
-
-        $response = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
-       
-        $this->_getStatus()
-            ->reset()
-            ->init($this->_getRedirectResponseModel()->getRedirectUrl($response));
-
-        $payment->setIsTransactionPending(1);
-        $this->registryhelper->setworldpayRedirectUrl($this->_urlInterface->getUrl('worldpay/hostedpaymentpage/pay'));
-
-        $this->checkoutsession->setWpRedirecturl($this->_urlInterface->getUrl('worldpay/hostedpaymentpage/pay'));
+        if (empty($this->checkoutsession->getIframePay())) {
+               $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
+                   $orderCode,
+                   $quote,
+                   $orderStoreId,
+                   $paymentDetails
+               );
+            $response = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
+            $this->_getStatus()
+                ->reset()
+                ->init($this->_getRedirectResponseModel()->getRedirectUrl($response));
+            $payment->setIsTransactionPending(1);
+            $this->registryhelper->setworldpayRedirectUrl(
+                $this->_urlInterface->getUrl('worldpay/hostedpaymentpage/pay')
+            );
+            $this->checkoutsession->setWpRedirecturl($this->_urlInterface->getUrl('worldpay/hostedpaymentpage/pay'));
+        }
     }
 
     /**

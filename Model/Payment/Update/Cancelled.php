@@ -4,7 +4,9 @@
  */
 namespace Sapient\Worldpay\Model\Payment\Update;
 
-class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sapient\Worldpay\Model\Payment\Update
+use \Sapient\Worldpay\Model\Payment\UpdateInterface;
+
+class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements UpdateInterface
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;

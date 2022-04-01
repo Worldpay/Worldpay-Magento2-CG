@@ -298,7 +298,7 @@ class Service
         return [
                 'orderCode' => $orderCode,
                 'merchantCode' => $this->worldpayHelper->
-                                   getMerchantCode($paymentDetails['additional_data']['cc_type']),
+                                   getMerchantCode($paymentType),
                 'orderDescription' => $this->_getOrderDescription($reservedOrderId),
                 'currencyCode' => $quote->getQuoteCurrencyCode(),
                 'amount' => $quote->getGrandTotal(),
@@ -319,7 +319,7 @@ class Service
                 'billingAddress' => $this->_getBillingAddress($quote),
                 'method' => $paymentDetails['method'],
                 'paymentPagesEnabled' => $this->worldpayHelper->getCustomPaymentEnabled(),
-                'installationId' => $this->worldpayHelper->getInstallationId(),
+                'installationId' => $this->worldpayHelper->getInstallationId($paymentType),
                 'hideAddress' => $this->worldpayHelper->getHideAddress(),
                 'shopperId' => $quote->getCustomerId(),
                 'orderStoreId' => $orderStoreId,
@@ -372,7 +372,7 @@ class Service
             'billingAddress' => $this->_getKlarnaBillingAddress($quote),
             'method' => $paymentDetails['method'],
             'paymentPagesEnabled' => $this->worldpayHelper->getCustomPaymentEnabled(),
-            'installationId' => $this->worldpayHelper->getInstallationId(),
+            'installationId' => $this->worldpayHelper->getInstallationId($paymentDetails['additional_data']['cc_type']),
             'hideAddress' => $this->worldpayHelper->getHideAddress(),
             'orderLineItems' => $this->_getOrderLineItems($quote, 'KLARNA-SSL'),
             'orderStoreId' => $orderStoreId,
@@ -426,7 +426,7 @@ class Service
 
         return [
             'orderCode' => $orderCode,
-                'merchantCode' => $this->worldpayHelper->getMerchantCode($updatedPaymentDetails['brand']),
+                'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentType),
                 'id' => $id,
                 'orderDescription' => $this->_getOrderDescription($reservedOrderId),
                 'currencyCode' => $quote->getQuoteCurrencyCode(),
@@ -818,7 +818,7 @@ class Service
             $details['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
         }
         // CVV through HPP
-        $details['installationId'] = $this->worldpayHelper->getInstallationId();
+        $details['installationId'] = $this->worldpayHelper->getInstallationId($savedCardData->getCardBrand().'-SSL');
         $details['ccIntegrationMode'] = $this->worldpayHelper->getCcIntegrationMode();
         $details['paymentPagesEnabled'] = $this->worldpayHelper->getCustomPaymentEnabled();
         // Check for Merchant Token

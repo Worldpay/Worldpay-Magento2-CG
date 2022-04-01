@@ -31,15 +31,12 @@
           
     </div>
     <div class="payment-method-content">
-
         <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
            <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
-            <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
-                <!-- ko if: (paymentMethodSelection()=='radio')-->
-               
-                    <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
-                    <div class="paymentmethods-radio-wrapper">
-                        <input type="radio"  data-bind="event:{ change: $parent.loadEventAction }, attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
+            <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">          
+                <!-- ko foreach: {data: availableCCTypes(), as: 'item'} -->
+                       <div class="paymentmethods-radio-wrapper">
+                        <input type="radio"  data-bind="click:$parent.onSelectCcard.bind(this,$parent), event:{ change: $parent.loadEventAction }, attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
                                         'validate-one-required-by-name':true
                                                 }),id: 'redirect_cc_' + item.ccValue}" name="payment[cc_type]" />
                         <!--ko if: $parent.getIcons(item.ccValue) -->
@@ -49,51 +46,42 @@
                                     'width': $parent.getIcons(item.ccValue).width,
                                     'height': $parent.getIcons(item.ccValue).height
                                     }"></label>
-                        <!--/ko-->
-                    <!--ko if: item.ccValue=='savedcard' -->
-                        <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}"><!-- ko i18n: 'Saved Cards'--><!-- /ko --></label>
-                    <!--/ko-->
+                        <!--/ko-->                   
                    </div>
                 <!--/ko-->
-               
-            <!-- /ko -->
-                <!-- ko if: (paymentMethodSelection()=='dropdown')-->
-                        <select name="payment[cc_type]" class="select select-ccytpe"
-                        data-bind="
-                       attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type',
-                       'data-validate': JSON.stringify({required:true})},
-                       options: availableCCTypes(),
-                       optionsText: 'ccLabel',
-                       value: selectedCCType,
-                        optionsValue: 'ccValue',
-                       optionsCaption: 'Select Your Credit Card', event:{ change: loadEventAction }"></select>
-                <!-- /ko -->
+                 <!-- ko if: (getSavedCardsCount() > 0)-->
+                 <div class="paymentmethods-radio-wrapper">
+                    <label class="action label-saved-card" data-bind="click: loadSavedCards,text: $t('Use Saved Card')"></label>
+                       
+                    </div>
+                   <!-- /ko -->               
             </div>
 
-             <!-- ko if: (getSaveCardAllowed() && (isTokenizationEnabled() || isStoredCredentialsEnabled()))-->
-                <div class="field savecc" data-bind="attr: {id: getCode() + '_save-card_div'}">
+            <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
+                <!-- ko if: (getSavedCardsCount() > 0)-->
+                   <fieldset class="fieldset payment items ccard worldpay_cc" id="payment_form_worldpay_cc">
+                   <hr>
+                       <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
+                       <!-- ko template: 'Sapient_Worldpay/payment/saved-card-form' --><!-- /ko -->
+                   </fieldset>
+               <!-- /ko -->
+               </div>
+            <!-- ko if: (getSaveCardAllowed() && (isTokenizationEnabled() || isStoredCredentialsEnabled()))-->
+                <div  class="field savecc" data-bind="attr: {id: getCode() + '_save-card_div'},visible: isSaveThisCardVisible">
                     <div class="control">
-                        <input type="checkbox" class="input-check savecard"  name="save-card"  data-bind="attr: {
-                                id: getCode() + '_save_card', title: $t('Save This Card'),
-                                'data-container': getCode() + '-save-card'}, value: saveMyCard">
-                         <label data-bind="attr: {for: getCode() + 'save-card'}" class="label">
-                            <span><!-- ko i18n: 'Save This Card'--><!-- /ko --></span>
+                        <input type="checkbox" class="input-check savecard"  name="save-card"  data-bind="click: savethiscard,attr: {
+                            id: getCode() + '_save_card', title: $t('Save This Card'),
+                            'data-container': getCode() + '-save-card'}, value: saveMyCard">
+                            <label data-bind="attr: {for: getCode() + 'save-card'}" class="label">
+                            <span><!-- ko i18n: getCheckoutLabels('CO26')--><!-- /ko --></span>
                             <!-- ko if: (isStoredCredentialsEnabled() && isDisclaimerMessageEnabled())-->
-                                <span>(<a data-bind="click: disclaimerPopup">Important Disclaimer!</a>)</span>
+                                <span>(<a class="checkout-disclaimer" data-bind="i18n: getCheckoutLabels('CO9'),click: disclaimerPopup"></a>)</span>
                             <!-- /ko -->
                         </label>
                     </div>
                 </div>
              <!-- /ko -->
-                 <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
-             <!-- ko if: (getSavedCardsCount() > 0)-->
-                <fieldset class="fieldset payment items ccard worldpay_cc" id="payment_form_worldpay_cc">
-                <hr>
-                    <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
-                    <!-- ko template: 'Sapient_Worldpay/payment/saved-card-form' --><!-- /ko -->
-                </fieldset>
-            <!-- /ko -->
-            </div>
+                
             <div id="dialog" style="display: none" align = "center" title="Disclaimer!">
                 <form id="disclaimer" name="disclaimer">
                     <div data-bind="html: disclaimerMessage()"></div>
@@ -142,11 +130,10 @@
                             </select>
                                 </div>
                             </div>
-                        
-            </fieldset>
+             </fieldset>
         </form>
         
-
+     
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
@@ -160,6 +147,28 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
+         <!-- ko if: (getIntigrationMode() == 'redirect')-->
+         <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary checkout hpp-checkout"
+                        type="button"
+                        data-bind="
+                            click: loadHppIframe,
+                            attr: {title: getCheckoutLabels('CO27')}">
+                    <span data-bind="text: getCheckoutLabels('CO27')"></span>
+                </button>
+            </div>
+        </div>
+         <!-- HPP IFRAME -->
+         <style type="text/css">#checkout-payment-worldpay-container{padding-top:10px;} #wp-cl{ width: 93%;} .wp-cl-iframe{ height: 600px;  min-width: 93%; } #changePaymentMethod{display:none; } #wp-cl-checkout-payment-worldpay-container-iframe #changePaymentMethod{ display:none;}</style>
+         <div style="display:none" id="checkout-payment-worldpay-alert-message" data-bind="text: getCheckoutLabels('CO28')"></div>
+         <div id="checkout-payment-worldpay-container"></div>
+         <!-- HPP IFRAME -->
+
+         <!--/ko-->
+
+
+        <!-- ko if: (getIntigrationMode() == 'direct')-->
         <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"
@@ -175,5 +184,6 @@
                 </button>
             </div>
         </div>
+        <!--/ko-->
     </div>
 </div>

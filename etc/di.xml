@@ -39,6 +39,7 @@
     </type>
     <preference for="Sapient\Worldpay\Api\HistoryInterface" type="Sapient\Worldpay\Model\Notification\History" />
     <preference for="Sapient\Worldpay\Api\PaymentTypeInterface" type="Sapient\Worldpay\Model\Payment\PaymentTypes" />
+    <preference for="Sapient\Worldpay\Api\HostedUrlInterface" type="Sapient\Worldpay\Model\Payment\HostedUrl" />
     <preference for="Sapient\Worldpay\Api\LatAmInstalInterface" type="Sapient\Worldpay\Model\Payment\LatAmInstalTypes" />
     <preference for="Magento\Vault\Model\Method\Vault" type="Sapient\Worldpay\Model\PaymentMethods\CcVault" />
     <preference for="Magento\Sales\Model\Order\Email\Sender\OrderSender" type="Sapient\Worldpay\Model\Order\Email\Sender\OrderSender"/>

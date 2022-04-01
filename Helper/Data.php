@@ -4,6 +4,7 @@ namespace Sapient\Worldpay\Helper;
 
 use Sapient\Worldpay\Model\Config\Source\HppIntegration as HPPI;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\App\Filesystem\DirectoryList;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -15,12 +16,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private $serializer;
 
+    protected $_storeManager;
+    protected $_filesystem;
+
     const MERCHANT_CONFIG = 'worldpay/merchant_config/';
     const INTEGRATION_MODE = 'worldpay/cc_config/integration_mode';
 
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\Filesystem $filesystem,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Locale\CurrencyInterface $localeCurrency,
         \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist,
         \Sapient\Worldpay\Helper\Merchantprofile $merchantprofile,
@@ -37,6 +43,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries
     ) {
         $this->_scopeConfig = $scopeConfig;
+        $this->_storeManager = $storeManager;
+        $this->_filesystem = $filesystem;
         $this->wplogger = $wplogger;
         $this->paymentlist = $paymentlist;
         $this->localecurrency = $localeCurrency;
@@ -399,8 +407,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
-    public function getInstallationId($storeId = null)
+    public function getInstallationId($paymentType = null)
     {
+        if ($paymentType) {
+            $merchant_detail = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantInstallationId = $merchant_detail ? $merchant_detail['merchant_installation_id']:'';
+            if (!empty($merchantInstallationId)) {
+                return $merchantInstallationId;
+            }
+        }
+
         return $this->_scopeConfig->getValue(
             'worldpay/hpp_config/installation_id',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
@@ -1377,7 +1393,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $this->wplogger->info('Passed regex check for mac');
                 return true;
             }
-            $this->wplogger->info(print_r($useragent, true));
+            $this->wplogger->info(json_encode($useragent));
             $this->wplogger->info('Outside regex check');
             return false;
         }
@@ -1414,5 +1430,147 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'worldpay/moto_config/moto_integration_mode',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
+    }
+
+    public function getAdditionalMerchantProfiles()
+    {
+        return $this->merchantprofile->getAdditionalMerchantProfiles();
+    }
+    /**
+     *  Check if Global APM API Call configuration is enabled
+     */
+    public function isGlobalApmEnable()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/global_apm/enable_global_apm_call',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Check if there is order code present in checkout session
+     */
+    public function getOrderCodeFromCheckoutSession()
+    {
+        return $this->_checkoutSession->getHppOrderCode();
+    }
+
+    /**
+     *  Check if Payment Method Logo config is enabled
+     */
+    public function isPaymentMethodlogoEnable()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/payment_method_logo_config_enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get Credit card uploaded file value
+     * @param $methodCode
+     * @return string
+     */
+    public function getCcLogoConfigValue($methodCode)
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/cc/'.$methodCode.'/'.'logo_config',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get APM uploaded file value
+     * @param $methodCode
+     * @return string
+     */
+    public function getApmLogoConfigValue($methodCode)
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/apm/'.$methodCode.'/'.'logo_config',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get Wallet uploaded file value
+     * @param $methodCode
+     * @return string
+     */
+    public function getWalletLogoConfigValue($methodCode)
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/wallet/'.$methodCode.'/'.'logo_config',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * check if Credit Card config enable
+     * @param $methodCode
+     * @return bool
+     */
+    public function isCcLogoConfigEnabled($methodCode)
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/cc/'.$methodCode.'/'.'enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * check if APM config enable
+     * @param $methodCode
+     * @return bool
+     */
+    public function isApmLogoConfigEnabled($methodCode)
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/apm/'.$methodCode.'/'.'enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * check if Wallet config enable
+     * @param $methodCode
+     * @return bool
+     */
+    public function isWalletLogoConfigEnabled($methodCode)
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/wallet/'.$methodCode.'/'.'enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get Media url with Path
+     */
+    public function getBaseUrlMedia($path)
+    {
+        return $this->_storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . $path;
+    }
+
+    /**
+     * Get Media Directory with path
+     */
+    public function getMediaDirectory($path)
+    {
+        return $this->_filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath(). $path;
+    }
+    /**
+     * return worldpay payment methods
+     */
+    public function getWpPaymentMethods()
+    {
+        return [
+            \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::WORLDPAY_APM_TYPE,
+            \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::WORLDPAY_CC_TYPE,
+            \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::WORLDPAY_MOTO_TYPE,
+            \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::WORLDPAY_WALLETS_TYPE,
+            \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::WORLDPAY_CC_TYPE,
+            'worldpay_cc_vault'
+        ];
     }
 }

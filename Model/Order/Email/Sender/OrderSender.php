@@ -63,7 +63,7 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
                $this->orderResource->saveAttribute($order, 'send_email');
                return false;
         } else {
-            return parent::send($order, $forceSyncMode = false);
+            return parent::send($order, $forceSyncMode);
              
         }
         return false;

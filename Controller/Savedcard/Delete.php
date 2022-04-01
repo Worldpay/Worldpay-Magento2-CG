@@ -30,6 +30,8 @@ class Delete extends \Magento\Framework\App\Action\Action
         
     protected $helper;
 
+    protected $vaultPaymentToken;
+
     /**
      * Constructor
      *
@@ -53,7 +55,8 @@ class Delete extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         PaymentTokenRepositoryInterface $tokenRepository,
         PaymentTokenManagement $paymentTokenManagement,
-        MyAccountException $helper
+        MyAccountException $helper,
+        \Magento\Vault\Model\PaymentToken $vaultPaymentToken
     ) {
         parent::__construct($context);
         $this->_storeManager = $storeManager;
@@ -66,6 +69,7 @@ class Delete extends \Magento\Framework\App\Action\Action
         $this->tokenRepository = $tokenRepository;
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->helper = $helper;
+        $this->vaultPaymentToken = $vaultPaymentToken;
     }
 
     /**
@@ -156,15 +160,12 @@ class Delete extends \Magento\Framework\App\Action\Action
             'worldpay_cc',
             $customer->getId()
         );
-        
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $model = $objectManager->create(\Magento\Vault\Model\PaymentToken::class);
-        $model->load($paymentToken->getEntityId());
         if ($paymentToken === null) {
             return;
         }
+        $vaultToken = $this->vaultPaymentToken->load($paymentToken->getEntityId());
         try {
-            $model->delete();
+            $vaultToken->delete();
         } catch (\Exception $e) {
             $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('MCAM6')));
         }

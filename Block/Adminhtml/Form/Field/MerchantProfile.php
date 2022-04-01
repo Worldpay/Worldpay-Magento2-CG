@@ -61,6 +61,10 @@ class MerchantProfile extends \Magento\Config\Block\System\Config\Form\Field\Fie
             )
             ]);
         
+        $this->addColumn(
+            'merchant_installation_id',
+            ['label' => __('Installation Id'),'style' => 'width:100px','class' => '']
+        );
         $this->_addAfter = false;
         $this->_addButtonLabel = __('Add');
     }

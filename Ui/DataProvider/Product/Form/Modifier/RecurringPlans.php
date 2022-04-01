@@ -82,6 +82,10 @@ class RecurringPlans extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
+        // if worldpay is not enabled
+        if (!$this->recurringHelper->isWorldpayEnable()) {
+            return $meta;
+        }
         if (!$this->locator->getProduct()->getId()
             || !in_array($this->locator->getProduct()->getTypeId(), $this->recurringHelper->getAllowedProductTypeIds())
         ) {

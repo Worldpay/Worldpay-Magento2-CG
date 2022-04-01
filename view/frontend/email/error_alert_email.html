@@ -1,0 +1,22 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject {{var mail_subject|raw }} @-->
+{{template config_path="design/email/header_template"}}
+<p>Hi,</p>
+<p>
+    {{trans "There has been error while sending request to Worldpay. Details are given below"}}
+</p>
+<ul>
+    <li><strong>{{trans "Error Code:"}}</strong> <em>{{var error_code}}</em></li>
+    <li><strong>{{trans "Error Message:"}}</strong> <em>{{var error_message}}</em></li>
+</ul>
+<p>{{trans "More details are attached in the attachment"}}</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><small>{{trans "Note: You are receiving this email because you have enabled the error alert configuration in admin"}}</small></p>
+{{template config_path="design/email/footer_template"}}
+

@@ -54,7 +54,7 @@ class WorldpayToken
      *
      * @param Sapient\WorldPay\Model\Token $token
      * @param \Magento\Customer\Model\Customer $customer
-     * @throws Sapient\WorldPay\Model\Token\AccessDeniedException
+     * @throws Sapient\Worldpay\Model\Token\AccessDeniedException
      */
     public function updateTokenByCustomer(SavedToken $token, \Magento\Customer\Model\Customer $customer)
     {
@@ -65,14 +65,16 @@ class WorldpayToken
     /**
      * @param Sapient\WorldPay\Model\Token $token
      * @param \Magento\Customer\Model\Customer $customer
-     * @throws Sapient\WorldPay\Model\Token\AccessDeniedException
+     * @throws Sapient\Worldpay\Model\Token\AccessDeniedException
      */
     private function _assertAccessForToken(SavedToken $token, \Magento\Customer\Model\Customer $customer)
     {
         $msg = 'Access denied: token "%s" is not owned by customer "%d"';
         if (!$this->hasCustomerAccessForToken($token, $customer)) {
-            throw new \AccessDeniedException(
-                sprintf($msg, $token->getTokenCode(), $customer->getId())
+            $errorMsg = sprintf($msg, $token->getTokenCode(), $customer->getId());
+            // added fix for github issue 71
+            throw new \Sapient\Worldpay\Model\Token\AccessDeniedException(
+                __($errorMsg)
             );
         }
     }
@@ -95,7 +97,7 @@ class WorldpayToken
      *
      * @param Sapient\WorldPay\Model\Token $token
      * @param \Magento\Customer\Model\Customer $customer
-     * @throws Sapient\WorldPay\Model\Token\AccessDeniedException
+     * @throws Sapient\Worldpay\Model\Token\AccessDeniedException
      */
     public function deleteTokenByCustomer(SavedToken $token, \Magento\Customer\Model\Customer $customer)
     {
@@ -108,7 +110,7 @@ class WorldpayToken
      *
      * @param Sapient\WorldPay\Model\Token $token
      * @param \Magento\Customer\Model\Customer $customer
-     * @throws Sapient\WorldPay\Model\Token\AccessDeniedException
+     * @throws Sapient\Worldpay\Model\Token\AccessDeniedException
      */
     public function updateOrInsertToken(TokenStateInterface $tokenState, $paymentObject, $customerId = null)
     {

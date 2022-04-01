@@ -192,6 +192,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
 
         $orderCode = $this->_generateOrderCode($quote);
+
+        if (!empty($this->worlpayhelper->getOrderCodeFromCheckoutSession())) {
+            $orderCode = $this->worlpayhelper->getOrderCodeFromCheckoutSession();
+        }
+
         $this->authSession->setCurrencyCode($quote->getQuoteCurrencyCode());
         $this->paymentdetailsdata = self::$paymentDetails;
         try {
@@ -341,13 +346,19 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         //      $integrationType = 'redirect'; uncomment to support moto redirect
         }
         $wpp = $this->worldpaypayment->create();
+        
+        $cardType = $paymentdetails['additional_data']['cc_type'];
+        if ($cardType == 'savedcard') {
+            $cardType = $this->_getpaymentType();
+        }
+
         $wpp->setData('order_id', $orderId);
         $wpp->setData('payment_status', \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION);
         $wpp->setData('worldpay_order_id', $orderCode);
         $wpp->setData('store_id', $storeId);
         $wpp->setData(
             'merchant_id',
-            $this->worlpayhelper->getMerchantCode($paymentdetails['additional_data']['cc_type'])
+            $this->worlpayhelper->getMerchantCode($cardType)
         );
         $wpp->setData('3d_verified', $this->worlpayhelper->isDynamic3DEnabled());
         $wpp->setData('payment_model', $integrationType);
@@ -383,14 +394,15 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $partialCapture = $this->_scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
           
         $mageOrder = $payment->getOrder();
-        $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
+        $orderId = $mageOrder->getIncrementId();
+        /*$quote = $this->quoteRepository->get($mageOrder->getQuoteId());
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
         $orderId = '';
         if ($quote->getReservedOrderId()) {
             $orderId = $quote->getReservedOrderId();
         } else {
             $orderId = $mageOrder->getIncrementId();
-        }
+        }*/
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($orderId);
         $captureArray = '';
         //added Klarna check
@@ -472,9 +484,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     {
         $payment = $this->getInfoInstance()->getOrder()->getPayment();
         $mageOrder = $payment->getOrder();
-        $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
-        $wpPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
-
+        //$quote = $this->quoteRepository->get($mageOrder->getQuoteId());
+        $wpPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
         if ($wpPayment) {
             return $this->_isRefundAllowed($wpPayment->getPaymentStatus());
         }

@@ -29,13 +29,15 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Model\Request $request,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
         \Sapient\Worldpay\Helper\GeneralException $exceptionHelper,
-        \Magento\Sales\Model\Service\InvoiceService $invoiceService
+        \Magento\Sales\Model\Service\InvoiceService $invoiceService,
+        \Sapient\Worldpay\Helper\SendErrorReport $emailErrorReportHelper
     ) {
         $this->_wplogger = $wplogger;
         $this->_request = $request;
         $this->worldpayhelper = $worldpayhelper;
         $this->exceptionHelper = $exceptionHelper;
         $this->_invoiceService = $invoiceService;
+        $this->emailErrorReportHelper = $emailErrorReportHelper;
     }
 
     /**
@@ -254,9 +256,13 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             'threeDSecureConfig' => $tokenOrderParams['threeDSecureConfig'],
             'tokenRequestConfig' => $tokenOrderParams['tokenRequestConfig']
         ];
-        
-        $xmlUsername = $this->worldpayhelper->getXmlUsername($tokenOrderParams['paymentDetails']['brand']);
-        $xmlPassword = $this->worldpayhelper->getXmlPassword($tokenOrderParams['paymentDetails']['brand']);
+
+        $methodCode = $tokenOrderParams['paymentDetails']['brand'];
+        if (isset($tokenOrderParams['paymentDetails']['methodCode'])) {
+                $methodCode = $tokenOrderParams['paymentDetails']['methodCode'];
+        }
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($methodCode);
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($methodCode);
         $merchantCode = $tokenOrderParams['merchantCode'];
         
         if ($tokenOrderParams['method'] == 'worldpay_moto'
@@ -640,7 +646,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     protected function _sendRequest($xml, $username, $password)
     {
         $response = $this->_request->sendRequest($xml, $username, $password);
-        $this->_checkForError($response);
+        $this->_checkForError($response, $xml);
         return $response;
     }
 
@@ -650,7 +656,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param SimpleXmlElement $response
      * @throw Exception
      */
-    protected function _checkForError($response)
+    protected function _checkForError($response, $xml = "")
     {
         $paymentService = new \SimpleXmlElement($response);
         $lastEvent = $paymentService->xpath('//lastEvent');
@@ -660,6 +666,13 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $error = $paymentService->xpath('//error');
 
         if ($error) {
+            $this->emailErrorReportHelper->sendErrorReport([
+                'request'=>$xml->saveXML(),
+                'response'=>$response,
+                'error_code'=>$error[0]['code'],
+                'error_message'=>$error[0]
+            ]);
+
             $this->_wplogger->error('An error occurred while sending the request');
             $this->_wplogger->error('Error (code ' . $error[0]['code'] . '): ' . $error[0]);
             if ($error[0]['code'] == 6) {
@@ -1003,7 +1016,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     public function order3Ds2Secure($directOrderParams)
     {
         $loggerMsg = '########## Submitting direct 3Ds2Secure order request. OrderCode: ';
-        $this->_wplogger->info($loggerMsg . $directOrderParams['orderCode'] . ' ##########');
+        $this->_wplogger->info($loggerMsg . ' ##########');
         if (isset($directOrderParams['tokenRequestConfig'])) {
             $requestConfiguration = [
             'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],

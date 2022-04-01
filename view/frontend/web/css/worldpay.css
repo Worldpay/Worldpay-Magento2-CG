@@ -50,6 +50,7 @@ vertical-align: middle;
 
 .paymentmethods-radio-wrapper label img {
 max-width: 69px;
+max-height:30px;
 }
 
 .checkout-payment-method .payment-method+.payment-method .payment-method-title {
@@ -291,6 +292,36 @@ span.cc-card-type {
 .payment-method .payment-method-content [type="radio"]:focus + label:before {
     outline: 1px dotted #ed0b02;
 }
+.label-saved-card{
+	padding-left: 32px;
+    height: 30px;
+    display: table-cell !important;
+    background-image: none;
+    background: #1979c3;
+    border: 1px solid #1979c3;
+    color: #fff;
+    cursor: pointer;   
+    font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-weight: 600;
+    padding: 7px 15px;
+    font-size: 1.4rem;
+    box-sizing: border-box;
+    vertical-align: middle;
+    border-radius: 6px;
+ }
+ 
+ .checkout-disclaimer{
+     cursor: pointer;
+ }
+ #checkout-payment-worldpay-alert-message{
+    margin: 0 40px 8px 0px;
+    padding: 10px 10px 10px 10px;
+    display: block;
+    line-height: 1.2em;
+    font-size: 1.3rem;
+    background: #fdf0d5;
+    color: #6f4400;
+ }
 /* Custom select */
 
 @media screen and (max-width: 980px) {

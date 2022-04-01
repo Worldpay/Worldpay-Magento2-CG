@@ -4,8 +4,9 @@
  */
 namespace Sapient\Worldpay\Model\Payment\Update;
 
-class Defaultupdate extends \Sapient\Worldpay\Model\Payment\Update\Base implements
-    \Sapient\Worldpay\Model\Payment\Update
+use \Sapient\Worldpay\Model\Payment\UpdateInterface;
+
+class Defaultupdate extends \Sapient\Worldpay\Model\Payment\Update\Base implements UpdateInterface
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;

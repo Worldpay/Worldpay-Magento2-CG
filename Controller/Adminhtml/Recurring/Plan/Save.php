@@ -7,6 +7,7 @@ namespace Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan;
 
 use Magento\Framework\Controller\ResultFactory;
 use Sapient\Worldpay\Helper\GeneralException;
+use Laminas\Uri\Uri;
 
 class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
 {
@@ -32,13 +33,15 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
         \Sapient\Worldpay\Ui\DataProvider\Product\Form\Modifier\Data\RecurringPlans $planGridDataProvider,
         \Magento\Framework\Locale\FormatInterface $localeFormat,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Sapient\Worldpay\Helper\GeneralException $helper
+        \Sapient\Worldpay\Helper\GeneralException $helper,
+        \Laminas\Uri\Uri $uri
     ) {
         parent::__construct($context, $planFactory);
         $this->planGridDataProvider = $planGridDataProvider;
         $this->localeFormat = $localeFormat;
         $this->helper = $helper;
         $this->storeManager = $storeManager;
+        $this->uri = $uri;
     }
 
     /**
@@ -48,9 +51,10 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
     {
         $data = $this->getRequest()->getPostValue();
         //$productId = $this->getRequest()->getParam('product_id');
-        
-        $url = parse_url($this->_redirect->getRefererUrl());
-        $path_parts=explode('/', $url['path']);
+
+        //$url = parse_url($this->_redirect->getRefererUrl());
+        $parsedUrl = $this->uri->parse($this->_redirect->getRefererUrl());
+        $path_parts=explode('/', $parsedUrl->getPath());
         if (in_array('id', $path_parts)) {
             $key = array_search('id', $path_parts);
             $productId = $path_parts[$key+1];

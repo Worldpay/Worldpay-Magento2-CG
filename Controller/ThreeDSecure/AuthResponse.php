@@ -13,6 +13,9 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
      * @var CreditCardException
      */
     protected $helper;
+    protected $request;
+    protected $_cookieManager;
+    protected $cookieMetadataFactory;
     /**
      * Constructor
      *
@@ -34,7 +37,10 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Framework\UrlInterface $urlBuilder,
         \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
-        CreditCardException $helper
+        CreditCardException $helper,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager,
+        \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory $cookieMetadataFactory
     ) {
         $this->wplogger = $wplogger;
         $this->resultJsonFactory = $resultJsonFactory;
@@ -46,6 +52,9 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         $this->urlBuilders    = $urlBuilder;
         $this->resultRedirectFactory = $resultRedirectFactory;
         $this->helper = $helper;
+        $this->request = $request;
+        $this->_cookieManager = $cookieManager;
+        $this->cookieMetadataFactory = $cookieMetadataFactory;
         parent::__construct($context);
     }
 
@@ -58,32 +67,58 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
         $threeDSecureParams = $this->checkoutSession->get3DSecureParams();
         $skipSameSiteForIOs = $this->shouldSkipSameSiteNone($directOrderParams);
-        
+        $mhost = $this->request->getHttpHost();
+        $cookieValue = $this->_cookieManager->getCookie('PHPSESSID');
         if ($skipSameSiteForIOs) {
-            if (isset($_COOKIE['PHPSESSID'])) {
-                $phpsessId = $_COOKIE['PHPSESSID'];
-                $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
-                setcookie("PHPSESSID", $phpsessId, [
+            if (isset($cookieValue)) {
+                $phpsessId = $cookieValue;
+                $domain = $mhost;
+                $expires = time() + 3600;
+                /*setcookie("PHPSESSID", $phpsessId, [
                 'expires' => time() + 3600,
                 'path' => '/',
                 'domain' => $domain,
                 'secure' => true,
                 'httponly' => true,
-                ]);
+                ]);*/
+                $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata();
+                $metadata->setPath('/');
+                $metadata->setDomain($domain);
+                $metadata->setDuration($expires);
+                $metadata->setSecure(true);
+                $metadata->setHttpOnly(true);
+                $this->_cookieManager->setPublicCookie(
+                    "PHPSESSID",
+                    $phpsessId,
+                    $metadata
+                );
             }
             
         } else {
-            if (isset($_COOKIE['PHPSESSID'])) {
-                $phpsessId = $_COOKIE['PHPSESSID'];
-                $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
-                setcookie("PHPSESSID", $phpsessId, [
+            if (isset($cookieValue)) {
+                $phpsessId = $cookieValue;
+                $domain = $mhost;
+                $expires = time() + 3600;
+                /*setcookie("PHPSESSID", $phpsessId, [
                 'expires' => time() + 3600,
                 'path' => '/',
                 'domain' => $domain,
                 'secure' => true,
                 'httponly' => true,
                 'samesite' => 'None',
-                ]);
+                ]);*/
+                $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata();
+                $metadata->setPath('/');
+                $metadata->setDomain($domain);
+                $metadata->setDuration($expires);
+                $metadata->setSecure(true);
+                $metadata->setHttpOnly(true);
+                $metadata->setSameSite("None");
+                $this->_cookieManager->setPublicCookie(
+                    "PHPSESSID",
+                    $phpsessId,
+                    $metadata
+                );
             }
         }
         $this->checkoutSession->unsDirectOrderParams();
@@ -150,7 +185,7 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
                 $this->wplogger->info('Passed regex check for mac');
                 return true;
             }
-            $this->wplogger->info(print_r($useragent, true));
+            $this->wplogger->info(json_encode($useragent));
             $this->wplogger->info('Outside regex check');
             return false;
         }

@@ -44,6 +44,11 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
         $responsexml = simplexml_load_string($response);
 
         $paymentoptions =  $this->getPaymentOptions($responsexml);
+        
+        if ($this->worldpayhelper->isGlobalApmEnable()) {
+            $additionalMerchanPaymentoptions =  $this->getAdditionalMerchantPaymentOptions($countryId, $paymentoptions);
+            $paymentoptions = array_merge($paymentoptions, $additionalMerchanPaymentoptions);
+        }
         return $paymentoptions;
     }
 
@@ -53,5 +58,41 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
             return (array) $xml->reply->paymentOption;
         }
         return null;
+    }
+
+    /**
+     *  Get Additional merchant profile from merchant override configuration
+     *  and merge all the unique values(if not available in global merchant profile)
+     *  to the global payment method array
+     */
+    public function getAdditionalMerchantPaymentOptions($countryId, $paymentoptions)
+    {
+        $additionalMerchantConfigurations = $this->worldpayhelper->getAdditionalMerchantProfiles();
+        $additonalPaymentMethods = [];
+        if (!empty($additionalMerchantConfigurations)) {
+            
+            foreach ($additionalMerchantConfigurations as $paymentType => $merchant) {
+                $paymentOptionParams = [
+                        'merchantCode' => $merchant['merchant_code'],
+                        'countryCode' => $countryId,
+                        'paymentType'=> $paymentType
+                ];
+               
+                $response = $this->paymentservicerequest->paymentOptionsByCountry($paymentOptionParams);
+                $responsexml = simplexml_load_string($response);
+                $paymentMethods =  $this->getPaymentOptions($responsexml);
+
+                if (!empty($paymentMethods)) {
+                    foreach ($paymentMethods as $paymentMethod) {
+                        if (!in_array($paymentMethod, $paymentoptions)) {
+                            $additonalPaymentMethods[] = $paymentMethod;
+                        }
+                    }
+                }
+
+            }
+        }
+
+        return $additonalPaymentMethods;
     }
 }
