@@ -67,6 +67,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @var SerializerInterface
      */
     private $serializer;
+
+    /**
+     * @var fileDriver
+     */
+    protected $fileDriver;
     
     /**
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
@@ -95,7 +100,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         RequestInterface $request,
         Source $assetSource,
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        \Magento\Framework\Filesystem\Driver\File $fileDriver
     ) {
 
             $this->wplogger = $wplogger;
@@ -115,6 +121,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
             $this->assetSource = $assetSource;
             $this->localeResolver = $localeResolver;
             $this->serializer = $serializer;
+            $this->fileDriver = $fileDriver;
     }
 
     /**
@@ -430,29 +437,91 @@ class WorldpayConfigProvider implements ConfigProviderInterface
 
         $types = $this->worldpayHelper->getCcTypes();
         $types['VISA_DEBIT-SSL'] = 'Visa debit';
+        $types['KLARNA-SSL'] = 'Klarna';
         $apmTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
         $walletsTypes = $this->worldpayHelper->getWalletsTypes('worldpay_wallets');
-        
+        /* custom logo Path */
+        $customLogoPath = 'sapient_worldpay/images/';
+        $urlMedia = $this->worldpayHelper->getBaseUrlMedia($customLogoPath);
+        $mediaDirectory = $this->worldpayHelper->getMediaDirectory($customLogoPath);
+
         $allTypePayments = array_unique(array_merge($types, $apmTypes));
-        
         $allTypePayments = array_unique(array_merge($allTypePayments, $walletsTypes));
         
         foreach (array_keys($allTypePayments) as $code) {
             if (!array_key_exists($code, $this->icons)) {
                 $asset = $this->createAsset('Sapient_Worldpay::images/cc/' . strtolower($code) . '.png');
                 $placeholder = $this->assetSource->findSource($asset);
+                
                 if ($placeholder) {
-                    
-                    list($width, $height) = getimagesize($asset->getSourceFile());
+                    //list($width, $height) = getimagesize($asset->getSourceFile());
+                    list($width, $height) = getimagesizefromstring($asset->getUrl());
                     $this->icons[$code] = [
                         'url' => $asset->getUrl(),
                         'width' => $width,
                         'height' => $height
                     ];
                 }
+                $personalisedLogoXmlPath = strtolower(str_replace('-', '_', $code));
+                if ($this->checkLogoConfigEnabled($personalisedLogoXmlPath) &&
+                $this->checkLogoConfigValues($personalisedLogoXmlPath)) {
+                    $absoulteMediaUrl = $urlMedia. $this->checkLogoConfigValues($personalisedLogoXmlPath);
+                    $mediaSourceUrl = $mediaDirectory. $this->checkLogoConfigValues($personalisedLogoXmlPath);
+                    if ($this->fileDriver->isExists($mediaSourceUrl)) {
+                        list($width, $height) = getimagesizefromstring($absoulteMediaUrl);
+                        $this->icons[$code] = [
+                            'url' => $absoulteMediaUrl,
+                            'width' => '50px',
+                            'height' => '30px',
+                            'vertical-align' => 'middle'
+                        ];
+                    }
+                }
             }
         }
         return $this->icons;
+    }
+
+    /**
+     * Get logo uploaded file value
+     * @param $code
+     * @return string
+     */
+    public function checkLogoConfigValues($code)
+    {
+        $ccDataConfig = $this->worldpayHelper->getCcLogoConfigValue($code);
+        if (!empty($ccDataConfig)) {
+            return $ccDataConfig;
+        }
+        $apmDataConfig = $this->worldpayHelper->getApmLogoConfigValue($code);
+        if (!empty($apmDataConfig)) {
+            return $apmDataConfig;
+        }
+        $walletDataConfig = $this->worldpayHelper->getwalletLogoConfigValue($code);
+        if (!empty($walletDataConfig)) {
+            return $walletDataConfig;
+        }
+        return null;
+    }
+
+    /**
+     * check Logo config enabled
+     * @param $code
+     * @return bool
+     */
+    public function checkLogoConfigEnabled($code)
+    {
+        if ($this->worldpayHelper->isPaymentMethodlogoEnable()) {
+            if ($this->worldpayHelper->isCcLogoConfigEnabled($code)) {
+                return true;
+            } elseif ($this->worldpayHelper->isApmLogoConfigEnabled($code)) {
+                return true;
+            } elseif ($this->worldpayHelper->isWalletLogoConfigEnabled($code)) {
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
     /**
      * Create a file asset that's subject of fallback system

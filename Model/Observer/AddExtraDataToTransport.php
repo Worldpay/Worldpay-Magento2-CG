@@ -11,10 +11,14 @@ class AddExtraDataToTransport implements ObserverInterface
 
     protected $worldpaypayment;
 
+    protected $wpHelper;
+
     public function __construct(
-        \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
+        \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment,
+        \Sapient\Worldpay\Helper\Data $wpHelper
     ) {
         $this->worldpaypayment = $worldpaypayment;
+        $this->wpHelper = $wpHelper;
     }
 
     public function execute(\Magento\Framework\Event\Observer $observer)
@@ -23,12 +27,13 @@ class AddExtraDataToTransport implements ObserverInterface
         // Order info
         $order = $transport['order'];
         $paymentCode = $order->getPayment()->getMethod();
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $helper = $objectManager->get(\Sapient\Worldpay\Helper\Data::class);
-        // Full payment method name
-        $paymentMethod = $helper->getPaymentTitleForOrders($order, $paymentCode, $this->worldpaypayment);
-        if ($paymentMethod) {
-            $transport['payment_html'] = $paymentMethod;
+        $allowedPaymentMethods = $this->wpHelper->getWpPaymentMethods();
+        if (in_array($paymentCode, $allowedPaymentMethods)) {
+            // Full payment method name
+            $paymentMethod = $this->wpHelper->getPaymentTitleForOrders($order, $paymentCode, $this->worldpaypayment);
+            if ($paymentMethod) {
+                $transport['payment_html'] = $paymentMethod;
+            }
         }
     }
 }

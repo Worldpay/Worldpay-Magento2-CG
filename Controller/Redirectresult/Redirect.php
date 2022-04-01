@@ -43,6 +43,8 @@ class Redirect extends \Magento\Framework\App\Action\Action
     {
         $redirecturl = $this->checkoutsession->getWpRedirecturl();
         $this->checkoutsession->unsWpRedirecturl();
+        $this->checkoutsession->unsIframePay();
+        $this->checkoutsession->unsHppOrderCode();
         return $this->resultRedirectFactory->create()->setUrl($redirecturl);
     }
 }

@@ -25,8 +25,6 @@ define([
                     var request = initPaymentRequest();
                     onBuyClicked(request);
                     request = initPaymentRequest();                
-                } else {
-                    location.href = this.options.url.checkout;
                 }
             }
         });

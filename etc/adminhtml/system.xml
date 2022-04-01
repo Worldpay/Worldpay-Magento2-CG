@@ -673,6 +673,542 @@
                 </field>
                 
             </group>
+            <!-- Load Payment Methods from Multiple Merchant Code -->
+            <group id="global_apm" translate="label" type="text" sortOrder="18" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Load Payment Methods from Multiple Merchant Code</label>               
+                <field id="enable_global_apm_call" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Global APM API Call </label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Please enable this to display all payment methods to the shopper, if different payment methods are mapped under different merchant codes and this is configured under Merchant profile override configuration below.
+                     We recommend this to be set to `Yes`.</comment>
+                </field>              
+            </group>
+            <!-- Payment Method Logo Group -->
+            <group id="payment_method_logo_config" translate="label" type="text" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Logo Personalisation of Payment Methods</label>
+                <!-- Payment Method Logo enabled-->
+                <field id="payment_method_logo_config_enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <group id="cc" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Credit Card Logo Config</label>
+                    <group id="amex_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>American Express </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>  
+                    <group id="cb_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Carte Bancaire </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="cartebleue_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Carte Bleue </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group> 
+                    <group id="dankort_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Dankort </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="diners_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Diners </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group> 
+                    <group id="discover_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Discover </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="jcb_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Japanese Credit Bank </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group> 
+                    <group id="maestro_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Maestro </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="ecmc_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Master Card </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="visa_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Visa </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>   
+                    <depends>
+                        <field id="worldpay/payment_method_logo_config/payment_method_logo_config_enabled">1</field>
+                    </depends>
+                </group>
+                <group id="apm" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>APM Logo Config</label>
+                    <group id="ach_direct_debit_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>ACH Pay </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="alipay_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>AliPay </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                               <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="giropay_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>GiroPay </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="ideal_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>IDEAL Pay </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="klarna_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>KLARNA </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="mistercash_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Mistercash/Bancontact </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group> 
+                    <group id="paypal_express" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>PayPal </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                               <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="przelewy_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>P24 </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="qiwi_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Qiwi </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="sepa_direct_debit_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>SEPA (One off transactions) </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="sofort_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>SoFort EU </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group> 
+                    <group id="chinaunionpay_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Union Pay </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <depends>
+                        <field id="worldpay/payment_method_logo_config/payment_method_logo_config_enabled">1</field>
+                    </depends>
+                </group>
+                <group id="wallet" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Wallets Logo Config </label>
+                    <group id="applepay_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Apple Pay </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="paywithgoogle_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Google Pay </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>
+                    <group id="samsungpay_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Samsung Pay </label>
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Use Custom Logo</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field> 
+                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                                <label>Logo</label>
+                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
+                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
+                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
+                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
+                                <ul style="margin-left: 2em;">
+                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
+                                </ul>
+                                ]]></comment>
+                                <depends><field id="enabled">1</field></depends>
+                        </field>            
+                    </group>                    
+                    <depends>
+                        <field id="worldpay/payment_method_logo_config/payment_method_logo_config_enabled">1</field>
+                    </depends>
+                </group>  
+            </group>
+             <!-- Worldpay API security alerts -->
+            <group id="wp_error_alerts" translate="label"  sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Worldpay API security alerts</label>               
+                <field id="enable_error_alerts" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Worldpay Security Alerts </label> 
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>This feature enables you to receive the API security alerts and report the incident to Worldpay (if set to "Yes" below).</comment>                  
+                </field>
+                <field id="error_alert_emails" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recipient Email(s)</label> 
+                    <comment>Multiple emails can be added using comma seperated(i.e abc@example.com,xyz@example.com)</comment>
+                     <depends><field id="enable_error_alerts">1</field></depends>
+                </field>
+                <field id="send_email_to_worldpay" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Do you want to report the error(if appears) to worldpay?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Note: If set to "Yes", this setting will send the security incident report to Worldpay.</comment>
+                    <depends><field id="enable_error_alerts">1</field></depends>
+                </field>
+                 <field id="wp_team_email" translate="label" type="label" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Worldpay Team Email</label>
+                    <depends><field id="enable_error_alerts">1</field></depends>
+                </field>                
+            </group>
         </section>
         <!-- New Tab for Worldpay exceptions -->
         <section id="worldpay_exceptions" translate="label" type="text" sortOrder="402" showInDefault="1" showInWebsite="1" showInStore="1">

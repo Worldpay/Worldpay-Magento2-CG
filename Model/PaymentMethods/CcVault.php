@@ -189,8 +189,9 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
     {
         $this->logger->info('Vault capture function executed');
         $mageOrder = $payment->getOrder();
-        $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
-        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
+        //$quote = $this->quoteRepository->get($mageOrder->getQuoteId());
+        //$worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
+        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
         $paymenttype = $worldPayPayment->getPaymentType();
         if ($this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype)) {
             $this->paymentservicerequest->capture(
@@ -235,8 +236,8 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
     {
         $payment = $this->getInfoInstance()->getOrder()->getPayment();
         $mageOrder = $payment->getOrder();
-        $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
-        $wpPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
+        //$quote = $this->quoteRepository->get($mageOrder->getQuoteId());
+        $wpPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
 
         if ($wpPayment) {
             return $this->_isRefundAllowed($wpPayment->getPaymentStatus());

@@ -120,6 +120,9 @@ class Merchantprofile
                                   'merchant_code' => $merchant_detail['merchant_code'],
                                   'merchant_username' => $merchant_detail['merchant_username'],
                                   'merchant_password' => $merchant_detail['merchant_password'],
+                                  'merchant_installation_id' => isset(
+                                      $merchant_detail['merchant_installation_id']
+                                  ) ? $merchant_detail['merchant_installation_id'] : '' ,
                                  ];
         }
         return $result;
@@ -153,6 +156,7 @@ class Merchantprofile
                 $rs['merchant_code'] = $row['merchant_code'];
                 $rs['merchant_username'] = $row['merchant_username'];
                 $rs['merchant_password'] = $row['merchant_password'];
+                $rs['merchant_installation_id'] = $row['merchant_installation_id'];
                 $result[$payment_type] = $rs;
             }
         }
@@ -213,5 +217,23 @@ class Merchantprofile
         if (!empty($value[$paymenttype])) {
             return $value[$paymenttype];
         }
+    }
+
+    /**
+     *  Retrieve all merchant details which is configured in Merchant override setting
+     */
+    public function getAdditionalMerchantProfiles($store = null)
+    {
+        $value = $this->scopeConfig->getValue(
+            'worldpay/merchant_config/merchant_profile',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $store
+        );
+        $value = $this->unserializeValue($value);
+        if ($this->isEncodedArrayFieldValue($value)) {
+            $value = $this->decodeArrayFieldValue($value);
+        }
+
+        return $value;
     }
 }

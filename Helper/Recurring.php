@@ -79,7 +79,11 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * @var SerializerInterface
      */
     private $serializer;
-
+  
+    /**
+     * @var curlHelper
+     */
+    protected $curlHelper;
     /**
      * Recurring constructor.
      * @param \Magento\Framework\App\Helper\Context $context
@@ -111,7 +115,8 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Checkout\Model\Cart $cart,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        \Sapient\Worldpay\Helper\CurlHelper $curlHelper
     ) {
         parent::__construct($context);
         $this->plansCollectionFactory = $plansCollectionFactory;
@@ -134,6 +139,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_customerSession = $customerSession;
         $this->_tokenModelFactory = $tokenModelFactory;
         $this->serializer = $serializer;
+        $this->curlHelper = $curlHelper;
     }
 
     /**
@@ -611,64 +617,54 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     public function createEmptyQuote($tokenKey)
     {
         $token = 'Bearer '.$tokenKey;
-        
-        $curl = curl_init();
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine');
-        curl_setopt_array($curl, [
-          CURLOPT_URL => $apiUrl,
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => "",
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => "POST",
-          CURLOPT_POSTFIELDS =>'',
-          CURLOPT_HTTPHEADER => [
-            "Authorization: $token",
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, "
-              . "like Gecko) Chrome/81.0.4044.138 Safari/537.36",
-            "Content-Type: application/json"
-            //"Cookie: private_content_version=6803ffbab48db2029bb648e4a02b9692; PHPSESSID=d4nbqs1pbd0uc2dn04061mvjp4"
-          ],
-
-        ]);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        
-        return $response;
+        return $this->curlHelper->sendCurlRequest(
+            $apiUrl,
+            [
+                    CURLOPT_URL => $apiUrl,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "POST",
+                    CURLOPT_POSTFIELDS =>'',
+                    CURLOPT_HTTPHEADER => [
+                        "Authorization: $token",
+                        "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, "
+                    . "like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+                        "Content-Type: application/json"
+                    ],
+            ]
+        );
     }
     
     public function addItemsToQuote($tokenKey, $itemData, $quoteId)
     {
         $token = 'Bearer '.$tokenKey;
-        
-        $curl = curl_init();
         $apiUrl = '';
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
-        curl_setopt_array($curl, [
-          CURLOPT_URL => $apiUrl.'items?cart_id='.$quoteId,
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => "",
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => "POST",
-          CURLOPT_POSTFIELDS => $itemData,
-          CURLOPT_HTTPHEADER => [
-            "Authorization: $token",
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
-              . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
-            "Content-Type: application/json"
-            //"Cookie: private_content_version=6803ffbab48db2029bb648e4a02b9692; PHPSESSID=d4nbqs1pbd0uc2dn04061mvjp4"
-          ],
-
-        ]);
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-        
+        $response = $this->curlHelper->sendCurlRequest(
+            $apiUrl,
+            [
+                CURLOPT_URL => $apiUrl.'items?cart_id='.$quoteId,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => $itemData,
+                CURLOPT_HTTPHEADER => [
+                  "Authorization: $token",
+                  "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
+                    . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+                  "Content-Type: application/json"
+                ],
+            ]
+        );
         return json_decode($response, true);
     }
     
@@ -691,96 +687,81 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     public function getShippingMethods($tokenKey, $addressData)
     {
         $token = 'Bearer '.$tokenKey;
-        
-        $curl = curl_init();
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
-        curl_setopt_array($curl, [
-          CURLOPT_URL => $apiUrl.'estimate-shipping-methods',
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => "",
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => "POST",
-          CURLOPT_POSTFIELDS => $addressData,
-          CURLOPT_HTTPHEADER => [
-            "Authorization: $token",
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
-              . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
-            "Content-Type: application/json"
-            //"Cookie: private_content_version=6803ffbab48db2029bb648e4a02b9692; PHPSESSID=d4nbqs1pbd0uc2dn04061mvjp4"
-          ],
-
-        ]);
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-        
+        $response = $this->curlHelper->sendCurlRequest(
+            $apiUrl,
+            [
+                CURLOPT_URL => $apiUrl.'estimate-shipping-methods',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => $addressData,
+                CURLOPT_HTTPHEADER => [
+                  "Authorization: $token",
+                  "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
+                    . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+                  "Content-Type: application/json"
+                ],
+            ]
+        );
         return json_decode($response, true);
     }
     
     public function setShippingInformation($tokenKey, $shippingInformation)
     {
         $token = 'Bearer '.$tokenKey;
-        
-        $curl = curl_init();
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
-        curl_setopt_array($curl, [
-          CURLOPT_URL => $apiUrl.'shipping-information',
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => "",
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => "POST",
-          CURLOPT_POSTFIELDS => $shippingInformation,
-          CURLOPT_HTTPHEADER => [
-            "Authorization: $token",
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
-              . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
-            "Content-Type: application/json"
-            //"Cookie: private_content_version=6803ffbab48db2029bb648e4a02b9692; PHPSESSID=d4nbqs1pbd0uc2dn04061mvjp4"
-          ],
-
-        ]);
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-        
+        $response = $this->curlHelper->sendCurlRequest(
+            $apiUrl,
+            [
+                CURLOPT_URL => $apiUrl.'shipping-information',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => $shippingInformation,
+                CURLOPT_HTTPHEADER => [
+                  "Authorization: $token",
+                  "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
+                    . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+                  "Content-Type: application/json"
+                ],
+              ]
+        );
         return json_decode($response, true);
     }
     
     public function orderPayment($tokenKey, $paymentData)
     {
         $token = 'Bearer '.$tokenKey;
-        
-        $curl = curl_init();
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
-        curl_setopt_array($curl, [
-          CURLOPT_URL => $apiUrl.'payment-information',
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING => "",
-          CURLOPT_MAXREDIRS => 10,
-          CURLOPT_TIMEOUT => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST => "POST",
-          CURLOPT_POSTFIELDS =>$paymentData,
-          CURLOPT_HTTPHEADER => [
-            "Authorization: $token",
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
-              . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
-            "Content-Type: application/json"
-            //"Cookie: private_content_version=6803ffbab48db2029bb648e4a02b9692; PHPSESSID=d4nbqs1pbd0uc2dn04061mvjp4"
-          ],
-
-        ]);
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-        
+        $response = $this->curlHelper->sendCurlRequest(
+            $apiUrl,
+            [
+                CURLOPT_URL => $apiUrl.'payment-information',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS =>$paymentData,
+                CURLOPT_HTTPHEADER => [
+                  "Authorization: $token",
+                  "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 "
+                    . "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+                  "Content-Type: application/json"
+                ],
+            ]
+        );
         return json_decode($response, true);
     }
     
@@ -837,18 +818,25 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     }
     public function getAdminLabels($labelCode, $store = null, $scope = null)
     {
+        $adminLabels = '';
         if ($scope==='website') {
-            $adminLabels = $this->serializer->unserialize($this->scopeConfig->getValue(
+            $customAdminLabel = $this->scopeConfig->getValue(
                 'worldpay_custom_labels/admin_labels/admin_label',
                 \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE,
                 $store
-            ));
+            );
+            if (!empty($customAdminLabel)) {
+                $adminLabels = $this->serializer->unserialize($customAdminLabel);
+            }
         } else {
-            $adminLabels = $this->serializer->unserialize($this->scopeConfig->getValue(
+            $customAdminLabel = $this->scopeConfig->getValue(
                 'worldpay_custom_labels/admin_labels/admin_label',
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                 $store
-            ));
+            );
+            if (!empty($customAdminLabel)) {
+                $adminLabels = $this->serializer->unserialize($customAdminLabel);
+            }
         }
         if (is_array($adminLabels) || is_object($adminLabels)) {
             foreach ($adminLabels as $key => $valuepair) {
@@ -917,5 +905,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
                 }
             }
         }
+    }
+    public function isWorldpayEnable()
+    {
+        return (bool) $this->scopeConfig->getValue(
+            'worldpay/general_config/enable_worldpay',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
     }
 }

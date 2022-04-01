@@ -31,9 +31,12 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     public static function createFromCancelledResponse($params)
     {
         $orderkey = $params['orderKey'];
-        $orderCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractOrderCode($orderkey);
-        $merchantCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractMerchantCode($orderkey);
-
+        // extract order code
+        $extractOrderCode = explode('^', $orderkey);
+        $orderCode = end($extractOrderCode);
+        // extract merchantcode
+        $extractMerchantCode = explode('^', $orderkey);
+        $merchantCode = $extractMerchantCode[1];
         return new self(
             $orderCode,
             $merchantCode,
@@ -45,8 +48,13 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     public static function createFromPendingResponse($params, $paymentType = null)
     {
         $orderkey = $params['orderKey'];
-        $orderCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractOrderCode($orderkey);
-        $merchantCode = \Sapient\Worldpay\Model\Payment\StateResponse::_extractMerchantCode($orderkey);
+         // extract order code
+         $extractOrderCode = explode('^', $orderkey);
+         $orderCode = end($extractOrderCode);
+         // extract merchantcode
+         $extractMerchantCode = explode('^', $orderkey);
+         $merchantCode = $extractMerchantCode[1];
+
         if (!empty($paymentType) && $paymentType == "KLARNA-SSL") {
             return new self(
                 $orderCode,
@@ -63,8 +71,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
             );
         }
     }
-    
-    public static function createFrom3DError($orderCode, $merchantCode, $paymentStatus)
+    /** not in use */
+    /*public static function createFrom3DError($orderCode, $merchantCode, $paymentStatus)
     {
         return new self(
             $orderCode,
@@ -72,7 +80,7 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
             $paymentStatus,
             null
         );
-    }
+    }*/
 
     /**
      * @return string
@@ -184,26 +192,6 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     public function getCvcResultCode()
     {
         return null;
-    }
-
-    /**
-     * @return string
-     */
-    
-    private static function _extractOrderCode($orderKey)
-    {
-        $array = explode('^', $orderKey);
-        return end($array);
-    }
-
-    /**
-     * @return string
-     */
-    
-    private static function _extractMerchantCode($orderKey)
-    {
-        $array = explode('^', $orderKey);
-        return $array[1];
     }
 
     /**

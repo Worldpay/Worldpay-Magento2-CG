@@ -1,6 +1,11 @@
 Latest releases for all supported version:
 
 For Magento 2.4.3
+Worldpay Plugin version: 2.4.3-p0322
+1. Payment method logo personalisation
+2. API Security alert to Merchant and Worldpay
+2. Magento 2.4.3-p1 compatible
+
 Worldpay Plugin version: 2.4.3-rc1221
 1. MOTO supports new Merchant code for supporting non-3DS payment
 2. Magento 2.4.3 compatible

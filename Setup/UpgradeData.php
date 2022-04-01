@@ -1541,9 +1541,7 @@ class UpgradeData implements UpgradeDataInterface
              $configModel = $this->configFactory->create(['data' => $configData]);
              $configModel->save();
         }
-        
         if (version_compare($context->getVersion(), '1.4.3', '<')) {
-             
             $groupName = 'Level23 Data Configuration';
             $catalogSetup->addAttributeGroup(Product::ENTITY, 'Default', $groupName, 16);
 
@@ -1597,6 +1595,69 @@ class UpgradeData implements UpgradeDataInterface
             );
             
         }
+        if (version_compare($context->getVersion(), '1.4.4', '<')) {
+            $index = time();
+            $configFactory = $this->configFactory->create();
+            $configValues = $configFactory->getConfigDataValue('worldpay_custom_labels/checkout_labels/checkout_label');
+            $labelsValue = [];
+            if ($configValues) {
+                $previousValues = $this->serializer->unserialize($configValues);
+                if (is_array($previousValues)) {
+                    $resultArray = [];
+                    $counter = 0;
+                    foreach ($previousValues as $key => $row) {
+                        $resultArray[$counter] = [
+                            'wpay_label_code' => $key,
+                            'wpay_label_desc'=> $row['wpay_label_desc'],
+                            'wpay_custom_label'=> $row['wpay_custom_label']
+                        ];
+                        $counter++;
+                    }
+                    $iframeCheckOutMsg = "Please do not navigate away or refresh this page before ";
+                    $iframeCheckOutMsg .= "completing the payment or else this order will be cancelled";
+                    $newLabels = [
+                        [
+                            'wpay_label_code' => 'CO26',
+                            'wpay_label_desc'=> 'Save this card for future usage and recurring payments',
+                            'wpay_custom_label'=> ''
+                        ],
+                        [
+                            'wpay_label_code' => 'CO27',
+                            'wpay_label_desc'=> "Continue to Worldpay",
+                            'wpay_custom_label'=> ""
+                        ],
+                        [
+                            'wpay_label_code' => 'CO28',
+                            'wpay_label_desc'=> $iframeCheckOutMsg,
+                            'wpay_custom_label'=> ""
+                        ]
+                     ];
+                    foreach ($newLabels as $label) {
+                        $resultArray[$counter] = $label;
+                        $counter++;
+                    }
+                    $labelsValue = $resultArray;
+                }
+                $labelsCodes = $this->convertArrayToStringForLabels($labelsValue);
+                $configData = [
+                    'section' => 'worldpay_custom_labels',
+                    'website' => null,
+                    'store'   => null,
+                    'groups'  => [
+                        'checkout_labels' => [
+                            'fields' => [
+                                'checkout_label' => [
+                                    'value' => $labelsCodes
+                                ],
+                            ],
+                        ],
+                    ],
+                ];
+                /** @var \Magento\Config\Model\Config $configModel */
+                $configModel = $this->configFactory->create(['data' => $configData]);
+                $configModel->save();
+            }
+        }
     }
     
     public function convertArrayToString($exceptionValues)
@@ -1610,7 +1671,6 @@ class UpgradeData implements UpgradeDataInterface
         }
         return $this->serializer->serialize($resultArray);
     }
-    
     public function convertArrayToStringForLabels($exceptionValues)
     {
         $resultArray = [];

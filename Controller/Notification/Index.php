@@ -27,6 +27,7 @@ class Index extends \Magento\Framework\App\Action\Action
     const RESPONSE_OK = '[OK]';
     const RESPONSE_FAILED = '[FAILED]';
 
+    protected $fileDriver;
     /**
      * Constructor
      *
@@ -47,7 +48,8 @@ class Index extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod,
-        \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
+        \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification,
+        \Magento\Framework\Filesystem\DriverInterface $fileDriver
     ) {
         parent::__construct($context);
         $this->wplogger = $wplogger;
@@ -57,6 +59,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->historyNotification = $historyNotification;
         $this->worldpaytoken = $worldpaytoken;
         $this->abstractMethod = $abstractMethod;
+        $this->fileDriver = $fileDriver;
     }
 
     public function execute()
@@ -91,9 +94,7 @@ class Index extends \Magento\Framework\App\Action\Action
     public function _getRawBody()
     {
         if (null === $this->_rawBody) {
-            
-            $body = file_get_contents('php://input');
-
+            $body = $this->fileDriver->fileGetContents('php://input');
             if (strlen(trim($body)) > 0) {
                 $this->_rawBody = $body;
             } else {

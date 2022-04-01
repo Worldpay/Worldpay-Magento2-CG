@@ -213,12 +213,14 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 $paymentType = "worldpay_cc";
                 $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
                 $billingaddress = $this->addressRepository->getById($customer->getData('default_billing'));
-                $merchantCode = $this->scopeConfig->
-                getValue('worldpay/general_config/merchant_code', $storeScope);
+                //$merchantCode = $this->scopeConfig->getValue('worldpay/general_config/merchant_code', $storeScope);
+                //$merchantCode = $this->worldpayHelper->getMerchantCode($fullRequest->payment->paymentType);
                 $currencyCode = $store->getCurrentCurrencyCode();
                 $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
                 $billingadd = $this->getAddress($billingaddress);
                 $fullRequest = json_decode($this->getRequest()->getContent());
+
+                $merchantCode = $this->worldpayHelper->getMerchantCode($fullRequest->payment->paymentType);
                 
                 $payment = [
                     'cardNumber' => $fullRequest->payment->cardNumber,
@@ -573,37 +575,5 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         $paymentData = $this->getRequest()->getContent();
         
         return $paymentData;
-    }
-    
-    public function createEmptyQuote($tokenKey)
-    {
-        $token = 'Bearer '.$tokenKey;
-        
-        $curl = curl_init();
-        $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine');
-        curl_setopt_array($curl, [
-         CURLOPT_URL => $apiUrl,
-         CURLOPT_RETURNTRANSFER => true,
-         CURLOPT_ENCODING => "",
-         CURLOPT_MAXREDIRS => 10,
-         CURLOPT_TIMEOUT => 0,
-         CURLOPT_FOLLOWLOCATION => true,
-         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-         CURLOPT_CUSTOMREQUEST => "POST",
-         CURLOPT_POSTFIELDS =>'',
-         CURLOPT_HTTPHEADER => [
-           "Authorization: $token",
-           "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, "
-             . "like Gecko) Chrome/81.0.4044.138 Safari/537.36",
-           "Content-Type: application/json"
-           //"Cookie: private_content_version=6803ffbab48db2029bb648e4a02b9692;
-           // PHPSESSID=d4nbqs1pbd0uc2dn04061mvjp4"
-         ],
-
-        ]);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        
-        return $response;
     }
 }

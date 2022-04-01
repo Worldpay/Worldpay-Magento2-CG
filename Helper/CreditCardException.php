@@ -202,7 +202,7 @@ class CreditCardException
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
             $store
         );
-        $value -> $this->unserializeValue($value);
+        $value = $this->unserializeValue($value);
         if ($this->isEncodedArrayFieldValue($value)) {
             $value = $this->decodeArrayFieldValue($value);
         }

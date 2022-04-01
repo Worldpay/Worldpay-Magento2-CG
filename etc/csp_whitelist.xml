@@ -9,7 +9,7 @@
 	<policies>
 		<policy id="script-src">
 	        <values>
-                <value id="payment-shim" type="host">https://storage.googleapis.com/prshim/v1/payment-shim.js</value>
+                <value id="payment-shim" type="hash" algorithm="sha256">sha256-U2Pr6nr/58DuOrqmOIptLSxY0eHWqp8OVjb169SPqqU=</value>
 	            <value id="google-recaptcha" type="host">https://www.google.com/recaptcha/api.js</value>
                 <value id="gstatic" type="host">*.gstatic.com</value>
                 <value id="cloudflare" type="host">*.cloudflare.com</value>

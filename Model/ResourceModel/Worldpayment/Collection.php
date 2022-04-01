@@ -2,7 +2,7 @@
 /**
  * @copyright 2017 Sapient
  */
-namespace Sapient\Worldpay\Model\ResourceModel\Collection;
+namespace Sapient\Worldpay\Model\ResourceModel\Worldpayment;
 
 /**
  * Worldpay payment collection

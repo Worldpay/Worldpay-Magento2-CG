@@ -222,6 +222,7 @@ class UpdateWorldpayment
         $riskProviderFinalScore=$payment->riskScore['finalScore'];
         $refusalcode=$payment->issueResponseCode['code'] ? : $payment->ISO8583ReturnCode['code'];
         $refusaldescription=$payment->issueResponseCode['description'] ? : $payment->ISO8583ReturnCode['description'];
+        $lataminstalments  = "";
         if (($payment->instalments[0]) !== null) {
             $lataminstalments=$payment->instalments[0];
         }
