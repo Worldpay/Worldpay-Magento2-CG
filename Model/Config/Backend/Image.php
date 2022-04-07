@@ -10,7 +10,7 @@ class Image extends \Magento\Config\Model\Config\Backend\Image
     /**
      * Define Upload Directory Path
      */
-    const UPLOAD_DIR = 'sapient_worldpay/images';
+    public const UPLOAD_DIR = 'sapient_worldpay/images';
 
     /**
      * Upload max file size in KB

@@ -9,8 +9,8 @@ class PaymentMethodSelection implements \Magento\Framework\Option\ArrayInterface
     /**
      * @return array
      */
-    const RADIO_BUTTONS = 'radio';
-    const DROPDOWN_MENU = 'dropdown';
+    public const RADIO_BUTTONS = 'radio';
+    public const DROPDOWN_MENU = 'dropdown';
     public function toOptionArray()
     {
 

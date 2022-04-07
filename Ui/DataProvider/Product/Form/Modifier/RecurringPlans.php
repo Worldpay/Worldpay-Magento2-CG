@@ -18,10 +18,10 @@ use Sapient\Worldpay\Helper\Recurring as RecurringHelper;
 
 class RecurringPlans extends AbstractModifier
 {
-    const CODE_RECURRING_DATA = 'subscriptions';
-    const CODE_RECURRING_PLANS = 'worldpay_recurring_plans';
-    const CODE_PLANS = 'plans';
-    const CODE_ADD_PLAN_MODAL = 'worldpay_add_recurring_plan_modal';
+    public const CODE_RECURRING_DATA = 'subscriptions';
+    public const CODE_RECURRING_PLANS = 'worldpay_recurring_plans';
+    public const CODE_PLANS = 'plans';
+    public const CODE_ADD_PLAN_MODAL = 'worldpay_add_recurring_plan_modal';
 
     /**
      * @var LocatorInterface

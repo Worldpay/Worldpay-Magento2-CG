@@ -9,8 +9,8 @@ class HppIntegration implements \Magento\Framework\Option\ArrayInterface
     /**
      * @return array
      */
-    const OPTION_VALUE_FULL_PAGE = 'full_page';
-    const OPTION_VALUE_IFRAME = 'iframe';
+    public const OPTION_VALUE_FULL_PAGE = 'full_page';
+    public const OPTION_VALUE_IFRAME = 'iframe';
 
     public function toOptionArray()
     {

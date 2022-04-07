@@ -63,7 +63,8 @@ class Index extends \Magento\Backend\App\Action
     public function execute()
     {
         $this->_loadOrder();
-        $storeid = $this->_order->getOrder()->getStoreId();
+        $order = $this->_order->getOrder();
+        $storeid = $order->getStoreId();
         $store = $this->storeManager->getStore($storeid)->getCode();
         try {
             $this->_fetchPaymentUpdate();
@@ -81,11 +82,11 @@ class Index extends \Magento\Backend\App\Action
                     $this->helper->getConfigValue('ACAM4', $store).': ' . $e->getMessage()
                 );
             }
-            return $this->_redirectBackToOrderView();
+            return $this->_redirectBackToOrderView($order->getId());
         }
 
         $this->messageManager->addSuccess($this->helper->getConfigValue('ACAM3', $store));
-        return $this->_redirectBackToOrderView();
+        return $this->_redirectBackToOrderView($order->getId());
     }
 
     private function _loadOrder()
@@ -123,10 +124,15 @@ class Index extends \Magento\Backend\App\Action
         $this->worldpaytoken->updateOrInsertToken($this->_tokenState, $this->_order->getPayment());
     }
 
-    private function _redirectBackToOrderView()
+    private function _redirectBackToOrderView($orderId)
     {
         $resultRedirect = $this->resultRedirectFactory->create();
-        $resultRedirect->setPath($this->_redirect->getRefererUrl());
+        $resultRedirect->setPath(
+            'sales/order/view',
+            [
+                'order_id' => $orderId
+            ]
+        );
         return $resultRedirect;
     }
     private function _updateOrderStatus()

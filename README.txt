@@ -4,7 +4,8 @@ For Magento 2.4.3
 Worldpay Plugin version: 2.4.3-p0322
 1. Payment method logo personalisation
 2. API Security alert to Merchant and Worldpay
-2. Magento 2.4.3-p1 compatible
+3. Existing feature Chrome Payment request API is experiencing issues with Chrome version 100 and above
+4. Magento 2.4.3-p1 compatible
 
 Worldpay Plugin version: 2.4.3-rc1221
 1. MOTO supports new Merchant code for supporting non-3DS payment
@@ -30,7 +31,7 @@ For Magento 2.3.5
 Worldpay Plugin version: 2.3.5-p0721
 1. PHP 7.4 Support
 
-This release (2.4.3-rc1221) is compatible with Magento 2.4.3 with following key features:
+This release (2.4.3-p0322) is compatible with Magento 2.4.3-p1 with following key features:
 1. Credit card payment
 2. Hosted payment page solution
 3. Alternative payment methods like Paypal, AliPay, Klarna, ACH Pay etc.
@@ -47,3 +48,7 @@ This release (2.4.3-rc1221) is compatible with Magento 2.4.3 with following key 
 14. US and Canada domestic acquiring - Issure Insights, Prime Routing, ACH Pay and Level 2/3 Data
 15. Klarna PayNow, PayLater and SLICEIT
 16. MOTO supports new Merchant code for supporting non-3DS payment.
+17. Payment method logo personalisation
+18. API Security alert to Merchant and Worldpay
+
+Note - In this release Chrome Payment request API is experiencing issues with Chrome version 100 and above.

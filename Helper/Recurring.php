@@ -14,7 +14,7 @@ use Magento\Framework\Serialize\SerializerInterface;
 
 class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const PENDING_RECURRING_PAYMENT_ORDER_STATUS = 'pending_recurring_payment';
+    public const PENDING_RECURRING_PAYMENT_ORDER_STATUS = 'pending_recurring_payment';
 
     /**
      * Product type ids supported to act as subscriptions

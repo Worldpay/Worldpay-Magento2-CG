@@ -42,13 +42,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     protected $paymentdetailsdata;
     protected $_isInitializeNeeded = true;
 
-    const REDIRECT_MODEL = 'redirect';
-    const RECURRING_MODEL = 'recurring';
-    const DIRECT_MODEL = 'direct';
-    const WORLDPAY_CC_TYPE = 'worldpay_cc';
-    const WORLDPAY_APM_TYPE = 'worldpay_apm';
-    const WORLDPAY_WALLETS_TYPE = 'worldpay_wallets';
-    const WORLDPAY_MOTO_TYPE = 'worldpay_moto';
+    public const REDIRECT_MODEL = 'redirect';
+    public const RECURRING_MODEL = 'recurring';
+    public const DIRECT_MODEL = 'direct';
+    public const WORLDPAY_CC_TYPE = 'worldpay_cc';
+    public const WORLDPAY_APM_TYPE = 'worldpay_apm';
+    public const WORLDPAY_WALLETS_TYPE = 'worldpay_wallets';
+    public const WORLDPAY_MOTO_TYPE = 'worldpay_moto';
     /**
      * Constructor
      *

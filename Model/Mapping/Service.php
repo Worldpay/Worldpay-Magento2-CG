@@ -15,15 +15,15 @@ class Service
      * @var SessionManagerInterface
      */
     protected $session;
-    const THIS_TRANSACTION = 'thisTransaction';
-    const LESS_THAN_THIRTY_DAYS = 'lessThanThirtyDays';
-    const THIRTY_TO_SIXTY_DAYS = 'thirtyToSixtyDays';
-    const MORE_THAN_SIXTY_DAYS = 'moreThanSixtyDays';
-    const DURING_TRANSACTION = 'duringTransaction';
-    const CREATED_DURING_TRANSACTION = 'createdDuringTransaction';
-    const CHANGED_DURING_TRANSACTION = 'changedDuringTransaction';
-    const NO_ACCOUNT = 'noAccount';
-    const NO_CHANGE = 'noChange';
+    public const THIS_TRANSACTION = 'thisTransaction';
+    public const LESS_THAN_THIRTY_DAYS = 'lessThanThirtyDays';
+    public const THIRTY_TO_SIXTY_DAYS = 'thirtyToSixtyDays';
+    public const MORE_THAN_SIXTY_DAYS = 'moreThanSixtyDays';
+    public const DURING_TRANSACTION = 'duringTransaction';
+    public const CREATED_DURING_TRANSACTION = 'createdDuringTransaction';
+    public const CHANGED_DURING_TRANSACTION = 'changedDuringTransaction';
+    public const NO_ACCOUNT = 'noAccount';
+    public const NO_CHANGE = 'noChange';
 
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,

@@ -6,7 +6,7 @@ namespace Sapient\Worldpay\Model\Response;
 
 class DirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
 {
-    const PAYMENT_AUTHORISED = 'AUTHORISED';
+    public const PAYMENT_AUTHORISED = 'AUTHORISED';
 
     /**
      * @param SimpleXmlElement

@@ -8,8 +8,8 @@ use Exception;
 
 class State
 {
-    const SESSION_KEY_STATE = 'worldpay_hpp_state';
-    const SESSION_KEY_URL = 'worldpay_hpp_redirect_url';
+    public const SESSION_KEY_STATE = 'worldpay_hpp_state';
+    public const SESSION_KEY_URL = 'worldpay_hpp_redirect_url';
 
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutsession

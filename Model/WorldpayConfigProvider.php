@@ -20,7 +20,7 @@ use Magento\Framework\Serialize\SerializerInterface;
  */
 class WorldpayConfigProvider implements ConfigProviderInterface
 {
-    const CC_VAULT_CODE = "worldpay_cc_vault";
+    public const CC_VAULT_CODE = "worldpay_cc_vault";
     /**
      * @var string[]
      */

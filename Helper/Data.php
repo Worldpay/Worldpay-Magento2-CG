@@ -19,8 +19,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $_storeManager;
     protected $_filesystem;
 
-    const MERCHANT_CONFIG = 'worldpay/merchant_config/';
-    const INTEGRATION_MODE = 'worldpay/cc_config/integration_mode';
+    public const MERCHANT_CONFIG = 'worldpay/merchant_config/';
+    public const INTEGRATION_MODE = 'worldpay/cc_config/integration_mode';
 
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,

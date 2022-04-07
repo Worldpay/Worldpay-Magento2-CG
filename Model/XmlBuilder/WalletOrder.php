@@ -9,9 +9,9 @@ namespace Sapient\Worldpay\Model\XmlBuilder;
  */
 class WalletOrder
 {
-    const DYNAMIC3DS_DO3DS = 'do3DS';
-    const DYNAMIC3DS_NO3DS = 'no3DS';
-    const ROOT_ELEMENT = <<<EOD
+    public const DYNAMIC3DS_DO3DS = 'do3DS';
+    public const DYNAMIC3DS_NO3DS = 'no3DS';
+    public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;

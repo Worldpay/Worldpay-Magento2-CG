@@ -32,6 +32,8 @@ class Delete extends \Magento\Framework\App\Action\Action
 
     protected $vaultPaymentToken;
 
+    protected $resultRedirect;
+
     /**
      * Constructor
      *
@@ -56,7 +58,8 @@ class Delete extends \Magento\Framework\App\Action\Action
         PaymentTokenRepositoryInterface $tokenRepository,
         PaymentTokenManagement $paymentTokenManagement,
         MyAccountException $helper,
-        \Magento\Vault\Model\PaymentToken $vaultPaymentToken
+        \Magento\Vault\Model\PaymentToken $vaultPaymentToken,
+        \Magento\Backend\Model\View\Result\Redirect $resultRedirect
     ) {
         parent::__construct($context);
         $this->_storeManager = $storeManager;
@@ -70,6 +73,7 @@ class Delete extends \Magento\Framework\App\Action\Action
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->helper = $helper;
         $this->vaultPaymentToken = $vaultPaymentToken;
+        $this->resultRedirect = $resultRedirect;
     }
 
     /**
@@ -124,7 +128,9 @@ class Delete extends \Magento\Framework\App\Action\Action
                 }
             }
         }
-        $this->_redirect('worldpay/savedcard/index');
+        $resultRedirect = $this->resultRedirectFactory->create();
+        $resultRedirect->setPath('worldpay/savedcard/index');
+        return $resultRedirect;
     }
 
     /**

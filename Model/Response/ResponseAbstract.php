@@ -11,12 +11,12 @@ use Exception;
  */
 abstract class ResponseAbstract
 {
-    const INTERNAL_ERROR = 1;
-    const PARSE_ERROR = 2;
-    const SECURITY_ERROR = 4;
-    const INVALID_REQUEST_ERROR = 5;
-    const INVALID_CONTENT_ERROR = 6;
-    const PAYMENT_DETAILS_ERROR = 7;
+    public const INTERNAL_ERROR = 1;
+    public const PARSE_ERROR = 2;
+    public const SECURITY_ERROR = 4;
+    public const INVALID_REQUEST_ERROR = 5;
+    public const INVALID_CONTENT_ERROR = 6;
+    public const PAYMENT_DETAILS_ERROR = 7;
 
     protected $_responseXml;
     protected $_merchantCode;

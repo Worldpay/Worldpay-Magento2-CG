@@ -10,7 +10,7 @@ class Refunded extends \Sapient\Worldpay\Model\Payment\Update\Base implements Up
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
-    const REFUND_COMMENT = 'Refund request PROCESSED by the bank.';
+    public const REFUND_COMMENT = 'Refund request PROCESSED by the bank.';
     /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState

@@ -17,9 +17,9 @@ $myaccountexception = $block->getMyAccountSpecificException('MCAM8') ;
 $ccexception = $block->getCreditCardSpecificException('CCAM12');
 if (array_key_exists('error', $param)) {
     if (array_key_exists('message', $param)) {
-        $block->_messageManager->addError(__($ccexception));
+        $block->getMessageManager()->addError(__($ccexception));
     } else {
-        $block->_messageManager->addError(__($myaccountexception));
+        $block->getMessageManager()->addError(__($myaccountexception));
     }
 }
 
@@ -28,7 +28,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
 /** @var $block \Sapient\Worldpay\Block\Webpayment */
 ?>
 
-<script type="text/javascript">
+<script>
     window.ChromepayButtonName = '<?= /* @noEscape */ $block->getChromepayButtonName() ?>';
     window.ChromepayEnabled = '<?= /* @noEscape */ $block->getChromepayEnabled() ?>';
     window.ChromePaymentMode = '<?= /* @noEscape */ $block->getPaymentMode() ?>';

@@ -12,7 +12,7 @@
     <?php if ($block->isDisabled()):?>disabled="disabled"<?php endif; ?>>
     <span><?= /* @noEscape */ __('Checkout Now') ?></span>
 </button>
-<script type="text/javascript">
+<script>
  if(window.ChromepayEnabled == 1 && window.ChromePaymentMode == 'direct' 
          && window.SubscriptionStatus == "" && window.ChromepayAvailable == '1') {
     var buttonObj = document.getElementById("checkout-now-bottom");

@@ -21,12 +21,12 @@ class Request
      */
     protected $_logger;
 
-    const CURL_POST = true;
-    const CURL_RETURNTRANSFER = true;
-    const CURL_NOPROGRESS = false;
-    const CURL_TIMEOUT = 300;
-    const CURL_VERBOSE = true;
-    const SUCCESS = 200;
+    public const CURL_POST = true;
+    public const CURL_RETURNTRANSFER = true;
+    public const CURL_NOPROGRESS = false;
+    public const CURL_TIMEOUT = 300;
+    public const CURL_VERBOSE = true;
+    public const SUCCESS = 200;
 
     /**
      * Constructor

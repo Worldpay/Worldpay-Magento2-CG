@@ -8,10 +8,10 @@ namespace Sapient\Worldpay\Model\Config\Source;
 
 class SubscriptionStatus extends AbstractArraySource
 {
-    const ACTIVE = 'active';
-    const SUSPENDED = 'suspended';
-    const CANCELLED = 'cancelled';
-    const EXPIRED = 'expired';
+    public const ACTIVE = 'active';
+    public const SUSPENDED = 'suspended';
+    public const CANCELLED = 'cancelled';
+    public const EXPIRED = 'expired';
 
     /**
      * {@inheritdoc}

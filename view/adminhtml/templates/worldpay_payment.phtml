@@ -15,7 +15,9 @@ if ($isworldpayment) {
             </tr>
                <?php if ($payment->getRefusalCode()): ?>
                 <tr>
-                    <td class="label"><label><?= /* @noEscape */ $block->__('Refusal Description'); ?></label></td>
+                    <td class="label">
+                        <label><?= /* @noEscape */ $block->escapeHtml(__('Refusal Description')); ?></label>
+                    </td>
                     <td class="value">
                         <strong><?= /* @noEscape */ $payment->getRefusalDescription() ?>
                             (<?= /* @noEscape */ $payment->getRefusalCode() ?>)

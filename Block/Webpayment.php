@@ -45,7 +45,7 @@ class Webpayment extends Template
      * @var Magento\Framework\Message\ManagerInterface
      */
     
-    protected $messageManager;
+    public $_messageManager;
 
     /**
      * @var Magento\Store\Model\StoreManagerInterface $storeManager
@@ -370,5 +370,9 @@ class Webpayment extends Template
     public function is3DsEnabled()
     {
         return $this->_helper->is3DSecureEnabled() || $this->_helper->isDynamic3DEnabled();
+    }
+    public function getMessageManager()
+    {
+        return $this->_messageManager;
     }
 }

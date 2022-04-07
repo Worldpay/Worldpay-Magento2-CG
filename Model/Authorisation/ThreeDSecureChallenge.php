@@ -11,7 +11,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
     /** @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory */
     protected $updateWorldPayPayment;
 
-    const CART_URL = 'checkout/cart';
+    public const CART_URL = 'checkout/cart';
 
     /**
      * Constructor

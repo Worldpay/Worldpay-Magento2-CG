@@ -9,10 +9,10 @@ use \Magento\Store\Model\StoreManagerInterface;
 
 class SendErrorReport extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    const WORLDPAY_SUPPORT_EMAIL = "adobe@fisglobal.com";
-    const WORLDPAY_ERROR_ALERT_EMAIL_TEMPLATE = "worldpay_error_alert_email";
-    const EMAIL_ATTACHMENT_WP_REQUEST_FILE_NAME = 'request.txt';
-    const EMAIL_ATTACHMENT_WP_RESPONSE_FILE_NAME = 'response.txt';
+    public const WORLDPAY_SUPPORT_EMAIL = "adobe@fisglobal.com";
+    public const WORLDPAY_ERROR_ALERT_EMAIL_TEMPLATE = "worldpay_error_alert_email";
+    public const EMAIL_ATTACHMENT_WP_REQUEST_FILE_NAME = 'request.txt';
+    public const EMAIL_ATTACHMENT_WP_RESPONSE_FILE_NAME = 'response.txt';
     protected $_scopeConfig;
     protected $wplogger;
     

@@ -8,8 +8,8 @@ namespace Sapient\Worldpay\Model\Recurring\Subscription\Addon;
 
 class Validator extends \Magento\Framework\Validator\AbstractValidator
 {
-    const CODE_MAX_LENGTH = 25;
-    const NAME_MAX_LENGTH = 100;
+    public const CODE_MAX_LENGTH = 25;
+    public const NAME_MAX_LENGTH = 100;
 
     /**
      * Returns true if and only if $value meets the validation requirements
