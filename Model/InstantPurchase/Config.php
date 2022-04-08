@@ -14,8 +14,8 @@ use Magento\Store\Model\StoreManagerInterface;
  */
 class Config
 {
-    const ACTIVE = 'sales/instant_purchase/active';
-    const BUTTON_TEXT = 'sales/instant_purchase/button_text';
+    public const ACTIVE = 'sales/instant_purchase/active';
+    public const BUTTON_TEXT = 'sales/instant_purchase/button_text';
 
     /**
      * @var ScopeConfigInterface

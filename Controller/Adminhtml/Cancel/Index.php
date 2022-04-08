@@ -52,7 +52,8 @@ class Index extends \Magento\Backend\App\Action
     public function execute()
     {
         $this->_loadOrder();
-        $storeid = $this->_order->getOrder()->getStoreId();
+        $order = $this->_order->getOrder();
+        $storeid = $order->getStoreId();
         $store = $this->storeManager->getStore($storeid)->getCode();
         try {
             $this->abstractMethod->canCancel($this->_order);
@@ -74,13 +75,13 @@ class Index extends \Magento\Backend\App\Action
             } else {
                 $this->messageManager->addError($errorMessage .': '. $e->getMessage());
             }
-            return $this->_redirectBackToOrderView();
+            return $this->_redirectBackToOrderView($order->getId());
         }
         $codeMessage = 'Order cancelled successfully, Please run Sync Status after sometime.';
         $camMessage = $this->helper->getConfigValue('AFR02', $store);
         $message = $camMessage? $camMessage : $codeMessage;
         $this->messageManager->addSuccess($message);
-        return $this->_redirectBackToOrderView();
+        return $this->_redirectBackToOrderView($order->getId());
     }
 
     private function _loadOrder()
@@ -113,10 +114,15 @@ class Index extends \Magento\Backend\App\Action
         }
     }
 
-    private function _redirectBackToOrderView()
+    private function _redirectBackToOrderView($orderId)
     {
         $resultRedirect = $this->resultRedirectFactory->create();
-        $resultRedirect->setPath($this->_redirect->getRefererUrl());
+        $resultRedirect->setPath(
+            'sales/order/view',
+            [
+                'order_id' => $orderId
+            ]
+        );
         return $resultRedirect;
     }
 }

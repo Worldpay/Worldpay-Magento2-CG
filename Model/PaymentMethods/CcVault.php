@@ -40,7 +40,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
     protected $_canVoid = true;
     protected $_canCapturePartial = true;
 
-     const DIRECT_MODEL = 'direct';
+    public const DIRECT_MODEL = 'direct';
     protected static $paymentDetails;
 
     public function __construct(

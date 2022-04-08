@@ -10,7 +10,7 @@ class SentForRefund extends \Sapient\Worldpay\Model\Payment\Update\Base implemen
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
-    const REFUND_COMMENT = 'Refund has been requested';
+    public const REFUND_COMMENT = 'Refund has been requested';
     /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\State $paymentState

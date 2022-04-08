@@ -22,8 +22,8 @@ class Sample extends \Magento\Framework\App\Action\Action
      */
     protected $historyNotification;
 
-    const RESPONSE_OK = '[OK]';
-    const RESPONSE_FAILED = '[FAILED]';
+    public const RESPONSE_OK = '[OK]';
+    public const RESPONSE_FAILED = '[FAILED]';
     
     private $cron;
 

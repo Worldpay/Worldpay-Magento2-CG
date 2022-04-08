@@ -76,7 +76,7 @@ use Sapient\Worldpay\Model\Config\Source\SubscriptionStatus;
  */
 class Subscription extends \Magento\Framework\Model\AbstractModel
 {
-    const REGISTRY_NAME = 'current_worldpay_subscription';
+    public const REGISTRY_NAME = 'current_worldpay_subscription';
 
     /**
      * Store manager

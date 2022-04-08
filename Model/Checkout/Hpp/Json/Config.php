@@ -9,7 +9,7 @@ use Exception;
 
 class Config
 {
-    const TYPE_IFRAME = 'iframe';
+    public const TYPE_IFRAME = 'iframe';
 
     /** @var string $type Indicates whether you are using an iframe or lightbox integration. */
     private $type;

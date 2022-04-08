@@ -20,8 +20,8 @@ use Magento\Framework\Session\SessionManagerInterface;
 class PaymentRequestApi extends Template
 {
 
-    const PAYMENT_SHIM_URL = 'https://storage.googleapis.com/prshim/v1/payment-shim.js';
-    const CSP_HASH = 'sha256-U2Pr6nr/58DuOrqmOIptLSxY0eHWqp8OVjb169SPqqU=';
+    public const PAYMENT_SHIM_URL = 'https://storage.googleapis.com/prshim/v1/payment-shim.js';
+    public const CSP_HASH = 'sha256-U2Pr6nr/58DuOrqmOIptLSxY0eHWqp8OVjb169SPqqU=';
 
     protected $httpHeader;
 

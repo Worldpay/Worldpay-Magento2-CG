@@ -1,0 +1,289 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+  <table name="worldpay_payment" resource="default" engine="innodb" comment="Payment Table">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="varchar" name="order_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Order Id" length="25"/>
+    <column xsi:type="varchar" name="payment_status" nullable="true" length="255" comment="Payment Status"/>
+    <column xsi:type="varchar" name="payment_model" nullable="false" length="25" comment="Payment Model"/>
+    <column xsi:type="varchar" name="payment_type" nullable="false" length="255" comment="Payment Type"/>
+    <column xsi:type="boolean" name="mac_verified" nullable="true" comment="MAC Verified"/>
+    <column xsi:type="varchar" name="merchant_id" nullable="true" length="255" comment="Merchant Id"/>
+    <column xsi:type="boolean" name="3d_verified" nullable="true" comment="3D Secure Verified"/>
+    <column xsi:type="int" name="risk_score" padding="11" unsigned="false" nullable="true" identity="false" comment="Risk Score"/>
+    <column xsi:type="text" name="method" nullable="true" comment="Method"/>
+    <column xsi:type="text" name="card_number" nullable="true" comment="Card Number"/>
+    <column xsi:type="text" name="avs_result" nullable="true" comment="AVS Result"/>
+    <column xsi:type="text" name="cvc_result" nullable="true" comment="CVC Result"/>
+    <column xsi:type="text" name="3d_secure_result" nullable="true" comment="3D Secure Result"/>
+    <column xsi:type="varchar" name="worldpay_order_id" nullable="true" length="40" comment="WorldPay Order Id"/>
+    <column xsi:type="varchar" name="risk_provider" nullable="true" length="24" comment="Risk Provider"/>
+    <column xsi:type="decimal" name="risk_provider_score" scale="4" precision="8" unsigned="false" nullable="true" comment="Risk Provider Score"/>
+    <column xsi:type="varchar" name="risk_provider_id" nullable="true" length="20" comment="Risk Provider Id"/>
+    <column xsi:type="varchar" name="risk_provider_threshold" nullable="true" length="4" comment="Risk Provider Threshold"/>
+    <column xsi:type="varchar" name="risk_provider_final" nullable="true" length="4" comment="Risk Provider Final"/>
+    <column xsi:type="varchar" name="aav_address_result_code" nullable="true" length="25" comment="AAV Address Result Code"/>
+    <column xsi:type="varchar" name="avv_postcode_result_code" nullable="true" length="25" comment="AAV Postcode Result Code"/>
+    <column xsi:type="varchar" name="aav_cardholder_name_result_code" nullable="true" length="25" comment="AAV Cardholder Name Result Code"/>
+    <column xsi:type="varchar" name="aav_telephone_result_code" nullable="true" length="25" comment="AAV Telephone Result Code"/>
+    <column xsi:type="varchar" name="aav_email_result_code" nullable="true" length="25" comment="AAV Email Result Code"/>
+    <column xsi:type="varchar" name="interaction_type" nullable="true" length="25" comment="Interaction Type"/>
+    <column xsi:type="boolean" name="client_side_encryption" nullable="false" comment="Client side encryption"/>
+    <column xsi:type="int" name="latam_instalments" padding="11" unsigned="false" nullable="true" identity="false" comment="Latin America Instalments"/>
+    <column xsi:type="boolean" name="is_recurring_order" nullable="false" comment="Check Recurring Order"/>
+    <column xsi:type="boolean" name="is_primerouting_enabled" nullable="true" comment="PrimeRouting Enabled"/>
+    <column xsi:type="text" name="primerouting_networkused" nullable="true" comment="PrimeRouting Network Used"/>
+    <column xsi:type="text" name="source_type" nullable="true" comment="Issuer Insight Source Type"/>
+    <column xsi:type="text" name="available_balance" nullable="true" comment="Issuer Insight Available Balance"/>
+    <column xsi:type="text" name="prepaid_card_type" nullable="true" comment="Issuer Insight Prepaid CardType"/>
+    <column xsi:type="text" name="reloadable" nullable="true" comment="Issuer Insight Reloadable"/>
+    <column xsi:type="text" name="card_product_type" nullable="true" comment="Issuer Insight Card Product Type"/>
+    <column xsi:type="text" name="affluence" nullable="true" comment="Issuer Insight Affluence"/>
+    <column xsi:type="varchar" name="account_range_id" nullable="true" length="19" comment="Issuer Insight Account RangeId"/>
+    <column xsi:type="text" name="issuer_country" nullable="true" comment="Issuer Insight Issuer Country"/>
+    <column xsi:type="text" name="virtual_account_number" nullable="true" comment="Issuer Insight Virtual Account Number"/>
+    <column xsi:type="varchar" name="fraudsight_message" nullable="true" length="25" comment="Fraudsight Message"/>
+    <column xsi:type="decimal" name="fraudsight_score" scale="4" precision="8" unsigned="false" nullable="true" comment="Fraudsight Score"/>
+    <column xsi:type="varchar" name="fraudsight_reasoncode" nullable="true" length="255" comment="Fraudsight reasoncode"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+    <index referenceId="WORLDPAY_PAYMENT_ORDER_ID" indexType="btree">
+      <column name="order_id"/>
+    </index>
+    <index referenceId="WORLDPAY_PAYMENT_WORLDPAY_ORDER_ID" indexType="btree">
+      <column name="worldpay_order_id"/>
+    </index>
+  </table>
+  <table name="worldpay_recurring" resource="default" engine="innodb" comment="Reucurring Table">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Customer Id"/>
+    <column xsi:type="int" name="payment_id" padding="11" unsigned="false" nullable="false" identity="false" comment="Payment Id"/>
+    <column xsi:type="varchar" name="order_code" nullable="false" length="25" comment="Order Code"/>
+    <column xsi:type="varchar" name="merchant_code" nullable="false" length="50" comment="Merchant Code"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+  </table>
+  <table name="worldpay_token" resource="default" engine="innodb" comment="Token Table">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="varchar" name="token_code" nullable="false" length="21" comment="Token Code"/>
+    <column xsi:type="date" name="token_expiry_date" comment="Token Expiry Date"/>
+    <column xsi:type="varchar" name="token_reason" nullable="false" length="255" comment="Token Reason"/>
+    <column xsi:type="text" name="card_number" nullable="false" comment="Obfuscated Card number"/>
+    <column xsi:type="text" name="cardholder_name" nullable="true" comment="Card Holder Name"/>
+    <column xsi:type="int" name="card_expiry_month" padding="11" unsigned="false" nullable="false" identity="false" comment="Card Expiry Month"/>
+    <column xsi:type="int" name="card_expiry_year" padding="11" unsigned="false" nullable="false" identity="false" comment="Card Expiry Year"/>
+    <column xsi:type="text" name="method" nullable="true" comment="Payment method used"/>
+    <column xsi:type="text" name="card_brand" nullable="true" comment="Card Brand"/>
+    <column xsi:type="text" name="card_sub_brand" nullable="true" comment="Card Sub Brand"/>
+    <column xsi:type="text" name="card_issuer_country_code" nullable="true" comment="Card Issuer Country Code"/>
+    <column xsi:type="varchar" name="merchant_code" nullable="false" length="50" comment="Merchant Code"/>
+    <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Customer Id"/>
+    <column xsi:type="text" name="authenticated_shopper_id" nullable="true" comment="Authenticated Shopper ID"/>
+    <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+    <column xsi:type="varchar" name="transaction_identifier" nullable="true" length="255" comment="Transaction Indentifier"/>
+    <column xsi:type="varchar" name="bin_number" nullable="true" length="25" comment="Bin Number"/>
+    <column xsi:type="boolean" name="disclaimer_flag" nullable="false" comment="Disclaimer Flag"/>
+    <column xsi:type="text" name="token_type" nullable="true" comment="Token type"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+    <index referenceId="WORLDPAY_TOKEN_TOKEN_CODE" indexType="btree">
+      <column name="token_code"/>
+    </index>
+    <index referenceId="WORLDPAY_TOKEN_CUSTOMER_ID" indexType="btree">
+      <column name="customer_id"/>
+    </index>
+  </table>
+  <table name="worldpay_notification_history" resource="default" engine="innodb" comment="Worldpay Notification History">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="varchar" name="order_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Worldpay order id" onCreate="migrateDataFrom(order_id)" length="255"/>
+    <column xsi:type="varchar" name="status" nullable="true" length="255" comment="Status"/>
+    <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+    <index referenceId="WORLDPAY_NOTIFICATION_HISTORY_ORDER_ID" indexType="btree">
+      <column name="order_id"/>
+    </index>
+  </table>
+  <table name="worldpay_recurring_plans" resource="default" engine="innodb" comment="Worldpay Recurring Plans">
+    <column xsi:type="int" name="plan_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Plan ID"/>
+    <column xsi:type="int" name="product_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Product ID"/>
+    <column xsi:type="smallint" name="website_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Website ID"/>
+    <column xsi:type="varchar" name="code" nullable="true" length="32" comment="Code"/>
+    <column xsi:type="varchar" name="name" nullable="true" length="100" comment="Name"/>
+    <column xsi:type="varchar" name="description" nullable="true" length="100" comment="Description"/>
+    <column xsi:type="int" name="number_of_payments" padding="10" unsigned="true" nullable="true" identity="false" comment="Number of Payments"/>
+    <column xsi:type="varchar" name="interval" nullable="true" length="32" comment="Interval"/>
+    <column xsi:type="decimal" name="interval_amount" scale="4" precision="12" unsigned="true" nullable="true" comment="Interval Amount"/>
+    <column xsi:type="varchar" name="trial_interval" nullable="true" length="32" comment="Trial Interval"/>
+    <column xsi:type="int" name="number_of_trial_intervals" padding="10" unsigned="true" nullable="true" identity="false" comment="Number of Trial Intervals"/>
+    <column xsi:type="smallint" name="sort_order" padding="6" unsigned="false" nullable="false" identity="false" default="0" comment="Sort Order"/>
+    <column xsi:type="smallint" name="active" padding="5" unsigned="true" nullable="true" identity="false" default="0" comment="Active"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="plan_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="WORLDPAY_RECURRING_PLANS_PRD_ID_CAT_PRD_ENTT_ENTT_ID" table="worldpay_recurring_plans" column="product_id" referenceTable="catalog_product_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+    <constraint xsi:type="foreign" referenceId="WORLDPAY_RECURRING_PLANS_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID" table="worldpay_recurring_plans" column="website_id" referenceTable="store_website" referenceColumn="website_id" onDelete="CASCADE"/>
+    <index referenceId="WORLDPAY_RECURRING_PLANS_CODE" indexType="btree">
+      <column name="code"/>
+    </index>
+    <index referenceId="WORLDPAY_RECURRING_PLANS_ACTIVE_SORT_ORDER" indexType="btree">
+      <column name="active"/>
+      <column name="sort_order"/>
+    </index>
+  </table>
+  <table name="worldpay_subscriptions" resource="default" engine="innodb" comment="Worldpay Subscriptions">
+    <column xsi:type="int" name="subscription_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Subscription ID"/>
+    <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="true" identity="false" comment="Store Id"/>
+    <column xsi:type="varchar" name="store_name" nullable="true" length="255" comment="Store Name"/>
+    <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+    <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated At"/>
+    <column xsi:type="int" name="plan_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Plan ID"/>
+    <column xsi:type="decimal" name="interval_amount" scale="4" precision="12" unsigned="true" nullable="true" comment="Interval Amount"/>
+    <column xsi:type="date" name="start_date" comment="Start Date"/>
+    <column xsi:type="varchar" name="worldpay_subscription_id" nullable="false" length="20" comment="Worldpay Subscription ID"/>
+    <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Customer ID"/>
+    <column xsi:type="int" name="original_order_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Original Order ID"/>
+    <column xsi:type="varchar" name="original_order_increment_id" nullable="true" length="32" comment="Original Order Increment ID"/>
+    <column xsi:type="int" name="product_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Product ID"/>
+    <column xsi:type="varchar" name="product_name" nullable="true" length="255" comment="Product Name"/>
+    <column xsi:type="varchar" name="billing_name" nullable="true" length="255" comment="Billing Name"/>
+    <column xsi:type="varchar" name="shipping_name" nullable="true" length="255" comment="Shipping Name"/>
+    <column xsi:type="varchar" name="customer_email" nullable="true" length="128" comment="Customer Email"/>
+    <column xsi:type="varchar" name="status" nullable="true" length="32" comment="Status"/>
+    <column xsi:type="varchar" name="shipping_method" nullable="true" length="32" comment="Shipping Method"/>
+    <column xsi:type="varchar" name="shipping_description" nullable="true" length="255" comment="Shipping Description"/>
+    <column xsi:type="smallint" name="is_virtual" padding="5" unsigned="true" nullable="true" identity="false" comment="Is Virtual"/>
+    <column xsi:type="decimal" name="discount_amount" scale="4" precision="12" unsigned="true" nullable="true" comment="Discount Amount"/>
+    <column xsi:type="varchar" name="discount_description" nullable="true" length="255" comment="Discount Description"/>
+    <column xsi:type="decimal" name="shipping_amount" scale="4" precision="12" unsigned="true" nullable="true" comment="Shipping Amount"/>
+    <column xsi:type="decimal" name="shipping_tax_amount" scale="4" precision="12" unsigned="true" nullable="true" comment="Shipping Tax Amount"/>
+    <column xsi:type="decimal" name="subtotal" scale="4" precision="12" unsigned="true" nullable="true" comment="Order Subtotal"/>
+    <column xsi:type="decimal" name="tax_amount" scale="4" precision="12" unsigned="true" nullable="true" comment="Tax Amount"/>
+    <column xsi:type="decimal" name="subtotal_incl_tax" scale="4" precision="12" unsigned="true" nullable="true" comment="Subtotal Incl Tax"/>
+    <column xsi:type="decimal" name="weight" scale="4" precision="12" unsigned="true" nullable="true" comment="Weight"/>
+    <column xsi:type="text" name="customer_note" nullable="true" comment="Customer Note"/>
+    <column xsi:type="varchar" name="product_type" nullable="true" length="255" comment="Product Type"/>
+    <column xsi:type="text" name="product_options" nullable="true" comment="Product Options"/>
+    <column xsi:type="varchar" name="product_sku" nullable="true" length="255" comment="Product SKU"/>
+    <column xsi:type="decimal" name="item_price" scale="4" precision="12" unsigned="false" nullable="true" default="0" comment="Item Price"/>
+    <column xsi:type="decimal" name="item_original_price" scale="4" precision="12" unsigned="false" nullable="true" default="0" comment="Item Original Price"/>
+    <column xsi:type="decimal" name="item_tax_percent" scale="4" precision="12" unsigned="false" nullable="true" default="0" comment="Item Tax Percent"/>
+    <column xsi:type="decimal" name="item_tax_amount" scale="4" precision="12" unsigned="false" nullable="true" default="0" comment="Item Tax Amount"/>
+    <column xsi:type="decimal" name="item_discount_percent" scale="4" precision="12" unsigned="false" nullable="true" default="0" comment="Item Discount Percent"/>
+    <column xsi:type="decimal" name="item_discount_amount" scale="4" precision="12" unsigned="false" nullable="true" default="0" comment="Item Discount Amount"/>
+    <column xsi:type="varchar" name="payment_method" nullable="true" length="128" comment="Payment Method"/>
+    <column xsi:type="varchar" name="payment_cc_exp_month" nullable="true" length="12" comment="Payment Cc Exp Month"/>
+    <column xsi:type="varchar" name="payment_cc_exp_year" nullable="true" length="12" comment="Payment Cc Exp Year"/>
+    <column xsi:type="varchar" name="payment_cc_last_4" nullable="true" length="100" comment="Payment Cc Last 4"/>
+    <column xsi:type="text" name="payment_additional_information" nullable="true" comment="Payment Additional Information"/>
+    <column xsi:type="date" name="end_date" comment="Subscription End Date"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="subscription_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="WORLDPAY_SUBSCRIPTIONS_STORE_ID_STORE_STORE_ID" table="worldpay_subscriptions" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="SET NULL"/>
+    <constraint xsi:type="foreign" referenceId="WORLDPAY_SUBSCRIPTIONS_PLAN_ID_WORLDPAY_RECURRING_PLANS_PLAN_ID" table="worldpay_subscriptions" column="plan_id" referenceTable="worldpay_recurring_plans" referenceColumn="plan_id" onDelete="SET NULL"/>
+    <constraint xsi:type="foreign" referenceId="WORLDPAY_SUBSCRIPTIONS_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID" table="worldpay_subscriptions" column="customer_id" referenceTable="customer_entity" referenceColumn="entity_id" onDelete="SET NULL"/>
+    <constraint xsi:type="foreign" referenceId="WORLDPAY_SUBSCRIPTIONS_ORIGINAL_ORDER_ID_SALES_ORDER_ENTITY_ID" table="worldpay_subscriptions" column="original_order_id" referenceTable="sales_order" referenceColumn="entity_id" onDelete="SET NULL"/>
+    <constraint xsi:type="foreign" referenceId="WORLDPAY_SUBSCRIPTIONS_PRD_ID_CAT_PRD_ENTT_ENTT_ID" table="worldpay_subscriptions" column="product_id" referenceTable="catalog_product_entity" referenceColumn="entity_id" onDelete="SET NULL"/>
+    <index referenceId="WORLDPAY_SUBSCRIPTIONS_STATUS" indexType="btree">
+      <column name="status"/>
+    </index>
+    <index referenceId="WORLDPAY_SUBSCRIPTIONS_WORLDPAY_SUBSCRIPTION_ID" indexType="btree">
+      <column name="worldpay_subscription_id"/>
+    </index>
+    <index referenceId="WORLDPAY_SUBSCRIPTIONS_STORE_ID" indexType="btree">
+      <column name="store_id"/>
+    </index>
+    <index referenceId="WORLDPAY_SUBSCRIPTIONS_CUSTOMER_ID_STORE_ID" indexType="btree">
+      <column name="customer_id"/>
+      <column name="store_id"/>
+    </index>
+    <index referenceId="WORLDPAY_SUBSCRIPTIONS_ORIGINAL_ORDER_INCREMENT_ID" indexType="btree">
+      <column name="original_order_increment_id"/>
+    </index>
+    <index referenceId="INDEX_KEY" indexType="fulltext">
+      <column name="original_order_increment_id"/>
+      <column name="product_name"/>
+      <column name="billing_name"/>
+      <column name="shipping_name"/>
+    </index>
+  </table>
+  <table name="sales_order" resource="default">
+    <column xsi:type="int" name="worldpay_subscription_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Worldpay Subscription ID"/>
+    <index referenceId="SALES_ORDER_WORLDPAY_SUBSCRIPTION_ID" indexType="btree">
+      <column name="worldpay_subscription_id"/>
+    </index>
+  </table>
+  <table name="sales_order_grid" resource="default">
+    <column xsi:type="int" name="worldpay_subscription_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Worldpay Subscription ID"/>
+    <index referenceId="SALES_ORDER_GRID_WORLDPAY_SUBSCRIPTION_ID" indexType="btree">
+      <column name="worldpay_subscription_id"/>
+    </index>
+  </table>
+  <table name="worldpay_subscription_address" resource="default" engine="innodb" comment="Subscription Address">
+    <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
+    <column xsi:type="int" name="subscription_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Subscription Id"/>
+    <column xsi:type="int" name="region_id" padding="11" unsigned="false" nullable="true" identity="false" comment="Region Id"/>
+    <column xsi:type="varchar" name="fax" nullable="true" length="255" comment="Fax"/>
+    <column xsi:type="varchar" name="region" nullable="true" length="255" comment="Region"/>
+    <column xsi:type="varchar" name="postcode" nullable="true" length="255" comment="Postcode"/>
+    <column xsi:type="varchar" name="lastname" nullable="true" length="255" comment="Lastname"/>
+    <column xsi:type="varchar" name="street" nullable="true" length="255" comment="Street"/>
+    <column xsi:type="varchar" name="city" nullable="true" length="255" comment="City"/>
+    <column xsi:type="varchar" name="email" nullable="true" length="255" comment="Email"/>
+    <column xsi:type="varchar" name="telephone" nullable="true" length="255" comment="Phone Number"/>
+    <column xsi:type="varchar" name="country_id" nullable="true" length="2" comment="Country Id"/>
+    <column xsi:type="varchar" name="firstname" nullable="true" length="255" comment="Firstname"/>
+    <column xsi:type="varchar" name="address_type" nullable="true" length="255" comment="Address Type"/>
+    <column xsi:type="varchar" name="prefix" nullable="true" length="255" comment="Prefix"/>
+    <column xsi:type="varchar" name="middlename" nullable="true" length="255" comment="Middlename"/>
+    <column xsi:type="varchar" name="suffix" nullable="true" length="255" comment="Suffix"/>
+    <column xsi:type="varchar" name="company" nullable="true" length="255" comment="Company"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="entity_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="FK_8C190A9EEA0DCCC6894CD9BAF72989A6" table="worldpay_subscription_address" column="subscription_id" referenceTable="worldpay_subscriptions" referenceColumn="subscription_id" onDelete="CASCADE"/>
+  </table>
+  <table name="worldpay_recurring_transactions" resource="default" engine="innodb" comment="Recurring Transactions">
+    <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
+    <column xsi:type="int" name="original_order_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Original Order ID"/>
+    <column xsi:type="varchar" name="original_order_increment_id" nullable="true" length="32" comment="Original Order Increment ID"/>
+    <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Customer ID"/>
+    <column xsi:type="int" name="plan_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Plan Id"/>
+    <column xsi:type="int" name="subscription_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Subscription Id"/>
+    <column xsi:type="date" name="recurring_date" comment="Recurring Date"/>
+    <column xsi:type="date" name="recurring_end_date" comment="Recurring End Date"/>
+    <column xsi:type="varchar" name="status" nullable="true" length="32" comment="Status"/>
+    <column xsi:type="varchar" name="recurring_order_id" nullable="true" length="32" comment="Recurring Order ID"/>
+    <column xsi:type="varchar" name="worldpay_token_id" nullable="true" length="32" comment="Worldpay token ID"/>
+    <column xsi:type="varchar" name="worldpay_order_id" nullable="true" length="40" comment="WorldPay Order Id"/>
+    <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+    <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated At"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="entity_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="WORLDPAY_RECURRING_TRANSACTIONS_CSTR_ID_CSTR_ENTT_ENTT_ID" table="worldpay_recurring_transactions" column="customer_id" referenceTable="customer_entity" referenceColumn="entity_id" onDelete="SET NULL"/>
+    <constraint xsi:type="foreign" referenceId="FK_231DC9B61DE4EAE74A18B9E7CBB5D0D5" table="worldpay_recurring_transactions" column="subscription_id" referenceTable="worldpay_subscriptions" referenceColumn="subscription_id" onDelete="CASCADE"/>
+    <index referenceId="WORLDPAY_RECURRING_TRANSACTIONS_STATUS" indexType="btree">
+      <column name="status"/>
+    </index>
+    <index referenceId="WORLDPAY_RECURRING_TRANSACTIONS_SUBSCRIPTION_ID" indexType="btree">
+      <column name="subscription_id"/>
+    </index>
+    <index referenceId="WORLDPAY_RECURRING_TRANSACTIONS_CUSTOMER_ID" indexType="btree">
+      <column name="customer_id"/>
+    </index>
+    <index referenceId="WORLDPAY_RECURRING_TRANSACTIONS_ORIGINAL_ORDER_ID" indexType="btree">
+      <column name="original_order_id"/>
+    </index>
+    <index referenceId="WORLDPAY_RECURRING_TRANSACTIONS_ORIGINAL_ORDER_INCREMENT_ID" indexType="btree">
+      <column name="original_order_increment_id"/>
+    </index>
+    <index referenceId="WORLDPAY_RECURRING_TRANSACTIONS_WORLDPAY_ORDER_ID" indexType="btree">
+      <column name="worldpay_order_id"/>
+    </index>
+  </table>
+</schema>

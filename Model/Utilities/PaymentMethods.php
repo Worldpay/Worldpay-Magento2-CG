@@ -19,8 +19,8 @@ class PaymentMethods
      */
     protected $_xmlLocation;
 
-    const PAYMENT_METHOD_PATH = '/paymentMethods/';
-    const TYPE_PATH = '/types/';
+    public const PAYMENT_METHOD_PATH = '/paymentMethods/';
+    public const TYPE_PATH = '/types/';
 
     /**
      * Constructor

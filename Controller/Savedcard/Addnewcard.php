@@ -48,8 +48,9 @@ class Addnewcard extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         if (!$this->customerSession->isLoggedIn()) {
-            $this->_redirect('customer/account/login');
-            return;
+            $resultRedirect = $this->resultRedirectFactory->create();
+            $resultRedirect->setPath('customer/account/login');
+            return $resultRedirect;
         }
         $resultPage = $this->_resultPageFactory->create();
         $resultPage->getConfig()->getTitle()->set(

@@ -87,8 +87,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
     public function execute()
     {
         if (!$this->customerSession->isLoggedIn()) {
-            $this->_redirect('customer/account/login');
-            return;
+            $resultRedirect = $this->resultRedirectFactory->create();
+            $resultRedirect->setPath('customer/account/login');
+            return $resultRedirect;
         }
         $validFormKey = $this->formKeyValidator->validate($this->getRequest());
         $wpTokenId = $this->_getTokenModel()->getId();
@@ -110,8 +111,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
             } catch (Exception $e) {
                 $this->wplogger->error($e->getMessage());
                 $this->messageManager->addException($e, __('Error: ').$e->getMessage());
-                $this->_redirect('*/savedcard/edit', ['id' => $wpTokenId]);
-                return;
+                $resultRedirect = $this->resultRedirectFactory->create();
+                $resultRedirect->setPath('*/savedcard/edit', ['id' => $wpTokenId]);
+                return $resultRedirect;
             }
             // added fix for github issue 71
             try {
@@ -120,27 +122,31 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
                     $this->_applyVaultTokenUpdate();
                 } else {
                     $this->messageManager->addError(__($this->helper->getConfigValue('MCAM7')));
-                    $this->_redirect('*/savedcard/edit', ['id' => $wpTokenId]);
-                    return;
+                    $resultRedirect = $this->resultRedirectFactory->create();
+                    $resultRedirect->setPath('*/savedcard/edit', ['id' => $wpTokenId]);
+                    return $resultRedirect;
                 }
                 if ($tokenInquiryResponse->getTokenCode()) {
                     $this->_applyTokenInquiry($tokenInquiryResponse);
                     $this->_applyVaultTokenUpdate();
                 } else {
                     $this->messageManager->addError(__($this->helper->getConfigValue('MCAM7')));
-                    $this->_redirect('*/savedcard/edit', ['id' => $wpTokenId]);
-                    return;
+                    $resultRedirect = $this->resultRedirectFactory->create();
+                    $resultRedirect->setPath('*/savedcard/edit', ['id' => $wpTokenId]);
+                    return $resultRedirect;
                 }
             } catch (Exception $e) {
                 $this->wplogger->error($e->getMessage());
                 $this->messageManager->addException($e, __('Error: ').$this->helper->getConfigValue('MCAM7'));
-                $this->_redirect('*/savedcard/edit', ['id' => $wpTokenId]);
-                return;
+                $resultRedirect = $this->resultRedirectFactory->create();
+                $resultRedirect->setPath('*/savedcard/edit', ['id' => $wpTokenId]);
+                return $resultRedirect;
             }
             
             $this->messageManager->addSuccess(__($this->helper->getConfigValue('MCAM9')));
-            $this->_redirect('*/savedcard');
-            return;
+            $resultRedirect = $this->resultRedirectFactory->create();
+            $resultRedirect->setPath('*/savedcard');
+            return $resultRedirect;
         }
     }
 

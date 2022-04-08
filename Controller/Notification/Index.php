@@ -24,8 +24,8 @@ class Index extends \Magento\Framework\App\Action\Action
     
     private $abstractMethod;
 
-    const RESPONSE_OK = '[OK]';
-    const RESPONSE_FAILED = '[FAILED]';
+    public const RESPONSE_OK = '[OK]';
+    public const RESPONSE_FAILED = '[FAILED]';
 
     protected $fileDriver;
     /**
