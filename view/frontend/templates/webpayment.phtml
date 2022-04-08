@@ -48,7 +48,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     }
     
     var browserType = window.navigator.userAgent.match(/chrome/i);
-    var browserEdge = window.navigator.userAgent.match(/edge/i);
+    var browserEdge = window.navigator.userAgent.match(/edg/i);
 
     if((browserType && browserType[0] == 'Chrome') && !browserEdge) {
         window.ChromepayAvailable = '1';
