@@ -2,7 +2,7 @@
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
   <table name="worldpay_payment" resource="default" engine="innodb" comment="Payment Table">
     <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
-    <column xsi:type="varchar" name="order_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Order Id" length="25"/>
+    <column xsi:type="varchar" name="order_id" nullable="false" comment="Order Id" length="25"/>
     <column xsi:type="varchar" name="payment_status" nullable="true" length="255" comment="Payment Status"/>
     <column xsi:type="varchar" name="payment_model" nullable="false" length="25" comment="Payment Model"/>
     <column xsi:type="varchar" name="payment_type" nullable="false" length="255" comment="Payment Type"/>
@@ -97,7 +97,7 @@
   </table>
   <table name="worldpay_notification_history" resource="default" engine="innodb" comment="Worldpay Notification History">
     <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
-    <column xsi:type="varchar" name="order_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Worldpay order id" onCreate="migrateDataFrom(order_id)" length="255"/>
+    <column xsi:type="varchar" name="order_id" nullable="true" comment="Worldpay order id" onCreate="migrateDataFrom(order_id)" length="255"/>
     <column xsi:type="varchar" name="status" nullable="true" length="255" comment="Status"/>
     <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
     <constraint xsi:type="primary" referenceId="PRIMARY">
