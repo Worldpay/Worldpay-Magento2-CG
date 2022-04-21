@@ -244,11 +244,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                     if (isset($data['cpf']) && !(preg_match("/^\d{11}$/", $data['cpf'], $matches) ||
                             preg_match("/^\d{14}$/", $data['cpf'], $matches))) {
                         $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM20');
-                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
                     }
                     if (isset($data['statement']) && !preg_match("/^[a-zA-Z0-9 ]*$/", $data['statement'], $matches)) {
                         $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM21');
-                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
                     }
                 }
                 if ($method == self::WORLDPAY_MOTO_TYPE && $mode == self::DIRECT_MODEL) {
@@ -266,7 +266,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 }
                 if ($mode == 'redirect' && $method != self::WORLDPAY_MOTO_TYPE) {
                     if (!isset($data['cc_type'])) {
-                        throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
+                        throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage);
                     }
                     if (isset($data['cc_number']) && $data['cc_number'] != null) {
                         $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM24');
@@ -274,7 +274,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                     }
                 } elseif ($mode == self::DIRECT_MODEL) {
                     if (!isset($data['cc_type'])) {
-                        throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
+                        throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage);
                     }
                     if ($data['cc_type'] != 'savedcard') {
                         if (!isset($data['cc_exp_year'])) {
@@ -297,12 +297,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 }
             } else {
                 $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM13');
-                throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
             }
         } elseif ($method == self::WORLDPAY_APM_TYPE && !isset($paymentData['additional_data']['cc_type'])) {
-            throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
+            throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage);
         } elseif ($method == self::WORLDPAY_WALLETS_TYPE && !isset($paymentData['additional_data']['cc_type'])) {
-            throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
+            throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage);
         }
     }
 
