@@ -10,7 +10,7 @@ interface LatAmInstalInterface
      * Retrive Instalment Types
      *
      * @api
-     * @param string $countryId.
+     * @param string $countryId
      * @return null|string
      */
     public function getInstalmentType($countryId);

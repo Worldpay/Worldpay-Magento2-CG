@@ -10,8 +10,8 @@ interface HostedUrlInterface
      * Retrive HPP payment Url
      *
      * @api
-     * @param string $quoteId.
-     * @param string[] $paymentdetails.
+     * @param string $quoteId
+     * @param string[] $paymentdetails
      * @return null|string
      */
     public function getHostedUrl($quoteId, array $paymentdetails);
