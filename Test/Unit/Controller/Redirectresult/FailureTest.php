@@ -18,8 +18,14 @@ use Sapient\Worldpay\Controller\Redirectresult\Failure;
 
 class FailureTest extends TestCase
 {
-    
+    /**
+     * [$failureObj description]
+     * @var [type]
+     */
     protected $failureObj;
+    /**
+     * [setUp description]
+     */
     protected function setUp()
     {
         $context = $this->getMockBuilder(Context::class)
@@ -47,7 +53,10 @@ class FailureTest extends TestCase
             $checkoutSession
         );
     }
-    
+    /**
+     * [testExecute description]
+     * @return [type] [description]
+     */
     public function testExecute()
     {
         $this->assertInstanceOf(Failure::class, $this->failureObj);

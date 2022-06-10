@@ -24,8 +24,10 @@ class CatalogProductGetFinalPriceObserver implements ObserverInterface
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
-     * @return $this
+     * [execute description]
+     *
+     * @param  \Magento\Framework\Event\Observer $observer [description]
+     * @return [type]                                      [description]
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {

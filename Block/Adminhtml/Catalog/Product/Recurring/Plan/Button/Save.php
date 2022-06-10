@@ -16,6 +16,11 @@ class Save implements ButtonProviderInterface
      */
     private $recurringHelper;
     
+    /**
+     * Save constructor
+     *
+     * @param RecurringHelper $recurringHelper
+     */
     public function __construct(
         RecurringHelper $recurringHelper
     ) {

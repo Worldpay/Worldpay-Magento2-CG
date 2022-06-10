@@ -253,11 +253,11 @@ $storeCode = $block->getStoreCode();
                             $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
             return false;
                     } 
-                if((window.is3DsEnabled)) {
+               /* if((window.is3DsEnabled)) {
                 createPayment3DS();
-                }else {
+                }else { */
                 createPayment();
-            }
+            //}
             } else if (cvvValid && jQuery('#form_add_card').valid() && window.isDynamic3DS2Enabled) {
                 document.getElementById('save_newcard').disabled=true;
 
@@ -321,12 +321,15 @@ $storeCode = $block->getStoreCode();
                         if (result.threeD) {
                             console.log("enetered 3d consition");
                             window.location.href = baseUrl + 'worldpay/savedcard/redirect';
+                            return;
                             //window.location.replace(urlBuilder.build('worldpay/savedcard/redirect'));
                         }
                         if (result.success) {
                             window.location.replace(urlBuilder.build('worldpay/savedcard'));
+                            return;
                         } else {
                             window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));
+                            return;
                         }
                     },
                     error: function (error) {
@@ -364,7 +367,7 @@ $storeCode = $block->getStoreCode();
             response = JSON.stringify(data);
                         var result = JSON.parse(response);
                         console.log(result);
-            if(result.threeDError) {
+                        if((result.threeDError == true) || (result.success == false)) {
              window.location.replace(urlBuilder.build('worldpay/savedcard/addnewcard'));
             }else {
             console.log("entered success case to go to auth");

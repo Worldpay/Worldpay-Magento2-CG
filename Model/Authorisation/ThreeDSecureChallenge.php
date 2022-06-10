@@ -11,7 +11,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
     /** @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory */
     protected $updateWorldPayPayment;
 
-    const CART_URL = 'checkout/cart';
+    public const CART_URL = 'checkout/cart';
 
     /**
      * Constructor
@@ -57,6 +57,12 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
         $this->worldpayHelper = $worldpayHelper;
     }
     
+   /**
+    * Continue post 3ds2 authorization process
+    *
+    * @param array $directOrderParams
+    * @param array $threeDSecureParams
+    */
     public function continuePost3dSecure2AuthorizationProcess($directOrderParams, $threeDSecureParams)
     {
         //$directOrderParams['response'] = $responseParams;
@@ -169,7 +175,9 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
     
     /**
      * It handles if payment is refused or cancelled
-     * @param  Object $paymentUpdate
+     *
+     * @param Object $paymentUpdate
+     * @param int|string $orderId
      */
     private function _abortIfPaymentError($paymentUpdate, $orderId)
     {

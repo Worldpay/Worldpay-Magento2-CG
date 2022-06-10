@@ -7,8 +7,8 @@ namespace Sapient\Worldpay\Model\Config\Source;
 
 class TrialInterval extends AbstractArraySource
 {
-    const DAY = 'DAY';
-    const MONTH = 'MONTH';
+    public const DAY = 'DAY';
+    public const MONTH = 'MONTH';
 
     /**
      * @inheritdoc

@@ -9,29 +9,103 @@ namespace Sapient\Worldpay\Model\XmlBuilder;
  */
 class WalletOrder
 {
-    const DYNAMIC3DS_DO3DS = 'do3DS';
-    const DYNAMIC3DS_NO3DS = 'no3DS';
-    const ROOT_ELEMENT = <<<EOD
+    /**
+     * @var [DYNAMIC3DS_DO3DS]
+     */
+    public const DYNAMIC3DS_DO3DS = 'do3DS';
+    /**
+     * @var [DYNAMIC3DS_NO3DS]
+     */
+    public const DYNAMIC3DS_NO3DS = 'no3DS';
+    public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
-
+    
+    /**
+     * [$merchantCode description]
+     * @var [type]
+     */
     private $merchantCode;
+    /**
+     * [$orderCode description]
+     * @var [type]
+     */
     private $orderCode;
+    /**
+     * [$orderDescription description]
+     * @var [type]
+     */
     private $orderDescription;
+    /**
+     * [$currencyCode description]
+     * @var [type]
+     */
     private $currencyCode;
+    /**
+     * [$amount description]
+     * @var [type]
+     */
     private $amount;
+    /**
+     * [$paymentType description]
+     * @var [type]
+     */
     private $paymentType;
+    /**
+     * [$exponent description]
+     * @var [type]
+     */
     private $exponent;
+    /**
+     * [$paResponse description]
+     * @var null
+     */
     protected $paResponse = null;
+    /**
+     * [$dfReferenceId description]
+     * @var null
+     */
     protected $dfReferenceId = null;
+    /**
+     * [$sessionId description]
+     * @var [type]
+     */
     private $sessionId;
+    /**
+     * [$threeDSecureConfig description]
+     * @var [type]
+     */
     protected $threeDSecureConfig;
+    /**
+     * [$cusDetails description]
+     * @var [type]
+     */
     private $cusDetails;
+    /**
+     * [$shopperIpAddress description]
+     * @var [type]
+     */
     private $shopperIpAddress;
+    /**
+     * [$paymentDetails description]
+     * @var [type]
+     */
     private $paymentDetails;
+    /**
+     * [$shippingAddress description]
+     * @var [type]
+     */
     private $shippingAddress;
+    /**
+     * [$acceptHeader description]
+     * @var [type]
+     */
     protected $acceptHeader;
+    /**
+     * [$userAgentHeader description]
+     * @var [type]
+     */
     protected $userAgentHeader;
     
      /**
@@ -48,15 +122,27 @@ EOD;
     }
     
     /**
-     * Build xml for processing Request
+     * [build description]
      *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param string $orderDescription
-     * @param string $currencyCode
-     * @param float $amount
-     * @param string $paymentType
-     * @return SimpleXMLElement $xml
+     * @param  [type] $merchantCode     [description]
+     * @param  [type] $orderCode        [description]
+     * @param  [type] $orderDescription [description]
+     * @param  [type] $currencyCode     [description]
+     * @param  [type] $amount           [description]
+     * @param  [type] $paymentType      [description]
+     * @param  [type] $shopperEmail     [description]
+     * @param  [type] $acceptHeader     [description]
+     * @param  [type] $userAgentHeader  [description]
+     * @param  [type] $protocolVersion  [description]
+     * @param  [type] $signature        [description]
+     * @param  [type] $signedMessage    [description]
+     * @param  [type] $shippingAddress  [description]
+     * @param  [type] $billingAddress   [description]
+     * @param  [type] $cusDetails       [description]
+     * @param  [type] $shopperIpAddress [description]
+     * @param  [type] $paymentDetails   [description]
+     * @param  [type] $exponent         [description]
+     * @return [type]                   [description]
      */
     public function build(
         $merchantCode,
@@ -110,7 +196,7 @@ EOD;
      * @param string $merchantCode
      * @param string $orderCode
      * @param array $paymentDetails
-     * @param $dfReferenceId
+     * @param string $dfReferenceId
      * @return SimpleXMLElement $xml
      */
     public function build3Ds2Secure(
@@ -148,8 +234,8 @@ EOD;
      * @param string $merchantCode
      * @param string $orderCode
      * @param array $paymentDetails
-     * @param $paResponse,
-     * @param $echoData
+     * @param array $paResponse
+     * @param string $echoData
      * @return SimpleXMLElement $xml
      */
     public function build3DSecure(

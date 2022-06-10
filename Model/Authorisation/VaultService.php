@@ -8,6 +8,7 @@ use Exception;
 
 class VaultService extends \Magento\Framework\DataObject
 {
+    /** @var $checkoutSession */
     protected $checkoutSession;
     
     /**
@@ -44,7 +45,17 @@ class VaultService extends \Magento\Framework\DataObject
         $this->wplogger = $wplogger;
         $this->registryhelper = $registryhelper;
     }
-    
+
+    /**
+     * AuthorizePayment
+     *
+     * @param string $mageOrder
+     * @param string $quote
+     * @param string|int $orderCode
+     * @param string|int $orderStoreId
+     * @param string $paymentDetails
+     * @param string $payment
+     */
     public function authorizePayment(
         $mageOrder,
         $quote,
@@ -96,7 +107,10 @@ class VaultService extends \Magento\Framework\DataObject
             $this->_applyPaymentUpdate($directResponse, $payment);
         }
     }
-    // get 3ds2 params from the configuration and set to checkout session
+    
+    /**
+     * Get 3ds2 params from the configuration and set to checkout session
+     */
     public function get3DS2ConfigValues()
     {
         $data = [];
@@ -114,6 +128,14 @@ class VaultService extends \Magento\Framework\DataObject
         
         return $data;
     }
+
+    /**
+     * Handle3DSecure
+     *
+     * @param string $threeDSecureParams
+     * @param string $directOrderParams
+     * @param string|int $mageOrderId
+     */
     private function _handle3DSecure($threeDSecureParams, $directOrderParams, $mageOrderId)
     {
         $this->wplogger->info('HANDLING 3DS IN VAULT');
@@ -124,6 +146,14 @@ class VaultService extends \Magento\Framework\DataObject
         $this->checkoutSession->setInstantPurchaseOrder(true);
     }
     
+    /**
+     * Handle3Ds2
+     *
+     * @param string $threeDSecureChallengeParams
+     * @param string $directOrderParams
+     * @param string|int $mageOrderId
+     * @param string $threeDSecureConfig
+     */
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)
     {
         $this->wplogger->info('HANDLING 3DS2 IN VAULT');
@@ -133,6 +163,13 @@ class VaultService extends \Magento\Framework\DataObject
         $this->checkoutSession->setAuthOrderId($mageOrderId);
         $this->checkoutSession->set3DS2Config($threeDSecureConfig);
     }
+
+    /**
+     * ApplyPaymentUpdate
+     *
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param string $payment
+     */
     private function _applyPaymentUpdate(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
         $payment
@@ -141,6 +178,13 @@ class VaultService extends \Magento\Framework\DataObject
         $paymentUpdate->apply($payment);
         $this->_abortIfPaymentError($paymentUpdate, $directResponse);
     }
+
+    /**
+     * AbortIfPaymentError
+     *
+     * @param string $paymentUpdate
+     * @param string $directResponse
+     */
     private function _abortIfPaymentError($paymentUpdate, $directResponse)
     {
         $responseXml = $directResponse->getXml();

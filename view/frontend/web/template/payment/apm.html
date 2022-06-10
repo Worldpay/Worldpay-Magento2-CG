@@ -3,7 +3,7 @@
         <input type="radio"
                name="payment[method]"
                class="radio"
-               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"></input>
 
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
         
@@ -41,7 +41,7 @@
                         <div class="paymentmethods-radio-wrapper">
                         <input type="radio"  data-bind="event:{ change: $parent.checkPaymentTypes },attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
                                         'validate-one-required-by-name':true
-                                                }),id: 'apm_' + item.ccValue}" name="apm_type" />
+                                                }),id: 'apm_' + item.ccValue}" name="apm_type"></input>
                        <!--ko if: $parent.getIcons(item.ccValue) -->
                             <label data-bind="attr: {for: 'apm_' + item.ccValue}"><img data-bind="attr: {
                                         'src': $parent.getIcons(item.ccValue).url,
@@ -115,7 +115,7 @@
                                     enable: isActive($parents),
                                     value: achaccountnumber,
                                     valueUpdate: 'keyup'"
-                               />  
+                               >  
 
                 </div>
 
@@ -135,7 +135,7 @@
                                     enable: isActive($parents),
                                     value: achroutingnumber,
                                     valueUpdate: 'keyup'"
-                               /> 
+                               ></input> 
 
                 </div>
 
@@ -156,7 +156,7 @@
                                     enable: isActive($parents),
                                     value: achchecknumber,
                                     valueUpdate: 'keyup'"
-                                   /> 
+                                   ></input> 
                     </div>
 
                 </div>
@@ -177,7 +177,7 @@
                                     enable: isActive($parents),
                                     value: achcompanyname,
                                     valueUpdate: 'keyup'"
-                                   /> 
+                                   ></input> 
                     </div>
 
                 </div>
@@ -198,7 +198,7 @@
                                     enable: isActive($parents),
                                     value: achemailaddress,
                                     valueUpdate: 'keyup'"
-                                   /> 
+                                   ></input> 
                     </div>
 
                 </div>

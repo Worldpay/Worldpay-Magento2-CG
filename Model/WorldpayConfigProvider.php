@@ -20,7 +20,10 @@ use Magento\Framework\Serialize\SerializerInterface;
  */
 class WorldpayConfigProvider implements ConfigProviderInterface
 {
-    const CC_VAULT_CODE = "worldpay_cc_vault";
+   /**
+    * @var CC_VAULT_CODE
+    */
+    public const CC_VAULT_CODE = "worldpay_cc_vault";
     /**
      * @var string[]
      */
@@ -69,21 +72,23 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     private $serializer;
     
     /**
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-     * @param \Sapient\Worldpay\Helper\Data $helper
-     * @param PaymentHelper $paymentHelper
-     * @param WorldPayCCPayment $payment
-     * @param Cart $cart
-     * @param \Magento\Customer\Model\Session $customerSession
-     * @param \Magento\Backend\Model\Session\Quote $adminquotesession
-     * @param SavedTokenFactory $savedTokenFactory
-     * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentmethodutils
-     * @param \Magento\Backend\Model\Auth\Session $backendAuthSession
-     * @param Repository $assetRepo
-     * @param RequestInterface $request
-     * @param Source $assetSource
-     * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
-     * @param SerializerInterface $serializer
+     * [__construct description]
+     *
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger          $wplogger           [description]
+     * @param \Sapient\Worldpay\Helper\Data                    $helper             [description]
+     * @param PaymentHelper                                    $paymentHelper      [description]
+     * @param WorldPayCCPayment                                $payment            [description]
+     * @param Cart                                             $cart               [description]
+     * @param \Magento\Customer\Model\Session                  $customerSession    [description]
+     * @param \Magento\Backend\Model\Session\Quote             $adminquotesession  [description]
+     * @param SavedTokenFactory                                $savedTokenFactory  [description]
+     * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentmethodutils [description]
+     * @param \Magento\Backend\Model\Auth\Session              $backendAuthSession [description]
+     * @param Repository                                       $assetRepo          [description]
+     * @param RequestInterface                                 $request            [description]
+     * @param Source                                           $assetSource        [description]
+     * @param \Magento\Framework\Locale\ResolverInterface      $localeResolver     [description]
+     * @param SerializerInterface                              $serializer         [description]
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -123,7 +128,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
     
     /**
-     * {@inheritdoc}
+     * [getConfig description]
+     *
+     * @return [type] [description]
      */
     public function getConfig()
     {
@@ -298,7 +305,10 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
     
     /**
-     * @return Array
+     * [getApmTypes description]
+     *
+     * @param  [type] $code [description]
+     * @return [type]       [description]
      */
     public function getApmTypes($code)
     {
@@ -306,7 +316,10 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
     
     /**
-     * @return Array
+     * [getWalletsTypes description]
+     *
+     * @param  [type] $code [description]
+     * @return [type]       [description]
      */
     public function getWalletsTypes($code)
     {
@@ -454,7 +467,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
         return [];
     }
-    
+    /**
+     * [getIcons description]
+     *
+     * @return [type] [description]
+     */
     public function getIcons()
     {
         if (!empty($this->icons)) {
@@ -475,7 +492,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $asset = $this->createAsset('Sapient_Worldpay::images/cc/' . strtolower($code) . '.png');
                 $placeholder = $this->assetSource->findSource($asset);
                 if ($placeholder) {
-                    list($width, $height) = getimagesize($asset->getSourceFile());
+                    list($width, $height) = getimagesizefromstring($asset->getUrl());
                     $this->icons[$code] = [
                         'url' => $asset->getUrl(),
                         'width' => $width,
@@ -594,7 +611,12 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
         return $data;
     }
-    
+    /**
+     * [getInstalmentValues description]
+     *
+     * @param  [type] $countryId [description]
+     * @return [type]            [description]
+     */
     public function getInstalmentValues($countryId)
     {
         return $this->worldpayHelper->getInstalmentValues($countryId);

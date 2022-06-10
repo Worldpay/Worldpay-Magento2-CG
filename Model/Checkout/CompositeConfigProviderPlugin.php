@@ -39,8 +39,7 @@ class CompositeConfigProviderPlugin
     }
 
     /**
-     * Plugin for:
-     * Retrieve assoc array of checkout configuration
+     * Plugin for: Retrieve assoc array of checkout configuration
      *
      * @param \Magento\Checkout\Model\CompositeConfigProvider $subject
      * @param array $result

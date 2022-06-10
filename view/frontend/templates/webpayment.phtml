@@ -17,9 +17,9 @@ $myaccountexception = $block->getMyAccountSpecificException('MCAM8') ;
 $ccexception = $block->getCreditCardSpecificException('CCAM12');
 if (array_key_exists('error', $param)) {
     if (array_key_exists('message', $param)) {
-        $block->_messageManager->addError(__($ccexception));
+        $block->getMessageManager()->addError(__($ccexception));
     } else {
-        $block->_messageManager->addError(__($myaccountexception));
+        $block->getMessageManager()->addError(__($myaccountexception));
     }
 }
 
@@ -27,8 +27,21 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
 
 /** @var $block \Sapient\Worldpay\Block\Webpayment */
 ?>
-
-<script type="text/javascript">
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register("<?php echo $block->getServiceWorkerUrl(); ?>", { scope: "<?php echo $block->getServiceWorkerScope().'/'; ?>" })
+                .then(function (registration)
+                {
+                console.log('Service worker registered successfully');
+                }).catch(function (e)
+                {
+                console.error('Error during service worker registration:', e);
+                });
+        });
+    }
+</script>
+<script>
     window.ChromepayButtonName = '<?= /* @noEscape */ $block->getChromepayButtonName() ?>';
     window.ChromepayEnabled = '<?= /* @noEscape */ $block->getChromepayEnabled() ?>';
     window.ChromePaymentMode = '<?= /* @noEscape */ $block->getPaymentMode() ?>';
@@ -49,14 +62,17 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     }
     
     var browserType = window.navigator.userAgent.match(/chrome/i);
-    var browserEdge = window.navigator.userAgent.match(/edge/i);
+    var browserEdge = window.navigator.userAgent.match(/edg/i);
 
     if((browserType && browserType[0] == 'Chrome') && !browserEdge) {
         window.ChromepayAvailable = '1';
     }else{
         window.ChromepayAvailable = '0';
     }
-
+    function getChromeVersion () {
+        var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+        return raw ? parseInt(raw[2], 10) : false;
+    }
 </script>
 
 <script>
@@ -65,7 +81,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var token = '<?= /* @noEscape */ $cusToken ?>';
     var cardType;
     var totalAmount;
-    var baseUrl = '<?= /* @noEscape */ $block->getBaseUrl() ?>';
+    //var BASE_URL = BASE_URL;
     var baseCurrency = '<?= /* @noEscape */ $block->getCurrency() ?>';
     var orderCode;
     var reqShipping = '<?= /* @noEscape */ $block->getshippingRequired() ?>';
@@ -77,8 +93,12 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             "amex", "mastercard", "visa"
     ];
     const types = ['credit'];
+    var supportedMethods =  'basic-card';
+    if(getChromeVersion() > 99 ){
+            supportedMethods =  BASE_URL+'worldpay/payment/pay';
+    }
     const supportedInstruments = [{
-    supportedMethods: 'basic-card',
+        supportedMethods: supportedMethods,
             data: {
             supportedNetworks: networks,
                     supportedTypes: types
@@ -194,9 +214,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         var jsonReq = JSON.stringify(req);
         var totalsUrl;
         if (isCustomerLoggedIn) { //Api for logged inb customer
-            totalsUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/totals-information';
+            totalsUrl = BASE_URL + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/totals-information';
         } else { // Api for guest customer
-            totalsUrl = baseUrl + 'rest/<?= /* @noEscape */  $storeCode; ?>/V1/guest-carts/' + 
+            totalsUrl = BASE_URL + 'rest/<?= /* @noEscape */  $storeCode; ?>/V1/guest-carts/' + 
                     guestMaskedQuoteId + '/totals-information';
         }
         var xhttp = new XMLHttpRequest();
@@ -222,9 +242,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         var jsonReq = JSON.stringify(req);
         var apiUrl;
         if (isCustomerLoggedIn) { //Api for logged inb customer
-            apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/estimate-shipping-methods';
+            apiUrl = BASE_URL + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/estimate-shipping-methods';
         } else { // Api for guest customer
-            apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + 
+            apiUrl = BASE_URL + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + 
                     guestMaskedQuoteId + '/estimate-shipping-methods';
         }
         var xhttp = new XMLHttpRequest();
@@ -267,7 +287,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     return request;
     } // ------------- End of initPaymentRequest fn ---------------
 
-    var jwtUrl = baseUrl +'worldpay/hostedpaymentpage/jwt';
+    var jwtUrl = BASE_URL +'worldpay/hostedpaymentpage/jwt';
         
         function createJwt(cardNumber){
             var bin = cardNumber;
@@ -294,8 +314,8 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         function placeOrder(instrumentResponse) {
             orderCode = createOrder(instrumentResponse);
             if (instrumentResponse && orderCode){
-           // window.location.href = baseUrl + 'checkout/onepage/success';
-            window.location.href = baseUrl + 'worldpay/threedsecure/auth';
+           // window.location.href = BASE_URL + 'checkout/onepage/success';
+            window.location.href = BASE_URL + 'worldpay/threedsecure/auth';
         }
         }
     /**
@@ -414,13 +434,16 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var orderResponse;
     var dfReferenceId = "";
     if (isCustomerLoggedIn) { //Api for logged in customer
-        apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/shipping-information';
+        apiUrl = BASE_URL + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/shipping-information';
     } else { // Api for guest customer
-        apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + 
+        apiUrl = BASE_URL + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + 
                 guestMaskedQuoteId + '/shipping-information';
     }
-    
-    
+    if(typeof instrumentResponse.details.billingAddress == 'undefined' || instrumentResponse.details.billingAddress == null){
+        instrumentResponse.details.billingAddress = {};
+        instrumentResponse.details.billingAddress = instrumentResponse.shippingAddress;
+
+    }    
     var fullName = instrumentResponse.details.billingAddress.recipient;
     var strArray = fullName.split(" ");
     var firstName = strArray[0];
@@ -543,9 +566,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var jsonPaymentDetails = JSON.stringify(paymentDetails);
     var orderApiUrl;
     if (isCustomerLoggedIn) { //Api for logged in customer
-    orderApiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/payment-information';
+    orderApiUrl = BASE_URL + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/payment-information';
     } else { // Api for guest customer
-    orderApiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/order';
+    orderApiUrl = BASE_URL + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/order';
     }
 
     var xhttp = new XMLHttpRequest();
@@ -562,10 +585,10 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
    
    if(isNaN(orderResponse)){
        if(orderResponse.hasOwnProperty("message") && orderResponse['message'].indexOf('3DS2')!==-1) {
-         window.location.href = baseUrl + 'checkout/cart?error=true&message=error';
+         window.location.href = BASE_URL + 'checkout/cart?error=true&message=error';
            exit;
        }
-        window.location.href = baseUrl + 'checkout/cart?error=true';
+        window.location.href = BASE_URL + 'checkout/cart?error=true';
         exit;
     }
    

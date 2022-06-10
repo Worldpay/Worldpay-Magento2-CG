@@ -429,7 +429,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      *
      * @param \Magento\Sales\Model\Order $order
      * @param \Magento\Framework\DataObject $wp
-     * @param string $paymentMethodCode
+     * @param string $grandTotal
      * @return mixed
      */
     public function partialCapture(\Magento\Sales\Model\Order $order, $wp, $grandTotal)
@@ -509,9 +509,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param \Magento\Framework\DataObject $wp
      * @param string $paymentMethodCode
      * @param float $amount
-     * @param  $reference
+     * @param string $reference
      * @return mixed
      */
+    
     public function refund(
         \Magento\Sales\Model\Order $order,
         $wp,
@@ -871,7 +872,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             'merchantCode' => $this->worldpayhelper->getMerchantCode($tokenModel->getMethod()),
         ];
         /**
-         * create TokenInquiry request
+         * Create TokenInquiry request
          *
          * @var SimpleXMLElement $simpleXml
          */
@@ -885,6 +886,12 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
     }
     
+    /**
+     * GetCountryCodeSpoof
+     *
+     * @param string $cntrs
+     * @param string $cntryId
+     */
     private function getCountryCodeSpoof($cntrs, $cntryId)
     {
         if ($cntrs) {

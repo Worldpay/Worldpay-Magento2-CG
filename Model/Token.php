@@ -122,8 +122,8 @@ class Token
      * Call api to process send request
      *
      * @param SimpleXMLElement $xml
-     * @param string  $username
-     * @param string  $password
+     * @param string $username
+     * @param string $password
      * @return SimpleXMLElement $response
      */
     protected function _sendRequest($xml, $username, $password)
@@ -136,7 +136,7 @@ class Token
     /**
      * Check error while processing the request
      *
-     * @param SimpleXMLElement $xml
+     * @param SimpleXMLElement $response
      * @throws Exception
      */
     protected function _checkForError($response)

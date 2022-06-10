@@ -144,10 +144,11 @@ class SimplePlugin
 
     /**
      * Plugin for:
+     *
      * Check if product can be bought
      *
      * @param \Magento\Catalog\Model\Product\Type\AbstractType $subject
-     * @param $product
+     * @param string $product
      * @return \Magento\Catalog\Model\Product\Type\AbstractType
      * @throws \Magento\Framework\Exception\LocalizedException
      *
@@ -193,12 +194,13 @@ class SimplePlugin
 
     /**
      * Plugin for:
+     *
      * Prepare selected options for product
      *
      * @param \Magento\Catalog\Model\Product\Type\AbstractType $subject
      * @param \Closure $proceed
-     * @param $product
-     * @param $buyRequest
+     * @param string $product
+     * @param string $buyRequest
      * @return array
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -287,7 +289,7 @@ class SimplePlugin
      *
      * @param \Magento\Catalog\Model\Product\Type\AbstractType $subject
      * @param \Closure $proceed
-     * @param $product
+     * @param string $product
      * @return bool
      */
     public function aroundCanConfigure(
@@ -307,6 +309,14 @@ class SimplePlugin
         return $product->getWorldpayRecurringEnabled() && $this->recurringHelper->getProductSubscriptionPlans($product);
     }
     
+    /**
+     * ShowModifiedEndDate:
+     *
+     * @param string|date $startDateDisplay
+     * @param string|date $displayToday
+     * @param string|date $endDate
+     * @return bool
+     */
     public function showModifiedEndDate($startDateDisplay, $displayToday, $endDate)
     {
         $result = false;
@@ -319,6 +329,14 @@ class SimplePlugin
         return $result;
     }
     
+    /**
+     * ModifyStartDate:
+     *
+     * @param string|date $startDate
+     * @param string|date $modifyStartdate
+     * @param string|date $modifyTodaydate
+     * @return bool
+     */
     public function modifyStartDate($startDate, $modifyStartdate, $modifyTodaydate)
     {
         $result = false;

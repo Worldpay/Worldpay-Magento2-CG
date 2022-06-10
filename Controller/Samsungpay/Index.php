@@ -13,9 +13,20 @@ use Magento\Framework\Controller\ResultFactory;
 
 class Index extends \Magento\Framework\App\Action\Action
 {
+    /**
+     * @var \Magento\Quote\Model\QuoteFactory
+     */
     protected $quoteFactory;
     
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
     protected $_storeManager;
+    /**
+     * [$curlHelper description]
+     * @var [type]
+     */
+    protected $curlHelper;
     
     /**
      * @var Magento\Framework\View\Result\PageFactory
@@ -32,6 +43,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Magento\Framework\App\Request\Http $request
      * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
      */
     public function __construct(
         Context $context,
@@ -41,7 +53,8 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Sapient\Worldpay\Helper\CurlHelper $curlHelper
     ) {
         parent::__construct($context);
         $this->wplogger = $wplogger;
@@ -51,8 +64,15 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->request = $request;
         $this->quoteFactory = $quoteFactory;
         $this->_storeManager = $storeManager;
+        $this->curlHelper = $curlHelper;
     }
     
+    /**
+     * Execute action
+     *
+     * @return string
+     * @throws \Exception
+     */
     public function execute()
     {
  
@@ -106,26 +126,23 @@ class Index extends \Magento\Framework\App\Action\Action
         $postFieldsJson = (json_encode($postFields));
               
         try {
-         
-            $curl = curl_init();
-            curl_setopt_array($curl, [
-              CURLOPT_URL => $serviceUrl,
-              CURLOPT_RETURNTRANSFER => true,
-              CURLOPT_ENCODING => "",
-              CURLOPT_MAXREDIRS => 10,
-              CURLOPT_TIMEOUT => 0,
-              CURLOPT_FOLLOWLOCATION => true,
-              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-              CURLOPT_CUSTOMREQUEST => "POST",
-              CURLOPT_POSTFIELDS =>$postFieldsJson,
-              CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json"
-              ],
-            ]);
-
-            $response = curl_exec($curl);
-
-            curl_close($curl);
+            $response = $this->curlHelper->sendCurlRequest(
+                $serviceUrl,
+                [
+                    CURLOPT_URL => $serviceUrl,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "POST",
+                    CURLOPT_POSTFIELDS =>$postFieldsJson,
+                    CURLOPT_HTTPHEADER => [
+                      "Content-Type: application/json"
+                    ],
+                ]
+            );
                 $resultJson = '';
                 $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
                 $resultJson->setData($response);

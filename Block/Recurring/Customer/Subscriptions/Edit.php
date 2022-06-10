@@ -64,7 +64,7 @@ class Edit extends \Magento\Framework\View\Element\Template
      * @param IconsProvider $iconsProvider
      * @param PaymentTokenManagementInterface $tokenManager
      * @param Session $customerSession
-     * @param Data $helper,
+     * @param Data $helper
      * @param array $data
      */
     public function __construct(
@@ -90,6 +90,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Set template to itself
+     *
      * @return $this
      */
     protected function _prepareLayout()
@@ -101,12 +103,20 @@ class Edit extends \Magento\Framework\View\Element\Template
         return $this;
     }
     
+    /**
+     * Retrieve my account labels
+     *
+     * @param string $labelCode
+     * @return array
+     */
     public function getMyAccountLabels($labelCode)
     {
         return $this->recurringHelper->getAccountLabelbyCode($labelCode);
     }
 
     /**
+     * Get subscription by ID
+     *
      * @return Subscription|null
      */
     public function getSubscription()
@@ -125,6 +135,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Return save url for edit form
+     *
      * @return string
      */
     public function getSaveUrl()
@@ -150,6 +162,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Is plan selected?
+     *
      * @param Plan $plan
      * @return bool
      */
@@ -170,6 +184,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get plan amount
+     *
      * @param Plan $plan
      * @return \Magento\Framework\Pricing\Amount\AmountInterface
      */
@@ -181,6 +197,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get plan price
+     *
      * @param Plan $plan
      * @return string
      */
@@ -206,6 +224,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get product
+     *
      * @return \Magento\Catalog\Model\Product|null
      */
     public function getProduct()
@@ -224,6 +244,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get cc form magento init jsos
+     *
      * @return string
      */
     public function getCcFormMageInitJson()
@@ -243,6 +265,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get saved payments
+     *
      * @return array
      */
     public function getSavedPayments()
@@ -276,6 +300,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Retrieve additional details about token
+     *
      * @param PaymentToken $token
      * @return mixed
      */
@@ -285,6 +311,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get payment icon
+     *
      * @param PaymentToken $token
      * @return array
      */
@@ -299,6 +327,7 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
     
     /**
+     * Retrieve regions data json
      *
      * @return string
      */
@@ -308,6 +337,7 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
     
     /**
+     * Return ISO2 country codes, which have optional Zip/Postal pre-configured
      *
      * @param type $asJson
      * @return array|string

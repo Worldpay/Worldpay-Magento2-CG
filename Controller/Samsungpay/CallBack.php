@@ -16,9 +16,21 @@ use Magento\Framework\Controller\ResultFactory;
 class CallBack extends \Magento\Framework\App\Action\Action
 {
 
+    /**
+     * @var \Magento\Sales\Model\OrderFactory
+     */
     protected $orderFactory;
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
     protected $worldpayHelper;
+    /**
+     * @var CheckoutSession
+     */
     protected $_checkoutSession;
+    /**
+     * @var OrderManagementInterface
+     */
     protected $orderManagement;
 
     /**
@@ -41,6 +53,7 @@ class CallBack extends \Magento\Framework\App\Action\Action
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Magento\Sales\Api\OrderManagementInterface $orderManagement
      * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory
+     * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
      */
     public function __construct(
         Context $context,
@@ -55,7 +68,8 @@ class CallBack extends \Magento\Framework\App\Action\Action
         \Magento\Sales\Model\OrderFactory $orderFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Sales\Api\OrderManagementInterface $orderManagement,
-        \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory
+        \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory,
+        \Sapient\Worldpay\Helper\CurlHelper $curlHelper
     ) {
         parent::__construct($context);
         $this->wplogger = $wplogger;
@@ -70,8 +84,15 @@ class CallBack extends \Magento\Framework\App\Action\Action
         $this->_checkoutSession = $checkoutSession;
         $this->orderManagement = $orderManagement;
         $this->_worldpaymentFactory= $worldpaymentFactory;
+        $this->curlHelper = $curlHelper;
     }
     
+    /**
+     * Execute action
+     *
+     * @return string
+     * @throws \Exception
+     */
     public function execute()
     {
 
@@ -112,26 +133,19 @@ class CallBack extends \Magento\Framework\App\Action\Action
         if ($refId != '') {
             try {
 
-                $curl = curl_init();
-
-                curl_setopt_array($curl, [
-                    //CURLOPT_URL => "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions/paymentCredentials/76d8dfa36c5e430e898539?serviceId=9f389a8702a24e33ae3978",
-                    CURLOPT_URL => $serviceUrl,
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => "",
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => "GET",
-                    CURLOPT_HTTPHEADER => [
-                        "serviceId: $serviceId"
+                $json = $this->curlHelper->sendGetCurlRequest(
+                    $serviceUrl,
+                    [
+                        CURLOPT_ENCODING => "",
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1
                     ],
-                ]);
-
-                $json = curl_exec($curl);
-
-                curl_close($curl);
+                    [
+                        "serviceId"=> $serviceId,
+                        "Expect"=> ""
+                    ]
+                );
 
                 $response = json_decode($json, true);
 

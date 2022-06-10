@@ -20,15 +20,33 @@ class PayTest extends TestCase
 {
 
     /**
-     *
-     * @var Pay
+     * [$payObj description]
+     * @var [type]
      */
     protected $payObj;
+    /**
+     * [$context description]
+     * @var [type]
+     */
     protected $context;
+    /**
+     * [$pageFactory description]
+     * @var [type]
+     */
     protected $pageFactory;
+    /**
+     * [$hppstate description]
+     * @var [type]
+     */
     protected $hppstate;
+    /**
+     * [$dataHelper description]
+     * @var [type]
+     */
     protected $dataHelper;
-
+    /**
+     * [setUp description]
+     */
     protected function setUp()
     {
         $this->context = $this->getMockBuilder(Context::class)
@@ -48,7 +66,10 @@ class PayTest extends TestCase
 
         $this->payObj = new Pay($this->context, $this->pageFactory, $this->hppstate, $this->dataHelper, $wplogger);
     }
-
+    /**
+     * [testExecuteIsIframe description]
+     * @return [type] [description]
+     */
     public function testExecuteIsIframe()
     {
         $this->dataHelper->expects($this->any())

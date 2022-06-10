@@ -32,6 +32,7 @@ class ExtendedResponseCodes
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Math\Random $mathRandom
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -190,7 +191,7 @@ class ExtendedResponseCodes
     /**
      * Retrieve merchant detail value from config
      *
-     * @param int $customerGroupId
+     * @param int $wpcode
      * @param null|string|bool|int|Store $store
      * @return float|null
      */

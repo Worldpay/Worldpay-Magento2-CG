@@ -23,8 +23,7 @@ class SalesQuoteCollectTotalsBeforeObserver implements ObserverInterface
     }
 
     /**
-     * Restrict usage of alternative payment options (like customer balance, rewards, etc.) if cart contains
-     * subscription items
+     * Restrict usage of alternative payment options (like customer balance, rewards, etc.)
      *
      * @param \Magento\Framework\Event\Observer $observer
      * @return void

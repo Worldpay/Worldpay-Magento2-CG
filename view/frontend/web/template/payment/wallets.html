@@ -14,7 +14,7 @@
         <input type="radio"
                name="payment[method]"
                class="radio"
-               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"></input>
 
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
         
@@ -50,7 +50,7 @@
                     <div class="paymentmethods-radio-wrapper">
                         <input type="radio"  data-bind="attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
                                         'validate-one-required-by-name':true
-                                                }),id: 'wallets_' + item.ccValue}" name="wallets_type" />
+                                                }),id: 'wallets_' + item.ccValue}" name="wallets_type"></input>
                        <!--ko if: $parent.getIcons(item.ccValue) -->
                             <label data-bind="attr: {for: 'wallets_' + item.ccValue, id: 'wallets_image_' + item.ccValue}"><img data-bind="attr: {
                                         'src': $parent.getIcons(item.ccValue).url,

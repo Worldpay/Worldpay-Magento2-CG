@@ -14,8 +14,6 @@ class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     private $orderFactory;
 
     /**
-     * Fields that should be serialized before persistence
-     *
      * @var array
      */
     protected $_serializableFields = [
@@ -24,9 +22,11 @@ class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     ];
 
     /**
-     * @param \Magento\Framework\Model\ResourceModel\Db\Context $context
-     * @param \Magento\Sales\Model\OrderFactory $orderFactory
-     * @param string $connectionName
+     * [__construct description]
+     *
+     * @param \Magento\Framework\Model\ResourceModel\Db\Context $context        [description]
+     * @param \Magento\Sales\Model\OrderFactory                 $orderFactory   [description]
+     * @param string                                            $connectionName [description]
      */
     public function __construct(
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
@@ -50,8 +50,8 @@ class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     /**
      * Update subscription id in order table
      *
-     * @param $orderId
-     * @param $subscriptionId
+     * @param int $orderId
+     * @param int $subscriptionId
      * @return $this
      */
     public function updateOrderRelation($orderId, $subscriptionId)

@@ -30,6 +30,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
      */
     protected $formKeyValidator;
     
+    /**
+     * @var Sapient\Worldpay\Helper\Data;
+     */
     protected $helper;
 
     /**
@@ -42,8 +45,10 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
      * @param StoreManagerInterface $storeManager
      * @param \Sapient\Worldpay\Model\Token\Service $tokenService
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken
-     * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param PaymentTokenRepositoryInterface $tokenRepository
+     * @param PaymentTokenManagement $paymentTokenManagement
+     * @param MyAccountException $helper
      */
     public function __construct(
         Context $context,
@@ -87,8 +92,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
     public function execute()
     {
         if (!$this->customerSession->isLoggedIn()) {
-            $this->_redirect('customer/account/login');
-            return;
+            $resultRedirect = $this->resultRedirectFactory->create();
+            $resultRedirect->setPath('customer/account/login');
+            return $resultRedirect;
         }
         $validFormKey = $this->formKeyValidator->validate($this->getRequest());
         if ($validFormKey && $this->getRequest()->isPost()) {
@@ -106,28 +112,32 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
             } catch (Exception $e) {
                 $this->wplogger->error($e->getMessage());
                 $this->messageManager->addException($e, __('Error: ').$e->getMessage());
-                $this->_redirect('*/savedcard/edit', ['id' => $this->_getTokenModel()->getId()]);
-                return;
+                $resultRedirect = $this->resultRedirectFactory->create();
+                $resultRedirect->setPath('*/savedcard/edit', ['id' => $this->_getTokenModel()->getId()]);
+                return $resultRedirect;
             }
             if ($tokenUpdateResponse->isSuccess()) {
                 $this->_applyTokenUpdate();
                 $this->_applyVaultTokenUpdate();
             } else {
                 $this->messageManager->addError(__($this->helper->getConfigValue('MCAM7')));
-                $this->_redirect('*/savedcard/edit', ['id' => $this->_getTokenModel()->getId()]);
-                return;
+                $resultRedirect = $this->resultRedirectFactory->create();
+                $resultRedirect->setPath('*/savedcard/edit', ['id' => $this->_getTokenModel()->getId()]);
+                return $resultRedirect;
             }
             if ($tokenInquiryResponse->getTokenCode()) {
                 $this->_applyTokenInquiry($tokenInquiryResponse);
                 $this->_applyVaultTokenUpdate();
             } else {
                 $this->messageManager->addError(__($this->helper->getConfigValue('MCAM7')));
-                $this->_redirect('*/savedcard/edit', ['id' => $this->_getTokenModel()->getId()]);
-                return;
+                $resultRedirect = $this->resultRedirectFactory->create();
+                $resultRedirect->setPath('*/savedcard/edit', ['id' => $this->_getTokenModel()->getId()]);
+                return $resultRedirect;
             }
             $this->messageManager->addSuccess(__($this->helper->getConfigValue('MCAM9')));
-            $this->_redirect('*/savedcard');
-            return;
+            $resultRedirect = $this->resultRedirectFactory->create();
+            $resultRedirect->setPath('*/savedcard');
+            return $resultRedirect;
         }
     }
 
@@ -143,6 +153,8 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
     }
 
     /**
+     * Get token model
+     *
      * @return Sapient/WorldPay/Model/Token
      */
     protected function _getTokenModel()
@@ -161,6 +173,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         return $token;
     }
 
+    /**
+     * Apply vault token update
+     */
     protected function _applyVaultTokenUpdate()
     {
         $existingVaultPaymentToken = $this->paymentTokenManagement->getByGatewayToken(
@@ -171,6 +186,13 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         $this->_saveVaultToken($existingVaultPaymentToken);
     }
 
+    /**
+     * Save vault token
+     *
+     * @param PaymentTokenInterface $vaultToken
+     * @return bool
+     * @throws Exception
+     */
     protected function _saveVaultToken(PaymentTokenInterface $vaultToken)
     {
         $vaultToken->setTokenDetails($this->convertDetailsToJSON([
@@ -187,16 +209,34 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         return true;
     }
 
+    /**
+     * Get expiration month and year
+     *
+     * @param array $token
+     * @return string
+     */
     public function getExpirationMonthAndYear($token)
     {
         return $token->getCardExpiryMonth().'/'.$token->getCardExpiryYear();
     }
 
+    /**
+     * Finding the last four digits by given number
+     *
+     * @param string $number
+     * @return string
+     */
     public function getLastFourNumbers($number)
     {
         return substr($number, -4);
     }
 
+    /**
+     * Convert payment token details to JSON
+     *
+     * @param array $details
+     * @return string
+     */
     private function convertDetailsToJSON($details)
     {
         $json = \Zend_Json::encode($details);
@@ -205,6 +245,8 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
     
     /**
      * Update Saved Card Detail
+     *
+     * @param array $tokenInquiryResponse
      */
     protected function _applyTokenInquiry($tokenInquiryResponse)
     {
@@ -215,6 +257,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
     }
     
     /**
+     * Get token model inquiry
+     *
+     * @param array $tokenInquiryResponse
      * @return Sapient/WorldPay/Model/Token
      */
     protected function _getTokenModelInquiry($tokenInquiryResponse)

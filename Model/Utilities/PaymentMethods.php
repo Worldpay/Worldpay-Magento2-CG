@@ -19,20 +19,25 @@ class PaymentMethods
      * @var string
      */
     protected $_xmlLocation;
-
-    const PAYMENT_METHOD_PATH = '/paymentMethods/';
-    const TYPE_PATH = '/types/';
+    /**
+     * @var PAYMENT_METHOD_PATH
+     */
+    public const PAYMENT_METHOD_PATH = '/paymentMethods/';
+    /**
+     * @var TYPE_PATH
+     */
+    public const TYPE_PATH = '/types/';
 
     /**
-     * Constructor
+     * [__construct description]
      *
-     * @param \Magento\Framework\Module\Dir\Reader $moduleReader
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-     * @param \Magento\Checkout\Model\Session $checkoutsession
-     * @param \Magento\Backend\Model\Session\Quote $adminsessionquote
-     * @param \Magento\Backend\Model\Auth\Session $authSession
+     * @param \Magento\Framework\Module\Dir\Reader               $moduleReader      [description]
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig       [description]
+     * @param \Magento\Store\Model\StoreManagerInterface         $storeManager      [description]
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger            $wplogger          [description]
+     * @param \Magento\Checkout\Model\Session                    $checkoutsession   [description]
+     * @param \Magento\Backend\Model\Session\Quote               $adminsessionquote [description]
+     * @param \Magento\Backend\Model\Auth\Session                $authSession       [description]
      */
     public function __construct(
         \Magento\Framework\Module\Dir\Reader $moduleReader,
@@ -116,6 +121,7 @@ class PaymentMethods
     /**
      * Check payment method exit or not
      *
+     * @param string $paymentMethodNode
      * @return Boolean
      */
     private function _paymentMethodExists($paymentMethodNode)
@@ -283,12 +289,22 @@ class PaymentMethods
         }
         return true;
     }
-
+    /**
+     * [_currencyNodeExists description]
+     *
+     * @param  [type] $node [description]
+     * @return [type]       [description]
+     */
     private function _currencyNodeExists($node)
     {
         return $node && count($node);
     }
-
+    /**
+     * [_typeAllowedForCurrency description]
+     *
+     * @param  \SimpleXMLElement $node [description]
+     * @return [type]                  [description]
+     */
     private function _typeAllowedForCurrency(\SimpleXMLElement $node)
     {
         return $this->_isCurrencyAllowed(
@@ -296,27 +312,48 @@ class PaymentMethods
             $this->_getAvailableCurrencyCodes($node)
         );
     }
-
+    /**
+     * [_getAllowedCurrencies description]
+     *
+     * @return [type] [description]
+     */
     private function _getAllowedCurrencies()
     {
         $currencyCode = $this->_storeManager->getStore()->getCurrentCurrencyCode();
         return [$currencyCode];
     }
-
+    /**
+     * [_getAvailableCurrencyCodes description]
+     *
+     * @param  \SimpleXMLElement $node [description]
+     * @return [type]                  [description]
+     */
     private function _getAvailableCurrencyCodes(\SimpleXMLElement $node)
     {
         $currencies = (array) $node;
 
         return is_array($currencies['currency']) ? $currencies['currency'] : [$currencies['currency']];
     }
-
+    /**
+     * [_isCurrencyAllowed description]
+     *
+     * @param  [type]  $allowedCurrencyCodes   [description]
+     * @param  [type]  $availableCurrencyCodes [description]
+     * @return boolean                         [description]
+     */
     private function _isCurrencyAllowed($allowedCurrencyCodes, $availableCurrencyCodes)
     {
         $matchingCurrencies = array_intersect($allowedCurrencyCodes, $availableCurrencyCodes);
 
         return !empty($matchingCurrencies);
     }
-
+    /**
+     * [checkShipping description]
+     *
+     * @param  [type] $code [description]
+     * @param  [type] $type [description]
+     * @return [type]       [description]
+     */
     public function checkShipping($code, $type)
     {
         if ($xml = $this->_readXML()) {
@@ -330,12 +367,22 @@ class PaymentMethods
         }
         return true;
     }
-
+    /**
+     * [_shippingNodeExists description]
+     *
+     * @param  [type] $node [description]
+     * @return [type]       [description]
+     */
     private function _shippingNodeExists($node)
     {
         return $node && count($node);
     }
-
+    /**
+     * [_typeAllowedForShipping description]
+     *
+     * @param  \SimpleXMLElement $node [description]
+     * @return [type]                  [description]
+     */
     private function _typeAllowedForShipping(\SimpleXMLElement $node)
     {
         return $this->_isShippingAllowed(
@@ -370,14 +417,26 @@ class PaymentMethods
 
         return is_array($areas['ship']) ? $areas['ship'] : [$areas['ship']];
     }
-    
+    /**
+     * [_isShippingAllowed description]
+     *
+     * @param  [type]  $allowedShippingCountries   [description]
+     * @param  [type]  $availableShippingCountries [description]
+     * @return boolean                             [description]
+     */
     private function _isShippingAllowed($allowedShippingCountries, $availableShippingCountries)
     {
         $matchingCountries = array_intersect($allowedShippingCountries, $availableShippingCountries);
 
         return !empty($matchingCountries);
     }
-
+    /**
+     * [checkStopAutoInvoice description]
+     *
+     * @param  [type] $code [description]
+     * @param  [type] $type [description]
+     * @return [type]       [description]
+     */
     public function checkStopAutoInvoice($code, $type)
     {
         if ($xml = $this->_readXML()) {
@@ -391,16 +450,22 @@ class PaymentMethods
         }
         return false;
     }
-
+    /**
+     * [_autoInvoiceNodeExists description]
+     *
+     * @param  [type] $node [description]
+     * @return [type]       [description]
+     */
     private function _autoInvoiceNodeExists($node)
     {
         return $node && count($node);
     }
 
     /**
+     * [_getStopAutoInvoice description]
      *
-     * @param \SimpleXMLElement $node
-     * @return string
+     * @param  \SimpleXMLElement $node [description]
+     * @return [type]                  [description]
      */
     private function _getStopAutoInvoice(\SimpleXMLElement $node)
     {

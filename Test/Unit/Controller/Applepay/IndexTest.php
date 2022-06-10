@@ -17,12 +17,29 @@ use Sapient\Worldpay\Controller\Applepay\Index;
 
 class IndexTest extends TestCase
 {
-
+    /**
+     * [$scopeConfig description]
+     * @var [type]
+     */
     protected $scopeConfig;
+    /**
+     * [$request description]
+     * @var [type]
+     */
     protected $request;
+    /**
+     * [$indexObj description]
+     * @var [type]
+     */
     protected $indexObj;
+    /**
+     * [$objectManagerMock description]
+     * @var [type]
+     */
     protected $objectManagerMock;
-    
+    /**
+     * [setUp description]
+     */
     protected function setUp()
     {
         $context = $this->getMockBuilder(Context::class)
@@ -49,7 +66,10 @@ class IndexTest extends TestCase
             $this->request
         );
     }
-
+    /**
+     * [testExecute description]
+     * @return [type] [description]
+     */
     public function testExecute()
     {
         $this->scopeConfig

@@ -11,8 +11,18 @@ use Sapient\Worldpay\Model\Config\Source\InstalmentCountries;
 
 class CountryColumn extends Select
 {
+    /**
+     * @var InstalmentCountries $instalmentcountries
+     */
     private $instalmentcountries;
      
+    /**
+     * CountryColumn constructor
+     *
+     * @param string $context
+     * @param string $instalmentcountries
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         InstalmentCountries $instalmentcountries,
@@ -22,11 +32,22 @@ class CountryColumn extends Select
         $this->instalmentcountries = $instalmentcountries;
     }
 
+    /**
+     * Set Input Name
+     *
+     * @param string $value
+     * @return Sapient\Worldpay\Block\Adminhtml\Form\Field\InstalmentCountries
+     */
     public function setInputName($value)
     {
         return $this->setName($value . '[]');
     }
 
+    /**
+     * Display Html
+     *
+     * @return string
+     */
     public function _toHtml(): string
     {
         if (!$this->getOptions()) {

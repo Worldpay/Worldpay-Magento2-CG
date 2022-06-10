@@ -6,7 +6,7 @@ namespace Sapient\Worldpay\Controller\Redirectresult;
 
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\Context;
-use Sapient\Worldpay\Model\Payment\StateResponse as PaymentStateResponse;
+use Sapient\Worldpay\Model\Payment\StateResponse;
 
 /**
  * if got notification to get cancel order from worldpay then redirect to  cart page and display the notice
@@ -28,7 +28,9 @@ class Cancel extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Checkout\Service $checkoutservice
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
      * @param \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice
+     * @param \Sapient\Worldpay\Model\Payment\StateResponse $paymentStateResponse
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
      */
     public function __construct(
         Context $context,
@@ -37,7 +39,9 @@ class Cancel extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Checkout\Service $checkoutservice,
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
         \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice,
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+        \Sapient\Worldpay\Model\Payment\StateResponseFactory $paymentStateResponse,
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
     ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
@@ -45,9 +49,16 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $this->checkoutservice = $checkoutservice;
         $this->paymentservice = $paymentservice;
         $this->authenticatinservice = $authenticatinservice;
+        $this->paymentStateResponse = $paymentStateResponse;
+        $this->wpresponse = $wpresponse;
         return parent::__construct($context);
     }
     
+    /**
+     * Execute action
+     *
+     * @return string
+     */
     public function execute()
     {
 
@@ -62,12 +73,18 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $params = $this->getRequest()->getParams();
         if ($this->authenticatinservice->requestAuthenticated($params)) {
             if (isset($params['orderKey'])) {
-                $this->_applyPaymentUpdate(PaymentStateResponse::createFromCancelledResponse($params), $order);
+                $this->_applyPaymentUpdate($this->wpresponse->createFromCancelledResponse($params), $order);
             }
         }
         return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
     }
 
+    /**
+     * Get Cancellation NoticeFor Order
+     *
+     * @param array $order
+     * @return string
+     */
     private function _getCancellationNoticeForOrder($order)
     {
 
@@ -80,6 +97,13 @@ class Cancel extends \Magento\Framework\App\Action\Action
         return $message;
     }
 
+    /**
+     * Apply Payment Update
+     *
+     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
+     * @param Order $order
+     * @throws \Exception
+     */
     private function _applyPaymentUpdate($paymentState, $order)
     {
         try {

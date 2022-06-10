@@ -6,8 +6,10 @@
 namespace Sapient\Worldpay\Controller\Recurring;
 
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Action\HttpGetActionInterface as HttpGetActionInterface;
+use Magento\Framework\Controller\ResultFactory;
 
-class Index extends \Magento\Framework\App\Action\Action
+class Index extends \Magento\Framework\App\Action\Action implements HttpGetActionInterface
 {
     /**
      * @var \Magento\Customer\Model\Session
@@ -52,8 +54,8 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        $this->_view->loadLayout();
-        $this->_view->getPage()->getConfig()->getTitle()->set($this->worldpayHelper->getAccountLabelbyCode('AC12'));
-        $this->_view->renderLayout();
+        $resultPage = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
+        $resultPage->getConfig()->getTitle()->set($this->worldpayHelper->getAccountLabelbyCode('AC12'));
+        return $resultPage;
     }
 }

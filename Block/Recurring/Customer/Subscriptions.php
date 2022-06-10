@@ -78,6 +78,12 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
         return $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/endDate');
     }
     
+    /**
+     * Retrieve my account labels
+     *
+     * @param string $labelCode
+     * @return array
+     */
     public function getMyAccountLabels($labelCode)
     {
         return $this->recurringHelper->getAccountLabelbyCode($labelCode);
@@ -123,6 +129,8 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get pagination html
+     *
      * @return string
      */
     public function getPaginationHtml()
@@ -133,6 +141,7 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
     /**
      * Get order id column value
      *
+     * @param Subscription $subscription
      * @return string
      */
     public function getOrderIdLabel(Subscription $subscription)
@@ -149,6 +158,8 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Retrieve edit url
+     *
      * @param Subscription $subscription
      * @return string
      */
@@ -158,6 +169,8 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
     }
     
     /**
+     * Retrieve cancel url
+     *
      * @param Subscription $subscription
      * @return string
      */
@@ -172,6 +185,12 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
         );
     }
     
+    /**
+     * Get my account specific exception
+     *
+     * @param string $exceptioncode
+     * @return string
+     */
     public function getMyAccountSpecificException($exceptioncode)
     {
         return $this->recurringHelper->getMyAccountExceptions($exceptioncode);

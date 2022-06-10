@@ -14,9 +14,21 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      * @var string
      */
     protected $_code = 'worldpay_wallets';
+    /**
+     * @var string
+     */
     protected $_isGateway = true;
+    /**
+     * @var string
+     */
     protected $_canAuthorize = true;
+    /**
+     * @var string
+     */
     protected $_canUseInternal = false;
+    /**
+     * @var string
+     */
     protected $_canUseCheckout = true;
 
     /**

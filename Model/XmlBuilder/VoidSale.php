@@ -9,26 +9,47 @@ namespace Sapient\Worldpay\Model\XmlBuilder;
  */
 class VoidSale
 {
-    const ROOT_ELEMENT = <<<EOD
+    public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * [$merchantCode description]
+     * @var [type]
+     */
     private $merchantCode;
+    /**
+     * [$orderCode description]
+     * @var [type]
+     */
     private $orderCode;
+    /**
+     * [$currencyCode description]
+     * @var [type]
+     */
     private $currencyCode;
+    /**
+     * [$amount description]
+     * @var [type]
+     */
     private $amount;
+    /**
+     * [$exponent description]
+     * @var [type]
+     */
     private $exponent;
     
     /**
-     * Build xml for processing Request
+     * [build description]
      *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param string $currencyCode
-     * @param float $amount
-     * @param float $exponent
-     * @return SimpleXMLElement $xml
+     * @param  [type] $merchantCode [description]
+     * @param  [type] $orderCode    [description]
+     * @param  [type] $currencyCode [description]
+     * @param  [type] $amount       [description]
+     * @param  [type] $exponent     [description]
+     * @param  [type] $paymentType  [description]
+     * @return [type]               [description]
      */
     public function build($merchantCode, $orderCode, $currencyCode, $amount, $exponent, $paymentType = null)
     {

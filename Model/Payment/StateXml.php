@@ -7,8 +7,9 @@ namespace Sapient\Worldpay\Model\Payment;
 /**
  * Reading xml
  */
-class StateXml implements \Sapient\Worldpay\Model\Payment\State
+class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
 {
+    /** @var xml */
     private $_xml;
     /**
      * Constructor
@@ -247,7 +248,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
         $statusNode = $this->_getStatusNode();
 
         foreach ($statusNode->journal as $journal) {
-            if ($journal['journalType'] == \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_REFUND) {
+            if ($journal['journalType'] == \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_REFUND) {
                 foreach ($journal->accountTx as $account) {
                     if ($account['accountType'] == "IN_PROCESS_CAPTURED") {
                         $amount = $account->amount['value'];

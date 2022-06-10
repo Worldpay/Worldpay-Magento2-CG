@@ -10,12 +10,20 @@ namespace Sapient\Worldpay\Model\XmlBuilder;
 class Inquiry
 {
 
-    const ROOT_ELEMENT = <<<EOD
+    public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * [$merchantCode description]
+     * @var [type]
+     */
     private $merchantCode;
+    /**
+     * [$orderCode description]
+     * @var [type]
+     */
     private $orderCode;
 
     /**

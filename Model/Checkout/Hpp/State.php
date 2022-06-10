@@ -9,8 +9,8 @@ use Exception;
 
 class State
 {
-    const SESSION_KEY_STATE = 'worldpay_hpp_state';
-    const SESSION_KEY_URL = 'worldpay_hpp_redirect_url';
+    public const SESSION_KEY_STATE = 'worldpay_hpp_state';
+    public const SESSION_KEY_URL = 'worldpay_hpp_redirect_url';
 
     /**
      * State constructor
@@ -23,12 +23,18 @@ class State
 
         $this->session = $checkoutsession;
     }
-    
+
+    /**
+     * IsUninitialised
+     */
     public function isUninitialised()
     {
         return !$this->session->hasData(self::SESSION_KEY_STATE);
     }
-    
+
+    /**
+     * IsInitialised
+     */
     public function isInitialised()
     {
         return $this->session->getData(self::SESSION_KEY_STATE) === 'initialised';
@@ -93,7 +99,10 @@ class State
 
         return $this->session->getData(self::SESSION_KEY_URL);
     }
-    
+
+    /**
+     * ValidateInitializesState
+     */
     private function validateInitializesState()
     {
         if (!$this->isInitialised()) {

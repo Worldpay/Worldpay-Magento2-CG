@@ -11,6 +11,7 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
    
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Model\Mapping\Service $mappingservice
      * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
@@ -29,8 +30,12 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
     }
     
     /**
-     * handles provides authorization data for redirect
+     * Handles provides authorization data for redirect
+     *
      * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
+     *
+     * @param int|string $countryId
+     * @param int|string $paymenttype
      */
     public function collectPaymentOptions(
         $countryId,

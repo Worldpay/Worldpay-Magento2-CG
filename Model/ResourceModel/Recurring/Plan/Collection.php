@@ -8,8 +8,6 @@ namespace Sapient\Worldpay\Model\ResourceModel\Recurring\Plan;
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
     /**
-     * Store manager
-     *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManager;
@@ -71,7 +69,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     /**
      * Filter collection by product id
      *
-     * @param $productId
+     * @param int $productId
      * @return $this
      */
     public function addProductIdFilter($productId)

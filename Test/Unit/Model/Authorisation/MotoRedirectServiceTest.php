@@ -29,11 +29,30 @@ class MotoRedirectServiceTest extends TestCase
      * @var HostedPaymentPageService
      */
     protected $motoObj;
+    /**
+     *
+     * @var HostedPaymentPageService
+     */
     protected $checkoutsession;
+    /**
+     *
+     * @var HostedPaymentPageService
+     */
     protected $mappingservice;
+    /**
+     *
+     * @var HostedPaymentPageService
+     */
     protected $paymentservicerequest;
+    /**
+     *
+     * @var HostedPaymentPageService
+     */
     protected $registryhelper;
 
+/**
+ * [setUp description]
+ */
     protected function setUp()
     {
         $this->mappingservice = $this->getMockBuilder(Service::class)
@@ -76,7 +95,11 @@ class MotoRedirectServiceTest extends TestCase
             $paymentMethods
         );
     }
-
+/**
+ * [testAuthorizePayment description]
+ *
+ * @return [type] [description]
+ */
     public function testAuthorizePayment()
     {
 

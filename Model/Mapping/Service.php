@@ -7,9 +7,17 @@ use Magento\Framework\Session\SessionManagerInterface;
 
 class Service
 {
-
+    /**
+     * @var Logger
+     */
     protected $_logger;
+    /**
+     * @var SavedTokenFactory
+     */
     protected $savedTokenFactory;
+    /**
+     * @var ScopeConfig
+     */
     protected $_scopeConfig;
     /**
      * Declare varaible
@@ -17,15 +25,15 @@ class Service
      * @var SessionManagerInterface
      */
     protected $session;
-    const THIS_TRANSACTION = 'thisTransaction';
-    const LESS_THAN_THIRTY_DAYS = 'lessThanThirtyDays';
-    const THIRTY_TO_SIXTY_DAYS = 'thirtyToSixtyDays';
-    const MORE_THAN_SIXTY_DAYS = 'moreThanSixtyDays';
-    const DURING_TRANSACTION = 'duringTransaction';
-    const CREATED_DURING_TRANSACTION = 'createdDuringTransaction';
-    const CHANGED_DURING_TRANSACTION = 'changedDuringTransaction';
-    const NO_ACCOUNT = 'noAccount';
-    const NO_CHANGE = 'noChange';
+    public const THIS_TRANSACTION = 'thisTransaction';
+    public const LESS_THAN_THIRTY_DAYS = 'lessThanThirtyDays';
+    public const THIRTY_TO_SIXTY_DAYS = 'thirtyToSixtyDays';
+    public const MORE_THAN_SIXTY_DAYS = 'moreThanSixtyDays';
+    public const DURING_TRANSACTION = 'duringTransaction';
+    public const CREATED_DURING_TRANSACTION = 'createdDuringTransaction';
+    public const CHANGED_DURING_TRANSACTION = 'changedDuringTransaction';
+    public const NO_ACCOUNT = 'noAccount';
+    public const NO_CHANGE = 'noChange';
 
     /**
      * Constructor
@@ -61,7 +69,15 @@ class Service
         $this->session = $session;
         $this->_scopeConfig = $scopeConfig;
     }
-    
+
+    /**
+     * CollectVaultOrderParameters
+     *
+     * @param string|int $orderCode
+     * @param string|int $quote
+     * @param string|int $orderStoreId
+     * @param string|int $paymentDetails
+     */
     public function collectVaultOrderParameters(
         $orderCode,
         $quote,
@@ -101,6 +117,14 @@ class Service
         ];
     }
 
+    /**
+     * CollectDirectOrderParameters
+     *
+     * @param string|int $orderCode
+     * @param string|int $quote
+     * @param string|int $orderStoreId
+     * @param string|int $paymentDetails
+     */
     public function collectDirectOrderParameters(
         $orderCode,
         $quote,
@@ -240,7 +264,15 @@ class Service
                 );
         return $exemptionEngine;
     }
-     
+
+    /**
+     * CollectRedirectOrderParameters
+     *
+     * @param string|int $orderCode
+     * @param string|int $quote
+     * @param string|int $orderStoreId
+     * @param string $paymentDetails
+     */
     public function collectRedirectOrderParameters(
         $orderCode,
         $quote,
@@ -309,6 +341,14 @@ class Service
             ];
     }
 
+    /**
+     * CollectKlarnaOrderParameters
+     *
+     * @param string|int $orderCode
+     * @param string|int $quote
+     * @param string|int $orderStoreId
+     * @param string $paymentDetails
+     */
     public function collectKlarnaOrderParameters(
         $orderCode,
         $quote,
@@ -355,6 +395,14 @@ class Service
         ];
     }
 
+    /**
+     * CollectTokenOrderParameters
+     *
+     * @param string|int $orderCode
+     * @param string|int $quote
+     * @param string|int $orderStoreId
+     * @param string $paymentDetails
+     */
     public function collectTokenOrderParameters(
         $orderCode,
         $quote,
@@ -421,6 +469,14 @@ class Service
             ];
     }
     
+    /**
+     * CollectACHOrderParameters
+     *
+     * @param string|int $orderCode
+     * @param string|int $quote
+     * @param string|int $orderStoreId
+     * @param string $paymentDetails
+     */
     public function collectACHOrderParameters(
         $orderCode,
         $quote,
@@ -470,11 +526,10 @@ class Service
     }
 
     /**
-     * Collect payment options
+     * CollectPaymentOptionsParameters
      *
-     * @param string $countryId
-     * @param string $paymenttype
-     * @return array
+     * @param string|int $countryId
+     * @param string|int $paymenttype
      */
     public function collectPaymentOptionsParameters(
         $countryId,
@@ -828,7 +883,15 @@ class Service
         $remoteAddresses = explode(',', $REMOTE_ADDR);
         return trim($remoteAddresses[0]);
     }
-    
+
+    /**
+     * CollectWalletOrderParameters
+     *
+     * @param string|int $orderCode
+     * @param string|int $quote
+     * @param string|int $orderStoreId
+     * @param string|int $paymentDetails
+     */
     public function collectWalletOrderParameters(
         $orderCode,
         $quote,
@@ -1032,6 +1095,13 @@ class Service
         return false;
     }
     
+    /**
+     * GetShopperAccountAgeIndicator
+     *
+     * @param string|int $fromDate
+     * @param string|int $toDate
+     * @param string|int $differenceFormat
+     */
     public function getShopperAccountAgeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -1051,6 +1121,13 @@ class Service
         }
     }
     
+    /**
+     * GetShopperAccountChangeIndicator
+     *
+     * @param string|int $fromDate
+     * @param string|int $toDate
+     * @param string|int $differenceFormat
+     */
     public function getShopperAccountChangeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -1068,6 +1145,13 @@ class Service
         }
     }
     
+    /**
+     * GetShopperAccountPasswordChangeIndicator
+     *
+     * @param string|int $fromDate
+     * @param string|int $toDate
+     * @param string|int $differenceFormat
+     */
     public function getShopperAccountPasswordChangeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -1087,6 +1171,13 @@ class Service
         }
     }
     
+    /**
+     * GetShopperAccountShippingAddressUsageIndicator
+     *
+     * @param string|int $fromDate
+     * @param string|int $toDate
+     * @param string|int $differenceFormat
+     */
     public function getShopperAccountShippingAddressUsageIndicator(
         $fromDate,
         $toDate,
@@ -1107,6 +1198,13 @@ class Service
         }
     }
     
+    /**
+     * GetShopperAccountPaymentAccountIndicator
+     *
+     * @param string|int $fromDate
+     * @param string|int $toDate
+     * @param string|int $differenceFormat
+     */
     public function getShopperAccountPaymentAccountIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -1154,8 +1252,9 @@ class Service
     }
     
     /**
-     *
      * Get customer DOB
+     *
+     * @param string|int $customer
      */
     public function getCustomerDOB($customer)
     {

@@ -46,6 +46,12 @@ class Pay extends \Magento\Framework\App\Action\Action
         return parent::__construct($context);
     }
     
+    /**
+     * Execute action
+     *
+     * @return string
+     * @throws \Exception
+     */
     public function execute()
     {
 
@@ -55,6 +61,11 @@ class Pay extends \Magento\Framework\App\Action\Action
         return $this->pageFactory->create();
     }
 
+    /**
+     * Get hosted payment page status
+     *
+     * @return \Sapient\Worldpay\Model\Checkout\Hpp\State
+     */
     protected function _getStatus()
     {
         if ($this->_status === null) {

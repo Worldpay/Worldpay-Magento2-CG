@@ -11,32 +11,121 @@ use Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecureConfig;
  */
 class RedirectOrder
 {
-    const DYNAMIC3DS_DO3DS = 'do3DS';
-    const DYNAMIC3DS_NO3DS = 'no3DS';
-    const TOKEN_SCOPE = 'shopper';
-    const ROOT_ELEMENT = <<<EOD
+   
+    /**
+     * @var DYNAMIC3DS_DO3DS
+     */
+    public const DYNAMIC3DS_DO3DS = 'do3DS';
+    /**
+     * @var DYNAMIC3DS_NO3DS
+     */
+    public const DYNAMIC3DS_NO3DS = 'no3DS';
+    /**
+     * @var TOKEN_SCOPE
+     */
+    public const TOKEN_SCOPE = 'shopper';
+    /**
+     * @var ROOT_ELEMENT
+     */
+    public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * [$merchantCode description]
+     * @var [type]
+     */
     private $merchantCode;
+    /**
+     * [$orderCode description]
+     * @var [type]
+     */
     private $orderCode;
+    /**
+     * [$orderDescription description]
+     * @var [type]
+     */
     private $orderDescription;
+    /**
+     * [$currencyCode description]
+     * @var [type]
+     */
     private $currencyCode;
+    /**
+     * [$amount description]
+     * @var [type]
+     */
     private $amount;
+    /**
+     * [$paymentType description]
+     * @var [type]
+     */
     private $paymentType;
+    /**
+     * [$shopperEmail description]
+     * @var [type]
+     */
     private $shopperEmail;
+    /**
+     * [$statementNarrative description]
+     * @var [type]
+     */
     private $statementNarrative;
+    /**
+     * [$acceptHeader description]
+     * @var [type]
+     */
     private $acceptHeader;
+    /**
+     * [$userAgentHeader description]
+     * @var [type]
+     */
     private $userAgentHeader;
+    /**
+     * [$shippingAddress description]
+     * @var [type]
+     */
     private $shippingAddress;
+    /**
+     * [$billingAddress description]
+     * @var [type]
+     */
     private $billingAddress;
+    /**
+     * [$paymentPagesEnabled description]
+     * @var [type]
+     */
     private $paymentPagesEnabled;
+    /**
+     * [$installationId description]
+     * @var [type]
+     */
     private $installationId;
+    /**
+     * [$hideAddress description]
+     * @var [type]
+     */
     private $hideAddress;
+    /**
+     * [$thirdparty description]
+     * @var [type]
+     */
     private $thirdparty;
+    /**
+     * [$shippingfee description]
+     * @var [type]
+     */
     private $shippingfee;
+    /**
+     * [$exponent description]
+     * @var [type]
+     */
     private $exponent;
+    /**
+     * [$cusDetails description]
+     * @var [type]
+     */
     private $cusDetails;
 
     /**
@@ -64,25 +153,29 @@ EOD;
     }
     
     /**
-     * Build xml for processing Request
+     * [build description]
      *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param string $orderDescription
-     * @param string $currencyCode
-     * @param float $amount
-     * @param string $paymentType
-     * @param $shopperEmail
-     * @param $statementNarrative
-     * @param string $acceptHeader
-     * @param string $userAgentHeader
-     * @param string $shippingAddress
-     * @param string $billingAddress
-     * @param float $paymentPagesEnabled
-     * @param string $installationId
-     * @param $hideAddress
-     * @param array $paymentDetails
-     * @return SimpleXMLElement $xml
+     * @param  [type] $merchantCode        [description]
+     * @param  [type] $orderCode           [description]
+     * @param  [type] $orderDescription    [description]
+     * @param  [type] $currencyCode        [description]
+     * @param  [type] $amount              [description]
+     * @param  [type] $paymentType         [description]
+     * @param  [type] $shopperEmail        [description]
+     * @param  [type] $statementNarrative  [description]
+     * @param  [type] $acceptHeader        [description]
+     * @param  [type] $userAgentHeader     [description]
+     * @param  [type] $shippingAddress     [description]
+     * @param  [type] $billingAddress      [description]
+     * @param  [type] $paymentPagesEnabled [description]
+     * @param  [type] $installationId      [description]
+     * @param  [type] $hideAddress         [description]
+     * @param  [type] $paymentDetails      [description]
+     * @param  [type] $thirdparty          [description]
+     * @param  [type] $shippingfee         [description]
+     * @param  [type] $exponent            [description]
+     * @param  [type] $cusDetails          [description]
+     * @return [type]                      [description]
      */
     public function build(
         $merchantCode,
@@ -409,8 +502,10 @@ EOD;
     }
 
     /**
-     * @param float $amount
-     * @return int
+     * [_amountAsInt description]
+     *
+     * @param  [type] $amount [description]
+     * @return [type]         [description]
      */
     private function _amountAsInt($amount)
     {
@@ -448,13 +543,18 @@ EOD;
             $tokenNode['tokenScope'] = 'merchant';
         }
         if (isset($this->paymentDetails['ccIntegrationMode']) &&
-            $this->paymentDetails['ccIntegrationMode'] == "redirect" && $this->paymentDetails['paymentPagesEnabled']) {
+            $this->paymentDetails['ccIntegrationMode'] == "redirect") {
             $tokenNode['captureCvc'] = "true";
         }
         
         $tokenNode->addChild('paymentTokenID', $this->paymentDetails['tokenCode']);
     }
-    
+
+    /**
+     * [_addThirdPartyData description]
+     *
+     * @param [type] $order [description]
+     */
     protected function _addThirdPartyData($order)
     {
         $thirdparty = $order->addChild('thirdPartyData');
@@ -471,7 +571,12 @@ EOD;
         }
         return $thirdparty;
     }
-    
+
+    /**
+     * [_addFraudSightData description]
+     *
+     * @param [type] $order [description]
+     */
     private function _addFraudSightData($order)
     {
         $fraudsightData = $order->addChild('FraudSightData');

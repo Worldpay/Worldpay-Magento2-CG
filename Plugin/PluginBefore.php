@@ -32,7 +32,14 @@ class PluginBefore
         $this->request = $request;
         $this->worldpayHelper = $worldpayHelper;
     }
-
+    /**
+     * [beforePushButtons description]
+     *
+     * @param  ToolbarContext                                  $toolbar    [description]
+     * @param  \Magento\Framework\View\Element\AbstractBlock   $context    [description]
+     * @param  \Magento\Backend\Block\Widget\Button\ButtonList $buttonList [description]
+     * @return [type]                                                      [description]
+     */
     public function beforePushButtons(
         ToolbarContext $toolbar,
         \Magento\Framework\View\Element\AbstractBlock $context,
@@ -90,7 +97,12 @@ class PluginBefore
 
         return [$context, $buttonList];
     }
-    
+    /**
+     * [getOrderDateDetails description]
+     *
+     * @param  [type] $order [description]
+     * @return [type]        [description]
+     */
     public function getOrderDateDetails($order)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -107,7 +119,12 @@ class PluginBefore
         
         return false;
     }
-    
+    /**
+     * [getPaymentType description]
+     *
+     * @param  [type] $orderid [description]
+     * @return [type]          [description]
+     */
     public function getPaymentType($orderid)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -115,7 +132,12 @@ class PluginBefore
         $worldpaydata=$worldpaymodel->loadByPaymentId($orderid);
         return $worldpaydata->getPaymentType();
     }
-    
+    /**
+     * [checkEligibilityForVoidSale description]
+     *
+     * @param  [type] $order [description]
+     * @return [type]        [description]
+     */
     public function checkEligibilityForVoidSale($order)
     {
         $data = $order->getData();
@@ -131,7 +153,12 @@ class PluginBefore
             }
         }
     }
-    
+    /**
+     * [isPrimeRoutingRequest description]
+     *
+     * @param  [type]  $orderid [description]
+     * @return boolean          [description]
+     */
     public function isPrimeRoutingRequest($orderid)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -142,7 +169,13 @@ class PluginBefore
             return true;
         }
     }
-    
+    /**
+     * [removeShipmentButton description]
+     *
+     * @param  [type] $order      [description]
+     * @param  [type] $buttonList [description]
+     * @return [type]             [description]
+     */
     public function removeShipmentButton($order, $buttonList)
     {
         $orderStatus = $order->getStatus();

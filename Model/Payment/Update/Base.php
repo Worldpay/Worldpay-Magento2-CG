@@ -12,24 +12,24 @@ use \Magento\Framework\Exception\LocalizedException;
 class Base
 {
 
-    /** @var \Sapient\Worldpay\Model\Payment\State */
+    /** @var \Sapient\Worldpay\Model\Payment\StateInterface */
     protected $_paymentState;
 
     /** @var \Sapient\Worldpay\Model\Payment\WorldPayPayment */
     protected $_worldPayPayment;
 
-    const STATUS_PROCESSING = 'processing';
-    const STATUS_CANCELLED = 'cancelled';
-    const STATUS_CLOSED = 'closed';
+    public const STATUS_PROCESSING = 'processing';
+    public const STATUS_CANCELLED = 'cancelled';
+    public const STATUS_CLOSED = 'closed';
 
     /**
      * Constructor
      *
-     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
+     * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      */
     public function __construct(
-        \Sapient\Worldpay\Model\Payment\State $paymentState,
+        \Sapient\Worldpay\Model\Payment\StateInterface $paymentState,
         \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
     ) {
 

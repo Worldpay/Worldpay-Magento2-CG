@@ -33,8 +33,11 @@ class AdminLabels
     private $serializer;
     
     /**
+     * AdminLabels constructor
+     *
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Math\Random $mathRandom
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -194,7 +197,7 @@ class AdminLabels
     /**
      * Retrieve merchant detail value from config
      *
-     * @param int $customerGroupId
+     * @param string $wplabelcode
      * @param null|string|bool|int|Store $store
      * @return float|null
      */

@@ -13,6 +13,7 @@ namespace Sapient\Worldpay\Ui\Component\Listing\Column;
  *
  * @author aatrai
  */
+
 use \Magento\Sales\Api\OrderRepositoryInterface;
 use \Magento\Ui\Component\Listing\Columns\Column;
 use \Magento\Framework\View\Element\UiComponent\ContextInterface;
@@ -23,10 +24,32 @@ use Sapient\Worldpay\Helper\Data;
 
 class FraudisightMessage extends Column
 {
+    /**
+     * @var _worldpaypayment
+     */
     protected $_worldpaypayment;
+    /**
+     * @var _searchCriteria
+     */
     protected $_searchCriteria;
+    /**
+     * @var _orderRepository
+     */
     protected $_orderRepository;
-    
+
+    /**
+     * Constructor
+     *
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param OrderRepositoryInterface $orderRepository
+     * @param Worldpayment $_worldpaypayment
+     * @param SearchCriteriaBuilder $criteria
+     * @param Data $helper
+     * @param Data $components
+     * @param Data $data
+     */
+
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
@@ -43,7 +66,12 @@ class FraudisightMessage extends Column
         $this->helper = $helper;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
-    
+    /**
+     * Prepare DataSource
+     *
+     * @param array $dataSource
+     */
+
     public function prepareDataSource(array $dataSource)
     {
         if (isset($dataSource['data']['items'])) {
@@ -64,6 +92,7 @@ class FraudisightMessage extends Column
     }
     /**
      * Prepare component configuration
+     *
      * @return void
      */
     public function prepare()

@@ -7,11 +7,11 @@ namespace Sapient\Worldpay\Model\Config\Source;
 
 class Interval extends AbstractArraySource
 {
-    const ANNUAL = 'ANNUAL';
-    const SEMIANNUAL = 'SEMIANNUAL';
-    const QUARTERLY = 'QUARTERLY';
-    const MONTHLY = 'MONTHLY';
-    const WEEKLY = 'WEEKLY';
+    public const ANNUAL = 'ANNUAL';
+    public const SEMIANNUAL = 'SEMIANNUAL';
+    public const QUARTERLY = 'QUARTERLY';
+    public const MONTHLY = 'MONTHLY';
+    public const WEEKLY = 'WEEKLY';
 
     /**
      * @inheritdoc

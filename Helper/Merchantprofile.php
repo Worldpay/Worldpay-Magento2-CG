@@ -25,10 +25,20 @@ class Merchantprofile
     protected $mathRandom;
 
     /**
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\Math\Random $mathRandom
+     */
+    
+    /**
      * @var SerializerInterface
      */
     private $serializer;
     
+    /**
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\Math\Random $mathRandom
+     * @param SerializerInterface $serializer
+     */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Math\Random $mathRandom,
@@ -189,7 +199,7 @@ class Merchantprofile
     /**
      * Retrieve merchant detail value from config
      *
-     * @param int $customerGroupId
+     * @param int $paymenttype
      * @param null|string|bool|int|Store $store
      * @return float|null
      */

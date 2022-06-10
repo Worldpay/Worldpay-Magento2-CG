@@ -15,6 +15,9 @@ class LatAmInstalTypes implements LatAmInstalInterface
      */
     protected $scopeConfig;
     
+    /**
+     * @var $configHelper
+     */
     protected $configHelper;
     /**
      * Constructor
@@ -30,6 +33,11 @@ class LatAmInstalTypes implements LatAmInstalInterface
         $this->configHelper = $configHelper;
     }
     
+    /**
+     * GetInstalmentType
+     *
+     * @param string|int $countryid
+     */
     public function getInstalmentType($countryid)
     {
         $value = $this->configHelper->getConfigTypeForCountry($countryid);

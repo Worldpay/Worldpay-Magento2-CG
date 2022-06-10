@@ -8,8 +8,9 @@ use Exception;
 
 class WalletService extends \Magento\Framework\DataObject
 {
-
+    /** @var $checkoutSession */
     protected $checkoutSession;
+    /** @var $updateWorldPayPayment */
     protected $updateWorldPayPayment;
     
     /**
@@ -51,8 +52,16 @@ class WalletService extends \Magento\Framework\DataObject
     }
     
     /**
-     * handles provides authorization data for redirect
+     * Handles provides authorization data for redirect
+     *
      * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
+     *
+     * @param string $mageOrder
+     * @param string $quote
+     * @param string|int $orderCode
+     * @param string|int $orderStoreId
+     * @param string $paymentDetails
+     * @param string $payment
      */
     public function authorizePayment(
         $mageOrder,
@@ -112,7 +121,10 @@ class WalletService extends \Magento\Framework\DataObject
             $this->_applyPaymentUpdate($directResponse, $payment);
         }
     }
-     // get 3ds2 params from the configuration and set to checkout session
+
+    /**
+     * Get 3ds2 params from the configuration and set to checkout session
+     */
     public function get3DS2ConfigValues()
     {
         $data = [];
@@ -131,6 +143,13 @@ class WalletService extends \Magento\Framework\DataObject
         return $data;
     }
     
+    /**
+     * Handle3DSecure
+     *
+     * @param string $threeDSecureParams
+     * @param string $directOrderParams
+     * @param int|string $mageOrderId
+     */
     private function _handle3DSecure($threeDSecureParams, $directOrderParams, $mageOrderId)
     {
         $this->registryhelper->setworldpayRedirectUrl($threeDSecureParams);
@@ -139,6 +158,14 @@ class WalletService extends \Magento\Framework\DataObject
         $this->checkoutSession->setAuthOrderId($mageOrderId);
     }
     
+    /**
+     * Handle3Ds2
+     *
+     * @param string $threeDSecureChallengeParams
+     * @param string $directOrderParams
+     * @param int|string $mageOrderId
+     * @param int|string $threeDSecureConfig
+     */
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)
     {
         $this->registryhelper->setworldpayRedirectUrl($threeDSecureChallengeParams);
@@ -149,10 +176,10 @@ class WalletService extends \Magento\Framework\DataObject
     }
     
     /**
-     * Method to apply payment update
+     * ApplyPaymentUpdate
      *
      * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param string $payment
      */
     private function _applyPaymentUpdate(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
@@ -163,6 +190,11 @@ class WalletService extends \Magento\Framework\DataObject
         $this->_abortIfPaymentError($paymentUpdate);
     }
 
+    /**
+     * AbortIfPaymentError
+     *
+     * @param string $paymentUpdate
+     */
     private function _abortIfPaymentError($paymentUpdate)
     {
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Refused) {

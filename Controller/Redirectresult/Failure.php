@@ -47,7 +47,8 @@ class Failure extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         SubscriptionFactory $subscriptionFactory,
         TransactionsFactory $transactionsFactory,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender
     ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
@@ -55,9 +56,15 @@ class Failure extends \Magento\Framework\App\Action\Action
         $this->subscriptionFactory = $subscriptionFactory;
         $this->transactionsFactory = $transactionsFactory;
         $this->checkoutSession = $checkoutSession;
+        $this->emailsender = $emailsender;
         return parent::__construct($context);
     }
     
+    /**
+     * Execute action
+     *
+     * @return string
+     */
     public function execute()
     {
         $this->wplogger->info('worldpay returned failure url');
@@ -85,9 +92,17 @@ class Failure extends \Magento\Framework\App\Action\Action
                 $transactions->delete();
             }
         }
+        // send Payment Fail Email
+        $this->emailsender->authorisedEmailSend($magentoorder, false);
         return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
     }
 
+    /**
+     * Get failure notice for order
+     *
+     * @param Order $order
+     * @return string
+     */
     private function _getFailureNoticeForOrder($order)
     {
         return __('Order #'.$order->getIncrementId().' Failed');

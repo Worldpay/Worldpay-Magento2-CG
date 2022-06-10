@@ -3,11 +3,35 @@ namespace Sapient\Worldpay\Controller\Cartdetails;
 
 class Chromepay extends \Magento\Framework\App\Action\Action
 {
+    /**
+     * @var Magento\Framework\View\Result\PageFactory
+     */
     protected $_pageFactory;
+    /**
+     * @var RequestInterface
+     */
     protected $_request;
+    /**
+     * Worldpay Payment Service Request
+     *
+     * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+     **/
     protected $_paymentservicerequest;
+    /**
+     * @var \Magento\Backend\Model\Auth\Session
+     */
     protected $_authSession;
     
+    /**
+     * Chromepay constructor
+     *
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $pageFactory
+     * @param \Magento\Framework\App\Request\Http $request
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Magento\Backend\Model\Auth\Session $authSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $pageFactory,
@@ -24,6 +48,12 @@ class Chromepay extends \Magento\Framework\App\Action\Action
         return parent::__construct($context);
     }
 
+    /**
+     * Execute action
+     *
+     * @return string
+     * @throws \Exception
+     */
     public function execute()
     {
             $data = $this->getRequest()->getParams();

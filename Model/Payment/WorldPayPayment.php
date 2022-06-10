@@ -26,9 +26,9 @@ class WorldPayPayment
     /**
      * Updating Risk gardian
      *
-     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
+     * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
      */
-    public function updateWorldpayPayment(\Sapient\Worldpay\Model\Payment\State $paymentState)
+    public function updateWorldpayPayment(\Sapient\Worldpay\Model\Payment\StateInterface $paymentState)
     {
          $wpp = $this->worldpaypayment->create();
 
@@ -71,10 +71,12 @@ class WorldPayPayment
      * Update prime routing data
      *
      * @param InfoInterface $payment
-     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
+     * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
      */
-    public function updatePrimeroutingData(InfoInterface $payment, \Sapient\Worldpay\Model\Payment\State $paymentState)
-    {
+    public function updatePrimeroutingData(
+        InfoInterface $payment,
+        \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
+    ) {
         $wpp = $this->worldpaypayment->create();
         $wpp = $wpp->loadByWorldpayOrderId($paymentState->getOrderCode());
         $isPrimeRoutingRequest = $this->getPrimeRoutingEnabled($payment);

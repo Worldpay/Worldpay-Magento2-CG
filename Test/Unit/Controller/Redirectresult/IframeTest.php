@@ -15,8 +15,14 @@ use Sapient\Worldpay\Controller\Redirectresult\Iframe;
 
 class IframeTest extends TestCase
 {
-    
+    /**
+     * [$iframeObj description]
+     * @var [type]
+     */
     protected $iframeObj;
+    /**
+     * [setUp description]
+     */
     protected function setUp()
     {
         $context = $this->getMockBuilder(Context::class)
@@ -30,7 +36,10 @@ class IframeTest extends TestCase
 
         $this->iframeObj = new Iframe($context, $page, $hppstate, $wplogger);
     }
-    
+    /**
+     * [testExecute description]
+     * @return [type] [description]
+     */
     public function testExecute()
     {
         $this->assertInstanceOf(Iframe::class, $this->iframeObj);

@@ -17,14 +17,45 @@ use Exception;
  */
 class Index extends \Magento\Backend\App\Action
 {
+    /**
+     * @var Magento\Framework\View\Result\PageFactory
+     */
     protected $pageFactory;
+    /**
+     * @var string
+     */
     protected $_rawBody;
+    /**
+     * @var string
+     */
     private $_orderId;
+    /**
+     * @var Order
+     */
     private $_order;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Update\Base
+     */
     private $_paymentUpdate;
+    /**
+     * @var \Sapient\Worldpay\Model\Token\StateXml
+     */
     private $_tokenState;
+    /**
+     * Worldpay helper
+     *
+     * @var \Magento\Catalog\Helper\Data
+     */
     private $helper;
+    /**
+     * Store manager interface
+     *
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
     private $storeManager;
+    /**
+     * @var \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations
+     */
     private $abstractMethod;
    
     /**
@@ -62,11 +93,18 @@ class Index extends \Magento\Backend\App\Action
         $this->storeManager = $storeManager;
         $this->abstractMethod = $abstractMethod;
     }
-    
+
+    /**
+     * Execute action
+     *
+     * @return string
+     * @throws \Exception
+     */
     public function execute()
     {
         $this->_loadOrder();
-        $storeid = $this->_order->getOrder()->getStoreId();
+        $order = $this->_order->getOrder();
+        $storeid = $order->getStoreId();
         $store = $this->storeManager->getStore($storeid)->getCode();
         try {
             $this->abstractMethod->canCancel($this->_order);
@@ -88,21 +126,27 @@ class Index extends \Magento\Backend\App\Action
             } else {
                 $this->messageManager->addError($errorMessage .': '. $e->getMessage());
             }
-            return $this->_redirectBackToOrderView();
+            return $this->_redirectBackToOrderView($order->getId());
         }
         $codeMessage = 'Order cancelled successfully, Please run Sync Status after sometime.';
         $camMessage = $this->helper->getConfigValue('AFR02', $store);
         $message = $camMessage? $camMessage : $codeMessage;
         $this->messageManager->addSuccess($message);
-        return $this->_redirectBackToOrderView();
+        return $this->_redirectBackToOrderView($order->getId());
     }
 
+    /**
+     * Load order data
+     */
     private function _loadOrder()
     {
         $this->_orderId = (int) $this->_request->getParam('order_id');
         $this->_order = $this->orderservice->getById($this->_orderId);
     }
 
+    /**
+     * Fetch payment update
+     */
     private function _fetchPaymentUpdate()
     {
         $xml = $this->paymentservice->getPaymentUpdateXmlForOrder($this->_order);
@@ -110,11 +154,19 @@ class Index extends \Magento\Backend\App\Action
         $this->_tokenState = new \Sapient\Worldpay\Model\Token\StateXml($xml);
     }
 
+    /**
+     * Register worldpay model
+     */
     private function _registerWorldPayModel()
     {
         $this->paymentservice->setGlobalPaymentByPaymentUpdate($this->_paymentUpdate);
     }
 
+    /**
+     * Apply payment update
+     *
+     * @throws \Exception
+     */
     private function _applyPaymentUpdate()
     {
         try {
@@ -127,10 +179,21 @@ class Index extends \Magento\Backend\App\Action
         }
     }
 
-    private function _redirectBackToOrderView()
+    /**
+     * RedirectBackToOrderView
+     *
+     * @param Int $orderId
+     * @return string
+     */
+    private function _redirectBackToOrderView($orderId)
     {
         $resultRedirect = $this->resultRedirectFactory->create();
-        $resultRedirect->setPath($this->_redirect->getRefererUrl());
+        $resultRedirect->setPath(
+            'sales/order/view',
+            [
+                'order_id' => $orderId
+            ]
+        );
         return $resultRedirect;
     }
 }

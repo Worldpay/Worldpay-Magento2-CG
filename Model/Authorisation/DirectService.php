@@ -9,7 +9,14 @@ use Magento\Framework\Phrase;
 
 class DirectService extends \Magento\Framework\DataObject
 {
+    /**
+     * @var checkoutSession
+     */
     protected $checkoutSession;
+
+    /**
+     * @var updateWorldPayPayment
+     */
     protected $updateWorldPayPayment;
     
     /**
@@ -20,7 +27,7 @@ class DirectService extends \Magento\Framework\DataObject
     private $objectCopyService;
 
     /**
-     * Constructor
+     * __construct
      *
      * @param \Sapient\Worldpay\Model\Mapping\Service $mappingservice
      * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
@@ -59,7 +66,18 @@ class DirectService extends \Magento\Framework\DataObject
         $this->urlBuilders    = $urlBuilder;
         $this->objectCopyService = $objectCopyService;
     }
-    
+
+    /**
+     * AuthorizePayment
+     *
+     * @param int|string $mageOrder
+     * @param int|string $quote
+     * @param int|string $orderCode
+     * @param int|string $orderStoreId
+     * @param int|string $paymentDetails
+     * @param int|string $payment
+     * @return string
+     */
     public function authorizePayment(
         $mageOrder,
         $quote,
@@ -123,6 +141,15 @@ class DirectService extends \Magento\Framework\DataObject
             $this->_applyPaymentUpdate($directResponse, $payment);
         }
     }
+
+    /**
+     * _handle3DSecure
+     *
+     * @param int|string $threeDSecureParams
+     * @param int|string $directOrderParams
+     * @param int|string $mageOrderId
+     * @return string
+     */
     private function _handle3DSecure($threeDSecureParams, $directOrderParams, $mageOrderId)
     {
         $this->registryhelper->setworldpayRedirectUrl($threeDSecureParams);
@@ -131,6 +158,15 @@ class DirectService extends \Magento\Framework\DataObject
         $this->checkoutSession->setAuthOrderId($mageOrderId);
     }
     
+    /**
+     * _handle3Ds2
+     *
+     * @param int|string $threeDSecureChallengeParams
+     * @param int|string $directOrderParams
+     * @param int|string $mageOrderId
+     * @param int|string $threeDSecureConfig
+     * @return string
+     */
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)
     {
         $this->registryhelper->setworldpayRedirectUrl($threeDSecureChallengeParams);
@@ -140,6 +176,13 @@ class DirectService extends \Magento\Framework\DataObject
         $this->checkoutSession->set3DS2Config($threeDSecureConfig);
     }
 
+    /**
+     * ApplyPaymentUpdate
+     *
+     * @param int|string $directResponse
+     * @param int|string $payment
+     * @return string
+     */
     private function _applyPaymentUpdate(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
         $payment
@@ -149,6 +192,13 @@ class DirectService extends \Magento\Framework\DataObject
         $this->_abortIfPaymentError($paymentUpdate, $directResponse);
     }
 
+    /**
+     * _abortIfPaymentError
+     *
+     * @param int|string $paymentUpdate
+     * @param int|string $directResponse
+     * @return string
+     */
     private function _abortIfPaymentError($paymentUpdate, $directResponse)
     {
         $responseXml = $directResponse->getXml();

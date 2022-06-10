@@ -20,6 +20,11 @@ class PaymentTypes implements PaymentTypeInterface
         $this->paymentoptionsservice = $paymentoptionsservice;
     }
     
+    /**
+     * GetPaymentType
+     *
+     * @param int|string $countryId
+     */
     public function getPaymentType($countryId)
     {
         $responsearray = [];

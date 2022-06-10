@@ -11,29 +11,65 @@ use Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecureConfig;
  */
 class ApplePayOrder
 {
-    const ROOT_ELEMENT = <<<EOD
+    public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * [$merchantCode description]
+     * @var [type]
+     */
     private $merchantCode;
+    /**
+     * [$orderCode description]
+     * @var [type]
+     */
     private $orderCode;
+    /**
+     * [$orderDescription description]
+     * @var [type]
+     */
     private $orderDescription;
+    /**
+     * [$currencyCode description]
+     * @var [type]
+     */
     private $currencyCode;
+    /**
+     * [$amount description]
+     * @var [type]
+     */
     private $amount;
+    /**
+     * [$paymentType description]
+     * @var [type]
+     */
     private $paymentType;
+    /**
+     * [$exponent description]
+     * @var [type]
+     */
     private $exponent;
     
     /**
-     * Build xml for processing Request
+     * [build description]
      *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param string $orderDescription
-     * @param string $currencyCode
-     * @param float $amount
-     * @param string $paymentType
-     * @return SimpleXMLElement $xml
+     * @param  [type] $merchantCode       [description]
+     * @param  [type] $orderCode          [description]
+     * @param  [type] $orderDescription   [description]
+     * @param  [type] $currencyCode       [description]
+     * @param  [type] $amount             [description]
+     * @param  [type] $paymentType        [description]
+     * @param  [type] $shopperEmail       [description]
+     * @param  [type] $protocolVersion    [description]
+     * @param  [type] $signature          [description]
+     * @param  [type] $data               [description]
+     * @param  [type] $ephemeralPublicKey [description]
+     * @param  [type] $publicKeyHash      [description]
+     * @param  [type] $transactionId      [description]
+     * @param  [type] $exponent           [description]
+     * @return [type]                     [description]
      */
     public function build(
         $merchantCode,

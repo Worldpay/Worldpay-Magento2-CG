@@ -56,24 +56,12 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
     }
     
     /**
-     * Accepts callback from worldpay's 3DS2 Secure page. If payment has been
-     * authorised, update order and redirect to the checkout success page.
+     * Accepts callback from worldpay's 3DS2 Secure page.
+     * If payment has been authorised,
+     * Update order and redirect to the checkout success page.
      */
     public function execute()
     {
-        if (isset($_COOKIE['PHPSESSID'])) {
-            $phpsessId = $_COOKIE['PHPSESSID'];
-            $domain = parse_url($this->_url->getUrl(), PHP_URL_HOST);
-            setcookie("PHPSESSID", $phpsessId, [
-                'expires' => time() + 3600,
-                'path' => '/',
-                'domain' => $domain,
-                'secure' => true,
-                'httponly' => true,
-                'samesite' => 'None',
-            ]);
-        }
-        
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
         $threeDSecureParams = $this->checkoutSession->get3Ds2Params();
         $this->checkoutSession->unsDirectOrderParams();

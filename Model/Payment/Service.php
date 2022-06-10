@@ -9,12 +9,15 @@ class Service
 
     /** @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest */
     protected $_paymentServiceRequest;
+    /** @var \Sapient\Worldpay\Model\Request\AdminhtmlResponse */
     protected $_adminhtmlResponse;
     /** @var \Sapient\Worldpay\Model\Payment\Update\Factory */
     protected $_paymentUpdateFactory;
     /** @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest */
     protected $_redirectResponse;
+    /** @var \Sapient\Worldpay\Model\Request\PaymentModel */
     protected $_paymentModel;
+    /** @var \Sapient\Worldpay\Model\Request\Helper */
     protected $_helper;
     /**
      * Constructor
@@ -32,13 +35,21 @@ class Service
         $this->paymentservicerequest = $paymentservicerequest;
         $this->worldpayPayment = $worldpayPayment;
     }
-    
+
+    /**
+     * CreatePaymentUpdateFromWorldPayXml
+     *
+     * @param string|int|xml $xml
+     */
     public function createPaymentUpdateFromWorldPayXml($xml)
     {
         return $this->_getPaymentUpdateFactory()
             ->create(new \Sapient\Worldpay\Model\Payment\StateXml($xml));
     }
 
+    /**
+     * GetPaymentUpdateFactory
+     */
     protected function _getPaymentUpdateFactory()
     {
         if ($this->_paymentUpdateFactory === null) {
@@ -48,17 +59,21 @@ class Service
         return $this->_paymentUpdateFactory;
     }
 
-    public function createPaymentUpdateFromWorldPayResponse(\Sapient\Worldpay\Model\Payment\State $state)
+    /**
+     * GetPaymentUpdateFactory
+     *
+     * @param \Sapient\Worldpay\Model\Payment\StateInterface $state
+     */
+    public function createPaymentUpdateFromWorldPayResponse(\Sapient\Worldpay\Model\Payment\StateInterface $state)
     {
         return $this->_getPaymentUpdateFactory()
             ->create($state);
     }
     
     /**
-     * Getter for Payment update xml from notification
+     * GetPaymentUpdateXmlForNotification
      *
-     * @param type $xml
-     * @throws \Magento\Framework\Exception\CouldNotDeleteException
+     * @param string|xml $xml
      */
     public function getPaymentUpdateXmlForNotification($xml)
     {

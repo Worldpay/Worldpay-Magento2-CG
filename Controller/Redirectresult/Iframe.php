@@ -6,6 +6,7 @@ namespace Sapient\Worldpay\Controller\Redirectresult;
 
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\Controller\ResultFactory;
 
 /**
  * Display page in iframe
@@ -29,19 +30,27 @@ class Iframe extends \Magento\Framework\App\Action\Action
      * @param PageFactory $pageFactory
      * @param \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param ResultFactory $resultPageFactory
      */
     public function __construct(
         Context $context,
         PageFactory $pageFactory,
         \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate,
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        ResultFactory $resultPageFactory
     ) {
         $this->pageFactory = $pageFactory;
         $this->wplogger = $wplogger;
         $this->hppstate = $hppstate;
+        $this->resultPageFactory = $resultPageFactory;
         return parent::__construct($context);
     }
     
+    /**
+     * Execute action
+     *
+     * @return string
+     */
     public function execute()
     {
         $this->_getStatus()->reset();
@@ -55,9 +64,18 @@ class Iframe extends \Magento\Framework\App\Action\Action
             $redirecturl = str_replace("iframe/status/", "", $currenturl);
         }
 
-        print_r('<script>window.top.location.href = "'.$redirecturl.'";</script>');
+        //print_r('<script>window.top.location.href = "'.$redirecturl.'";</script>');
+        $result = $this->resultPageFactory->create(ResultFactory::TYPE_RAW);
+        $result->setHeader('Content-Type', 'text/html');
+        $result->setContents('<script>window.top.location.href = "'.$redirecturl.'";</script>');
+        return $result;
     }
 
+    /**
+     * Get hpp status
+     *
+     * @return string
+     */
     protected function _getStatus()
     {
         if ($this->_status === null) {

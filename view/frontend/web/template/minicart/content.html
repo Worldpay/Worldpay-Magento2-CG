@@ -6,7 +6,7 @@
 -->
 <div class="block-title">
     <strong>
-        <span class="text" translate="'My Cart'"/>
+        <span class="text" translate="'My Cart'"></span>
         <span
             class="qty empty"
             text="getCartParam('summary_count')"
@@ -22,20 +22,20 @@
             class="action close"
             data-action="close"
             data-bind="attr: { title: $t('Close') }">
-        <span translate="'Close'"/>
+        <span translate="'Close'"></span>
     </button>
 
     <if args="getCartParam('summary_count')">
         <div class="items-total">
-            <span class="count" if="maxItemsToDisplay < getCartLineItemsCount()" text="maxItemsToDisplay"/>
-            <translate args="'of'" if="maxItemsToDisplay < getCartLineItemsCount()"/>
-            <span class="count" text="getCartLineItemsCount()"/>
-            <translate args="'Item in Cart'" if="getCartLineItemsCount() === 1"/>
-            <translate args="'Items in Cart'" if="getCartLineItemsCount() > 1"/>
+            <span class="count" if="maxItemsToDisplay < getCartLineItemsCount()" text="maxItemsToDisplay"></span>
+            <translate args="'of'" if="maxItemsToDisplay < getCartLineItemsCount()"></translate>
+            <span class="count" text="getCartLineItemsCount()"></span>
+            <translate args="'Item in Cart'" if="getCartLineItemsCount() === 1"></translate>
+            <translate args="'Items in Cart'" if="getCartLineItemsCount() > 1"></translate>
         </div>
 
-        <each args="getRegion('subtotalContainer')" render=""/>
-        <each args="getRegion('extraInfo')" render=""/>
+        <each args="getRegion('subtotalContainer')" render=""></each>
+        <each args="getRegion('extraInfo')" render=""></each>
 
         <div class="actions" if="getCartParam('possible_onepage_checkout')">
             <div class="primary">
@@ -51,7 +51,7 @@
                         click: closeMinicart()
                     "
                     translate="'Proceed to Checkout'"
-                />
+                ></button>
                 <!-- ko if:getSubscriptionStatus() == false -->
                 <if args="chromepayEnabled == 1">
                     <if args="chromePaymentMode == 'direct'">
@@ -64,7 +64,7 @@
                                 class="action primary checkout"
                                 data-action="close"
                                 data-bind="attr: {href: checkoutNowUrl, title: checkoutNowTitle}, text: checkoutNowTitle"
-                            />
+                            ></button>
                         </a>
                     </if>
                    </if>
@@ -76,12 +76,12 @@
     </if>
 
     <if args="getCartParam('summary_count')">
-        <strong class="subtitle" translate="'Recently added item(s)'"/>
+        <strong class="subtitle" translate="'Recently added item(s)'"></strong>
         <div data-action="scroll" class="minicart-items-wrapper">
             <ol id="mini-cart" class="minicart-items" data-bind="foreach: { data: getCartItems(), as: 'item' }">
                 <each args="$parent.getRegion($parent.getItemRenderer(item.product_type))"
                       render="{name: getTemplate(), data: item, afterRender: function() {$parents[1].initSidebar()}}"
-                />
+                ></each>
             </ol>
         </div>
     </if>
@@ -90,13 +90,13 @@
         <strong class="subtitle empty"
                 data-bind="visible: closeSidebar()"
                 translate="'You have no items in your shopping cart.'"
-        />
+        ></strong>
         <if args="getCartParam('cart_empty_message')">
-            <p class="minicart empty text" text="getCartParam('cart_empty_message')"/>
+            <p class="minicart empty text" text="getCartParam('cart_empty_message')"></p>
             <div class="actions">
                 <div class="secondary">
                     <a class="action viewcart" data-bind="attr: {href: shoppingCartUrl}">
-                        <span translate="'View and Edit Cart'"/>
+                        <span translate="'View and Edit Cart'"></span>
                     </a>
                 </div>
             </div>
@@ -106,13 +106,13 @@
     <div class="actions" if="getCartParam('summary_count')">
         <div class="secondary">
             <a class="action viewcart" data-bind="attr: {href: shoppingCartUrl}">
-                <span translate="'View and Edit Cart'"/>
+                <span translate="'View and Edit Cart'"></span>
             </a>
         </div>
     </div>
 
     <div id="minicart-widgets" class="minicart-widgets">
-        <each args="getRegion('promotion')" render=""/>
+        <each args="getRegion('promotion')" render=""></each>
     </div>
 </div>
-<each args="getRegion('sign-in-popup')" render=""/>
+<each args="getRegion('sign-in-popup')" render=""></each>

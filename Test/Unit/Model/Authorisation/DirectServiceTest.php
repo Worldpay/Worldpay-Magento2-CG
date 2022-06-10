@@ -31,13 +31,40 @@ class DirectServiceTest extends TestCase
      * @var DirectService
      */
     protected $dirctccObj;
+/**
+ * [$checkoutsession description]
+ * @var [type]
+ */
     protected $checkoutsession;
+/**
+ * [$mappingservice description]
+ * @var [type]
+ */
     protected $mappingservice;
+/**
+ * [$paymentservicerequest description]
+ * @var [type]
+ */
     protected $paymentservicerequest;
+/**
+ * [$registryhelper description]
+ * @var [type]
+ */
     protected $registryhelper;
+/**
+ * [$checkoutSession description]
+ * @var [type]
+ */
     protected $checkoutSession;
+ /**
+  * [$updateWorldPayPayment description]
+  * @var [type]
+  */
     protected $updateWorldPayPayment;
 
+/**
+ * [setUp description]
+ */
     protected function setUp()
     {
         $this->mappingservice = $this->getMockBuilder(Service::class)
@@ -87,7 +114,10 @@ class DirectServiceTest extends TestCase
             $objectCopyService
         );
     }
-
+/**
+ * [testAuthorizePayment description]
+ * @return [type] [description]
+ */
     public function testAuthorizePayment()
     {
 

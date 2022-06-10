@@ -16,6 +16,11 @@ class Cancel implements ButtonProviderInterface
      */
     private $recurringHelper;
     
+    /**
+     * Cancel constructor
+     *
+     * @param RecurringHelper $recurringHelper
+     */
     public function __construct(
         RecurringHelper $recurringHelper
     ) {

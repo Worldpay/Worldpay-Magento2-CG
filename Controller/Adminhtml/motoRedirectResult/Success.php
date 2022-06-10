@@ -46,6 +46,8 @@ class Success extends \Magento\Backend\App\Action
     }
 
     /**
+     * Get worldpay order
+     *
      * @return \Sapient\Worldpay\Model\Order
      */
     private function _getWorldPayOrder()
@@ -54,6 +56,8 @@ class Success extends \Magento\Backend\App\Action
     }
 
     /**
+     * Get order increment id
+     *
      * @return string
      */
     private function _getOrderIncrementId()
@@ -65,6 +69,9 @@ class Success extends \Magento\Backend\App\Action
     }
 
     /**
+     * Redirect to order view page
+     *
+     * @param array $worldPayOrder
      * @return string
      */
     private function _redirectToOrderViewPage($worldPayOrder)

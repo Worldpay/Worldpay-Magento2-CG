@@ -9,7 +9,7 @@ use Exception;
 
 class Config
 {
-    const TYPE_IFRAME = 'iframe';
+    public const TYPE_IFRAME = 'iframe';
 
     /** @var string $type Indicates whether you are using an iframe or lightbox integration. */
     private $type;
@@ -44,10 +44,27 @@ class Config
     /** @var string $country The default country setting for the payment pages. */
     private $country;
 
+    /** @var string $preferredPaymentMethod */
     private $preferredPaymentMethod;
 
+    /** @var string $urlConfig */
     private $urlConfig;
-    
+
+    /**
+     * Constructor
+     *
+     * @param string|int $type
+     * @param string|int $iframeIntegrationID
+     * @param string|int $iframeHelperURL
+     * @param string|int $iframeBaseURL
+     * @param string|int $url
+     * @param string|int $target
+     * @param string|int $urlConfig
+     * @param string|int $language
+     * @param string|int $country
+     * @param string|int|null $preferredPaymentMethod
+     * @param string|int|bool $debug
+     */
     public function __construct(
         $type,
         $iframeIntegrationID,

@@ -14,9 +14,21 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      * @var string
      */
     protected $_code = 'worldpay_cc';
+    /**
+     * @var string
+     */
     protected $_isGateway = true;
+    /**
+     * @var string
+     */
     protected $_canAuthorize = true;
+    /**
+     * @var string
+     */
     protected $_canUseInternal = false;
+    /**
+     * @var string
+     */
     protected $_canUseCheckout = true;
 
     /**
@@ -33,6 +45,11 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return $this;
     }
     
+    /**
+     * GetAuthorisationService
+     *
+     * @param string|int $storeId
+     */
     public function getAuthorisationService($storeId)
     {
         $integrationModel = $this->worlpayhelper->getCcIntegrationMode($storeId);

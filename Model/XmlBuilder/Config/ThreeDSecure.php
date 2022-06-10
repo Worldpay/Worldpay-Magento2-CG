@@ -9,12 +9,22 @@ namespace Sapient\Worldpay\Model\XmlBuilder\Config;
  */
 class ThreeDSecure
 {
+    /**
+     * [$isDynamic3D description]
+     * @var [type]
+     */
     private $isDynamic3D = false;
+    /**
+     * [$is3DSecure description]
+     * @var [type]
+     */
     private $is3DSecure = false;
 
     /**
-     * @param bool $isDynamic3D
-     * @param bool $is3DSecure
+     * [__construct description]
+     *
+     * @param boolean $isDynamic3D [description]
+     * @param boolean $is3DSecure  [description]
      */
     public function __construct($isDynamic3D = false, $is3DSecure = false)
     {

@@ -31,6 +31,11 @@ class Edit extends \Magento\Framework\App\Action\Action
      */
     private $subscriptionFactory;
     
+    /**
+     * Worldpay helper
+     *
+     * @var \Magento\Catalog\Helper\Data
+     */
     private $helper;
 
     /**
@@ -38,6 +43,7 @@ class Edit extends \Magento\Framework\App\Action\Action
      * @param Session $customerSession
      * @param PageFactory $resultPageFactory
      * @param SubscriptionFactory $subscriptionFactory
+     * @param \Sapient\Worldpay\Helper\GeneralException $helper
      */
     public function __construct(
         Context $context,

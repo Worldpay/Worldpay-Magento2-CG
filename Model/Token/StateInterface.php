@@ -11,9 +11,9 @@ namespace Sapient\Worldpay\Model\Token;
  */
 interface StateInterface
 {
-    const TOKEN_EVENT_NEW = 'NEW';
-    const TOKEN_EVENT_MATCH = 'MATCH';
-    const TOKEN_EVENT_CONFLICT = 'CONFLICT';
+    public const TOKEN_EVENT_NEW = 'NEW';
+    public const TOKEN_EVENT_MATCH = 'MATCH';
+    public const TOKEN_EVENT_CONFLICT = 'CONFLICT';
 
     /**
      * Get order code

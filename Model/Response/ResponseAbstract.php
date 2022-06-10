@@ -11,18 +11,60 @@ use Exception;
  */
 abstract class ResponseAbstract
 {
-    const INTERNAL_ERROR = 1;
-    const PARSE_ERROR = 2;
-    const SECURITY_ERROR = 4;
-    const INVALID_REQUEST_ERROR = 5;
-    const INVALID_CONTENT_ERROR = 6;
-    const PAYMENT_DETAILS_ERROR = 7;
+    /**
+     * @var INTERNAL_ERROR
+     */
+    public const INTERNAL_ERROR = 1;
+    /**
+     * @var PARSE_ERROR
+     */
+    public const PARSE_ERROR = 2;
+    /**
+     * @var SECURITY_ERROR
+     */
+    public const SECURITY_ERROR = 4;
+    /**
+     * @var INVALID_REQUEST_ERROR
+     */
+    public const INVALID_REQUEST_ERROR = 5;
+    /**
+     * @var INVALID_CONTENT_ERROR
+     */
+    public const INVALID_CONTENT_ERROR = 6;
+    /**
+     * @var PAYMENT_DETAILS_ERROR
+     */
+    public const PAYMENT_DETAILS_ERROR = 7;
 
+    /**
+     * [$_responseXml description]
+     * @var [type]
+     */
     protected $_responseXml;
+    /**
+     * [$_merchantCode description]
+     * @var [type]
+     */
     protected $_merchantCode;
+    /**
+     * [$_paymentStatus description]
+     * @var [type]
+     */
     protected $_paymentStatus;
+    /**
+     * [$_payAsOrder description]
+     * @var [type]
+     */
     protected $_payAsOrder;
+    /**
+     * [$_errorMessage description]
+     * @var [type]
+     */
     protected $_errorMessage;
+    /**
+     * [$_wpOrderId description]
+     * @var [type]
+     */
     protected $_wpOrderId;
 
     /**
@@ -36,8 +78,9 @@ abstract class ResponseAbstract
     }
     
     /**
-     * @param $response
-     * @return  $this
+     * [setResponse description]
+     *
+     * @param [type] $response [description]
      */
     public function setResponse($response)
     {

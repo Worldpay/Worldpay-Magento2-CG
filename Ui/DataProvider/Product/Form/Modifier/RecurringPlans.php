@@ -18,10 +18,26 @@ use Sapient\Worldpay\Helper\Recurring as RecurringHelper;
 
 class RecurringPlans extends AbstractModifier
 {
-    const CODE_RECURRING_DATA = 'subscriptions';
-    const CODE_RECURRING_PLANS = 'worldpay_recurring_plans';
-    const CODE_PLANS = 'plans';
-    const CODE_ADD_PLAN_MODAL = 'worldpay_add_recurring_plan_modal';
+    /**
+     * @var CODE_RECURRING_DATA
+     */
+
+    public const CODE_RECURRING_DATA = 'subscriptions';
+    /**
+     * @var CODE_RECURRING_PLANS
+     */
+
+    public const CODE_RECURRING_PLANS = 'worldpay_recurring_plans';
+    /**
+     * @var CODE_PLANS
+     */
+
+    public const CODE_PLANS = 'plans';
+    /**
+     * @var CODE_ADD_PLAN_MODAL
+     */
+
+    public const CODE_ADD_PLAN_MODAL = 'worldpay_add_recurring_plan_modal';
 
     /**
      * @var LocatorInterface
@@ -54,6 +70,8 @@ class RecurringPlans extends AbstractModifier
     private $recurringHelper;
     
     /**
+     * Constructor
+     *
      * @param LocatorInterface $locator
      * @param ArrayManager $arrayManager
      * @param Website $websiteSource
@@ -78,7 +96,9 @@ class RecurringPlans extends AbstractModifier
     }
 
     /**
-     * {@inheritdoc}
+     * Modify Meta
+     *
+     * @param array $meta
      */
     public function modifyMeta(array $meta)
     {
@@ -122,7 +142,9 @@ class RecurringPlans extends AbstractModifier
     }
 
     /**
-     * {@inheritdoc}
+     * Modify Data
+     *
+     * @param array $data
      */
     public function modifyData(array $data)
     {
@@ -140,7 +162,7 @@ class RecurringPlans extends AbstractModifier
      * Move dataScope data to children
      *
      * @param array $meta
-     * @param $path
+     * @param string $path
      * @return array
      */
     private function moveDataScopeToChildren(array $meta, $path)

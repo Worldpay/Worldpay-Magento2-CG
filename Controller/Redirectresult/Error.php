@@ -67,6 +67,11 @@ class Error extends \Magento\Framework\App\Action\Action
         return parent::__construct($context);
     }
     
+    /**
+     * Execute action
+     *
+     * @return string
+     */
     public function execute()
     {
         $this->wplogger->info('worldpay returned error url');
@@ -95,6 +100,12 @@ class Error extends \Magento\Framework\App\Action\Action
         return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
     }
 
+    /**
+     * Get error notice for order
+     *
+     * @param Order $order
+     * @return string
+     */
     private function _getErrorNoticeForOrder($order)
     {
         return __('Order #'.$order->getIncrementId().$this->helper->getConfigValue('CCAM7'));

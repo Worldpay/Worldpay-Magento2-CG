@@ -27,6 +27,11 @@ class Savedcard extends \Magento\Framework\View\Element\Template
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Sapient\Worldpay\Model\SavedTokenFactory $savecard
      * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param SerializerInterface $serializer
+     * @param \Magento\Customer\Helper\Session\CurrentCustomerAddress $currentCustomerAddress
+     * @param \Magento\Customer\Model\Address\Config $addressConfig
+     * @param \Magento\Customer\Model\Address\Mapper $addressMapper
      * @param array $data
      */
     public function __construct(
@@ -72,6 +77,11 @@ class Savedcard extends \Magento\Framework\View\Element\Template
             return $this->getUrl('worldpay/savedcard/addnewcard', ['_secure' => true]);
     }
     
+    /**
+     * Check if the billing address is present?
+     *
+     * @return bool
+     */
     public function ifBillingAddressPresent()
     {
         $address = $this->currentCustomerAddress->getDefaultBillingAddress();
@@ -100,6 +110,8 @@ class Savedcard extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get saved card
+     *
      * @return bool|\Sapient\Worldpay\Model\ResourceModel\SavedToken\Collection
      */
     public function getSavedCard()
@@ -117,6 +129,12 @@ class Savedcard extends \Magento\Framework\View\Element\Template
                                     ->addFieldToFilter('token_type', ['eq' => $tokenType]);
     }
     
+    /**
+     * Retrieve my account labels
+     *
+     * @param string $labelCode
+     * @return array
+     */
     public function getMyAccountLabels($labelCode)
     {
         $accdata = $this->serializer->unserialize($this->worlpayhelper->getMyAccountLabels());
@@ -130,6 +148,12 @@ class Savedcard extends \Magento\Framework\View\Element\Template
         }
     }
     
+    /**
+     * Retrieve checkout labels
+     *
+     * @param string $labelCode
+     * @return array
+     */
     public function getCheckoutLabels($labelCode)
     {
         $accdata = $this->serializer->unserialize($this->worlpayhelper->getCheckoutLabels());
@@ -144,6 +168,8 @@ class Savedcard extends \Magento\Framework\View\Element\Template
     }
 
    /**
+    * Generate and return "Delete" URL
+    *
     * @param \Sapient\Worldpay\Model\SavedToken $saveCard
     * @return string
     */
@@ -153,6 +179,8 @@ class Savedcard extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Generate and return "Edit" URL
+     *
      * @param \Sapient\Worldpay\Model\SavedToken $saveCard
      * @return string
      */

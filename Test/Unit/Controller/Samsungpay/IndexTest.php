@@ -19,11 +19,29 @@ use \Magento\Store\Model\StoreManagerInterface;
 
 class IndexTest extends TestCase
 {
+/**
+ * [$scopeConfig description]
+ * @var [type]
+ */
     protected $scopeConfig;
+ /**
+  * [$request description]
+  * @var [type]
+  */
     protected $request;
+ /**
+  * [$indexObj description]
+  * @var [type]
+  */
     protected $indexObj;
+ /**
+  * [$objectManagerMock description]
+  * @var [type]
+  */
     protected $objectManagerMock;
-
+/**
+ * [setUp description]
+ */
     protected function setUp()
     {
         $context = $this->getMockBuilder(Context::class)
@@ -54,7 +72,10 @@ class IndexTest extends TestCase
             $this->_storeManager
         );
     }
-
+    /**
+     * [testExecute description]
+     * @return [type] [description]
+     */
     public function testExecute()
     {
         $this->scopeConfig

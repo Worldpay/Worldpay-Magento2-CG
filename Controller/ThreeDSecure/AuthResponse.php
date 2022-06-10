@@ -10,9 +10,21 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
 {
 
     /**
-     * @var CreditCardException
+     * @var helper
      */
     protected $helper;
+    /**
+     * @var request
+     */
+    protected $request;
+    /**
+     * @var _cookieManager
+     */
+    protected $_cookieManager;
+    /**
+     * @var cookieMetadataFactory
+     */
+    protected $cookieMetadataFactory;
     /**
      * Constructor
      *
@@ -26,6 +38,9 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
      * @param \Magento\Framework\UrlInterface $urlBuilder
      * @param \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory
      * @param CreditCardException $helper
+     * @param \Magento\Framework\App\Request\Http $request
+     * @param \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager
+     * @param \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory $cookieMetadataFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -37,7 +52,10 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Framework\UrlInterface $urlBuilder,
         \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory,
-        CreditCardException $helper
+        CreditCardException $helper,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager,
+        \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory $cookieMetadataFactory
     ) {
         $this->wplogger = $wplogger;
         $this->resultJsonFactory = $resultJsonFactory;
@@ -49,17 +67,65 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         $this->urlBuilders    = $urlBuilder;
         $this->resultRedirectFactory = $resultRedirectFactory;
         $this->helper = $helper;
+        $this->request = $request;
+        $this->_cookieManager = $cookieManager;
+        $this->cookieMetadataFactory = $cookieMetadataFactory;
         parent::__construct($context);
     }
     
     /**
-     * Accepts callback from worldpay's 3D Secure page. If payment has been
-     * authorised, update order and redirect to the checkout success page.
+     * Accepts callback from worldpay's 3D Secure page.
+     * If payment has been authorised,
+     * Update order and redirect to the checkout success page.
      */
     public function execute()
     {
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
         $threeDSecureParams = $this->checkoutSession->get3DSecureParams();
+        $skipSameSiteForIOs = $this->shouldSkipSameSiteNone($directOrderParams);
+        $mhost = $this->request->getHttpHost();
+        $cookieValue = $this->_cookieManager->getCookie('PHPSESSID');
+
+        if ($skipSameSiteForIOs) {
+            $this->wplogger->info("Inside skip same site block");
+            if (isset($cookieValue)) {
+                
+                $phpsessId = $cookieValue;
+                $domain = $mhost;
+                $expires = time() + 3600;
+                $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata();
+                $metadata->setPath('/');
+                $metadata->setDomain($domain);
+                $metadata->setDuration($expires);
+                $metadata->setSecure(true);
+                $metadata->setHttpOnly(true);
+
+                $this->_cookieManager->setPublicCookie(
+                    "PHPSESSID",
+                    $phpsessId,
+                    $metadata
+                );
+            }
+        } else {
+            $this->wplogger->info("Outside skip same site block");
+            if (isset($cookieValue)) {
+                $phpsessId = $cookieValue;
+                $domain = $mhost;
+                $expires = time() + 3600;
+                $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata();
+                $metadata->setPath('/');
+                $metadata->setDomain($domain);
+                $metadata->setDuration($expires);
+                $metadata->setSecure(true);
+                $metadata->setHttpOnly(true);
+                $metadata->setSameSite("None");
+                $this->_cookieManager->setPublicCookie(
+                    "PHPSESSID",
+                    $phpsessId,
+                    $metadata
+                );
+            }
+        }
         $this->checkoutSession->unsDirectOrderParams();
         $this->checkoutSession->uns3DSecureParams();
         try {
@@ -108,5 +174,35 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
             $this->checkoutSession->unsWpResponseForwardUrl();
             $this->getResponse()->setRedirect($redirectUrl);
         }
+    }
+
+    /**
+     * ShouldSkip SameSiteNone
+     *
+     * @param string $directOrderParams
+     * @return false;
+     */
+    public function shouldSkipSameSiteNone($directOrderParams)
+    {
+        if (isset($directOrderParams)) {
+            $useragent = $directOrderParams['userAgentHeader'] ;
+            $iosDeviceRegex = "/\(iP.+; CPU .*OS (\d+)[_\d]*.*\) AppleWebKit\//";
+            $macDeviceRegex = "/\(Macintosh;.*Mac OS X (\d+)_(\d+)[_\d]*.*\) AppleWebKit\//";
+            $iosVersionRegex = '/OS 12./';
+            $macVersionRegex ='/OS X 10./';
+            $macLatestVersionRegex = '/OS X 10_15_7/';
+            if (preg_match($iosDeviceRegex, $useragent) && preg_match($iosVersionRegex, $useragent)) {
+                $this->wplogger->info('Passed regex check for ios');
+                return true;
+            } elseif ((preg_match($macDeviceRegex, $useragent) && preg_match($macVersionRegex, $useragent))
+                  && (!preg_match($macLatestVersionRegex, $useragent))) {
+                $this->wplogger->info('Passed regex check for mac');
+                return true;
+            }
+            $this->wplogger->info(json_encode($useragent));
+            $this->wplogger->info('Outside regex check');
+            return false;
+        }
+        return false;
     }
 }

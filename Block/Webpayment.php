@@ -45,7 +45,7 @@ class Webpayment extends Template
      * @var Magento\Framework\Message\ManagerInterface
      */
     
-    protected $messageManager;
+    public $_messageManager;
 
     /**
      * @var Magento\Store\Model\StoreManagerInterface $storeManager
@@ -63,12 +63,21 @@ class Webpayment extends Template
     private $serializer;
     
     /**
-     * Webpayment constructor.
+     * Webpayment constructor
+     *
      * @param Template\Context $context
      * @param AbstractCart $cart
      * @param Create $helper
-     * @param array $data
+     * @param Session $customerSession
+     * @param \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param Recurring $recurringHelper
+     * @param SessionManagerInterface $session
+     * @param SerializerInterface $serializer
+     * @param \Magento\Framework\View\Asset\Repository $assetRepo
+     * @param array $data
      */
     public function __construct(
         Template\Context $context,
@@ -82,6 +91,7 @@ class Webpayment extends Template
         Recurring $recurringHelper,
         SessionManagerInterface $session,
         SerializerInterface $serializer,
+        \Magento\Framework\View\Asset\Repository $assetRepo,
         array $data = []
     ) {
 
@@ -99,6 +109,7 @@ class Webpayment extends Template
         $this->recurringHelper = $recurringHelper;
         $this->serializer = $serializer;
         $this->session = $session;
+        $this->_assetRepo = $assetRepo;
     }
     
     /**
@@ -112,6 +123,8 @@ class Webpayment extends Template
     }
 
     /**
+     * Retrieve currency
+     *
      * @return string
      */
     public function getCurrency()
@@ -120,12 +133,22 @@ class Webpayment extends Template
         return $currency;
     }
 
+    /**
+     * Get all cart items
+     *
+     * @return array
+     */
     public function getAllItems()
     {
         $allItems = $this->_cart->getQuote()->getAllVisibleItems();
         return $allItems;
     }
 
+    /**
+     * Gets the grand total
+     *
+     * @return float
+     */
     public function getTotal()
     {
         $quote = $this->_cart->getTotalsCache();
@@ -134,6 +157,11 @@ class Webpayment extends Template
         return $getGrandTotal;
     }
 
+    /**
+     * Return shipping rate
+     *
+     * @return Rate
+     */
     public function getShippingRate()
     {
         $quote = $this->_cart->getTotalsCache();
@@ -142,6 +170,11 @@ class Webpayment extends Template
         return $getShippingRate;
     }
     
+    /**
+     * Return tax rate
+     *
+     * @return Rate
+     */
     public function getTaxRate()
     {
         $quote = $this->_cart->getTotalsCache();
@@ -150,6 +183,11 @@ class Webpayment extends Template
         return $getShippingRate;
     }
 
+    /**
+     * Gets the sub total
+     *
+     * @return float
+     */
     public function getSubTotal()
     {
         $quote = $this->_cart->getTotalsCache();
@@ -158,6 +196,11 @@ class Webpayment extends Template
         return $getSubTotal;
     }
  
+    /**
+     * Get customer ID token
+     *
+     * @return string
+     */
     public function getCustomerToken()
     {
         $customerId = $this->_customerSession->getCustomer()->getId();
@@ -165,6 +208,11 @@ class Webpayment extends Template
          return $customerToken->createCustomerToken($customerId)->getToken();
     }
     
+    /**
+     * Check if shipping is required?
+     *
+     * @return bool
+     */
     public function getshippingRequired()
     {
         // Disable shipping for downloadable and virtual products
@@ -198,6 +246,11 @@ class Webpayment extends Template
         }
     }
     
+    /**
+     * Check downloadable product
+     *
+     * @return bool
+     */
     public function checkDownloadableProduct()
     {
         // Login required for downloadable and virtual products
@@ -224,12 +277,22 @@ class Webpayment extends Template
         return 'false';
     }
 
+    /**
+     * Retrieve count products
+     *
+     * @return int
+     */
     public function getProductCount()
     {
         $allItems = $this->_cart->getQuote()->getAllVisibleItems();
         return $count = count($allItems);
     }
     
+    /**
+     * Retrieve chromepay button name
+     *
+     * @return string
+     */
     public function getChromepayButtonName()
     {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
@@ -237,6 +300,11 @@ class Webpayment extends Template
         return $this->scopeConfig->getValue('worldpay/chromepay_config/chromepay_button_name', $storeScope);
     }
      
+    /**
+     * Check if chrome pay is enabled?
+     *
+     * @return bool
+     */
     public function getChromepayEnabled()
     {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
@@ -248,6 +316,11 @@ class Webpayment extends Template
         return false;
     }
      
+    /**
+     * Get payment mode
+     *
+     * @return string
+     */
     public function getPaymentMode()
     {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
@@ -255,6 +328,11 @@ class Webpayment extends Template
         return $this->scopeConfig->getValue('worldpay/cc_config/integration_mode', $storeScope);
     }
     
+    /**
+     * Get environment mode
+     *
+     * @return string
+     */
     public function getEnvMode()
     {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
@@ -262,6 +340,11 @@ class Webpayment extends Template
         return $this->scopeConfig->getValue('worldpay/general_config/environment_mode', $storeScope);
     }
     
+    /**
+     * Check if subscription items are there in the cart?
+     *
+     * @return bool
+     */
     public function checkSubscriptionItems()
     {
         if ($this->recurringHelper->quoteContainsSubscription($this->_cart->getQuote())) {
@@ -270,6 +353,11 @@ class Webpayment extends Template
         return false;
     }
     
+    /**
+     * Retrieve general exception
+     *
+     * @return string
+     */
     public function getGeneralException()
     {
         $generaldata=$this->serializer->unserialize($this->_helper->getGeneralException());
@@ -288,6 +376,12 @@ class Webpayment extends Template
         //$output=implode(',', $data);
         return json_encode($data);
     }
+
+    /**
+     * Retrieve cc exception
+     *
+     * @return string
+     */
     public function getCreditCardException()
     {
         $generaldata=$this->serializer->unserialize($this->_helper->getCreditCardException());
@@ -307,6 +401,11 @@ class Webpayment extends Template
         return json_encode($data);
     }
     
+    /**
+     * Retrieve my account exception
+     *
+     * @return string
+     */
     public function myAccountExceptions()
     {
         $generaldata=$this->serializer->unserialize($this->_helper->getMyAccountException());
@@ -326,6 +425,12 @@ class Webpayment extends Template
         return json_encode($data);
     }
     
+    /**
+     * Retrieve my account specific exception
+     *
+     * @param string $exceptioncode
+     * @return string
+     */
     public function getMyAccountSpecificException($exceptioncode)
     {
         $data=json_decode($this->myAccountExceptions(), true);
@@ -338,11 +443,23 @@ class Webpayment extends Template
             }
         }
     }
+
+    /**
+     * Retrieve cc specific exception
+     *
+     * @param string $exceptioncode
+     * @return string
+     */
     public function getCreditCardSpecificException($exceptioncode)
     {
         return $this->_helper->getCreditCardSpecificexception($exceptioncode);
     }
     
+    /**
+     * Get discount rate
+     *
+     * @return float
+     */
     public function getDiscountRate()
     {
         $discountamount=0;
@@ -354,22 +471,70 @@ class Webpayment extends Template
         return $discountamount;
     }
     
+    /**
+     * Check if dynamic 3ds2 is enabled?
+     *
+     * @return bool
+     */
     public function isDynamic3DS2Enabled()
     {
         return $this->_helper->isDynamic3DS2Enabled();
     }
+
+    /**
+     * Get jwt event url
+     *
+     * @return string
+     */
     public function getJwtEventUrl()
     {
         return $this->_helper->getJwtEventUrl();
     }
     
+    /**
+     * Get session id
+     *
+     * @return string
+     */
     public function getSessionId()
     {
         return $this->session->getSessionId();
     }
     
+    /**
+     * Check if 3ds is enabled?
+     *
+     * @return bool
+     */
     public function is3DsEnabled()
     {
         return $this->_helper->is3DSecureEnabled() || $this->_helper->isDynamic3DEnabled();
+    }
+    /**
+     * Get message manager
+     *
+     * @return mixed
+     */
+    public function getMessageManager()
+    {
+        return $this->_messageManager;
+    }
+    /**
+     * Get service worker url
+     *
+     * @return string
+     */
+    public function getServiceWorkerUrl()
+    {
+        return  $this->_assetRepo->getUrl("Sapient_Worldpay::chromepay/sw.js");
+    }
+    /**
+     * Get service worker scope
+     *
+     * @return string
+     */
+    public function getServiceWorkerScope()
+    {
+        return  $this->_assetRepo->getUrl("Sapient_Worldpay::chromepay");
     }
 }

@@ -8,7 +8,9 @@ use Exception;
 
 class TokenService extends \Magento\Framework\DataObject
 {
+    /** @var Session */
     protected $_session;
+    /** @var updateWorldPayPayment */
     protected $updateWorldPayPayment;
 
     /**
@@ -45,7 +47,18 @@ class TokenService extends \Magento\Framework\DataObject
         $this->worldpayHelper = $worldpayHelper;
         $this->registryhelper = $registryhelper;
     }
-    
+
+    /**
+     * AuthorizePayment
+     *
+     * @param string|int $mageOrder
+     * @param string|int $quote
+     * @param string|int $orderCode
+     * @param string|int $orderStoreId
+     * @param string|int $paymentDetails
+     * @param string|int $payment
+     * @return array
+     */
     public function authorizePayment(
         $mageOrder,
         $quote,
@@ -99,6 +112,14 @@ class TokenService extends \Magento\Framework\DataObject
         }
         $quote->setActive(false);
     }
+
+    /**
+     * Handle3DSecure
+     *
+     * @param string|int $threeDSecureParams
+     * @param string|int $directOrderParams
+     * @param string|int $mageOrderId
+     */
     private function _handle3DSecure($threeDSecureParams, $directOrderParams, $mageOrderId)
     {
         $this->wplogger->info('HANDLING 3DS');
@@ -108,6 +129,14 @@ class TokenService extends \Magento\Framework\DataObject
         $this->checkoutSession->setAuthOrderId($mageOrderId);
     }
     
+    /**
+     * Handle3Ds2
+     *
+     * @param string|int $threeDSecureChallengeParams
+     * @param string|int $directOrderParams
+     * @param string|int $mageOrderId
+     * @param string|int $threeDSecureConfig
+     */
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)
     {
         $this->wplogger->info('HANDLING 3DS2');
@@ -118,6 +147,12 @@ class TokenService extends \Magento\Framework\DataObject
         $this->checkoutSession->set3DS2Config($threeDSecureConfig);
     }
     
+    /**
+     * ApplyPaymentUpdate
+     *
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param string|int $payment
+     */
     private function _applyPaymentUpdate(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
         $payment
@@ -127,6 +162,12 @@ class TokenService extends \Magento\Framework\DataObject
         $this->_abortIfPaymentError($paymentUpdate, $directResponse);
     }
 
+    /**
+     * AbortIfPaymentError
+     *
+     * @param string|int $paymentUpdate
+     * @param string|int $directResponse
+     */
     private function _abortIfPaymentError($paymentUpdate, $directResponse)
     {
         $responseXml = $directResponse->getXml();

@@ -14,21 +14,18 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected $_idFieldName = 'subscription_id';
 
     /**
-     * Store manager
-     *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManager;
 
     /**
-     * Flag that indicates if plans table has been joined
-     *
      * @var bool
      */
     private $plansJoined = false;
 
     /**
-     * Collection constructor.
+     * Collection constructor
+     *
      * @param \Magento\Framework\Data\Collection\EntityFactoryInterface $entityFactory
      * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy

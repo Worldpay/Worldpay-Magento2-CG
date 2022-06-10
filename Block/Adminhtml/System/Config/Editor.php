@@ -8,14 +8,18 @@ use Magento\Cms\Model\Wysiwyg\Config as WysiwygConfig;
 class Editor extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
-     * @var  Registry
+     * Magento Core registry
+     *
+     * @var Registry
      */
     protected $_coreRegistry;
-    
+
     /**
-     * @param Context       $context
+     * Editor constructor
+     *
+     * @param Context $context
      * @param WysiwygConfig $wysiwygConfig
-     * @param array         $data
+     * @param array $data
      */
     public function __construct(
         Context $context,
@@ -26,6 +30,13 @@ class Editor extends \Magento\Config\Block\System\Config\Form\Field
         parent::__construct($context, $data);
     }
  
+    /**
+     * Return element html
+     *
+     * @param  \Magento\Framework\Data\Form\Element\AbstractElement $element
+     * @return string
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
         $element->setWysiwyg(true);

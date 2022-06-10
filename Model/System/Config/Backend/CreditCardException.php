@@ -12,9 +12,15 @@ use Magento\Framework\Phrase;
  */
 class CreditCardException extends \Magento\Framework\App\Config\Value
 {
-    
+    /**
+     * [$helper description]
+     * @var [type]
+     */
     private $helper;
-    
+    /**
+     * [$storeManager description]
+     * @var [type]
+     */
     private $storeManager;
     
     /**

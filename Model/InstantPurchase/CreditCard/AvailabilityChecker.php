@@ -8,9 +8,13 @@ class AvailabilityChecker implements \Magento\InstantPurchase\PaymentMethodInteg
      */
     private $config;
 
+    /**
+     * @var Wplogger
+     */
     private $wplogger;
     /**
      * AvailabilityChecker constructor.
+     *
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      */

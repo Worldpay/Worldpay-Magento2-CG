@@ -9,11 +9,35 @@ namespace Sapient\Worldpay\Model\Token;
  */
 class StateXml implements \Sapient\Worldpay\Model\Token\StateInterface
 {
+    /**
+     * [$_xml description]
+     * @var [type]
+     */
     private $_xml;
+    /**
+     * [$_tokenNode description]
+     * @var [type]
+     */
     private $_tokenNode;
+    /**
+     * [$_cardNode description]
+     * @var [type]
+     */
     private $_cardNode;
+    /**
+     * [$_derivedNode description]
+     * @var [type]
+     */
     private $_derivedNode;
+    /**
+     * [$_paymentNode description]
+     * @var [type]
+     */
     private $_paymentNode;
+    /**
+     * [$_orderStatusNode description]
+     * @var [type]
+     */
     private $_orderStatusNode;
 
     /**

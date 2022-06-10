@@ -22,9 +22,10 @@ class SavedToken extends AbstractModel
     }
     
     /**
-     * Load worldpay token Details
+     * [loadByTokenCode description]
      *
-     * @return Sapient\Worldpay\Model\SavedToken
+     * @param  [type] $order_id [description]
+     * @return [type]           [description]
      */
     public function loadByTokenCode($order_id)
     {
@@ -36,9 +37,10 @@ class SavedToken extends AbstractModel
     }
     
     /**
-     * Load worldpay Storedcredentials Details
+     * [loadByStoredCredentials description]
      *
-     * @return Sapient\Worldpay\Model\SavedToken
+     * @param  [type] $transactionIdentifier [description]
+     * @return [type]                        [description]
      */
     public function loadByStoredCredentials($transactionIdentifier)
     {

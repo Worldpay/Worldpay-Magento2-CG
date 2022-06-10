@@ -55,6 +55,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
      * @param SubscriptionFactory $subscriptionFactory
      * @param PaymentTokenFactory $tokenFactory
      * @param CollectionFactory $regionCollectionFactory
+     * @param MyAccountException $helper
      */
     public function __construct(
         Context $context,
@@ -91,6 +92,8 @@ class FormPost extends \Magento\Framework\App\Action\Action
     }
 
     /**
+     * Execute action
+     *
      * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()

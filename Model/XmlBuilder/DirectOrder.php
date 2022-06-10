@@ -12,40 +12,151 @@ use \Sapient\Worldpay\Logger\WorldpayLogger;
  */
 class DirectOrder
 {
-
-    const ALLOW_INTERACTION_TYPE = 'MOTO';
-    const DYNAMIC3DS_DO3DS = 'do3DS';
-    const DYNAMIC3DS_NO3DS = 'no3DS';
-    const TOKEN_SCOPE = 'shopper';
-    const ROOT_ELEMENT = <<<EOD
+    /**
+     * @var ALLOW_INTERACTION_TYPE
+     */
+    public const ALLOW_INTERACTION_TYPE = 'MOTO';
+    /**
+     * @var DYNAMIC3DS_DO3DS
+     */
+    public const DYNAMIC3DS_DO3DS = 'do3DS';
+    /**
+     * @var DYNAMIC3DS_NO3DS
+     */
+    public const DYNAMIC3DS_NO3DS = 'no3DS';
+    /**
+     * @var TOKEN_SCOPE
+     */
+    public const TOKEN_SCOPE = 'shopper';
+    public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * [$merchantCode description]
+     * @var [type]
+     */
     private $merchantCode;
+    /**
+     * [$orderCode description]
+     * @var [type]
+     */
     private $orderCode;
+    /**
+     * [$orderDescription description]
+     * @var [type]
+     */
     private $orderDescription;
+    /**
+     * [$currencyCode description]
+     * @var [type]
+     */
     private $currencyCode;
+    /**
+     * [$amount description]
+     * @var [type]
+     */
     private $amount;
+    /**
+     * [$paymentDetails description]
+     * @var [type]
+     */
     protected $paymentDetails;
+    /**
+     * [$cardAddress description]
+     * @var [type]
+     */
     private $cardAddress;
+    /**
+     * [$shopperEmail description]
+     * @var [type]
+     */
     protected $shopperEmail;
+    /**
+     * [$acceptHeader description]
+     * @var [type]
+     */
     protected $acceptHeader;
+    /**
+     * [$userAgentHeader description]
+     * @var [type]
+     */
     protected $userAgentHeader;
+    /**
+     * [$shippingAddress description]
+     * @var [type]
+     */
     private $shippingAddress;
+    /**
+     * [$billingAddress description]
+     * @var [type]
+     */
     private $billingAddress;
+    /**
+     * [$paResponse description]
+     * @var null
+     */
     protected $paResponse = null;
+    /**
+     * [$echoData description]
+     * @var null
+     */
     private $echoData = null;
+    /**
+     * [$shopperId description]
+     * @var [type]
+     */
     private $shopperId;
+    /**
+     * [$saveCardEnabled description]
+     * @var [type]
+     */
     private $saveCardEnabled;
+    /**
+     * [$tokenizationEnabled description]
+     * @var [type]
+     */
     private $tokenizationEnabled;
+    /**
+     * [$storedCredentialsEnabled description]
+     * @var [type]
+     */
     private $storedCredentialsEnabled;
+    /**
+     * [$dfReferenceId description]
+     * @var null
+     */
     protected $dfReferenceId = null;
+    /**
+     * [$cusDetails description]
+     * @var [type]
+     */
     private $cusDetails;
+    /**
+     * [$exemptionEngine description]
+     * @var [type]
+     */
     private $exemptionEngine;
+    /**
+     * [$thirdparty description]
+     * @var [type]
+     */
     private $thirdparty;
+    /**
+     * [$shippingfee description]
+     * @var [type]
+     */
     private $shippingfee;
+    /**
+     * [$exponent description]
+     * @var [type]
+     */
     private $exponent;
+    /**
+     * [$primeRoutingData description]
+     * @var [type]
+     */
     private $primeRoutingData;
 
     /**
@@ -75,27 +186,31 @@ EOD;
     }
 
     /**
-     * Build xml for processing Request
+     * [build description]
      *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param string $orderDescription
-     * @param string $currencyCode
-     * @param float $amount
-     * @param array $paymentDetails
-     * @param array $cardAddress
-     * @param string $shopperEmail
-     * @param string $acceptHeader
-     * @param string $userAgentHeader
-     * @param string $shippingAddress
-     * @param float $billingAddress
-     * @param string $thirdparty
-     * @param string $shopperId
-     * @param string $saveCardEnabled
-     * @param string $tokenizationEnabled
-     * @param string $storedCredentialsEnabled
-     * @param string $cusDetails
-     * @return SimpleXMLElement $xml
+     * @param  [type] $merchantCode             [description]
+     * @param  [type] $orderCode                [description]
+     * @param  [type] $orderDescription         [description]
+     * @param  [type] $currencyCode             [description]
+     * @param  [type] $amount                   [description]
+     * @param  [type] $paymentDetails           [description]
+     * @param  [type] $cardAddress              [description]
+     * @param  [type] $shopperEmail             [description]
+     * @param  [type] $acceptHeader             [description]
+     * @param  [type] $userAgentHeader          [description]
+     * @param  [type] $shippingAddress          [description]
+     * @param  [type] $billingAddress           [description]
+     * @param  [type] $shopperId                [description]
+     * @param  [type] $saveCardEnabled          [description]
+     * @param  [type] $tokenizationEnabled      [description]
+     * @param  [type] $storedCredentialsEnabled [description]
+     * @param  [type] $cusDetails               [description]
+     * @param  [type] $exemptionEngine          [description]
+     * @param  [type] $thirdparty               [description]
+     * @param  [type] $shippingfee              [description]
+     * @param  [type] $exponent                 [description]
+     * @param  [type] $primeRoutingData         [description]
+     * @return [type]                           [description]
      */
     public function build(
         $merchantCode,
@@ -156,14 +271,14 @@ EOD;
     }
 
     /**
-     * Build xml for 3dsecure processing Request
+     * [build3DSecure description]
      *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param array $paymentDetails
-     * @param $paResponse,
-     * @param $echoData
-     * @return SimpleXMLElement $xml
+     * @param  [type] $merchantCode   [description]
+     * @param  [type] $orderCode      [description]
+     * @param  [type] $paymentDetails [description]
+     * @param  [type] $paResponse     [description]
+     * @param  [type] $echoData       [description]
+     * @return [type]                 [description]
      */
     public function build3DSecure(
         $merchantCode,
@@ -191,7 +306,7 @@ EOD;
      * @param string $merchantCode
      * @param string $orderCode
      * @param array $paymentDetails
-     * @param $dfReferenceId
+     * @param stirng $dfReferenceId
      * @return SimpleXMLElement $xml
      */
     public function build3Ds2Secure(
@@ -603,6 +718,7 @@ EOD;
     
     /**
      * Add Customer Risk Data  and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     protected function _addCustomerRiskData($order)
@@ -704,6 +820,7 @@ EOD;
     
     /**
      * Add  Risk Data  and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     protected function _addRiskData($order)
@@ -727,6 +844,7 @@ EOD;
     
     /**
      * Add Additional3Ds data and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     protected function _addAdditional3DsElement($order)
@@ -743,6 +861,7 @@ EOD;
     
     /**
      * Add Exemption Engine data and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     protected function _addExemptionEngineElement($order)
@@ -757,8 +876,10 @@ EOD;
     }
 
     /**
-     * @param SimpleXMLElement $element
-     * @param string $content
+     * [_addCDATA description]
+     *
+     * @param [type] $element [description]
+     * @param [type] $content [description]
      */
     protected function _addCDATA($element, $content)
     {
@@ -766,10 +887,11 @@ EOD;
         $no   = $node->ownerDocument;
         $node->appendChild($no->createCDATASection($content));
     }
-
     /**
-     * @param float $amount
-     * @return int
+     * [_amountAsInt description]
+     *
+     * @param  [type] $amount [description]
+     * @return [type]         [description]
      */
     private function _amountAsInt($amount)
     {
@@ -777,9 +899,9 @@ EOD;
     }
     
     /**
-     * @param element $paymentDetailsElement
+     * [_addStoredCredentials description]
      *
-     * @return string
+     * @param [type] $paymentDetailsElement [description]
      */
     private function _addStoredCredentials($paymentDetailsElement)
     {
@@ -789,9 +911,9 @@ EOD;
     }
     
     /**
-     * @param element $paymentDetailsElement
+     * [_addPaymentDetailsForStoredCredentialsOrder description]
      *
-     * @return string
+     * @param [type] $paymentDetailsElement [description]
      */
     private function _addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement)
     {
@@ -800,7 +922,11 @@ EOD;
         $storedCredentials->addChild('schemeTransactionIdentifier', $this->paymentDetails['transactionIdentifier']);
         return $storedCredentials;
     }
-    
+    /**
+     * [_addThirdPartyData description]
+     *
+     * @param [type] $order [description]
+     */
     private function _addThirdPartyData($order)
     {
         $thirdparty = $order->addChild('thirdPartyData');
@@ -818,7 +944,11 @@ EOD;
         
         return $thirdparty;
     }
-    
+    /**
+     * [_addPrimeRoutingElement description]
+     *
+     * @param [type] $order [description]
+     */
     private function _addPrimeRoutingElement($order)
     {
         $primeRouting = $order->addChild('primeRoutingRequest');
@@ -834,7 +964,11 @@ EOD;
         }
         return $primeRouting;
     }
-    
+    /**
+     * [_addFraudSightData description]
+     *
+     * @param [type] $order [description]
+     */
     private function _addFraudSightData($order)
     {
         $fraudsightData = $order->addChild('FraudSightData');

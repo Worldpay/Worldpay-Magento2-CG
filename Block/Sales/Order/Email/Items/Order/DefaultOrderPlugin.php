@@ -23,8 +23,10 @@ class DefaultOrderPlugin
     }
 
     /**
+     * After GetItem Options Plugin
+     *
      * @param \Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder $subject
-     * @param $result
+     * @param array $result
      * @return array
      */
     public function afterGetItemOptions(\Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder $subject, $result)

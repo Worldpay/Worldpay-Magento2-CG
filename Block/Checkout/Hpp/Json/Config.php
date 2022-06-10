@@ -26,6 +26,8 @@ class Config extends \Magento\Framework\View\Element\Template
         parent::__construct($context, $data);
     }
     /**
+     * Render block HTML
+     *
      * @return json
      */
     protected function _toHtml()

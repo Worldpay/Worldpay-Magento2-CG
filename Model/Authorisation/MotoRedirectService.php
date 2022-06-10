@@ -8,7 +8,10 @@ use Exception;
 
 class MotoRedirectService extends \Magento\Framework\DataObject
 {
+    /** @var  session */
     protected $_session;
+
+    /** @var  redirectResponseModel */
     protected $_redirectResponseModel;
 
     /**
@@ -48,7 +51,18 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         $this->_urlBuilder = $urlBuilder;
         $this->worldpayhelper = $worldpayhelper;
     }
-    
+
+    /**
+     * AuthorizePayment
+     *
+     * @param int|string $mageOrder
+     * @param int|string $quote
+     * @param int|string $orderCode
+     * @param int|string $orderStoreId
+     * @param int|string $paymentDetails
+     * @param int|string $payment
+     * @return string
+     */
     public function authorizePayment(
         $mageOrder,
         $quote,
@@ -78,6 +92,14 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         $this->checkoutsession->setAdminWpRedirecturl($successUrl);
     }
 
+    /**
+     * BuildRedirectUrl
+     *
+     * @param int|string $responseXml
+     * @param int|string $paymentType
+     * @param int|string $countryCode
+     * @return string
+     */
     private function _buildRedirectUrl($responseXml, $paymentType, $countryCode)
     {
         $redirectUrl = $this->_getUrlFromResponse($responseXml);
@@ -87,6 +109,12 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return $redirectUrl;
     }
 
+    /**
+     * GetUrlFromResponse
+     *
+     * @param int|string $responseXml
+     * @return string
+     */
     private function _getUrlFromResponse($responseXml)
     {
         $responseXmlElement = new \SimpleXmlElement($responseXml);
@@ -95,6 +123,12 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return trim($url[0]);
     }
 
+    /**
+     * AddOutcomeRoutes
+     *
+     * @param int|string $redirectUrl
+     * @return string
+     */
     private function _addOutcomeRoutes($redirectUrl)
     {
         $redirectUrl .= '&successURL=' . $this->_encodeUrl('worldpay/motoRedirectResult/success');
@@ -104,6 +138,14 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return $redirectUrl;
     }
 
+    /**
+     * AddExtraUrlParameters
+     *
+     * @param int|string $redirectUrl
+     * @param int|string $paymentType
+     * @param int|string $countryCode
+     * @return string
+     */
     private function _addExtraUrlParameters($redirectUrl, $paymentType, $countryCode)
     {
         $redirectUrl .= '&preferredPaymentMethod=' . $paymentType;
@@ -113,6 +155,13 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return $redirectUrl;
     }
 
+    /**
+     * EncodeUrl
+     *
+     * @param int|string $path
+     * @param int|string $additionalParams
+     * @return string
+     */
     private function _encodeUrl($path, $additionalParams = [])
     {
         $urlParams = ['_type' => 'direct_link', '_secure' => true];
@@ -124,6 +173,12 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return $rawurlencode;
     }
 
+    /**
+     * GetCountryForQuote
+     *
+     * @param int|string $quote
+     * @return string
+     */
     private function _getCountryForQuote($quote)
     {
         $address = $quote->getBillingAddress();
@@ -135,7 +190,7 @@ class MotoRedirectService extends \Magento\Framework\DataObject
     }
 
     /**
-     * Get the locale for selected language
+     * GetLanguageForLocale
      *
      * @return string
      */

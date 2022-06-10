@@ -46,8 +46,17 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
     }
     
     /**
-     * handles provides authorization data for Hosted Payment Page integration
+     * Handles provides authorization data for Hosted Payment Page integration
+     *
      * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
+     *
+     * @param int|string $mageOrder
+     * @param int|string $quote
+     * @param int|string $orderCode
+     * @param int|string $orderStoreId
+     * @param int|string $paymentDetails
+     * @param int|string $payment
+     * @return string
      */
     public function authorizePayment(
         $mageOrder,

@@ -54,7 +54,7 @@ class Plan extends \Magento\Framework\Model\AbstractModel
     /**
      * Load plan Details
      *
-     *
+     * @param string $planId
      */
     public function loadById($planId)
     {

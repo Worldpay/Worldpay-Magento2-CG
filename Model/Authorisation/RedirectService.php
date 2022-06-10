@@ -48,7 +48,15 @@ class RedirectService extends \Magento\Framework\DataObject
     
     /**
      * Handles provides authorization data for redirect
+     *
      * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
+     *
+     * @param string $mageOrder
+     * @param string $quote
+     * @param string $orderCode
+     * @param string $orderStoreId
+     * @param string $paymentDetails
+     * @param string $payment
      */
     public function authorizePayment(
         $mageOrder,
@@ -91,12 +99,22 @@ class RedirectService extends \Magento\Framework\DataObject
             );
             $response = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
         }
-        $successUrl = $this->_buildRedirectUrl(
-            $this->_getRedirectResponseModel()->getRedirectLocation($response),
-            $redirectOrderParams['paymentType'],
-            $this->_getCountryForQuote($quote),
-            $this->_getLanguageForLocale()
-        );
+       
+        if($paymentDetails['additional_data']['cc_type'] == 'savedcard'){
+            $successUrl = $this->_buildRedirectUrl(
+                $this->_getRedirectResponseModel()->getRedirectLocation($response),
+               null,
+               $this->_getCountryForQuote($quote),
+               $this->_getLanguageForLocale()
+            );
+        }else{
+            $successUrl = $this->_buildRedirectUrl(
+                $this->_getRedirectResponseModel()->getRedirectLocation($response),
+                $redirectOrderParams['paymentType'],
+                $this->_getCountryForQuote($quote),
+                $this->_getLanguageForLocale()
+            );
+        }
 
         $payment->setIsTransactionPending(1);
 
@@ -104,6 +122,14 @@ class RedirectService extends \Magento\Framework\DataObject
         $this->checkoutsession->setWpRedirecturl($successUrl);
     }
 
+    /**
+     * BuildRedirectUrl
+     *
+     * @param string|int $redirect
+     * @param string|int $paymentType
+     * @param string|int $countryCode
+     * @param string|int $languageCode
+     */
     private function _buildRedirectUrl($redirect, $paymentType, $countryCode, $languageCode)
     {
         $redirect .= '&preferredPaymentMethod=' . $paymentType;
@@ -115,6 +141,8 @@ class RedirectService extends \Magento\Framework\DataObject
 
     /**
      * Get billing Country
+     *
+     * @param string $quote
      * @return string
      */
     private function _getCountryForQuote($quote)

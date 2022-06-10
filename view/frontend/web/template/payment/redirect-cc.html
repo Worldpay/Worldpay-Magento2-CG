@@ -3,7 +3,7 @@
         <input type="radio"
                name="payment[method]"
                class="radio"
-               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"></input>
 
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
         
@@ -41,7 +41,7 @@
                     <div class="paymentmethods-radio-wrapper">
                         <input type="radio"  data-bind="event:{ change: $parent.loadEventAction }, attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
                                         'validate-one-required-by-name':true
-                                                }),id: 'redirect_cc_' + item.ccValue}" name="payment[cc_type]" />
+                                                }),id: 'redirect_cc_' + item.ccValue}" name="payment[cc_type]"></input>
                         <!--ko if: $parent.getIcons(item.ccValue) -->
                             <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}"><img data-bind="attr: {
                                     'src': $parent.getIcons(item.ccValue).url,
@@ -116,7 +116,7 @@
                                     enable: isActive($parents),
                                     value: isCPF,
                                     valueUpdate: 'keyup'"
-                                   /> 
+                                   ></input> 
                         </div>
                             </div>
                     <div class="field instalment required"  data-bind="visible: (showInstalmentSection())">

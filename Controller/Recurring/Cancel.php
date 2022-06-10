@@ -32,12 +32,19 @@ class Cancel extends \Magento\Framework\App\Action\Action
      */
     private $customerSession;
     
+    /**
+     * Worldpay helper
+     *
+     * @var \Magento\Catalog\Helper\Data
+     */
     private $helper;
     
     /**
      * @param Context $context
      * @param Session $customerSession
      * @param SubscriptionFactory $subscriptionFactory
+     * @param TransactionsFactory $transactionFactory
+     * @param MyAccountException $helper
      */
     public function __construct(
         Context $context,
@@ -70,6 +77,8 @@ class Cancel extends \Magento\Framework\App\Action\Action
     }
 
     /**
+     * Execute action
+     *
      * @return \Magento\Framework\Controller\ResultInterface|ResponseInterface
      * @throws \Magento\Framework\Exception\NotFoundException
      */

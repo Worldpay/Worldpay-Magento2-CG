@@ -11,7 +11,7 @@
                    checked: $parent.paymentToken,
                    attr: {id: 'saved_card_' + id,
                    'data-validate': JSON.stringify({'required':true})}
-               "/>
+               "></input>
         
         <label class="label" for="wp_save_card" data-bind='attr: {for: "saved_card_" + id}'>
             <!--ko if: $parent.getIcons(method) -->
@@ -49,7 +49,7 @@
                           'data-container': getCode() + '-cc-cvv',
                           enable: isActive($parents),
                           value: SavedcreditCardVerificationNumber"
-               />
+               ></input>
         <div class="field-tooltip toggle">
             <span class="field-tooltip-action action-cvv"
                   tabindex="0"
@@ -80,7 +80,7 @@
                                     enable: isActive($parents),
                                     value: isCPF,
                                     valueUpdate: 'keyup'"
-                           /> 
+                           ></input> 
                 </div>
             </div>
             <div class="field instalment required" style="width: 225px;" data-bind="visible: (showInstalmentSection())">
@@ -121,7 +121,7 @@
                                             'worldpay-validate-latm-desc':true
                                     })},
                                     enable: isActive($parents)
-                       "/>  
+                       "></input>  
             </div>
 <!-- /ko -->
 

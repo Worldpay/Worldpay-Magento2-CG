@@ -14,8 +14,15 @@ use Magento\Framework\Phrase;
  */
 class AdminLabels extends \Magento\Framework\App\Config\Value
 {
-
+    /**
+     * [$generalexception description]
+     * @var [type]
+     */
     private $generalexception;
+    /**
+     * [$storeManager description]
+     * @var [type]
+     */
     private $storeManager;
 
     /**

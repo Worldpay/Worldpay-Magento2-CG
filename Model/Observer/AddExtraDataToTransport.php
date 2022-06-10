@@ -9,6 +9,7 @@ use Magento\Framework\Event\ObserverInterface;
 class AddExtraDataToTransport implements ObserverInterface
 {
 
+    /**  @var Worldpaypayment*/
     protected $worldpaypayment;
 
     /**

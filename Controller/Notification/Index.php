@@ -16,16 +16,32 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     protected $pageFactory;
 
+    /**
+     * @var string
+     */
     protected $_rawBody;
+    /**
+     * [$fileDriver description]
+     * @var [type]
+     */
+    protected $fileDriver;
     /**
      * @var \Sapient\Worldpay\Model\HistoryNotificationFactory
      */
     protected $historyNotification;
     
+    /**
+     * @var \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations
+     */
     private $abstractMethod;
-
-    const RESPONSE_OK = '[OK]';
-    const RESPONSE_FAILED = '[FAILED]';
+    /**
+     * @var RESPONSE_OK
+     */
+    public const RESPONSE_OK = '[OK]';
+    /**
+     * @var RESPONSE_FAILED
+     */
+    public const RESPONSE_FAILED = '[FAILED]';
     
     /**
      * Constructor
@@ -38,6 +54,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod
      * @param \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
+     * @param \Magento\Framework\Filesystem\DriverInterface $fileDriver
      */
     public function __construct(
         Context $context,
@@ -47,7 +64,8 @@ class Index extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod,
-        \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
+        \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification,
+        \Magento\Framework\Filesystem\DriverInterface $fileDriver
     ) {
         parent::__construct($context);
         $this->wplogger = $wplogger;
@@ -57,8 +75,15 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->historyNotification = $historyNotification;
         $this->worldpaytoken = $worldpaytoken;
         $this->abstractMethod = $abstractMethod;
+        $this->fileDriver = $fileDriver;
     }
 
+    /**
+     * Execute action
+     *
+     * @return string
+     * @throws \Exception
+     */
     public function execute()
     {
         $this->wplogger->info('notification index url hit');
@@ -88,10 +113,15 @@ class Index extends \Magento\Framework\App\Action\Action
         }
     }
 
+    /**
+     * Return the raw body of the request
+     *
+     * @return false|string Raw body, or false if not present
+     */
     public function _getRawBody()
     {
         if (null === $this->_rawBody) {
-            $body = file_get_contents('php://input');
+            $body = $this->fileDriver->fileGetContents('php://input');
 
             if (strlen(trim($body)) > 0) {
                 $this->_rawBody = $body;
@@ -103,7 +133,9 @@ class Index extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * @param $xmlRequest SimpleXMLElement
+     * Create payment update
+     *
+     * @param SimpleXMLElement $xmlRequest
      */
     private function _createPaymentUpdate($xmlRequest)
     {
@@ -116,6 +148,9 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->_logNotification();
     }
 
+    /**
+     * Log notification
+     */
     private function _logNotification()
     {
 //        $this->wplogger->info('########## Received notification ##########');
@@ -135,6 +170,11 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
     }
 
+    /**
+     * Try to apply payment update
+     *
+     * @throws Exception
+     */
     private function _tryToApplyPaymentUpdate()
     {
         try {
@@ -148,7 +188,9 @@ class Index extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * @param $xmlRequest SimpleXMLElement
+     * Apply token update
+     *
+     * @param SimpleXMLElement $xmlRequest
      */
     private function _applyTokenUpdate($xmlRequest)
     {
@@ -160,6 +202,11 @@ class Index extends \Magento\Framework\App\Action\Action
         );
     }
 
+    /**
+     * Set response code 200
+     *
+     * @return string
+     */
     public function _returnOk()
     {
         $resultJson = $this->resultJsonFactory->create();
@@ -168,6 +215,11 @@ class Index extends \Magento\Framework\App\Action\Action
         return $resultJson;
     }
 
+    /**
+     * Set response code 500
+     *
+     * @return string
+     */
     public function _returnFailure()
     {
         $resultJson = $this->resultJsonFactory->create();
@@ -178,6 +230,8 @@ class Index extends \Magento\Framework\App\Action\Action
 
     /**
      * Save Notification
+     *
+     * @param SimpleXMLElement $xml
      */
     private function updateNotification($xml)
     {
@@ -196,6 +250,9 @@ class Index extends \Magento\Framework\App\Action\Action
         $hn->save();
     }
     
+    /**
+     * Update order status
+     */
     private function _updateOrderStatus()
     {
         $this->abstractMethod->updateOrderStatusForVoidSale($this->_order);

@@ -27,12 +27,21 @@ class Service
         $this->cart = $cart;
         $this->wplogger = $wplogger;
     }
-    
+    /**
+     * [clearSession description]
+     *
+     * @return [type] [description]
+     */
     public function clearSession()
     {
         $this->checkoutsession->clearQuote();
     }
-
+    /**
+     * [reactivateQuoteForOrder description]
+     *
+     * @param  \Sapient\Worldpay\Model\Order $order [description]
+     * @return [type]                               [description]
+     */
     public function reactivateQuoteForOrder(\Sapient\Worldpay\Model\Order $order)
     {
 

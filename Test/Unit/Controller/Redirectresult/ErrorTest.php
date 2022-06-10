@@ -19,8 +19,14 @@ use Sapient\Worldpay\Controller\Redirectresult\Error;
 
 class ErrorTest extends TestCase
 {
-    
+    /**
+     * [$errorObj description]
+     * @var [type]
+     */
     protected $errorObj;
+    /**
+     * [setUp description]
+     */
     protected function setUp()
     {
         $context = $this->getMockBuilder(Context::class)
@@ -51,7 +57,10 @@ class ErrorTest extends TestCase
             $helper
         );
     }
-    
+    /**
+     * [testExecute description]
+     * @return [type] [description]
+     */
     public function testExecute()
     {
         $this->assertInstanceOf(Error::class, $this->errorObj);

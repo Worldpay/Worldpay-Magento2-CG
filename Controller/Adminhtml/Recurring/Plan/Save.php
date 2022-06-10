@@ -7,6 +7,7 @@ namespace Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan;
 
 use Magento\Framework\Controller\ResultFactory;
 use Sapient\Worldpay\Helper\GeneralException;
+use Laminas\Uri\Uri;
 
 class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
 {
@@ -15,8 +16,18 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
      */
     private $planGridDataProvider;
     
+    /**
+     * Worldpay helper
+     *
+     * @var \Magento\Catalog\Helper\Data
+     */
     private $helper;
     
+    /**
+     * Store manager interface
+     *
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
     private $storeManager;
 
     /**
@@ -28,6 +39,8 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
      * @param \Magento\Framework\Locale\FormatInterface $localeFormat
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Sapient\Worldpay\Helper\GeneralException $helper
+     * @param \Laminas\Uri\Uri $uri
+     * @param \Magento\Framework\App\Response\RedirectInterface $redirect
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -35,24 +48,31 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
         \Sapient\Worldpay\Ui\DataProvider\Product\Form\Modifier\Data\RecurringPlans $planGridDataProvider,
         \Magento\Framework\Locale\FormatInterface $localeFormat,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Sapient\Worldpay\Helper\GeneralException $helper
+        \Sapient\Worldpay\Helper\GeneralException $helper,
+        \Laminas\Uri\Uri $uri,
+        \Magento\Framework\App\Response\RedirectInterface $redirect
     ) {
         parent::__construct($context, $planFactory);
         $this->planGridDataProvider = $planGridDataProvider;
         $this->localeFormat = $localeFormat;
         $this->helper = $helper;
         $this->storeManager = $storeManager;
+        $this->uri = $uri;
+        $this->redirect = $redirect;
     }
     
     /**
+     * Execute request
+     *
      * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
     {
         $data = $this->getRequest()->getPostValue();
         //$productId = $this->getRequest()->getParam('product_id');
-        $url = parse_url($this->_redirect->getRefererUrl());
-        $path_parts=explode('/', $url['path']);
+        //$url = parse_url($this->_redirect->getRefererUrl());
+        $parsedUrl = $this->uri->parse($this->redirect->getRefererUrl());
+        $path_parts=explode('/', $parsedUrl->getPath());
         if (in_array('id', $path_parts)) {
             $key = array_search('id', $path_parts);
             $productId = $path_parts[$key+1];

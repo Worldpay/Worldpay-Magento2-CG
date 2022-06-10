@@ -14,9 +14,15 @@ use Sapient\Worldpay\Controller\Redirectresult\Redirect;
 
 class RedirectTest extends TestCase
 {
-
+    /**
+     * [$redirectObj description]
+     * @var [type]
+     */
     protected $redirectObj;
 
+    /**
+     * [setUp description]
+     */
     protected function setUp()
     {
         $context = $this->getMockBuilder(Context::class)

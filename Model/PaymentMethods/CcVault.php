@@ -29,18 +29,51 @@ use Magento\Vault\Model\VaultPaymentInterface;
 
 class CcVault extends \Magento\Vault\Model\Method\Vault
 {
+    /**
+     * @var $_code
+     */
     protected $_code = 'worldpay_cc_vault';
+    /**
+     * @var $_isGateway
+     */
     protected $_isGateway = true;
+    /**
+     * @var $_canAuthorize
+     */
     protected $_canAuthorize = true;
+    /**
+     * @var $_canUseInternal
+     */
     protected $_canUseInternal = false;
+    /**
+     * @var $_canUseCheckout
+     */
     protected $_canUseCheckout = true;
+    /**
+     * @var $_canCapture
+     */
     protected $_canCapture = true;
+    /**
+     * @var $_canRefund
+     */
     protected $_canRefund = true;
+    /**
+     * @var $_canRefundInvoicePartial
+     */
     protected $_canRefundInvoicePartial = true;
+    /**
+     * @var $_canVoid
+     */
     protected $_canVoid = true;
+    /**
+     * @var $_canCapturePartial
+     */
     protected $_canCapturePartial = true;
 
-     const DIRECT_MODEL = 'direct';
+    public const DIRECT_MODEL = 'direct';
+    /**
+     * @var $paymentDetails
+     */
     protected static $paymentDetails;
 
     /**
@@ -113,6 +146,12 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $this->registry = $registry;
     }
     
+    /**
+     * Initialize
+     *
+     * @param string $paymentAction
+     * @param string $stateObject
+     */
     public function initialize($paymentAction, $stateObject)
     {
         $payment = $this->getInfoInstance();
@@ -128,6 +167,12 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $stateObject->setIsNotified(false);
     }
 
+    /**
+     * Addtransaction
+     *
+     * @param string $payment
+     * @param string $amount
+     */
     protected function _addtransaction($payment, $amount)
     {
         $order = $payment->getOrder();
@@ -146,6 +191,11 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $payment->addTransactionCommentsToOrder($transaction, $message);
     }
 
+    /**
+     * GenerateOrderCode
+     *
+     * @param string $quote
+     */
     private function _generateOrderCode($quote)
     {
         return $quote->getReservedOrderId() . '-' . time();
@@ -201,6 +251,15 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         return $this->vaultService;
     }
     
+    /**
+     * CreateWorldPayPayment
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param string $orderCode
+     * @param string $storeId
+     * @param string $orderId
+     * @param string $interactionType
+     */
     private function _createWorldPayPayment(
         \Magento\Payment\Model\InfoInterface $payment,
         $orderCode,
@@ -212,7 +271,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $integrationType =$this->worlpayhelper->getIntegrationModelByPaymentMethodCode($payment->getMethod(), $storeId);
         $wpp = $this->worldpaypayment->create();
         $wpp->setData('order_id', $orderId);
-        $wpp->setData('payment_status', \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION);
+        $wpp->setData('payment_status', \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION);
         $wpp->setData('worldpay_order_id', $orderCode);
         $wpp->setData('store_id', $storeId);
         $wpp->setData('merchant_id', $this->worlpayhelper->getMerchantCode($paymentdetails['cc_type']));
@@ -234,8 +293,8 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
     {
         $this->logger->info('Vault capture function executed');
         $mageOrder = $payment->getOrder();
-        $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
-        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
+        //$quote = $this->quoteRepository->get($mageOrder->getQuoteId());
+        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
         $paymenttype = $worldPayPayment->getPaymentType();
         if ($this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype)) {
             $this->paymentservicerequest->capture(
@@ -248,6 +307,12 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         return $this;
     }
     
+    /**
+     * Refund
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param string $amount
+     */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         $this->logger->info('Vault refund payment model function executed');
@@ -277,12 +342,15 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         );
     }
     
+    /**
+     * CanRefund
+     */
     public function canRefund()
     {
         $payment = $this->getInfoInstance()->getOrder()->getPayment();
         $mageOrder = $payment->getOrder();
-        $quote = $this->quoteRepository->get($mageOrder->getQuoteId());
-        $wpPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
+        //$quote = $this->quoteRepository->get($mageOrder->getQuoteId());
+        $wpPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
 
         if ($wpPayment) {
             return $this->_isRefundAllowed($wpPayment->getPaymentStatus());
@@ -302,13 +370,13 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $allowed = in_array(
             $state,
             [
-                \Sapient\Worldpay\Model\Payment\State::STATUS_CAPTURED,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_SETTLED,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_SETTLED_BY_MERCHANT,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_REFUND,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_REFUNDED,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_REFUNDED_BY_MERCHANT,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_REFUND_FAILED
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_CAPTURED,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SETTLED,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SETTLED_BY_MERCHANT,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_REFUND,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_REFUNDED,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_REFUNDED_BY_MERCHANT,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_REFUND_FAILED
             ]
         );
         return $allowed;

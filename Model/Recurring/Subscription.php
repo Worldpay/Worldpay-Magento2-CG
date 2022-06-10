@@ -76,11 +76,9 @@ use Sapient\Worldpay\Model\Config\Source\SubscriptionStatus;
  */
 class Subscription extends \Magento\Framework\Model\AbstractModel
 {
-    const REGISTRY_NAME = 'current_worldpay_subscription';
+    public const REGISTRY_NAME = 'current_worldpay_subscription';
 
     /**
-     * Store manager
-     *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManager;
@@ -162,15 +160,14 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     private $transactionsFactory;
 
     /**
-     * Subscription model constructor.
+     * Subscription model constructor
      *
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param SubscriptionStatus $statusSource
      * @param \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
-     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\CollectionFactory
-     * $addressCollectionFactory
+     * @param CollectionFactory $addressCollectionFactory
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
@@ -801,6 +798,11 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $transactions->save();
     }
     
+    /**
+     * GetOrderStatus
+     *
+     * @param string $orderId
+     */
     public function getOrderStatus($orderId)
     {
         $order = $this->orderRepository->get($orderId);
@@ -811,7 +813,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     /**
      * Load subscription Details
      *
-     *
+     * @param string|int $order_id
      */
     public function loadByOrderId($order_id)
     {

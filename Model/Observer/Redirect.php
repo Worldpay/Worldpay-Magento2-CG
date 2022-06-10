@@ -10,7 +10,9 @@ use Exception;
 
 class Redirect implements ObserverInterface
 {
+    /**  @var ResponseFactory*/
     protected $_responseFactory;
+    /**  @var Url*/
     protected $_url;
     
     /**

@@ -5,7 +5,15 @@ namespace Sapient\Worldpay\Observer\Backend\Sales;
 
 class OrderInvoicePay implements \Magento\Framework\Event\ObserverInterface
 {
-    
+    /**
+     * [__construct description]
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger               $wplogger             [description]
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentServiceReq    [description]
+     * @param \Sapient\Worldpay\Model\Worldpayment                  $worldpaypaymentmodel [description]
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface    $scopeConfig          [description]
+     * @param \Magento\Framework\Message\ManagerInterface           $messageManager       [description]
+     * @param \Magento\Framework\App\RequestInterface               $request              [description]
+     */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentServiceReq,

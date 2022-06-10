@@ -9,13 +9,26 @@ namespace Sapient\Worldpay\Model\XmlBuilder\Config;
  */
 class TokenConfiguration
 {
+    /**
+     * [$createTokenBeforeAuth description]
+     * @var [type]
+     */
     private $createTokenBeforeAuth = false;
+    /**
+     * [$createTokenAndAuthTogether description]
+     * @var [type]
+     */
     private $createTokenAndAuthTogether = false;
+    /**
+     * [$createTokenEnabled description]
+     * @var [type]
+     */
     private $createTokenEnabled = false;
     
     /**
-     * @param bool $isDynamic3D
-     * @param bool $is3DSecure
+     * [__construct description]
+     *
+     * @param [type] $args [description]
      */
     public function __construct($args)
     {
@@ -35,6 +48,7 @@ class TokenConfiguration
     /**
      * Get token reason
      *
+     * @param string $orderCode
      * @return string
      */
     public function getTokenReason($orderCode = null)

@@ -12,6 +12,10 @@ use Magento\Framework\Phrase;
  */
 class GeneralException extends \Magento\Framework\App\Config\Value
 {
+    /**
+     * [$storeManager description]
+     * @var [type]
+     */
     private $storeManager;
     /**
      * @param \Magento\Framework\Model\Context $context

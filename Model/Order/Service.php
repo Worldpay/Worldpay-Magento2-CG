@@ -104,7 +104,7 @@ class Service
     {
         $order = $this->getAuthorisedOrder();
         $magentoorder = $order->getOrder();
-        $this->emailsender->send($magentoorder);
+        $this->emailsender->authorisedEmailSend($magentoorder, true);
     }
 
     /**

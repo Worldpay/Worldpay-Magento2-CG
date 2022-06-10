@@ -16,15 +16,21 @@ class Sample extends \Magento\Framework\App\Action\Action
      */
     protected $pageFactory;
 
+    /**
+     * @var string
+     */
     protected $_rawBody;
     /**
      * @var \Sapient\Worldpay\Model\HistoryNotificationFactory
      */
     protected $historyNotification;
 
-    const RESPONSE_OK = '[OK]';
-    const RESPONSE_FAILED = '[FAILED]';
+    public const RESPONSE_OK = '[OK]';
+    public const RESPONSE_FAILED = '[FAILED]';
     
+    /**
+     * @var Cron
+     */
     private $cron;
 
     /**
@@ -37,6 +43,7 @@ class Sample extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
+     * @param \Sapient\Worldpay\Cron\RecurringOrders $cron
      */
     public function __construct(
         Context $context,
@@ -58,6 +65,11 @@ class Sample extends \Magento\Framework\App\Action\Action
         $this->cron = $cron;
     }
 
+    /**
+     * Execute action
+     *
+     * @return bool
+     */
     public function execute()
     {
         //echo 'sanju';

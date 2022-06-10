@@ -4,21 +4,24 @@
  */
 namespace Sapient\Worldpay\Model\Payment\Update;
 
-class RefundFailed extends \Sapient\Worldpay\Model\Payment\Update\Base implements \Sapient\Worldpay\Model\Payment\Update
+use \Sapient\Worldpay\Model\Payment\UpdateInterface;
+
+class RefundFailed extends \Sapient\Worldpay\Model\Payment\Update\Base implements
+    \Sapient\Worldpay\Model\Payment\UpdateInterface
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
-    const REFUND_FAILED_COMMENT  = 'The attempted refund request FAILED.';
-    const REFUND_EXPIRED_COMMENT = 'The attempted refund request EXPIRED.';
+    public const REFUND_FAILED_COMMENT  = 'The attempted refund request FAILED.';
+    public const REFUND_EXPIRED_COMMENT = 'The attempted refund request EXPIRED.';
     /**
      * Constructor
      *
-     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
+     * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
      */
     public function __construct(
-        \Sapient\Worldpay\Model\Payment\State $paymentState,
+        \Sapient\Worldpay\Model\Payment\StateInterface $paymentState,
         \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment,
         \Sapient\Worldpay\Helper\Data $configHelper
     ) {
@@ -26,7 +29,14 @@ class RefundFailed extends \Sapient\Worldpay\Model\Payment\Update\Base implement
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
     }
-    
+
+    /**
+     * Apply
+     *
+     * @param string|int $payment
+     * @param string|int|null $order
+     * @return array
+     */
     public function apply($payment, $order = null)
     {
         $paymentStatus = $this->_paymentState->getPaymentStatus();
@@ -34,7 +44,7 @@ class RefundFailed extends \Sapient\Worldpay\Model\Payment\Update\Base implement
             $this->_paymentState->getPaymentStatus()
         );
 
-        if ($paymentStatus == \Sapient\Worldpay\Model\Payment\State::STATUS_REFUND_EXPIRED) {
+        if ($paymentStatus == \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_REFUND_EXPIRED) {
             $this->_message = self::REFUND_EXPIRED_COMMENT;
         } else {
             $this->_message = self::REFUND_FAILED_COMMENT;

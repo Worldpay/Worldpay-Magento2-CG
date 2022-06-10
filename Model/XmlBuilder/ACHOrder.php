@@ -12,52 +12,116 @@ use \Sapient\Worldpay\Logger\WorldpayLogger;
  */
 class ACHOrder
 {
-    const TOKEN_SCOPE = 'shopper';
-    const ROOT_ELEMENT = <<<EOD
+    public const TOKEN_SCOPE = 'shopper';
+    public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
-
+    
+    /**
+     * [$merchantCode description]
+     * @var [type]
+     */
     private $merchantCode;
+    /**
+     * [$orderCode description]
+     * @var [type]
+     */
     private $orderCode;
+    /**
+     * [$orderDescription description]
+     * @var [type]
+     */
     private $orderDescription;
+    /**
+     * [$currencyCode description]
+     * @var [type]
+     */
     private $currencyCode;
+    /**
+     * [$amount description]
+     * @var [type]
+     */
     private $amount;
+    /**
+     * [$paymentDetails description]
+     * @var [type]
+     */
     private $paymentDetails;
+    /**
+     * [$shopperEmail description]
+     * @var [type]
+     */
     private $shopperEmail;
+    /**
+     * [$acceptHeader description]
+     * @var [type]
+     */
     private $acceptHeader;
+    /**
+     * [$userAgentHeader description]
+     * @var [type]
+     */
     private $userAgentHeader;
+    /**
+     * [$shippingAddress description]
+     * @var [type]
+     */
     private $shippingAddress;
+    /**
+     * [$billingAddress description]
+     * @var [type]
+     */
     private $billingAddress;
+    /**
+     * [$paResponse description]
+     * @var null
+     */
     private $paResponse = null;
+    /**
+     * [$echoData description]
+     * @var null
+     */
     private $echoData = null;
+    /**
+     * [$shopperId description]
+     * @var [type]
+     */
     private $shopperId;
+    /**
+     * [$dfReferenceId description]
+     * @var null
+     */
     private $dfReferenceId = null;
+    /**
+     * [$statementNarrative description]
+     * @var [type]
+     */
     private $statementNarrative;
+    /**
+     * [$exponent description]
+     * @var [type]
+     */
     private $exponent;
     
     /**
-     * Build xml for processing Request
+     * [build description]
      *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param string $orderDescription
-     * @param string $currencyCode
-     * @param float $amount
-     * @param array $paymentDetails
-     * @param array $cardAddress
-     * @param string $shopperEmail
-     * @param string $acceptHeader
-     * @param string $userAgentHeader
-     * @param string $shippingAddress
-     * @param float $billingAddress
-     * @param string $thirdparty
-     * @param string $shopperId
-     * @param string $saveCardEnabled
-     * @param string $tokenizationEnabled
-     * @param string $storedCredentialsEnabled
-     * @param string $cusDetails
-     * @return SimpleXMLElement $xml
+     * @param  [type] $merchantCode       [description]
+     * @param  [type] $orderCode          [description]
+     * @param  [type] $orderDescription   [description]
+     * @param  [type] $currencyCode       [description]
+     * @param  [type] $amount             [description]
+     * @param  [type] $paymentDetails     [description]
+     * @param  [type] $shopperEmail       [description]
+     * @param  [type] $acceptHeader       [description]
+     * @param  [type] $userAgentHeader    [description]
+     * @param  [type] $shippingAddress    [description]
+     * @param  [type] $billingAddress     [description]
+     * @param  [type] $shopperId          [description]
+     * @param  [type] $statementNarrative [description]
+     * @param  [type] $exponent           [description]
+     * @return [type]                     [description]
      */
     public function build(
         $merchantCode,

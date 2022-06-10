@@ -23,9 +23,21 @@ class OrderSyncStatus
      * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
      */
     private $orderCollectionFactory;
+    /**
+     * @var string
+     */
     private $_orderId;
+    /**
+     * @var Order
+     */
     private $_order;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Update\Base
+     */
     private $_paymentUpdate;
+    /**
+     * @var \Sapient\Worldpay\Model\Token\StateXml
+     */
     private $_tokenState;
     
     /**
@@ -104,6 +116,8 @@ class OrderSyncStatus
     }
 
     /**
+     * Get order collection factory
+     *
      * @return CollectionFactoryInterface
      */
     private function getOrderCollectionFactory()
@@ -115,12 +129,23 @@ class OrderSyncStatus
         return $this->orderCollectionFactory;
     }
     
+    /**
+     * Load order
+     *
+     * @param string $orderId
+     */
     private function _loadOrder($orderId)
     {
         $this->_orderId = $orderId;
         $this->_order = $this->orderservice->getById($this->_orderId);
     }
 
+    /**
+     * Create sync request
+     *
+     * @return bool
+     * @thorws Exception
+     */
     public function createSyncRequest()
     {
         try {
@@ -139,6 +164,9 @@ class OrderSyncStatus
         return true;
     }
     
+    /**
+     * Fetch payment update
+     */
     private function _fetchPaymentUpdate()
     {
         $xml = $this->paymentservice->getPaymentUpdateXmlForOrder($this->_order);
@@ -146,11 +174,19 @@ class OrderSyncStatus
         $this->_tokenState = new \Sapient\Worldpay\Model\Token\StateXml($xml);
     }
 
+    /**
+     * Register worldpay model
+     */
     private function _registerWorldPayModel()
     {
         $this->paymentservice->setGlobalPaymentByPaymentUpdate($this->_paymentUpdate);
     }
 
+    /**
+     * Apply payment update
+     *
+     * @throws Exception
+     */
     private function _applyPaymentUpdate()
     {
         try {
@@ -160,6 +196,9 @@ class OrderSyncStatus
         }
     }
 
+    /**
+     * Apply token update
+     */
     private function _applyTokenUpdate()
     {
         $this->worldpaytoken->updateOrInsertToken($this->_tokenState, $this->_order->getPayment());

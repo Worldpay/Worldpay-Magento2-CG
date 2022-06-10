@@ -14,9 +14,21 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
      * @var string
      */
     protected $_code = 'worldpay_apm';
+    /**
+     * @var $_isGateway
+     */
     protected $_isGateway = true;
+    /**
+     * @var $_canAuthorize
+     */
     protected $_canAuthorize = true;
+    /**
+     * @var $_canUseInternal
+     */
     protected $_canUseInternal = false;
+    /**
+     * @var $_canUseCheckout
+     */
     protected $_canUseCheckout = true;
 
     /**
@@ -33,6 +45,11 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
         return $this;
     }
     
+    /**
+     * GetAuthorisationService
+     *
+     * @param string $storeId
+     */
     public function getAuthorisationService($storeId)
     {
         $apmmethods = $this->paymentdetailsdata['additional_data']['cc_type'];

@@ -10,26 +10,52 @@ namespace Sapient\Worldpay\Model\XmlBuilder;
 class Refund
 {
 
-    const ROOT_ELEMENT = <<<EOD
+    public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * [$merchantCode description]
+     * @var [type]
+     */
     private $merchantCode;
+    /**
+     * [$orderCode description]
+     * @var [type]
+     */
     private $orderCode;
+    /**
+     * [$currencyCode description]
+     * @var [type]
+     */
     private $currencyCode;
+    /**
+     * [$amount description]
+     * @var [type]
+     */
     private $amount;
+    /**
+     * [$refundReference description]
+     * @var [type]
+     */
     private $refundReference;
+    /**
+     * [$exponent description]
+     * @var [type]
+     */
     private $exponent;
     
     /**
-     * Build xml for processing Request
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param string $currencyCode
-     * @param float $amount
-     * @param string $refundReference
-     * @return SimpleXMLElement $xml
+     * [build description]
+     *
+     * @param  [type] $merchantCode    [description]
+     * @param  [type] $orderCode       [description]
+     * @param  [type] $currencyCode    [description]
+     * @param  [type] $amount          [description]
+     * @param  [type] $refundReference [description]
+     * @param  [type] $exponent        [description]
+     * @return [type]                  [description]
      */
     public function build($merchantCode, $orderCode, $currencyCode, $amount, $refundReference, $exponent)
     {

@@ -20,9 +20,14 @@ use Sapient\Worldpay\Controller\Redirectresult\Cancel;
 
 class CancelTest extends TestCase
 {
-
+    /**
+     * [$cancelObj description]
+     * @var [type]
+     */
     protected $cancelObj;
-
+    /**
+     * [setUp description]
+     */
     protected function setUp()
     {
         $context = $this->getMockBuilder(Context::class)
@@ -49,7 +54,10 @@ class CancelTest extends TestCase
             $wplogger
         );
     }
-
+    /**
+     * [testExecute description]
+     * @return [type] [description]
+     */
     public function testExecute()
     {
         $this->assertInstanceOf(Cancel::class, $this->cancelObj);

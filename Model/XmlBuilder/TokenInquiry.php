@@ -12,8 +12,11 @@ use \Sapient\Worldpay\Logger\WorldpayLogger;
  */
 class TokenInquiry
 {
-    const TOKEN_SCOPE = 'shopper';
-    const ROOT_ELEMENT = <<<EOD
+    /**
+     * @var TOKEN_SCOPE
+     */
+    public const TOKEN_SCOPE = 'shopper';
+    public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
@@ -32,7 +35,11 @@ EOD;
      * @var string
      */
     protected $merchantCode;
-    
+    /**
+     * [__construct description]
+     *
+     * @param array $args [description]
+     */
     public function __construct(array $args = [])
     {
         if (isset($args['tokenModel']) && $args['tokenModel'] instanceof \Sapient\WorldPay\Model\SavedToken) {

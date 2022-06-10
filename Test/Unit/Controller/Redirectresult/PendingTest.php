@@ -17,8 +17,14 @@ use Sapient\Worldpay\Controller\Redirectresult\Pending;
 
 class PendingTest extends TestCase
 {
-    
+    /**
+     * [$pendingObj description]
+     * @var [type]
+     */
     protected $pendingObj;
+    /**
+     * [setUp description]
+     */
     protected function setUp()
     {
         $context = $this->getMockBuilder(Context::class)
@@ -43,7 +49,10 @@ class PendingTest extends TestCase
             $wplogger
         );
     }
-    
+    /**
+     * [testExecute description]
+     * @return [type] [description]
+     */
     public function testExecute()
     {
         $this->assertInstanceOf(Pending::class, $this->pendingObj);

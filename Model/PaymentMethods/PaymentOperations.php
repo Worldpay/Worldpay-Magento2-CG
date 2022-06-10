@@ -1,10 +1,16 @@
 <?php
-
+/**
+ * @copyright 2017 Sapient
+ */
 namespace Sapient\Worldpay\Model\PaymentMethods;
 
 class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
 {
-    
+    /**
+     * UpdateOrderStatusForVoidSale
+     *
+     * @param string $order
+     */
     public function updateOrderStatusForVoidSale($order)
     {
         if (!empty($order)) {
@@ -29,6 +35,11 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
         }
     }
     
+    /**
+     * CanVoidSale
+     *
+     * @param string $order
+     */
     public function canVoidSale($order)
     {
         $payment = $order->getPayment();
@@ -57,6 +68,11 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
         }
     }
     
+    /**
+     * CanCancel
+     *
+     * @param string $order
+     */
     public function canCancel($order)
     {
         $payment = $order->getPayment();
@@ -83,6 +99,11 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
         }
     }
     
+    /**
+     * UpdateOrderStatusForCancelOrder
+     *
+     * @param string $order
+     */
     public function updateOrderStatusForCancelOrder($order)
     {
         if (!empty($order)) {

@@ -7,7 +7,14 @@ namespace Sapient\Worldpay\Logger;
 
 class WorldpayLogger extends \Monolog\Logger
 {
-    
+/**
+ * Add Record
+ *
+ * @param int|string $level
+ * @param int|string $message
+ * @param array $context
+ * @return string
+ */
     public function addRecord($level, $message, array $context = [])
     {
         $ObjectManager = \Magento\Framework\App\ObjectManager::getInstance();

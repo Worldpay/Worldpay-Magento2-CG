@@ -88,6 +88,7 @@ class PlaceOrder extends Action
      * @param PlaceOrderModel $placeOrder
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param OrderRepositoryInterface $orderRepository
+     * @param Magento\Framework\App\Response\RedirectInterface $redirect
      */
     public function __construct(
         Context $context,
@@ -98,7 +99,8 @@ class PlaceOrder extends Action
         ProductRepositoryInterface $productRepository,
         PlaceOrderModel $placeOrder,
         \Magento\Checkout\Model\Session $checkoutSession,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        \Magento\Framework\App\Response\RedirectInterface $redirect
     ) {
         parent::__construct($context);
 
@@ -110,6 +112,7 @@ class PlaceOrder extends Action
         $this->placeOrder = $placeOrder;
         $this->checkoutSession = $checkoutSession;
         $this->orderRepository = $orderRepository;
+        $this->redirect = $redirect;
     }
 
     /**
@@ -139,7 +142,7 @@ class PlaceOrder extends Action
             if ($dfReferenceId) {
                 $this->checkoutSession->setDfReferenceId($dfReferenceId);
                 $this->checkoutSession->setInstantPurchaseOrder(true);
-                $this->checkoutSession->setInstantPurchaseRedirectUrl($this->_redirect->getRefererUrl());
+                $this->checkoutSession->setInstantPurchaseRedirectUrl($this->redirect->getRefererUrl());
             }
         }
         try {
@@ -179,7 +182,7 @@ class PlaceOrder extends Action
         $threeDSecureChallengeParams = $this->checkoutSession->get3Ds2Params();
         $this->messageManager->getMessages(true);
         if ($threeDSecureChallengeParams || ($redirectData = $this->checkoutSession->get3DSecureParams())) {
-            $this->checkoutSession->setInstantPurchaseRedirectUrl($this->_redirect->getRefererUrl());
+            $this->checkoutSession->setInstantPurchaseRedirectUrl($this->redirect->getRefererUrl());
             $this->checkoutSession->setInstantPurchaseMessage($message);
             $message = __('');
         } else {

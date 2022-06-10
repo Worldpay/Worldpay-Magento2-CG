@@ -10,6 +10,7 @@ use \Sapient\Worldpay\Model\Checkout\Hpp\State as HppState;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\App\RequestInterface;
+use Laminas\Uri\UriFactory;
 use Exception;
 
 class Factory
@@ -61,12 +62,16 @@ class Factory
     }
     
     /**
+     * Create
+     *
+     * @param string $javascriptObjectVariable
+     * @param string|int $containerId
      * @return Sapient\Worldpay\Model\Checkout\Hpp\Json\Config
      */
     public function create($javascriptObjectVariable, $containerId)
     {
-        $parts = parse_url($this->state->getRedirectUrl());
-        parse_str($parts['query'], $orderparams);
+        $parts = UriFactory::factory($this->state->getRedirectUrl());
+        $orderparams = $parts->getQueryAsArray();
         $orderkey = $orderparams['OrderKey'];
         $magentoincrementid = $this->_extractOrderId($orderkey);
         $mageOrder = $this->mageorder->loadByIncrementId($magentoincrementid);
@@ -102,7 +107,7 @@ class Factory
     /**
      * Return Country
      *
-     * @return string
+     * @param string|int $quote
      */
     private function _getCountryForQuote($quote)
     {
@@ -117,7 +122,7 @@ class Factory
     /**
      * Return Language
      *
-     * @return string
+     * @return Sapient\Worldpay\Model\Checkout\Hpp\Json\Config
      */
     private function _getLanguageForLocale()
     {
@@ -128,7 +133,12 @@ class Factory
         return substr($locale, 0, 2);
     }
     
-    private static function _extractOrderId($orderKey)
+    /**
+     * ExtractOrderId
+     *
+     * @param string|int $orderKey
+     */
+    private function _extractOrderId($orderKey)
     {
         $array = explode('^', $orderKey);
         $ordercode = end($array);

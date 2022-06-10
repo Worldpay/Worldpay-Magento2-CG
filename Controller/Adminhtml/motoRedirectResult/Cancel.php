@@ -4,7 +4,7 @@
  */
 namespace Sapient\Worldpay\Controller\Adminhtml\motoRedirectResult;
 
-use Sapient\Worldpay\Model\Payment\StateResponse as PaymentStateResponse;
+use Sapient\Worldpay\Model\Payment\StateResponse;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
@@ -15,9 +15,18 @@ use Exception;
  */
 class Cancel extends \Magento\Backend\App\Action
 {
+    /**
+     * @var Magento\Framework\View\Result\PageFactory
+     */
     protected $pageFactory;
+    /**
+     * @var string
+     */
     protected $_rawBody;
 
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Update\Base
+     */
     private $_paymentUpdate;
 
     /**
@@ -30,6 +39,8 @@ class Cancel extends \Magento\Backend\App\Action
      * @param \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice
      * @param \Sapient\Worldpay\Model\Adminhtml\Order\Service $adminorderservice
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
+     * @param \Sapient\Worldpay\Model\Payment\StateResponse $paymentStateResponse
+     * @param \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
      */
     public function __construct(
         Context $context,
@@ -38,7 +49,9 @@ class Cancel extends \Magento\Backend\App\Action
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
         \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice,
         \Sapient\Worldpay\Model\Adminhtml\Order\Service $adminorderservice,
-        \Sapient\Worldpay\Model\Order\Service $orderservice
+        \Sapient\Worldpay\Model\Order\Service $orderservice,
+        \Sapient\Worldpay\Model\Payment\StateResponse $paymentStateResponse,
+        \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
     ) {
        
         parent::__construct($context);
@@ -48,6 +61,8 @@ class Cancel extends \Magento\Backend\App\Action
         $this->resultJsonFactory = $resultJsonFactory;
         $this->adminorderservice = $adminorderservice;
         $this->authenticatinservice = $authenticatinservice;
+        $this->paymentStateResponse = $paymentStateResponse;
+        $this->wpresponse = $wpresponse;
     }
     
     /**
@@ -65,13 +80,18 @@ class Cancel extends \Magento\Backend\App\Action
 
         $params = $this->getRequest()->getParams();
         if ($this->authenticatinservice->requestAuthenticated($params)) {
-            $this->_applyPaymentUpdate(PaymentStateResponse::createFromCancelledResponse($params), $worldPayOrder);
+            $this->_applyPaymentUpdate(
+                $this->wpresponse->createFromCancelledResponse($params),
+                $worldPayOrder
+            );
         }
 
         return $this->_redirectToCreateOrderPage();
     }
 
     /**
+     * Get worldpay order
+     *
      * @return \Sapient\Worldpay\Model\Order
      */
     private function _getWorldPayOrder()
@@ -80,6 +100,9 @@ class Cancel extends \Magento\Backend\App\Action
     }
 
     /**
+     * Get cancellation notice for order
+     *
+     * @param Order $order
      * @return string
      */
     private function _getCancellationNoticeForOrder($order)
@@ -90,6 +113,8 @@ class Cancel extends \Magento\Backend\App\Action
     }
 
     /**
+     * Get order increment id
+     *
      * @return string
      */
     private function _getOrderIncrementId()
@@ -99,6 +124,13 @@ class Cancel extends \Magento\Backend\App\Action
         return $matches[1];
     }
 
+    /**
+     * Apply payment update
+     *
+     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
+     * @param Order $order
+     * @throws \Exception
+     */
     private function _applyPaymentUpdate($paymentState, $order)
     {
         try {
@@ -111,6 +143,8 @@ class Cancel extends \Magento\Backend\App\Action
     }
 
     /**
+     * Redirect to create order page
+     *
      * @return string
      */
     private function _redirectToCreateOrderPage()

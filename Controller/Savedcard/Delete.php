@@ -28,6 +28,9 @@ class Delete extends \Magento\Framework\App\Action\Action
      */
     protected $customerSession;
         
+    /**
+     * @var Sapient\Worldpay\Helper\Data;
+     */
     protected $helper;
     
     /**
@@ -41,6 +44,9 @@ class Delete extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Token\Service $tokenService
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param PaymentTokenRepositoryInterface $tokenRepository
+     * @param PaymentTokenManagement $paymentTokenManagement
+     * @param MyAccountException $helper
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -79,7 +85,7 @@ class Delete extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * perform card deletion
+     * Perform card deletion
      */
     public function execute()
     {
@@ -120,10 +126,15 @@ class Delete extends \Magento\Framework\App\Action\Action
                 }
             }
         }
-        $this->_redirect('worldpay/savedcard/index');
+        $resultRedirect = $this->resultRedirectFactory->create();
+        $resultRedirect->setPath('worldpay/savedcard/index');
+        return $resultRedirect;
     }
 
     /**
+     * Check "Token does not exist"
+     *
+     * @param string $error
      * @return bool
      */
     protected function _tokenNotExistOnWorldpay($error)
@@ -137,6 +148,9 @@ class Delete extends \Magento\Framework\App\Action\Action
 
     /**
      * Delete card of customer
+     *
+     * @param Token $tokenModel
+     * @param Customer $customer
      */
     protected function _applyTokenDelete($tokenModel, $customer)
     {
@@ -148,6 +162,9 @@ class Delete extends \Magento\Framework\App\Action\Action
 
     /**
      * Delete vault card of customer
+     *
+     * @param Token $tokenModel
+     * @param Customer $customer
      */
     protected function _applyVaultTokenDelete($tokenModel, $customer)
     {

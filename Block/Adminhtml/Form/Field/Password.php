@@ -11,6 +11,11 @@ namespace Sapient\Worldpay\Block\Adminhtml\Form\Field;
 class Password extends \Magento\Framework\View\Element\AbstractBlock
 {
     
+    /**
+     * Render block HTML
+     *
+     * @return string
+     */
     protected function _toHtml()
     {
 
@@ -20,20 +25,33 @@ class Password extends \Magento\Framework\View\Element\AbstractBlock
         return $html;
     }
 
-     /**
-      * @param string $value
-      * @return Sapient\Worldpay\Block\Adminhtml\Form\Field\MerchantProfile
-      */
+    /**
+     * Set Input Name
+     *
+     * @param string $value
+     * @return Sapient\Worldpay\Block\Adminhtml\Form\Field\MerchantProfile
+     */
     public function setInputName($value)
     {
         return $this->setName($value);
     }
 
+    /**
+     * Set input id
+     *
+     * @param string $value
+     * @return string
+     */
     public function setInputId($value)
     {
         return $this->setId($value);
     }
    
+    /**
+     * Get field html
+     *
+     * @return mixed
+     */
     public function getHtml()
     {
         return $this->toHtml();

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Sapient, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">   
+
+    <template id="wp_sales_email_order_template" label="New Order" file="wp_redirect_order_new.html" type="html" module="Sapient_Worldpay" area="frontend"/>
+    <template id="wp_sales_email_order_guest_template" label="New Order for Guest" file="wp_redirect_order_new_guest.html" type="html" module="Sapient_Worldpay" area="frontend"/>
+
+      <template id="wp_auth_sales_email_order_template" label="New Order" file="wp_auth_sales_email_order_template.html" type="html" module="Sapient_Worldpay" area="frontend"/>
+    <template id="wp_auth_sales_email_order_guest_template" label="New Order for Guest" file="wp_auth_sales_email_order_guest_template.html" type="html" module="Sapient_Worldpay" area="frontend"/>
+
+
+
+
+</config>

@@ -9,12 +9,29 @@ namespace Sapient\Worldpay\Model\PaymentMethods;
  */
 class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
 {
+    /**
+     * @var string
+     */
     protected $_code = 'worldpay_moto';
+    /**
+     * @var string
+     */
     protected $_isGateway = true;
+    /**
+     * @var string
+     */
     protected $_canAuthorize = true;
+    /**
+     * @var string
+     */
     protected $_canUseInternal = true;
+    /**
+     * @var string
+     */
     protected $_canUseCheckout = false;
-
+    /**
+     * @var string
+     */
     protected $_formBlockType = \Sapient\Worldpay\Block\Form\Card::class;
 
     /**
@@ -47,6 +64,11 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
         }
     }
     
+    /**
+     * GetAuthorisationService
+     *
+     * @param string $storeId
+     */
     public function getAuthorisationService($storeId)
     {
         $checkoutpaymentdata = $this->paymentdetailsdata;

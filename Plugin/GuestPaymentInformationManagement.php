@@ -55,16 +55,17 @@ class GuestPaymentInformationManagement
         $this->methodList = $methodList;
         $this->checkMethods = $checkMethods;
     }
-    
+
     /**
-     * @param CheckoutGuestPaymentInformationManagement $subject
-     * @param \Closure $proceed
-     * @param $cartId
-     * @param $email
-     * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
-     * @param \Magento\Quote\Api\Data\AddressInterface|null $billingAddress
-     * @return int
-     * @throws CouldNotSaveException
+     * [aroundSavePaymentInformationAndPlaceOrder description]
+     *
+     * @param  CheckoutGuestPaymentInformationManagement     $subject        [description]
+     * @param  \Closure                                      $proceed        [description]
+     * @param  [type]                                        $cartId         [description]
+     * @param  [type]                                        $email          [description]
+     * @param  \Magento\Quote\Api\Data\PaymentInterface      $paymentMethod  [description]
+     * @param  \Magento\Quote\Api\Data\AddressInterface|null $billingAddress [description]
+     * @return [type]                                                        [description]
      */
     public function aroundSavePaymentInformationAndPlaceOrder(
         CheckoutGuestPaymentInformationManagement $subject,

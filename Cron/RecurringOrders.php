@@ -29,10 +29,25 @@ class RecurringOrders
      * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
      */
     private $orderCollectionFactory;
+    /**
+     * @var string
+     */
     private $_orderId;
+    /**
+     * @var Order
+     */
     private $_order;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Update\Base
+     */
     private $_paymentUpdate;
+    /**
+     * @var \Sapient\Worldpay\Model\Token\StateXml
+     */
     private $_tokenState;
+    /**
+     * @var array
+     */
     private $_newEntityId;
     
     /**
@@ -159,7 +174,8 @@ class RecurringOrders
     /**
      * Update recurring order Transactionsfor next order
      *
-     *
+     * @param string $orderId
+     * @param string $recurringId
      */
     public function updateRecurringTransOrderId($orderId, $recurringId)
     {
@@ -186,6 +202,12 @@ class RecurringOrders
         return $result;
     }
     
+    /**
+     * Get token details
+     *
+     * @param array $recurringOrderData
+     * @return array
+     */
     public function getTotalDetails($recurringOrderData)
     {
         $data = [];
@@ -199,6 +221,13 @@ class RecurringOrders
         return $data;
     }
     
+    /**
+     * Get token info
+     *
+     * @param string $tokenId
+     * @param int $customerId
+     * @return array
+     */
     public function getTokenInfo($tokenId, $customerId)
     {
         $curdate = date("Y-m-d");
@@ -210,7 +239,13 @@ class RecurringOrders
             return $result;
         }
     }
-    
+
+    /**
+     * Get subscription info
+     *
+     * @param string $subscriptionId
+     * @return array
+     */
     public function getSubscriptionsInfo($subscriptionId)
     {
         if ($subscriptionId) {
@@ -220,6 +255,12 @@ class RecurringOrders
         }
     }
     
+    /**
+     * Get address info
+     *
+     * @param string $subscriptionId
+     * @return array
+     */
     public function getAddressInfo($subscriptionId)
     {
         if ($subscriptionId) {
@@ -232,6 +273,7 @@ class RecurringOrders
     /**
      * Get the list of orders to be Sync
      *
+     * @param string $orderId
      * @return array List of order IDs
      */
     public function getOrderInfo($orderId)
@@ -244,6 +286,8 @@ class RecurringOrders
     }
 
     /**
+     * Get order collection factory
+     *
      * @return CollectionFactoryInterface
      */
     private function getOrderCollectionFactory()
@@ -257,6 +301,9 @@ class RecurringOrders
     
     /**
      * Frame Shipping Address
+     *
+     * @param array $addressDetails
+     * @param int $customerId
      * @return array
      */
     private function getShippingAddress($addressDetails, $customerId)
@@ -280,6 +327,8 @@ class RecurringOrders
     
     /**
      * Frame Billing Address
+     *
+     * @param array $addressDetails
      * @return array
      */
     private function getBillingAddress($addressDetails)
@@ -302,6 +351,8 @@ class RecurringOrders
     
     /**
      * Frame Payment Additional data
+     *
+     * @param array $tokenDetails
      * @return array
      */
     private function getAdditionalData($tokenDetails)
@@ -328,7 +379,8 @@ class RecurringOrders
     /**
      * Update recurring order Transactionsfor next order
      *
-     *
+     * @param string $orderId
+     * @param string $recurringId
      */
     public function updateRecurringTransactions($orderId, $recurringId)
     {
@@ -336,6 +388,13 @@ class RecurringOrders
         return $this->insertNewTransaction($transactionDetails, $orderId);
     }
 
+    /**
+     * Insert new transaction
+     *
+     * @param array $transactionDetails
+     * @param string $orderId
+     * @return string
+     */
     public function insertNewTransaction($transactionDetails, $orderId)
     {
         if ($transactionDetails) {

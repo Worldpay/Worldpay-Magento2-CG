@@ -12,7 +12,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
     /** @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory */
     protected $updateWorldPayPayment;
 
-    const CART_URL = 'checkout/cart';
+    public const CART_URL = 'checkout/cart';
 
     /**
      * Constructor
@@ -67,6 +67,13 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
         return $this->worldpayHelper->isIAVEnabled();
     }
     
+    /**
+     * Continue post 3dSecure authorization process
+     *
+     * @param mixed $paResponse
+     * @param array $directOrderParams
+     * @param array $threeDSecureParams
+     */
     public function continuePost3dSecureAuthorizationProcess($paResponse, $directOrderParams, $threeDSecureParams)
     {
         $directOrderParams['paResponse'] = $paResponse;
@@ -87,6 +94,18 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
                     $responseXml = $this->response->getXml();
                     $orderStatus = $responseXml->reply->orderStatus;
                     $payment=$orderStatus->payment;
+                    if(empty($payment)){
+                        $this->_messageManager->addError(
+                            $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
+                               ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
+                            : 'Your card could not be saved'
+                        );
+                        $this->checkoutSession->setWpResponseForwardUrl($this->urlBuilders->getUrl(
+                            'savedcard',
+                            ['_secure' => true]
+                        ));
+                        return;
+                    }
                     $lastEvent = $payment->lastEvent;
                     $riskScore=$payment->riskScore['value'];
                     $riskProviderFinalScore=$payment->riskScore['finalScore'];
@@ -199,7 +218,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
     /**
      * It handles if payment is refused or cancelled
      *
-     * @param  Object $paymentUpdate
+     * @param Object $paymentUpdate
      * @param string $orderId
      */
     private function _abortIfPaymentError($paymentUpdate, $orderId)

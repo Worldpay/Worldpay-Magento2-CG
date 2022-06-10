@@ -85,6 +85,8 @@ class OrderCleanup
     }
 
     /**
+     * Get order collection factory
+     *
      * @return CollectionFactoryInterface
      */
     private function getOrderCollectionFactory()
@@ -100,7 +102,7 @@ class OrderCleanup
      * Returns orders have creation date exceeded the allowed limit
      *
      * @param array $carry Result of previous filter call
-     * @param \Magento\Sales\Model\Order
+     * @param \Magento\Sales\Model\Order $order
      *
      * @return array List of order IDs
      */
@@ -132,8 +134,9 @@ class OrderCleanup
     }
 
     /**
-     * @param \Magento\Sales\Model\Order $order
+     * Get creation date
      *
+     * @param \Magento\Sales\Model\Order $order
      * @return float|mixed
      */
     protected function getCreationDate(\Magento\Sales\Model\Order $order)
@@ -143,6 +146,7 @@ class OrderCleanup
 
     /**
      * Computes the latest valid date
+     *
      * @return DateTime
      */
     protected function getLimitDate()

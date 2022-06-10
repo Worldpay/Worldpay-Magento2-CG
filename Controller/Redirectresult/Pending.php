@@ -6,7 +6,7 @@ namespace Sapient\Worldpay\Controller\Redirectresult;
 
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\Context;
-use Sapient\Worldpay\Model\Payment\StateResponse as PaymentStateResponse;
+use Sapient\Worldpay\Model\Payment\StateResponse;
 
 /**
  * after deleting the card redirect to the pending page
@@ -26,7 +26,9 @@ class Pending extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Model\Checkout\Service $checkoutservice
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Sapient\Worldpay\Model\Payment\StateResponseFactory $paymentStateResponse
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
      */
     public function __construct(
         Context $context,
@@ -34,16 +36,25 @@ class Pending extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Sapient\Worldpay\Model\Checkout\Service $checkoutservice,
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+        \Sapient\Worldpay\Model\Payment\StateResponseFactory $paymentStateResponse,
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
     ) {
         $this->pageFactory = $pageFactory;
         $this->wplogger = $wplogger;
         $this->orderservice = $orderservice;
         $this->checkoutservice = $checkoutservice;
         $this->paymentservice = $paymentservice;
+        $this->paymentStateResponse = $paymentStateResponse;
+        $this->wpresponse = $wpresponse;
         return parent::__construct($context);
     }
     
+    /**
+     * Execute action
+     *
+     * @return string
+     */
     public function execute()
     {
         $paymentType = '';
@@ -59,7 +70,7 @@ class Pending extends \Magento\Framework\App\Action\Action
                 $worldPayPayment = $order->getWorldPayPayment();
                 $paymentType = $worldPayPayment->getPaymentType();
                 $this->_applyPaymentUpdate(
-                    PaymentStateResponse::createFromPendingResponse($params, $paymentType),
+                    $this->wpresponse->createFromPendingResponse($params, $paymentType),
                     $order
                 );
             }
@@ -78,7 +89,13 @@ class Pending extends \Magento\Framework\App\Action\Action
         $this->orderservice->removeAuthorisedOrder();
         return $this->pageFactory->create();
     }
-
+    /**
+     * Apply payment update
+     *
+     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
+     * @param Order $order
+     * @throws \Exception
+     */
     private function _applyPaymentUpdate($paymentState, $order)
     {
         try {

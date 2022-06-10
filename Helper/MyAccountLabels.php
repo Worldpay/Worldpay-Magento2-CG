@@ -35,6 +35,7 @@ class MyAccountLabels
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Math\Random $mathRandom
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -194,7 +195,7 @@ class MyAccountLabels
     /**
      * Retrieve merchant detail value from config
      *
-     * @param int $customerGroupId
+     * @param int|string $wplabelcode
      * @param null|string|bool|int|Store $store
      * @return float|null
      */

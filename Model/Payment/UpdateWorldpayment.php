@@ -21,8 +21,15 @@ class UpdateWorldpayment
      * @var \Sapient\Worldpay\Model\WorldpaymentFactory
      */
     protected $worldpaypayment;
+
+    /**
+     * @var paymentMethodType
+     */
     protected $paymentMethodType;
     
+    /**
+     * @var apmMethods
+     */
     public $apmMethods = ['ACH_DIRECT_DEBIT-SSL','SEPA_DIRECT_DEBIT-SSL'];
     /**
      * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
@@ -92,7 +99,11 @@ class UpdateWorldpayment
         $orderCode=$orderStatus['orderCode'];
         $payment=$orderStatus->payment;
         $cardDetail=$payment->paymentMethodDetail->card;
-        $cardNumber=$cardDetail['number'];
+        if (isset($cardDetail)) {
+            $cardNumber= $cardDetail['number'];
+        } else {
+            $cardNumber='';
+        }
         $paymentStatus=$payment->lastEvent;
         $cvcnumber=$payment->CVCResultCode['description'];
         $avsnumber=$payment->AVSResultCode['description'];
@@ -281,9 +292,12 @@ class UpdateWorldpayment
     
     /**
      * Saved token data
-     * @param $tokenElement
-     * @param $payment
-     * @param $merchantCode
+     *
+     * @param string $tokenElement
+     * @param string $payment
+     * @param string|int $merchantCode
+     * @param string|int|null $disclaimerFlag
+     * @param string|int|null $orderCode
      */
     public function saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag = null, $orderCode = null)
     {
@@ -356,6 +370,12 @@ class UpdateWorldpayment
         }
     }
     
+    /**
+     * SetVaultPaymentTokenMyAccount
+     *
+     * @param int|string $tokenElement
+     * @return string
+     */
     protected function setVaultPaymentTokenMyAccount($tokenElement)
     {
         // Check token existing in gateway response
@@ -382,6 +402,12 @@ class UpdateWorldpayment
         $this->paymentTokenRepository->save($paymentToken);
     }
     
+    /**
+     * GeneratePublicHash
+     *
+     * @param PaymentTokenInterface $paymentToken
+     * @return string
+     */
     protected function generatePublicHash(PaymentTokenInterface $paymentToken)
     {
         $hashKey = $paymentToken->getGatewayToken();
@@ -395,6 +421,12 @@ class UpdateWorldpayment
         return $this->encryptor->getHash($hashKey);
     }
 
+    /**
+     * GetVaultPaymentToken
+     *
+     * @param int|string $tokenElement
+     * @return string
+     */
     protected function getVaultPaymentToken($tokenElement)
     {
         // Check token existing in gateway response
@@ -416,6 +448,13 @@ class UpdateWorldpayment
         ]));
         return $paymentToken;
     }
+
+    /**
+     * GetExpirationMonthAndYear
+     *
+     * @param int|string $tokenElement
+     * @return string
+     */
     public function getExpirationMonthAndYear($tokenElement)
     {
         $month = $tokenElement[0]->paymentInstrument[0]->cardDetails[0]->expiryDate[0]->date['month'];
@@ -423,11 +462,23 @@ class UpdateWorldpayment
         return $month.'/'.$year;
     }
 
+    /**
+     * GetLastFourNumbers
+     *
+     * @param int|string $number
+     * @return string
+     */
     public function getLastFourNumbers($number)
     {
         return substr($number, -4);
     }
 
+    /**
+     * GetExpirationDate
+     *
+     * @param int|string $tokenElement
+     * @return string
+     */
     private function getExpirationDate($tokenElement)
     {
         $dateNode = $tokenElement[0]->tokenDetails->paymentTokenExpiry->date;
@@ -445,12 +496,24 @@ class UpdateWorldpayment
         return $expDate->format('Y-m-d 00:00:00');
     }
 
+    /**
+     * ConvertDetailsToJSON
+     *
+     * @param int|string $details
+     * @return string
+     */
     private function convertDetailsToJSON($details)
     {
         $json = \Zend_Json::encode($details);
         return $json ? $json : '{}';
     }
 
+    /**
+     * GetExtensionAttributes
+     *
+     * @param InfoInterface $payment
+     * @return string
+     */
     private function getExtensionAttributes(InfoInterface $payment)
     {
         $extensionAttributes = $payment->getExtensionAttributes();

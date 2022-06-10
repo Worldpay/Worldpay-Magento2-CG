@@ -16,10 +16,19 @@ use Magento\Backend\Block\Template\Context;
 
 class DisableTest extends TestCase
 {
-
+    /**
+     * [$disbaleObj description]
+     * @var [type]
+     */
     protected $disbaleObj;
+    /**
+     * [$element description]
+     * @var [type]
+     */
     protected $element;
-
+    /**
+     * [setUp description]
+     */
     protected function setUp()
     {
         $context = $this->getMockBuilder(Context::class)
@@ -35,7 +44,10 @@ class DisableTest extends TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
     }
-
+    /**
+     * [testgetElementHtml description]
+     * @return [type] [description]
+     */
     public function testgetElementHtml()
     {
         $this->assertNull($this->element->setData('readonly', 1));

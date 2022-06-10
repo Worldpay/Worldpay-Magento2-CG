@@ -21,6 +21,10 @@ use PHPUnit_Framework_MockObject_MockObject as MockObject;
  */
 class CardTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * [$baseCardTypes description]
+     * @var [type]
+     */
     public static $baseCardTypes = [
         'AMEX-SSL' => 'American Express',
         'VISA-SSL' => 'Visa',
@@ -30,7 +34,10 @@ class CardTest extends \PHPUnit\Framework\TestCase
         'DINERS-SSL' => 'Diners',
         'MAESTRO-SSL' => 'Maestro',
     ];
-
+    /**
+     * [$configCardTypes description]
+     * @var [type]
+     */
     public static $configCardTypes = [
         'AMEX-SSL', 'VISA-SSL', 'ECMC-SSL', 'DISCOVER-SSL', 'JCB-SSL', 'DINERS-SSL', 'MAESTRO-SSL'
     ];
@@ -64,7 +71,9 @@ class CardTest extends \PHPUnit\Framework\TestCase
      * @var string
      */
     private $storeId = '1';
-
+    /**
+     * [setUp description]
+     */
     protected function setUp()
     {
         $this->initCcTypeMock();

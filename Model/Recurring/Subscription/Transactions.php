@@ -69,7 +69,7 @@ class Transactions extends AbstractModel
     /**
      * Load order Details
      *
-     *
+     * @param string|int $order_increment_id
      */
     public function loadByOrderIncrementId($order_increment_id)
     {
@@ -82,7 +82,7 @@ class Transactions extends AbstractModel
     /**
      * Load order Details
      *
-     *
+     * @param string|int $order_id
      */
     public function loadByWorldpayOrderId($order_id)
     {
@@ -96,7 +96,7 @@ class Transactions extends AbstractModel
     /**
      * Load order Details
      *
-     *
+     * @param string|int $subscriptionId
      */
     public function loadBySubscriptionId($subscriptionId)
     {
@@ -110,7 +110,7 @@ class Transactions extends AbstractModel
     /**
      * Load order Details
      *
-     *
+     * @param string|int $entityId
      */
     public function loadById($entityId)
     {

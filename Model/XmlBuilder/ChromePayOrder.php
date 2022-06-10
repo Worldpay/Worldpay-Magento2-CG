@@ -12,52 +12,88 @@ use \Sapient\Worldpay\Logger\WorldpayLogger;
 class ChromePayOrder
 {
 
-    const ALLOW_INTERACTION_TYPE = 'MOTO';
-    const DYNAMIC3DS_DO3DS = 'do3DS';
-    const DYNAMIC3DS_NO3DS = 'no3DS';
-    const TOKEN_SCOPE = 'shopper';
-    const ROOT_ELEMENT = <<<EOD
+    public const ALLOW_INTERACTION_TYPE = 'MOTO';
+    public const DYNAMIC3DS_DO3DS = 'do3DS';
+    public const DYNAMIC3DS_NO3DS = 'no3DS';
+    public const TOKEN_SCOPE = 'shopper';
+    public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var $merchantCode
+     */
     private $merchantCode;
+    /**
+     * @var $orderCode
+     */
     private $orderCode;
+    /**
+     * @var $orderDescription
+     */
     private $orderDescription;
+    /**
+     * @var $currencyCode
+     */
     private $currencyCode;
+    /**
+     * @var $amount
+     */
     private $amount;
+    /**
+     * @var $paymentDetails
+     */
     protected $paymentDetails;
-    //private $cardAddress;
+    /**
+     * @var $shopperEmail
+     */
     protected $shopperEmail;
+    /**
+     * @var $acceptHeader
+     */
     protected $acceptHeader;
+    /**
+     * @var $userAgentHeader
+     */
     protected $userAgentHeader;
+    /**
+     * @var $shippingAddress
+     */
     private $shippingAddress;
+    /**
+     * @var $billingAddress
+     */
     private $billingAddress;
+    /**
+     * @var $echoData
+     */
     private $echoData = null;
+    /**
+     * @var $exponent
+     */
     private $exponent;
 
     /**
-     * @var Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration
+     * @var $tokenRequestConfig
      */
     protected $tokenRequestConfig;
     
     /**
-     * Build xml for processing Request
+     * [build description]
      *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param string $orderDescription
-     * @param string $currencyCode
-     * @param float $amount
-     * @param array $paymentDetails
-     * @param array $cardAddress
-     * @param string $shopperEmail
-     * @param string $acceptHeader
-     * @param string $userAgentHeader
-     * @param string $shippingAddress
-     * @param float $billingAddress
-     * @param string $shopperId
-     * @return SimpleXMLElement $xml
+     * @param  [type] $merchantCode     [description]
+     * @param  [type] $orderCode        [description]
+     * @param  [type] $orderDescription [description]
+     * @param  [type] $currencyCode     [description]
+     * @param  [type] $amount           [description]
+     * @param  [type] $paymentType      [description]
+     * @param  [type] $paymentDetails   [description]
+     * @param  [type] $shippingAddress  [description]
+     * @param  [type] $billingAddress   [description]
+     * @param  [type] $shopperEmail     [description]
+     * @param  [type] $exponent         [description]
+     * @return [type]                   [description]
      */
     public function build(
         $merchantCode,

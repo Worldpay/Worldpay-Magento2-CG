@@ -1,0 +1,277 @@
+{
+    "worldpay_payment": {
+        "column": {
+            "id": true,
+            "order_id": true,
+            "payment_status": true,
+            "payment_model": true,
+            "payment_type": true,
+            "mac_verified": true,
+            "merchant_id": true,
+            "3d_verified": true,
+            "risk_score": true,
+            "method": true,
+            "card_number": true,
+            "avs_result": true,
+            "cvc_result": true,
+            "3d_secure_result": true,
+            "worldpay_order_id": true,
+            "risk_provider": true,
+            "risk_provider_score": true,
+            "risk_provider_id": true,
+            "risk_provider_threshold": true,
+            "risk_provider_final": true,
+            "aav_address_result_code": true,
+            "avv_postcode_result_code": true,
+            "aav_cardholder_name_result_code": true,
+            "aav_telephone_result_code": true,
+            "aav_email_result_code": true,
+            "interaction_type": true,
+            "client_side_encryption": true,
+            "latam_instalments": true,
+            "is_recurring_order": true,
+            "is_primerouting_enabled": true,
+            "primerouting_networkused": true,
+            "source_type": true,
+            "available_balance": true,
+            "prepaid_card_type": true,
+            "reloadable": true,
+            "card_product_type": true,
+            "affluence": true,
+            "account_range_id": true,
+            "issuer_country": true,
+            "virtual_account_number": true,
+            "fraudsight_message": true,
+            "fraudsight_score": true,
+            "fraudsight_reasoncode": true
+        },
+        "index": {
+            "WORLDPAY_PAYMENT_ORDER_ID": true,
+            "WORLDPAY_PAYMENT_WORLDPAY_ORDER_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "worldpay_recurring": {
+        "column": {
+            "id": true,
+            "customer_id": true,
+            "payment_id": true,
+            "order_code": true,
+            "merchant_code": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "worldpay_token": {
+        "column": {
+            "id": true,
+            "token_code": true,
+            "token_expiry_date": true,
+            "token_reason": true,
+            "card_number": true,
+            "cardholder_name": true,
+            "card_expiry_month": true,
+            "card_expiry_year": true,
+            "method": true,
+            "card_brand": true,
+            "card_sub_brand": true,
+            "card_issuer_country_code": true,
+            "merchant_code": true,
+            "customer_id": true,
+            "authenticated_shopper_id": true,
+            "created_at": true,
+            "transaction_identifier": true,
+            "bin_number": true,
+            "disclaimer_flag": true,
+            "token_type": true
+        },
+        "index": {
+            "WORLDPAY_TOKEN_TOKEN_CODE": true,
+            "WORLDPAY_TOKEN_CUSTOMER_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "worldpay_notification_history": {
+        "column": {
+            "id": true,
+            "order_id": true,
+            "status": true,
+            "created_at": true
+        },
+        "index": {
+            "WORLDPAY_NOTIFICATION_HISTORY_ORDER_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "worldpay_recurring_plans": {
+        "column": {
+            "plan_id": true,
+            "product_id": true,
+            "website_id": true,
+            "code": true,
+            "name": true,
+            "description": true,
+            "number_of_payments": true,
+            "interval": true,
+            "interval_amount": true,
+            "trial_interval": true,
+            "number_of_trial_intervals": true,
+            "sort_order": true,
+            "active": true
+        },
+        "index": {
+            "WORLDPAY_RECURRING_PLANS_CODE": true,
+            "WORLDPAY_RECURRING_PLANS_ACTIVE_SORT_ORDER": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "WORLDPAY_RECURRING_PLANS_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true,
+            "WORLDPAY_RECURRING_PLANS_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID": true
+        }
+    },
+    "worldpay_subscriptions": {
+        "column": {
+            "subscription_id": true,
+            "store_id": true,
+            "store_name": true,
+            "created_at": true,
+            "updated_at": true,
+            "plan_id": true,
+            "interval_amount": true,
+            "start_date": true,
+            "worldpay_subscription_id": true,
+            "customer_id": true,
+            "original_order_id": true,
+            "original_order_increment_id": true,
+            "product_id": true,
+            "product_name": true,
+            "billing_name": true,
+            "shipping_name": true,
+            "customer_email": true,
+            "status": true,
+            "shipping_method": true,
+            "shipping_description": true,
+            "is_virtual": true,
+            "discount_amount": true,
+            "discount_description": true,
+            "shipping_amount": true,
+            "shipping_tax_amount": true,
+            "subtotal": true,
+            "tax_amount": true,
+            "subtotal_incl_tax": true,
+            "weight": true,
+            "customer_note": true,
+            "product_type": true,
+            "product_options": true,
+            "product_sku": true,
+            "item_price": true,
+            "item_original_price": true,
+            "item_tax_percent": true,
+            "item_tax_amount": true,
+            "item_discount_percent": true,
+            "item_discount_amount": true,
+            "payment_method": true,
+            "payment_cc_exp_month": true,
+            "payment_cc_exp_year": true,
+            "payment_cc_last_4": true,
+            "payment_additional_information": true,
+            "end_date": true
+        },
+        "index": {
+            "WORLDPAY_SUBSCRIPTIONS_STATUS": true,
+            "WORLDPAY_SUBSCRIPTIONS_WORLDPAY_SUBSCRIPTION_ID": true,
+            "WORLDPAY_SUBSCRIPTIONS_STORE_ID": true,
+            "WORLDPAY_SUBSCRIPTIONS_CUSTOMER_ID_STORE_ID": true,
+            "WORLDPAY_SUBSCRIPTIONS_ORIGINAL_ORDER_INCREMENT_ID": true,
+            "FTI_047B98A5C44AAFCEF76C254BA0D4F783": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "WORLDPAY_SUBSCRIPTIONS_STORE_ID_STORE_STORE_ID": true,
+            "WORLDPAY_SUBSCRIPTIONS_PLAN_ID_WORLDPAY_RECURRING_PLANS_PLAN_ID": true,
+            "WORLDPAY_SUBSCRIPTIONS_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID": true,
+            "WORLDPAY_SUBSCRIPTIONS_ORIGINAL_ORDER_ID_SALES_ORDER_ENTITY_ID": true,
+            "WORLDPAY_SUBSCRIPTIONS_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "worldpay_subscription_id": true
+        },
+        "index": {
+            "SALES_ORDER_WORLDPAY_SUBSCRIPTION_ID": true
+        }
+    },
+    "sales_order_grid": {
+        "column": {
+            "worldpay_subscription_id": true
+        },
+        "index": {
+            "SALES_ORDER_GRID_WORLDPAY_SUBSCRIPTION_ID": true
+        }
+    },
+    "worldpay_subscription_address": {
+        "column": {
+            "entity_id": true,
+            "subscription_id": true,
+            "region_id": true,
+            "fax": true,
+            "region": true,
+            "postcode": true,
+            "lastname": true,
+            "street": true,
+            "city": true,
+            "email": true,
+            "telephone": true,
+            "country_id": true,
+            "firstname": true,
+            "address_type": true,
+            "prefix": true,
+            "middlename": true,
+            "suffix": true,
+            "company": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_8C190A9EEA0DCCC6894CD9BAF72989A6": true
+        }
+    },
+    "worldpay_recurring_transactions": {
+        "column": {
+            "entity_id": true,
+            "original_order_id": true,
+            "original_order_increment_id": true,
+            "customer_id": true,
+            "plan_id": true,
+            "subscription_id": true,
+            "recurring_date": true,
+            "recurring_end_date": true,
+            "status": true,
+            "recurring_order_id": true,
+            "worldpay_token_id": true,
+            "worldpay_order_id": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "WORLDPAY_RECURRING_TRANSACTIONS_STATUS": true,
+            "WORLDPAY_RECURRING_TRANSACTIONS_SUBSCRIPTION_ID": true,
+            "WORLDPAY_RECURRING_TRANSACTIONS_CUSTOMER_ID": true,
+            "WORLDPAY_RECURRING_TRANSACTIONS_ORIGINAL_ORDER_ID": true,
+            "WORLDPAY_RECURRING_TRANSACTIONS_ORIGINAL_ORDER_INCREMENT_ID": true,
+            "WORLDPAY_RECURRING_TRANSACTIONS_WORLDPAY_ORDER_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "WORLDPAY_RECURRING_TRANSACTIONS_CSTR_ID_CSTR_ENTT_ENTT_ID": true,
+            "FK_231DC9B61DE4EAE74A18B9E7CBB5D0D5": true
+        }
+    }
+}

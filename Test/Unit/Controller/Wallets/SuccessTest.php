@@ -14,8 +14,14 @@ use Sapient\Worldpay\Controller\Wallets\Success;
 
 class SuccessTest extends TestCase
 {
-    
+   /**
+    * [$successObj description]
+    * @var [type]
+    */
     protected $successObj;
+/**
+ * [setUp description]
+ */
     protected function setUp()
     {
         $context = $this->getMockBuilder(Context::class)
@@ -29,7 +35,10 @@ class SuccessTest extends TestCase
 
         $this->successObj = new Success($context, $wplogger, $page);
     }
-    
+    /**
+     * [testExecute description]
+     * @return [type] [description]
+     */
     public function testExecute()
     {
         $this->assertInstanceOf(Success::class, $this->successObj);

@@ -22,6 +22,11 @@ class Button extends Template
      * @var Config
      */
     private $instantPurchaseConfig;
+    /**
+     * Core store config
+     *
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
     protected $_scopeConfig;
     /**
      * @var SessionManagerInterface
@@ -29,9 +34,12 @@ class Button extends Template
     protected $session;
     
     /**
-     * Button constructor.
+     * Button constructor
+     *
      * @param Context $context
      * @param Config $instantPurchaseConfig
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\Session\SessionManagerInterface $session
      * @param array $data
      */
     public function __construct(
@@ -91,6 +99,11 @@ class Button extends Template
         return $this->_storeManager->getStore()->getId();
     }
     
+    /**
+     * Get Session ID
+     *
+     * @return string
+     */
     public function getSessionId()
     {
         return $this->session->getSessionId();

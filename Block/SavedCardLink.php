@@ -22,8 +22,22 @@ use Sapient\Worldpay\Helper\Data;
 class SavedCardLink extends \Magento\Framework\View\Element\Html\Link\Current
 {
 
+    /**
+     * Core store config
+     *
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface|null
+     */
     protected $_scopeConfig = null;
     
+    /**
+     * SavedCardLink constructor
+     *
+     * @param Context $context
+     * @param WorldpayConfigProvider $config
+     * @param Data $helper
+     * @param DefaultPathInterface $defaultPath
+     * @param array $data
+     */
     public function __construct(
         Context $context,
         WorldpayConfigProvider $config,
@@ -36,6 +50,11 @@ class SavedCardLink extends \Magento\Framework\View\Element\Html\Link\Current
         $this->helper = $helper;
     }
 
+    /**
+     * Render the block if needed
+     *
+     * @return string
+     */
     public function _toHtml()
     {
         if ($this->helper->isWorldPayEnable() && $this->checkSaveCardTabToBeEnabled()) {
@@ -45,6 +64,11 @@ class SavedCardLink extends \Magento\Framework\View\Element\Html\Link\Current
         }
     }
 
+    /**
+     * Check if the save card tab is enabled?
+     *
+     * @return bool
+     */
     public function checkSaveCardTabToBeEnabled()
     {
         if ($this->helper->getSaveCard() ||

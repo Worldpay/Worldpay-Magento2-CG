@@ -27,11 +27,29 @@ class HostedPaymentPageServiceTest extends TestCase
      * @var HostedPaymentPageService
      */
     protected $hppObj;
+    /**
+     * [$checkoutsession description]
+     * @var [type]
+     */
     protected $checkoutsession;
+    /**
+     * [$mappingservice description]
+     * @var [type]
+     */
     protected $mappingservice;
+    /**
+     * [$paymentservicerequest description]
+     * @var [type]
+     */
     protected $paymentservicerequest;
+    /**
+     * [$registryhelper description]
+     * @var [type]
+     */
     protected $registryhelper;
-
+        /**
+         * [setUp description]
+         */
     protected function setUp()
     {
         $this->mappingservice = $this->getMockBuilder(Service::class)
@@ -68,7 +86,11 @@ class HostedPaymentPageServiceTest extends TestCase
             $urlInterface
         );
     }
-
+/**
+ * [testAuthorizePayment description]
+ *
+ * @return [type] [description]
+ */
     public function testAuthorizePayment()
     {
 

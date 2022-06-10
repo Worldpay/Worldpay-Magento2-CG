@@ -68,7 +68,7 @@ class View extends \Magento\Backend\Block\Template
     }
 
     /**
-     * check if order is placed through WorldPay Payment
+     * Check if order is placed through WorldPay Payment
      *
      * @return Boolean
      */

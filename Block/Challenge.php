@@ -17,7 +17,8 @@ class Challenge extends \Magento\Framework\View\Element\Template
     protected $checkoutSession;
     
     /**
-     * Jwt constructor.
+     * Jwt constructor
+     *
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param Data $helper
@@ -35,16 +36,31 @@ class Challenge extends \Magento\Framework\View\Element\Template
         parent::__construct($context, $data);
     }
 
+    /**
+     * Get jwt issue
+     *
+     * @return mixed
+     */
     public function getJwtIssuer()
     {
         return $this->_helper->isJwtIssuer();
     }
     
+    /**
+     * Get organisational unit id
+     *
+     * @return string
+     */
     public function getOrganisationalUnitId()
     {
         return $this->_helper->isOrganisationalUnitId();
     }
     
+    /**
+     * Get ddc url
+     *
+     * @return string
+     */
     public function getDdcUrl()
     {
         $ddcurl = '';
@@ -57,6 +73,11 @@ class Challenge extends \Magento\Framework\View\Element\Template
         return $ddcurl;
     }
     
+    /**
+     * Retrieve challenge configs
+     *
+     * @return array
+     */
     public function challengeConfigs()
     {
         $data['threeDSecureChallengeConfig'] = $this->checkoutSession->get3DS2Config();

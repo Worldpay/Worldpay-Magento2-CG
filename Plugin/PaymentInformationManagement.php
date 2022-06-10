@@ -55,9 +55,11 @@ class PaymentInformationManagement
     }
     
     /**
+     * Around Save PaymentInformation And Place Order
+     *
      * @param CheckoutPaymentInformationManagement $subject
      * @param \Closure $proceed
-     * @param $cartId
+     * @param string $cartId
      * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
      * @param \Magento\Quote\Api\Data\AddressInterface|null $billingAddress
      * @return int

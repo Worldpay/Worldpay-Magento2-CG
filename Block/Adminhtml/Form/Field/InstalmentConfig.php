@@ -95,7 +95,11 @@ class InstalmentConfig extends \Magento\Config\Block\System\Config\Form\Field\Fi
         $row->setData('option_extra_attrs', $options);
     }
     
-    /* Multiselect renderer for countries */
+    /**
+     *  Multiselect renderer for countries
+     *
+     * @return string
+     */
     private function getCountryRenderer()
     {
         if (!$this->countryRenderer) {
