@@ -1,4 +1,4 @@
-This version is compatible with Magento 2.3.7 with following key features:
+This version is compatible with Magento 2.3.7-p3 with following key features:
 1. Credit card payment
 2. Hosted payment page solution
 3. Alternative payment methods like Paypal, AliPay, Klarna, ACH Pay etc.
