@@ -15,20 +15,42 @@ class Refund
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
+    /**
+     * @var string
+     */
     private $currencyCode;
+    /**
+     * @var float
+     */
     private $amount;
+    /**
+     * @var string
+     */
     private $refundReference;
+    /**
+     * @var mixed
+     */
     private $exponent;
 
     /**
      * Build xml for processing Request
+     *
      * @param string $merchantCode
      * @param string $orderCode
      * @param string $currencyCode
      * @param float $amount
      * @param string $refundReference
+     * @param mixed $exponent
+     * @param Order $order
+     * @param string|null $paymentType
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -60,6 +82,8 @@ EOD;
     }
 
     /**
+     * Add tag modify to xml
+     *
      * @param SimpleXMLElement $xml
      * @return SimpleXMLElement
      */
@@ -69,6 +93,8 @@ EOD;
     }
 
     /**
+     * Add tag orderModification to xml
+     *
      * @param SimpleXMLElement $modify
      * @return SimpleXMLElement $orderModification
      */
@@ -81,7 +107,11 @@ EOD;
     }
 
     /**
+     * Add tag refund to xml
+     *
      * @param SimpleXMLElement $orderModification
+     * @param Order $order
+     * @param string $paymentType
      */
     private function _addRefundElement($orderModification, $order, $paymentType)
     {
@@ -111,6 +141,8 @@ EOD;
     }
 
     /**
+     * Returns the rounded value of num to specified precision
+     *
      * @param float $amount
      * @return int
      */
@@ -123,6 +155,7 @@ EOD;
       * Add branchSpecificExtension and its child tag to xml
       *
       * @param SimpleXMLElement $order
+      * @param array $refund
       */
     private function _addBranchSpecificExtension($order, $refund)
     {
@@ -201,6 +234,13 @@ EOD;
         $this->_addL23OrderLineItemElement($order, $purchase, $refund);
     }
     
+    /**
+     * Add all order line item element values to xml
+     *
+     * @param Order $order
+     * @param mixed $purchase
+     * @param mixed $capture
+     */
     private function _addL23OrderLineItemElement($order, $purchase, $capture)
     {
         
@@ -221,6 +261,21 @@ EOD;
         }
     }
     
+    /**
+     * Add order line item element values to xml
+     *
+     * @param SimpleXMLElement $parentElement
+     * @param string $description
+     * @param string $productCode
+     * @param string $commodityCode
+     * @param string $quantity
+     * @param float $unitCost
+     * @param string $unitOfMeasure
+     * @param float $itemTotal
+     * @param float $itemTotalWithTax
+     * @param float $itemDiscountAmount
+     * @param float $taxAmount
+     */
     private function _addLineItemElement(
         $parentElement,
         $description,
@@ -282,7 +337,10 @@ EOD;
     /**
      * Add amount and its child tag to xml
      *
-     * @param SimpleXMLElement $order
+     * @param SimpleXMLElement $capture
+     * @param string $currencyCode
+     * @param mixed $exponent
+     * @param float $amount
      */
     private function _addAmountElement($capture, $currencyCode, $exponent, $amount)
     {
@@ -295,7 +353,10 @@ EOD;
      /**
       * Add amount and its child tag to xml
       *
-      * @param SimpleXMLElement $order
+      * @param SimpleXMLElement $discountAmountXml
+      * @param string $currencyCode
+      * @param mixed $exponent
+      * @param float $discountAmount
       */
     private function _addAmountElementCapture($discountAmountXml, $currencyCode, $exponent, $discountAmount)
     {
@@ -306,6 +367,8 @@ EOD;
     }
     
      /**
+      * Add cdata to xml
+      *
       * @param SimpleXMLElement $element
       * @param string $content
       */

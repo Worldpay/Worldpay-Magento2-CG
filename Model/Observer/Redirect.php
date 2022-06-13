@@ -10,9 +10,23 @@ use Exception;
 
 class Redirect implements ObserverInterface
 {
+    /**
+     * @var _responseFactory
+     */
     protected $_responseFactory;
+    /**
+     * @var _url
+     */
     protected $_url;
-    
+     /**
+      * Constructor
+      *
+      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+      * @param \Magento\Checkout\Model\Session $checkoutsession
+      * @param \Magento\Framework\App\ResponseFactory $responseFactory
+      * @param \Magento\Framework\UrlInterface $url
+      */
+
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Checkout\Model\Session $checkoutsession,
@@ -24,6 +38,13 @@ class Redirect implements ObserverInterface
         $this->_responseFactory = $responseFactory;
         $this->_url = $url;
     }
+    /**
+     * Execute
+     *
+     * @param \Magento\Framework\Event\Observer $observer
+     * @return string
+     */
+
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $event = $observer->getEvent();

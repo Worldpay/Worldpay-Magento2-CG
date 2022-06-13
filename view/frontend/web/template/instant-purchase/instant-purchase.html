@@ -9,32 +9,32 @@
             class="action primary instant-purchase"
             click="instantPurchase"
             attr="title: $t(buttonText)">
-        <span translate="buttonText" />
+        <span translate="buttonText"></span>
     </button>
     <input if="paymentToken()"
            type="hidden"
            name="instant_purchase_payment_token"
-           ko-value="paymentToken().publicHash" />
+           ko-value="paymentToken().publicHash"></input>
     <if args="dfreference()">
     <input if="dfreference()"
            type="hidden"
            name="instant_purchase_dfreference"
-           ko-value="dfreference()" />
+           ko-value="dfreference()"></input>
     </if>
     <input if="shippingAddress()"
            type="hidden"
            name="instant_purchase_shipping_address"
-           ko-value="shippingAddress().id" />
+           ko-value="shippingAddress().id"></input>
     <input if="billingAddress()"
            type="hidden"
            name="instant_purchase_billing_address"
-           ko-value="billingAddress().id" />
+           ko-value="billingAddress().id"></input>
     <if args="shippingMethod()">
         <input type="hidden"
                name="instant_purchase_carrier"
-               ko-value="shippingMethod().carrier" />
+               ko-value="shippingMethod().carrier"></input>
         <input type="hidden"
                name="instant_purchase_shipping"
-               ko-value="shippingMethod().method" />
+               ko-value="shippingMethod().method"></input>
     </if>
 </if>

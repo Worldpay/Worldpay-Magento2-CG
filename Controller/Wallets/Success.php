@@ -27,8 +27,8 @@ class Success extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * Renders the 3D Secure  page, responsible for forwarding
-     * all necessary order data to worldpay.
+     * Renders the 3D Secure page
+     *  .
      */
     public function execute()
     {

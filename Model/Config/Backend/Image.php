@@ -39,8 +39,7 @@ class Image extends \Magento\Config\Model\Config\Backend\Image
     }
 
     /**
-     * Save uploaded file before saving config value
-     * Save changes and delete file if "delete" option passed
+     * Save uploaded file before saving config value Save changes and delete file if "delete" option passed
      *
      * @return $this
      */

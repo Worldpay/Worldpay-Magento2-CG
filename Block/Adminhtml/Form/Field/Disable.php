@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @copyright 2020 Sapient
  */
@@ -10,6 +9,12 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 
 class Disable extends \Magento\Config\Block\System\Config\Form\Field
 {
+    /**
+     * Get getElementHtml
+     *
+     * @param string $element
+     * @return string
+     */
 
     protected function _getElementHtml(AbstractElement $element)
     {

@@ -13,9 +13,24 @@ class SendErrorReport extends \Magento\Framework\App\Helper\AbstractHelper
     public const WORLDPAY_ERROR_ALERT_EMAIL_TEMPLATE = "worldpay_error_alert_email";
     public const EMAIL_ATTACHMENT_WP_REQUEST_FILE_NAME = 'request.txt';
     public const EMAIL_ATTACHMENT_WP_RESPONSE_FILE_NAME = 'response.txt';
+    /**
+     * @var ScopeConfigInterface
+     */
     protected $_scopeConfig;
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
     protected $wplogger;
     
+    /**
+     * SendErrorReport constructor
+     *
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param TransportBuilder $transportBuilder
+     * @param StoreManagerInterface $storeManager
+     * @param StateInterface $state
+     */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -70,7 +85,10 @@ class SendErrorReport extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * send Email
+     * Send Email
+     *
+     * @param array $params
+     * @param string $toEmail
      */
     public function sendEmail($params, $toEmail)
     {
@@ -123,6 +141,8 @@ class SendErrorReport extends \Magento\Framework\App\Helper\AbstractHelper
     }
     /**
      * Send email to error report
+     *
+     * @param array $params
      */
     public function sendErrorReport($params)
     {

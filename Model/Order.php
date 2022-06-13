@@ -9,6 +9,9 @@ use Sapient\Worldpay\Helper\CreditCardException;
 
 class Order
 {
+    /**
+     * @var order
+     */
     private $_order;
     
     /**
@@ -46,6 +49,11 @@ class Order
         $this->creditmemoRepository = $creditmemoRepository;
     }
 
+    /**
+     * Retrieve Order data
+     *
+     * @return string
+     */
     public function getOrder()
     {
         return $this->_order;
@@ -70,7 +78,11 @@ class Order
     {
         return $this->getOrder()->getPayment()->getMethod();
     }
-
+    /**
+     * Retrieve PaymentType
+     *
+     * @return string
+     */
     public function getPaymentType()
     {
         return $this->getWorldPayPayment()->getPaymentType();
@@ -89,7 +101,11 @@ class Order
             $mageOrder->save();
         }
     }
-
+    /**
+     * Retrieve capture
+     *
+     * @return string
+     */
     public function capture()
     {
         if (!$this->_canInvoice()) {
@@ -112,6 +128,8 @@ class Order
     }
 
     /**
+     * Retrieve Payment
+     *
      * @return Magento\Sales\Model\Order\Payment
      */
     public function getPayment()
@@ -120,18 +138,26 @@ class Order
     }
 
     /**
+     * Retrieve Payment Status
+     *
      * @return string
      */
     public function getPaymentStatus()
     {
         return $this->getWorldPayPayment()->getPaymentStatus();
     }
-
+    /**
+     * Retrieve can Invoice
+     *
+     * @return string
+     */
     private function _canInvoice()
     {
         return $this->getOrder()->canInvoice();
     }
-
+    /**
+     * Retrieve invoice Order
+     */
     private function _invoiceOrder()
     {
         $order = $this->getOrder();
@@ -155,6 +181,11 @@ class Order
         );
         $transactionSave->save();
     }
+    /**
+     * Check WorldPayPayment
+     *
+     * @return string
+     */
 
     public function hasWorldPayPayment()
     {
@@ -166,7 +197,9 @@ class Order
     }
 
     /**
-     * @return Sapient/Worldpay/Model/Worldpayment
+     * Get WorldPayPayment
+     *
+     * @return string
      */
     public function getWorldPayPayment()
     {
@@ -196,6 +229,9 @@ class Order
 
     /**
      * Mark Credit Memo as refunded
+     *
+     * @param string $reference
+     * @param string $comment
      */
     public function refund($reference, $comment)
     {
@@ -219,12 +255,10 @@ class Order
     }
 
     /**
-     * Handle the refund request, usually issued from WorldPay panel and triggered by notification.
-     * Create Credit Memo, register and mark it as refunded.
-     * Deals with the full order or remainder refund only.
+     * Handle the refund request, usually issued from WorldPay panel and triggered by notification
      *
-     * @param $amount
-     * @param $comment
+     * @param float $amount
+     * @param string $comment
      */
     public function refundFull($amount, $comment)
     {
@@ -235,7 +269,12 @@ class Order
             $this->_createCreditMemos($comment);
         }
     }
-
+    /**
+     * Order Unrefunded Equals
+     *
+     * @param float $amount
+     * @return string
+     */
     private function _orderUnrefundedEquals($amount)
     {
         $amount /= 100;
@@ -247,6 +286,8 @@ class Order
     }
 
     /**
+     * Refund Full order amount
+     *
      * @return boolean
      */
     private function _canRefundFull()
@@ -265,6 +306,12 @@ class Order
 
         return true;
     }
+    /**
+     * Create Credit Memos
+     *
+     * @param string $comment
+     * @return boolean
+     */
 
     private function _createCreditMemos($comment)
     {
@@ -280,6 +327,12 @@ class Order
             $this->_markRefunded($creditmemo, $comment);
         }
     }
+    /**
+     * Create Credit Memos
+     *
+     * @param string $creditmemo
+     * @param string $comment
+     */
 
     private function _markRefunded($creditmemo, $comment)
     {
@@ -294,6 +347,12 @@ class Order
          );
         $transactionSave->save();
     }
+    /**
+     * Cancel Refund
+     *
+     * @param string $reference
+     * @param string $comment
+     */
 
     public function cancelRefund($reference, $comment)
     {
@@ -314,6 +373,12 @@ class Order
             $this->_cancelCreditmemo($creditmemo, $comment);
         }
     }
+    /**
+     * Cancel Credit memo
+     *
+     * @param string $creditmemo
+     * @param string $comment
+     */
 
     private function _cancelCreditmemo($creditmemo, $comment = null)
     {
@@ -333,7 +398,11 @@ class Order
             $transactionSave->save();
         }
     }
-
+    /**
+     * Cancel Magento Credit Memo
+     *
+     * @param int $id
+     */
     public function cancelMagentoCreditMemo($id)
     {
         try {
@@ -351,6 +420,12 @@ class Order
         }
         return true;
     }
+   /**
+    * Deduct Order Totals
+    *
+    * @param array $order
+    * @param string $creditmemo
+    */
 
     private function _deductOrderTotals($order, $creditmemo)
     {

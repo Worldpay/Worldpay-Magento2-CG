@@ -18,14 +18,44 @@ abstract class ResponseAbstract
     public const INVALID_CONTENT_ERROR = 6;
     public const PAYMENT_DETAILS_ERROR = 7;
 
+    /**
+     * @var SimpleXmlElement
+     */
     protected $_responseXml;
+    /**
+     * Worldpay merchant code
+     *
+     * @var string
+     */
     protected $_merchantCode;
+    /**
+     * Worldpay payment status
+     *
+     * @var string
+     */
     protected $_paymentStatus;
+    /**
+     * Purchase order
+     *
+     * @var string
+     */
     protected $_payAsOrder;
+    /**
+     * Error messages
+     *
+     * @var string
+     */
     protected $_errorMessage;
+    /**
+     * Worldpay order id
+     *
+     * @var string
+     */
     protected $_wpOrderId;
 
     /**
+     * Getter for xml element
+     *
      * @return SimpleXMLElement
      */
     public function getXml()
@@ -34,8 +64,10 @@ abstract class ResponseAbstract
     }
 
     /**
-     * @param $response
-     * @return  $this
+     * Set the XML response(s) to be returned by this adapter
+     *
+     * @param SimpleXmlElement|array|string $response
+     * @return $this
      */
     public function setResponse($response)
     {

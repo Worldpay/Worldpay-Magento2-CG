@@ -13,12 +13,12 @@ class SentForRefund extends \Sapient\Worldpay\Model\Payment\Update\Base implemen
     public const REFUND_COMMENT = 'Refund has been requested';
     /**
      * Constructor
-     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
+     * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
      */
     public function __construct(
-        \Sapient\Worldpay\Model\Payment\State $paymentState,
+        \Sapient\Worldpay\Model\Payment\StateInterface $paymentState,
         \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment,
         \Sapient\Worldpay\Helper\Data $configHelper
     ) {
@@ -27,6 +27,12 @@ class SentForRefund extends \Sapient\Worldpay\Model\Payment\Update\Base implemen
         $this->_configHelper = $configHelper;
     }
 
+    /**
+     * Apply
+     *
+     * @param Payment $payment
+     * @param Order $order
+     */
     public function apply($payment, $order = null)
     {
         $reference = $this->_paymentState->getJournalReference($this->_paymentState->getPaymentStatus());

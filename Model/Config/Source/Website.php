@@ -16,11 +16,13 @@ class Website implements \Magento\Framework\Option\ArrayInterface
     private $storeManager;
 
     /**
-     * @var Data
+     * @var directoryHelper
      */
     private $directoryHelper;
 
     /**
+     * Constructor
+     *
      * @param StoreManagerInterface $storeManager
      * @param Data $directoryHelper
      */
@@ -33,7 +35,9 @@ class Website implements \Magento\Framework\Option\ArrayInterface
     }
 
     /**
-     * {@inheritdoc}
+     * To Option Array
+     *
+     * @return array
      */
     public function toOptionArray()
     {

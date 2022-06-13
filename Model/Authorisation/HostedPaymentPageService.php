@@ -45,8 +45,16 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
         $this->_urlInterface = $urlInterface;
     }
     /**
-     * handles provides authorization data for Hosted Payment Page integration
+     * Handles provides authorization data for Hosted Payment Page integration
+     *
      * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
+     *
+     * @param MageOrder $mageOrder
+     * @param Quote $quote
+     * @param string $orderCode
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @param Payment $payment
      */
     public function authorizePayment(
         $mageOrder,
@@ -77,6 +85,8 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
     }
 
     /**
+     * Get redirect response model
+     *
      * @return  \Sapient\Worldpay\Model\Response\RedirectResponse
      */
     protected function _getRedirectResponseModel()
@@ -89,6 +99,8 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
     }
 
     /**
+     * Get hosted payment page status
+     *
      * @return  \Sapient\Worldpay\Model\Checkout\Hpp\State
      */
     protected function _getStatus()

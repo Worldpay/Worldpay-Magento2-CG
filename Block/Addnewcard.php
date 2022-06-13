@@ -14,25 +14,32 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
       * @var \Magento\Customer\Model\Session
       */
     protected $_customerSession;
-     /**
-      * @var array
-      */
+    /**
+     * @var array
+     */
     protected static $_months;
-     /**
-      * @var array
-      */
+    /**
+     * @var array
+     */
     protected static $_expiryYears;
     /**
      * Constructor
      *
-     * @param \Magento\Backend\Block\Template\Context $context,
-     * @param \Sapient\Worldpay\Model\SavedTokenFactory $savecard,
-     * @param \Magento\Customer\Model\Session $customerSession,
+     * @param \Magento\Backend\Block\Template\Context $context
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Magento\Customer\Helper\Session\CurrentCustomerAddress $currentCustomerAddress
+     * @param \Magento\Customer\Model\Address\Config $addressConfig
+     * @param \Magento\Customer\Model\Address\Mapper $addressMapper
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
+     * @param \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param array $data
      */
+
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
-        //\Sapient\Worldpay\Model\SavedTokenFactory $savecard,
         \Magento\Customer\Model\Session $customerSession,
         \Sapient\Worldpay\Helper\Data $worldpayHelper,
         \Magento\Customer\Helper\Session\CurrentCustomerAddress $currentCustomerAddress,
@@ -44,7 +51,7 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         array $data = []
     ) {
-        //$this->_savecard = $savecard;
+
         $this->_customerSession = $customerSession;
         $this->worldpayHelper = $worldpayHelper;
         $this->currentCustomerAddress = $currentCustomerAddress;
@@ -56,7 +63,13 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
         $this->_storeManager = $storeManager;
         parent::__construct($context, $data);
     }
-    
+   
+    /**
+     * Get Cvc Enabled
+     *
+     * @return string
+     */
+
     public function requireCvcEnabled()
     {
         return $this->worldpayHelper->isCcRequireCVC();
@@ -71,11 +84,24 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
     {
         return $this->_storeManager->getStore()->getCode();
     }
+
+    /**
+     * Get Session Id
+     *
+     * @return string
+     */
     
     public function getSessionId()
     {
         return $this->_customerSession->getSessionId();
     }
+
+    /**
+     * Get Customer Token
+     *
+     * @return string
+     */
+    
     public function getCustomerToken()
     {
         $customerId = $this->_customerSession->getCustomer()->getId();
@@ -88,11 +114,10 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
      * @param AddressInterface $address
      * @return string
      */
+
     public function getPrimaryBillingAddressHtml()
     {
-        /** @var \Magento\Customer\Block\Address\Renderer\RendererInterface $renderer */
         $address = $this->currentCustomerAddress->getDefaultBillingAddress();
-        
         if ($address) {
             $renderer = $this->_addressConfig->getFormatByCode('html')->getRenderer();
             return $renderer->renderArray($this->addressMapper->toFlatArray($address));
@@ -100,13 +125,24 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
             return $this->escapeHtml(__('You have not set a default billing address.'));
         }
     }
+    /**
+     * Get CC Types
+     *
+     * @return string
+     */
 
     public function getCCtypes()
     {
         $cctypes = $this->worldpayHelper->getCcTypes();
         return $cctypes;
     }
-    
+    /**
+     * Get Checkout Specific Label
+     *
+     * @param Specific $labelcode
+     * @return string
+     */
+
     public function getCheckoutSpecificLabel($labelcode)
     {
         $data = $this->worldpayHelper->getCheckoutLabelbyCode($labelcode);
@@ -131,12 +167,24 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
 
         return self::$_months;
     }
+    /**
+     * Get Account Label by Code
+     *
+     * @param string $labelCode
+     * @return string
+     */
 
     public function getAccountLabelbyCode($labelCode)
     {
         return $this->worldpayHelper->getAccountLabelbyCode($labelCode);
     }
-    
+    /**
+     * Get Checkout Label by Code
+     *
+     * @param string $labelCode
+     * @return string
+     */
+
     public function getCheckoutLabelbyCode($labelCode)
     {
         return $this->worldpayHelper->getCheckoutLabelbyCode($labelCode);
@@ -160,26 +208,44 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
         }
         return self::$_expiryYears;
     }
-    
+    /**
+     * Get Disclaimer Message Enable
+     *
+     * @return string
+     */
+
     public function getDisclaimerMessageEnable()
     {
-        
-          return (bool) $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer'
+        return (bool) $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer'
                   . '/stored_credentials_message_enable', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
+    /**
+     * Get Disclaimer Text
+     *
+     * @return string
+     */
+
     public function getDisclaimerText()
     {
-        
-            return $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer/'
+        return $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer/'
                     . 'stored_credentials_disclaimer_message', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
-    
+    /**
+     * Get Disclaimer Message Mandatory
+     *
+     * @return string
+     */
+
     public function getDisclaimerMessageMandatory()
     {
-        
-            return (bool) $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer/'
+        return (bool) $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer/'
                     . 'stored_credentials_flag', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
+    /**
+     * Get Stored Credentials Enabled Value
+     *
+     * @return string
+     */
     
     public function getStoredCredentialsEnabledValue()
     {
@@ -188,6 +254,13 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get Credit Card Specific exception
+     *
+     * @param string $execptionCode
+     * @return string
+     */
+
     public function getCreditCardSpecificexception($execptionCode)
     {
         return $this->worldpayHelper->getCreditCardSpecificexception($execptionCode);

@@ -9,13 +9,21 @@ namespace Sapient\Worldpay\Model\XmlBuilder\Config;
  */
 class TokenConfiguration
 {
+    /**
+     * @var bool
+     */
     private $createTokenBeforeAuth = false;
+    /**
+     * @var bool
+     */
     private $createTokenAndAuthTogether = false;
+    /**
+     * @var bool
+     */
     private $createTokenEnabled = false;
 
     /**
-     * @param bool $isDynamic3D
-     * @param bool $is3DSecure
+     * @param bool $args
      */
     public function __construct($args)
     {
@@ -23,6 +31,8 @@ class TokenConfiguration
     }
 
     /**
+     * Requested save cc
+     *
      * @return bool
      */
     public function isSaveCreditCardReqested()
@@ -31,6 +41,9 @@ class TokenConfiguration
     }
 
     /**
+     * Retrive token reason
+     *
+     * @param string|null $orderCode
      * @return string
      */
     public function getTokenReason($orderCode = null)
@@ -39,6 +52,8 @@ class TokenConfiguration
     }
     
     /**
+     * Check if tokenization is enabled?
+     *
      * @return bool
      */
     public function istokenizationIsEnabled()

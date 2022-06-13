@@ -15,14 +15,20 @@ class PaymentOptions
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $countryCode;
 
     /**
      * Build xml for processing Request
      *
      * @param string $merchantCode
-     * @param string $orderCode
+     * @param string $countryCode
      * @return SimpleXMLElement $xml
      */
     public function build($merchantCode, $countryCode)

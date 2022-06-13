@@ -13,7 +13,14 @@ use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class DisableTest extends TestCase
 {
+    
+    /**
+     * @var \Sapient\Worldpay\Block\Adminhtml\Form\Field\Disable
+     */
     protected $disbaleObj;
+    /**
+     * @var Text
+     */
     protected $element;
     protected function setUp(): void
     {

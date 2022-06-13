@@ -20,6 +20,8 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
     }
     
     /**
+     * Return succeess, pending, cancel and failure redirect URLs
+     *
      * @param SimpleXmlElement $xml
      * @return string $url
      */
@@ -36,6 +38,8 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
     }
 
     /**
+     * Returns url for redirect.
+     *
      * @param SimpleXmlElement $xml
      * @return string $url
      */
@@ -47,6 +51,11 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
         return trim($url[0]);
     }
 
+    /**
+     * Return succeess, pending, cancel and failure callback URLs
+     *
+     * @return array $callbackurl
+     */
     public function getCallBackUrl()
     {
         $callbackurl = [];

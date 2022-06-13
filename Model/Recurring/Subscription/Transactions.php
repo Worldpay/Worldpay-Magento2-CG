@@ -21,6 +21,8 @@ class Transactions extends AbstractModel
     private $subscription;
 
     /**
+     * Transactions constructor
+     *
      * @return void
      */
     protected function _construct()
@@ -29,6 +31,8 @@ class Transactions extends AbstractModel
     }
 
     /**
+     * Set subscription info
+     *
      * @param Subscription $subscription
      * @return $this
      */
@@ -39,6 +43,8 @@ class Transactions extends AbstractModel
     }
 
     /**
+     * Get subscription info
+     *
      * @return Subscription
      */
     public function getSubscription()
@@ -63,7 +69,8 @@ class Transactions extends AbstractModel
     /**
      * Load order Details
      *
-     *
+     * @param int $order_increment_id
+     * @return array
      */
     public function loadByOrderIncrementId($order_increment_id)
     {
@@ -76,7 +83,8 @@ class Transactions extends AbstractModel
     /**
      * Load order Details
      *
-     *
+     * @param int $order_id
+     * @return array
      */
     public function loadByWorldpayOrderId($order_id)
     {
@@ -90,7 +98,8 @@ class Transactions extends AbstractModel
     /**
      * Load order Details
      *
-     *
+     * @param int $subscriptionId
+     * @return array
      */
     public function loadBySubscriptionId($subscriptionId)
     {
@@ -104,7 +113,8 @@ class Transactions extends AbstractModel
     /**
      * Load order Details
      *
-     *
+     * @param int $entityId
+     * @return array
      */
     public function loadById($entityId)
     {

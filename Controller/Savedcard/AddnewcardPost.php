@@ -21,36 +21,79 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
+    /**
+     * @var $checkoutSession
+     */
     protected $checkoutSession;
+    /**
+     * @var THIS_TRANSACTION
+     */
     public const THIS_TRANSACTION = 'thisTransaction';
+    /**
+     * @var LESS_THAN_THIRTY_DAYS
+     */
     public const LESS_THAN_THIRTY_DAYS = 'lessThanThirtyDays';
+    /**
+     * @var THIRTY_TO_SIXTY_DAYS
+     */
     public const THIRTY_TO_SIXTY_DAYS = 'thirtyToSixtyDays';
+    /**
+     * @var MORE_THAN_SIXTY_DAYS
+     */
     public const MORE_THAN_SIXTY_DAYS = 'moreThanSixtyDays';
+    /**
+     * @var DURING_TRANSACTION
+     */
     public const DURING_TRANSACTION = 'duringTransaction';
+    /**
+     * @var CREATED_DURING_TRANSACTION
+     */
     public const CREATED_DURING_TRANSACTION = 'createdDuringTransaction';
+    /**
+     * @var CHANGED_DURING_TRANSACTION
+     */
     public const CHANGED_DURING_TRANSACTION = 'changedDuringTransaction';
+    /**
+     * @var NO_ACCOUNT
+     */
     public const NO_ACCOUNT = 'noAccount';
+    /**
+     * @var NO_CHANGE
+     */
     public const NO_CHANGE = 'noChange';
 
     /**
      * @var Magento\Framework\Data\Form\FormKey\Validator
      */
     protected $formKeyValidator;
-    
+    /**
+     * @var @helper
+     */
+
     protected $helper;
 
     /**
      * Constructor
      *
      * @param Context $context
-     * @param SavedTokenFactory $savecard
      * @param Session $customerSession
      * @param Validator $formKeyValidator
      * @param StoreManagerInterface $storeManager
-     * @param \Sapient\Worldpay\Model\Token\Service $tokenService
-     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken
-     * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Magento\Framework\Session\SessionManagerInterface $session
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory
+     * @param \Magento\SalesSequence\Model\Manager $sequenceManager
+     * @param \Sapient\Worldpay\Helper\Registry $registryhelper
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param MyAccountException $helper
+     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
      */
     public function __construct(
         Context $context,
@@ -93,7 +136,15 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         $this->helper = $helper;
         $this->resultJsonFactory = $resultJsonFactory;
     }
-    
+     /**
+      * Get Shopper Account Change Indicator
+      *
+      * @param string $fromDate
+      * @param string $toDate
+      * @param string $differenceFormat
+      * @return string
+      */
+   
     public function getShopperAccountChangeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -110,6 +161,14 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
             return self::CHANGED_DURING_TRANSACTION;
         }
     }
+    /**
+     * Get Shopper Account Password Change Indicator
+     *
+     * @param string $fromDate
+     * @param string $toDate
+     * @param string $differenceFormat
+     * @return string
+     */
     
     public function getShopperAccountPasswordChangeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
@@ -129,7 +188,15 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
             return $indicator;
         }
     }
-    
+    /**
+     * Get Shopper Account Shipping Address Usage Indicator
+     *
+     * @param string $fromDate
+     * @param string $toDate
+     * @param string $differenceFormat
+     * @return string
+     */
+
     public function getShopperAccountShippingAddressUsageIndicator(
         $fromDate,
         $toDate,
@@ -149,6 +216,14 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
             return self::THIS_TRANSACTION;
         }
     }
+    /**
+     * Get Shopper Account Shipping Address Usage Indicator
+     *
+     * @param string $fromDate
+     * @param string $toDate
+     * @param string $differenceFormat
+     * @return string
+     */
     
     public function getShopperAccountPaymentAccountIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
@@ -178,6 +253,11 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
     {
         return $this->_storeManager->getStore()->getId();
     }
+    /**
+     * Reserved Order Id
+     *
+     * @return string
+     */
     
     public function getReservedOrderId()
     {
@@ -189,6 +269,8 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
     }
     
     /**
+     * GenerateOrderCode
+     *
      * @return string
      */
     private function _generateOrderCode()
@@ -271,7 +353,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 $orderParams['userAgentHeader'] = php_sapi_name() !== "cli" ? filter_input(
                     INPUT_SERVER,
                     'HTTP_USER_AGENT',
-                    FILTER_SANITIZE_STRING,
+                    FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     FILTER_FLAG_STRIP_LOW
                 ) : '';
                 $orderParams['method'] = $paymentType;
@@ -395,6 +477,14 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
     {
         return $this->worldpayHelper->isIAVEnabled();
     }
+    /**
+     * Execute
+     *
+     * @param string $threeDSecureParams
+     * @param string $directOrderParams
+     * @param Int $mageOrderId
+     * @return string
+     */
     
     private function _handle3DSecure($threeDSecureParams, $directOrderParams, $mageOrderId)
     {
@@ -403,6 +493,15 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         $this->checkoutSession->setDirectOrderParams($directOrderParams);
         $this->checkoutSession->setAuthOrderId($mageOrderId);
     }
+    /**
+     * Handle3Ds2
+     *
+     * @param string $threeDSecureChallengeParams
+     * @param string $directOrderParams
+     * @param Int $mageOrderId
+     * @param string $threeDSecureConfig
+     * @return string
+     */
     
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)
     {
@@ -412,7 +511,11 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         $this->checkoutSession->setAuthOrderId($mageOrderId);
         $this->checkoutSession->set3DS2Config($threeDSecureConfig);
     }
-    // get 3ds2 params from the configuration and set to checkout session
+    /**
+     * Get 3DS2 Config Values
+     *
+     * @return string
+     */
     public function get3DS2ConfigValues()
     {
         $data = [];
@@ -430,6 +533,13 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         
         return $data;
     }
+    /**
+     * Get Prime Routing Details
+     *
+     * @param string $countryCode
+     * @return string
+     */
+
     public function getPrimeRoutingDetails($countryCode)
     {
         if ($countryCode==='US') {
@@ -447,6 +557,11 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
             }
         }
     }
+    /**
+     * Get ClientIP Address
+     *
+     * @return string
+     */
     
     private function _getClientIPAddress()
     {
@@ -454,6 +569,11 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         $remoteAddresses = explode(',', $REMOTE_ADDR);
         return trim($remoteAddresses[0]);
     }
+    /**
+     * Get ThreeDSecure Config
+     *
+     * @return string
+     */
     
     private function _getThreeDSecureConfig()
     {
@@ -462,6 +582,11 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 'is3DSecure' => (bool) $this->worldpayHelper->is3DSecureEnabled()
             ];
     }
+    /**
+     * Get Customer Detailsfor 3DS2
+     *
+     * @return string
+     */
     
     public function getCustomerDetailsfor3DS2()
     {
@@ -512,6 +637,15 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
 
         return $cusDetails;
     }
+    /**
+     * Execute
+     *
+     * @param string $fromDate
+     * @param string $toDate
+     * @param string $differenceFormat
+     * @return string
+     */
+
     public function getShopperAccountAgeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -532,6 +666,8 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
     }
     /**
      * Frame Shipping Address
+     *
+     * @param array $addressDetails
      * @return array
      */
     private function getAddress($addressDetails)
@@ -547,6 +683,11 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                     ];
         return $address;
     }
+    /**
+     * Execute
+     *
+     * @return string
+     */
     
     public function getExemptionEngineDetails()
     {
@@ -569,6 +710,8 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         return $exemptionEngine;
     }
     /**
+     * Get Payment Model
+     *
      * @return Sapient/WorldPay/Model/Token
      */
     protected function _getPaymentModel()

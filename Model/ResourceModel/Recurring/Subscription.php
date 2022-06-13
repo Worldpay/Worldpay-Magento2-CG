@@ -50,8 +50,8 @@ class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     /**
      * Update subscription id in order table
      *
-     * @param $orderId
-     * @param $subscriptionId
+     * @param int $orderId
+     * @param int $subscriptionId
      * @return $this
      */
     public function updateOrderRelation($orderId, $subscriptionId)

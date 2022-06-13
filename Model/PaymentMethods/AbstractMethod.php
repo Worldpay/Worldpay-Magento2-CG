@@ -10,10 +10,35 @@ use Magento\Sales\Model\Order\Payment\Transaction;
 abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
 {
 
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_canCapture = true;
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_canRefund = true;
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_canRefundInvoicePartial = true;
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_canVoid = true;
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_canCapturePartial = true;
 
     /**
@@ -40,6 +65,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @var array
      */
     protected $paymentdetailsdata;
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_isInitializeNeeded = true;
 
     public const REDIRECT_MODEL = 'redirect';
@@ -78,6 +108,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @param \Sapient\Worldpay\Model\Response\AdminhtmlResponse $adminhtmlresponse
      * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
      * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentutils
+     * @param \Sapient\Worldpay\Model\Payment\PaymentTypes $paymenttypes
+     * @param \Magento\Framework\App\RequestInterface $request
      * @param \Magento\Backend\Model\Auth\Session $authSession
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
@@ -153,6 +185,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->registry = $registry;
         $this->_request = $request;
     }
+    /**
+     * Initializer
+     *
+     * @param string $paymentAction
+     * @param Object $stateObject
+     */
     public function initialize($paymentAction, $stateObject)
     {
         $payment = $this->getInfoInstance();
@@ -180,6 +218,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         return $this->registryhelper->getworldpayRedirectUrl();
     }
 
+    /**
+     * Authorize payment abstract method
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param float $amount
+     * @return $this
+     */
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         $mageOrder = $payment->getOrder();
@@ -228,6 +273,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             );
         }
     }
+    /**
+     * Validate payment data
+     *
+     * @param array $paymentData
+     */
     public function validatePaymentData($paymentData)
     {
         $mode = $this->worlpayhelper->getCcIntegrationMode();
@@ -244,11 +294,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                     if (isset($data['cpf']) && !(preg_match("/^\d{11}$/", $data['cpf'], $matches) ||
                             preg_match("/^\d{14}$/", $data['cpf'], $matches))) {
                         $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM20');
-                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
                     }
                     if (isset($data['statement']) && !preg_match("/^[a-zA-Z0-9 ]*$/", $data['statement'], $matches)) {
                         $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM21');
-                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                        throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
                     }
                 }
                 if ($method == self::WORLDPAY_MOTO_TYPE && $mode == self::DIRECT_MODEL) {
@@ -266,7 +316,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 }
                 if ($mode == 'redirect' && $method != self::WORLDPAY_MOTO_TYPE) {
                     if (!isset($data['cc_type'])) {
-                        throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
+                        throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage);
                     }
                     if (isset($data['cc_number']) && $data['cc_number'] != null) {
                         $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM24');
@@ -274,7 +324,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                     }
                 } elseif ($mode == self::DIRECT_MODEL) {
                     if (!isset($data['cc_type'])) {
-                        throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
+                        throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage);
                     }
                     if ($data['cc_type'] != 'savedcard') {
                         if (!isset($data['cc_exp_year'])) {
@@ -297,15 +347,21 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 }
             } else {
                 $errorMsg = $this->worlpayhelper->getCreditCardSpecificexception('CCAM13');
-                throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg), 1);
+                throw new \Magento\Framework\Exception\LocalizedException(__($errorMsg));
             }
         } elseif ($method == self::WORLDPAY_APM_TYPE && !isset($paymentData['additional_data']['cc_type'])) {
-            throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
+            throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage);
         } elseif ($method == self::WORLDPAY_WALLETS_TYPE && !isset($paymentData['additional_data']['cc_type'])) {
-            throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage, 1);
+            throw new \Magento\Framework\Exception\LocalizedException($generalErrorMessage);
         }
     }
 
+    /**
+     * Assign data to info model instance
+     *
+     * @param \Magento\Framework\DataObject|mixed $data
+     * @return $this
+     */
     public function assignData(\Magento\Framework\DataObject $data)
     {
         parent::assignData($data);
@@ -314,6 +370,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     }
 
     /**
+     *  Generate order code for reserved order
+     *
+     * @param Quote $quote
      * @return string
      */
     private function _generateOrderCode($quote)
@@ -323,6 +382,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
 
     /**
      * Save Risk gardian
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param string $orderCode
+     * @param int $storeId
+     * @param string $orderId
+     * @param string $interactionType
      */
     private function _createWorldPayPayment(
         \Magento\Payment\Model\InfoInterface $payment,
@@ -353,7 +418,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
 
         $wpp->setData('order_id', $orderId);
-        $wpp->setData('payment_status', \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION);
+        $wpp->setData('payment_status', \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION);
         $wpp->setData('worldpay_order_id', $orderCode);
         $wpp->setData('store_id', $storeId);
         $wpp->setData(
@@ -380,6 +445,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $wpp->save();
     }
 
+    /**
+     * Capture payment
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param float $amount
+     * @return $this
+     */
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         if (!$this->worlpayhelper->isWorldPayEnable()) {
@@ -446,6 +518,14 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         return $this;
     }
 
+    /**
+     * Refund capture
+     *
+     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param float $amount
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         if (!$this->worlpayhelper->isWorldPayEnable()) {
@@ -480,6 +560,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         );
     }
 
+    /**
+     * Check refund availability
+     *
+     * @return bool
+     */
     public function canRefund()
     {
         $payment = $this->getInfoInstance()->getOrder()->getPayment();
@@ -494,6 +579,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     }
 
     /**
+     * Is refund allowed?
+     *
+     * @param State $state
      * @return bool
      */
     private function _isRefundAllowed($state)
@@ -501,22 +589,22 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $allowed = in_array(
             $state,
             [
-                \Sapient\Worldpay\Model\Payment\State::STATUS_CAPTURED,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_SETTLED,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_SETTLED_BY_MERCHANT,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_REFUND,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_REFUNDED,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_REFUNDED_BY_MERCHANT,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_REFUND_FAILED
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_CAPTURED,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SETTLED,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SETTLED_BY_MERCHANT,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_REFUND,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_REFUNDED,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_REFUNDED_BY_MERCHANT,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_REFUND_FAILED
             ]
         );
         return $allowed;
     }
 
     /**
-     * check paymentmethod is available for billing country
+     * Check paymentmethod is available for billing country
      *
-     * @param $quote
+     * @param Quote $quote
      * @return bool
      * @throw Exception
      */
@@ -529,10 +617,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     }
 
     /**
-     * check paymentmethod is available for shipping country
+     * Check paymentmethod is available for shipping country
+     *
      * No shipping country was mentioned in config it will be applicable for all shipping country
      *
-     * @param $quote
+     * @param Quote $quote
      * @return bool
      * @throw Exception
      */
@@ -554,7 +643,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     }
 
     /**
-     * payment method
+     * Payment method
      *
      * @return bool
      */
@@ -580,6 +669,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
     }
 
+    /**
+     * Add transaction
+     *
+     * @param Payment $payment
+     * @param float $amount
+     */
     protected function _addtransaction($payment, $amount)
     {
         $order = $payment->getOrder();
@@ -598,6 +693,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $payment->addTransactionCommentsToOrder($transaction, $message);
     }
     
+    /**
+     * Void the order abstract method
+     *
+     * @param array $order
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function canVoidSale($order)
     {
 
@@ -627,6 +729,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
     }
     
+    /**
+     * Update status for void order abstract method
+     *
+     * @param array $order
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function updateOrderStatusForVoidSale($order)
     {
         $payment = $order->getPayment();
@@ -641,6 +749,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
     }
     
+    /**
+     * Cancel the order abstract method
+     *
+     * @param array $order
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function canCancel($order)
     {
         $payment = $order->getPayment();
@@ -667,6 +782,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
     }
     
+    /**
+     * Update status for cancel order abstract method
+     *
+     * @param array $order
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function updateOrderStatusForCancelOrder($order)
     {
         $payment = $order->getPayment();
@@ -681,6 +802,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
     }
     
+    /**
+     * Get card type from credit card number
+     *
+     * @param string $ccnumber
+     * @return string
+     */
     public function getCardTypeFromCreditCardNumber($ccnumber)
     {
         $visaRegex = '/^4[0-9]{0,20}$/';
@@ -711,6 +838,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
     }
     
+    /**
+     * Check apm partial capture
+     *
+     * @param string $paymenttype
+     * @return bool
+     */
     private function checkAPMforPartialCapture($paymenttype)
     {
         $activeAPMs = $this->worlpayhelper->getApmTypes(self::WORLDPAY_APM_TYPE);

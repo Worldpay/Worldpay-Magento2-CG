@@ -13,9 +13,9 @@ use Exception;
 class HostedUrl implements HostedUrlInterface
 {
 
-     /**
-      * @var \Sapient\Worldpay\Model\Mapping\Service
-      */
+    /**
+     * @var \Sapient\Worldpay\Model\Mapping\Service
+     */
     protected $mappingService;
     /**
      * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
@@ -25,26 +25,53 @@ class HostedUrl implements HostedUrlInterface
      * @var \Sapient\Worldpay\Model\Response\RedirectResponse
      */
     protected $redirectresponse;
+    /**
+     * @var assetrepo
+     */
     protected $assetrepo;
+   /**
+    * @var $request
+    */
     protected $request;
+   /**
+    * @var checkoutsession
+    */
     protected $checkoutsession;
+   /**
+    * @var wplogger
+    */
     protected $wplogger;
+   /**
+    * @var worldpayhelper
+    */
     protected $worldpayhelper;
+    /**
+     * @var quoteRepository
+     */
     protected $quoteRepository;
+   /**
+    * @var storeManager
+    */
     protected $storeManager;
+   /**
+    * @var quoteIdMaskFactory
+    */
     protected $quoteIdMaskFactory;
     
     /**
-     * @param \Sapient\Worldpay\Model\Mapping\Service               $mappingService
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Model\Mapping\Service $mappingService
      * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
-     * @param \Sapient\Worldpay\Model\Response\RedirectResponse     $redirectresponse
-     * @param Magento\Framework\View\Asset\Repository               $assetrepo
-     * @param Magento\Framework\App\RequestInterface                $request
-     * @param \Magento\Checkout\Model\Session                       $checkoutsession
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger               $wplogger
-     * @param \Sapient\Worldpay\Helper\Data                         $worldpayhelper
-     * @param \Magento\Quote\Api\CartRepositoryInterface            $quoteRepository
-     * @param Magento\Store\Model\StoreManagerInterface             $storeManager
+     * @param \Sapient\Worldpay\Model\Response\RedirectResponse $redirectresponse
+     * @param Magento\Framework\View\Asset\Repository $assetrepo
+     * @param Magento\Framework\App\RequestInterface $request
+     * @param \Magento\Checkout\Model\Session $checkoutsession
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+     * @param Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory
      */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingService,
@@ -75,8 +102,8 @@ class HostedUrl implements HostedUrlInterface
     /**
      * Retrive HPP payment Url
      *
-     * @param  string   $quoteId.
-     * @param  string[] $paymentdetails.
+     * @param  string $quoteId
+     * @param  string $paymentdetails
      * @return null|string
      */
     public function getHostedUrl($quoteId, array $paymentdetails)
@@ -135,9 +162,9 @@ class HostedUrl implements HostedUrlInterface
         }
     }
     /**
-     *  generate order code for HPP Iframe
+     *  Generate order code for HPP Iframe
      *
-     * @param  string $reservedOrderId.
+     * @param  string $reservedOrderId
      * @return string
      */
     private function _generateOrderCode($reservedOrderId)
@@ -147,6 +174,7 @@ class HostedUrl implements HostedUrlInterface
     /**
      *  Get country from quote
      *
+     * @param int $quote
      * @return string
      */
     private function _getCountryForQuote($quote)
@@ -159,7 +187,7 @@ class HostedUrl implements HostedUrlInterface
         return $this->worldpayhelper->getDefaultCountry();
     }
     /**
-     * get locale language
+     * Get locale language
      *
      * @return string
      */

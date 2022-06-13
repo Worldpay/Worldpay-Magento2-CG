@@ -16,12 +16,33 @@ class SamsungPayOrder
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
+    /**
+     * @var string
+     */
     private $orderDescription;
+    /**
+     * @var string
+     */
     private $currencyCode;
+    /**
+     * @var float
+     */
     private $amount;
+    /**
+     * @var string
+     */
     private $paymentType;
+    /**
+     * @var mixed
+     */
     private $exponent;
 
     /**
@@ -33,6 +54,9 @@ EOD;
      * @param string $currencyCode
      * @param float $amount
      * @param string $paymentType
+     * @param string $shopperEmail
+     * @param array $data
+     * @param mixed $exponent
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -145,6 +169,8 @@ EOD;
     }
 
     /**
+     * Add cdata to xml
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */
@@ -156,6 +182,8 @@ EOD;
     }
 
     /**
+     * Returns the rounded value of num to specified precision
+     *
      * @param float $amount
      * @return int
      */

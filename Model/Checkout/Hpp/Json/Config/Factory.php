@@ -19,13 +19,18 @@ class Factory
     private $store;
 
     /**
-     * @param StoreManagerInterface $storeManager,
-     * @param \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate,
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-     * @param Repository $assetrepo,
-     * @param RequestInterface $request,
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+     * Factory constructor
+     *
+     * @param StoreManagerInterface $storeManager
+     * @param \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param Repository $assetrepo
+     * @param RequestInterface $request
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+     * @param \Magento\Sales\Model\Order $mageOrder
+     * @param array $services
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -57,8 +62,11 @@ class Factory
             $this->state = $hppstate;
         }
     }
-
     /**
+     * Create sequence with javascript
+     *
+     * @param mixed $javascriptObjectVariable
+     * @param int $containerId
      * @return Sapient\Worldpay\Model\Checkout\Hpp\Json\Config
      */
     public function create($javascriptObjectVariable, $containerId)
@@ -98,6 +106,12 @@ class Factory
         );
     }
 
+    /**
+     * Get billing Country
+     *
+     * @param Quote $quote
+     * @return string
+     */
     private function _getCountryForQuote($quote)
     {
         $address = $quote->getBillingAddress();
@@ -108,6 +122,11 @@ class Factory
         return $this->worldpayhelper->getDefaultCountry();
     }
 
+    /**
+     * Get local language code
+     *
+     * @return string
+     */
     private function _getLanguageForLocale()
     {
         $locale = $this->worldpayhelper->getLocaleDefault();
@@ -117,6 +136,12 @@ class Factory
         return substr($locale, 0, 2);
     }
     
+    /**
+     * Extract order id
+     *
+     * @param array $orderKey
+     * @return array
+     */
     private function _extractOrderId($orderKey)
     {
         $array = explode('^', $orderKey);

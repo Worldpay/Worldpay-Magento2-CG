@@ -8,7 +8,23 @@ use Exception;
 
 class VaultService extends \Magento\Framework\DataObject
 {
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
     protected $checkoutSession;
+    /**
+     * VaultService constructor
+     *
+     * @param \Sapient\Worldpay\Model\Mapping\Service $mappingservice
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Helper\Registry $registryhelper
+     */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
@@ -30,6 +46,18 @@ class VaultService extends \Magento\Framework\DataObject
         $this->wplogger = $wplogger;
         $this->registryhelper = $registryhelper;
     }
+    /**
+     * Handles provides authorization data for vault
+     *
+     * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
+     *
+     * @param MageOrder $mageOrder
+     * @param Quote $quote
+     * @param string $orderCode
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @param Payment $payment
+     */
     public function authorizePayment(
         $mageOrder,
         $quote,
@@ -81,7 +109,11 @@ class VaultService extends \Magento\Framework\DataObject
             $this->_applyPaymentUpdate($directResponse, $payment);
         }
     }
-    // get 3ds2 params from the configuration and set to checkout session
+    /**
+     * Get 3ds2 params from the configuration and set to checkout session
+     *
+     * @return array
+     */
     public function get3DS2ConfigValues()
     {
         $data = [];
@@ -99,6 +131,13 @@ class VaultService extends \Magento\Framework\DataObject
         
         return $data;
     }
+    /**
+     * Handles 3d secure for direct
+     *
+     * @param array $threeDSecureParams
+     * @param array $directOrderParams
+     * @param string $mageOrderId
+     */
     private function _handle3DSecure($threeDSecureParams, $directOrderParams, $mageOrderId)
     {
         $this->wplogger->info('HANDLING 3DS IN VAULT');
@@ -108,7 +147,14 @@ class VaultService extends \Magento\Framework\DataObject
         $this->checkoutSession->setAuthOrderId($mageOrderId);
         $this->checkoutSession->setInstantPurchaseOrder(true);
     }
-    
+    /**
+     * Handles 3ds2 secure for direct
+     *
+     * @param array $threeDSecureChallengeParams
+     * @param array $directOrderParams
+     * @param string $mageOrderId
+     * @param array $threeDSecureConfig
+     */
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)
     {
         $this->wplogger->info('HANDLING 3DS2 IN VAULT');
@@ -118,6 +164,12 @@ class VaultService extends \Magento\Framework\DataObject
         $this->checkoutSession->setAuthOrderId($mageOrderId);
         $this->checkoutSession->set3DS2Config($threeDSecureConfig);
     }
+    /**
+     * Apply payment update
+     *
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param Payment $payment
+     */
     private function _applyPaymentUpdate(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
         $payment
@@ -126,6 +178,12 @@ class VaultService extends \Magento\Framework\DataObject
         $paymentUpdate->apply($payment);
         $this->_abortIfPaymentError($paymentUpdate, $directResponse);
     }
+    /**
+     * Abort if payment error
+     *
+     * @param Object $paymentUpdate
+     * @param \SimpleXMLObject $directResponse
+     */
     private function _abortIfPaymentError($paymentUpdate, $directResponse)
     {
         $responseXml = $directResponse->getXml();

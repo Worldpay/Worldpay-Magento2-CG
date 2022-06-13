@@ -10,6 +10,13 @@ namespace Sapient\Worldpay\Block\Adminhtml\Form\Field;
  */
 class Password extends \Magento\Framework\View\Element\AbstractBlock
 {
+    /**
+     * Update password
+     *
+     * @param string $value
+     * @return string
+     */
+
     protected function _toHtml()
     {
 
@@ -18,21 +25,34 @@ class Password extends \Magento\Framework\View\Element\AbstractBlock
         $html .= 'class="required-entry ' . $this->getClass() . '" ' . $this->getExtraParams() . '/> ';
         return $html;
     }
-
      /**
+      * Set Input Name
+      *
       * @param string $value
       * @return Sapient\Worldpay\Block\Adminhtml\Form\Field\MerchantProfile
       */
+
     public function setInputName($value)
     {
         return $this->setName($value);
     }
+    /**
+     * Set Input Value
+     *
+     * @param string $value
+     * @return string
+     */
 
     public function setInputId($value)
     {
         return $this->setId($value);
     }
-   
+    /**
+     * Return Html
+     *
+     * @return string
+     */
+
     public function getHtml()
     {
         return $this->toHtml();

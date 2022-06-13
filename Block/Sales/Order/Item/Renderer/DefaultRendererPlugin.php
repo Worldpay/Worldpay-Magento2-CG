@@ -22,8 +22,10 @@ class DefaultRendererPlugin
     }
 
     /**
-     * @param \Magento\Sales\Block\Order\Item\Renderer\DefaultRenderer $subject
-     * @param $result
+     * After GetItem Options Plugin
+     *
+     * @param array $subject
+     * @param array $result
      * @return array
      */
     public function afterGetItemOptions(\Magento\Sales\Block\Order\Item\Renderer\DefaultRenderer $subject, $result)

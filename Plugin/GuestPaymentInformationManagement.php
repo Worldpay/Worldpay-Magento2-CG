@@ -55,10 +55,12 @@ class GuestPaymentInformationManagement
         $this->checkMethods = $checkMethods;
     }
     /**
+     * Data provider for payment information and place order
+     *
      * @param CheckoutGuestPaymentInformationManagement $subject
      * @param \Closure $proceed
-     * @param $cartId
-     * @param $email
+     * @param string $cartId
+     * @param string $email
      * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
      * @param \Magento\Quote\Api\Data\AddressInterface|null $billingAddress
      * @return int

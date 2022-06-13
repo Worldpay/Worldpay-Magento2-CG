@@ -3,7 +3,7 @@
     <update handle="customer_account"/>
     <head>
         <css src="Sapient_Worldpay::css/worldpay.css"/>
-    </head>
+    </head>    
     <body>
         <referenceContainer name="page.messages">
             <block class="Magento\Framework\View\Element\Template" name="ajax.message.placeholder" template="Magento_Theme::html/messages.phtml"/>

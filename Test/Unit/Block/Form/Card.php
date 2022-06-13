@@ -21,6 +21,10 @@ use PHPUnit_Framework_MockObject_MockObject as MockObject;
  */
 class CardTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * Most used credit card types
+     * @var array
+     */
     public static $baseCardTypes = [
         'AMEX-SSL' => 'American Express',
         'VISA-SSL' => 'Visa',
@@ -31,6 +35,10 @@ class CardTest extends \PHPUnit\Framework\TestCase
         'MAESTRO-SSL' => 'Maestro',
     ];
 
+    /**
+     * Config credit card types
+     * @var array
+     */
     public static $configCardTypes = [
         'AMEX-SSL', 'VISA-SSL', 'ECMC-SSL', 'DISCOVER-SSL', 'JCB-SSL', 'DINERS-SSL', 'MAESTRO-SSL'
     ];

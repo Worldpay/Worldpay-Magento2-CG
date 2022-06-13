@@ -3,10 +3,34 @@ namespace Sapient\Worldpay\Controller\Hostedpaymentpage;
 
 class Challenge extends \Magento\Framework\App\Action\Action
 {
+    /**
+     * @var $_pageFactory
+     */
     protected $_pageFactory;
+    /**
+     * @var $request
+     */
     protected $request;
+    /**
+     * @var $_cookieManager
+     */
     protected $_cookieManager;
+    /**
+     * @var $cookieMetadataFactory
+     */
     protected $cookieMetadataFactory;
+    /**
+     * Constructor
+     *
+     * @param Context $context
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Magento\Framework\View\Result\PageFactory $pageFactory
+     * @param \Magento\Framework\App\Request\Http $request
+     * @param \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager
+     * @param \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory $cookieMetadataFactory
+     */
+
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
@@ -24,7 +48,11 @@ class Challenge extends \Magento\Framework\App\Action\Action
         $this->cookieMetadataFactory = $cookieMetadataFactory;
         return parent::__construct($context);
     }
-
+    /**
+     * Execute
+     *
+     * @return string
+     */
     public function execute()
     {
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();

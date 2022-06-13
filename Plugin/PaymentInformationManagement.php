@@ -53,9 +53,11 @@ class PaymentInformationManagement
         $this->checkMethods = $checkMethods;
     }
     /**
+     * Data provider for payment information and place order
+     *
      * @param CheckoutPaymentInformationManagement $subject
      * @param \Closure $proceed
-     * @param $cartId
+     * @param string $cartId
      * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
      * @param \Magento\Quote\Api\Data\AddressInterface|null $billingAddress
      * @return int

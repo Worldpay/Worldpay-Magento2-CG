@@ -15,7 +15,7 @@ class WorldpayHandler extends \Magento\Framework\Logger\Handler\Base
     protected $loggerType = Logger::INFO;
 
     /**
-     * File name
+     * Log file name
      * @var string
      */
     protected $fileName = '/var/log/worldpay.log';

@@ -16,6 +16,7 @@ class KlarnaCountries extends \Sapient\Worldpay\Block\Form\Field\FieldArray\Klar
      *
      * @return \Sapient\Worldpay\Block\Adminhtml\Form\Field\Activation
      */
+
     protected function _getKlarnaCountriesRenderer()
     {
         if (!$this->_klarnaCountriesList) {
@@ -24,7 +25,8 @@ class KlarnaCountries extends \Sapient\Worldpay\Block\Form\Field\FieldArray\Klar
                 '',
                 ['data' => ['is_render_to_js_template' => true]]
             );
-             $this->_klarnaCountriesList->setClass('required-entry');
+            
+            $this->_klarnaCountriesList->setClass('required-entry');
         }
 
         return $this->_klarnaCountriesList;

@@ -84,7 +84,9 @@ class PlaceOrder extends Action
      * @param InstantPurchaseOptionLoadingFactory $instantPurchaseOptionLoadingFactory
      * @param ProductRepositoryInterface $productRepository
      * @param PlaceOrderModel $placeOrder
+     * @param Magento\Checkout\Model\Session $checkoutSession
      * @param OrderRepositoryInterface $orderRepository
+     * @param Magento\Framework\App\Response\RedirectInterface $redirect
      */
     public function __construct(
         Context $context,
@@ -187,8 +189,8 @@ class PlaceOrder extends Action
     }
 
     /**
-     * Creates error message without exposing error details.
-     * ########## Payment update of type:
+     * Creates error message without exposing error details
+     *
      * @return string
      */
     private function createGenericErrorMessage(): string

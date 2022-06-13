@@ -23,10 +23,37 @@ use Sapient\Worldpay\Helper\Data;
 
 class FraudisightMessage extends Column
 {
+    /**
+     * Worldpay payments
+     *
+     * @var \Sapient\Worldpay\Model\Payment\WorldPayPayment
+     */
     protected $_worldpaypayment;
+    /**
+     * Search criteria builder API
+     *
+     * @var SearchCriteriaBuilder
+     */
     protected $_searchCriteria;
+    /**
+     * Order repository interface
+     *
+     * @var OrderRepositoryInterface
+     */
     protected $_orderRepository;
     
+    /**
+     * FraudisightMessage constructor
+     *
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param OrderRepositoryInterface $orderRepository
+     * @param Worldpayment $_worldpaypayment
+     * @param SearchCriteriaBuilder $criteria
+     * @param Data $helper
+     * @param array $components
+     * @param array $data
+     */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
@@ -44,6 +71,12 @@ class FraudisightMessage extends Column
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
     
+    /**
+     * Prepare Data Source
+     *
+     * @param array $dataSource
+     * @return array
+     */
     public function prepareDataSource(array $dataSource)
     {
         if (isset($dataSource['data']['items'])) {
@@ -51,10 +84,12 @@ class FraudisightMessage extends Column
 
                 $worldpaypayment=$this->_worldpaypayment->loadByPaymentId($item["increment_id"]);
                 $fraudsightMessage = $worldpaypayment->getFraudsightMessage();
-                if (strtolower($fraudsightMessage) === 'review') {
-                    $fraudsightMessage=  '<font color="red">'.$fraudsightMessage.'</font>';
+                if (isset($fraudsightMessage)) {
+                    if (strtolower($fraudsightMessage) === 'review') {
+                        $fraudsightMessage=  '<font color="red">'.$fraudsightMessage.'</font>';
+                    }
+                    $item[$this->getData('name')] = strtoupper($fraudsightMessage);
                 }
-                $item[$this->getData('name')] = strtoupper($fraudsightMessage);
             }
         }
 
@@ -63,6 +98,7 @@ class FraudisightMessage extends Column
     
     /**
      * Prepare component configuration
+     *
      * @return void
      */
     public function prepare()

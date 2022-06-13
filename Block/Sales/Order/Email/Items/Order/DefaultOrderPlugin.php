@@ -20,10 +20,11 @@ class DefaultOrderPlugin
     {
         $this->recurringHelper = $recurringHelper;
     }
-
     /**
-     * @param \Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder $subject
-     * @param $result
+     * After GetItem Options Plugin
+     *
+     * @param array $subject
+     * @param array $result
      * @return array
      */
     public function afterGetItemOptions(\Magento\Sales\Block\Order\Email\Items\Order\DefaultOrder $subject, $result)

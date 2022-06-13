@@ -11,6 +11,7 @@ class Refund implements ObserverInterface
 {
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Framework\Pricing\Helper\Data $pricinghelper
      * @param \Magento\Checkout\Model\Session $checkoutsession
@@ -27,7 +28,11 @@ class Refund implements ObserverInterface
 
     /**
      * Process the credit memo
+     *
+     * @param \Magento\Framework\Event\Observer $observer
+     * @return string
      */
+
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $payment = $observer->getEvent()->getPayment();

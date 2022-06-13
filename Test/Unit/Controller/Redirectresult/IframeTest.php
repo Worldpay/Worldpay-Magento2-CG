@@ -16,6 +16,9 @@ use Sapient\Worldpay\Controller\Redirectresult\Iframe;
 class IframeTest extends TestCase
 {
     
+    /**
+     * @var Iframe
+     */
     protected $iframeObj;
     protected function setUp(): void
     {

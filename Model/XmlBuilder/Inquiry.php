@@ -15,7 +15,13 @@ class Inquiry
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
 
     /**

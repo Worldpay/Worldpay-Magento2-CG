@@ -26,8 +26,11 @@ class Config extends \Magento\Framework\View\Element\Template
         parent::__construct($context, $data);
     }
     /**
+     * Display json encode config data
+     *
      * @return json
      */
+    
     protected function _toHtml()
     {
         return json_encode($this->_getConfig());

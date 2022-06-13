@@ -15,15 +15,22 @@ use Magento\Framework\Controller\ResultFactory;
 
 class CallBack extends \Magento\Framework\App\Action\Action
 {
-
-    protected $orderFactory;
-    protected $worldpayHelper;
-    protected $_checkoutSession;
-    protected $orderManagement;
-
     /**
-     * @var Magento\Framework\View\Result\PageFactory
+     * @var $orderFactory
      */
+    protected $orderFactory;
+    /**
+     * @var $worldpayHelper
+     */
+    protected $worldpayHelper;
+    /**
+     * @var $_checkoutSession
+     */
+    protected $_checkoutSession;
+    /**
+     * @var $orderManagement
+     */
+    protected $orderManagement;
 
     /**
      * Constructor
@@ -34,7 +41,16 @@ class CallBack extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\Request\Http $request
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Magento\Backend\Model\Auth\Session $authSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Magento\Sales\Model\OrderFactory $orderFactory
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Sales\Api\OrderManagementInterface $orderManagement
+     * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory
+     * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
      */
+
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
@@ -66,6 +82,11 @@ class CallBack extends \Magento\Framework\App\Action\Action
         $this->_worldpaymentFactory= $worldpaymentFactory;
         $this->curlHelper = $curlHelper;
     }
+    /**
+     * Execute
+     *
+     * @return string
+     */
 
     public function execute()
     {

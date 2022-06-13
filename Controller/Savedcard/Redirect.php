@@ -9,8 +9,19 @@ use Exception;
 
 class Redirect extends \Magento\Framework\App\Action\Action
 {
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
+
     protected $checkoutSession;
 
+    /**
+     * Constructor
+     *
+     * @param Context $context
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     */
     public function __construct(
         Context $context,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -20,6 +31,9 @@ class Redirect extends \Magento\Framework\App\Action\Action
         $this->checkoutSession = $checkoutSession;
         parent::__construct($context);
     }
+    /**
+     * Perform redirect
+     */
 
     public function execute()
     {

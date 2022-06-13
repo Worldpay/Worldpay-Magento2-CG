@@ -10,9 +10,20 @@ use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Backend\Block\Widget\Button\ButtonList;
 use Sapient\Worldpay\Helper\Data;
 
+/**
+ * Initialize  plugin
+ */
 class PluginBefore
 {
 
+    /**
+     * PluginBefore constructor
+     *
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Sales\Model\Order $order
+     * @param RequestInterface $request
+     * @param Data $worldpayHelper
+     */
     public function __construct(
         \Magento\Framework\UrlInterface $urlBuilder,
         \Magento\Sales\Model\Order $order,
@@ -25,6 +36,14 @@ class PluginBefore
         $this->worldpayHelper = $worldpayHelper;
     }
 
+    /**
+     * Add Login as Customer button.
+     *
+     * @param ToolbarContext $toolbar
+     * @param AbstractBlock $context
+     * @param ButtonList $buttonList
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function beforePushButtons(
         ToolbarContext $toolbar,
         \Magento\Framework\View\Element\AbstractBlock $context,
@@ -83,6 +102,12 @@ class PluginBefore
         return [$context, $buttonList];
     }
     
+    /**
+     * Get the order date details
+     *
+     * @param Order $order
+     * @return bool
+     */
     public function getOrderDateDetails($order)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -99,7 +124,13 @@ class PluginBefore
         
         return false;
     }
-    
+
+    /**
+     * Get the payment types by orderid
+     *
+     * @param string $orderid
+     * @return array|string
+     */
     public function getPaymentType($orderid)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -108,6 +139,12 @@ class PluginBefore
         return $worldpaydata->getPaymentType();
     }
     
+    /**
+     * Check eligibility for void sale
+     *
+     * @param Order $order
+     * @return bool
+     */
     public function checkEligibilityForVoidSale($order)
     {
         $data = $order->getData();
@@ -124,6 +161,12 @@ class PluginBefore
         }
     }
     
+    /**
+     * Is prime routing request?
+     *
+     * @param string $orderid
+     * @return bool|null
+     */
     public function isPrimeRoutingRequest($orderid)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -135,6 +178,12 @@ class PluginBefore
         }
     }
     
+    /**
+     * Remove shipment button
+     *
+     * @param Order $order
+     * @param ButtonList $buttonList
+     */
     public function removeShipmentButton($order, $buttonList)
     {
         $orderStatus = $order->getStatus();

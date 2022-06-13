@@ -9,9 +9,29 @@ use Exception;
 class WalletService extends \Magento\Framework\DataObject
 {
 
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
     protected $checkoutSession;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
+     */
     protected $updateWorldPayPayment;
 
+    /**
+     * WalletService constructor
+     *
+     * @param \Sapient\Worldpay\Model\Mapping\Service $mappingservice
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Sapient\Worldpay\Helper\Registry $registryhelper
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
@@ -37,8 +57,16 @@ class WalletService extends \Magento\Framework\DataObject
     }
 
     /**
-     * handles provides authorization data for redirect
+     * Handles provides authorization data for redirect
+     *
      * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
+     *
+     * @param MageOrder $mageOrder
+     * @param Quote $quote
+     * @param string $orderCode
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @param Payment $payment
      */
     public function authorizePayment(
         $mageOrder,
@@ -103,7 +131,11 @@ class WalletService extends \Magento\Framework\DataObject
             $this->_applyPaymentUpdate($directResponse, $payment);
         }
     }
-     // get 3ds2 params from the configuration and set to checkout session
+    /**
+     * Get 3ds2 params from the configuration and set to checkout session
+     *
+     * @return array
+     */
     public function get3DS2ConfigValues()
     {
         $data = [];
@@ -122,6 +154,13 @@ class WalletService extends \Magento\Framework\DataObject
         return $data;
     }
     
+    /**
+     * Handles 3d secure for direct
+     *
+     * @param array $threeDSecureParams
+     * @param array $directOrderParams
+     * @param string $mageOrderId
+     */
     private function _handle3DSecure($threeDSecureParams, $directOrderParams, $mageOrderId)
     {
         $this->registryhelper->setworldpayRedirectUrl($threeDSecureParams);
@@ -130,6 +169,14 @@ class WalletService extends \Magento\Framework\DataObject
         $this->checkoutSession->setAuthOrderId($mageOrderId);
     }
     
+    /**
+     * Handles 3ds2 secure for direct
+     *
+     * @param array $threeDSecureChallengeParams
+     * @param array $directOrderParams
+     * @param string $mageOrderId
+     * @param array $threeDSecureConfig
+     */
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)
     {
         $this->registryhelper->setworldpayRedirectUrl($threeDSecureChallengeParams);
@@ -139,6 +186,12 @@ class WalletService extends \Magento\Framework\DataObject
         $this->checkoutSession->set3DS2Config($threeDSecureConfig);
     }
 
+    /**
+     * Apply payment update
+     *
+     * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param Payment $payment
+     */
     private function _applyPaymentUpdate(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
         $payment
@@ -148,6 +201,11 @@ class WalletService extends \Magento\Framework\DataObject
         $this->_abortIfPaymentError($paymentUpdate);
     }
 
+    /**
+     * Abort if payment error
+     *
+     * @param Object $paymentUpdate
+     */
     private function _abortIfPaymentError($paymentUpdate)
     {
         if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Refused) {

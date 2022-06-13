@@ -16,8 +16,7 @@ class TokenFormatter implements PaymentTokenFormatterInterface
       */
     protected $_worldpaymentFactory;
     /**
-     * Most used credit card types
-     * @var array
+     * @var baseCardTypes
      */
     public static $baseCardTypes = [
         'AMEX-SSL' => 'American Express',
@@ -31,6 +30,14 @@ class TokenFormatter implements PaymentTokenFormatterInterface
         'CB-SSL' => 'Carte Bancaire',
         'DINERS-SSL' => 'Diners',
     ];
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\SavedTokenFactory $savedWPFactory
+     * @param \Sapient\Worldpay\Helper\Data $wpdata
+     * @param SavedToken $savedtoken
+     */
 
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -45,7 +52,9 @@ class TokenFormatter implements PaymentTokenFormatterInterface
     }
 
     /**
-     * @inheritdoc
+     * Format Payment Token
+     *
+     * @param string $paymentToken
      */
     public function formatPaymentToken(PaymentTokenInterface $paymentToken): string
     {

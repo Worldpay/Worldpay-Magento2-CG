@@ -15,6 +15,9 @@ use Sapient\Worldpay\Controller\Wallets\Success;
 class SuccessTest extends TestCase
 {
     
+    /**
+     * @var Success
+     */
     protected $successObj;
     protected function setUp(): void
     {

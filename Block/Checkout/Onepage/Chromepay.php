@@ -30,6 +30,8 @@ class Chromepay extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Check chrom pay enable disable
+     *
      * @return bool
      */
     public function isDisabled()

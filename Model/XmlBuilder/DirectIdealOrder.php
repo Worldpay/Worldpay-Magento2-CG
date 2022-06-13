@@ -19,21 +19,69 @@ class DirectIdealOrder
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
+    /**
+     * @var string
+     */
     private $orderDescription;
+    /**
+     * @var string
+     */
     private $currencyCode;
+    /**
+     * @var float
+     */
     private $amount;
+    /**
+     * @var string
+     */
     private $paymentType;
+    /**
+     * @var string
+     */
     private $shopperEmail;
+    /**
+     * @var string
+     */
     private $statementNarrative;
+    /**
+     * @var string
+     */
     private $acceptHeader;
+    /**
+     * @var string
+     */
     private $userAgentHeader;
+    /**
+     * @var array
+     */
     private $shippingAddress;
+    /**
+     * @var array
+     */
     private $billingAddress;
+    /**
+     * @var float
+     */
     private $paymentPagesEnabled;
+    /**
+     * @var string
+     */
     private $installationId;
+    /**
+     * @var string
+     */
     private $hideAddress;
+    /**
+     * @var array|string
+     */
     private $exponent;
 
     /**
@@ -69,15 +117,18 @@ EOD;
      * @param string $currencyCode
      * @param float $amount
      * @param string $paymentType
-     * @param $shopperEmail
-     * @param $statementNarrative
+     * @param string $shopperEmail
+     * @param string $statementNarrative
      * @param string $acceptHeader
      * @param string $userAgentHeader
      * @param string $shippingAddress
      * @param string $billingAddress
      * @param float $paymentPagesEnabled
      * @param string $installationId
-     * @param $hideAddress
+     * @param string $hideAddress
+     * @param string $callbackurl
+     * @param string $ccbank
+     * @param array|string $exponent
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -207,6 +258,8 @@ EOD;
     }
 
     /**
+     * Add dynamicInteractionType and its attribute tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     private function _addDynamic3DSElement($order)
@@ -224,6 +277,8 @@ EOD;
     }
 
     /**
+     * Add createToken and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     private function _addCreateTokenElement($order)
@@ -243,12 +298,22 @@ EOD;
         }
     }
 
+    /**
+     * Add orderContent and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addOrderContentElement($order)
     {
           $ordercontent = $order->addChild('orderContent');
           $this->_addCDATA($ordercontent, '');
     }
 
+    /**
+     * Add paymentDetails and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addPaymentDetailsElement($order)
     {
         $paymentdetails = $order->addChild('paymentDetails');
@@ -349,6 +414,8 @@ EOD;
     }
   
     /**
+     * Add cdata to xml
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */
@@ -360,6 +427,8 @@ EOD;
     }
 
     /**
+     * Returns the rounded value of num to specified precision
+     *
      * @param float $amount
      * @return int
      */

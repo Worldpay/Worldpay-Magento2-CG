@@ -25,6 +25,7 @@ class Token
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
      * @param \Sapient\Worldpay\Model\Request $request
+     * @param \Magento\Framework\Session\SessionManager $sessionManager
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -90,6 +91,8 @@ class Token
     }
 
     /**
+     * Get payment details
+     *
      * @param array $paymentDetails
      * @return array $details
      */
@@ -116,11 +119,11 @@ class Token
     }
 
     /**
-     * call api to process send request
+     * Call api to process send request
      *
      * @param SimpleXMLElement $xml
-     * @param string  $username
-     * @param string  $password
+     * @param string $username
+     * @param string $password
      * @return SimpleXMLElement $response
      */
     protected function _sendRequest($xml, $username, $password)
@@ -133,7 +136,7 @@ class Token
     /**
      * Check error while processing the request
      *
-     * @param SimpleXMLElement $xml
+     * @param SimpleXMLElement $response
      * @throws Exception
      */
     protected function _checkForError($response)

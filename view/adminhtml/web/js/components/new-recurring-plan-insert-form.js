@@ -47,7 +47,7 @@ define([
                          * @param {String} msg
                          */
                         insertMethod: function (msg) {
-                            var $wrapper = $('<div/>').addClass(self.messagesClass).html(msg);
+                            var $wrapper = $('</div>').addClass(self.messagesClass).html(msg);
 
                             $('.page-main-actions', self.prefix).after($wrapper);
                         }

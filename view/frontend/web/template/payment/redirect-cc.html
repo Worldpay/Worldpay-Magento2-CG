@@ -3,7 +3,7 @@
         <input type="radio"
                name="payment[method]"
                class="radio"
-               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"></input>
 
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
         
@@ -38,7 +38,7 @@
                        <div class="paymentmethods-radio-wrapper">
                         <input type="radio"  data-bind="click:$parent.onSelectCcard.bind(this,$parent), event:{ change: $parent.loadEventAction }, attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
                                         'validate-one-required-by-name':true
-                                                }),id: 'redirect_cc_' + item.ccValue}" name="payment[cc_type]" />
+                                                }),id: 'redirect_cc_' + item.ccValue}" name="payment[cc_type]"></input>
                         <!--ko if: $parent.getIcons(item.ccValue) -->
                             <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}"><img data-bind="attr: {
                                     'src': $parent.getIcons(item.ccValue).url,
@@ -46,15 +46,20 @@
                                     'width': $parent.getIcons(item.ccValue).width,
                                     'height': $parent.getIcons(item.ccValue).height
                                     }"></label>
-                        <!--/ko-->                   
+                        <!--/ko-->
+                        <!--ko if: (item.ccValue=='savedcard') -->
+                        <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}"><!-- ko i18n: 'Saved Cards'--><!-- /ko --></label>
+                        <!--/ko-->                      
                    </div>
                 <!--/ko-->
-                 <!-- ko if: (getSavedCardsCount() > 0)-->
-                 <div class="paymentmethods-radio-wrapper">
-                    <label class="action label-saved-card" data-bind="click: loadSavedCards,text: $t('Use Saved Card')"></label>
-                       
-                    </div>
-                   <!-- /ko -->               
+                   <!-- ko if: (getSavedCardsCount() > 0)-->
+                    <!-- ko if: (getHppIntegrationType()  == 'iframe')-->
+                    <div class="paymentmethods-radio-wrapper">
+                        <label class="action label-saved-card" data-bind="click: loadSavedCards,text: $t('Use Saved Card')"></label>
+                        
+                        </div>
+                        <!-- /ko -->
+                   <!-- /ko -->                
             </div>
 
             <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
@@ -104,7 +109,7 @@
                                     enable: isActive($parents),
                                     value: isCPF,
                                     valueUpdate: 'keyup'"
-                                   /> 
+                                   ></input> 
                         </div>
                             </div>
                     <div class="field instalment required"  data-bind="visible: (showInstalmentSection())">
@@ -147,8 +152,8 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-         <!-- ko if: (getIntigrationMode() == 'redirect')-->
-         <div class="actions-toolbar">
+          <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='iframe')-->
+          <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout hpp-checkout"
                         type="button"
@@ -167,6 +172,26 @@
 
          <!--/ko-->
 
+
+         <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='full_page')-->
+         <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary checkout hpp-checkout"
+                        type="button"
+                        data-bind="
+                            click: preparePayment,
+                            attr: {title: getCheckoutLabels('CO27')}">
+                    <span data-bind="text: getCheckoutLabels('CO27')"></span>
+                </button>
+            </div>
+        </div>
+         <!-- HPP IFRAME -->
+         <style type="text/css">#checkout-payment-worldpay-container{padding-top:10px;} #wp-cl{ width: 93%;} .wp-cl-iframe{ height: 600px;  min-width: 93%; } #changePaymentMethod{display:none; } #wp-cl-checkout-payment-worldpay-container-iframe #changePaymentMethod{ display:none;}</style>
+         <div style="display:none" id="checkout-payment-worldpay-alert-message" data-bind="text: getCheckoutLabels('CO28')"></div>
+         <div id="checkout-payment-worldpay-container"></div>
+         <!-- HPP IFRAME -->
+
+         <!--/ko-->   
 
         <!-- ko if: (getIntigrationMode() == 'direct')-->
         <div class="actions-toolbar">

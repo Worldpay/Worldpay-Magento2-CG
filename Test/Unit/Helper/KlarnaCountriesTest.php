@@ -17,6 +17,11 @@ use \PHPUnit\Framework\TestCase;
 
 class KlarnaCountriesTest extends TestCase
 {
+    /**
+     * Core store config
+     *
+     * @var ScopeConfigInterface
+     */
     protected $scopeConfig;
      /** @var KlarnaCountries  */
     protected $model;

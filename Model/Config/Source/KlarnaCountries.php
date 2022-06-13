@@ -8,14 +8,21 @@ namespace Sapient\Worldpay\Model\Config\Source;
 
 class KlarnaCountries implements \Magento\Framework\Option\ArrayInterface
 {
+    /**
+     * @var _countryCollectionFactory
+     */
     protected $_countryCollectionFactory;
-    
+    /**
+     * @var _scopeConfig
+     */
     protected $_scopeConfig;
 
-    /**
-     * @param StoreManagerInterface $storeManager
-     * @param Data $directoryHelper
-     */
+     /**
+      * Constructor
+      *
+      * @param \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory
+      * @param  \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+      */
     public function __construct(
         \Magento\Directory\Model\ResourceModel\Country\CollectionFactory $countryCollectionFactory,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -24,7 +31,9 @@ class KlarnaCountries implements \Magento\Framework\Option\ArrayInterface
         $this->_countryCollectionFactory = $countryCollectionFactory;
     }
     /**
-     * {@inheritdoc}
+     * To Option Array
+     *
+     * @return array
      */
     public function toOptionArray()
     {
@@ -37,7 +46,11 @@ class KlarnaCountries implements \Magento\Framework\Option\ArrayInterface
         $optionArray = $countryCollection;
         return $optionArray;
     }
-    
+    /**
+     * Retrieve list of klarna countries
+     *
+     * @return array
+     */
     public function getCountryCollection()
     {
         $collection = $this->_countryCollectionFactory->create()->loadByStore();
@@ -45,7 +58,7 @@ class KlarnaCountries implements \Magento\Framework\Option\ArrayInterface
     }
     
     /**
-     * Retrieve list of klarna countries
+     * Retrieve Top Destinations
      *
      * @return array
      */

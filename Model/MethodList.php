@@ -11,7 +11,8 @@ class MethodList
      */
     private $methodCodes;
     /**
-     * MethodList constructor.
+     * MethodList constructor
+     *
      * @param array $methodCodes
      */
     public function __construct(array $methodCodes = [])
@@ -19,6 +20,8 @@ class MethodList
         $this->methodCodes = $methodCodes;
     }
     /**
+     * Get method code
+     *
      * @return array
      */
     public function get()

@@ -14,9 +14,25 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      * @var string
      */
     protected $_code = 'worldpay_wallets';
+    /**
+     * Enable the gateway
+     * @var bool
+     */
     protected $_isGateway = true;
+    /**
+     * Use the authorization
+     * @var bool
+     */
     protected $_canAuthorize = true;
+    /**
+     * Disabled internal use
+     * @var bool
+     */
     protected $_canUseInternal = false;
+    /**
+     * Disabled checkout use
+     * @var bool
+     */
     protected $_canUseCheckout = true;
 
     /**
@@ -32,14 +48,22 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         parent::authorize($payment, $amount);
         return $this;
     }
-
+    
+    /**
+     * Authorisation service abstract method
+     *
+     * @param int $storeId
+     * @return bool
+     */
     public function getAuthorisationService($storeId)
     {
         return $this->walletService;
     }
 
     /**
-     * check if apm is enabled
+     * Check if apm is enabled
+     *
+     * @param string|null $quote
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
@@ -51,6 +75,11 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return false;
     }
 
+    /**
+     * Get payment title
+     *
+     * @return string
+     */
     public function getTitle()
     {
         if ($order = $this->registry->registry('current_order')) {

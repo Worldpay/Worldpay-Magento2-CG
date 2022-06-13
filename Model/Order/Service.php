@@ -9,6 +9,7 @@ class Service
 
     /**
      * Constructor
+     *
      * @param \Magento\Sales\Model\Order $mageOrder
      * @param \Magento\Checkout\Model\Session $checkoutsession
      * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender
@@ -49,6 +50,8 @@ class Service
     }
 
     /**
+     * Get Order By Id
+     *
      * @param int $orderId
      * @return \Sapient\Worldpay\Model\Order
      */
@@ -70,10 +73,12 @@ class Service
          );
     }
 
-    /**
-     * @param string $incrementId
-     * @return \Sapient\Worldpay\Model\Order
-     */
+   /**
+    * Get Order By incremented Id
+    *
+    * @param string $incrementId
+    * @return \Sapient\Worldpay\Model\Order
+    */
     public function getByIncrementId($incrementId)
     {
 
@@ -93,16 +98,18 @@ class Service
     }
 
     /**
-     * if order is success send email and mark order as processing
+     * If order is success send email and mark order as processing
      */
     public function redirectOrderSuccess()
     {
         $order = $this->getAuthorisedOrder();
         $magentoorder = $order->getOrder();
-        $this->emailsender->send($magentoorder);
+        $this->emailsender->authorisedEmailSend($magentoorder, true);
     }
 
     /**
+     * Get Authorised Order
+     *
      * @return Increament Id
      */
     public function getAuthorisedOrder()

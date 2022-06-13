@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Pay with Worldpay</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+       :root {
+  --small-mobile-font-size: 20px;
+  --large-mobile-font-size: 22px;
+  --desktop-font-size: 18px;
+}
+
+body {
+  font-family: sans-serif;
+  font-weight: 500;
+}
+
+button {
+  background-color: black;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  color: #eee;
+  cursor: pointer;
+  display: block;
+  font-size: 20px; /* fallback */
+  font-size: var(--large-mobile-font-size);
+  font-weight: 400;
+  margin: 3px 0 0 0;
+  padding: 14px;
+}
+
+button:disabled {
+  color: #888;
+  cursor: default;
+}
+
+button:not(:disabled):hover {
+  background-color: #333;
+  color: white;
+}
+
+div.explanation {
+  font-size: 14px;
+  margin: 10px 0 0 0;
+}
+
+section#cc-exp-csc div:not(:last-child) {
+  margin: 0 10px 0 0;
+}
+
+div#exp-month-year {
+  width: 50%;
+}
+
+form {
+  margin: 0 0 20px 0;
+  padding: 0 0 20px 0;
+}
+
+h1 {
+  border-bottom: 1px solid #ccc;
+  font-size: 28px;
+  font-weight: 300;
+  margin: 0 0 30px 0;
+  padding: 0 0 10px 0;
+}
+
+input {
+  border: 1px solid #ccc;
+  font-size: 22px; /* fallback */
+  font-size: var(--large-mobile-font-size);
+  padding: 5px 5px 5px 23px;
+  width: 90%; /* fallback */
+  width: calc(100% - 30px); /* full width minus padding */
+}
+
+input:not(:focus):invalid {
+  color: red;
+  outline-color: red;
+}
+
+label {
+  display: block;
+  font-size: 20px;
+  font-size: var(--large-mobile-font-size);
+  font-weight: 400;
+  margin: 0 0 8px 0;
+}
+
+main {
+  margin: 0 auto;
+  max-width: 500px;
+}
+
+p {
+  font-size: 19px;
+  font-weight: 400;
+}
+
+form section {
+  margin: 0 0 15px 0;
+  position: relative;
+}
+
+form section:last-of-type {
+  margin: 0 0 25px 0;
+}
+
+section#cc-exp-csc {
+  display: flex;
+  justify-content: space-between;
+}
+
+select {
+  background-color: white;
+  border: 1px solid #ccc;
+  display: inline-block;
+  font-size: var(--mobile-font-size);
+  padding: 6px 22px 7px 15px;
+  width: 45%;
+}
+
+@media (min-width: 400px) {
+  body {
+    margin: 12px 20px 0 12px;
+  }
+
+  button {
+    font-size: 20px; /* fallback */
+    font-size: var(--large-mobile-font-size);
+  }
+
+  div.explanation {
+    font-size: 16px;
+  }
+
+  h1 {
+    font-size: 36px;
+    font-weight: 500;
+    margin: 0 0 10px 0;
+  }
+
+  input {
+    font-size: 22px; /* fallback */
+    font-size: var(--large-mobile-font-size);
+  }
+
+  label {
+    font-size: 22px; /* fallback */
+    font-size: var(--large-mobile-font-size);
+    margin: 0 0 10px 0;
+  }
+
+  p {
+    font-weight: 100;
+    line-height: 1.5em;
+  }
+
+  form section {
+    margin: 0 0 10px 0;
+  }
+
+  form section:last-of-type {
+    margin: 0 0 10px 0;
+  }
+}
+
+@media (min-width: 500px) {
+  
+
+  button {
+    font-size: 18px; /* fallback */
+    font-size: var(--desktop-font-size);
+  }
+
+  section#cc-exp-csc div:not(:last-child) {
+    margin: 0 20px 0 0;
+  }
+
+  form {
+    margin: 0 0 20px 0;
+    padding: 0 0 56px 0;
+  }
+
+  h1 {
+    font-size: 36px;
+    font-weight: 100;
+  }
+
+  input {
+    font-size: 18px; /* fallback */
+    font-size: var(--desktop-font-size);
+  }
+
+  label {
+    font-size: 18px; /* fallback */
+    font-size: var(--desktop-font-size);
+    margin: 0 0 10px 0;
+  }
+
+  form section {
+    margin: 0 0 10px 0;
+  }
+}
+
+#complete-payment{
+	width: 50%;
+	float:left;
+}
+#cancel-payment{
+	width: 40%;
+	float:right;
+}
+
+    </style>
+  </head>
+  <body>
+    <main>
+    
+      <form action="#" onsubmit="payWithCreditCard()" method="post">
+
+        <h1>Enter details</h1>
+
+        <section>        
+          <label for="cc-number">Card number</label>
+          <!-- Allow for spaces and for shorter and longer payment card numbers -->
+          <input id="cc-number" onblur="validateCard()"  name="cc-number" autocomplete="cc-number" inputmode="numeric" maxlength="50" pattern="[\d ]{10,30}" required>
+        </section>
+
+        <section>        
+          <label for="cc-name">Name on card</label>
+          <input id="cc-name" name="cc-name" autocomplete="cc-name" maxlength="50"  required>
+        </section>
+        
+        <!-- section id="cc-exp-csc">      
+          <div>
+            <label for="cc-exp">Expiry date</label>
+            <input id="cc-exp" name="cc-exp" autocomplete="cc-exp" placeholder="MM/YY" maxlength="5" required>
+          </div> 
+          <div>
+            <label for="cc-csc">Security code</label>
+            <input id="cc-csc" name="cc-csc" inputmode="numeric" maxlength="3" required>
+            <div class="explanation">Back of card, last 3 digits</div>
+          </div>
+        </section -->  
+
+        <!-- Alternative using select elements for expiry month and year  -->
+        
+        <section id="cc-exp-csc">
+          <div id="exp-month-year">
+            <label for="cc-exp-month">Expiry date</label>
+            <select id="cc-exp-month" name="cc-exp-month" autocomplete="cc-exp-month" placeholder="MM">
+              <option value="">MM</option>
+              <option value="01">01</option>
+              <option value="02">02</option>
+              <option value="03">03</option>
+              <option value="04">04</option>
+              <option value="05">05</option>
+              <option value="06">06</option>
+              <option value="07">07</option>
+              <option value="08">08</option>
+              <option value="09">09</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+            </select>
+            <select id="cc-exp-year" name="cc-exp-year" autocomplete="cc-exp-year" placeholder="YY">
+              <option value="">YYYY</option>
+              <option value="2022">2022</option>
+              <option value="2023">2023</option>
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+              <option value="2028">2028</option>
+              <option value="2029">2029</option>
+              <option value="2030">2030</option>
+              <option value="2031">2031</option>
+              <option value="2032">2032</option>
+              <option value="2033">2033</option>
+              <option value="2034">2034</option>
+              <option value="2035">2035</option>
+              <option value="2036">2036</option>
+            </select>
+          </div>
+          <div>
+            <label for="cc-csc">Security code</label>
+            <input id="cc-csc" name="cc-csc" autocomplete="cc-csc" inputmode="numeric" minlength="3" maxlength="3" required>
+            <div class="explanation">Back of card, last 3 digits</div>
+          </div>
+        </section>
+
+        <button type="submit" id="complete-payment" onclick="javascript:void(0);">Complete payment</button>
+        <button id="cancel-payment" onclick="cancel();">Cancel</button>
+
+      </form>
+    
+    </main>
+    <script>
+      let paymentRequestClient;
+      let methodData;
+    
+      function validateCard(){
+        var cardType = getCardType(document.getElementById('cc-number').value);        
+        if(cardType == 'AMEX-SSL'){
+          document.getElementById('cc-csc').removeAttribute('maxlength')
+          document.getElementById('cc-csc').removeAttribute('minlength')
+          document.getElementById('cc-csc').setAttribute('maxlength','4');
+          document.getElementById('cc-csc').setAttribute('minlength','4');
+        }else{
+
+          document.getElementById('cc-csc').removeAttribute('maxlength')
+          document.getElementById('cc-csc').removeAttribute('minlength')
+          document.getElementById('cc-csc').setAttribute('maxlength','3');
+          document.getElementById('cc-csc').setAttribute('minlength','3');
+        }
+      }
+
+      function payWithCreditCard() {
+        if(!paymentRequestClient) return;
+       
+
+        var paymentAppResponse = {
+          methodName: "basic-card",
+          details: {
+            cardNumber: document.getElementById('cc-number').value,
+            cardholderName: document.getElementById('cc-name').value,
+            cardSecurityCode: document.getElementById('cc-csc').value,
+            expiryMonth: document.getElementById('cc-exp-month').value,
+            expiryYear: document.getElementById('cc-exp-year').value,
+            billingAddress: null,
+          }
+        };
+      
+        paymentRequestClient.postMessage(paymentAppResponse);
+        window.close();
+      }
+      
+      
+      
+      
+      navigator.serviceWorker.addEventListener('message', e => {
+          console.log('service worker === ',e);
+        paymentRequestClient = e.source;
+        
+        methodData = e.data["methodData"];
+        //document.getElementById('details').innerHTML = JSON.stringify(e.data, undefined, 2);
+      
+        //populatePaymentInstrumentsList();
+      });
+      console.log(navigator.serviceWorker);
+      navigator.serviceWorker.controller.postMessage('payment_app_window_ready');
+      
+      function cancel() {
+        if(!paymentRequestClient) return;
+      
+        paymentRequestClient.postMessage("The payment request is cancelled by user");
+        window.close();
+      }
+
+      function getCardType(cardNumber) {
+    // visa
+    var re = new RegExp("^4");
+    if (cardNumber.match(re) != null)
+            return "VISA-SSL";
+    // Mastercard 
+    // Updated for Mastercard 2017 BINs expansion
+    var binExps = /^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$/;
+    if (binExps.test(cardNumber))
+            return "ECMC-SSL";
+    // AMEX
+    re = new RegExp("^3[47]");
+    if (cardNumber.match(re) != null)
+            return "AMEX-SSL";
+    // Discover
+    re = new RegExp("^(6011|622(12[6-9]|1[3-9][0-9]|[2-8][0-9]{2}|9[0-1][0-9]|92[0-5]|64[4-9])|65)");
+    if (cardNumber.match(re) != null)
+            return "DISCOVER-SSL";
+    // Diners
+    re = new RegExp("^36");
+    if (cardNumber.match(re) != null)
+            return "DINERS-SSL";
+    // Diners - Carte Blanche
+    re = new RegExp("^30[0-5]");
+    if (cardNumber.match(re) != null)
+            return "DINERS-SSL";
+    // JCB
+    re = new RegExp("^35(2[89]|[3-8][0-9])");
+    if (cardNumber.match(re) != null)
+            return "JCB-SSL";
+    // Visa Electron
+    re = new RegExp("^(4026|417500|4508|4844|491(3|7))");
+    if (cardNumber.match(re) != null)
+            return "VISA-SET";
+    re = new RegExp("^62|88");
+    if (cardNumber.match(re) != null)
+            return "CHINAUNIONPAY-SSL";
+    return "";
+    } //end of getCardType
+      
+          </script>
+  </body>
+</html>

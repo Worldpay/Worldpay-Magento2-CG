@@ -63,7 +63,7 @@ class Edit extends \Magento\Framework\View\Element\Template
      * @param IconsProvider $iconsProvider
      * @param PaymentTokenManagementInterface $tokenManager
      * @param Session $customerSession
-     * @param Data $helper,
+     * @param Data $helper
      * @param array $data
      */
     public function __construct(
@@ -87,9 +87,10 @@ class Edit extends \Magento\Framework\View\Element\Template
         $this->helper = $helper;
         $this->iconsProvider = $iconsProvider;
     }
-
     /**
-     * @return $this
+     * Prepare layout
+     *
+     * @return $layout
      */
     protected function _prepareLayout()
     {
@@ -99,15 +100,23 @@ class Edit extends \Magento\Framework\View\Element\Template
 
         return $this;
     }
-    
+    /**
+     * Account Labels
+     *
+     * @param string $labelCode
+     * @return string
+     */
+
     public function getMyAccountLabels($labelCode)
     {
         return $this->recurringHelper->getAccountLabelbyCode($labelCode);
     }
-
     /**
+     * Subscription
+     *
      * @return Subscription|null
      */
+
     public function getSubscription()
     {
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
@@ -124,6 +133,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Save Url
+     *
      * @return string
      */
     public function getSaveUrl()
@@ -149,7 +160,9 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
-     * @param Plan $plan
+     * Plan Selected
+     *
+     * @param Int $plan
      * @return bool
      */
     public function isPlanSelected(Plan $plan)
@@ -169,6 +182,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Plan amount
+     *
      * @param Plan $plan
      * @return \Magento\Framework\Pricing\Amount\AmountInterface
      */
@@ -180,6 +195,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Plan Price
+     *
      * @param Plan $plan
      * @return string
      */
@@ -205,6 +222,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Product
+     *
      * @return \Magento\Catalog\Model\Product|null
      */
     public function getProduct()
@@ -223,6 +242,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * CC Form Mage
+     *
      * @return string
      */
     public function getCcFormMageInitJson()
@@ -242,6 +263,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Return Saved Payments
+     *
      * @return array
      */
     public function getSavedPayments()
@@ -275,6 +298,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get Payments Token Details
+     *
      * @param PaymentToken $token
      * @return mixed
      */
@@ -284,6 +309,8 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Get Payment Icon
+     *
      * @param PaymentToken $token
      * @return array
      */
@@ -298,6 +325,7 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
     
     /**
+     * Region Json
      *
      * @return string
      */
@@ -307,6 +335,7 @@ class Edit extends \Magento\Framework\View\Element\Template
     }
     
     /**
+     * Countries With Optional Zip
      *
      * @param type $asJson
      * @return array|string

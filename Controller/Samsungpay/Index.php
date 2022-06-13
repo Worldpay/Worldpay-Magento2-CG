@@ -13,15 +13,18 @@ use Magento\Framework\Controller\ResultFactory;
 
 class Index extends \Magento\Framework\App\Action\Action
 {
-    protected $quoteFactory;
-    
-    protected $_storeManager;
-   
-    protected $curlHelper;
     /**
-     * @var Magento\Framework\View\Result\PageFactory
+     * @var $quoteFactory
      */
-   
+    protected $quoteFactory;
+    /**
+     * @var $_storeManager
+     */
+    protected $_storeManager;
+    /**
+     * @var $curlHelper
+     */
+    protected $curlHelper;
     /**
      * Constructor
      *
@@ -31,6 +34,9 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\Request\Http $request
+     * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
      */
     public function __construct(
         Context $context,
@@ -53,7 +59,11 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->_storeManager = $storeManager;
         $this->curlHelper = $curlHelper;
     }
-
+    /**
+     * Execute
+     *
+     * @return string
+     */
     public function execute()
     {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;

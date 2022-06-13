@@ -4,6 +4,12 @@ namespace Sapient\Worldpay\Model\PaymentMethods;
 
 class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
 {
+    /**
+     * Update status for void order abstract method
+     *
+     * @param array $order
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function updateOrderStatusForVoidSale($order)
     {
         if (!empty($order)) {
@@ -27,7 +33,14 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
             throw new \Magento\Framework\Exception\LocalizedException(__('No Payment'));
         }
     }
-    
+
+    /**
+     * Void the order abstract method
+     *
+     * @param array $order
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function canVoidSale($order)
     {
         $payment = $order->getPayment();
@@ -55,7 +68,14 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
                     . 'Please check Payment Status below for confirmation.'));
         }
     }
-    
+
+    /**
+     * Cancel the order abstract method
+     *
+     * @param array $order
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function canCancel($order)
     {
         $payment = $order->getPayment();
@@ -82,6 +102,12 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
         }
     }
     
+    /**
+     * Update status for cancel order abstract method
+     *
+     * @param array $order
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function updateOrderStatusForCancelOrder($order)
     {
         if (!empty($order)) {

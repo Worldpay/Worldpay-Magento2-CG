@@ -11,6 +11,11 @@ class State
     public const SESSION_KEY_STATE = 'worldpay_hpp_state';
     public const SESSION_KEY_URL = 'worldpay_hpp_redirect_url';
 
+    /**
+     * State constructor
+     *
+     * @param \Magento\Checkout\Model\Session $checkoutsession
+     */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutsession
     ) {
@@ -18,11 +23,21 @@ class State
         $this->session = $checkoutsession;
     }
 
+    /**
+     * Is uninitialised?
+     *
+     * @return mixed
+     */
     public function isUninitialised()
     {
         return !$this->session->hasData(self::SESSION_KEY_STATE);
     }
 
+    /**
+     * Is initialised?
+     *
+     * @return mixed
+     */
     public function isInitialised()
     {
         return $this->session->getData(self::SESSION_KEY_STATE) === 'initialised';
@@ -88,6 +103,11 @@ class State
         return $this->session->getData(self::SESSION_KEY_URL);
     }
 
+    /**
+     * Validate Hosted Payment initialised state
+     *
+     * @throws \DomainException
+     */
     private function validateInitializesState()
     {
         if (!$this->isInitialised()) {

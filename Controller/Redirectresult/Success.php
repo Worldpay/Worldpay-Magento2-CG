@@ -20,6 +20,8 @@ class Success extends \Magento\Framework\App\Action\Action
     /**
      * Constructor
      *
+     * @param Context $context
+     * @param PageFactory $pageFactory
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      */
@@ -34,7 +36,11 @@ class Success extends \Magento\Framework\App\Action\Action
         $this->wplogger = $wplogger;
         return parent::__construct($context);
     }
- 
+   /**
+    * Execute
+    *
+    * @return string
+    */
     public function execute()
     {
         $this->wplogger->info('worldpay returned success url');

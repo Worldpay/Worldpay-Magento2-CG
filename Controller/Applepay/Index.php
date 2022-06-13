@@ -15,9 +15,15 @@ use Magento\Framework\Controller\ResultFactory;
 class Index extends \Magento\Framework\App\Action\Action
 {
     /**
-     * @var Magento\Framework\View\Result\PageFactory
+     * @var fileDriver
      */
-   
+    protected $fileDriver;
+
+    /**
+     * @var curlHelper
+     */
+    public $curlHelper;
+  
     /**
      * Constructor
      *
@@ -27,12 +33,9 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\Request\Http $request
+     * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
+     * @param \Magento\Framework\Filesystem\DriverInterface $fileDriver
      */
-    /**
-     * @var curlHelper
-     */
-    public $curlHelper;
-    protected $fileDriver;
 
     public function __construct(
         Context $context,
@@ -53,9 +56,17 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->curlHelper = $curlHelper;
         $this->fileDriver = $fileDriver;
     }
+    /**
+     * Execute
+     *
+     * @return string
+     */
 
     public function execute()
     {
+               
+        
+        
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
         $certificateKey = $this->scopeConfig->getValue(
@@ -87,7 +98,7 @@ class Index extends \Magento\Framework\App\Action\Action
             return $resultJson;
      
         }
-               
+
         define('PRODUCTION_CERTIFICATE_KEY', $certificateKey);
         define('PRODUCTION_CERTIFICATE_PATH', $certificateCrt);
 

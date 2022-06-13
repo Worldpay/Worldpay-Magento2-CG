@@ -70,6 +70,8 @@ class SalesServiceQuoteSubmitBeforeObserver implements ObserverInterface
     }
 
     /**
+     * Convert addresses
+     *
      * @param \Sapient\Worldpay\Model\Recurring\Subscription $subscription
      * @param \Magento\Sales\Model\Order $order
      * @param \Magento\Sales\Model\Order\Item $item
@@ -95,6 +97,13 @@ class SalesServiceQuoteSubmitBeforeObserver implements ObserverInterface
         $subscription->setAddresses($addresses);
     }
     
+    /**
+     * Save subscription data
+     *
+     * @param \Sapient\Worldpay\Model\Recurring\Subscription $subscription
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Sales\Model\Order\Item $item
+     */
     public function saveSubscriptionData(
         \Sapient\Worldpay\Model\Recurring\Subscription $subscription,
         \Magento\Sales\Model\Order $order,

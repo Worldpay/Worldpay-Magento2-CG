@@ -24,9 +24,21 @@ class PayTest extends TestCase
      * @var Pay
      */
     protected $payObj;
+    /**
+     * @var Context
+     */
     protected $context;
+    /**
+     * @var Magento\Framework\View\Result\PageFactory
+     */
     protected $pageFactory;
+    /**
+     * @var State
+     */
     protected $hppstate;
+    /**
+     * @var DataHelper
+     */
     protected $dataHelper;
 
     protected function setUp(): void

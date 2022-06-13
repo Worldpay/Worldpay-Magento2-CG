@@ -33,7 +33,7 @@ class RecurringPlans
     /**
      * @param Escaper $escaper
      * @param LocatorInterface $locator
-     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan\CollectionFactory $plansCollection
+     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan\CollectionFactory $plansCollectionFactory
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      */
     public function __construct(
@@ -49,6 +49,8 @@ class RecurringPlans
     }
 
     /**
+     * Get the plans data
+     *
      * @return array
      */
     public function getPlansData()

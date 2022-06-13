@@ -3,7 +3,7 @@
     <!-- ko if: (isShowLegend())-->
     <legend class="legend">
         <span><!-- ko i18n: 'Credit Card Information'--><!-- /ko --></span>
-    </legend><br />
+    </legend><br>
     <!-- /ko -->
     <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
         <label data-bind="attr: {for: getCode() + '_cc_type'}" class="label">
@@ -23,7 +23,7 @@
                 <div class="paymentmethods-radio-wrapper">
                     <input type="radio" name="payment[cc_type]"
                             data-bind="event:{ change: $parent.loadEventAction }, attr: {'value': item.ccValue,
-                            'data-validate': JSON.stringify({ 'validate-one-required-by-name':true }),id: 'direct_cc_' + item.ccValue}"/>
+                            'data-validate': JSON.stringify({ 'validate-one-required-by-name':true }),id: 'direct_cc_' + item.ccValue}"></input>
                     <!--ko if: $parent.getIcons(item.ccValue) -->
                         <label data-bind="attr: {for: 'direct_cc_' + item.ccValue}"><img data-bind="attr: {
                                     'src': $parent.getIcons(item.ccValue).url,
@@ -61,7 +61,7 @@
                                     enable: isActive($parents),
                                     value: creditCardNumber,
                                     valueUpdate: 'keyup'
-                                    "/>
+                                    "></input>
             <span class="cc-card-type"></span>
         </div>
     </div>
@@ -79,7 +79,7 @@
                                       'required':true
                                     })},
                                     value: cardHolderName,
-                                    "/>
+                                    "></input>
         </div>
     </div>
 
@@ -134,7 +134,7 @@
                         'data-container': getCode() + '-cc-cvv',
                         'data-validate': JSON.stringify({'required-number':true, 'validate-card-cvv':'#' + getCode() + '_cc_type'})},
                         enable: isActive($parents),
-                        value: creditCardVerificationNumber" />
+                        value: creditCardVerificationNumber"></input>
             <div class="field-tooltip toggle">
                 <span class="field-tooltip-action action-cvv"
                       tabindex="0"
@@ -187,7 +187,7 @@
                                     enable: isActive($parents),
                                     value: isCPF,
                                     valueUpdate: 'keyup'"
-                                   /> 
+                                   ></input> 
                         </div>
                     </div>
                     <div class="field instalment required cc-Visibility-Enabled">
@@ -230,7 +230,7 @@
                                     })},
                                     enable: isActive($parents),
                                     valueUpdate: 'keyup'
-                               "/> 
+                               "></input> 
                     </div>
                 </div>
     </fieldset>

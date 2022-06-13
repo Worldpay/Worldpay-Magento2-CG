@@ -7,6 +7,8 @@ namespace Sapient\Worldpay\Model\Config\Source;
 class ACHAccountTypes extends \Magento\Framework\App\Config\Value
 {
   /**
+   * ToOption Array
+   *
    * @return array
    */
     public function toOptionArray()

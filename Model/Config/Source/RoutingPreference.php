@@ -10,11 +10,11 @@ namespace Sapient\Worldpay\Model\Config\Source;
  */
 class RoutingPreference implements \Magento\Framework\Option\ArrayInterface
 {
-     /**
-      * Options getter
-      *
-      * @return array
-      */
+    /**
+     * To Option Array
+     *
+     * @return array
+     */
     public function toOptionArray()
     {
         return [

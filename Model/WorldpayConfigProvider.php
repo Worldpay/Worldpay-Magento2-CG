@@ -82,8 +82,14 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Backend\Model\Session\Quote $adminquotesession
      * @param SavedTokenFactory $savedTokenFactory
+     * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentmethodutils
      * @param \Magento\Backend\Model\Auth\Session $backendAuthSession
+     * @param Repository $assetRepo
+     * @param RequestInterface $request
+     * @param Source $assetSource
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
+     * @param SerializerInterface $serializer
+     * @param \Magento\Framework\Filesystem\Driver\File $fileDriver
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -125,7 +131,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getConfig()
     {
@@ -150,6 +156,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                         getUrlWithParams('Sapient_Worldpay::images/cc/cvv.png', $params);
                 $config['payment']['ccform']["ssStartYears"][$code] = $this->getStartYears();
                 $config['payment']['ccform']['intigrationmode'] = $this->getIntigrationMode();
+                $config['payment']['ccform']['hpp_integration_type'] = $this->worldpayHelper->getRedirectIntegrationMode();
                 $config['payment']['ccform']['cctitle'] = $this->getCCtitle();
                 $config['payment']['ccform']['isCvcRequired'] = $this->getCvcRequired();
                 $config['payment']['ccform']['cseEnabled'] = $this->worldpayHelper->isCseEnabled();
@@ -262,6 +269,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * Check if the saved card option is enabled?
+     *
      * @return boolean
      */
     public function getIsSaveCardAllowed()
@@ -273,7 +282,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * @return String
+     * Retrieve list of cc integration mode details
+     *
+     * @return string
      */
     public function getIntigrationMode()
     {
@@ -281,6 +292,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * Retrieve list of cc types
+     *
+     * @param string $paymentconfig
      * @return Array
      */
     public function getCcTypes($paymentconfig = "cc_config")
@@ -296,6 +310,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * Retrieve list of apm types
+     *
+     * @param string $code
      * @return Array
      */
     public function getApmTypes($code)
@@ -304,6 +321,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
     
     /**
+     * Retrieve list of wallets types
+     *
+     * @param string $code
      * @return Array
      */
     public function getWalletsTypes($code)
@@ -331,7 +351,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * @return Array
+     * Retrieve a list of the next ten years
+     *
+     * @return array
      */
     public function getYears()
     {
@@ -344,6 +366,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * Retrieve a list of the previos five years
+     *
      * @return Array
      */
     public function getStartYears()
@@ -357,7 +381,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * @return String
+     * Retrieve cc title
+     *
+     * @return string
      */
     public function getCCtitle()
     {
@@ -365,7 +391,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * @return String
+     * Retrieve apm title
+     *
+     * @return string
      */
     public function getApmtitle()
     {
@@ -373,7 +401,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
     
     /**
-     * @return String
+     * Retrieve wallets title
+     *
+     * @return string
      */
     public function getWalletstitle()
     {
@@ -381,7 +411,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
     
     /**
-     * @return String
+     * Retrieve samsung service id
+     *
+     * @return string
      */
     public function getSamsungServiceId()
     {
@@ -389,6 +421,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * Check if CVC is required?
+     *
      * @return boolean
      */
     public function getCvcRequired()
@@ -397,6 +431,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * Retrieve payment method selection
+     *
      * @return string
      */
     public function getPaymentMethodSelection()
@@ -405,6 +441,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
+     * Retrieve save card list for admin orders
+     *
+     * @param \Magento\Customer\Model\Customer $customer
      * @return string
      */
     public function getSaveCardListForAdminOrder($customer)
@@ -419,6 +458,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $savedCardsList;
     }
    
+    /**
+     * Retrieve apm ideal bank list
+     *
+     * @return array
+     */
     public function getApmIdealBankList()
     {
         $apmPaymentTypes = $this->getApmTypes('worldpay_apm');
@@ -429,6 +473,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return [];
     }
     
+    /**
+     * Get icons for available payment methods
+     *
+     * @return array
+     */
     public function getIcons()
     {
         if (!empty($this->icons)) {
@@ -484,7 +533,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
 
     /**
      * Get logo uploaded file value
-     * @param $code
+     *
+     * @param string $code
      * @return string
      */
     public function checkLogoConfigValues($code)
@@ -505,8 +555,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * check Logo config enabled
-     * @param $code
+     * Check Logo config enabled
+     *
+     * @param string $code
      * @return bool
      */
     public function checkLogoConfigEnabled($code)
@@ -536,6 +587,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $this->assetRepo->createAsset($fileId, $params);
     }
     
+    /**
+     * Retrieve cc exception
+     *
+     * @return array
+     */
     public function getCreditCardException()
     {
         $ccdata= $this->unserializeValue($this->worldpayHelper->getCreditCardException());
@@ -554,6 +610,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $data;
     }
     
+    /**
+     * Retrieve general exception
+     *
+     * @return array
+     */
     public function getGeneralException()
     {
         $generaldata=$this->unserializeValue($this->worldpayHelper->getGeneralException());
@@ -573,6 +634,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
     
      /**
+      * Check if cpf is enabled?
+      *
       * @return boolean
       */
     public function cpfEnabled()
@@ -584,6 +647,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     }
     
      /**
+      * Check if the installment is enabled?
+      *
       * @return boolean
       */
     public function instalmentEnabled()
@@ -594,6 +659,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return false;
     }
     
+    /**
+     * Retrieve my account exception
+     *
+     * @return array
+     */
     public function getMyAccountException()
     {
         $generaldata=$this->unserializeValue($this->worldpayHelper->getMyAccountException());
@@ -611,11 +681,25 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
         return $data;
     }
+
+    /**
+     * Retrieve installment values
+     *
+     * @param string $countryId
+     * @return mixed
+     */
     public function getInstalmentValues($countryId)
     {
         return $this->worldpayHelper->getInstalmentValues($countryId);
     }
     
+    /**
+     * Unserialize value
+     *
+     * @param string $value
+     * @return mixed
+     * @throws DataConversionException
+     */
     protected function unserializeValue($value)
     {
         if (is_string($value) && !empty($value)) {
@@ -625,6 +709,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
     }
     
+    /**
+     * Retrieve save card list by customer
+     *
+     * @return array
+     */
     public function getSaveCardListForMyAccount()
     {
         $savedCardsList = [];
@@ -637,6 +726,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $savedCardsList;
     }
     
+    /**
+     * Retrieve my account labels
+     *
+     * @return array
+     */
     public function getMyAccountLabels()
     {
         $generaldata=$this->unserializeValue($this->worldpayHelper->getMyAccountLabels());
@@ -655,6 +749,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $data;
     }
     
+    /**
+     * Retrieve checkout labels
+     *
+     * @return array
+     */
     public function getCheckoutLabels()
     {
         $generaldata=$this->unserializeValue($this->worldpayHelper->getCheckoutLabels());
@@ -672,6 +771,12 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
         return $data;
     }
+
+    /**
+     * Retrieve admin labels
+     *
+     * @return array
+     */
     public function getAdminLabels()
     {
         $generaldata=$this->unserializeValue($this->worldpayHelper->getAdminLabels());
@@ -690,6 +795,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         return $data;
     }
     
+    /**
+     * Retrieve klarna types and countries
+     *
+     * @return array
+     */
     public function getKlarnaTypesAndContries()
     {
         $klarnaValues = [];

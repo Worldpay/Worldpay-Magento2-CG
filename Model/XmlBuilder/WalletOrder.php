@@ -16,22 +16,73 @@ class WalletOrder
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
+    /**
+     * @var string
+     */
     private $orderDescription;
+    /**
+     * @var string
+     */
     private $currencyCode;
+    /**
+     * @var float
+     */
     private $amount;
+    /**
+     * @var string
+     */
     private $paymentType;
+    /**
+     * @var float
+     */
     private $exponent;
+    /**
+     * @var mixed|null
+     */
     protected $paResponse = null;
+    /**
+     * @var string|null
+     */
     protected $dfReferenceId = null;
+    /**
+     * @var string
+     */
     private $sessionId;
+    /**
+     * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
+     */
     protected $threeDSecureConfig;
+    /**
+     * @var string
+     */
     private $cusDetails;
+    /**
+     * @var string
+     */
     private $shopperIpAddress;
+    /**
+     * @var array
+     */
     private $paymentDetails;
+    /**
+     * @var array
+     */
     private $shippingAddress;
+    /**
+     * @var string
+     */
     protected $acceptHeader;
+    /**
+     * @var string
+     */
     protected $userAgentHeader;
     
      /**
@@ -56,6 +107,18 @@ EOD;
      * @param string $currencyCode
      * @param float $amount
      * @param string $paymentType
+     * @param string $shopperEmail
+     * @param string $acceptHeader
+     * @param string $userAgentHeader
+     * @param string $protocolVersion
+     * @param string $signature
+     * @param string $signedMessage
+     * @param array $shippingAddress
+     * @param array $billingAddress
+     * @param string $cusDetails
+     * @param string $shopperIpAddress
+     * @param array $paymentDetails
+     * @param float $exponent
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -110,7 +173,7 @@ EOD;
       * @param string $merchantCode
       * @param string $orderCode
       * @param array $paymentDetails
-      * @param $dfReferenceId
+      * @param string $dfReferenceId
       * @return SimpleXMLElement $xml
       */
     public function build3Ds2Secure(
@@ -148,8 +211,8 @@ EOD;
      * @param string $merchantCode
      * @param string $orderCode
      * @param array $paymentDetails
-     * @param $paResponse,
-     * @param $echoData
+     * @param mixed $paResponse
+     * @param bool $echoData
      * @return SimpleXMLElement $xml
      */
     public function build3DSecure(
@@ -207,6 +270,7 @@ EOD;
     }
     /**
      * Add Customer Risk Data  and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     protected function _addCustomerRiskData($order)
@@ -298,6 +362,7 @@ EOD;
     }
     /**
      * Add Additional3Ds data and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     protected function _addAdditional3DsElement($order)
@@ -398,6 +463,8 @@ EOD;
     }
 
     /**
+     * Add cdata to xml
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */
@@ -409,6 +476,8 @@ EOD;
     }
 
     /**
+     * Returns the rounded value of num to specified precision
+     *
      * @param float $amount
      * @return int
      */

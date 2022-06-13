@@ -8,20 +8,32 @@ use Magento\Customer\Controller\RegistryConstants;
 
 class Card extends \Magento\Payment\Block\Form
 {
+    /**
+     * @var MOTO_CONFIG
+     */
+
     public const MOTO_CONFIG = 'moto_config';
    
+    /**
+     * @var worldpayPaymentsMoto
+     */
     private $worldpayPaymentsMoto;
     /**
      * Constructor
      *
-     * @param \Magento\Framework\View\Element\Template\Context $context,
-     * @param \Sapient\Worldpay\Model\WorldpayConfigProvider $configProvider,
-     * @param \Magento\Payment\Helper\Data $paymentHelper,
-     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper,
+     * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param \Sapient\Worldpay\Model\WorldpayConfigProvider $configProvider
+     * @param \Magento\Payment\Helper\Data $paymentHelper
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
      * @param \Magento\Framework\Registry $registry
-     * @param \Magento\Backend\Model\Session\Quote $session,
+     * @param \Magento\Backend\Model\Session\Quote $session
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Payment\PaymentTypes $paymenttypes
+     * @param \Sapient\Worldpay\Model\Payment\LatAmInstalTypes $latamtypes
+     * @param \Magento\Backend\Model\Session\Quote $adminsessionquote
      * @param array $data
      */
+
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Sapient\Worldpay\Model\WorldpayConfigProvider $configProvider,
@@ -46,31 +58,61 @@ class Card extends \Magento\Payment\Block\Form
         $this->adminsessionquote = $adminsessionquote;
         $this->worldpayPaymentsMoto = $paymentHelper->getMethodInstance('worldpay_moto');
     }
-    
+    /**
+     * Get Client Key
+     *
+     * @return bool
+     */
+
     public function getClientKey()
     {
         return true;
     }
-    
+    /**
+     * Return save card enable
+     *
+     * @return string
+     */
+
     public function saveCardEnabled()
     {
         return $this->configProvider->getIsSaveCardAllowed();
     }
-    
+    /**
+     * Get Tokenization
+     *
+     * @return string
+     */
+
     public function tokenizationEnabled()
     {
         return $this->worldpayhelper->getTokenization();
     }
-    
+    /**
+     * Get Stored Credentials
+     *
+     * @return string
+     */
+
     public function storedCredentialsEnabled()
     {
         return $this->worldpayhelper->getStoredCredentials();
     }
+    /**
+     * Require CVV enable or disable
+     *
+     * @return string
+     */
 
     public function requireCvcEnabled()
     {
         return $this->worldpayhelper->isCcRequireCVC();
     }
+    /**
+     * Get Saved Card value
+     *
+     * @return string
+     */
 
     public function getSavedCards()
     {
@@ -84,11 +126,22 @@ class Card extends \Magento\Payment\Block\Form
         }
         return $filterccards;
     }
+    /**
+     * Get Customer ID
+     *
+     * @return string
+     */
+
     public function getCustomerId()
     {
         return $this->adminquotesession->getCustomerId();
     }
-    
+    /**
+     * Get CC Types
+     *
+     * @return string
+     */
+
     public function getCCtypes()
     {
         $cctypes = $this->configProvider->getCcTypes(self::MOTO_CONFIG);
@@ -109,24 +162,44 @@ class Card extends \Magento\Payment\Block\Form
         }
         return $filtercctypes;
     }
+    /**
+     * Get Integration Mode
+     *
+     * @return string
+     */
 
     public function getIntegrationMode()
     {
         return $this->worldpayhelper->getMotoIntegrationMode();
     }
+    /**
+     * Return Direct Integration
+     *
+     * @return string
+     */
 
     public function isDirectIntegration()
     {
         $integrationmode = $this->getIntegrationMode();
         return $integrationmode === 'moto_direct';
     }
-    
+    /**
+     * Return Redirect Integration
+     *
+     * @return string
+     */
+
     public function isRedirectIntegration()
     {
         $integrationmode = $this->getIntegrationMode();
         return $integrationmode === 'moto_redirect';
     }
-    
+    /**
+     * Return CPF Enable
+     *
+     * @return string
+     */
+
     public function cpfEnabled()
     {
         $adminQuote = $this->adminsessionquote->getQuote();
@@ -137,12 +210,22 @@ class Card extends \Magento\Payment\Block\Form
         }
         return false;
     }
+    /**
+     * Get Instalment Enabled
+     *
+     * @return string
+     */
 
     public function instalmentEnabled()
     {
         return $this->worldpayhelper->isInstalmentEnabled();
     }
-    
+    /**
+     * Get Instalment Types
+     *
+     * @return string
+     */
+
     public function getInstalmentTypes()
     {
         $adminQuote = $this->adminsessionquote->getQuote();
@@ -158,6 +241,11 @@ class Card extends \Magento\Payment\Block\Form
         }
         return $filtertypes;
     }
+    /**
+     * Get Months
+     *
+     * @return string
+     */
 
     public function getMonths()
     {
@@ -168,11 +256,21 @@ class Card extends \Magento\Payment\Block\Form
         }
         return $months;
     }
+    /**
+     * Get Years
+     *
+     * @return string
+     */
 
     public function getYears()
     {
         return $this->configProvider->getYears();
     }
+    /**
+     * Get LookUp Payment Type
+     *
+     * @return string
+     */
 
     public function getLookUpPaymentTypes()
     {
@@ -182,7 +280,13 @@ class Card extends \Magento\Payment\Block\Form
         $paymenttypes = $this->paymenttypes->getPaymentType($countryId);
         return json_decode($paymenttypes);
     }
-    
+    /**
+     * Get Json Data
+     *
+     * @param json $wpData
+     * @return string
+     */
+
     public function getJsonData($wpData)
     {
         $serializedData = '';
@@ -191,7 +295,13 @@ class Card extends \Magento\Payment\Block\Form
         }
         return $serializedData;
     }
-    
+    /**
+     * Get Checkout Specific Label
+     *
+     * @param string $labelcode
+     * @return string
+     */
+
     public function getCheckoutSpecificLabel($labelcode)
     {
         $data = $this->configProvider->getCheckoutLabels();

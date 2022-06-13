@@ -46,8 +46,16 @@ class RedirectService extends \Magento\Framework\DataObject
         $this->worldpayhelper = $worldpayhelper;
     }
     /**
-     * handles provides authorization data for redirect
+     * Handles provides authorization data for redirect
+     *
      * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
+     *
+     * @param MageOrder $mageOrder
+     * @param Quote $quote
+     * @param string $orderCode
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @param Payment $payment
      */
     public function authorizePayment(
         $mageOrder,
@@ -90,12 +98,21 @@ class RedirectService extends \Magento\Framework\DataObject
             );
             $response = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
         }
-        $successUrl = $this->_buildRedirectUrl(
-            $this->_getRedirectResponseModel()->getRedirectLocation($response),
-            $redirectOrderParams['paymentType'],
-            $this->_getCountryForQuote($quote),
-            $this->_getLanguageForLocale()
-        );
+        if($paymentDetails['additional_data']['cc_type'] == 'savedcard'){
+            $successUrl = $this->_buildRedirectUrl(
+                $this->_getRedirectResponseModel()->getRedirectLocation($response),
+               null,
+               $this->_getCountryForQuote($quote),
+               $this->_getLanguageForLocale()
+            );
+        }else{
+            $successUrl = $this->_buildRedirectUrl(
+                $this->_getRedirectResponseModel()->getRedirectLocation($response),
+                $redirectOrderParams['paymentType'],
+                $this->_getCountryForQuote($quote),
+                $this->_getLanguageForLocale()
+            );
+        }
 
         $payment->setIsTransactionPending(1);
 
@@ -103,6 +120,15 @@ class RedirectService extends \Magento\Framework\DataObject
         $this->checkoutsession->setWpRedirecturl($successUrl);
     }
 
+    /**
+     * Build redirect url
+     *
+     * @param string $redirect
+     * @param string $paymentType
+     * @param string $countryCode
+     * @param string $languageCode
+     * @return string
+     */
     private function _buildRedirectUrl($redirect, $paymentType, $countryCode, $languageCode)
     {
         if ($paymentType == "SEPA_DIRECT_DEBIT-SSL") {
@@ -120,6 +146,8 @@ class RedirectService extends \Magento\Framework\DataObject
 
     /**
      * Get billing Country
+     *
+     * @param Quote $quote
      * @return string
      */
     private function _getCountryForQuote($quote)
@@ -133,6 +161,7 @@ class RedirectService extends \Magento\Framework\DataObject
 
     /**
      * Get local language code
+     *
      * @return string
      */
     protected function _getLanguageForLocale()
@@ -145,6 +174,8 @@ class RedirectService extends \Magento\Framework\DataObject
     }
 
     /**
+     * Get redirect response model
+     *
      * @return \Sapient\Worldpay\Model\Response\RedirectResponse
      */
     protected function _getRedirectResponseModel()

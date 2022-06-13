@@ -26,10 +26,21 @@ use Sapient\Worldpay\Model\WorldpayConfigProvider;
 
 class WorldpayConfigProviderTest extends TestCase
 {
-
+    /**
+     * @var /Sapient\Worldpay\Model\WorldpayConfigProvider
+     */
     protected $worldpayConfigObj;
+    /**
+     * @var MockObject|DataObjectHelper
+     */
     protected $dataHelper;
+    /**
+     * @var PaymentMethods
+     */
     protected $paymentmethodutils;
+    /**
+     * @var array
+     */
     protected $ALL_APM_METHODS = [
         'CHINAUNIONPAY-SSL' => 'Union Pay',
         'IDEAL-SSL' => 'IDEAL',
@@ -46,6 +57,9 @@ class WorldpayConfigProviderTest extends TestCase
         'MISTERCASH-SSL' => 'Mistercash/Bancontact',
         'ACH_DIRECT_DEBIT-SSL' => 'ACH Pay'
     ];
+    /**
+     * @var array
+     */
     protected $IDEAL_BANKS_INFO = [
         'ING' => 'ING',
         'ABN_AMRO' => 'ABN AMRO',
@@ -57,13 +71,33 @@ class WorldpayConfigProviderTest extends TestCase
         'VAN_LANSCHOT' => 'Van Lanschot',
         'KNAB' => 'Knab'
     ];
+    /**
+     * @var string
+     */
     protected $KLARNA_PAYNOW_TYPE = 'KLARNA_PAYNOW';
+    /**
+     * @var array
+     */
     protected $KLARNA_PAYNOW_COUNTRIES = '[SE,DE,NL,AT]';
+    /**
+     * @var string
+     */
     protected $KLARNA_PAYLATER_TYPE = 'KLARNA_PAYLATER';
+    /**
+     * @var array
+     */
     protected $KLARNA_PAYLATER_COUNTRIES = '[SE,NO,FI,DE,NL,AT,CH,GB,DK,US]';
+    /**
+     * @var string
+     */
     protected $KLARNA_SLICEIT_TYPE = 'KLARNA_SLICEIT';
+    /**
+     * @var array
+     */
     protected $KLARNA_SLICEIT_COUNTRIES = '[SE,NO,FI,DE,AT,GB,DK,US]';
-    
+    /**
+     * @var array
+     */
     protected $ALL_CC_METHODS = [
                 'AMEX-SSL' => 'American Express',
                 'VISA-SSL' => 'Visa',
@@ -81,7 +115,7 @@ class WorldpayConfigProviderTest extends TestCase
                 'LASER-SSL' => 'Laser Card',
                 'UATP-SSL' => 'UATP'
         ];
-
+        
     protected function setUp(): void
     {
         $wplogger = $this->getMockBuilder(WorldpayLogger::class)

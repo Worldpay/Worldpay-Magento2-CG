@@ -25,6 +25,8 @@ class InquiryXml implements UpdateInterface
     }
 
     /**
+     * Getting token code
+     *
      * @return string
      */
     public function getTokenCode()
@@ -33,6 +35,8 @@ class InquiryXml implements UpdateInterface
     }
 
     /**
+     * Is success?
+     *
      * @return bool
      */
     public function isSuccess()

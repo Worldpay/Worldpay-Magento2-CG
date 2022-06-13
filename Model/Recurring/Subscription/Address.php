@@ -22,6 +22,8 @@ class Address extends AbstractModel implements AddressModelInterface
     private $subscription;
 
     /**
+     * Address constructor
+     *
      * @return void
      */
     protected function _construct()
@@ -30,6 +32,8 @@ class Address extends AbstractModel implements AddressModelInterface
     }
 
     /**
+     * Set subscription info
+     *
      * @param Subscription $subscription
      * @return $this
      */
@@ -40,6 +44,8 @@ class Address extends AbstractModel implements AddressModelInterface
     }
 
     /**
+     * Get subscription info
+     *
      * @return Subscription
      */
     public function getSubscription()
@@ -65,7 +71,7 @@ class Address extends AbstractModel implements AddressModelInterface
      * Enforce format of the street field
      *
      * @param array|string $key
-     * @param null $value
+     * @param array|null $value
      * @return \Magento\Framework\DataObject
      */
     public function setData($key, $value = null)

@@ -15,6 +15,9 @@ use Sapient\Worldpay\Controller\Redirectresult\Redirect;
 class RedirectTest extends TestCase
 {
 
+    /**
+     * @var Redirect
+     */
     protected $redirectObj;
 
     protected function setUp(): void

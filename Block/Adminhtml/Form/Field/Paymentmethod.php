@@ -24,19 +24,22 @@ class Paymentmethod extends \Magento\Framework\View\Element\Html\Select
     }
 
     /**
+     * Set Input Name
+     *
      * @param string $value
      * @return Sapient\Worldpay\Block\Adminhtml\Form\Field\MerchantProfile
      */
+
     public function setInputName($value)
     {
         return $this->setName($value);
     }
-
     /**
      * Parse to html.
      *
      * @return mixed
      */
+
     public function _toHtml()
     {
        
@@ -48,12 +51,12 @@ class Paymentmethod extends \Magento\Framework\View\Element\Html\Select
 
         return parent::_toHtml();
     }
-
     /**
      * Retrive all the payment type.
      *
      * @return mixed
      */
+
     private function getAllPaymentType()
     {
 

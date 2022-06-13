@@ -36,6 +36,10 @@ class Failure extends \Magento\Framework\App\Action\Action
      * @param PageFactory $pageFactory
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \SubscriptionFactory $subscriptionFactory
+     * @param \TransactionsFactory $transactionsFactory
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender
      */
     public function __construct(
         Context $context,
@@ -44,7 +48,8 @@ class Failure extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         SubscriptionFactory $subscriptionFactory,
         TransactionsFactory $transactionsFactory,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender
     ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
@@ -52,9 +57,14 @@ class Failure extends \Magento\Framework\App\Action\Action
         $this->subscriptionFactory = $subscriptionFactory;
         $this->transactionsFactory = $transactionsFactory;
         $this->checkoutSession = $checkoutSession;
+        $this->emailsender = $emailsender;
         return parent::__construct($context);
     }
-
+    /**
+     * Execute
+     *
+     * @return string
+     */
     public function execute()
     {
         $this->wplogger->info('worldpay returned failure url');
@@ -82,8 +92,16 @@ class Failure extends \Magento\Framework\App\Action\Action
                 $transactions->delete();
             }
         }
+        // send Payment Fail Email
+        $this->emailsender->authorisedEmailSend($magentoorder, false);
         return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
     }
+    /**
+     * Get Failure NoticeFor Order
+     *
+     * @param array $order
+     * @return string
+     */
 
     private function _getFailureNoticeForOrder($order)
     {

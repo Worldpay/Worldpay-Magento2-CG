@@ -27,11 +27,17 @@ class Delete extends \Magento\Framework\App\Action\Action
      * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
-        
+    /**
+     * @var helper
+     */
     protected $helper;
-
+    /**
+     * @var vaultPaymentToken
+     */
     protected $vaultPaymentToken;
-
+    /**
+     * @var resultRedirect
+     */
     protected $resultRedirect;
 
     /**
@@ -45,6 +51,11 @@ class Delete extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Token\Service $tokenService
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param PaymentTokenRepositoryInterface $tokenRepository
+     * @param PaymentTokenManagement $paymentTokenManagement
+     * @param MyAccountException $helper
+     * @param \Magento\Vault\Model\PaymentToken $vaultPaymentToken
+     * @param \Magento\Backend\Model\View\Result\Redirect $resultRedirect
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -87,7 +98,7 @@ class Delete extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * perform card deletion
+     * Perform card deletion
      */
     public function execute()
     {
@@ -134,6 +145,9 @@ class Delete extends \Magento\Framework\App\Action\Action
     }
 
     /**
+     * Token Not ExistOn Worldpay
+     *
+     * @param string $error
      * @return bool
      */
     protected function _tokenNotExistOnWorldpay($error)
@@ -147,6 +161,9 @@ class Delete extends \Magento\Framework\App\Action\Action
 
     /**
      * Delete card of customer
+     *
+     * @param string $tokenModel
+     * @param string $customer
      */
     protected function _applyTokenDelete($tokenModel, $customer)
     {
@@ -158,7 +175,11 @@ class Delete extends \Magento\Framework\App\Action\Action
 
     /**
      * Delete vault card of customer
+     *
+     * @param string $tokenModel
+     * @param string $customer
      */
+    
     protected function _applyVaultTokenDelete($tokenModel, $customer)
     {
         $paymentToken = $this->paymentTokenManagement->getByGatewayToken(
