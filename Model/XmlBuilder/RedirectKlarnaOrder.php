@@ -13,27 +13,92 @@ class RedirectKlarnaOrder
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
+    /**
+     * @var string
+     */
     private $orderDescription;
+    /**
+     * @var string
+     */
     private $currencyCode;
+    /**
+     * @var float
+     */
     private $amount;
+    /**
+     * @var string
+     */
     private $paymentType;
+    /**
+     * @var string
+     */
     private $shopperEmail;
+    /**
+     * @var string
+     */
     private $statementNarrative;
+    /**
+     * @var string
+     */
     private $acceptHeader;
+    /**
+     * @var string
+     */
     private $userAgentHeader;
+    /**
+     * @var array
+     */
     private $shippingAddress;
+    /**
+     * @var array
+     */
     private $billingAddress;
+    /**
+     * @var float
+     */
     private $paymentPagesEnabled;
+    /**
+     * @var string
+     */
     private $installationId;
+    /**
+     * @var string
+     */
     private $hideAddress;
+    /**
+     * @var mixed
+     */
     private $exponent;
+    /**
+     * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
+     */
     private $threeDSecureConfig;
+    /**
+     * @var Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration
+     */
     private $tokenRequestConfig;
+    /**
+     * @var string
+     */
     private $sessionData;
+    /**
+     * Order Datas
+     *
+     * @var array|string
+     */
     private $orderContent;
 
+    /**
+     * RedirectKlarnaOrder constructor
+     */
     public function __construct()
     {
          $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure();
@@ -41,6 +106,30 @@ EOD;
         $this->tokenRequestConfig = false;
     }
 
+    /**
+     * Build xml for processing Request
+     *
+     * @param string $merchantCode
+     * @param string $orderCode
+     * @param string $orderDescription
+     * @param string $currencyCode
+     * @param float $amount
+     * @param string $paymentType
+     * @param string $shopperEmail
+     * @param string $statementNarrative
+     * @param string $acceptHeader
+     * @param string $userAgentHeader
+     * @param string $shippingAddress
+     * @param string $billingAddress
+     * @param float $paymentPagesEnabled
+     * @param string $installationId
+     * @param string $hideAddress
+     * @param array $orderlineitems
+     * @param array|string $exponent
+     * @param string $sessionData
+     * @param array|string $orderContent
+     * @return SimpleXMLElement $xml
+     */
     public function build(
         $merchantCode,
         $orderCode,
@@ -92,11 +181,23 @@ EOD;
         return $xml;
     }
 
+    /**
+     * Add submit tag to xml
+     *
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
     private function _addSubmitElement($xml)
     {
         return $xml->addChild('submit');
     }
 
+    /**
+     * Add order tag to xml
+     *
+     * @param SimpleXMLElement $submit
+     * @return SimpleXMLElement $order
+     */
     private function _addOrderElement($submit)
     {
         $order = $submit->addChild('order');
@@ -128,12 +229,22 @@ EOD;
         return $order;
     }
 
+    /**
+     * Add description tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addDescriptionElement($order)
     {
         $description = $order->addChild('description');
         $this->_addCDATA($description, $this->orderDescription);
     }
 
+    /**
+     * Add amount tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addAmountElement($order)
     {
         $amountElement = $order->addChild('amount');
@@ -143,12 +254,22 @@ EOD;
         //$amountElement['value'] = $this->_amountAsInt($this->_roundOfTotal($order));
     }
     
+    /**
+     * Add orderContent and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addOrderContentElement($order)
     {
         $orderContent = $order->addChild('orderContent');
         $this->_addCDATA($orderContent, $this->orderDescription);
     }
 
+    /**
+     * Add dynamicInteractionType and its attribute tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addDynamic3DSElement($order)
     {
         if ($this->threeDSecureConfig->isDynamic3DEnabled() === false) {
@@ -163,6 +284,11 @@ EOD;
         }
     }
 
+    /**
+     * Add paymentMethodMask and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addPaymentMethodMaskElement($order)
     {
         $paymentMethodMask = $order->addChild('paymentDetails');
@@ -188,6 +314,11 @@ EOD;
         $session['id'] = $this->sessionData['sessionId'];
     }
 
+    /**
+     * Add shopper and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addShopperElement($order)
     {
         $shopper = $order->addChild('shopper');
@@ -205,6 +336,11 @@ EOD;
         $order->addChild('statementNarrative', $this->statementNarrative);
     }
 
+    /**
+     * Add shippingAddress and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addShippingElement($order)
     {
         $shippingAddress = $order->addChild('shippingAddress');
@@ -221,6 +357,11 @@ EOD;
         );
     }
 
+    /**
+     * Add billing and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addBillingElement($order)
     {
         $billingAddress = $order->addChild('billingAddress');
@@ -237,6 +378,19 @@ EOD;
         );
     }
 
+    /**
+     * Add address and its child tag to xml
+     *
+     * @param SimpleXMLElement $parentElement
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $address1
+     * @param string $postalCode
+     * @param string $city
+     * @param string $state
+     * @param string $countryCode
+     * @param string $telephoneNumber
+     */
     private function _addAddressElement(
         $parentElement,
         $firstName,
@@ -275,6 +429,11 @@ EOD;
         $this->_addCDATA($telephoneElement, $telephoneNumber);
     }
 
+    /**
+     * Add order line item and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addOrderLineItemElement($order)
     {
         $diffAmt = 0;
@@ -319,6 +478,21 @@ EOD;
         }
     }
 
+    /**
+     * Add order line item element values to xml
+     *
+     * @param SimpleXMLElement $parentElement
+     * @param string $reference
+     * @param string $name
+     * @param string $productType
+     * @param string $quantity
+     * @param string $quantityUnit
+     * @param float $unitPrice
+     * @param float $taxRate
+     * @param float $totalAmount
+     * @param float $totalTaxAmount
+     * @param float $totalDiscountAmount
+     */
     private function _addLineItemElement(
         $parentElement,
         $reference,
@@ -377,6 +551,12 @@ EOD;
         }
     }
 
+    /**
+     * Add cdata to xml
+     *
+     * @param SimpleXMLElement $element
+     * @param string $content
+     */
     private function _addCDATA($element, $content)
     {
         $node = dom_import_simplexml($element);
@@ -384,11 +564,23 @@ EOD;
         $node->appendChild($no->createCDATASection($content));
     }
 
+    /**
+     * Returns the rounded value of num to specified precision
+     *
+     * @param float $amount
+     * @return int
+     */
     private function _amountAsInt($amount)
     {
         return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
     }
-
+    
+    /**
+     * Round price
+     *
+     * @param Order $order
+     * @return float $accTotalAmt
+     */
     private function _roundOfTotal($order)
     {
         $accTotalAmt = 0;
@@ -405,6 +597,11 @@ EOD;
         return $accTotalAmt;
     }
     
+    /**
+     * Add subsciption and its child tag to xml
+     *
+     * @param SimpleXMLElement $parentElement
+     */
     private function _addSubscriptionElement($parentElement)
     {
         $fullName = $this->billingAddress['firstName'] . " " . $this->billingAddress['lastName'];
@@ -424,6 +621,12 @@ EOD;
         $affiliateNameElement = $subscription->addChild('affiliateName', $fullName);
     }
 
+    /**
+     * Retrieve start date
+     *
+     * @param string $date
+     * @param string $today
+     */
     public function _getStartDate($date, $today)
     {
         $date['dayOfMonth'] = $today->format('d');
@@ -432,6 +635,13 @@ EOD;
         $this->_getTime($date, $today);
     }
 
+    /**
+     * Retrieve end date
+     *
+     * @param string $date
+     * @param string $today
+     * @param string $subscriptionDays
+     */
     public function _getEndDate($date, $today, $subscriptionDays)
     {
         if ($subscriptionDays) {
@@ -447,6 +657,12 @@ EOD;
         $this->_getTime($date, $today);
     }
 
+    /**
+     * Returns time()
+     *
+     * @param string $date
+     * @param today $today
+     */
     public function _getTime($date, $today)
     {
         $date['hour'] = $today->format('H');

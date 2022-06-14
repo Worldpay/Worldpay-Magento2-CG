@@ -11,7 +11,18 @@ use Sapient\Worldpay\Model\Config\Source\InstalmentCountries;
 
 class CountryColumn extends Select
 {
+    /**
+     * @var $instalmentcountries
+     */
+    
     private $instalmentcountries;
+    /**
+     * Constructor
+     *
+     * @param string $context
+     * @param string $instalmentcountries
+     * @param array $data
+     */
 
     public function __construct(
         Context $context,
@@ -21,11 +32,21 @@ class CountryColumn extends Select
         parent::__construct($context, $data);
         $this->instalmentcountries = $instalmentcountries;
     }
-
+    /**
+     * Get Cvc Enabled
+     *
+     * @param string $value
+     * @return string
+     */
     public function setInputName($value)
     {
         return $this->setName($value . '[]');
     }
+    /**
+     * Display Html
+     *
+     * @return string
+     */
 
     public function _toHtml(): string
     {

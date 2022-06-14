@@ -14,10 +14,25 @@ class Capture
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
+    /**
+     * @var string
+     */
     private $currencyCode;
+    /**
+     * @var float
+     */
     private $amount;
+    /**
+     * @var string|array|float
+     */
     private $exponent;
 
     /**
@@ -27,6 +42,11 @@ EOD;
      * @param string $orderCode
      * @param string $currencyCode
      * @param float $amount
+     * @param string|array|float $exponent
+     * @param Order $order
+     * @param mixed $captureType
+     * @param string|null $paymentType
+     * @param array|null $invoicedItems
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -165,18 +185,26 @@ EOD;
     }
 
     /**
+     * Returns the rounded value of num to specified precision
+     *
      * @param float $amount
      * @return int
      */
     private function _amountAsInt($amount)
     {
-        return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
+        if (!is_null($amount)) {
+            return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
+        } else {
+            return intval($amount);
+        }
     }
 
     /**
      * Add tag Shipping to xml
      *
      * @param SimpleXMLElement $capture
+     * @param Order $order
+     * @param array $invoicedItems
      *
      * Descrition : Adding additional shipping tag for Klarna
      */
@@ -192,6 +220,7 @@ EOD;
       * Add branchSpecificExtension and its child tag to xml
       *
       * @param SimpleXMLElement $order
+      * @param mixed $capture
       */
     private function _addBranchSpecificExtension($order, $capture)
     {
@@ -279,6 +308,13 @@ EOD;
         $this->_addL23OrderLineItemElement($order, $purchase, $capture);
     }
     
+    /**
+     * Add all order line item element values to xml
+     *
+     * @param Order $order
+     * @param mixed $purchase
+     * @param mixed $capture
+     */
     private function _addL23OrderLineItemElement($order, $purchase, $capture)
     {
         
@@ -298,7 +334,21 @@ EOD;
             );
         }
     }
-    
+    /**
+     * Add order line item element values to xml
+     *
+     * @param SimpleXMLElement $parentElement
+     * @param string $description
+     * @param string $productCode
+     * @param string $commodityCode
+     * @param string $quantity
+     * @param float $unitCost
+     * @param string $unitOfMeasure
+     * @param float $itemTotal
+     * @param float $itemTotalWithTax
+     * @param float $itemDiscountAmount
+     * @param float $taxAmount
+     */
     private function _addLineItemElement(
         $parentElement,
         $description,
@@ -366,6 +416,13 @@ EOD;
         }
     }
     
+    /**
+     * Adding Klarna order line items tag to xml
+     *
+     * @param Order $order
+     * @param SimpleXMLElement $capture
+     * @param array $invoicedItems
+     */
     private function _addKlarnaOrderLineItemElement($order, $capture, $invoicedItems)
     {
         $orderLinesElement = $capture->addChild('orderLines');
@@ -403,12 +460,33 @@ EOD;
             );
         }
     }
-    
+
+    /**
+     * Calculates the integral part of a specified double-precision floating-point number.
+     *
+     * @param int|float $number
+     * @return int|float
+     */
     private function truncateNumber($number)
     {
         return (floor($number * pow(10, 2)))/100;
     }
 
+    /**
+     * Adding Klarna line items tag to xml
+     *
+     * @param SimpleXMLElement $parentElement
+     * @param string $reference
+     * @param string $name
+     * @param string $productType
+     * @param string $quantity
+     * @param string $quantityUnit
+     * @param float $unitPrice
+     * @param float $taxRate
+     * @param float $totalAmount
+     * @param float $totalTaxAmount
+     * @param float $totalDiscountAmount
+     */
     private function _addKlarnaLineItemElement(
         $parentElement,
         $reference,
@@ -466,7 +544,10 @@ EOD;
     /**
      * Add amount and its child tag to xml
      *
-     * @param SimpleXMLElement $order
+     * @param SimpleXMLElement $capture
+     * @param string $currencyCode
+     * @param string|array|float $exponent
+     * @param float $amount
      */
     private function _addAmountElement($capture, $currencyCode, $exponent, $amount)
     {
@@ -479,7 +560,10 @@ EOD;
      /**
       * Add amount and its child tag to xml
       *
-      * @param SimpleXMLElement $order
+      * @param SimpleXMLElement $discountAmountXml
+      * @param string $currencyCode
+      * @param string|array|float $exponent
+      * @param float $discountAmount
       */
     private function _addAmountElementCapture($discountAmountXml, $currencyCode, $exponent, $discountAmount)
     {
@@ -490,6 +574,8 @@ EOD;
     }
     
      /**
+      * Add cdata to xml
+      *
       * @param SimpleXMLElement $element
       * @param string $content
       */

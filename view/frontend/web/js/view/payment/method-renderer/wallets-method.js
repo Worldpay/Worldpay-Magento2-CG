@@ -321,11 +321,11 @@ define(
                     
                     //---------------------------------- Apple Pay starts -----------------------
              
-                    var baseGrandTotal 	= window.checkoutConfig.totalsData.base_subtotal;
+                    var baseGrandTotal     = window.checkoutConfig.totalsData.base_subtotal;
                     var runningAmount = (Math.round(baseGrandTotal * 100) / 100).toFixed(2);
-                    var subTotal	= window.checkoutConfig.quoteData.base_grand_total;
+                    var subTotal    = window.checkoutConfig.quoteData.base_grand_total;
                     var runningTotal = (Math.round(subTotal * 100) / 100).toFixed(2);
-                    var subTotalDescr	= "Cart Subtotal";
+                    var subTotalDescr    = "Cart Subtotal";
                     var currencyCode = window.checkoutConfig.quoteData.quote_currency_code;
                     var countryCode = window.checkoutConfig.defaultCountryId;
                     var paymentRequest = {
@@ -370,7 +370,7 @@ define(
                     session.onpaymentauthorized = function (event) {
                         var promise = sendPaymentToken(event.payment.token);
 
-                        promise.then(function (success) {	
+                        promise.then(function (success) {    
                             var status;
                             if (success){
                                 status = ApplePaySession.STATUS_SUCCESS;

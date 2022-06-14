@@ -142,10 +142,11 @@ class SimplePlugin
 
     /**
      * Plugin for:
+     *
      * Check if product can be bought
      *
      * @param \Magento\Catalog\Model\Product\Type\AbstractType $subject
-     * @param $product
+     * @param Product $product
      * @return \Magento\Catalog\Model\Product\Type\AbstractType
      * @throws \Magento\Framework\Exception\LocalizedException
      *
@@ -191,12 +192,13 @@ class SimplePlugin
 
     /**
      * Plugin for:
+     *
      * Prepare selected options for product
      *
      * @param \Magento\Catalog\Model\Product\Type\AbstractType $subject
      * @param \Closure $proceed
-     * @param $product
-     * @param $buyRequest
+     * @param Product $product
+     * @param \Magento\Framework\DataObject $buyRequest
      * @return array
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -280,11 +282,12 @@ class SimplePlugin
 
     /**
      * Plugin for:
+     *
      * Check if product can be configured
      *
      * @param \Magento\Catalog\Model\Product\Type\AbstractType $subject
      * @param \Closure $proceed
-     * @param $product
+     * @param Product $product
      * @return bool
      */
     public function aroundCanConfigure(
@@ -303,7 +306,16 @@ class SimplePlugin
 
         return $product->getWorldpayRecurringEnabled() && $this->recurringHelper->getProductSubscriptionPlans($product);
     }
-    
+    /**
+     * Plugin for:
+     *
+     * Show modified end date
+     *
+     * @param int|string|\DateTimeInterface $startDateDisplay
+     * @param int|string|\DateTimeInterface $displayToday
+     * @param int|string|\DateTimeInterface $endDate
+     * @return bool
+     */
     public function showModifiedEndDate($startDateDisplay, $displayToday, $endDate)
     {
         $result = false;
@@ -315,7 +327,16 @@ class SimplePlugin
         
         return $result;
     }
-    
+    /**
+     * Plugin for:
+     *
+     * Modified Start Date
+     *
+     * @param int|string|\DateTimeInterface $startDate
+     * @param int|string|\DateTimeInterface $modifyStartdate
+     * @param int|string|\DateTimeInterface $modifyTodaydate
+     * @return bool
+     */
     public function modifyStartDate($startDate, $modifyStartdate, $modifyTodaydate)
     {
         $result = false;

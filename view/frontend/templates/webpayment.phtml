@@ -1,6 +1,6 @@
 <?php
-$param = $block->getRequest()->getParams();
-$storeCode = $block->getStoreCode();
+$param= $block->getRequest()->getParams();
+$storeCode= $block->getStoreCode();
 
 if (array_key_exists('chromepay', $param)) {
     ?>
@@ -27,7 +27,22 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
 
 /** @var $block \Sapient\Worldpay\Block\Webpayment */
 ?>
-
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        var serviceWorkerUrl = "<?= /* @noEscape */ $block->getServiceWorkerUrl(); ?>";
+        var serviceWorkerScope = "<?= /* @noEscape */ $block->getServiceWorkerScope().'/'; ?>";
+        navigator.serviceWorker.register(serviceWorkerUrl, { scope: serviceWorkerScope })
+            .then(function (registration)
+            {
+            console.log('Service worker registered successfully');
+            }).catch(function (e)
+            {
+            console.error('Error during service worker registration:', e);
+            }); 
+    });
+}
+</script>
 <script>
     window.ChromepayButtonName = '<?= /* @noEscape */ $block->getChromepayButtonName() ?>';
     window.ChromepayEnabled = '<?= /* @noEscape */ $block->getChromepayEnabled() ?>';
@@ -56,6 +71,11 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         window.ChromepayAvailable = '0';
     }
 
+    function getChromeVersion () {
+        var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+        return raw ? parseInt(raw[2], 10) : false;
+    }
+
 </script>
 
 <script>
@@ -76,8 +96,16 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             "amex", "mastercard", "visa"
     ];
     const types = ['credit'];
+
+    var supportedMethods =  'basic-card';
+    if(getChromeVersion() > 99 ){
+            supportedMethods =  baseUrl+'worldpay/payment/pay';
+    }
+
+
     const supportedInstruments = [{
-    supportedMethods: 'basic-card',
+    //supportedMethods: 'basic-card',
+    supportedMethods: supportedMethods,
             data: {
             supportedNetworks: networks,
                     supportedTypes: types
@@ -210,7 +238,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     } //--------------end of updateTotals fn -----------
     
 
-    function updateDetailsAddress(details, request, resolve, reject) {
+    function updateDetailsAddress(details, request, resolve, reject) {       
         var countryCode = request.country;
         var req = {
         'address' : {
@@ -297,6 +325,27 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             window.location.href = baseUrl + 'worldpay/threedsecure/auth';
         }
         }
+
+
+    function getRegionById(countryId,regionCode){        
+        var apiUrl =  baseUrl + 'rest/V1/directory/countries/'+countryId; 
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", apiUrl, false);
+        xhttp.setRequestHeader("Content-type", "application/json");        
+        xhttp.send();
+        var regions = JSON.parse(xhttp.responseText);
+        if(typeof regions.available_regions !='undefined' ){
+            if(regions.available_regions.length > 0){
+                for (var i=0; i < regions.available_regions.length; i++) {
+                        var regionData = regions.available_regions[i];
+                        if(regionData.code == regionCode){
+                            return regionData.id;
+                        }
+                }
+            }
+        }
+        return 0;
+    }
     /**
      * Invokes PaymentRequest for credit cards.
      *
@@ -412,13 +461,22 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var apiUrl;
     var orderResponse;
     var dfReferenceId = "";
+    
     if (isCustomerLoggedIn) { //Api for logged in customer
         apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/shipping-information';
     } else { // Api for guest customer
         apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + 
                 guestMaskedQuoteId + '/shipping-information';
     }
-    
+    var billingAddress = instrumentResponse.details.billingAddress;
+    if(typeof billingAddress == 'undefined' || billingAddress == null){
+        instrumentResponse.details.billingAddress = {};
+        instrumentResponse.details.billingAddress = instrumentResponse.shippingAddress;
+
+    }
+
+    //country code 
+    var regionId = getRegionById(instrumentResponse.details.billingAddress.country,instrumentResponse.details.billingAddress.region);
     
     var fullName = instrumentResponse.details.billingAddress.recipient;
     var strArray = fullName.split(" ");
@@ -436,7 +494,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var customerDetails = {  "addressInformation": {
     "shipping_address": {
     "region": "",
-            "region_id": 0,
+            "region_id": regionId,
             "region_code": "",
             "country_id": "",
             "street": [
@@ -452,7 +510,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             "billing_address": {
             "email": instrumentResponse.payerEmail,
                     "region": instrumentResponse.details.billingAddress.region,
-                    "region_id": 0,
+                    "region_id": regionId,
                     "region_code": instrumentResponse.details.billingAddress.region,
                     "country_id": instrumentResponse.details.billingAddress.country,
                     "street": instrumentResponse.details.billingAddress.addressLine,
@@ -528,7 +586,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             "billing_address": {
             "email": instrumentResponse.payerEmail,
                     "region": instrumentResponse.details.billingAddress.city,
-                    "region_id": 0,
+                    "region_id":regionId,    
                     "region_code": instrumentResponse.details.billingAddress.region,
                     "country_id": instrumentResponse.details.billingAddress.country,
                     "street": instrumentResponse.details.billingAddress.addressLine,
@@ -540,6 +598,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             }
     };
     var jsonPaymentDetails = JSON.stringify(paymentDetails);
+    
     var orderApiUrl;
     if (isCustomerLoggedIn) { //Api for logged in customer
     orderApiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/payment-information';

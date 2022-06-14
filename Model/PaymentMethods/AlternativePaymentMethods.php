@@ -11,12 +11,33 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
 {
     /**
      * Payment code
+     *
      * @var string
      */
     protected $_code = 'worldpay_apm';
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_isGateway = true;
+    /**
+     * Payment Method feature
+     *
+     * @var bool
+     */
     protected $_canAuthorize = true;
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_canUseInternal = false;
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_canUseCheckout = true;
 
     /**
@@ -33,6 +54,12 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
         return $this;
     }
 
+    /**
+     * Authorisation service abstract method
+     *
+     * @param int $storeId
+     * @return bool
+     */
     public function getAuthorisationService($storeId)
     {
         $apmmethods = $this->paymentdetailsdata['additional_data']['cc_type'];
@@ -43,7 +70,9 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
     }
 
     /**
-     * check if apm is enabled
+     * Check if apm is enabled
+     *
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
@@ -55,6 +84,11 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
         return false;
     }
 
+    /**
+     * Get the apm title
+     *
+     * @return string
+     */
     public function getTitle()
     {
         if ($order = $this->registry->registry('current_order')) {

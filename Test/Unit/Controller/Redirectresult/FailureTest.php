@@ -19,6 +19,9 @@ use Sapient\Worldpay\Controller\Redirectresult\Failure;
 class FailureTest extends TestCase
 {
     
+    /**
+     * @var Failure
+     */
     protected $failureObj;
     protected function setUp(): void
     {

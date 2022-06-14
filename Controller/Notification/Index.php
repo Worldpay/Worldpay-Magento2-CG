@@ -14,18 +14,36 @@ class Index extends \Magento\Framework\App\Action\Action
     /**
      * @var Magento\Framework\View\Result\PageFactory
      */
+
     protected $pageFactory;
+    /**
+     * @var _rawBody
+     */
 
     protected $_rawBody;
     /**
-     * @var \Sapient\Worldpay\Model\HistoryNotificationFactory
+     * @var historyNotification
      */
+
     protected $historyNotification;
-    
+    /**
+     * @var abstractMethod
+     */
+
     private $abstractMethod;
+    /**
+     * @var RESPONSE_OK
+     */
 
     public const RESPONSE_OK = '[OK]';
+    /**
+     * @var RESPONSE_FAILED
+     */
+
     public const RESPONSE_FAILED = '[FAILED]';
+    /**
+     * @var fileDriver
+     */
 
     protected $fileDriver;
     /**
@@ -39,6 +57,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod
      * @param \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
+     * @param \Magento\Framework\Filesystem\DriverInterface $fileDriver
      */
     public function __construct(
         Context $context,
@@ -61,6 +80,11 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->abstractMethod = $abstractMethod;
         $this->fileDriver = $fileDriver;
     }
+    /**
+     * Execute
+     *
+     * @return string
+     */
 
     public function execute()
     {
@@ -90,6 +114,11 @@ class Index extends \Magento\Framework\App\Action\Action
             }
         }
     }
+    /**
+     * Get Raw Body
+     *
+     * @return string
+     */
 
     public function _getRawBody()
     {
@@ -105,7 +134,9 @@ class Index extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * @param $xmlRequest SimpleXMLElement
+     * Create Payment Update
+     *
+     * @param SimpleXMLElement $xmlRequest
      */
     private function _createPaymentUpdate($xmlRequest)
     {
@@ -117,7 +148,9 @@ class Index extends \Magento\Framework\App\Action\Action
 
         $this->_logNotification();
     }
-
+    /**
+     * Log Notification
+     */
     private function _logNotification()
     {
 //        $this->wplogger->info('########## Received notification ##########');
@@ -136,6 +169,9 @@ class Index extends \Magento\Framework\App\Action\Action
 
         $this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
     }
+    /**
+     * Try ToApply Payment Update
+     */
 
     private function _tryToApplyPaymentUpdate()
     {
@@ -150,8 +186,11 @@ class Index extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * @param $xmlRequest SimpleXMLElement
+     * ToApply Payment Update
+     *
+     * @param SimpleXMLElement $xmlRequest
      */
+
     private function _applyTokenUpdate($xmlRequest)
     {
         $tokenService = $this->worldpaytoken;
@@ -161,6 +200,11 @@ class Index extends \Magento\Framework\App\Action\Action
             $this->_order->getOrder()->getCustomerId()
         );
     }
+    /**
+     * Return Ok
+     *
+     * @return json
+     */
 
     public function _returnOk()
     {
@@ -169,6 +213,11 @@ class Index extends \Magento\Framework\App\Action\Action
         $resultJson->setData(self::RESPONSE_OK);
         return $resultJson;
     }
+    /**
+     * Return Failure
+     *
+     * @return json
+     */
 
     public function _returnFailure()
     {
@@ -180,6 +229,8 @@ class Index extends \Magento\Framework\App\Action\Action
 
     /**
      * Save Notification
+     *
+     * @param xml $xml
      */
     private function updateNotification($xml)
     {
@@ -197,7 +248,9 @@ class Index extends \Magento\Framework\App\Action\Action
         $hn->setData('order_id', trim($orderCode));
         $hn->save();
     }
-    
+    /**
+     * Update Order Status
+     */
     private function _updateOrderStatus()
     {
         $this->abstractMethod->updateOrderStatusForVoidSale($this->_order);

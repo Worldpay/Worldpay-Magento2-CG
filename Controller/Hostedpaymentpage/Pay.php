@@ -22,15 +22,16 @@ class Pay extends \Magento\Framework\App\Action\Action
      * @var \Sapient\Worldpay\Model\Checkout\Hpp\State
      */
     protected $_status;
-
     /**
      * Constructor
      *
      * @param Context $context
      * @param PageFactory $pageFactory
-     * @param \Sapient\Worldpay\Model\Checkout\Hpp\State
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger
+     * @param \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      */
+
     public function __construct(
         Context $context,
         PageFactory $pageFactory,
@@ -44,7 +45,11 @@ class Pay extends \Magento\Framework\App\Action\Action
         $this->worldpayhelper = $worldpayhelper;
         return parent::__construct($context);
     }
- 
+    /**
+     * Execute
+     *
+     * @return string
+     */
     public function execute()
     {
 
@@ -53,6 +58,11 @@ class Pay extends \Magento\Framework\App\Action\Action
         }
         return $this->pageFactory->create();
     }
+    /**
+     * Get Status
+     *
+     * @return string
+     */
 
     protected function _getStatus()
     {

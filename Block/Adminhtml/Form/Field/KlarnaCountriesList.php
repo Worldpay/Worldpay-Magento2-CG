@@ -22,11 +22,13 @@ class KlarnaCountriesList extends \Magento\Framework\View\Element\Html\Select
         parent::__construct($context, $data);
         $this->klarnaCountries = $klarnaCountries;
     }
-
     /**
+     * Set Input Name
+     *
      * @param string $value
      * @return Sapient\Worldpay\Block\Adminhtml\Form\Field\KlarnaCountries
      */
+
     public function setInputName($value)
     {
         return $this->setName($value);

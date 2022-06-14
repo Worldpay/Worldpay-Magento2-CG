@@ -20,6 +20,9 @@ use Sapient\Worldpay\Controller\Redirectresult\Error;
 class ErrorTest extends TestCase
 {
     
+    /**
+     * @var Error
+     */
     protected $errorObj;
     protected function setUp(): void
     {

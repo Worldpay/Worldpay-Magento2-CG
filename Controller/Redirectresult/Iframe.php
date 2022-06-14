@@ -29,8 +29,8 @@ class Iframe extends \Magento\Framework\App\Action\Action
      * @param Context $context
      * @param PageFactory $pageFactory
      * @param \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate
-     * @param \Magento\Framework\UrlInterface $urlInterface
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param ResultFactory $resultPageFactory
      */
     public function __construct(
         Context $context,
@@ -45,7 +45,11 @@ class Iframe extends \Magento\Framework\App\Action\Action
         $this->resultPageFactory = $resultPageFactory;
         return parent::__construct($context);
     }
- 
+    /**
+     * Execute
+     *
+     * @return string
+     */
     public function execute()
     {
         $this->_getStatus()->reset();
@@ -63,6 +67,11 @@ class Iframe extends \Magento\Framework\App\Action\Action
         $result->setContents('<script>window.top.location.href = "'.$redirecturl.'";</script>');
         return $result;
     }
+    /**
+     * Execute
+     *
+     * @return Status
+     */
 
     protected function _getStatus()
     {

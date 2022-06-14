@@ -18,6 +18,9 @@ use Sapient\Worldpay\Controller\Redirectresult\Success;
 class SuccessTest extends TestCase
 {
 
+    /**
+     * @var Success
+     */
     protected $successObj;
 
     protected function setUp(): void

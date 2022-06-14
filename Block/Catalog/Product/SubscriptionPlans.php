@@ -27,6 +27,7 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
      * @param \Magento\Catalog\Block\Product\Context $context
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param Json $encoder
+     * @param Data $worldpayHelper
      * @param array $data
      */
     public function __construct(
@@ -74,6 +75,8 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
     }
 
     /**
+     * Sapient\Worldpay\Model\Recurring\Plan
+     *
      * @param \Sapient\Worldpay\Model\Recurring\Plan $plan
      * @return bool
      */
@@ -198,6 +201,8 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
     }
 
     /**
+     * Get payment amount id
+     *
      * @param Plan $plan
      * @return \Magento\Framework\Pricing\Amount\AmountInterface
      */
@@ -207,6 +212,8 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
     }
 
     /**
+     * Get payment plan
+     *
      * @param Plan $plan
      * @return string
      */
@@ -230,6 +237,8 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
     }
 
     /**
+     * GetJson Config
+     *
      * @return string
      */
     public function getJsonConfig()
@@ -275,32 +284,62 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
 
         return parent::_toHtml();
     }
-    
+    /**
+     * Render get store data
+     *
+     * @return string
+     */
+
     public function getStartDate()
     {
         return $this->getProduct()->getPreconfiguredValues()->getSubscriptionDate();
     }
-    
+    /**
+     * Render get buy one time label
+     *
+     * @return string
+     */
+
     public function getBuyOneTimelabel()
     {
         return $this->recurringHelper->getBuyOneTimelabel();
     }
-    
+    /**
+     * Render Start Data label
+     *
+     * @return string
+     */
+
     public function getStartDateLabel()
     {
         return $this->recurringHelper->getStartDateLabel();
     }
-    
+    /**
+     * Render get end data label
+     *
+     * @return string
+     */
+
     public function getEndDateLabel()
     {
         return $this->recurringHelper->getEndDateLabel();
     }
-    
+    /**
+     * Render get subscribe checkbox label
+     *
+     * @return string
+     */
+
     public function getSubscribeCheckboxLabel()
     {
         return $this->recurringHelper->getSubscribeCheckboxLabel();
     }
-    
+      /**
+       * Render get end date
+       *
+       * @return string
+       */
+
     public function getEndDate()
     {
         return $this->getProduct()->getPreconfiguredValues()->getSubscriptionEndDate();

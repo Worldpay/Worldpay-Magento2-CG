@@ -18,6 +18,9 @@ use Sapient\Worldpay\Controller\Redirectresult\Pending;
 class PendingTest extends TestCase
 {
     
+    /**
+     * @var Pending
+     */
     protected $pendingObj;
     protected function setUp(): void
     {

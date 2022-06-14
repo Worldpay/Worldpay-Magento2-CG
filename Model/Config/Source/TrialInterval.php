@@ -7,11 +7,20 @@ namespace Sapient\Worldpay\Model\Config\Source;
 
 class TrialInterval extends AbstractArraySource
 {
+    /**
+     * @var DAY
+     */
     public const DAY = 'DAY';
+
+    /**
+     * @var MONTH
+     */
     public const MONTH = 'MONTH';
 
     /**
-     * {@inheritdoc}
+     * To Option Array
+     *
+     * @return array
      */
     public function toOptionArray()
     {

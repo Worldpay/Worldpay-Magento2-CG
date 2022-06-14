@@ -79,7 +79,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     public const REGISTRY_NAME = 'current_worldpay_subscription';
 
     /**
-     * Store manager
+     * Store manager interface
      *
      * @var \Magento\Store\Model\StoreManagerInterface
      */
@@ -169,8 +169,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param SubscriptionStatus $statusSource
      * @param \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
-     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\CollectionFactory
-     * $addressCollectionFactory
+     * @param CollectionFactory $addressCollectionFactory
+     * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      * @param \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder
@@ -212,6 +212,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Subscription constructor
+     *
      * @return void
      */
     protected function _construct()
@@ -312,6 +314,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Get the plans data
+     *
      * @return Plan
      */
     public function getPlan()
@@ -331,6 +335,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Set the plan data
+     *
      * @param Plan $plan
      * @return $this
      */
@@ -356,6 +362,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Retrieve quote address collection
+     *
      * @return \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\Collection
      */
     public function getAddressesCollection()
@@ -370,6 +378,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Retrieve customer address array
+     *
      * @return \Sapient\Worldpay\Model\Recurring\Subscription\Address[]
      */
     public function getAddresses()
@@ -381,6 +391,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Set customer addresses.
+     *
      * @param array $addresses
      * @return $this
      */
@@ -499,6 +511,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
 //    }
 
     /**
+     * Set discount list
+     *
      * @param array $discountList
      * @return $this
      */
@@ -509,6 +523,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
+     * Add amount to existing discount amount
+     *
      * @param Subscription\Discount $discount
      */
     public function addDiscount(Subscription\Discount $discount)
@@ -784,6 +800,12 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $transactions->save();
     }
     
+    /**
+     * Getter for order state
+     *
+     * @param string $orderId
+     * @return string
+     */
     public function getOrderStatus($orderId)
     {
         $order = $this->orderRepository->get($orderId);
@@ -794,7 +816,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     /**
      * Load subscription Details
      *
-     *
+     * @param string $order_id
      */
     public function loadByOrderId($order_id)
     {

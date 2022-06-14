@@ -9,8 +9,24 @@ use Exception;
 
 class Instantredirect extends \Magento\Framework\App\Action\Action
 {
+
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
     protected $checkoutSession;
+    /**
+     * @var resultRedirect
+     */
     protected $redirect;
+   
+    /**
+     * Constructor
+     *
+     * @param Context $context
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Framework\App\Response\RedirectInterface $redirect
+     */
 
     public function __construct(
         Context $context,
@@ -24,6 +40,9 @@ class Instantredirect extends \Magento\Framework\App\Action\Action
         parent::__construct($context);
     }
 
+    /**
+     * Perform Instant redirect
+     */
     public function execute()
     {
         $threeDSecureChallengeParams = $this->checkoutSession->get3Ds2Params();

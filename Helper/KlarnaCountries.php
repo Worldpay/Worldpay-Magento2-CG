@@ -25,15 +25,17 @@ class KlarnaCountries
     protected $mathRandom;
 
     /**
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Framework\Math\Random $mathRandom
-     */
-    
-    /**
      * @var SerializerInterface
      */
     private $serializer;
     
+    /**
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\Math\Random $mathRandom
+     * @param SerializerInterface $serializer
+     * @param \Sapient\Worldpay\Model\Config\Source\KlarnaCountries $klarnaCountries
+     */
+
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Math\Random $mathRandom,
@@ -191,6 +193,7 @@ class KlarnaCountries
     /**
      * Retrieve klarna subscription value from config
      *
+     * @param null|string|bool|int $countrycode
      * @param null|string|bool|int|Store $store
      * @return float|null
      */

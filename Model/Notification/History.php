@@ -11,6 +11,7 @@ class History implements HistoryInterface
 
     /**
      * Constructor
+     *
      * @param \Sapient\Worldpay\Model\HistoryNotification $historyNotification
      */
     public function __construct(
@@ -20,9 +21,10 @@ class History implements HistoryInterface
     }
     /**
      * Returns Order Notification
+     *
      * @api
      * @param Integer $order
-     * @return json $result.
+     * @return json $result
      */
     public function getHistory($order)
     {

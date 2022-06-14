@@ -33,6 +33,7 @@ class Request
      *
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Helper\Data $helper
+     * @param \Magento\Framework\HTTP\Client\Curl $curl
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -46,9 +47,9 @@ class Request
      /**
       * Process the request
       *
-      * @param $quote
-      * @param $username
-      * @param $password
+      * @param array $quote
+      * @param string $username
+      * @param string $password
       * @return SimpleXMLElement body
       * @throws Exception
       */
@@ -115,8 +116,14 @@ class Request
         $body = array_pop($bits);
         $headers = implode("\r\n\r\n", $bits);
         // Extracting Cookie from Response Header.
+        if (preg_match("/set-cookie: (.+?)([\r\n]|$)/", $headers, $match)) {
+            // Keep a hold of the cookie returned incase we need to send a
+            // second order message after 3dSecure check
+            $logger->info('Cookie Get: ' . $match[1]);
+            $this->helper->setWorldpayAuthCookie($match[1]);
+        }
+        // if we get Set-Cookie instead of set-cookie
         if (preg_match("/Set-Cookie: (.+?)([\r\n]|$)/", $headers, $match)) {
-        //if (preg_match("/Set-Cookie: (.+?)([\r\n]|$)/", $headers, $match)) {
             // Keep a hold of the cookie returned incase we need to send a
             // second order message after 3dSecure check
             $logger->info('Cookie Get: ' . $match[1]);
@@ -127,6 +134,8 @@ class Request
 
     /**
      * Censors sensitive data before outputting to the log file
+     *
+     * @param array $quote
      */
     protected function _getObfuscatedXmlLog($quote)
     {
@@ -154,6 +163,8 @@ class Request
     }
 
     /**
+     * Worldpay request object
+     *
      * @return object
      */
     private function _getRequest()

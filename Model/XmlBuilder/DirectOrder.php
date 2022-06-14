@@ -22,31 +22,109 @@ class DirectOrder
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
+    /**
+     * @var string
+     */
     private $orderDescription;
+    /**
+     * @var string
+     */
     private $currencyCode;
+    /**
+     * @var float
+     */
     private $amount;
+    /**
+     * @var array
+     */
     protected $paymentDetails;
+    /**
+     * @var array
+     */
     private $cardAddress;
+    /**
+     * @var string
+     */
     protected $shopperEmail;
+    /**
+     * @var string
+     */
     protected $acceptHeader;
+    /**
+     * @var string
+     */
     protected $userAgentHeader;
+    /**
+     * @var array
+     */
     private $shippingAddress;
+    /**
+     * @var array
+     */
     private $billingAddress;
+    /**
+     * @var mixed|null
+     */
     protected $paResponse = null;
+    /**
+     * @var bool|null
+     */
     private $echoData = null;
+    /**
+     * @var string
+     */
     private $shopperId;
+    /**
+     * @var string
+     */
     private $saveCardEnabled;
+    /**
+     * @var string
+     */
     private $tokenizationEnabled;
+    /**
+     * @var string
+     */
     private $storedCredentialsEnabled;
+    /**
+     * @var string|null
+     */
     protected $dfReferenceId = null;
+    /**
+     * @var string
+     */
     private $cusDetails;
+    /**
+     * @var mixed
+     */
     private $exemptionEngine;
+    /**
+     * @var string
+     */
     private $thirdparty;
+    /**
+     * @var mixed
+     */
     private $shippingfee;
+    /**
+     * @var array|string
+     */
     private $exponent;
+    /**
+     * @var mixed
+     */
     private $primeRoutingData;
+    /**
+     * @var array
+     */
     private $orderLineItems;
 
     /**
@@ -90,12 +168,17 @@ EOD;
      * @param string $userAgentHeader
      * @param string $shippingAddress
      * @param float $billingAddress
-     * @param string $thirdparty
      * @param string $shopperId
      * @param string $saveCardEnabled
      * @param string $tokenizationEnabled
      * @param string $storedCredentialsEnabled
      * @param string $cusDetails
+     * @param mixed $exemptionEngine
+     * @param string $thirdparty
+     * @param mixed $shippingfee
+     * @param array|string $exponent
+     * @param mixed $primeRoutingData
+     * @param array $orderLineItems
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -164,8 +247,8 @@ EOD;
      * @param string $merchantCode
      * @param string $orderCode
      * @param array $paymentDetails
-     * @param $paResponse,
-     * @param $echoData
+     * @param mixed $paResponse
+     * @param bool $echoData
      * @return SimpleXMLElement $xml
      */
     public function build3DSecure(
@@ -194,7 +277,7 @@ EOD;
      * @param string $merchantCode
      * @param string $orderCode
      * @param array $paymentDetails
-     * @param $dfReferenceId
+     * @param string $dfReferenceId
      * @return SimpleXMLElement $xml
      */
     public function build3Ds2Secure(
@@ -624,6 +707,7 @@ EOD;
     
     /**
      * Add Customer Risk Data  and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     protected function _addCustomerRiskData($order)
@@ -724,6 +808,7 @@ EOD;
     
     /**
      * Add  Risk Data  and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     protected function _addRiskData($order)
@@ -747,6 +832,7 @@ EOD;
     
     /**
      * Add Additional3Ds data and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     protected function _addAdditional3DsElement($order)
@@ -763,6 +849,7 @@ EOD;
     
     /**
      * Add Exemption Engine data and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     protected function _addExemptionEngineElement($order)
@@ -777,6 +864,8 @@ EOD;
     }
 
     /**
+     * Add cdata to xml
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */
@@ -788,6 +877,8 @@ EOD;
     }
 
     /**
+     * Returns the rounded value of num to specified precision
+     *
      * @param float $amount
      * @return int
      */
@@ -797,8 +888,9 @@ EOD;
     }
     
     /**
-     * @param element $paymentDetailsElement
+     * Add stored credentials data and its child tag to xml
      *
+     * @param element $paymentDetailsElement
      * @return string
      */
     private function _addStoredCredentials($paymentDetailsElement)
@@ -809,8 +901,9 @@ EOD;
     }
     
     /**
-     * @param element $paymentDetailsElement
+     * Add payment details for stored credentials data and its child tag to xml
      *
+     * @param element $paymentDetailsElement
      * @return string
      */
     private function _addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement)
@@ -821,6 +914,12 @@ EOD;
         return $storedCredentials;
     }
     
+    /**
+     * Add third party data and its child tag to xml
+     *
+     * @param element $order
+     * @return string
+     */
     private function _addThirdPartyData($order)
     {
         $thirdparty = $order->addChild('thirdPartyData');
@@ -839,6 +938,12 @@ EOD;
         return $thirdparty;
     }
     
+    /**
+     * Add prime routing data and its child tag to xml
+     *
+     * @param element $order
+     * @return string
+     */
     private function _addPrimeRoutingElement($order)
     {
         $primeRouting = $order->addChild('primeRoutingRequest');
@@ -855,6 +960,12 @@ EOD;
         return $primeRouting;
     }
     
+    /**
+     * Add fraud sight data and its child tag to xml
+     *
+     * @param element $order
+     * @return string
+     */
     private function _addFraudSightData($order)
     {
         $fraudsightData = $order->addChild('FraudSightData');
@@ -964,6 +1075,12 @@ EOD;
         $this->_addL23OrderLineItemElement($order, $purchase);
     }
     
+    /**
+     * Add all order line item element values to xml
+     *
+     * @param Order $order
+     * @param mixed $purchase
+     */
     private function _addL23OrderLineItemElement($order, $purchase)
     {
         
@@ -986,6 +1103,21 @@ EOD;
         }
     }
     
+    /**
+     * Add order line item element values to xml
+     *
+     * @param SimpleXMLElement $parentElement
+     * @param string $description
+     * @param string $productCode
+     * @param string $commodityCode
+     * @param string $quantity
+     * @param float $unitCost
+     * @param string $unitOfMeasure
+     * @param float $itemTotal
+     * @param float $itemTotalWithTax
+     * @param float $itemDiscountAmount
+     * @param float $taxAmount
+     */
     private function _addLineItemElement(
         $parentElement,
         $description,
@@ -1048,7 +1180,10 @@ EOD;
     /**
      * Add amount and its child tag to xml
      *
-     * @param SimpleXMLElement $order
+     * @param SimpleXMLElement $orderXml
+     * @param string $currencyCode
+     * @param bool $exponent
+     * @param float $amount
      */
     private function _addAmountElementDirect($orderXml, $currencyCode, $exponent, $amount)
     {

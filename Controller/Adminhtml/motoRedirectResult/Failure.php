@@ -54,6 +54,8 @@ class Failure extends \Magento\Backend\App\Action
     }
 
     /**
+     * Get WorldPay Order
+     *
      * @return \Sapient\Worldpay\Model\Order
      */
     private function _getWorldPayOrder()
@@ -62,6 +64,9 @@ class Failure extends \Magento\Backend\App\Action
     }
 
     /**
+     * Show Failure Notice for order
+     *
+     * @param string $order
      * @return string
      */
     private function _getFailureNoticeForOrder($order)
@@ -70,6 +75,8 @@ class Failure extends \Magento\Backend\App\Action
     }
 
     /**
+     * Return order increment ID
+     *
      * @return string
      */
     private function _getOrderIncrementId()
@@ -81,6 +88,8 @@ class Failure extends \Magento\Backend\App\Action
     }
 
     /**
+     * Redirect To Create Order Page
+     *
      * @return string
      */
     private function _redirectToCreateOrderPage()

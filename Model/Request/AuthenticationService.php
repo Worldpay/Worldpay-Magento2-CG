@@ -24,6 +24,11 @@ class AuthenticationService extends \Magento\Framework\DataObject
     }
 
     /**
+     * Authentication request
+     *
+     * @param string $params
+     * @param string $type
+     *
      * @return bool
      */
     public function requestAuthenticated($params, $type = 'ecom')

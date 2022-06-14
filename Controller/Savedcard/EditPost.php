@@ -29,7 +29,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
      * @var Magento\Framework\Data\Form\FormKey\Validator
      */
     protected $formKeyValidator;
-    
+    /**
+     * @var $helper
+     */
     protected $helper;
 
     /**
@@ -42,8 +44,10 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
      * @param StoreManagerInterface $storeManager
      * @param \Sapient\Worldpay\Model\Token\Service $tokenService
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken
-     * @param \Magento\Framework\Message\ManagerInterface $messageManager
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param PaymentTokenRepositoryInterface $tokenRepository
+     * @param PaymentTokenManagement $paymentTokenManagement
+     * @param MyAccountException $helper
      */
     public function __construct(
         Context $context,
@@ -162,6 +166,8 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
     }
 
     /**
+     * Get Token Model
+     *
      * @return Sapient/WorldPay/Model/Token
      */
     protected function _getTokenModel()
@@ -179,7 +185,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         }
         return $token;
     }
-
+    /**
+     * Apply vault card of customer
+     */
     protected function _applyVaultTokenUpdate()
     {
         $existingVaultPaymentToken = $this->paymentTokenManagement->getByGatewayToken(
@@ -189,7 +197,12 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         );
         $this->_saveVaultToken($existingVaultPaymentToken);
     }
-
+    /**
+     * Save vault card of customer
+     *
+     * @param string $vaultToken
+     * @return string
+     */
     protected function _saveVaultToken(PaymentTokenInterface $vaultToken)
     {
         $vaultToken->setTokenDetails($this->convertDetailsToJSON([
@@ -205,16 +218,34 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         }
         return true;
     }
+    /**
+     * Get Expiration MonthAndYear
+     *
+     * @param string $token
+     * @return string
+     */
 
     public function getExpirationMonthAndYear($token)
     {
         return $token->getCardExpiryMonth().'/'.$token->getCardExpiryYear();
     }
+    /**
+     * Get Last Four Numbers
+     *
+     * @param string $number
+     * @return string
+     */
 
     public function getLastFourNumbers($number)
     {
         return substr($number, -4);
     }
+    /**
+     * Convert Details ToJSON
+     *
+     * @param string $details
+     * @return json
+     */
 
     private function convertDetailsToJSON($details)
     {
@@ -224,6 +255,8 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
     
     /**
      * Update Saved Card Detail
+     *
+     * @param string $tokenInquiryResponse
      */
     protected function _applyTokenInquiry($tokenInquiryResponse)
     {
@@ -234,6 +267,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
     }
     
     /**
+     * Get Token Model Inquiry
+     *
+     * @param string $tokenInquiryResponse
      * @return Sapient/WorldPay/Model/Token
      */
     protected function _getTokenModelInquiry($tokenInquiryResponse)

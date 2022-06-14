@@ -12,7 +12,7 @@ abstract class Plan extends \Magento\Backend\App\Action
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = 'Magento_Catalog::products';
+    public const ADMIN_RESOURCE = 'Magento_Catalog::products';
 
     /**
      * @var \Sapient\Worldpay\Model\Recurring\PlanFactory

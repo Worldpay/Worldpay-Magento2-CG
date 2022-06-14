@@ -14,10 +14,25 @@ class CancelOrder
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
+    /**
+     * @var string
+     */
     private $currencyCode;
+    /**
+     * @var float
+     */
     private $amount;
+    /**
+     * @var float
+     */
     private $exponent;
 
     /**
@@ -28,6 +43,7 @@ EOD;
      * @param string $currencyCode
      * @param float $amount
      * @param float $exponent
+     * @param string $paymentType
      * @return SimpleXMLElement $xml
      */
     public function build($merchantCode, $orderCode, $currencyCode, $amount, $exponent, $paymentType = null)

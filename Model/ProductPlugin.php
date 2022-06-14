@@ -24,10 +24,11 @@ class ProductPlugin
 
     /**
      * Plugin for:
+     *
      * Get product price
      *
      * @param \Magento\Catalog\Model\Product $subject
-     * @param $result
+     * @param array $result
      * @return float
      */
     public function afterGetPrice(\Magento\Catalog\Model\Product $subject, $result)

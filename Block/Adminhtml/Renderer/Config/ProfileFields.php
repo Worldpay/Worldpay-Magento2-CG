@@ -11,7 +11,8 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 class ProfileFields extends Field
 {
     /**
-     * create new admin config fields.
+     * Create new admin config fields.
+     *
      * @param AbstractElement $element
      * @return string
      */

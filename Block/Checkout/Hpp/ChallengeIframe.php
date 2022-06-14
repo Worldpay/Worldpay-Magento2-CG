@@ -10,6 +10,7 @@ class ChallengeIframe extends \Magento\Framework\View\Element\Template
      * Constructor
      *
      * @param \Magento\Backend\Block\Template\Context $context
+     * @param \Sapient\Worldpay\Model\Checkout\Hpp\Json\Config\Factory $configfactory
      * @param array $data
      */
     public function __construct(
@@ -22,6 +23,7 @@ class ChallengeIframe extends \Magento\Framework\View\Element\Template
     }
     
     /**
+     * Get Redirect Url
      *
      * @return string
      */

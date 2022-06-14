@@ -22,6 +22,10 @@ class Button extends Template
      * @var Config
      */
     private $instantPurchaseConfig;
+    /**
+     * @var Config
+     */
+
     protected $_scopeConfig;
     /**
      * @var SessionManagerInterface
@@ -29,9 +33,12 @@ class Button extends Template
     protected $session;
 
     /**
-     * Button constructor.
+     * Constructor
+     *
      * @param Context $context
-     * @param Config $instantPurchaseConfig
+     * @param InstantPurchaseConfig $instantPurchaseConfig
+     * @param ScopeConfig $scopeConfig
+     * @param Session $session
      * @param array $data
      */
     public function __construct(
@@ -90,7 +97,12 @@ class Button extends Template
     {
         return $this->_storeManager->getStore()->getId();
     }
-    
+     /**
+      * Returns session ID
+      *
+      * @return int
+      */
+
     public function getSessionId()
     {
         return $this->session->getSessionId();

@@ -17,9 +17,21 @@ class Auth extends \Magento\Framework\App\Action\Action
      * @var \Magento\Checkout\Model\Session
      */
     protected $checkoutSession;
+    /**
+     * @var _assetRepo
+     */
     protected $_assetRepo;
+    /**
+     * @var request
+     */
     protected $request;
+    /**
+     * @var _cookieManager
+     */
     protected $_cookieManager;
+    /**
+     * @var cookieMetadataFactory
+     */
     protected $cookieMetadataFactory;
 
     /**
@@ -29,6 +41,13 @@ class Auth extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Framework\View\Asset\Repository $assetRepo
+     * @param Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param ResultFactory $resultFactory
+     * @param \Magento\Framework\App\Request\Http $request
+     * @param \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager
+     * @param \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory $cookieMetadataFactory
+     *
      */
     public function __construct(
         Context $context,
@@ -55,8 +74,7 @@ class Auth extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * Renders the 3D Secure  page, responsible for forwarding
-     * all necessary order data to worldpay.
+     * Renders the 3D Secure  page, responsible for forwarding All necessary order data to worldpay
      */
     public function execute()
     {

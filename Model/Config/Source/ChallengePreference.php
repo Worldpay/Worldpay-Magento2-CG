@@ -6,9 +6,11 @@ namespace Sapient\Worldpay\Model\Config\Source;
 
 class ChallengePreference extends \Magento\Framework\App\Config\Value
 {
-    /**
-     * @return array
-     */
+  /**
+   * ToOption Array
+   *
+   * @return array
+   */
     public function toOptionArray()
     {
 

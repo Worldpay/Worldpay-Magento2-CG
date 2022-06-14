@@ -18,8 +18,21 @@ class KlarnaCountriesTest extends TestCase
     
     /** @var KlarnaCountries  */
     protected $model;
+    /**
+     * Core store config
+     *
+     * @var ScopeConfigInterface
+     */
     protected $scopeConfig;
+    /**
+     * @var AbstractCollection|MockObject
+     */
     protected $abstractCollection;
+    /**
+     * Collection name
+     *
+     * @var string
+     */
     protected $collection;
 
     protected function setUp(): void

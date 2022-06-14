@@ -68,20 +68,18 @@ class View extends \Magento\Backend\Block\Template
     }
 
     /**
-     * check if order is placed through WorldPay Payment
+     * Check if order is placed through WorldPay Payment
      *
      * @return Boolean
      */
     public function isWorldpayPayment()
     {
-
         $paymentMethod= $this->getPaymentMethod();
         if ($paymentMethod=='worldpay_cc' || $paymentMethod=='worldpay_apm'
                 || $paymentMethod=='worldpay_moto' || $paymentMethod=='worldpay_cc_vault'
                 || $paymentMethod=='worldpay_wallets') {
             return true;
         }
-
         return false;
     }
 }

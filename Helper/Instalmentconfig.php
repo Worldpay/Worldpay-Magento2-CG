@@ -27,18 +27,23 @@ class Instalmentconfig
      * @var \Magento\Framework\Math\Random
      */
     protected $mathRandom;
+     /**
+      * @var instalmentTypes
+      */
     protected $instalmentTypes;
-
-    /**
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Framework\Math\Random $mathRandom
-     */
     
     /**
      * @var SerializerInterface
      */
     private $serializer;
     
+    /**
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\Math\Random $mathRandom
+     * @param \Sapient\Worldpay\Model\Config\Source\InstalmentTypes $instalmentTypes
+     * @param SerializerInterface $serializer
+     */
+
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Math\Random $mathRandom,
@@ -194,6 +199,7 @@ class Instalmentconfig
     /**
      * Retrieve intsalment type value from config
      *
+     * @param null|string|bool|int $instalmenttype
      * @param null|string|bool|int|Store $store
      * @return float|null
      */
@@ -238,6 +244,7 @@ class Instalmentconfig
     /**
      * Retrieve intsalment type country from config
      *
+     * @param null|string|bool|int $countryid
      * @param null|string|bool|int|Store $store
      * @return float|null
      */
@@ -258,7 +265,14 @@ class Instalmentconfig
             }
         }
     }
-    
+    /**
+     * Get config value
+     *
+     * @param string $result
+     * @param string $instalmenttype
+     * @return mixed
+     */
+
     private function getInstalmentTypeForCountry($result, $instalmenttype)
     {
         foreach ($result as $types => $instalmentdata) {
@@ -273,8 +287,9 @@ class Instalmentconfig
 
     /**
      * Get config value
-     * @param $configPath
-     * @param null $store
+     *
+     * @param string $configPath
+     * @param string $store
      * @return mixed
      */
     public function getSerConfigValue($configPath, $store = null)
@@ -298,12 +313,10 @@ class Instalmentconfig
     }
 
     /**
-     * Get serialized config value
-     * temporarily solution to get unserialized config value
-     * should be deprecated in 2.3.x
+     * Get serialized config value temporarily solution to get unserialized config value should be deprecated in 2.3.x
      *
-     * @param $configPath
-     * @param null $store
+     * @param strin $configPath
+     * @param string $store
      * @return mixed
      */
     public function getSerializedConfigValue($configPath, $store = null)

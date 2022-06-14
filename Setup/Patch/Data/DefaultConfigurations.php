@@ -34,7 +34,12 @@ class DefaultConfigurations implements DataPatchInterface
     protected $serializer;
 
     /**
+     * DefaultConfigurations constructor
+     *
      * @param ModuleDataSetupInterface $moduleDataSetup
+     * @param CategorySetupFactory $categorySetupFactory
+     * @param \Magento\Config\Model\Config\Factory $configFactory
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         ModuleDataSetupInterface $moduleDataSetup,
@@ -170,7 +175,9 @@ class DefaultConfigurations implements DataPatchInterface
             $this->addExtraCheckoutLabels();
     }
     /**
-     * convert array to string
+     * Convert array to string
+     *
+     * @param array $exceptionValues
      */
     public function convertArrayToString($exceptionValues)
     {
@@ -184,7 +191,9 @@ class DefaultConfigurations implements DataPatchInterface
         return $this->serializer->serialize($resultArray);
     }
     /**
-     * convert array string to labels
+     * Convert array string to labels
+     *
+     * @param array $exceptionValues
      */
     public function convertArrayToStringForLabels($exceptionValues)
     {

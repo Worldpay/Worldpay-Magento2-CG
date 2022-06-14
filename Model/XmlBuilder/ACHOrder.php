@@ -18,22 +18,73 @@ class ACHOrder
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
+    /**
+     * @var string
+     */
     private $orderDescription;
+    /**
+     * @var string
+     */
     private $currencyCode;
+    /**
+     * @var float
+     */
     private $amount;
+    /**
+     * @var array
+     */
     private $paymentDetails;
+    /**
+     * @var string
+     */
     private $shopperEmail;
+    /**
+     * @var string
+     */
     private $acceptHeader;
+    /**
+     * @var string
+     */
     private $userAgentHeader;
+    /**
+     * @var array
+     */
     private $shippingAddress;
+    /**
+     * @var array
+     */
     private $billingAddress;
+    /**
+     * @var mixed|null
+     */
     private $paResponse = null;
+    /**
+     * @var bool|null
+     */
     private $echoData = null;
+    /**
+     * @var string
+     */
     private $shopperId;
+    /**
+     * @var int|string|null
+     */
     private $dfReferenceId = null;
+    /**
+     * @var array|string
+     */
     private $statementNarrative;
+    /**
+     * @var array|string
+     */
     private $exponent;
 
     /**
@@ -45,19 +96,14 @@ EOD;
      * @param string $currencyCode
      * @param float $amount
      * @param array $paymentDetails
-     * @param array $cardAddress
      * @param string $shopperEmail
      * @param string $acceptHeader
      * @param string $userAgentHeader
      * @param string $shippingAddress
      * @param float $billingAddress
-     * @param string $thirdparty
      * @param string $shopperId
-     * @param string $saveCardEnabled
-     * @param string $tokenizationEnabled
-     * @param string $storedCredentialsEnabled
-     * @param string $cusDetails
-     * @return SimpleXMLElement $xml
+     * @param string $statementNarrative
+     * @param string $exponent
      */
     public function build(
         $merchantCode,
@@ -264,6 +310,8 @@ EOD;
     }
 
     /**
+     * Add cdata to xml
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */
@@ -275,6 +323,8 @@ EOD;
     }
 
     /**
+     * Returns the rounded value of num to specified precision
+     *
      * @param float $amount
      * @return int
      */

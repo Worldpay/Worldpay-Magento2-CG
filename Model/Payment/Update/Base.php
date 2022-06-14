@@ -12,7 +12,7 @@ use \Magento\Framework\Exception\LocalizedException;
 class Base
 {
 
-    /** @var \Sapient\Worldpay\Model\Payment\State */
+    /** @var \Sapient\Worldpay\Model\Payment\StateInterface */
     protected $_paymentState;
 
     /** @var \Sapient\Worldpay\Model\Payment\WorldPayPayment */
@@ -24,11 +24,11 @@ class Base
 
     /**
      * Constructor
-     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
+     * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      */
     public function __construct(
-        \Sapient\Worldpay\Model\Payment\State $paymentState,
+        \Sapient\Worldpay\Model\Payment\StateInterface $paymentState,
         \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
     ) {
 
@@ -37,6 +37,8 @@ class Base
     }
 
     /**
+     * Get target order code
+     *
      * @return string ordercode
      */
     public function getTargetOrderCode()
@@ -45,7 +47,8 @@ class Base
     }
 
     /**
-     * check payment Status
+     * Check payment Status
+     *
      * @param object $order
      * @param array $allowedPaymentStatuses
      * @return null
@@ -69,7 +72,9 @@ class Base
     }
 
     /**
-     * check if order is not placed throgh worldpay payment
+     * Check if order is not placed throgh worldpay payment
+     *
+     * @param Order $order
      * @throws Exception
      */
     private function _assertPaymentExists($order)
@@ -79,8 +84,11 @@ class Base
         }
     }
 
-    /*
-     * convert worldpay amount to magento amount
+    /**
+     * Convert worldpay amount to magento amount
+     *
+     * @param float $amount
+     * @return int
      */
     protected function _amountAsInt($amount)
     {

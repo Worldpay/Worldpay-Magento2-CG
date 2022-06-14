@@ -7,28 +7,44 @@ namespace Sapient\Worldpay\Model\Payment;
 /**
  * Reading xml
  */
-class StateResponse implements \Sapient\Worldpay\Model\Payment\State
+class StateResponse implements \Sapient\Worldpay\Model\Payment\StateInterface
 {
-    private $orderCode;
-    private $paymentStatus;
-    private $amount;
+    /**
+     * @var orderCode
+     */
+    public $orderCode;
+    /**
+     * @var paymentStatus
+     */
+    public $paymentStatus;
+    /**
+     * @var amount
+     */
+    public $amount;
 
     /**
      * Constructor
+     *
      * @param string $orderCode
      * @param string $merchantCode
      * @param string $paymentStatus
      * @param float $amount
      */
-    private function __construct($orderCode, $merchantCode, $paymentStatus, $amount)
+    public function __construct($orderCode, $merchantCode, $paymentStatus, $amount)
     {
         $this->orderCode = $orderCode;
         $this->merchantCode = $merchantCode;
         $this->paymentStatus = $paymentStatus;
         $this->amount = $amount;
     }
-    
-    public static function createFromCancelledResponse($params)
+    /**
+     * Create From Cancelled Response
+     *
+     * @param string $params
+     * @return string
+     */
+
+    public function createFromCancelledResponse($params)
     {
         $orderkey = $params['orderKey'];
         // extract order code
@@ -40,12 +56,19 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
         return new self(
             $orderCode,
             $merchantCode,
-            \Sapient\Worldpay\Model\Payment\State::STATUS_CANCELLED,
+            \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_CANCELLED,
             null
         );
     }
-    
-    public static function createFromPendingResponse($params, $paymentType = null)
+    /**
+     * Create from Pending Response
+     *
+     * @param string $params
+     * @param int|bool|null $paymentType
+     * @return string
+     */
+
+    public function createFromPendingResponse($params, $paymentType = null)
     {
         $orderkey = $params['orderKey'];
          // extract order code
@@ -59,14 +82,14 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
             return new self(
                 $orderCode,
                 $merchantCode,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_AUTHORISATION,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION,
                 null
             );
         } else {
             return new self(
                 $orderCode,
                 $merchantCode,
-                \Sapient\Worldpay\Model\Payment\State::STATUS_PENDING_PAYMENT,
+                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_PENDING_PAYMENT,
                 null
             );
         }
@@ -83,6 +106,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }*/
 
     /**
+     * Get getOrderCode
+     *
      * @return string
      */
     public function getOrderCode()
@@ -91,6 +116,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getPaymentStatus
+     *
      * @return string
      */
     public function getPaymentStatus()
@@ -99,6 +126,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getAmount
+     *
      * @return float
      */
     public function getAmount()
@@ -107,6 +136,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getMerchantCode
+     *
      * @return string
      */
     public function getMerchantCode()
@@ -115,6 +146,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getRiskScore
+     *
      * @return null
      */
     public function getRiskScore()
@@ -123,6 +156,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getAdvancedRiskProvider
+     *
      * @return null
      */
     public function getAdvancedRiskProvider()
@@ -131,6 +166,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getAdvancedRiskProviderId
+     *
      * @return null
      */
     public function getAdvancedRiskProviderId()
@@ -139,6 +176,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getAdvancedRiskProviderThreshold
+     *
      * @return null
      */
     public function getAdvancedRiskProviderThreshold()
@@ -147,6 +186,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getAdvancedRiskProviderScore
+     *
      * @return null
      */
     public function getAdvancedRiskProviderScore()
@@ -155,6 +196,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getAdvancedRiskProviderFinalScore
+     *
      * @return null
      */
     public function getAdvancedRiskProviderFinalScore()
@@ -163,6 +206,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getPaymentMethod
+     *
      * @return null
      */
     public function getPaymentMethod()
@@ -171,6 +216,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getCardNumber
+     *
      * @return null
      */
     public function getCardNumber()
@@ -179,6 +226,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getAvsResultCode
+     *
      * @return null
      */
     public function getAvsResultCode()
@@ -187,6 +236,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getCvcResultCode
+     *
      * @return null
      */
     public function getCvcResultCode()
@@ -195,6 +246,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getPaymentRefusalCode
+     *
      * @return null
      */
     public function getPaymentRefusalCode()
@@ -203,6 +256,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getPaymentRefusalDescription
+     *
      * @return null
      */
     public function getPaymentRefusalDescription()
@@ -211,6 +266,9 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getJournalReference
+     *
+     * @param string $state
      * @return null
      */
     public function getJournalReference($state)
@@ -219,6 +277,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getFullRefundAmount
+     *
      * @return null
      */
     public function getFullRefundAmount()
@@ -247,6 +307,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getAAVAddressResultCode
+     *
      * @return null
      */
     public function getAAVAddressResultCode()
@@ -255,6 +317,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getAAVPostcodeResultCode
+     *
      * @return null
      */
     public function getAAVPostcodeResultCode()
@@ -263,6 +327,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getAAVCardholderNameResultCode
+     *
      * @return null
      */
     public function getAAVCardholderNameResultCode()
@@ -271,6 +337,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getAAVTelephoneResultCode
+     *
      * @return null
      */
     public function getAAVTelephoneResultCode()
@@ -279,6 +347,8 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
     
     /**
+     * Get getAAVEmailResultCode
+     *
      * @return null
      */
     public function getAAVEmailResultCode()
@@ -287,62 +357,128 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\State
     }
 
     /**
+     * Get getCurrency
+     *
      * @return null
      */
     public function getCurrency()
     {
         return null;
     }
-    
+    /**
+     * Get getNetworkUsed
+     *
+     * @return null
+     */
     public function getNetworkUsed()
     {
         return null;
     }
-    
+
+    /**
+     * Get getSourceType
+     *
+     * @return null
+     */
     public function getSourceType()
     {
         return null;
     }
+    /**
+     * Get getAvailableBalance
+     *
+     * @return null
+     */
     public function getAvailableBalance()
     {
         return null;
     }
+    /**
+     * Get getPrepaidCardType
+     *
+     * @return null
+     */
     public function getPrepaidCardType()
     {
         return null;
     }
+    /**
+     * Get getReloadable
+     *
+     * @return null
+     */
     public function getReloadable()
     {
         return null;
     }
+    /**
+     * Get getCardProductType
+     *
+     * @return null
+     */
     public function getCardProductType()
     {
         return null;
     }
+    /**
+     * Get getAffluence
+     *
+     * @return null
+     */
     public function getAffluence()
     {
         return null;
     }
+    /**
+     * Get getAccountRangeId
+     *
+     * @return null
+     */
     public function getAccountRangeId()
     {
         return null;
     }
+    /**
+     * Get getIssuerCountry
+     *
+     * @return null
+     */
     public function getIssuerCountry()
     {
         return null;
     }
+    /**
+     * Get getVirtualAccountNumber
+     *
+     * @return null
+     */
     public function getVirtualAccountNumber()
     {
         return null;
     }
+    /**
+     * Get getFraudsightMessage
+     *
+     * @return null
+     */
     public function getFraudsightMessage()
     {
         return null;
     }
+    /**
+     * Get getFraudsightScore
+     *
+     * @return null
+     */
     public function getFraudsightScore()
     {
         return null;
     }
+    /**
+     * Get getFraudsightReasonCode
+     *
+     * @return null
+     */
     public function getFraudsightReasonCode()
     {
         return null;

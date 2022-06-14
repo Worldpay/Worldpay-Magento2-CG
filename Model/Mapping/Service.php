@@ -7,23 +7,71 @@ use Magento\Framework\Session\SessionManagerInterface;
 
 class Service
 {
-
+    /**
+     * @var _logger
+     */
     protected $_logger;
+    /**
+     * @var savedTokenFactory
+     */
     protected $savedTokenFactory;
+    /**
+     * @var _scopeConfig
+     */
     protected $_scopeConfig;
     /**
-     * @var SessionManagerInterface
+     * @var session
      */
     protected $session;
+    /**
+     * @var THIS_TRANSACTION
+     */
     public const THIS_TRANSACTION = 'thisTransaction';
+    /**
+     * @var LESS_THAN_THIRTY_DAYS
+     */
     public const LESS_THAN_THIRTY_DAYS = 'lessThanThirtyDays';
+    /**
+     * @var THIRTY_TO_SIXTY_DAYS
+     */
     public const THIRTY_TO_SIXTY_DAYS = 'thirtyToSixtyDays';
+    /**
+     * @var MORE_THAN_SIXTY_DAYS
+     */
     public const MORE_THAN_SIXTY_DAYS = 'moreThanSixtyDays';
+    /**
+     * @var DURING_TRANSACTION
+     */
     public const DURING_TRANSACTION = 'duringTransaction';
+    /**
+     * @var CREATED_DURING_TRANSACTION
+     */
     public const CREATED_DURING_TRANSACTION = 'createdDuringTransaction';
+     /**
+      * @var CHANGED_DURING_TRANSACTION
+      */
     public const CHANGED_DURING_TRANSACTION = 'changedDuringTransaction';
+    /**
+     * @var NO_ACCOUNT
+     */
     public const NO_ACCOUNT = 'noAccount';
+     /**
+      * @var NO_CHANGE
+      */
     public const NO_CHANGE = 'noChange';
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param SavedTokenFactory $savedTokenFactory
+     * @param \Sapient\Worldpay\Model\SavedToken $savedtoken
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
+     * @param SessionManagerInterface $session
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     */
 
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -46,6 +94,14 @@ class Service
         $this->session = $session;
         $this->_scopeConfig = $scopeConfig;
     }
+    /**
+     * Collect Vault Order Parameters
+     *
+     * @param string $orderCode
+     * @param int $quote
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     */
 
     public function collectVaultOrderParameters(
         $orderCode,
@@ -83,7 +139,7 @@ class Service
             'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
                 INPUT_SERVER,
                 'HTTP_USER_AGENT',
-                FILTER_SANITIZE_STRING,
+                FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 FILTER_FLAG_STRIP_LOW
             ) : '',
             'shippingAddress' => $this->_getShippingAddress($quote),
@@ -98,7 +154,15 @@ class Service
             'orderLineItems' => $orderLineItems
         ];
     }
-
+    /**
+     * Collect Direct Order Parameters
+     *
+     * @param string $orderCode
+     * @param int $quote
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @return array
+     */
     public function collectDirectOrderParameters(
         $orderCode,
         $quote,
@@ -154,7 +218,7 @@ class Service
                 'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
                     INPUT_SERVER,
                     'HTTP_USER_AGENT',
-                    FILTER_SANITIZE_STRING,
+                    FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     FILTER_FLAG_STRIP_LOW
                 ) : '',
                 'shippingAddress' => $this->_getShippingAddress($quote),
@@ -174,6 +238,12 @@ class Service
                 'orderLineItems' => $orderLineItems
             ];
     }
+    /**
+     * Customer Details for 3DS2
+     *
+     * @param int $quote
+     * @return array
+     */
 
     public function getCustomerDetailsfor3DS2($quote)
     {
@@ -226,6 +296,9 @@ class Service
         
         return $cusDetails;
     }
+    /**
+     * Get ExemptionEngineDetails
+     */
 
     public function getExemptionEngineDetails()
     {
@@ -247,7 +320,15 @@ class Service
                 );
         return $exemptionEngine;
     }
-
+    /**
+     * Collect Redirect Order Parameters
+     *
+     * @param string $orderCode
+     * @param int $quote
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @return array
+     */
     public function collectRedirectOrderParameters(
         $orderCode,
         $quote,
@@ -312,7 +393,7 @@ class Service
                                         filter_input(
                                             INPUT_SERVER,
                                             'HTTP_USER_AGENT',
-                                            FILTER_SANITIZE_STRING,
+                                            FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                                             FILTER_FLAG_STRIP_LOW
                                         ) : '',
                 'shippingAddress' => $this->_getShippingAddress($quote),
@@ -331,7 +412,15 @@ class Service
                 'orderLineItems' => $orderLineItems
             ];
     }
-
+    /**
+     * Collect Klarna Order Parameters
+     *
+     * @param string $orderCode
+     * @param int $quote
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @return array
+     */
     public function collectKlarnaOrderParameters(
         $orderCode,
         $quote,
@@ -365,7 +454,7 @@ class Service
             'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
                 INPUT_SERVER,
                 'HTTP_USER_AGENT',
-                FILTER_SANITIZE_STRING,
+                FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 FILTER_FLAG_STRIP_LOW
             ) : '',
             'shippingAddress' => $this->_getKlarnaShippingAddress($quote),
@@ -382,7 +471,15 @@ class Service
             'orderContent' => $orderContent
         ];
     }
-
+    /**
+     * Collect Token Order Parameters
+     *
+     * @param string $orderCode
+     * @param int $quote
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @return array
+     */
     public function collectTokenOrderParameters(
         $orderCode,
         $quote,
@@ -440,7 +537,7 @@ class Service
                 'userAgentHeader' => filter_input(
                     INPUT_SERVER,
                     'HTTP_USER_AGENT',
-                    FILTER_SANITIZE_STRING,
+                    FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                     FILTER_FLAG_STRIP_LOW
                 ),
                 'shippingAddress' => $this->_getShippingAddress($quote),
@@ -460,7 +557,15 @@ class Service
                 'orderLineItems' => $orderLineItems
             ];
     }
-    
+    /**
+     * Collect ACH Order Parameters
+     *
+     * @param string $orderCode
+     * @param int $quote
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @return array
+     */
     public function collectACHOrderParameters(
         $orderCode,
         $quote,
@@ -496,7 +601,7 @@ class Service
             'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
                 INPUT_SERVER,
                 'HTTP_USER_AGENT',
-                FILTER_SANITIZE_STRING,
+                FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                 FILTER_FLAG_STRIP_LOW
             ) : '',
             'shippingAddress' => $this->_getShippingAddress($quote),
@@ -508,7 +613,13 @@ class Service
             'exponent' => $exponent
         ];
     }
-
+    /**
+     * Collect Payment Options Order Parameters
+     *
+     * @param Int $countryId
+     * @param string $paymenttype
+     * @return array
+     */
     public function collectPaymentOptionsParameters(
         $countryId,
         $paymenttype
@@ -519,14 +630,24 @@ class Service
             'paymentType' => $paymenttype
         ];
     }
-
+    /**
+     * Collect TokenRequest Config
+     *
+     * @param array $paymentDetails
+     * @return array
+     */
     private function _getTokenRequestConfig($paymentDetails)
     {
         if (isset($paymentDetails['additional_data']['save_my_card'])) {
             return $paymentDetails['additional_data']['save_my_card'];
         }
     }
-
+    /**
+     * Collect ThreeDSecure Config
+     *
+     * @param string|bool|null $method
+     * @return array
+     */
     private function _getThreeDSecureConfig($method = null)
     {
         if ($method == 'worldpay_moto') {
@@ -546,7 +667,12 @@ class Service
             ];
         }
     }
-
+    /**
+     * Collect ShippingAddress
+     *
+     * @param int $quote
+     * @return array
+     */
     private function _getShippingAddress($quote)
     {
         $shippingaddress = $this->_getAddress($quote->getShippingAddress());
@@ -555,7 +681,12 @@ class Service
         }
         return $shippingaddress;
     }
-    
+    /**
+     * Collect Klarna Shipping Address
+     *
+     * @param int $quote
+     * @return array
+     */
     private function _getKlarnaShippingAddress($quote)
     {
         $shippingaddress = $this->_getKlarnaAddress($quote->getShippingAddress());
@@ -564,17 +695,33 @@ class Service
         }
         return $shippingaddress;
     }
-
+    /**
+     * Collect Billing Address
+     *
+     * @param int $quote
+     * @return array
+     */
     private function _getBillingAddress($quote)
     {
         return $this->_getAddress($quote->getBillingAddress());
     }
-    
+    /**
+     * Collect Klarna Billing Address
+     *
+     * @param int $quote
+     * @return array
+     */
     private function _getKlarnaBillingAddress($quote)
     {
         return $this->_getKlarnaAddress($quote->getBillingAddress());
     }
-
+    /**
+     * Collect Order Line Items
+     *
+     * @param int $quote
+     * @param int|bool|null $paymentType
+     * @return array
+     */
     private function _getOrderLineItems($quote, $paymentType = null)
     {
         $orderitems = [];
@@ -646,7 +793,11 @@ class Service
             $orderitems['lineItem'][] = $storelineitem;
         }
 
-        $giftCards = json_decode($quote->getGiftCards(), true);
+        $giftCards = array();
+        $getGiftCards = $quote->getGiftCards();
+        if (!empty($getGiftCards)) {
+            $giftCards = json_decode($getGiftCards, true);
+        }
         if (!empty($giftCards) && count($giftCards) > 0) {
             $giftcardlineitem = [];
             foreach ($giftCards as $giftCard) {
@@ -666,7 +817,12 @@ class Service
         $orderitems['locale_code'] = $this->worldpayHelper->getLocaleDefault();
         return $orderitems;
     }
-
+    /**
+     * Collect Address
+     *
+     * @param array $address
+     * @return array
+     */
     private function _getAddress($address)
     {
         return [
@@ -678,7 +834,12 @@ class Service
             'countryCode' => $address->getCountryId(),
         ];
     }
-    
+    /**
+     * Collect Klarna Address
+     *
+     * @param array $address
+     * @return array
+     */
     private function _getKlarnaAddress($address)
     {
         return [
@@ -692,12 +853,22 @@ class Service
             'telephoneNumber' => $address->getData('telephone'),
         ];
     }
-
+    /**
+     * Collect Card Address
+     *
+     * @param int $quote
+     * @return array
+     */
     private function _getCardAddress($quote)
     {
         return $this->_getAddress($quote->getBillingAddress());
     }
-
+    /**
+     * Collect Payment Details
+     *
+     * @param array $paymentDetails
+     * @return array
+     */
     private function _getPaymentDetails($paymentDetails)
     {
         $method = $paymentDetails['method'];
@@ -768,7 +939,12 @@ class Service
         $details['cardType'] = $paymentDetails['additional_data']['cc_type'];
         return $details;
     }
-
+    /**
+     * Collect Redirect Payment Type
+     *
+     * @param array $paymentDetails
+     * @return array
+     */
     private function _getRedirectPaymentType($paymentDetails)
     {
         if ('CARTEBLEUE-SSL' == $paymentDetails['additional_data']['cc_type']) {
@@ -780,12 +956,23 @@ class Service
         }
         return $paymentDetails['additional_data']['cc_type'];
     }
-
+    /**
+     * Collect Orde rDescription
+     *
+     * @param string $reservedOrderId
+     * @return array
+     */
     private function _getOrderDescription($reservedOrderId)
     {
         return $this->worldpayHelper->getOrderDescription();
     }
-
+    /**
+     * Collect Payment Details Using Token
+     *
+     * @param array $paymentDetails
+     * @param int $quote
+     * @return array
+     */
     private function _getPaymentDetailsUsingToken($paymentDetails, $quote)
     {
         $savedCardData = $this->savedtoken->loadByTokenCode($paymentDetails['additional_data']['tokenCode']);
@@ -834,7 +1021,12 @@ class Service
         }
         return $details;
     }
-
+    /**
+     * Collect Vault Payment Details
+     *
+     * @param array $paymentDetails
+     * @return array
+     */
     private function _getVaultPaymentDetails($paymentDetails)
     {
         $details = [
@@ -860,14 +1052,27 @@ class Service
         }
         return $details;
     }
-
+    /**
+     * Collect client IP Address
+     *
+     * @param string $quote
+     * @return array
+     */
     private function _getClientIPAddress()
     {
         $REMOTE_ADDR = filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_VALIDATE_IP);
         $remoteAddresses = explode(',', $REMOTE_ADDR);
         return trim($remoteAddresses[0]);
     }
-
+    /**
+     * Collect Wallet Order Parameters
+     *
+     * @param string $orderCode
+     * @param int $quote
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @return array
+     */
     public function collectWalletOrderParameters(
         $orderCode,
         $quote,
@@ -919,7 +1124,7 @@ class Service
                     'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
                         INPUT_SERVER,
                         'HTTP_USER_AGENT',
-                        FILTER_SANITIZE_STRING,
+                        FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                         FILTER_FLAG_STRIP_LOW
                     ) : '',
                     'method' => $paymentDetails['method'],
@@ -977,7 +1182,13 @@ class Service
             }
         }
     }
-
+    /**
+     * Collect Third Party Details
+     *
+     * @param array $paymentDetails
+     * @param int $quote
+     * @return array
+     */
     public function getThirdPartyDetails($paymentDetails, $quote)
     {
 
@@ -998,7 +1209,13 @@ class Service
             return $details;
         }
     }
-
+    /**
+     * Collect Shipping Fee For Brazil
+     *
+     * @param array $paymentDetails
+     * @param int $quote
+     * @return array
+     */
     public function getShippingFeeForBrazil($paymentDetails, $quote)
     {
         if ($this->belongsToLACountryBr($paymentDetails, $quote)) {
@@ -1014,7 +1231,13 @@ class Service
             return $details;
         }
     }
-    
+    /**
+     * Collect belongs To LACountryBr
+     *
+     * @param array $paymentDetails
+     * @param int $quote
+     * @return array
+     */
     public function belongsToLACountryBr($paymentDetails, $quote)
     {
         $billingAdress = $this->_getBillingAddress($quote);
@@ -1024,7 +1247,13 @@ class Service
         }
         return false;
     }
-
+    /**
+     * Collect belongs To LACountries
+     *
+     * @param array $paymentDetails
+     * @param int $quote
+     * @return array
+     */
     public function belongsToLACountries($paymentDetails, $quote)
     {
         $billingAdress = $this->_getBillingAddress($quote);
@@ -1042,7 +1271,14 @@ class Service
         }
         return false;
     }
-    
+    /**
+     * Collect Shopper Account Age Indicator
+     *
+     * @param string $fromDate
+     * @param string $toDate
+     * @param srting $differenceFormat
+     * @return string
+     */
     public function getShopperAccountAgeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -1061,7 +1297,14 @@ class Service
             return $indicator;
         }
     }
-    
+    /**
+     * Collect Shopper Account Change Indicator
+     *
+     * @param string $fromDate
+     * @param string $toDate
+     * @param srting $differenceFormat
+     * @return string
+     */
     public function getShopperAccountChangeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -1078,7 +1321,14 @@ class Service
             return self::CHANGED_DURING_TRANSACTION;
         }
     }
-    
+    /**
+     * Collect Shopper Account Password Change Indicator
+     *
+     * @param string $fromDate
+     * @param string $toDate
+     * @param srting $differenceFormat
+     * @return string
+     */
     public function getShopperAccountPasswordChangeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -1097,7 +1347,14 @@ class Service
             return $indicator;
         }
     }
-    
+    /**
+     * Collect Shopper Account Shipping Address Usage Indicator
+     *
+     * @param string $fromDate
+     * @param string $toDate
+     * @param srting $differenceFormat
+     * @return string
+     */
     public function getShopperAccountShippingAddressUsageIndicator(
         $fromDate,
         $toDate,
@@ -1117,7 +1374,14 @@ class Service
             return self::THIS_TRANSACTION;
         }
     }
-    
+    /**
+     * Collect Shopper Account Payment AccountIndicator
+     *
+     * @param string $fromDate
+     * @param string $toDate
+     * @param srting $differenceFormat
+     * @return string
+     */
     public function getShopperAccountPaymentAccountIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -1136,7 +1400,13 @@ class Service
             return $indicator;
         }
     }
-    
+    /**
+     * Collect Prime Routing Details
+     *
+     * @param array $paymentDetails
+     * @param int $quote
+     * @return array
+     */
     public function getPrimeRoutingDetails($paymentDetails, $quote)
     {
         $billingAdress = $this->_getBillingAddress($quote);
@@ -1158,9 +1428,9 @@ class Service
     }
     
     /**
-     * getReturnUrls to return from the payment page
+     * Get Return Urls to return from the payment page
      *
-     * return array
+     * @return array
      */
     public function getReturnUrls()
     {
@@ -1171,7 +1441,13 @@ class Service
         $urls['failureURL'] = $this->_urlBuilder->getUrl('worldpay/redirectresult/failure');
         return $urls;
     }
-    
+    /**
+     * Collect Session Details
+     *
+     * @param array $paymentDetails
+     * @param string $countryCode
+     * @return array
+     */
     private function _getSessionDetails($paymentDetails, $countryCode)
     {
         $sessionDetails = [];
@@ -1184,7 +1460,12 @@ class Service
         }
         return $sessionDetails;
     }
-    
+    /**
+     * Collect Third Party Details
+     *
+     * @param string $customer
+     * @return array
+     */
     public function getCustomerDOB($customer)
     {
         $now = new \DateTime();
@@ -1194,7 +1475,13 @@ class Service
             return $dob;
         }
     }
-    
+     /**
+      * Collect Third Party Details
+      *
+      * @param int $quote
+      * @param int|bool|null $paymentType
+      * @return array
+      */
     private function _getL23OrderLineItems($quote, $paymentType = null)
     {
         $orderitems = [];
@@ -1224,7 +1511,12 @@ class Service
             }
                 $lineitem['description'] = substr($_item->getName(), 0, 12);
                 $lineitem['productCode'] = substr($_item->getProductId(), 0, 12);
-                $lineitem['commodityCode'] = substr($_product->getData('commodity_code'), 0, 12);
+                $commodityCode = $_product->getData('commodity_code');
+                if (isset($commodityCode)) {
+                    $lineitem['commodityCode'] = substr($commodityCode, 0, 12);
+                } else {
+                $lineitem['commodityCode'] = $commodityCode;
+                }
                 $lineitem['quantity'] = (int) substr($_item->getQty(), 0, 12);
                 $lineitem['unitCost'] = $rowtotal / $_item->getQty();
                 $lineitem['unitOfMeasure'] = substr($unitOfMeasure, 0, 12);

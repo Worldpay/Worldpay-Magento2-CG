@@ -12,9 +12,10 @@ class Jwt extends \Magento\Framework\View\Element\Template
     protected $helper;
     
     /**
-     * Jwt constructor.
-     * @param Create $helper
-     * @param array $data
+     * Jwt constructor
+     *
+     * @param Context $context
+     * @param string $helper
      */
 
     public function __construct(
@@ -24,22 +25,39 @@ class Jwt extends \Magento\Framework\View\Element\Template
         $this->_helper = $helper;
         parent::__construct($context);
     }
-
+    /**
+     * Get Jwt Api Key
+     *
+     * @return string
+     */
     public function getJwtApiKey()
     {
         return $this->_helper->isJwtApiKey();
     }
-    
+    /**
+     * Get Jwt Is user
+     *
+     * @return string
+     */
     public function getJwtIssuer()
     {
         return $this->_helper->isJwtIssuer();
     }
-    
+    /**
+     * Get Organisational UnitId
+     *
+     * @return string
+     */
     public function getOrganisationalUnitId()
     {
         return $this->_helper->isOrganisationalUnitId();
     }
-    
+   /**
+    * Get DDC Url
+    *
+    * @return string
+    */
+
     public function getDdcUrl()
     {
         $ddcurl = '';
@@ -51,12 +69,22 @@ class Jwt extends \Magento\Framework\View\Element\Template
         }
         return $ddcurl;
     }
-    
+    /**
+     * Return Cookie
+     *
+     * @return string
+     */
+
     public function getCookie()
     {
         return $cookie = $this->_helper->getWorldpayAuthCookie();
     }
-    
+    /**
+     * Get Current Date
+     *
+     * @return string
+     */
+
     public function getCurrentDate()
     {
         $curdate = date("Y-m-d H:i:s");

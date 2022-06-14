@@ -11,12 +11,33 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
 {
     /**
      * Payment code
+     *
      * @var string
      */
     protected $_code = 'worldpay_cc';
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_isGateway = true;
+    /**
+     * Payment Method feature
+     *
+     * @var bool
+     */
     protected $_canAuthorize = true;
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_canUseInternal = false;
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_canUseCheckout = true;
 
     /**
@@ -33,6 +54,12 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return $this;
     }
 
+    /**
+     * Authorisation service abstract method
+     *
+     * @param int $storeId
+     * @return bool
+     */
     public function getAuthorisationService($storeId)
     {
         $integrationModel = $this->worlpayhelper->getCcIntegrationMode($storeId);
@@ -54,7 +81,9 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
     }
 
     /**
-     * @param int storeId
+     * Return the integration mode
+     *
+     * @param int $storeId
      * @return bool
      */
     private function _isRedirectIntegrationModeEnabled($storeId)
@@ -65,6 +94,9 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
     }
 
     /**
+     * Check if cc is enabled
+     *
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
@@ -77,7 +109,9 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
     }
 
     /**
-     * @param int storeId
+     * Is embedded integartion mode enabled?
+     *
+     * @param int $storeId
      * @return bool
      */
     private function _isEmbeddedIntegrationModeEnabled($storeId)
@@ -85,6 +119,11 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         return $this->worlpayhelper->isIframeIntegration($storeId);
     }
 
+    /**
+     * Get the cc title
+     *
+     * @return string
+     */
     public function getTitle()
     {
         if ($order = $this->registry->registry('current_order')) {

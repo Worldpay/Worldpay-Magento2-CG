@@ -25,6 +25,11 @@ class Editor extends \Magento\Config\Block\System\Config\Form\Field
         $this->_wysiwygConfig = $wysiwygConfig;
         parent::__construct($context, $data);
     }
+    /**
+     * Magento\Framework\Data\Form\Element\AbstractElement
+     *
+     * @param Element $element
+     */
  
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {

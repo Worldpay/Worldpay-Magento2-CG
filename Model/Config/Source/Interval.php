@@ -13,9 +13,11 @@ class Interval extends AbstractArraySource
     public const MONTHLY = 'MONTHLY';
     public const WEEKLY = 'WEEKLY';
 
-    /**
-     * {@inheritdoc}
-     */
+  /**
+   * ToOption Array
+   *
+   * @return array
+   */
     public function toOptionArray()
     {
         return [

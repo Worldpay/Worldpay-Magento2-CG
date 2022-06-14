@@ -35,6 +35,7 @@ class AdminLabels
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Math\Random $mathRandom
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -109,7 +110,7 @@ class AdminLabels
     }
 
     /**
-     * Encode value to be used in \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray
+     * Encode value to be used Field\FieldArray\AbstractFieldArray
      *
      * @param array $value
      * @return array
@@ -194,7 +195,7 @@ class AdminLabels
     /**
      * Retrieve merchant detail value from config
      *
-     * @param int $customerGroupId
+     * @param int $wplabelcode
      * @param null|string|bool|int|Store $store
      * @return float|null
      */

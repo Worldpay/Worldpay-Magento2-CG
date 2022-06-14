@@ -78,7 +78,7 @@ class RecurringPlans extends AbstractModifier
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function modifyMeta(array $meta)
     {
@@ -126,7 +126,7 @@ class RecurringPlans extends AbstractModifier
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function modifyData(array $data)
     {
@@ -144,7 +144,7 @@ class RecurringPlans extends AbstractModifier
      * Move dataScope data to children
      *
      * @param array $meta
-     * @param $path
+     * @param string $path
      * @return array
      */
     private function moveDataScopeToChildren(array $meta, $path)

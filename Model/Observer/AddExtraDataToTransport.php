@@ -8,11 +8,21 @@ use Magento\Framework\Event\ObserverInterface;
 
 class AddExtraDataToTransport implements ObserverInterface
 {
-
+    /**
+     * @var worldpaypayment
+     */
     protected $worldpaypayment;
-
+    /**
+     * @var wpHelper
+     */
     protected $wpHelper;
-
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
+     * @param \Sapient\Worldpay\Helper\Data $wpHelper
+     */
+      
     public function __construct(
         \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment,
         \Sapient\Worldpay\Helper\Data $wpHelper
@@ -20,7 +30,12 @@ class AddExtraDataToTransport implements ObserverInterface
         $this->worldpaypayment = $worldpaypayment;
         $this->wpHelper = $wpHelper;
     }
-
+   /**
+    * Execute
+    *
+    * @param \Magento\Framework\Event\Observer $observer
+    * @return string
+    */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $transport = $observer->getEvent()->getTransport();

@@ -19,8 +19,9 @@ class OrderStatus implements \Magento\Framework\Option\ArrayInterface
     {
         $this->_orderConfig = $orderConfig;
     }
-
     /**
+     * To Option Array
+     *
      * @return array
      */
     public function toOptionArray()

@@ -10,9 +10,23 @@ use Sapient\Worldpay\Helper\GeneralException;
 
 class Validate extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
 {
-
+    /**
+     * @var $helper
+     */
     protected $helper;
+    /**
+     * @var $storeManager
+     */
     protected $storeManager;
+    /**
+     * Constructor
+     *
+     * @param string $context
+     * @param \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Sapient\Worldpay\Helper\GeneralException $helper
+     */
+
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory,
@@ -25,6 +39,8 @@ class Validate extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
     }
     
     /**
+     * Execute
+     *
      * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()

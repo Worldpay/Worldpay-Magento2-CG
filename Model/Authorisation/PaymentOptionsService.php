@@ -28,8 +28,13 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
         $this->worldpayhelper = $worldpayhelper;
     }
     /**
-     * handles provides authorization data for redirect
+     * Handles provides authorization data for redirect
+     *
      * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
+     *
+     * @param string $countryId
+     * @param string $paymenttype
+     * @return array
      */
     public function collectPaymentOptions(
         $countryId,
@@ -52,6 +57,12 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
         return $paymentoptions;
     }
 
+    /**
+     * Get payment options
+     *
+     * @param SimpleXMLElement $xml
+     * @return array|null
+     */
     private function getPaymentOptions($xml)
     {
         if (isset($xml->reply->paymentOption)) {
@@ -64,6 +75,10 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
      *  Get Additional merchant profile from merchant override configuration
      *  and merge all the unique values(if not available in global merchant profile)
      *  to the global payment method array
+     *
+     * @param string $countryId
+     * @param array $paymentoptions
+     * @return array
      */
     public function getAdditionalMerchantPaymentOptions($countryId, $paymentoptions)
     {

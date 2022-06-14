@@ -19,25 +19,85 @@ class RedirectOrder
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
+    /**
+     * @var string
+     */
     private $orderDescription;
+    /**
+     * @var string
+     */
     private $currencyCode;
+    /**
+     * @var float
+     */
     private $amount;
+    /**
+     * @var string
+     */
     private $paymentType;
+    /**
+     * @var string
+     */
     private $shopperEmail;
+    /**
+     * @var string
+     */
     private $statementNarrative;
+    /**
+     * @var string
+     */
     private $acceptHeader;
+    /**
+     * @var string
+     */
     private $userAgentHeader;
+    /**
+     * @var array
+     */
     private $shippingAddress;
+    /**
+     * @var array
+     */
     private $billingAddress;
+    /**
+     * @var float
+     */
     private $paymentPagesEnabled;
+    /**
+     * @var string
+     */
     private $installationId;
+    /**
+     * @var string
+     */
     private $hideAddress;
+    /**
+     * @var string
+     */
     private $thirdparty;
+    /**
+     * @var mixed
+     */
     private $shippingfee;
+    /**
+     * @var mixed
+     */
     private $exponent;
+    /**
+     * @var string
+     */
     private $cusDetails;
+    /**
+     * @var array
+     */
     private $orderLineItems;
 
     /**
@@ -73,16 +133,21 @@ EOD;
      * @param string $currencyCode
      * @param float $amount
      * @param string $paymentType
-     * @param $shopperEmail
-     * @param $statementNarrative
+     * @param string $shopperEmail
+     * @param string $statementNarrative
      * @param string $acceptHeader
      * @param string $userAgentHeader
      * @param string $shippingAddress
      * @param string $billingAddress
      * @param float $paymentPagesEnabled
      * @param string $installationId
-     * @param $hideAddress
+     * @param string $hideAddress
      * @param array $paymentDetails
+     * @param string $thirdparty
+     * @param mixed $shippingfee
+     * @param mixed $exponent
+     * @param string $cusDetails
+     * @param array $orderLineItems
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -223,7 +288,10 @@ EOD;
     /**
      * Add amount tag to xml
      *
-     * @param SimpleXMLElement $order
+     * @param SimpleXMLElement $amountElement
+     * @param string $currencyCode
+     * @param mixed $exponent
+     * @param float $amount
      */
     private function _addAmountElement($amountElement, $currencyCode, $exponent, $amount)
     {
@@ -233,6 +301,8 @@ EOD;
     }
 
     /**
+     * Add dynamicInteractionType and its attribute tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     private function _addDynamic3DSElement($order)
@@ -258,6 +328,8 @@ EOD;
     }
 
     /**
+     * Add createToken and its child tag to xml
+     *
      * @param SimpleXMLElement $order
      */
     private function _addCreateTokenElement($order)
@@ -411,6 +483,8 @@ EOD;
     }
 
     /**
+     * Add cdata to xml
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */
@@ -422,6 +496,8 @@ EOD;
     }
 
     /**
+     * Returns the rounded value of num to specified precision
+     *
      * @param float $amount
      * @return int
      */
@@ -461,13 +537,19 @@ EOD;
             $tokenNode['tokenScope'] = 'merchant';
         }
         if (isset($this->paymentDetails['ccIntegrationMode']) &&
-            $this->paymentDetails['ccIntegrationMode'] == "redirect" && $this->paymentDetails['paymentPagesEnabled']) {
+            $this->paymentDetails['ccIntegrationMode'] == "redirect") {
             $tokenNode['captureCvc'] = "true";
         }
         
         $tokenNode->addChild('paymentTokenID', $this->paymentDetails['tokenCode']);
     }
     
+    /**
+     * Add third party data and its child tag to xml
+     *
+     * @param element $order
+     * @return string
+     */
     protected function _addThirdPartyData($order)
     {
         $thirdparty = $order->addChild('thirdPartyData');
@@ -485,6 +567,12 @@ EOD;
         return $thirdparty;
     }
     
+    /**
+     * Add fraud sight data and its child tag to xml
+     *
+     * @param element $order
+     * @return string
+     */
     private function _addFraudSightData($order)
     {
         $fraudsightData = $order->addChild('FraudSightData');
@@ -586,6 +674,12 @@ EOD;
         $this->_addL23OrderLineItemElement($order, $purchase);
     }
     
+    /**
+     * Add all order line item element values to xml
+     *
+     * @param Order $order
+     * @param mixed $purchase
+     */
     private function _addL23OrderLineItemElement($order, $purchase)
     {
         
@@ -608,6 +702,21 @@ EOD;
         }
     }
     
+    /**
+     * Add order line item element values to xml
+     *
+     * @param SimpleXMLElement $parentElement
+     * @param string $description
+     * @param string $productCode
+     * @param string $commodityCode
+     * @param string $quantity
+     * @param float $unitCost
+     * @param string $unitOfMeasure
+     * @param float $itemTotal
+     * @param float $itemTotalWithTax
+     * @param float $itemDiscountAmount
+     * @param float $taxAmount
+     */
     private function _addLineItemElement(
         $parentElement,
         $description,

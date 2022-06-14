@@ -24,6 +24,8 @@ class Instalmenttype extends \Magento\Framework\View\Element\Html\Select
     }
 
     /**
+     * Set Input Name
+     *
      * @param string $value
      * @return Sapient\Worldpay\Block\Adminhtml\Form\Field\InstalmentConfig
      */

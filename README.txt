@@ -2,6 +2,9 @@ Latest releases for all supported version:
 
 For Magento 2.4.3
 
+Worldpay Plugin version: 2.4.3-p20622
+1. Magento 2.4.3-p2 compatible
+
 Worldpay Plugin version: 2.4.3-p0322
 1. Payment method logo personalisation
 2. API Security alert to Merchant and Worldpay
@@ -25,8 +28,13 @@ Worldpay Plugin version: 2.4.1-p0821
 4. PHP 7.4 Support
 
 For Magento 2.3.7
+Worldpay Plugin version: 2.3.7-p30622
+1. PHP 7.4 Support
+2. Magento 2.3.7-p3 compatible
+
 Worldpay Plugin version: 2.3.7-rc0921
 1. PHP 7.4 Support
+2. Magento 2.3.7 compatible
 
 For Magento 2.3.5
 Worldpay Plugin version: 2.3.5-p0721

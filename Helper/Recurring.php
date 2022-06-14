@@ -73,6 +73,9 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $scopeConfig = null;
     
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
     protected $_customerSession;
     
     /**
@@ -85,14 +88,29 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $curlHelper;
     /**
-     * Recurring constructor.
+     * Recurring constructor
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
      * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan\CollectionFactory $plansCollectionFactory
      * @param Interval $intervalSource
      * @param TrialInterval $trialIntervalSource
+     * @param \Magento\Framework\Escaper $escaper
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
      * @param ScopeConfigInterface $scopeConfig
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Catalog\Model\Product $product
+     * @param \Magento\Framework\Data\Form\FormKey $formkey
+     * @param \Magento\Quote\Model\QuoteFactory $quote
+     * @param \Magento\Quote\Model\QuoteManagement $quoteManagement
+     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+     * @param \Magento\Sales\Model\Service\OrderService $orderService
+     * @param \Magento\Quote\Model\Quote\Payment $payment
+     * @param \Magento\Checkout\Model\Cart $cart
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory
+     * @param SerializerInterface $serializer
+     * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -183,7 +201,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get plan interval label
      *
-     * @param $intervalCode
+     * @param string $intervalCode
      * @return string
      */
     public function getPlanIntervalLabel($intervalCode)
@@ -195,7 +213,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get trial interval label
      *
-     * @param $trialIntervalCode
+     * @param string $trialIntervalCode
      * @return string
      */
     public function getPlanTrialIntervalLabel($trialIntervalCode)
@@ -233,7 +251,6 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * Build plan option id
      *
      * @param \Sapient\Worldpay\Model\Recurring\Plan $plan
-     * @param string $renderedPrice
      * @return string
      */
     public function buildPlanOptionId(\Sapient\Worldpay\Model\Recurring\Plan $plan)
@@ -302,7 +319,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get trial info in one label
      *
-     * @param \Sapient\Worldpay\Model\Recurring\Plan
+     * @param \Sapient\Worldpay\Model\Recurring\Plan $plan
      * @return string
      */
     public function getPlanTrialLabel(\Sapient\Worldpay\Model\Recurring\Plan $plan)
@@ -313,8 +330,8 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Build trial label (number of trial intervals and interval label combined)
      *
-     * @param $numberOfTrialIntervals
-     * @param $trialInterval
+     * @param string $numberOfTrialIntervals
+     * @param mixed $trialInterval
      * @return string
      */
     private function getTrialLabel($numberOfTrialIntervals, $trialInterval)
@@ -383,10 +400,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @param $createdAt
-     * @param $startDate
-     * @param $numTrialIntervals
-     * @param $trialInterval
+     * Get the first payment date
+     *
+     * @param int|string|\DateTimeInterface $createdAt
+     * @param int|string|\DateTimeInterface $startDate
+     * @param string $numTrialIntervals
+     * @param string $trialInterval
      * @return \DateTime
      */
     public function getFirstPaymentDate($createdAt, $startDate, $numTrialIntervals, $trialInterval)
@@ -571,6 +590,13 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return $endDate;
     }
     
+     /**
+      * Create order in magento
+      *
+      * @param array $orderData
+      * @param array $paymentData
+      * @return string
+      */
     public function createMageOrder($orderData, $paymentData)
     {
         $this->_storeManager->setCurrentStore($orderData['store_id']);
@@ -614,6 +640,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return $orderId;
     }
     
+    /**
+     * Create empty quote
+     *
+     * @param string $tokenKey
+     * @return array
+     */
     public function createEmptyQuote($tokenKey)
     {
         $token = 'Bearer '.$tokenKey;
@@ -640,6 +672,15 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     
+    /**
+     * Add items to quote
+     *
+     * @param string $tokenKey
+     * @param array $itemData
+     * @param string $quoteId
+     * @return mixed Returns the JSON decoded data. Note that JSON objects are
+     *     decoded as associative arrays.
+     */
     public function addItemsToQuote($tokenKey, $itemData, $quoteId)
     {
         $token = 'Bearer '.$tokenKey;
@@ -668,6 +709,15 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return json_decode($response, true);
     }
     
+    /**
+     * Update cart items
+     *
+     * @param string $cartId
+     * @param int $itemId
+     * @param float $price
+     * @param int $qty
+     * @return bool
+     */
     public function updateCartItem($cartId, $itemId, $price, $qty)
     {
         if ($price) {
@@ -684,6 +734,14 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return true;
     }
     
+    /**
+     * Get list of available shipping methods
+     *
+     * @param string $tokenKey
+     * @param array $addressData
+     * @return mixed Returns the JSON decoded data. Note that JSON objects are
+     *     decoded as associative arrays.
+     */
     public function getShippingMethods($tokenKey, $addressData)
     {
         $token = 'Bearer '.$tokenKey;
@@ -711,6 +769,14 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return json_decode($response, true);
     }
     
+    /**
+     * Set shipping information
+     *
+     * @param string $tokenKey
+     * @param string $shippingInformation
+     * @return mixed Returns the JSON decoded data. Note that JSON objects are
+     *     decoded as associative arrays.
+     */
     public function setShippingInformation($tokenKey, $shippingInformation)
     {
         $token = 'Bearer '.$tokenKey;
@@ -738,6 +804,14 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return json_decode($response, true);
     }
     
+    /**
+     * Order payment
+     *
+     * @param string $tokenKey
+     * @param string $paymentData
+     * @return mixed Returns the JSON decoded data. Note that JSON objects are
+     *     decoded as associative arrays.
+     */
     public function orderPayment($tokenKey, $paymentData)
     {
         $token = 'Bearer '.$tokenKey;
@@ -765,6 +839,11 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return json_decode($response, true);
     }
     
+    /**
+     * Get Buy one time label text
+     *
+     * @return string
+     */
     public function getBuyOneTimelabel()
     {
         $label = $this->scopeConfig->getValue(
@@ -778,6 +857,11 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return $label;
     }
     
+    /**
+     * Get subscribe checkbox label text
+     *
+     * @return string
+     */
     public function getSubscribeCheckboxLabel()
     {
         $label = $this->scopeConfig->getValue(
@@ -791,6 +875,11 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return $label;
     }
     
+    /**
+     * Get start date label text
+     *
+     * @return string
+     */
     public function getStartDateLabel()
     {
         $label = $this->scopeConfig->getValue(
@@ -804,6 +893,11 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return $label;
     }
     
+    /**
+     * Get end date label text
+     *
+     * @return string
+     */
     public function getEndDateLabel()
     {
         $label = $this->scopeConfig->getValue(
@@ -816,6 +910,15 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         
         return $label;
     }
+
+    /**
+     * Get the list of admin labels
+     *
+     * @param string $labelCode
+     * @param Store $store
+     * @param string|null $scope
+     * @return array
+     */
     public function getAdminLabels($labelCode, $store = null, $scope = null)
     {
         $adminLabels = '';
@@ -848,6 +951,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         }
     }
 
+    /**
+     * Get account label by code
+     *
+     * @param string $labelCode
+     * @return array
+     */
     public function getAccountLabelbyCode($labelCode)
     {
         $aLabels = $this->serializer->unserialize($this->scopeConfig->getValue(
@@ -864,6 +973,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         }
     }
     
+    /**
+     * Get checkout label by code
+     *
+     * @param string $labelCode
+     * @return array
+     */
     public function getCheckoutLabelbyCode($labelCode)
     {
         $aLabels = $this->serializer->unserialize($this->scopeConfig->getValue(
@@ -880,6 +995,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         }
     }
     
+    /**
+     * Get the list of my account exceptions
+     *
+     * @param string $exceptioncode
+     * @return array
+     */
     public function getMyAccountExceptions($exceptioncode)
     {
         $accdata = $this->serializer->unserialize($this->scopeConfig->getValue('worldpay_exceptions/'
@@ -893,6 +1014,13 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
+
+    /**
+     * Get the list of checkout exceptions
+     *
+     * @param string $exceptioncode
+     * @return array
+     */
     public function getCheckoutExceptions($exceptioncode)
     {
         $ccdata = $this->serializer->unserialize($this->scopeConfig->getValue('worldpay_exceptions/'
@@ -906,6 +1034,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
+
+    /**
+     * Is worldpay enable?
+     *
+     * @return bool
+     */
     public function isWorldpayEnable()
     {
         return (bool) $this->scopeConfig->getValue(

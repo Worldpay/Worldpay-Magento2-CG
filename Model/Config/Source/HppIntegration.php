@@ -6,12 +6,19 @@ namespace Sapient\Worldpay\Model\Config\Source;
 
 class HppIntegration implements \Magento\Framework\Option\ArrayInterface
 {
-    /**
-     * @return array
-     */
+  /**
+   * @var OPTION_VALUE_FULL_PAGE
+   * @var OPTION_VALUE_IFRAME
+   */
+
     public const OPTION_VALUE_FULL_PAGE = 'full_page';
     public const OPTION_VALUE_IFRAME = 'iframe';
 
+  /**
+   * ToOption Array
+   *
+   * @return array
+   */
     public function toOptionArray()
     {
 

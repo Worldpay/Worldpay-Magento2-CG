@@ -18,9 +18,23 @@ use Sapient\Worldpay\Controller\Applepay\Index;
 class IndexTest extends TestCase
 {
 
+    /**
+     * Core store config
+     *
+     * @var ScopeConfigInterface
+     */
     protected $scopeConfig;
+    /**
+     * @var RequestInterface
+     */
     protected $request;
+    /**
+     * @var /Sapient\Worldpay\Controller\Applepay\Index
+     */
     protected $indexObj;
+    /**
+     * @var ObjectManagerInterface|MockObject
+     */
     protected $objectManagerMock;
 
     protected function setUp(): void

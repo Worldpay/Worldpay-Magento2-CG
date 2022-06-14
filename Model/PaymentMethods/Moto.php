@@ -9,15 +9,47 @@ namespace Sapient\Worldpay\Model\PaymentMethods;
  */
 class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
 {
+    /**
+     * Payment code
+     *
+     * @var string
+     */
     protected $_code = 'worldpay_moto';
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_isGateway = true;
+    /**
+     * Payment Method feature
+     *
+     * @var bool
+     */
     protected $_canAuthorize = true;
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_canUseInternal = true;
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
     protected $_canUseCheckout = false;
 
+    /**
+     * Checkout payment form
+     *
+     * @var string
+     */
     protected $_formBlockType = \Sapient\Worldpay\Block\Form\Card::class;
 
     /**
+     * Get payment method type
+     *
      * @return string
      */
     public function getPaymentMethodsType()
@@ -26,6 +58,8 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
     }
 
     /**
+     * Get the moto title
+     *
      * @return string
      */
     public function getTitle()
@@ -43,6 +77,12 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
         }
     }
 
+    /**
+     * Authorisation service abstract method
+     *
+     * @param int $storeId
+     * @return bool
+     */
     public function getAuthorisationService($storeId)
     {
         $checkoutpaymentdata = $this->paymentdetailsdata;
@@ -65,6 +105,9 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
         return $this->directservice;
     }
     /**
+     * Check if moto is enabled
+     *
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
@@ -77,6 +120,9 @@ class Moto extends \Sapient\Worldpay\Model\PaymentMethods\CreditCards
     }
 
     /**
+     * Return the integration mode
+     *
+     * @param int $storeId
      * @return bool
      */
     private function _isRedirectIntegrationModeEnabled($storeId)

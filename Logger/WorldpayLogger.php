@@ -6,7 +6,15 @@ namespace Sapient\Worldpay\Logger;
 
 class WorldpayLogger extends \Monolog\Logger
 {
-    public function addRecord($level, $message, array $context = [])
+    /**
+     * Adds a log record.
+     *
+     * @param integer $level The logging level
+     * @param string $message The log message
+     * @param array $context The log context
+     * @return bool Whether the record has been processed
+     */
+    public function addRecord($level, $message, array $context = []) : bool
     {
         $ObjectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $logEnabled = (bool) $ObjectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)

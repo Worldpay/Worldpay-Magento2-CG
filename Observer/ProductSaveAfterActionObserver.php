@@ -20,10 +20,19 @@ class ProductSaveAfterActionObserver implements ObserverInterface
      */
     private $messageManager;
     
+    /**
+     * Worldpay helper
+     *
+     * @var \Magento\Catalog\Helper\Data
+     */
     private $helper;
 
     /**
-     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan\CollectionFactory $plansCollection
+     * ProductSaveAfterActionObserver constructor
+     *
+     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan\CollectionFactory $plansCollectionFactory
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
+     * @param \Sapient\Worldpay\Helper\GeneralException $helper
      */
     public function __construct(
         \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan\CollectionFactory $plansCollectionFactory,

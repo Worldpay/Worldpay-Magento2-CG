@@ -34,7 +34,6 @@ class ToSubscription
     /**
      * @param \Magento\Framework\DataObject\Copy $objectCopyService
      * @param \Sapient\Worldpay\Model\Recurring\SubscriptionFactory $subscriptionFactory
-     * @param \Sapient\Worldpay\Model\Recurring\SubscriptionFactory $subscriptionFactory
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
      */
@@ -53,7 +52,7 @@ class ToSubscription
     /**
      * Convert order/order item data to subscription
      *
-     * @param Order\Item
+     * @param Order\Item $item
      * @param Order $order
      * @param array $data
      * @return Subscription
@@ -133,6 +132,8 @@ class ToSubscription
     }
 
     /**
+     * Create subscription addons and discounts
+     *
      * @param Subscription $subscription
      * @param Order $order
      */
@@ -216,6 +217,8 @@ class ToSubscription
     }
 
     /**
+     * Create subscription addon
+     *
      * @param Subscription $subscription
      * @param array $data
      * @return Subscription\Addon
@@ -244,6 +247,8 @@ class ToSubscription
     }
 
     /**
+     * Create subscription discount
+     *
      * @param Subscription $subscription
      * @param array $data
      * @return Subscription\Discount

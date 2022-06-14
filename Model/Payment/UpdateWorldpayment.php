@@ -21,8 +21,14 @@ class UpdateWorldpayment
      * @var \Sapient\Worldpay\Model\WorldpaymentFactory
      */
     protected $worldpaypayment;
+    /**
+     * @var mixed
+     */
     protected $paymentMethodType;
     
+    /**
+     * @var array
+     */
     public $apmMethods = ['ACH_DIRECT_DEBIT-SSL','SEPA_DIRECT_DEBIT-SSL'];
     /**
      * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
@@ -35,6 +41,13 @@ class UpdateWorldpayment
      * @param SavedTokenFactory $savedTokenFactory
      * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Magento\Framework\Message\ManagerInterface $messageManager
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
+     * @param CreditCardTokenFactory $paymentTokenFactory
+     * @param \Magento\Backend\Model\Session\Quote $session
+     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param EncryptorInterface $encryptor
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
      */
     public function __construct(
@@ -69,6 +82,9 @@ class UpdateWorldpayment
      * Updating Risk gardian
      *
      * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param \Magento\Payment\Model\InfoInterface $paymentObject
+     * @param string|null $tokenId
+     * @param string|null $disclaimerFlag
      */
     public function updateWorldpayPayment(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
@@ -198,6 +214,9 @@ class UpdateWorldpayment
      * Updating Risk gardian
      *
      * @param \Sapient\Worldpay\Model\Response\DirectResponse $directResponse
+     * @param InfoInterface $paymentObject
+     * @param string|null $tokenId
+     * @param string|null $disclaimerFlag
      */
     public function updateWorldpayPaymentForMyAccount(
         \Sapient\Worldpay\Model\Response\DirectResponse $directResponse,
@@ -211,7 +230,11 @@ class UpdateWorldpayment
         $orderCode=$orderStatus['orderCode'];
         $payment=$orderStatus->payment;
         $cardDetail=$payment->paymentMethodDetail->card;
-        $cardNumber=$cardDetail['number'];
+        if (isset($cardDetail)) {
+            $cardNumber= $cardDetail['number'];
+        } else {
+            $cardNumber='';
+        }
         $paymentStatus=$payment->lastEvent;
         $cvcnumber=$payment->CVCResultCode['description'];
         $avsnumber=$payment->AVSResultCode['description'];
@@ -271,9 +294,12 @@ class UpdateWorldpayment
 
     /**
      * Saved token data
-     * @param $tokenElement
-     * @param $payment
-     * @param $merchantCode
+     *
+     * @param array $tokenElement
+     * @param Payment $payment
+     * @param string $merchantCode
+     * @param string|null $disclaimerFlag
+     * @param string|null $orderCode
      */
     public function saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag = null, $orderCode = null)
     {
@@ -346,6 +372,12 @@ class UpdateWorldpayment
         }
     }
 
+    /**
+     * Get vault payment token entity
+     *
+     * @param array $tokenElement
+     * @return PaymentTokenInterface|null
+     */
     protected function getVaultPaymentToken($tokenElement)
     {
         // Check token existing in gateway response
@@ -354,7 +386,11 @@ class UpdateWorldpayment
             return null;
         }
 
-        /** @var PaymentTokenInterface $paymentToken */
+        /**
+         * Payment token interface
+         *
+         * @var PaymentTokenInterface $paymentToken
+         **/
         $paymentToken = $this->paymentTokenFactory->create();
         $paymentToken->setGatewayToken($token);
         $paymentToken->setExpiresAt($this->getExpirationDate($tokenElement));
@@ -368,6 +404,12 @@ class UpdateWorldpayment
         return $paymentToken;
     }
     
+    /**
+     * Set vault payment token
+     *
+     * @param int|string $tokenElement
+     * @return mixed
+     */
     protected function setVaultPaymentTokenMyAccount($tokenElement)
     {
         // Check token existing in gateway response
@@ -376,7 +418,11 @@ class UpdateWorldpayment
             return null;
         }
 
-        /** @var PaymentTokenInterface $paymentToken */
+        /**
+         * Payment token interface
+         *
+         * @var PaymentTokenInterface $paymentToken
+         */
         $paymentToken = $this->paymentTokenFactory->create();
         $paymentToken->setGatewayToken($token);
         $paymentToken->setExpiresAt($this->getExpirationDate($tokenElement));
@@ -394,6 +440,12 @@ class UpdateWorldpayment
         $this->paymentTokenRepository->save($paymentToken);
     }
     
+    /**
+     * Generate public hash
+     *
+     * @param PaymentTokenInterface $paymentToken
+     * @return string
+     */
     protected function generatePublicHash(PaymentTokenInterface $paymentToken)
     {
         $hashKey = $paymentToken->getGatewayToken();
@@ -407,6 +459,12 @@ class UpdateWorldpayment
         return $this->encryptor->getHash($hashKey);
     }
     
+    /**
+     * Get expiration month and year
+     *
+     * @param array $tokenElement
+     * @return string
+     */
     public function getExpirationMonthAndYear($tokenElement)
     {
         $month = $tokenElement[0]->paymentInstrument[0]->cardDetails[0]->expiryDate[0]->date['month'];
@@ -414,11 +472,23 @@ class UpdateWorldpayment
         return $month.'/'.$year;
     }
 
+    /**
+     * Finding the last four digits by given number
+     *
+     * @param string $number
+     * @return string
+     */
     public function getLastFourNumbers($number)
     {
         return substr($number, -4);
     }
 
+    /**
+     * Generates CC expiration date provided in payment.
+     *
+     * @param TokenStateInterface $tokenElement
+     * @return string
+     */
     private function getExpirationDate($tokenElement)
     {
         $dateNode = $tokenElement[0]->tokenDetails->paymentTokenExpiry->date;
@@ -436,12 +506,24 @@ class UpdateWorldpayment
         return $expDate->format('Y-m-d 00:00:00');
     }
 
+    /**
+     * Convert payment token details to JSON
+     *
+     * @param array $details
+     * @return string
+     */
     private function convertDetailsToJSON($details)
     {
         $json = \Zend_Json::encode($details);
         return $json ? $json : '{}';
     }
 
+    /**
+     * Retrive the extension attributes
+     *
+     * @param InfoInterface $payment
+     * @return mixed
+     */
     private function getExtensionAttributes(InfoInterface $payment)
     {
         $extensionAttributes = $payment->getExtensionAttributes();
@@ -452,6 +534,11 @@ class UpdateWorldpayment
         return $extensionAttributes;
     }
     
+    /**
+     * Provides additional information part specific for payment method.
+     *
+     * @param InfoInterface $payment
+     */
     private function getAdditionalInformation(InfoInterface $payment)
     {
         $additionalInformation = $payment->getAdditionalInformation();
@@ -462,6 +549,13 @@ class UpdateWorldpayment
         $payment->setAdditionalInformation($additionalInformation);
     }
     
+    /**
+     * Save token of the given transaction
+     *
+     * @param string $tokenId
+     * @param string $worldpayOrderCode
+     * @return void
+     */
     public function saveTokenDataToTransactions($tokenId, $worldpayOrderCode)
     {
         $orderId = explode('-', $worldpayOrderCode);
@@ -471,7 +565,13 @@ class UpdateWorldpayment
         $transactions->setOriginalOrderIncrementId($orderId[0]);
         $transactions->save();
     }
-    
+
+    /**
+     * Get prime routing enabled
+     *
+     * @param InfoInterface $paymentObject
+     * @return bool
+     */
     private function getPrimeRoutingEnabled(InfoInterface $paymentObject)
     {
         $paymentAditionalInformation = $paymentObject->getAdditionalInformation();
@@ -482,6 +582,12 @@ class UpdateWorldpayment
         }
     }
     
+    /**
+     * Get issue insight response data
+     *
+     * @param Payment $payment
+     * @return array
+     */
     private function getIssuerInsightResponseData($payment)
     {
         $issuerInsightData = [];
@@ -501,6 +607,12 @@ class UpdateWorldpayment
         }
     }
     
+    /**
+     * Get fraud sight data
+     *
+     * @param Payment $payment
+     * @return array
+     */
     private function getFraudsightData($payment)
     {
         $fraudsightData = [];
@@ -519,6 +631,12 @@ class UpdateWorldpayment
         }
     }
     
+    /**
+     * Get reason codes
+     *
+     * @param array $reasoncodes
+     * @return string
+     */
     private function getReasoncodes($reasoncodes)
     {
         $savereasoncode = '';

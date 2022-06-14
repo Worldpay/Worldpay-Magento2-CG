@@ -16,6 +16,7 @@ class ChallengeRedirectResponse extends \Magento\Framework\App\Action\Action
      * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
      * @param \Sapient\Worldpay\Model\Authorisation\ThreeDSecureChallenge $threedcredirectresponse
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,

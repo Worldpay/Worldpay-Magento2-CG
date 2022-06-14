@@ -33,6 +33,11 @@ EOD;
      */
     protected $merchantCode;
 
+    /**
+     * TokenDelete constructor
+     *
+     * @param array $args
+     */
     public function __construct(array $args = [])
     {
         if (isset($args['tokenModel']) && $args['tokenModel'] instanceof \Sapient\WorldPay\Model\SavedToken) {
@@ -50,6 +55,7 @@ EOD;
 
     /**
      * Build xml for processing Request
+     *
      * @return SimpleXMLElement $xml
      */
     public function build()
@@ -65,6 +71,8 @@ EOD;
     }
 
     /**
+     * Add tag modify to xml
+     *
      * @param SimpleXMLElement $xml
      * @return SimpleXMLElement
      */
@@ -74,6 +82,8 @@ EOD;
     }
 
     /**
+     * Add token update and its child tag to xml
+     *
      * @param SimpleXMLElement $modify
      * @return SimpleXMLElement
      */

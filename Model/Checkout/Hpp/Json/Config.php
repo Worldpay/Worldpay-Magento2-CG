@@ -44,10 +44,27 @@ class Config
     /** @var string $country The default country setting for the payment pages. */
     private $country;
 
+    /** @var string $preferredPaymentMethod */
     private $preferredPaymentMethod;
 
+    /** @var UrlConfig $urlConfig */
     private $urlConfig;
 
+    /**
+     * Config constructor
+     *
+     * @param string $type
+     * @param string $iframeIntegrationID
+     * @param string $iframeHelperURL
+     * @param string $iframeBaseURL
+     * @param string $url
+     * @param string $target
+     * @param UrlConfig $urlConfig
+     * @param string $language
+     * @param string $country
+     * @param string|null $preferredPaymentMethod
+     * @param bool $debug
+     */
     public function __construct(
         $type,
         $iframeIntegrationID,
@@ -102,6 +119,8 @@ class Config
     }
 
     /**
+     * Returns the concrete type instance associated with with this placeholder.
+     *
      * @return string
      */
     public function getType()
@@ -110,6 +129,8 @@ class Config
     }
 
     /**
+     * Get iframe integration id
+     *
      * @return string
      */
     public function getIframeIntegrationID()
@@ -118,6 +139,8 @@ class Config
     }
 
     /**
+     * Get iframe helper url
+     *
      * @return string
      */
     public function getIframeHelperURL()
@@ -126,6 +149,8 @@ class Config
     }
 
     /**
+     * Get iframe base url
+     *
      * @return string
      */
     public function getIframeBaseURL()
@@ -134,6 +159,8 @@ class Config
     }
 
     /**
+     * Getter for URL
+     *
      * @return string
      */
     public function getUrl()
@@ -142,6 +169,8 @@ class Config
     }
 
     /**
+     * Returns the set targetpath
+     *
      * @return string
      */
     public function getTarget()
@@ -150,6 +179,8 @@ class Config
     }
 
     /**
+     * Checks if debug mode is enabled.
+     *
      * @return boolean
      */
     public function isDebug()
@@ -158,6 +189,8 @@ class Config
     }
 
     /**
+     * Retrieve HPP language.
+     *
      * @return string
      */
     public function getLanguage()
@@ -166,6 +199,8 @@ class Config
     }
 
     /**
+     * Get the country
+     *
      * @return string
      */
     public function getCountry()
@@ -173,12 +208,19 @@ class Config
         return $this->country;
     }
     
+    /**
+     * Get the config url
+     *
+     * @return string
+     */
     public function getUrlConfig()
     {
         return $this->urlConfig;
     }
 
     /**
+     * Get the preferred payment method
+     *
      * @return string
      */
     public function getPreferredPaymentMethod()

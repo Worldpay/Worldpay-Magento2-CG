@@ -38,7 +38,11 @@ class Redirect extends \Magento\Framework\App\Action\Action
         $this->mageOrder = $mageOrder;
         return parent::__construct($context);
     }
-
+   /**
+    * Execute
+    *
+    * @return string
+    */
     public function execute()
     {
         $redirecturl = $this->checkoutsession->getWpRedirecturl();

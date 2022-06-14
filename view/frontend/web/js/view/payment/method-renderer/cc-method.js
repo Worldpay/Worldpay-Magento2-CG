@@ -585,9 +585,9 @@ define(
                 return true;
             },
             availableCCTypes : function(){
-                    if(this.getIntigrationMode() == 'redirect'){
-                        return ccTypesArr.filter(function(el) { return el.ccValue != "savedcard"; });
-                    }
+                if(this.getIntigrationMode() == 'redirect' && this.getHppIntegrationType() == 'iframe'){
+                    return ccTypesArr.filter(function(el) { return el.ccValue != "savedcard"; });
+                }
                 
                return ccTypesArr;
             },
@@ -1193,7 +1193,12 @@ define(
                     width: 450,
                     autoOpen: false,
                     modal: true,
-                    position: 'center',
+                    position:
+                    {
+                        my: "center",
+                        at: "center",
+                        of: window
+                    },
                     draggable: false,
                     buttons: {
                         Agree: function() { 
@@ -1220,6 +1225,9 @@ define(
             },
             getIntigrationMode: function(){
                 return window.checkoutConfig.payment.ccform.intigrationmode;
+            },
+            getHppIntegrationType: function(){
+                return window.checkoutConfig.payment.ccform.hpp_integration_type;
             }
         });
     }

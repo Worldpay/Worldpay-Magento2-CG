@@ -23,8 +23,18 @@ class PaymentRequestApi extends Template
     public const PAYMENT_SHIM_URL = 'https://storage.googleapis.com/prshim/v1/payment-shim.js';
     public const CSP_HASH = 'sha256-U2Pr6nr/58DuOrqmOIptLSxY0eHWqp8OVjb169SPqqU=';
 
+    /**
+     * @var $instalmentcountries
+     */
     protected $httpHeader;
-
+    /**
+     * Constructor
+     *
+     * @param string $context
+     * @param string $httpHeader
+     * @param array $data
+     */
+    
     public function __construct(
         Template\Context $context,
         \Magento\Framework\HTTP\Header $httpHeader,
@@ -37,10 +47,22 @@ class PaymentRequestApi extends Template
             $data
         );
     }
+    /**
+     * Get User Agent
+     *
+     * @return string
+     */
+
     public function getUserAgent()
     {
         return $this->httpHeader->getHttpUserAgent();
     }
+    /**
+     * Get Payment Api Script
+     *
+     * @return string
+     */
+
     public function getPaymentApiScript()
     {
         $script = '<script src="'.self::PAYMENT_SHIM_URL.'" ';

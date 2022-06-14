@@ -6,6 +6,12 @@ namespace Sapient\Worldpay\Model\Adminhtml\Order;
 
 class Service
 {
+    /**
+     * Service constructor
+     *
+     * @param \Magento\Backend\Model\Session\Quote $adminsessionquote
+     * @param \Magento\Sales\Model\AdminOrder\Create $adminordercreate
+     */
     public function __construct(
         \Magento\Backend\Model\Session\Quote $adminsessionquote,
         \Magento\Sales\Model\AdminOrder\Create $adminordercreate
@@ -14,6 +20,12 @@ class Service
         $this->adminordercreate = $adminordercreate;
     }
 
+    /**
+     * Reactivate admin quote for order
+     *
+     * @param array $worldPayOrder
+     * @return mixed
+     */
     public function reactivateAdminQuoteForOrder($worldPayOrder)
     {
         $mageOrder = $worldPayOrder->getOrder();

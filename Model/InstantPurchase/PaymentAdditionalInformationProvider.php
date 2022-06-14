@@ -10,6 +10,13 @@ use Sapient\Worldpay\Logger\WorldpayLogger;
  */
 class PaymentAdditionalInformationProvider implements PaymentAdditionalInformationProviderInterface
 {
+    /**
+     * Constructor
+     *
+     * @param WorldpayLogger $logger
+     * @param \Magento\Framework\Session\SessionManagerInterface $session
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     */
 
     public function __construct(
         WorldpayLogger $logger,
@@ -22,7 +29,9 @@ class PaymentAdditionalInformationProvider implements PaymentAdditionalInformati
     }
 
     /**
-     * @inheritdoc
+     * Get Additional Information
+     *
+     * @param string $paymentToken
      */
     public function getAdditionalInformation(PaymentTokenInterface $paymentToken): array
     {

@@ -28,28 +28,85 @@ use Magento\Quote\Model\Quote;
 class DataTest extends TestCase
 {
 
+    /**
+     * @var ScopeConfigInterface|MockObject
+     */
     protected $scopeConfigMock;
+    /**
+     * @var WorldpayLogger|MockObject
+     */
     protected $wploggerMock;
+    /**
+     * @var Data
+     */
     protected $dataObj;
+    /**
+     * @var SerializerInterface $serializer
+     */
     protected $serializer;
+    /**
+     * @var /Sapient\Worldpay\Helper\KlarnaCountries
+     */
     protected $klarnaCountries;
+    /**
+     * @var mixed
+     */
     protected $paymentlist;
+    /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
     protected $recurringHelper;
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
     protected $checkoutSession;
+    /**
+     * @var \Magento\Quote\Model\Quote
+     */
     protected $quote;
+    /**
+     * @var string
+     */
     protected $KLARNA_PAYNOW_TYPE = 'KLARNA_PAYNOW';
+    /**
+     * @var array
+     */
     protected $KLARNA_PAYNOW_COUNTRIES = '[SE,DE,NL,AT]';
+    /**
+     * @var string
+     */
     protected $KLARNA_PAYLATER_TYPE = 'KLARNA_PAYLATER';
+    /**
+     * @var array
+     */
     protected $KLARNA_PAYLATER_COUNTRIES = '[SE,NO,FI,DE,NL,AT,CH,GB,DK,US]';
+    /**
+     * @var string
+     */
     protected $KLARNA_SLICEIT_TYPE = 'KLARNA_SLICEIT';
+    /**
+     * @var array
+     */
     protected $KLARNA_SLICEIT_COUNTRIES = '[SE,NO,FI,DE,AT,GB,DK,US]';
+    /**
+     * @var string
+     */
     protected $APM_TYPES = 'CHINAUNIONPAY-SSL,IDEAL-SSL,QIWI-SSL,PAYPAL-EXPRESS,'
             . 'SOFORT-SSL,GIROPAY-SSL,ALIPAY-SSL,SEPA_DIRECT_DEBIT-SSL,'
             . 'KLARNA-SSL,PRZELEWY-SSL,MISTERCASH-SSL,ACH_DIRECT_DEBIT-SSL';
+    /**
+     * @var string
+     */
     protected $ACH_BANK_ACC_TYPES = 'Checking,Savings,Corporate,Corp Savings';
+    /**
+     * @var string
+     */
     protected $MOTO_TYPES = 'AMEX-SSL,VISA-SSL,ECMC-SSL,DISCOVER-SSL,DINERS-SSL,'
             . 'MAESTRO-SSL,AIRPLUS-SSL,AURORE-SSL,CB-SSL,CARTEBLEUE-SSL,'
             . 'DANKORT-SSL,GECAPITAL-SSL,JCB-SSL,LASER-SSL,UATP-SSL';
+    /**
+     * @var array
+     */
     protected $ALL_APM_METHODS = [
             'CHINAUNIONPAY-SSL' => 'Union Pay',
             'IDEAL-SSL' => 'IDEAL',
@@ -66,6 +123,9 @@ class DataTest extends TestCase
             'MISTERCASH-SSL' => 'Mistercash/Bancontact',
             'ACH_DIRECT_DEBIT-SSL' => 'ACH Pay'
         ];
+    /**
+     * @var array
+     */
     protected $ALL_MOTO_METHODS = [
                 'AMEX-SSL' => 'American Express',
                 'VISA-SSL' => 'Visa',
@@ -83,11 +143,23 @@ class DataTest extends TestCase
                 'LASER-SSL' => 'Laser Card',
                 'UATP-SSL' => 'UATP'
         ];
+    /**
+     * @var string
+     */
     protected $GOOGLE_PAYMENT_METHODS = 'AMEX,VISA,DISCOVER,JCB,MASTERCARD';
+    /**
+     * @var string
+     */
     protected $GOOGLE_AUTH_METHODS = 'PAN_ONLY,CRYPTOGRAM_3DS';
+    /**
+     * @var string
+     */
     protected $CC_TYPES = 'AMEX-SSL,VISA-SSL,ECMC-SSL,DISCOVER-SSL,DINERS-SSL,'
             . 'MAESTRO-SSL,AIRPLUS-SSL,AURORE-SSL,CB-SSL,CARTEBLEUE-SSL,'
             . 'DANKORT-SSL,GECAPITAL-SSL,JCB-SSL,LASER-SSL,UATP-SSL';
+    /**
+     * @var array
+     */
     protected $ALL_CC_METHODS = [
                 'AMEX-SSL' => 'American Express',
                 'VISA-SSL' => 'Visa',

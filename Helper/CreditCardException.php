@@ -25,6 +25,8 @@ class CreditCardException
     protected $mathRandom;
     
      /**
+      * Construct
+      *
       * @var SerializerInterface
       */
     private $serializer;
@@ -32,7 +34,9 @@ class CreditCardException
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Math\Random $mathRandom
+     * @param SerializerInterface $serializer
      */
+
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Math\Random $mathRandom,
@@ -191,7 +195,7 @@ class CreditCardException
     /**
      * Retrieve merchant detail value from config
      *
-     * @param int $customerGroupId
+     * @param int $paymenttype
      * @param null|string|bool|int|Store $store
      * @return float|null
      */

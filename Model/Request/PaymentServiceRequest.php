@@ -23,6 +23,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Model\Request $request
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param \Sapient\Worldpay\Helper\GeneralException $exceptionHelper
+     * @param \Magento\Sales\Model\Service\InvoiceService $invoiceService
+     * @param \Sapient\Worldpay\Helper\SendErrorReport $emailErrorReportHelper
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -406,7 +409,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     /**
      * Send Klarna Order request to Worldpay server
      *
-     * @param array redirectOrderParams
+     * @param array $redirectOrderParams
      * @return mixed
      */
     public function redirectKlarnaOrder($redirectOrderParams)
@@ -514,6 +517,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param \Magento\Sales\Model\Order $order
      * @param \Magento\Framework\DataObject $wp
      * @param string $paymentMethodCode
+     * @param array|null $capturedItems
      * @return mixed
      */
     public function capture(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode, $capturedItems = null)
@@ -576,7 +580,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      *
      * @param \Magento\Sales\Model\Order $order
      * @param \Magento\Framework\DataObject $wp
-     * @param string $paymentMethodCode
+     * @param float $grandTotal
+     * @param array|null $capturedItems
      * @return mixed
      */
     public function partialCapture(\Magento\Sales\Model\Order $order, $wp, $grandTotal, $capturedItems = null)
@@ -636,7 +641,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     }
     
     /**
-     * process the request
+     * Process the request
      *
      * @param SimpleXmlElement $xml
      * @param string $username
@@ -651,9 +656,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     }
 
     /**
-     * check error
+     * Check error
      *
      * @param SimpleXmlElement $response
+     * @param string|null $xml
      * @throw Exception
      */
     protected function _checkForError($response, $xml = "")
@@ -691,7 +697,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param \Magento\Framework\DataObject $wp
      * @param string $paymentMethodCode
      * @param float $amount
-     * @param  $reference
+     * @param string|array $reference
      * @return mixed
      */
     public function refund(
@@ -746,6 +752,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param int $storeId
      * @param string $paymentMethodCode
      * @param string $paymenttype
+     * @param string $interactionType
      * @return mixed
      */
     public function inquiry($merchantCode, $orderCode, $storeId, $paymentMethodCode, $paymenttype, $interactionType)
@@ -829,7 +836,6 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             'merchantCode' => $this->worldpayhelper->getMerchantCode($tokenModel->getMethod()),
         ];
 
-        /** @var SimpleXMLElement $simpleXml */
         $this->tokenDeleteXml = new \Sapient\Worldpay\Model\XmlBuilder\TokenDelete($requestParameters);
         $tokenDeleteSimpleXml = $this->tokenDeleteXml->build();
 
@@ -840,6 +846,12 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
     }
 
+    /**
+     * Get Payment options based on country
+     *
+     * @param array $paymentOptionsParams
+     * @return mixed
+     */
     public function paymentOptionsByCountry($paymentOptionsParams)
     {
         $spoofCountryId = '';
@@ -908,7 +920,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      /**
       * Send Apple Pay order XML to Worldpay server
       *
-      * @param array $walletOrderParams
+      * @param array $applePayOrderParams
       * @return mixed
       */
     public function applePayOrder($applePayOrderParams)
@@ -945,7 +957,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     /**
      * Send Samsung Pay order XML to Worldpay server
      *
-     * @param array $walletOrderParams
+     * @param array $samsungPayOrderParams
      * @return mixed
      */
     public function samsungPayOrder($samsungPayOrderParams)
@@ -977,7 +989,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     /**
      * Send chromepay order XML to Worldpay server
      *
-     * @param array $chromepayOrderParams
+     * @param array $chromeOrderParams
      * @return mixed
      */
     public function chromepayOrder($chromeOrderParams)
@@ -1070,7 +1082,6 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             'customer'     => $customer,
             'merchantCode' => $this->worldpayhelper->getMerchantCode($tokenModel->getMethod()),
         ];
-        /** @var SimpleXMLElement $simpleXml */
         $this->tokenInquiryXml = new \Sapient\Worldpay\Model\XmlBuilder\TokenInquiry($requestParameters);
         $tokenInquirySimpleXml = $this->tokenInquiryXml->build();
 
@@ -1081,6 +1092,13 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
     }
     
+    /**
+     * Get country code
+     *
+     * @param string $cntrs
+     * @param int $cntryId
+     * @return mixed
+     */
     private function getCountryCodeSpoof($cntrs, $cntryId)
     {
         if ($cntrs) {
@@ -1095,10 +1113,25 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         return false;
     }
     
+    /**
+     * Get credit card specific exception
+     *
+     * @param string $exceptioncode
+     * @return mixed
+     */
     public function getCreditCardSpecificException($exceptioncode)
     {
         return $this->worldpayhelper->getCreditCardSpecificexception($exceptioncode);
     }
+
+    /**
+     * Void Sale
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Framework\DataObject $wp
+     * @param string $paymentMethodCode
+     * @return mixed
+     */
     public function voidSale(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode)
     {
         $orderCode = $wp->getWorldpayOrderId();
@@ -1136,6 +1169,14 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
     }
     
+    /**
+     * Cancel the order
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Framework\DataObject $wp
+     * @param string $paymentMethodCode
+     * @return mixed
+     */
     public function cancelOrder(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode)
     {
         $orderCode = $wp->getWorldpayOrderId();
@@ -1174,6 +1215,12 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
     }
     
+    /**
+     * Get invoice cart item details
+     *
+     * @param array $capturedItems
+     * @return mixed
+     */
     public function getInvoicedItemsDetails($capturedItems)
     {
         $items = $this->getItemDetails($capturedItems);
@@ -1207,6 +1254,12 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         }
     }
 
+    /**
+     * Get cart item details
+     *
+     * @param array $capturedItems
+     * @return mixed
+     */
     public function getItemDetails($capturedItems)
     {
         $items = [];

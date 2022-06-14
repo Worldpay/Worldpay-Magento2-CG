@@ -8,6 +8,8 @@ namespace Sapient\Worldpay\Model\Config\Source;
 class MotoIntegrationMode implements \Magento\Framework\Option\ArrayInterface
 {
     /**
+     * To Option Array
+     *
      * @return array
      */
     public function toOptionArray()

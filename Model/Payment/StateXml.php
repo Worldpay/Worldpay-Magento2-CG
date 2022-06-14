@@ -7,12 +7,16 @@ namespace Sapient\Worldpay\Model\Payment;
 /**
  * Reading xml
  */
-class StateXml implements \Sapient\Worldpay\Model\Payment\State
+class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
 {
+    /**
+     * @var SimpleXMLElement
+     */
     private $_xml;
     /**
      * Constructor
-     * @param $xml
+     *
+     * @param SimpleXMLElement $xml
      */
     public function __construct($xml)
     {
@@ -21,6 +25,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive ordercode from xml
+     *
      * @return string
      */
     public function getOrderCode()
@@ -31,6 +36,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive ordercode from xml
+     *
      * @return string
      */
     public function getPaymentStatus()
@@ -41,6 +47,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive status node from xml
+     *
      * @return xml
      */
     private function _getStatusNode()
@@ -54,6 +61,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive amount from xml
+     *
      * @return string
      */
     public function getAmount()
@@ -64,6 +72,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive merchant code from xml
+     *
      * @return string
      */
     public function getMerchantCode()
@@ -73,6 +82,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive Risk Score from xml
+     *
      * @return string
      */
     public function getRiskScore()
@@ -83,6 +93,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive payment method from xml
+     *
      * @return string
      */
     public function getPaymentMethod()
@@ -93,6 +104,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive card number from xml
+     *
      * @return string
      */
     public function getCardNumber()
@@ -108,6 +120,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive avs result code from xml
+     *
      * @return string
      */
     public function getAvsResultCode()
@@ -118,6 +131,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive cvc result code from xml
+     *
      * @return string
      */
     public function getCvcResultCode()
@@ -128,6 +142,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive advance risk provider from xml
+     *
      * @return string
      */
     public function getAdvancedRiskProvider()
@@ -138,6 +153,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive advance risk provider id from xml
+     *
      * @return string
      */
     public function getAdvancedRiskProviderId()
@@ -148,6 +164,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive advance risk provider Threshold from xml
+     *
      * @return string
      */
     public function getAdvancedRiskProviderThreshold()
@@ -158,6 +175,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive advance risk provider Score from xml
+     *
      * @return string
      */
     public function getAdvancedRiskProviderScore()
@@ -168,6 +186,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive advance risk provider final score from xml
+     *
      * @return string
      */
     public function getAdvancedRiskProviderFinalScore()
@@ -178,6 +197,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive Payment refusal code from xml
+     *
      * @return string
      */
     public function getPaymentRefusalCode()
@@ -188,6 +208,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive Payment refusal Description from xml
+     *
      * @return string
      */
     public function getPaymentRefusalDescription()
@@ -199,6 +220,8 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive journal reference from xml
+     *
+     * @param string $state
      * @return string
      */
     public function getJournalReference($state)
@@ -220,6 +243,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive full Refund from xml
+     *
      * @return string
      */
     public function getFullRefundAmount()
@@ -227,7 +251,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
         $statusNode = $this->_getStatusNode();
 
         foreach ($statusNode->journal as $journal) {
-            if ($journal['journalType'] == \Sapient\Worldpay\Model\Payment\State::STATUS_SENT_FOR_REFUND) {
+            if ($journal['journalType'] == \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_REFUND) {
                 foreach ($journal->accountTx as $account) {
                     if ($account['accountType'] == "IN_PROCESS_CAPTURED") {
                         $amount = $account->amount['value'];
@@ -244,6 +268,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive Asynchronus Notification from xml
+     *
      * @return string
      */
     public function isAsyncNotification()
@@ -253,6 +278,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Tells if this response is a direct reply xml sent from WP server
+     *
      * @return bool
      */
     public function isDirectReply()
@@ -262,6 +288,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive AAV Addewss Result Code from xml
+     *
      * @return string
      */
     public function getAAVAddressResultCode()
@@ -272,6 +299,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive AAV Postcode Result Code from xml
+     *
      * @return string
      */
     public function getAAVPostcodeResultCode()
@@ -282,6 +310,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive AAV card holder Name Result Code from xml
+     *
      * @return string
      */
     public function getAAVCardholderNameResultCode()
@@ -292,6 +321,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive AAV Telephone Result Code from xml
+     *
      * @return string
      */
     public function getAAVTelephoneResultCode()
@@ -302,6 +332,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
 
     /**
      * Retrive AAV Email Result Code from xml
+     *
      * @return string
      */
     public function getAAVEmailResultCode()
@@ -310,20 +341,32 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
         return (string) $statusNode->payment->AAVEmailResultCode['description'];
     }
 
-    /*
-    *Retrieve currency code from xml
-    */
+    /**
+     * Retrieve currency code from xml
+     *
+     * @return string
+     */
     public function getCurrency()
     {
         $statusNode = $this->_getStatusNode();
         return (string) $statusNode->payment->amount['currencyCode'];
     }
     
+    /**
+     * Retrieve network used from xml
+     *
+     * @return string
+     */
     public function getNetworkUsed()
     {
         $statusNode = $this->_getStatusNode();
         return (string) $statusNode->payment->primeRoutingResponse->networkUsed;
     }
+    /**
+     * Retrieve source type from xml
+     *
+     * @return string
+     */
     public function getSourceType()
     {
         $statusNode = $this->_getStatusNode();
@@ -331,6 +374,11 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
             return (string) $statusNode->payment->enhancedAuthResponse->fundingSource->sourceType;
         }
     }
+    /**
+     * Retrieve available balance from xml
+     *
+     * @return string
+     */
     public function getAvailableBalance()
     {
         $statusNode = $this->_getStatusNode();
@@ -338,6 +386,11 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
             return (string) $statusNode->payment->enhancedAuthResponse->fundingSource->availableBalance;
         }
     }
+    /**
+     * Retrieve prepaid card type from xml
+     *
+     * @return string
+     */
     public function getPrepaidCardType()
     {
         $statusNode = $this->_getStatusNode();
@@ -345,6 +398,11 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
             return (string) $statusNode->payment->enhancedAuthResponse->fundingSource->prepaidCardType;
         }
     }
+    /**
+     * Retrieve status node from xml
+     *
+     * @return string
+     */
     public function getReloadable()
     {
         $statusNode = $this->_getStatusNode();
@@ -352,31 +410,61 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
             return (string) $statusNode->payment->enhancedAuthResponse->fundingSource->reloadable;
         }
     }
+    /**
+     * Retrieve card product type from xml
+     *
+     * @return string
+     */
     public function getCardProductType()
     {
         $statusNode = $this->_getStatusNode();
         return (string) $statusNode->payment->enhancedAuthResponse->cardProductType;
     }
+    /**
+     * Retrieve affulence from xml
+     *
+     * @return string
+     */
     public function getAffluence()
     {
         $statusNode = $this->_getStatusNode();
         return (string) $statusNode->payment->enhancedAuthResponse->affluence;
     }
+    /**
+     * Retrieve account range id from xml
+     *
+     * @return string
+     */
     public function getAccountRangeId()
     {
         $statusNode = $this->_getStatusNode();
         return (string) $statusNode->payment->enhancedAuthResponse->accountRangeId;
     }
+    /**
+     * Retrieve issuer country from xml
+     *
+     * @return string
+     */
     public function getIssuerCountry()
     {
         $statusNode = $this->_getStatusNode();
         return (string) $statusNode->payment->enhancedAuthResponse->issuerCountry;
     }
+    /**
+     * Retrieve virtual account number from xml
+     *
+     * @return string
+     */
     public function getVirtualAccountNumber()
     {
         $statusNode = $this->_getStatusNode();
         return (string) $statusNode->payment->enhancedAuthResponse->virtualAccountNumber;
     }
+    /**
+     * Retrieve fraud sight message from xml
+     *
+     * @return string
+     */
     public function getFraudsightMessage()
     {
         if (strtoupper($this->getAdvancedRiskProvider()) === 'FRAUDSIGHT') {
@@ -384,6 +472,11 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
             return (string) $statusNode->payment->riskScore['message'];
         }
     }
+    /**
+     * Retrieve fraud sight score from xml
+     *
+     * @return string
+     */
     public function getFraudsightScore()
     {
         $statusNode = $this->_getStatusNode();
@@ -391,6 +484,11 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\State
             return (string) $statusNode->payment->FraudSight['score'];
         }
     }
+    /**
+     * Retrieve fraud sight reason code from xml
+     *
+     * @return string
+     */
     public function getFraudsightReasonCode()
     {
         $statusNode = $this->_getStatusNode();

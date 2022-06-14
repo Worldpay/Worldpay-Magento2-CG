@@ -9,9 +9,11 @@ namespace Sapient\Worldpay\Model\Config\Source;
 class InstalmentCountryType extends \Magento\Framework\App\Config\Value
 {
 
-    /**
-     * @return array
-     */
+  /**
+   * ToOption Array
+   *
+   * @return array
+   */
     public function toOptionArray()
     {
         return

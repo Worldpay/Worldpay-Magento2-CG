@@ -20,6 +20,10 @@ use Sapient\Worldpay\Controller\Redirectresult\Cancel;
 class CancelTest extends TestCase
 {
 
+    /**
+     *
+     * @var Cancel
+     */
     protected $cancelObj;
 
     protected function setUp(): void

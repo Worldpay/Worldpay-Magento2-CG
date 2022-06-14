@@ -7,20 +7,36 @@ namespace Sapient\Worldpay\Model\Payment;
 class Service
 {
 
-    /** @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest */
+    /**
+     * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+     */
     protected $_paymentServiceRequest;
+    /**
+     * @var _adminhtmlResponse
+     */
     protected $_adminhtmlResponse;
-    /** @var \Sapient\Worldpay\Model\Payment\Update\Factory */
+    /**
+     * @var _paymentUpdateFactory
+     */
     protected $_paymentUpdateFactory;
-    /** @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest */
+    /**
+     * @var _redirectResponse
+     */
     protected $_redirectResponse;
+    /**
+     * @var _paymentModel
+     */
     protected $_paymentModel;
+    /**
+     * @var _helper
+     */
     protected $_helper;
     /**
      * Constructor
-     * @param \Sapient\Worldpay\Model\Payment\State $paymentState
-     * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
-     * @param \Sapient\Worldpay\Helper\Data $configHelper
+     *
+     * @param \Sapient\Worldpay\Model\Payment\Update\Factory $paymentupdatefactory
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Model\Worldpayment $worldpayPayment
      */
     public function __construct(
         \Sapient\Worldpay\Model\Payment\Update\Factory $paymentupdatefactory,
@@ -31,13 +47,22 @@ class Service
         $this->paymentservicerequest = $paymentservicerequest;
         $this->worldpayPayment = $worldpayPayment;
     }
-
+    /**
+     * Create Payment Update From WorldPay Xml
+     *
+     * @param string $xml
+     * @return array
+     */
     public function createPaymentUpdateFromWorldPayXml($xml)
     {
         return $this->_getPaymentUpdateFactory()
             ->create(new \Sapient\Worldpay\Model\Payment\StateXml($xml));
     }
-
+    /**
+     * Get Payment Update Factory
+     *
+     * @return array
+     */
     protected function _getPaymentUpdateFactory()
     {
         if ($this->_paymentUpdateFactory === null) {
@@ -46,12 +71,23 @@ class Service
 
         return $this->_paymentUpdateFactory;
     }
-
-    public function createPaymentUpdateFromWorldPayResponse(\Sapient\Worldpay\Model\Payment\State $state)
+    /**
+     * Create Payment Update From WorldPay Response
+     *
+     * @param Sapient\Worldpay\Model\Payment\StateInterface $state
+     * @return array
+     */
+    public function createPaymentUpdateFromWorldPayResponse(\Sapient\Worldpay\Model\Payment\StateInterface $state)
     {
         return $this->_getPaymentUpdateFactory()
             ->create($state);
     }
+    /**
+     * Get Payment Update Xml For Notification
+     *
+     * @param string $xml
+     * @return array
+     */
     public function getPaymentUpdateXmlForNotification($xml)
     {
         $paymentNotifyService = new \SimpleXmlElement($xml);
@@ -82,7 +118,12 @@ class Service
             }
         }
     }
-
+    /**
+     * Get Payment Update Xml For Order
+     *
+     * @param Sapient\Worldpay\Model\Order $order
+     * @return array
+     */
     public function getPaymentUpdateXmlForOrder(\Sapient\Worldpay\Model\Order $order)
     {
         $worldPayPayment = $order->getWorldPayPayment();
@@ -127,7 +168,12 @@ class Service
         }
         return simplexml_load_string($rawXml);
     }
-
+    /**
+     * Set Payment Global Payment By Payment Update
+     *
+     * @param string $paymentUpdate
+     * @return array
+     */
     public function setGlobalPaymentByPaymentUpdate($paymentUpdate)
     {
         $this->worldpayPayment->loadByWorldpayOrderId($paymentUpdate->getTargetOrderCode());

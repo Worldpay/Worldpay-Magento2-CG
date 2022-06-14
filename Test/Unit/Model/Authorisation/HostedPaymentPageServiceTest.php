@@ -27,9 +27,21 @@ class HostedPaymentPageServiceTest extends TestCase
      * @var HostedPaymentPageService
      */
     protected $hppObj;
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
     protected $checkoutsession;
+    /**
+     * @var \Sapient\Worldpay\Model\Mapping\Service
+     */
     protected $mappingservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+     */
     protected $paymentservicerequest;
+    /**
+     * @var \Sapient\Worldpay\Helper\Registry
+     */
     protected $registryhelper;
 
     protected function setUp(): void

@@ -40,102 +40,88 @@ use Laminas\Mime\PartFactory;
 class EmailTransportBuilder extends \Magento\Framework\Mail\Template\TransportBuilder
 {
     /**
-     * Template Identifier
-     *
-     * @var string
+     * @var templateIdentifier
      */
     protected $templateIdentifier;
 
     /**
-     * Template Model
-     *
-     * @var string
+     * @var templateModel
      */
     protected $templateModel;
 
     /**
-     * Template Variables
-     *
-     * @var array
+     * @var templateVars
      */
     protected $templateVars;
 
     /**
-     * Template Options
-     *
-     * @var array
+     * @var templateOptions
      */
     protected $templateOptions;
 
     /**
-     * Mail Transport
-     *
-     * @var TransportInterface
+     * @var transport
      */
     protected $transport;
 
     /**
-     * Template Factory
-     *
-     * @var FactoryInterface
+     * @var templateFactory
      */
     protected $templateFactory;
 
     /**
-     * Object Manager
-     *
-     * @var ObjectManagerInterface
+     * @var objectManager
      */
     protected $objectManager;
 
     /**
-     * Message
-     *
-     * @var MessageInterface
+     * @var message
      */
     protected $message;
 
     /**
-     * Sender resolver
-     *
-     * @var SenderResolverInterface
+     * @var _senderResolver
      */
     protected $_senderResolver;
 
     /**
-     * @var TransportInterfaceFactory
+     * @var mailTransportFactory
      */
     protected $mailTransportFactory;
 
     /**
      * Param that used for storing all message data until it will be used
      *
-     * @var array
+     * @var messageData
      */
     private $messageData = [];
 
     /**
-     * @var EmailMessageInterfaceFactory
+     * @var emailMessageInterfaceFactory
      */
     private $emailMessageInterfaceFactory;
 
     /**
-     * @var MimeMessageInterfaceFactory
+     * @var mimeMessageInterfaceFactory
      */
     private $mimeMessageInterfaceFactory;
 
     /**
-     * @var MimePartInterfaceFactory
+     * @var mimePartInterfaceFactory
      */
     private $mimePartInterfaceFactory;
 
     /**
-     * @var AddressConverter|null
+     * @var addressConverter
      */
     private $addressConverter;
-
+    /**
+     * @var attachments
+     */
     protected $attachments = [];
-
+    /**
+     * @var partFactory
+     */
     protected $partFactory;
 
     /**
@@ -151,8 +137,7 @@ class EmailTransportBuilder extends \Magento\Framework\Mail\Template\TransportBu
      * @param MimeMessageInterfaceFactory|null $mimeMessageInterfaceFactory
      * @param MimePartInterfaceFactory|null $mimePartInterfaceFactory
      * @param addressConverter|null $addressConverter
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     * @param \Laminas\Mime\PartFactory $partFactory
      */
     public function __construct(
         FactoryInterface $templateFactory,
@@ -464,6 +449,8 @@ class EmailTransportBuilder extends \Magento\Framework\Mail\Template\TransportBu
     }
 
      /**
+      * Add Attachment
+      *
       * @param string|null $content
       * @param string|null $fileName
       * @param string|null $fileType

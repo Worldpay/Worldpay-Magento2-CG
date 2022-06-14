@@ -9,7 +9,13 @@ namespace Sapient\Worldpay\Model\XmlBuilder\Config;
  */
 class ThreeDSecure
 {
+    /**
+     * @var bool
+     */
     private $isDynamic3D = false;
+    /**
+     * @var bool
+     */
     private $is3DSecure = false;
 
     /**
@@ -23,6 +29,8 @@ class ThreeDSecure
     }
 
     /**
+     * Check if dynamic 3d is enabled?
+     *
      * @return bool
      */
     public function isDynamic3DEnabled()
@@ -31,6 +39,8 @@ class ThreeDSecure
     }
 
     /**
+     * Check if 3ds is enabled?
+     *
      * @return bool
      */
     public function is3DSecureCheckEnabled()

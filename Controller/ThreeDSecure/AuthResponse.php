@@ -10,11 +10,20 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
 {
 
     /**
-     * @var CreditCardException
+     * @var helper
      */
     protected $helper;
+    /**
+     * @var request
+     */
     protected $request;
+    /**
+     * @var _cookieManager
+     */
     protected $_cookieManager;
+    /**
+     * @var cookieMetadataFactory
+     */
     protected $cookieMetadataFactory;
     /**
      * Constructor
@@ -26,6 +35,12 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
      * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
      * @param \Sapient\Worldpay\Model\Authorisation\ThreeDSecureService $threedsredirectresponse
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory
+     * @param CreditCardException $helper
+     * @param \Magento\Framework\App\Request\Http $request
+     * @param \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager
+     * @param \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory $cookieMetadataFactory
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -59,8 +74,7 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * Accepts callback from worldpay's 3D Secure page. If payment has been
-     * authorised, update order and redirect to the checkout success page.
+     * Accepts callback from worldpay's 3D Secure page authorised
      */
     public function execute()
     {
@@ -167,7 +181,12 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
             $this->getResponse()->setRedirect($redirectUrl);
         }
     }
-    
+    /**
+     * ShouldSkip SameSiteNone
+     *
+     * @param string $directOrderParams
+     * @return false;
+     */
     private function shouldSkipSameSiteNone($directOrderParams)
     {
         if (isset($directOrderParams)) {

@@ -23,6 +23,10 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
      * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
      * @param \Sapient\Worldpay\Model\Authorisation\ThreeDSecureChallenge $threedcredirectresponse
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Framework\Session\SessionManagerInterface $session
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory
+     * @param CreditCardException $helper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -52,8 +56,7 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * Accepts callback from worldpay's 3DS2 Secure page. If payment has been
-     * authorised, update order and redirect to the checkout success page.
+     * Accepts callback from worldpay's 3DS2 Secure page
      */
     public function execute()
     {

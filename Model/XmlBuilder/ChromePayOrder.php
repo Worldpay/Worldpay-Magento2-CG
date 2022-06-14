@@ -21,19 +21,58 @@ class ChromePayOrder
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
 
+    /**
+     * @var string
+     */
     private $merchantCode;
+    /**
+     * @var string
+     */
     private $orderCode;
+    /**
+     * @var string
+     */
     private $orderDescription;
+    /**
+     * @var string
+     */
     private $currencyCode;
+    /**
+     * @var float
+     */
     private $amount;
+    /**
+     * @var array
+     */
     protected $paymentDetails;
     //private $cardAddress;
+    /**
+     * @var string
+     */
     protected $shopperEmail;
+    /**
+     * @var string
+     */
     protected $acceptHeader;
+    /**
+     * @var string
+     */
     protected $userAgentHeader;
+    /**
+     * @var array
+     */
     private $shippingAddress;
+    /**
+     * @var array
+     */
     private $billingAddress;
+    /**
+     * @var bool|null
+     */
     private $echoData = null;
+    /**
+     * @var array|string
+     */
     private $exponent;
 
     /**
@@ -49,14 +88,12 @@ EOD;
      * @param string $orderDescription
      * @param string $currencyCode
      * @param float $amount
+     * @param string $paymentType
      * @param array $paymentDetails
-     * @param array $cardAddress
-     * @param string $shopperEmail
-     * @param string $acceptHeader
-     * @param string $userAgentHeader
      * @param string $shippingAddress
      * @param float $billingAddress
-     * @param string $shopperId
+     * @param string $shopperEmail
+     * @param array|string $exponent
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -334,7 +371,6 @@ EOD;
      *
      * @param SimpleXMLElement $parentElement
      * @param string $firstName
-     * @param string $lastName
      * @param string $street
      * @param string $postalCode
      * @param string $city
@@ -364,6 +400,8 @@ EOD;
     }
 
     /**
+     * Add cdata to xml
+     *
      * @param SimpleXMLElement $element
      * @param string $content
      */
@@ -375,6 +413,8 @@ EOD;
     }
 
     /**
+     * Returns the rounded value of num to specified precision
+     *
      * @param float $amount
      * @return int
      */

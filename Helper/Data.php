@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @copyright 2017 Sapient
+ */
 namespace Sapient\Worldpay\Helper;
 
 use Sapient\Worldpay\Model\Config\Source\HppIntegration as HPPI;
@@ -8,19 +10,57 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
-
+    /**
+     * @var _scopeConfig
+     */
     protected $_scopeConfig;
+    /**
+     * @var wplogger
+     */
     protected $wplogger;
     /**
-     * @var SerializerInterface
+     * @var serializer
      */
     private $serializer;
-
+    /**
+     * @var _storeManager
+     */
     protected $_storeManager;
+    /**
+     * @var _filesystem
+     */
     protected $_filesystem;
-
+    /**
+     * @var MERCHANT_CONFIG
+     */
     public const MERCHANT_CONFIG = 'worldpay/merchant_config/';
+    /**
+     * @var INTEGRATION_MODE
+     */
     public const INTEGRATION_MODE = 'worldpay/cc_config/integration_mode';
+
+    /**
+     * Constructor
+     *
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Framework\Filesystem $filesystem
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Locale\CurrencyInterface $localeCurrency
+     * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist
+     * @param \Sapient\Worldpay\Helper\Merchantprofile $merchantprofile
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Sales\Model\OrderFactory $orderFactory
+     * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
+     * @param \Sapient\Worldpay\Helper\ExtendedResponseCodes $extendedResponseCodes
+     * @param \Sapient\Worldpay\Helper\Instalmentconfig $instalmentconfig
+     * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
+     * @param \Sapient\Worldpay\Model\SavedTokenFactory $savecard
+     * @param \Magento\Sales\Model\Order\ItemFactory $itemFactory
+     * @param \Sapient\Worldpay\Helper\Currencyexponents $currencyexponents
+     * @param SerializerInterface $serializer
+     * @param \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries
+     */
 
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -61,7 +101,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->serializer = $serializer;
         $this->klarnaCountries = $klarnaCountries;
     }
-
+    /**
+     * Is WorldPay Enable or not
+     *
+     * @return bool
+     */
     public function isWorldPayEnable()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -69,7 +113,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Test mode and live mode
+     *
+     * @return string
+     */
     public function getEnvironmentMode()
     {
         return $this->_scopeConfig->getValue(
@@ -77,7 +125,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Test mode url
+     *
+     * @return string
+     */
     public function getTestUrl()
     {
         return $this->_scopeConfig->getValue(
@@ -85,7 +137,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Live mode url
+     *
+     * @return string
+     */
     public function getLiveUrl()
     {
         return $this->_scopeConfig->getValue(
@@ -93,7 +149,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get MerchantCode
+     *
+     * @param string $paymentType
+     * @return string
+     */
     public function getMerchantCode($paymentType)
     {
         if ($paymentType) {
@@ -108,7 +169,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Xml Username
+     *
+     * @param string $paymentType
+     * @return string
+     */
     public function getXmlUsername($paymentType)
     {
         if ($paymentType) {
@@ -123,7 +189,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Xml Password
+     *
+     * @param string $paymentType
+     * @return string
+     */
     public function getXmlPassword($paymentType)
     {
         if ($paymentType) {
@@ -138,7 +209,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Check isMacEnabled
+     *
+     * @return string
+     */
     public function isMacEnabled()
     {
         return $this->_scopeConfig->getValue(
@@ -146,7 +221,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Mac Secret
+     *
+     * @return string
+     */
     public function getMacSecret()
     {
         return $this->_scopeConfig->getValue(
@@ -154,7 +233,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Check Dynamic3DEnabled
+     *
+     * @return string
+     */
     public function isDynamic3DEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -162,7 +245,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Check 3DSecureEnabled
+     *
+     * @return string
+     */
     public function is3DSecureEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -170,11 +257,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Check 3dsEnabled
+     *
+     * @return string
+     */
+
     public function is3dsEnabled()
     {
         return $this->isDynamic3DEnabled() || $this->is3DSecureEnabled();
     }
-
+    /**
+     * Check LoggerEnabled
+     *
+     * @return string
+     */
     public function isLoggerEnable()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -182,7 +279,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Check MotoEnabled
+     *
+     * @return string
+     */
     public function isMotoEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -190,7 +291,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Check Credit Card Enabled
+     *
+     * @return string
+     */
     public function isCreditCardEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -198,7 +303,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Check CCTitle
+     *
+     * @return string
+     */
     public function getCcTitle()
     {
         return $this->_scopeConfig->getValue(
@@ -206,7 +315,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Check CCType
+     *
+     * @param string $paymentconfig
+     * @return string
+     */
     public function getCcTypes($paymentconfig = "cc_config")
     {
         $allCcMethods = [
@@ -226,7 +340,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $activeMethods;
     }
-
+   /**
+    * Get ApmTypes
+    *
+    * @param string $code
+    * @return string
+    */
     public function getApmTypes($code)
     {
         $allApmMethods = [
@@ -257,7 +376,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $activeMethods;
     }
-
+   /**
+    * Get Wallets Types
+    *
+    * @param string $code
+    * @return string
+    */
     public function getWalletsTypes($code)
     {
         $activeMethods = [];
@@ -272,7 +396,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $activeMethods;
     }
-
+   /**
+    * Get Cse PublicKey
+    *
+    * @return string
+    */
     public function getCsePublicKey()
     {
         return trim($this->_scopeConfig->getValue(
@@ -280,7 +408,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         ));
     }
-
+   /**
+    * Check Cse Enabled
+    *
+    * @return string
+    */
     public function isCseEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -288,7 +420,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+   /**
+    * Check CcRequireCVC
+    *
+    * @return string
+    */
     public function isCcRequireCVC()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -296,7 +432,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+   /**
+    * Get Cc Integration Mode
+    *
+    * @return string
+    */
     public function getCcIntegrationMode()
     {
         return $this->_scopeConfig->getValue(
@@ -304,7 +444,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+   /**
+    * Get Save Card
+    *
+    * @return string
+    */
     public function getSaveCard()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -312,6 +456,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get Tokenization
+     *
+     * @return string
+     */
 
     public function getTokenization()
     {
@@ -320,6 +469,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get Stored Credentials
+     *
+     * @return string
+     */
 
     public function getStoredCredentials()
     {
@@ -328,7 +482,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Check ApmEnabled
+     *
+     * @return string
+     */
     public function isApmEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -336,6 +494,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get Apm Title
+     *
+     * @return string
+     */
 
     public function getApmTitle()
     {
@@ -344,7 +507,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Apm Payment Methods
+     *
+     * @return string
+     */
     public function getApmPaymentMethods()
     {
         return $this->_scopeConfig->getValue(
@@ -352,6 +519,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get Payment Method Selection
+     *
+     * @return string
+     */
 
     public function getPaymentMethodSelection()
     {
@@ -360,6 +532,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get Auto Capture Enabled
+     *
+     * @param Int $storeId
+     * @return string
+     */
 
     public function isAutoCaptureEnabled($storeId)
     {
@@ -368,6 +546,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get Integration ModelBy Payment Method Code
+     *
+     * @param string $paymentMethodCode
+     * @param Int $storeId
+     * @return string
+     */
 
     public function getIntegrationModelByPaymentMethodCode($paymentMethodCode, $storeId)
     {
@@ -382,6 +567,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return 'redirect';
         }
     }
+    /**
+     * Check IframeIntegration
+     *
+     * @param Int $storeId
+     * @return string
+     */
 
     public function isIframeIntegration($storeId = null)
     {
@@ -390,7 +581,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         ) == HPPI::OPTION_VALUE_IFRAME;
     }
-
+    /**
+     * Check Redirect Integration Mode
+     *
+     * @param Int $storeId
+     * @return string
+     */
     public function getRedirectIntegrationMode($storeId = null)
     {
         return $this->_scopeConfig->getValue(
@@ -398,6 +594,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get Custom Payment Enabled
+     *
+     * @param Int $storeId
+     * @return string
+     */
 
     public function getCustomPaymentEnabled($storeId = null)
     {
@@ -406,6 +608,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get InstallationId
+     *
+     * @param string $paymentType
+     * @return string
+     */
 
     public function getInstallationId($paymentType = null)
     {
@@ -422,7 +630,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get InstallationId
+     *
+     * @param int $storeId
+     * @return string
+     */
     public function getHideAddress($storeId = null)
     {
         return $this->_scopeConfig->getValue(
@@ -430,6 +643,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get Order Sync Interval
+     *
+     * @return string
+     */
 
     public function getOrderSyncInterval()
     {
@@ -438,6 +656,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get Sync Order Status
+     *
+     * @return string
+     */
 
     public function getSyncOrderStatus()
     {
@@ -446,6 +669,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Get Dynamic Integration Type
+     *
+     * @param string $paymentMethodCode
+     * @return string
+     */
 
     public function getDynamicIntegrationType($paymentMethodCode)
     {
@@ -456,6 +685,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 return 'ECOMMERCE';
         }
     }
+    /**
+     * Get Error Message
+     *
+     * @param string $message
+     * @param string $orderid
+     * @return string
+     */
 
     public function updateErrorMessage($message, $orderid)
     {
@@ -486,7 +722,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $message;
     }
-
+    /**
+     * Get Time Limit Of Abandoned Orders
+     *
+     * @param string $paymentMethodCode
+     * @return string
+     */
     public function getTimeLimitOfAbandonedOrders($paymentMethodCode)
     {
         $path = sprintf(
@@ -495,7 +736,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
         return $this->_scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
-
+    /**
+     * Get Time Limit Of Abandoned Orders
+     *
+     * @param int $storeId
+     * @return string
+     */
     public function getDefaultCountry($storeId = null)
     {
         return $this->_scopeConfig->getValue(
@@ -503,7 +749,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Locale Default
+     *
+     * @param int $storeId
+     * @return string
+     */
     public function getLocaleDefault($storeId = null)
     {
         return $this->_scopeConfig->getValue(
@@ -511,22 +762,44 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Currency Symbol
+     *
+     * @param string $currencycode
+     * @return string
+     */
     public function getCurrencySymbol($currencycode)
     {
         return $this->localecurrency->getCurrency($currencycode)->getSymbol();
     }
+    /**
+     * Get Quantity Unit
+     *
+     * @param string $product
+     * @return string
+     */
 
     public function getQuantityUnit($product)
     {
         return 'product';
     }
+    /**
+     * Get Quantity Unit
+     *
+     * @param string $code
+     * @param string $type
+     * @return string
+     */
 
     public function checkStopAutoInvoice($code, $type)
     {
         return $this->paymentlist->checkStopAutoInvoice($code, $type);
     }
-
+    /**
+     * Check instant Purchase Enabled
+     *
+     * @return string
+     */
     public function instantPurchaseEnabled()
     {
         $instantPurchaseEnabled = false;
@@ -542,22 +815,39 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $instantPurchaseEnabled;
     }
-
+    /**
+     * Get Worldpay AuthCookie
+     *
+     * @return string
+     */
     public function getWorldpayAuthCookie()
     {
         return $this->_checkoutSession->getWorldpayAuthCookie();
     }
-
+    /**
+     * Get Worldpay AuthCookie
+     *
+     * @param string $value
+     * @return string
+     */
     public function setWorldpayAuthCookie($value)
     {
         return $this->_checkoutSession->setWorldpayAuthCookie($value);
     }
-
+    /**
+     * Get Worldpay isThreeDSRequest
+     *
+     * @return string
+     */
     public function isThreeDSRequest()
     {
         return $this->_checkoutSession->getIs3DSRequest();
     }
-
+    /**
+     * Get OrderDescription
+     *
+     * @return string
+     */
     public function getOrderDescription()
     {
         return $this->_scopeConfig->getValue(
@@ -565,7 +855,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get MotoTitle
+     *
+     * @return string
+     */
     public function getMotoTitle()
     {
         return $this->_scopeConfig->getValue(
@@ -574,6 +868,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
+    /**
+     * Get PaymentTitleForOrders
+     *
+     * @param array $order
+     * @param string $paymentCode
+     * @param object $worldpaypayment
+     * @return string
+     */
     public function getPaymentTitleForOrders(
         $order,
         $paymentCode,
@@ -599,12 +901,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return $this->getMotoTitle() . "\n" . $item->getPaymentType();
         }
     }
-
+    /**
+     * Get Order By OrderId
+     *
+     * @param string $orderId
+     * @return string
+     */
     public function getOrderByOrderId($orderId)
     {
         return $this->orderFactory->create()->load($orderId);
     }
-
+    /**
+     * Get Wallets Enabled
+     *
+     * @return string
+     */
     public function isWalletsEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -612,7 +923,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Wallets Title
+     *
+     * @return string
+     */
     public function getWalletsTitle()
     {
         return $this->_scopeConfig->getValue(
@@ -620,7 +935,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+    /**
+     * Get Samsung ServiceId
+     *
+     * @return string
+     */
     public function getSamsungServiceId()
     {
         return $this->_scopeConfig->getValue(
@@ -628,7 +947,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Google Pay Enable
+     *
+     * @return string
+     */
     public function isGooglePayEnable()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -636,7 +959,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get google Payment Methods
+     *
+     * @return string
+     */
     public function googlePaymentMethods()
     {
         return $this->_scopeConfig->getValue(
@@ -644,7 +971,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get google Auth Methods
+     *
+     * @return string
+     */
     public function googleAuthMethods()
     {
         return $this->_scopeConfig->getValue(
@@ -652,7 +983,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get google Gateway Merchantname
+     *
+     * @return string
+     */
     public function googleGatewayMerchantname()
     {
         return $this->_scopeConfig->getValue(
@@ -660,7 +995,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get google Gateway Merchantid
+     *
+     * @return string
+     */
     public function googleGatewayMerchantid()
     {
         return $this->_scopeConfig->getValue(
@@ -668,7 +1007,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get google Merchant name
+     *
+     * @return string
+     */
     public function googleMerchantname()
     {
         return $this->_scopeConfig->getValue(
@@ -676,7 +1019,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get google Merchantid
+     *
+     * @return string
+     */
     public function googleMerchantid()
     {
         return $this->_scopeConfig->getValue(
@@ -684,7 +1031,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Check ApplePay Enable
+     *
+     * @return string
+     */
     public function isApplePayEnable()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -692,7 +1043,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get apple MerchantId
+     *
+     * @return string
+     */
     public function appleMerchantId()
     {
         return $this->_scopeConfig->getValue(
@@ -700,7 +1055,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get is Samsung Pay Enable
+     *
+     * @return string
+     */
     public function isSamsungPayEnable()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -708,7 +1067,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get is Dynamic 3DS2 Enabled
+     *
+     * @return string
+     */
     public function isDynamic3DS2Enabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -716,7 +1079,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Jwt Event Url
+     *
+     * @return string
+     */
     public function getJwtEventUrl()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -727,7 +1094,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Get Jwt Api Key
+     *
+     * @return string
+     */
     public function isJwtApiKey()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -738,7 +1109,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Get Jwt Is suer
+     *
+     * @return string
+     */
     public function isJwtIssuer()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -750,6 +1125,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return (bool) false;
     }
 
+    /**
+     * Get Organisational Unit Id
+     *
+     * @return string
+     */
     public function isOrganisationalUnitId()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -760,7 +1140,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Get Test Ddc Url
+     *
+     * @return string
+     */
     public function isTestDdcUrl()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -771,7 +1155,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Get Production Ddc Url
+     *
+     * @return string
+     */
     public function isProductionDdcUrl()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -782,7 +1170,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Check Risk Data
+     *
+     * @return string
+     */
     public function isRiskData()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -793,7 +1185,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Check is Authentication Method
+     *
+     * @return string
+     */
     public function isAuthenticationMethod()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -804,7 +1200,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Check is Test Challenge Url
+     *
+     * @return string
+     */
     public function isTestChallengeUrl()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -815,7 +1215,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Production Challenge Url
+     *
+     * @return string
+     */
     public function isProductionChallengeUrl()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -827,6 +1231,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return (bool) false;
     }
 
+    /**
+     * Get Challenge Preference
+     *
+     * @return string
+     */
     public function isChallengePreference()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -837,7 +1246,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Get Challenge Window Size
+     *
+     * @return string
+     */
     public function getChallengeWindowSize()
     {
         if ($this->isDynamic3DS2Enabled()) {
@@ -848,7 +1261,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Get Disclaime rMessage
+     *
+     * @return string
+     */
     public function getDisclaimerMessage()
     {
         if ($this->getStoredCredentials()) {
@@ -857,7 +1274,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Check Disclaimer Message Enable
+     *
+     * @return string
+     */
     public function isDisclaimerMessageEnable()
     {
         if ($this->getStoredCredentials()) {
@@ -866,7 +1287,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Get Disclaimer Message Mandatory
+     *
+     * @return string
+     */
     public function isDisclaimerMessageMandatory()
     {
         if ($this->getStoredCredentials()) {
@@ -875,7 +1300,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return (bool) false;
     }
-
+    /**
+     * Get Country Code Spoofs
+     *
+     * @return string
+     */
     public function getCountryCodeSpoofs()
     {
         return $this->_scopeConfig->getValue(
@@ -883,7 +1312,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get subscription Status
+     *
+     * @return string
+     */
     public function getsubscriptionStatus()
     {
         if ($this->recurringHelper->quoteContainsSubscription($this->_checkoutSession->getQuote())) {
@@ -891,7 +1324,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return false;
     }
-
+    /**
+     * Get CPF Enabled
+     *
+     * @return string
+     */
     public function isCPFEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -899,7 +1336,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Check Instalment Enabled
+     *
+     * @return string
+     */
     public function isInstalmentEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -907,31 +1348,58 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get 3Ds2 Params From Session
+     *
+     * @return string
+     */
     public function get3Ds2ParamsFromSession()
     {
         return $this->_checkoutSession->get3Ds2Params();
     }
-    
+    /**
+     * Get 3Ds2 Config From Session
+     *
+     * @return string
+     */
     public function get3DS2ConfigFromSession()
     {
         return $this->_checkoutSession->get3DS2Config();
     }
-    
+    /**
+     * Get AuthOrderId From Session
+     *
+     * @return string
+     */
     public function getAuthOrderIdFromSession()
     {
         return $this->_checkoutSession->getAuthOrderId();
     }
-    
+    /**
+     * Get Instalment Values
+     *
+     * @param int $countryId
+     * @return string
+     */
     public function getInstalmentValues($countryId)
     {
         return $this->instalmentconfig->getConfigTypeForCountry($countryId);
     }
-    
+    /**
+     * Get Config Countries
+     *
+     * @return string
+     */
     public function getConfigCountries()
     {
         return $this->instalmentconfig->getConfigCountries();
     }
+    /**
+     * Get Merchant Tokenization
+     *
+     * @return string
+     */
+
     public function getMerchantTokenization()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -939,6 +1407,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+    /**
+     * Check isIAVEnabled
+     *
+     * @return string
+     */
     public function isIAVEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -946,7 +1419,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get MyAccount Exception
+     *
+     * @return string
+     */
     public function getMyAccountException()
     {
                 return $this->_scopeConfig->getValue(
@@ -954,7 +1431,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                 );
     }
-    
+    /**
+     * Get Credit Card Exception
+     *
+     * @return string
+     */
     public function getCreditCardException()
     {
                 return $this->_scopeConfig->getValue(
@@ -962,13 +1443,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                 );
     }
-    
+     /**
+      * Get General Exception
+      *
+      * @return string
+      */
     public function getGeneralException()
     {
                return $this->_scopeConfig->getValue('worldpay_exceptions/adminexceptions/'
                        . 'general_exception', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
     }
-    
+    /**
+     * Get Credit Card Specific exception
+     *
+     * @param string $exceptioncode
+     * @return string
+     */
     public function getCreditCardSpecificexception($exceptioncode)
     {
 
@@ -982,6 +1472,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
+    /**
+     * Get MyAccount Specific exception
+     *
+     * @param string $exceptioncode
+     * @return string
+     */
     public function getMyAccountSpecificexception($exceptioncode)
     {
 
@@ -995,7 +1491,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
-    
+    /**
+     * Get Extended Response
+     *
+     * @param string $wpaycode
+     * @param string $orderId
+     * @return string
+     */
     public function getExtendedResponse($wpaycode, $orderId)
     {
         $responseMessage = '';
@@ -1010,8 +1512,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
     
     /**
-     * Get the first order details of customer by email
+     * Get Order Details By Email Id
      *
+     * @param string $customerEmailId
      * @return array Order Item data
      */
     public function getOrderDetailsByEmailId($customerEmailId)
@@ -1024,8 +1527,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
     
     /**
-     * Get the orders count of customer by email
+     * Get Orders CountBy Email Id
      *
+     * @param string $customerEmailId
      * @return array List of order data
      */
     public function getOrdersCountByEmailId($customerEmailId)
@@ -1044,6 +1548,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get the list of orders of customer by email
      *
+     * @param string $customerEmailId
+     * @param int $interval
      * @return array List of order IDs
      */
     public function getOrderIdsCount($customerEmailId, $interval)
@@ -1062,8 +1568,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Returns cards count that are saved within 24 hrs
      *
-     * @param $customerId
-     *
+     * @param int $customerId
      * @return array count of saved cards
      */
     public function getSavedCardsCount($customerId)
@@ -1078,6 +1583,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                        ;
         return count($savedCards->getData());
     }
+    
+    /**
+     * Get GlobalCurrencyExponent
+     *
+     * @return string
+     */
+
     public function getGlobalCurrencyExponent()
     {
         return $this->_scopeConfig->getValue(
@@ -1085,7 +1597,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+    /**
+     * Get Dynamic Exponent Enabled
+     *
+     * @return string
+     */
     public function isDynamicExponentEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -1093,7 +1609,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+    /**
+     * Get All Currency Exponents
+     *
+     * @return string
+     */
     public function getAllCurrencyExponents()
     {
             return $this->_scopeConfig->getValue(
@@ -1101,7 +1621,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
     }
-
+    /**
+     * Get Currency Exponent
+     *
+     * @param string $currencycode
+     * @return string
+     */
     public function getCurrencyExponent($currencycode)
     {
         $globalexponent = $this->getGlobalCurrencyExponent();
@@ -1112,7 +1637,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         
         return $globalexponent;
     }
-    
+    /**
+     * Get ACH Details
+     *
+     * @return string
+     */
     public function getACHDetails()
     {
         $integrationmode = $this->getCcIntegrationMode();
@@ -1124,7 +1653,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return [];
     }
-
+    /**
+     * Get ACH Bank Account Types
+     *
+     * @return string
+     */
     public function getACHBankAccountTypes()
     {
         return $this->_scopeConfig->getValue(
@@ -1132,7 +1665,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+    /**
+     * Get Prime Routing Enabled
+     *
+     * @return string
+     */
     public function isPrimeRoutingEnabled()
     {
         $integrationmode = $this->getCcIntegrationMode();
@@ -1143,7 +1680,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             );
         }
     }
-    
+    /**
+     * Get Advanced Prime Routing Enabled
+     *
+     * @return string
+     */
     public function isAdvancedPrimeRoutingEnabled()
     {
         $isPrimeRoutingEnabled = $this->isPrimeRoutingEnabled();
@@ -1155,7 +1696,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
            
         }
     }
-    
+    /**
+     * Get Routing Preference
+     *
+     * @return string
+     */
     public function getRoutingPreference()
     {
         $isAdvancedPrimeRoutingEnabled = $this->isAdvancedPrimeRoutingEnabled();
@@ -1166,7 +1711,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             );
         }
     }
-    
+    /**
+     * Get Debit Networks
+     *
+     * @return string
+     */
     public function getDebitNetworks()
     {
         $isAdvancedPrimeRoutingEnabled = $this->isAdvancedPrimeRoutingEnabled();
@@ -1181,7 +1730,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return [];
     }
-    
+    /**
+     * Get MyAccount Labels
+     *
+     * @return string
+     */
     public function getMyAccountLabels()
     {
                 return $this->_scopeConfig->getValue(
@@ -1189,7 +1742,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                 );
     }
-    
+    /**
+     * Get Checkout Labels
+     *
+     * @return string
+     */
     public function getCheckoutLabels()
     {
                 return $this->_scopeConfig->getValue(
@@ -1197,7 +1754,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                 );
     }
-    
+    /**
+     * Get Admin Labels
+     *
+     * @return string
+     */
     public function getAdminLabels()
     {
                return $this->_scopeConfig->getValue(
@@ -1205,7 +1766,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                );
     }
-    
+    /**
+     * Get Account Label by Code
+     *
+     * @param string $labelCode
+     * @return string
+     */
     public function getAccountLabelbyCode($labelCode)
     {
         $aLabels = $this->serializer->unserialize($this->_scopeConfig->getValue(
@@ -1221,7 +1787,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
-    
+   /**
+    * Get Checkout Label by Code
+    *
+    * @param string $labelCode
+    * @return string
+    */
     public function getCheckoutLabelbyCode($labelCode)
     {
         $aLabels = $this->serializer->unserialize($this->_scopeConfig->getValue(
@@ -1237,7 +1808,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
-    
+   /**
+    * Check Klarna Enabled
+    *
+    * @return string
+    */
     public function isKlarnaEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -1245,7 +1820,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+   /**
+    * Get Klarna Sliceit Type
+    *
+    * @return string
+    */
     public function getKlarnaSliceitType()
     {
         $isKlarnaEnabled = $this->isKlarnaEnabled();
@@ -1256,7 +1835,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             );
         }
     }
-
+   /**
+    * Get Klarna Sliceit Contries
+    *
+    * @return string
+    */
     public function getKlarnaSliceitContries()
     {
         $isKlarnaEnabled = $this->isKlarnaEnabled();
@@ -1270,7 +1853,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
-
+   /**
+    * Get Klarna Pay Later Type
+    *
+    * @return string
+    */
     public function getKlarnaPayLaterType()
     {
         $isKlarnaEnabled = $this->isKlarnaEnabled();
@@ -1281,7 +1868,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             );
         }
     }
-
+   /**
+    * Get Klarna Pay Later Contries
+    *
+    * @return string
+    */
     public function getKlarnaPayLaterContries()
     {
         $isKlarnaEnabled = $this->isKlarnaEnabled();
@@ -1295,7 +1886,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
-
+   /**
+    * Get Klarna Pay PayNow Type
+    *
+    * @return string
+    */
     public function getKlarnaPayNowType()
     {
         $isKlarnaEnabled = $this->isKlarnaEnabled();
@@ -1306,7 +1901,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             );
         }
     }
-
+   /**
+    * Get Klarna Pay PayNow Contries
+    *
+    * @return string
+    */
     public function getKlarnaPayNowContries()
     {
         $isKlarnaEnabled = $this->isKlarnaEnabled();
@@ -1321,7 +1920,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
-    
+   /**
+    * Get Klarna Subscription Days
+    *
+    * @param string $countryCode
+    * @return string
+    */
     public function getKlarnaSubscriptionDays($countryCode)
     {
         if ($countryCode) {
@@ -1333,7 +1937,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
     }
-    
+   /**
+    * Check Level23 Enable
+    *
+    * @return string
+    */
     public function isLevel23Enabled()
     {
         return (bool) $this->_scopeConfig->getValue(
@@ -1341,7 +1949,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+   /**
+    * Get CardAcceptor Tax Id
+    *
+    * @return string
+    */
     public function getCardAcceptorTaxId()
     {
             return $this->_scopeConfig->getValue(
@@ -1349,7 +1961,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
     }
-    
+   /**
+    * Get DutyAmount
+    *
+    * @return string
+    */
     public function getDutyAmount()
     {
            return $this->_scopeConfig->getValue(
@@ -1357,7 +1973,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
            );
     }
-    
+   /**
+    * Get Unit Of Measure
+    *
+    * @return string
+    */
     public function getUnitOfMeasure()
     {
            return $this->_scopeConfig->getValue(
@@ -1365,7 +1985,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
            );
     }
-    
+   /**
+    * Get Invoiced Items Data
+    *
+    * @param int $itemId
+    * @return string
+    */
     public function getInvoicedItemsData($itemId)
     {
         $invoicedItems = $this->_itemFactory->create()->getCollection()
@@ -1375,7 +2000,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 ->addFieldToFilter('item_id', ['eq' => $itemId]);
         return $invoicedItems->getData()[0];
     }
-    
+   /**
+    * Get should Skip Same SiteNone
+    *
+    * @param string $directOrderParams
+    * @return string
+    */
     public function shouldSkipSameSiteNone($directOrderParams)
     {
         if (isset($directOrderParams)) {
@@ -1399,7 +2029,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
          return false;
     }
-    
+   /**
+    * Get Moto Merchant Code
+    *
+    * @return string
+    */
     public function getMotoMerchantCode()
     {
         return $this->_scopeConfig->getValue(
@@ -1407,7 +2041,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+    /**
+     * Get Moto Username
+     *
+     * @return string
+     */
     public function getMotoUsername()
     {
         return $this->_scopeConfig->getValue(
@@ -1415,7 +2053,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+    /**
+     * Get Moto Password
+     *
+     * @return string
+     */
     public function getMotoPassword()
     {
         return $this->_scopeConfig->getValue(
@@ -1423,7 +2065,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+    /**
+     * Get Moto Integration Mode
+     *
+     * @return string
+     */
     public function getMotoIntegrationMode()
     {
         return $this->_scopeConfig->getValue(
@@ -1431,7 +2077,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-
+    /**
+     * Get Additional Merchant Profiles
+     *
+     * @return string
+     */
     public function getAdditionalMerchantProfiles()
     {
         return $this->merchantprofile->getAdditionalMerchantProfiles();
@@ -1468,7 +2118,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get Credit card uploaded file value
-     * @param $methodCode
+     *
+     * @param string $methodCode
      * @return string
      */
     public function getCcLogoConfigValue($methodCode)
@@ -1481,7 +2132,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get APM uploaded file value
-     * @param $methodCode
+     *
+     * @param string $methodCode
      * @return string
      */
     public function getApmLogoConfigValue($methodCode)
@@ -1494,7 +2146,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get Wallet uploaded file value
-     * @param $methodCode
+     *
+     * @param string $methodCode
      * @return string
      */
     public function getWalletLogoConfigValue($methodCode)
@@ -1506,8 +2159,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * check if Credit Card config enable
-     * @param $methodCode
+     * Check if Credit Card config enable
+     *
+     * @param string $methodCode
      * @return bool
      */
     public function isCcLogoConfigEnabled($methodCode)
@@ -1519,8 +2173,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * check if APM config enable
-     * @param $methodCode
+     * Check if APM config enable
+     *
+     * @param string $methodCode
      * @return bool
      */
     public function isApmLogoConfigEnabled($methodCode)
@@ -1532,8 +2187,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * check if Wallet config enable
-     * @param $methodCode
+     * Check if Wallet config enable
+     *
+     * @param string $methodCode
      * @return bool
      */
     public function isWalletLogoConfigEnabled($methodCode)
@@ -1546,6 +2202,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get Media url with Path
+     *
+     * @param string $path
      */
     public function getBaseUrlMedia($path)
     {
@@ -1554,13 +2212,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get Media Directory with path
+     *
+     * @param string $path
      */
     public function getMediaDirectory($path)
     {
         return $this->_filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath(). $path;
     }
     /**
-     * return worldpay payment methods
+     * Return worldpay payment methods
      */
     public function getWpPaymentMethods()
     {
@@ -1572,5 +2232,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::WORLDPAY_CC_TYPE,
             'worldpay_cc_vault'
         ];
+    }
+
+    /**
+     * GetBaseUrl
+     */
+    public function getBaseUrl()
+    {
+        return $this->_storeManager->getStore()->getBaseUrl();
     }
 }

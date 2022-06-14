@@ -25,6 +25,8 @@ class UpdateXml implements UpdateInterface
     }
 
     /**
+     * Retrive tokencode
+     *
      * @return string
      */
     public function getTokenCode()
@@ -33,6 +35,8 @@ class UpdateXml implements UpdateInterface
     }
 
     /**
+     * Is success?
+     *
      * @return bool
      */
     public function isSuccess()

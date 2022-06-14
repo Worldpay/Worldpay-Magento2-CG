@@ -8,9 +8,29 @@ use Exception;
 
 class MotoRedirectService extends \Magento\Framework\DataObject
 {
+    /**
+     * @var \Magento\Backend\Model\Auth\Session
+     */
     protected $_session;
+    /**
+     * @var \Sapient\Worldpay\Model\Response\RedirectResponse
+     */
     protected $_redirectResponseModel;
 
+    /**
+     * MotoRedirectService constructor
+     *
+     * @param \Sapient\Worldpay\Model\Mapping\Service $mappingservice
+     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Sapient\Worldpay\Model\Response\RedirectResponse $redirectresponse
+     * @param \Sapient\Worldpay\Helper\Registry $registryhelper
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param \Magento\Checkout\Model\Session $checkoutsession
+     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist
+     */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
@@ -35,6 +55,18 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         $this->worldpayhelper = $worldpayhelper;
     }
 
+    /**
+     * Handles provides authorization data for Moto redirect service
+     *
+     * It initiates a  XML request to WorldPay and registers worldpayRedirectUrl
+     *
+     * @param MageOrder $mageOrder
+     * @param Quote $quote
+     * @param string $orderCode
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @param Payment $payment
+     */
     public function authorizePayment(
         $mageOrder,
         $quote,
@@ -64,6 +96,14 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         $this->checkoutsession->setAdminWpRedirecturl($successUrl);
     }
 
+    /**
+     * Build redirect url
+     *
+     * @param string $responseXml
+     * @param string $paymentType
+     * @param string $countryCode
+     * @return string
+     */
     private function _buildRedirectUrl($responseXml, $paymentType, $countryCode)
     {
         $redirectUrl = $this->_getUrlFromResponse($responseXml);
@@ -73,6 +113,12 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return $redirectUrl;
     }
 
+    /**
+     * Get the url from response
+     *
+     * @param SimpleXMLElement $responseXml
+     * @return string
+     */
     private function _getUrlFromResponse($responseXml)
     {
         $responseXmlElement = new \SimpleXmlElement($responseXml);
@@ -81,6 +127,12 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return trim($url[0]);
     }
 
+    /**
+     * Add outcome routes
+     *
+     * @param string $redirectUrl
+     * @return string
+     */
     private function _addOutcomeRoutes($redirectUrl)
     {
         $redirectUrl .= '&successURL=' . $this->_encodeUrl('worldpay/motoRedirectResult/success');
@@ -90,6 +142,14 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return $redirectUrl;
     }
 
+    /**
+     * Add extra url parameters
+     *
+     * @param string $redirectUrl
+     * @param string $paymentType
+     * @param string $countryCode
+     * @return string
+     */
     private function _addExtraUrlParameters($redirectUrl, $paymentType, $countryCode)
     {
         $redirectUrl .= '&preferredPaymentMethod=' . $paymentType;
@@ -99,6 +159,13 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return $redirectUrl;
     }
 
+    /**
+     * Encode url
+     *
+     * @param string $path
+     * @param array $additionalParams
+     * @return string
+     */
     private function _encodeUrl($path, $additionalParams = [])
     {
         $urlParams = ['_type' => 'direct_link', '_secure' => true];
@@ -110,6 +177,12 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return $rawurlencode;
     }
 
+    /**
+     * Get billing Country
+     *
+     * @param Quote $quote
+     * @return string
+     */
     private function _getCountryForQuote($quote)
     {
         $address = $quote->getBillingAddress();
@@ -120,6 +193,11 @@ class MotoRedirectService extends \Magento\Framework\DataObject
         return $this->worldpayhelper->getDefaultCountry();
     }
 
+    /**
+     * Get local language code
+     *
+     * @return string
+     */
     protected function _getLanguageForLocale()
     {
         $locale = $this->worldpayhelper->getLocaleDefault();
