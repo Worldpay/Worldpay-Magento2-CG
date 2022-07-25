@@ -22,5 +22,6 @@ class WorldpayLogger extends \Monolog\Logger
         if ($logEnabled) {
             return parent::addRecord($level, $message, $context);
         }
+        return false;
     }
 }
