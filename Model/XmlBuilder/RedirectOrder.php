@@ -110,6 +110,16 @@ EOD;
     private $tokenRequestConfig;
 
     /**
+     * @var array
+     */
+    private $saveCardEnabled;
+
+     /**
+     * @var array
+     */
+    private $storedCredentialsEnabled;
+
+    /**
      * Constructor
      *
      * @param array $args
@@ -171,7 +181,9 @@ EOD;
         $shippingfee,
         $exponent,
         $cusDetails,
-        $orderLineItems
+        $orderLineItems,
+        $savemyCard = null,
+        $storedCredentialsEnabled = null
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -194,6 +206,9 @@ EOD;
         $this->exponent = $exponent;
         $this->cusDetails = $cusDetails;
         $this->orderLineItems = $orderLineItems;
+
+        $this->saveCardEnabled = $savemyCard;
+        $this->storedCredentialsEnabled = $storedCredentialsEnabled;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -363,7 +378,9 @@ EOD;
     private function _addPaymentMethodMaskElement($order)
     {
         $paymentMethodMask = $order->addChild('paymentMethodMask');
-
+        if ($this->saveCardEnabled && $this->storedCredentialsEnabled) {
+            $this->_addStoredCredentials($paymentMethodMask);
+        }
         $include = $paymentMethodMask->addChild('include');
         $include['code'] = $this->paymentType;
     }
@@ -473,7 +490,13 @@ EOD;
         $this->_addCDATA($streetElement, $street);
 
         $postalCodeElement = $address->addChild('postalCode');
-        $this->_addCDATA($postalCodeElement, $postalCode);
+        //Zip code mandatory for worldpay, if not provided by customer we will pass manually
+        $zipCode = '00000';
+        //If Zip code provided by customer
+        if($postalCode){
+		    $zipCode = $postalCode;
+        }
+        $this->_addCDATA($postalCodeElement, $zipCode);
 
         $cityElement = $address->addChild('city');
         $this->_addCDATA($cityElement, $city);
@@ -514,13 +537,36 @@ EOD;
     protected function _addPaymentDetailsElement($order)
     {
         $paymentDetailsElement = $order->addChild('paymentDetails');
-        $this->_addPaymentDetailsForTokenOrder($paymentDetailsElement);
-        
+        $this->_addPaymentDetailsForTokenOrder($paymentDetailsElement);        
+        $this->_addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement);
         $session = $paymentDetailsElement->addChild('session');
         $session['id'] = $this->paymentDetails['sessionId'];
         $session['shopperIPAddress'] = $this->paymentDetails['shopperIpAddress'];
     }
-    
+     /**
+     * Add stored credentials data and its child tag to xml
+     *
+     * @param element $paymentDetailsElement
+     * @return string
+     */
+    protected function _addStoredCredentials($paymentDetailsElement)
+    {
+        $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
+        $storedCredentials['usage'] = "FIRST";
+        return $storedCredentials;
+    }
+     /**
+     * Add payment details for stored credentials data and its child tag to xml
+     *
+     * @param element $paymentDetailsElement
+     * @return string
+     */
+    protected function _addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement)
+    {
+        $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
+        $storedCredentials['usage'] = "USED";
+        return $storedCredentials;
+    }
     /**
      * Add encryptedData and its child tag to xml
      *

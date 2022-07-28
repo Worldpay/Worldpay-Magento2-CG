@@ -392,6 +392,28 @@
                         <comment>eg. mydomain.com</comment>
                     </field>
                 </group>
+                <group id="apple_pay_wallets_pdp_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="4">
+                    <label>Apple Pay on PDP</label>                    
+                    <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="applepay_button_color" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Button Color</label>
+                        <source_model>Sapient\Worldpay\Model\Config\Source\ApplePay\ButtonColor</source_model>
+                    </field>
+                     <field id="applepay_button_type" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Button Type</label>
+                        <source_model>Sapient\Worldpay\Model\Config\Source\ApplePay\ButtonTypes</source_model>
+                    </field>
+                     <field id="applepay_button_locale" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Button Locale</label>
+                        <source_model>Sapient\Worldpay\Model\Config\Source\ApplePay\ButtonLocale</source_model>
+                    </field>
+                    <field id="applepay_place_order_button_configuration" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                         <label>Place Order Pop Up Button Text</label>                                      
+                    </field>                 
+                </group>
                 <group id="google_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="4">
                     <label>Google Pay</label>
                     <!--Google Pay  enabled-->
@@ -426,7 +448,28 @@
                         <label>Test 3DS CardHolderName</label>
                     </field>
                 </group>
-                
+                <group id="google_pay_wallets_pdp_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="4">
+                    <label>Google Pay on PDP</label>                    
+                    <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="gpay_button_color" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>GooglePay button color</label>
+                        <source_model>Sapient\Worldpay\Model\Config\Source\GooglePay\ButtonColor</source_model>
+                    </field>
+                     <field id="gpay_button_type" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>GooglePay button type</label>
+                        <source_model>Sapient\Worldpay\Model\Config\Source\GooglePay\ButtonTypes</source_model>
+                    </field>
+                     <field id="gpay_button_locale" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>GooglePay button locale</label>
+                        <source_model>Sapient\Worldpay\Model\Config\Source\GooglePay\ButtonLocale</source_model>
+                    </field>
+                    <field id="gpay_place_order_button_configuration" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                         <label>Place Order Button Text</label>                                      
+                    </field>                   
+                </group>                
                 <group id="samsung_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="4">
                     <label>Samsung Pay</label>
                     <!--Samsung Pay  enabled-->

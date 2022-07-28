@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2017 Sapient
  */
@@ -192,10 +193,10 @@ EOD;
      */
     private function _amountAsInt($amount)
     {
-        if (!is_null($amount)) {
+        if (!empty($amount)) {
             return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
         } else {
-            return intval($amount);
+            return (int)($amount);
         }
     }
 

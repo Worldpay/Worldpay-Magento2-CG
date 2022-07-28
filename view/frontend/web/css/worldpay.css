@@ -194,9 +194,12 @@ span.cc-card-type {
 .payment-titlelogo-wrapper {
     display: flex;
 }
-.payment-title-wrapper {
-
-}
+.payment-applepay-checkout {
+    margin: 0;
+    width: 49%;
+    float: left;
+    display: inline;
+ }
 .payment-title-wrapper .step-title {
     margin: 0;
     padding-bottom: 5px;
@@ -210,10 +213,14 @@ span.cc-card-type {
 }
 .payment-logo-wrapper {
     margin: 0 auto;
+    width:100%;
 }
 .payment-logo-wrapper img {
     width: 180px;
     max-width: 180px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;    
 }
 .ach-block {
    font-weight: 600; 
@@ -292,6 +299,59 @@ span.cc-card-type {
 .payment-method .payment-method-content [type="radio"]:focus + label:before {
     outline: 1px dotted #ed0b02;
 }
+
+#wp-google-pay {
+    width: 100%;
+    margin-bottom : 10px;
+}
+#wp-google-pay-btn{
+    width: 49%;
+    margin-bottom: 10px;
+    float: left;
+    display: inline;
+}
+.gpay-card-info-container{
+    min-width:140px;
+}
+.payment-title-wrapper{
+    margin-top: auto;
+    width: 39%;
+}
+
+@media only screen and (max-width: 768px) {
+    .gpay-card-info-container {width: 100%;}
+    .payment-logo-wrapper{
+        display: inline-block;
+        width:100%;
+    }
+    .payment-title-wrapper{
+        width:100%;
+    }
+    .payment-applepay-checkout{
+        width:100%;
+    }
+}
+
+@media only screen and  (min-width: 768px) and (max-width: 820px) {
+    .gpay-card-info-container {width: 100%;}
+    .payment-logo-wrapper{
+        display: inline-block;
+        width:100%;
+    }
+    .payment-title-wrapper{
+        width:100%;
+    }
+    .payment-applepay-checkout{
+        width:100%;
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .payment-logo-wrapper img {
+        margin-bottom:10px;   
+    }
+}
+
 .label-saved-card{
 	padding-left: 32px;
     height: 30px;

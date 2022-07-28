@@ -1,0 +1,19 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<table class="data table table-totals">
+    <caption class="table-caption" data-bind="i18n: 'Order Summary'"></caption>
+    <tbody>
+        <% _.each(data.segment, function(segment,key) { %>
+            <tr class="totals <%= key %>">
+                <th data-bind="i18n: title" class="mark" scope="row"><%= segment.title %></th>
+                <td class="amount">
+                    <span class="price"><%= segment.value %></span>
+                </td>
+            </tr>
+        <% }); %>
+    </tbody>
+</table>

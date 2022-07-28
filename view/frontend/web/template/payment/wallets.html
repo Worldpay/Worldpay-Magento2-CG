@@ -9,6 +9,8 @@
         display: none;   
     }
 </style>
+ <!--ko if: (walletCCTypes().length) -->
+
 <div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
      <div class="payment-method-title field choice">
         <input type="radio"
@@ -111,3 +113,4 @@
         </div>
     </div>
 </div>
+  <!--/ko-->

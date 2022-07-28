@@ -27,4 +27,13 @@
     <event name="checkout_cart_update_items_after">
         <observer name="worldpay_subscription" instance="Sapient\Worldpay\Observer\CheckoutCartUpdateItemsAfterObserver"/>
     </event>
+    <event name="checkout_cart_product_add_before">
+        <observer name="worldpay_add_to_cart_before" instance="Sapient\Worldpay\Observer\AddtoCartBefore"/>
+    </event>
+    <event name="checkout_onepage_controller_success_action">
+        <observer name="worldpay_order_place_after" instance="Sapient\Worldpay\Observer\AfterPlaceOrder"/>
+    </event>
+
+
+    
 </config>

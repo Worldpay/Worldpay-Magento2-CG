@@ -93,7 +93,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
                     $responseXml = $this->response->getXml();
                     $orderStatus = $responseXml->reply->orderStatus;
                     $payment=$orderStatus->payment;
-                    if(empty($payment)){
+                    if (empty($payment)) {
                         $this->_messageManager->addError(
                             $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
                                ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')

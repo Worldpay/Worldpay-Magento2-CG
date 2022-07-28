@@ -343,8 +343,12 @@ class Service
         } else {
             $paymentType = $this->_getRedirectPaymentType($paymentDetails);
             $updatedPaymentDetails = ['token_type' => $this->worldpayHelper->getMerchantTokenization()];
-        }
-        
+        }        
+        $savemyCard = isset($paymentDetails['additional_data']['save_my_card'])
+        ? $paymentDetails['additional_data']['save_my_card'] : '';
+$storedCredentialsEnabled = isset($paymentDetails['additional_data']['stored_credentials_enabled'])
+        ? $paymentDetails['additional_data']['stored_credentials_enabled'] : '';
+
         //level23 data
         $billingAddr = $this->_getBillingAddress($quote);
         $orderLineItems = null;
@@ -409,8 +413,12 @@ class Service
                 'shippingfee' => $shippingFee,
                 'exponent' => $exponent,
                 'cusDetails' => $this->getCustomerDetailsfor3DS2($quote),
-                'orderLineItems' => $orderLineItems
+                'orderLineItems' => $orderLineItems,
+                'saveCardEnabled' => $savemyCard,
+                'storedCredentialsEnabled' => $storedCredentialsEnabled,
+                
             ];
+
     }
     /**
      * Collect Klarna Order Parameters
@@ -793,7 +801,7 @@ class Service
             $orderitems['lineItem'][] = $storelineitem;
         }
 
-        $giftCards = array();
+        $giftCards = [];
         $getGiftCards = $quote->getGiftCards();
         if (!empty($getGiftCards)) {
             $giftCards = json_decode($getGiftCards, true);
@@ -1512,11 +1520,11 @@ class Service
                 $lineitem['description'] = substr($_item->getName(), 0, 12);
                 $lineitem['productCode'] = substr($_item->getProductId(), 0, 12);
                 $commodityCode = $_product->getData('commodity_code');
-                if (isset($commodityCode)) {
-                    $lineitem['commodityCode'] = substr($commodityCode, 0, 12);
-                } else {
+            if (isset($commodityCode)) {
+                $lineitem['commodityCode'] = substr($commodityCode, 0, 12);
+            } else {
                 $lineitem['commodityCode'] = $commodityCode;
-                }
+            }
                 $lineitem['quantity'] = (int) substr($_item->getQty(), 0, 12);
                 $lineitem['unitCost'] = $rowtotal / $_item->getQty();
                 $lineitem['unitOfMeasure'] = substr($unitOfMeasure, 0, 12);

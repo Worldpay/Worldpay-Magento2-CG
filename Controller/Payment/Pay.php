@@ -15,30 +15,28 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 
 class Pay extends \Magento\Framework\App\Action\Action
 {
-    public const PAYMENT_MANIFEST_JSON = 'payment-manifest.json';
-    public const MANIFEST_JSON = 'manifest.json';
-   
     /**
-     * Constructor
-     *
-     * @param Context $context
-     * @param JsonFactory $resultJsonFactory
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Framework\App\Request\Http $request
+     * @var PAYMENT_MANIFEST_JSON
      */
+    public const PAYMENT_MANIFEST_JSON = 'payment-manifest.json';
+    /**
+     * @var MANIFEST_JSON
+     */
+    public const MANIFEST_JSON = 'manifest.json';
 
     /**
      * @var curlHelper
      */
     public $curlHelper;
-
     /**
-     * @var _rawBody
+     * @var fileDriver
+     */
+    protected $fileDriver;
+    /**
+     * @var _assetRepo
      */
     protected $_assetRepo;
-
+   
     /**
      * Constructor
      *
@@ -81,17 +79,17 @@ class Pay extends \Magento\Framework\App\Action\Action
         $this->_filesystem = $filesystem;
         $this->jsonPersistor = $jsonPersistor;
         $this->wpHelper = $wpHelper;
-        $this->file  =  $file;
+        $this->file = $file;
     }
-
     /**
      * Execute
+     *
+     * @return string
      */
     public function execute()
     {
         
         $result = $this->resultFactory->create(ResultFactory::TYPE_RAW);
-        
         $mediPathPaymentManifest = $this->wpHelper->getBaseUrlMedia('sapient_worldpay/'.self::PAYMENT_MANIFEST_JSON);
         $mediPathManifest = $this->wpHelper->getBaseUrlMedia('sapient_worldpay/'.self::MANIFEST_JSON);
 
@@ -129,10 +127,11 @@ class Pay extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * JsonGenerator
+     * Json Generator
      *
      * @param array $content
-     * @param string $filename
+     * @param file $filename
+     * @return string
      */
     public function jsonGenerator(array $content, $filename)
     {

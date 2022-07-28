@@ -126,12 +126,25 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         
         if ($directOrderParams['method'] == 'worldpay_moto'
            && $directOrderParams['paymentDetails']['dynamicInteractionType'] == 'MOTO') {
-            $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
-                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
-            $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
-                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
-            $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
-                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+
+            #### Get General Configuration by store id ######
+            $motoStoreId = $this->worldpayhelper->getStoreIdFromQuoteForAdminOrder();
+            $wpMUsername = $this->worldpayhelper->getMerchantUsernameByStoreId($motoStoreId);
+            $wpMPassword = $this->worldpayhelper->getMerchantPasswordByStoreId($motoStoreId);
+            $wpMcode = $this->worldpayhelper->getMerchantCodeByStoreId($motoStoreId);
+
+            $xmlUsername = !empty($wpMUsername) ? $wpMUsername : $xmlUsername;
+            $xmlPassword = !empty($wpMPassword) ? $wpMPassword : $xmlPassword;
+            $merchantCode = !empty($wpMcode) ? $wpMcode : $merchantCode;
+
+            ####   get moto order details #####
+            $wpMotoUsername = $this->worldpayhelper->getMotoUsername($motoStoreId);
+            $wpMotoPassword = $this->worldpayhelper->getMotoPassword($motoStoreId);
+            $wpMotoCode = $this->worldpayhelper->getMotoMerchantCode($motoStoreId);
+            
+            $xmlUsername = !empty($wpMotoUsername) ? $wpMotoUsername : $xmlUsername;
+            $xmlPassword = !empty($wpMotoPassword) ? $wpMotoPassword : $xmlPassword;
+            $merchantCode = !empty($wpMotoCode) ? $wpMotoCode : $merchantCode;
         }
 
         $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder($requestConfiguration);
@@ -376,6 +389,14 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         if (empty($redirectOrderParams['orderLineItems'])) {
             $redirectOrderParams['orderLineItems'] = '';
         }
+
+        if (empty($redirectOrderParams['saveCardEnabled'])) {
+            $redirectOrderParams['saveCardEnabled']='';
+        }
+        if (empty($redirectOrderParams['storedCredentialsEnabled'])) {
+            $redirectOrderParams['storedCredentialsEnabled']='';
+        }
+
         $redirectSimpleXml = $this->xmlredirectorder->build(
             $merchantCode,
             $redirectOrderParams['orderCode'],
@@ -397,7 +418,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $redirectOrderParams['shippingfee'],
             $redirectOrderParams['exponent'],
             $redirectOrderParams['cusDetails'],
-            $redirectOrderParams['orderLineItems']
+            $redirectOrderParams['orderLineItems'],
+            $redirectOrderParams['saveCardEnabled'],
+            $redirectOrderParams['storedCredentialsEnabled'],
         );
         return $this->_sendRequest(
             dom_import_simplexml($redirectSimpleXml)->ownerDocument,
@@ -675,8 +698,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $this->emailErrorReportHelper->sendErrorReport([
                 'request'=>$xml->saveXML(),
                 'response'=>$response,
-                'error_code'=>$error[0]['code'],
-                'error_message'=>$error[0]
+                'error_code'=>''.$error[0]['code'],
+                'error_message'=>''.$error[0]
             ]);
 
             $this->_wplogger->error('An error occurred while sending the request');

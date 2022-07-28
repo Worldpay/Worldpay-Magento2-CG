@@ -14,6 +14,7 @@
                 <value id="gstatic" type="host">*.gstatic.com</value>
                 <value id="cloudflare" type="host">*.cloudflare.com</value>
                 <value id="google-pay" type="host">https://pay.google.com/gp/p/js/pay.js</value>
+                <value id="apple-pay" type="host">https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js</value>
                 <value id="google-analytics" type="host">www.google-analytics.com</value>
                 <value id="wpay-cse" type="host">https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.2.min.js</value>
 	        </values>

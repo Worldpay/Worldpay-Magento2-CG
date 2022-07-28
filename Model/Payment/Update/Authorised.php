@@ -57,7 +57,9 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
     {
         $payment->setTransactionId(time());
         $payment->setIsTransactionClosed(0);
-        if (!empty($order) && ($order->getPaymentStatus() == \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION)) {
+        if (!empty($order) &&
+        ($order->getPaymentStatus() == \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION)
+        ) {
             $currencycode = $this->_paymentState->getCurrency();
             $currencysymbol = $this->_configHelper->getCurrencySymbol($currencycode);
             $amount = $this->_amountAsInt($this->_paymentState->getAmount());

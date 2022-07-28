@@ -63,9 +63,15 @@ class Webpayment extends Template
      * @var SerializerInterface
      */
     private $serializer;
+
+    /**
+     * @var httpRequest
+     */
+    protected $httpRequest;
     
     /**
-     * Webpayment constructor.
+     * Webpayment constructor
+     *
      * @param Template\Context $context
      * @param AbstractCart $cart
      * @param Create $helper
@@ -77,7 +83,7 @@ class Webpayment extends Template
      * @param Recurring $recurringHelper
      * @param SessionManagerInterface $session
      * @param SerializerInterface $serializer
-     * @param \Magento\Framework\View\Asset\Repository $assetRepo
+     * @param Magento\Framework\View\Asset\Repository $assetRepo
      * @param array $data
      */
     public function __construct(
@@ -93,6 +99,7 @@ class Webpayment extends Template
         SessionManagerInterface $session,
         SerializerInterface $serializer,
         \Magento\Framework\View\Asset\Repository $assetRepo,
+        \Magento\Framework\App\Request\Http $httpRequest,
         array $data = []
     ) {
 
@@ -111,6 +118,7 @@ class Webpayment extends Template
         $this->serializer = $serializer;
         $this->session = $session;
         $this->_assetRepo = $assetRepo;
+        $this->httpRequest = $httpRequest;
     }
     
     /**
@@ -204,7 +212,7 @@ class Webpayment extends Template
 
     public function getCustomerToken()
     {
-        if(!$this->_customerSession->isLoggedIn()){
+        if (!$this->_customerSession->isLoggedIn()) {
             return null;
         }
         $customerId = $this->_customerSession->getCustomer()->getId();
@@ -520,26 +528,31 @@ class Webpayment extends Template
     {
         return $this->_messageManager;
     }
-
     /**
-     * Get ServiceWorkerUrl
+     * Get Service Worker Url
      *
      * @return string
      */
-
     public function getServiceWorkerUrl()
     {
         return  $this->_assetRepo->getUrl("Sapient_Worldpay::chromepay/sw.js");
     }
-
     /**
-     * Get ServiceWorkerScope
+     * Get Service Worker scope
      *
      * @return string
      */
-
     public function getServiceWorkerScope()
     {
         return  $this->_assetRepo->getUrl("Sapient_Worldpay::chromepay");
+    }
+    /**
+     * Check if Checkout Cart Page
+     */
+    public function isCheckoutCartPage(){
+        if ($this->httpRequest->getFullActionName() == 'checkout_cart_index') {
+            return true;
+        }
+        return false;
     }
 }

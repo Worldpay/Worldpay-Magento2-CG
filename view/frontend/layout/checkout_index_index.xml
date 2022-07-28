@@ -35,6 +35,18 @@
                                                                     </item>
                                                                 </item>
                                                             </item>
+                                                        </item>                                                        
+                                                        <item name="payments-list" xsi:type="array">
+                                                                <item name="children" xsi:type="array">                                                                    
+                                                                    <item name="googlepayCheckout" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/googlepay-checkout</item>  
+                                                                        <item name="displayArea" xsi:type="string">googlepayCheckout</item>
+                                                                    </item>
+                                                                    <item name="applepayCheckout" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/applepay-checkout</item>  
+                                                                        <item name="displayArea" xsi:type="string">applepayCheckout</item>
+                                                                    </item>
+                                                                </item>                                                          
                                                         </item>
                                                     </item>
                                                 </item>

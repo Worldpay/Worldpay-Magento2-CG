@@ -55,6 +55,11 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
     protected $wplogger;
+
+    /**
+     * @var session
+     */
+    public $session;
     
     /**
      * Locale model
@@ -89,6 +94,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @param Source $assetSource
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
      * @param SerializerInterface $serializer
+     * @param \Magento\Framework\Session\SessionManagerInterface $session
      * @param \Magento\Framework\Filesystem\Driver\File $fileDriver
      */
     public function __construct(
@@ -107,6 +113,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         Source $assetSource,
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
         SerializerInterface $serializer,
+        \Magento\Framework\Session\SessionManagerInterface $session,
         \Magento\Framework\Filesystem\Driver\File $fileDriver
     ) {
 
@@ -127,6 +134,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
             $this->assetSource = $assetSource;
             $this->localeResolver = $localeResolver;
             $this->serializer = $serializer;
+            $this->session = $session;
             $this->fileDriver = $fileDriver;
     }
 
@@ -156,7 +164,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                         getUrlWithParams('Sapient_Worldpay::images/cc/cvv.png', $params);
                 $config['payment']['ccform']["ssStartYears"][$code] = $this->getStartYears();
                 $config['payment']['ccform']['intigrationmode'] = $this->getIntigrationMode();
-                $config['payment']['ccform']['hpp_integration_type'] = $this->worldpayHelper->getRedirectIntegrationMode();
+                $config['payment']['ccform']['hpp_integration_type']=$this->
+                worldpayHelper->getRedirectIntegrationMode();
                 $config['payment']['ccform']['cctitle'] = $this->getCCtitle();
                 $config['payment']['ccform']['isCvcRequired'] = $this->getCvcRequired();
                 $config['payment']['ccform']['cseEnabled'] = $this->worldpayHelper->isCseEnabled();
@@ -186,6 +195,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['apmIdealBanks'] = $this->getApmIdealBankList();
                 $config['payment']['ccform']['wpicons'] = $this->getIcons();
 
+                $config['payment']['ccform']['sessionId']   = $this->session->getSessionId();
+                $config['payment']['ccform']['isWalletsEnabled'] = $this->isWalletsEnabled();
                 $config['payment']['ccform']['isGooglePayEnable'] = $this->worldpayHelper->isGooglePayEnable();
                 $config['payment']['ccform']['googlePaymentMethods'] = $this->worldpayHelper->googlePaymentMethods();
                 $config['payment']['ccform']['googleAuthMethods'] = $this->worldpayHelper->googleAuthMethods();
@@ -196,6 +207,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['googleMerchantname'] = $this->worldpayHelper->googleMerchantname();
                 $config['payment']['ccform']['googleMerchantid'] = $this->worldpayHelper->googleMerchantid();
                 $config['payment']['ccform']['appleMerchantid'] = $this->worldpayHelper->appleMerchantId();
+                $config['payment']['ccform']['isApplePayEnable'] = $this->worldpayHelper->isApplePayEnable();
                 
                 if ($this->worldpayHelper->getEnvironmentMode()=='Live Mode') {
                     $config['payment']['general']['environmentMode'] = "PRODUCTION";
@@ -813,5 +825,12 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         $klarnaValues[$klarnaPayNowType] = $this->worldpayHelper->getKlarnaPayNowContries();
       
         return $klarnaValues;
+    }
+    /**
+     *  Check if wallets is enabled
+     */
+    public function isWalletsEnabled()
+    {
+        return $this->worldpayHelper->isWalletsEnabled();
     }
 }

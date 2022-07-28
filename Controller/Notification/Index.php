@@ -57,7 +57,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod
      * @param \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
-     * @param \Magento\Framework\Filesystem\DriverInterface $fileDriver
+     * @param \Magento\Framework\Filesystem\Driver\file $fileDriver
      */
     public function __construct(
         Context $context,
@@ -68,7 +68,7 @@ class Index extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod,
         \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification,
-        \Magento\Framework\Filesystem\DriverInterface $fileDriver
+        \Magento\Framework\Filesystem\Driver\file $fileDriver
     ) {
         parent::__construct($context);
         $this->wplogger = $wplogger;

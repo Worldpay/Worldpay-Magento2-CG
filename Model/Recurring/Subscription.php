@@ -175,9 +175,9 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      * @param \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
-     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
-     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource||null $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb||null $resourceCollection
      * @param array $data
      */
     public function __construct(
@@ -193,9 +193,9 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
+        \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);

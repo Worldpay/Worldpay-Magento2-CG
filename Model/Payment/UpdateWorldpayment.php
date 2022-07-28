@@ -618,16 +618,18 @@ class UpdateWorldpayment
         $fraudsightData = [];
         $frausdightProvider = $payment->riskScore?$payment->riskScore['Provider']:'';
         ;
-        if (strtoupper($frausdightProvider) === 'FRAUDSIGHT') {
-            $fraudsightData['message'] = $payment->riskScore['message'];
-            if (isset($payment->FraudSight)) {
-                $fraudsightData['score']  = $payment->FraudSight['score'];
+        if (isset($frausdightProvider)) {
+            if (strtoupper($frausdightProvider) === 'FRAUDSIGHT') {
+                $fraudsightData['message'] = $payment->riskScore['message'];
+                if (isset($payment->FraudSight)) {
+                    $fraudsightData['score']  = $payment->FraudSight['score'];
+                }
+                if (isset($payment->FraudSight->reasonCodes)) {
+                    $reasoncodes = $payment->FraudSight->reasonCodes->reasonCode;
+                    $fraudsightData['reasonCode']  = $this->getReasoncodes($reasoncodes);
+                }
+                return $fraudsightData;
             }
-            if (isset($payment->FraudSight->reasonCodes)) {
-                $reasoncodes = $payment->FraudSight->reasonCodes->reasonCode;
-                $fraudsightData['reasonCode']  = $this->getReasoncodes($reasoncodes);
-            }
-            return $fraudsightData;
         }
     }
     

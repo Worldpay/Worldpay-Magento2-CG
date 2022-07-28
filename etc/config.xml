@@ -51,6 +51,22 @@
                     <paymentmethods>AMEX,VISA,DISCOVER,JCB,MASTERCARD</paymentmethods>
                     <authmethods>PAN_ONLY,CRYPTOGRAM_3DS</authmethods>
                 </google_pay_wallets_config>
+                <apple_pay_wallets_pdp_config>
+                   <applepay_button_color>black</applepay_button_color>
+                    <applepay_button_type>buy</applepay_button_type>
+                    <applepay_button_locale>en-GB</applepay_button_locale>
+                    <applepay_place_order_button_configuration>
+                    <![CDATA[Place Order with Apple Pay]]>
+                    </applepay_place_order_button_configuration>
+                </apple_pay_wallets_pdp_config>
+                <google_pay_wallets_pdp_config>
+                    <gpay_place_order_button_configuration>
+                    <![CDATA[Place Order with GooglePay]]>
+                    </gpay_place_order_button_configuration>
+                    <gpay_button_color>default</gpay_button_color>
+                    <gpay_button_type>buy</gpay_button_type>
+                    <gpay_button_locale>en</gpay_button_locale>
+                </google_pay_wallets_pdp_config>
             </wallets_config>
             <chromepay_config>
                 <chromepay_button_name>Buy Now</chromepay_button_name>

@@ -10,6 +10,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Exception;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Quote\Model\QuoteIdMaskFactory;
 
 class Index extends \Magento\Framework\App\Action\Action
 {
@@ -25,6 +26,14 @@ class Index extends \Magento\Framework\App\Action\Action
      * @var $curlHelper
      */
     protected $curlHelper;
+    /**
+     * @var $quoteIdMaskFactory
+     */
+    public $quoteIdMaskFactory;
+     /**
+     * @var $customerSession
+     */
+    public $customerSession;
     /**
      * Constructor
      *
@@ -47,7 +56,9 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Request\Http $request,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Sapient\Worldpay\Helper\CurlHelper $curlHelper
+        \Sapient\Worldpay\Helper\CurlHelper $curlHelper,
+        QuoteIdMaskFactory $quoteIdMaskFactory,
+        \Magento\Customer\Model\Session $customerSession
     ) {
         parent::__construct($context);
         $this->wplogger = $wplogger;
@@ -58,6 +69,8 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->quoteFactory = $quoteFactory;
         $this->_storeManager = $storeManager;
         $this->curlHelper = $curlHelper;
+        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
+        $this->customerSession=$customerSession;
     }
     /**
      * Execute
@@ -89,12 +102,15 @@ class Index extends \Magento\Framework\App\Action\Action
         $baseUrl =  $this->_storeManager->getStore()->getBaseUrl();
         
          $quoteId = $this->request->getParam('quoteId');
+         if(!$this->customerSession->isLoggedIn()){
+            $quoteIdMask = $this->quoteIdMaskFactory->create();
+            $quoteIdMask->load($quoteId, 'masked_id');
+            $quoteId = $quoteIdMask->getQuoteId();
+         }
          $quote = $this->quoteFactory->create()->load($quoteId);
-         $quoteData = $quote->getData();
-         
-         $currency = $quoteData['quote_currency_code'];
-         $grandTotal = $quoteData['grand_total'];
-        
+         $quoteData = $quote->getData();         
+         $currency = $quote->getQuoteCurrencyCode();
+         $grandTotal =  $quote->getGrandTotal();        
          $postFields = [];
          
          $callBack = $baseUrl . 'worldpay/samsungpay/CallBack';
