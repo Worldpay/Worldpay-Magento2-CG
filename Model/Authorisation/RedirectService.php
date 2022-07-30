@@ -98,14 +98,14 @@ class RedirectService extends \Magento\Framework\DataObject
             );
             $response = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
         }
-        if($paymentDetails['additional_data']['cc_type'] == 'savedcard'){
+        if ($paymentDetails['additional_data']['cc_type'] == 'savedcard') {
             $successUrl = $this->_buildRedirectUrl(
                 $this->_getRedirectResponseModel()->getRedirectLocation($response),
-               null,
-               $this->_getCountryForQuote($quote),
-               $this->_getLanguageForLocale()
+                null,
+                $this->_getCountryForQuote($quote),
+                $this->_getLanguageForLocale()
             );
-        }else{
+        } else {
             $successUrl = $this->_buildRedirectUrl(
                 $this->_getRedirectResponseModel()->getRedirectLocation($response),
                 $redirectOrderParams['paymentType'],

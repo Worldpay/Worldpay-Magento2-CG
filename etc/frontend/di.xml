@@ -17,4 +17,10 @@
     <type name="Magento\Checkout\Block\Onepage">
         <plugin name="worldpay_recurring" type="Sapient\Worldpay\Plugin\Checkout\Block\Onepage" sortOrder="100"/>
     </type>
+     <type name="Magento\Checkout\CustomerData\Cart">
+        <plugin name="quote_id_and_masked_quote_id" type="Sapient\Worldpay\Plugin\Checkout\CustomerData\Cart"/>
+    </type>
+    <type name="Magento\Customer\CustomerData\Customer">
+        <plugin name="add_customer_address" type="Sapient\Worldpay\Plugin\Checkout\CustomerData\Customer"/>
+    </type>
 </config>

@@ -7,6 +7,7 @@ namespace Sapient\Worldpay\Helper;
 use Sapient\Worldpay\Model\Config\Source\HppIntegration as HPPI;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Session\SessionManagerInterface;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -40,6 +41,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public const INTEGRATION_MODE = 'worldpay/cc_config/integration_mode';
 
     /**
+     * @var SessionManagerInterface
+     */
+    protected $session;
+
+    /**
      * Constructor
      *
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
@@ -60,6 +66,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Sapient\Worldpay\Helper\Currencyexponents $currencyexponents
      * @param SerializerInterface $serializer
      * @param \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries
+     * @param \Magento\Backend\Model\Session\Quote $adminsessionquote
      */
 
     public function __construct(
@@ -80,7 +87,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Sales\Model\Order\ItemFactory $itemFactory,
         \Sapient\Worldpay\Helper\Currencyexponents $currencyexponents,
         SerializerInterface $serializer,
-        \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries
+        \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries,
+        \Magento\Backend\Model\Session\Quote $adminsessionquote
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
@@ -100,6 +108,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->currencyexponents = $currencyexponents;
         $this->serializer = $serializer;
         $this->klarnaCountries = $klarnaCountries;
+        $this->adminsessionquote = $adminsessionquote;
     }
     /**
      * Is WorldPay Enable or not
@@ -164,6 +173,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 return $merchantCodeValue;
             }
         }
+        
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/merchant_code',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
@@ -385,15 +395,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getWalletsTypes($code)
     {
         $activeMethods = [];
-        if ($this->isGooglePayEnable()) {
+        /*if ($this->isGooglePayEnable()) {
             $activeMethods['PAYWITHGOOGLE-SSL'] = 'Google Pay';
-        }
+        }*/
         if ($this->isSamsungPayEnable()) {
             $activeMethods['SAMSUNGPAY-SSL'] = 'Samsung Pay';
         }
-        if ($this->isApplePayEnable()) {
+        /*if ($this->isApplePayEnable()) {
             $activeMethods['APPLEPAY-SSL'] = 'Apple Pay';
-        }
+        }*/
         return $activeMethods;
     }
    /**
@@ -2029,13 +2039,65 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
          return false;
     }
+   
+    /**
+     * Get Moto Merchant Code
+     *
+     * @param string $storeId
+     * @return string
+     */
+    public function getMerchantCodeByStoreId($storeId)
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/general_config/merchant_code',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+    /**
+     * Get Moto Username
+     *
+     * @param string $storeId
+     * @return string
+     */
+    public function getMerchantUsernameByStoreId($storeId)
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/general_config/xml_username',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+    /**
+     * Get Moto Password
+     *
+     * @param string $storeId
+     * @return string
+     */
+    public function getMerchantPasswordByStoreId($storeId)
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/general_config/xml_password',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
    /**
     * Get Moto Merchant Code
     *
+    * @param string $storeId
     * @return string
     */
-    public function getMotoMerchantCode()
+    public function getMotoMerchantCode($storeId = "")
     {
+        if ($storeId) {
+            return $this->_scopeConfig->getValue(
+                'worldpay/moto_config/moto_merchant_code',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        }
         return $this->_scopeConfig->getValue(
             'worldpay/moto_config/moto_merchant_code',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
@@ -2044,10 +2106,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get Moto Username
      *
+     * @param string $storeId
      * @return string
      */
-    public function getMotoUsername()
+    public function getMotoUsername($storeId = "")
     {
+        if ($storeId) {
+            return $this->_scopeConfig->getValue(
+                'worldpay/moto_config/moto_username',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        }
         return $this->_scopeConfig->getValue(
             'worldpay/moto_config/moto_username',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
@@ -2056,10 +2126,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get Moto Password
      *
+     * @param string $storeId
      * @return string
      */
-    public function getMotoPassword()
+    public function getMotoPassword($storeId = "")
     {
+        if ($storeId) {
+            return $this->_scopeConfig->getValue(
+                'worldpay/moto_config/moto_password',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        }
         return $this->_scopeConfig->getValue(
             'worldpay/moto_config/moto_password',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
@@ -2104,10 +2182,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_checkoutSession->getHppOrderCode();
     }
-
-    /**
-     *  Check if Payment Method Logo config is enabled
-     */
+      /**
+       *  Check if Payment Method Logo config is enabled
+       */
     public function isPaymentMethodlogoEnable()
     {
         return $this->_scopeConfig->getValue(
@@ -2233,12 +2310,137 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'worldpay_cc_vault'
         ];
     }
-
     /**
-     * GetBaseUrl
+     * Return Store Base Url
      */
     public function getBaseUrl()
     {
         return $this->_storeManager->getStore()->getBaseUrl();
+    }
+    /**
+     *  Check if googlepay enable on PDP
+     */
+    public function isGooglePayEnableonPdp()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/google_pay_wallets_pdp_config/enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get google pay customise options
+     */
+    public function getGooglePayButtonConfig()
+    {
+        return trim($this->_scopeConfig->getValue(
+            'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_btn_configuration',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        ));
+    }
+    /**
+     * Get Place order text
+     */
+    public function getGooglePayPopupPlaceOrderText()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_place_order_button_configuration',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+     /**
+      *  Check if Apple Pay on PDP is enabled
+      */
+    public function isApplePayEnableonPdp()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/apple_pay_wallets_pdp_config/enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * ApplePay button color
+     */
+    public function getApplePayButtonColor()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_button_color',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * ApplePay button type
+     */
+    public function getApplePayButtonType()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_button_type',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * ApplePay button locale
+     */
+    public function getApplePayButtonLocale()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_button_locale',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     *  Apple Pay on PopUp Order Place Button Text
+     */
+    public function getApplePayPopupPlaceOrderText()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_place_order_button_configuration',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get googlepay button color
+     */
+    public function getGpayButtonColor()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_button_color',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get googlepay button type
+     */
+    public function getGpayButtonType()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_button_type',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get googlepay button locale
+     */
+    public function getGpayButtonLocale()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_button_locale',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get moto store id
+     */
+    public function getStoreIdFromQuoteForAdminOrder()
+    {
+
+        $adminQuote = $this->adminsessionquote->getQuote();
+        $storeId = $adminQuote->getStoreId();
+        if (empty($storeId)) {
+            $storeId = $this->_storeManager->getStore()->getId();
+        }
+        return $storeId;
     }
 }

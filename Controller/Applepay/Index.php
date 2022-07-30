@@ -34,7 +34,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\Request\Http $request
      * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
-     * @param \Magento\Framework\Filesystem\DriverInterface $fileDriver
+     * @param \Magento\Framework\Filesystem\Driver\file $fileDriver
      */
 
     public function __construct(
@@ -45,7 +45,7 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\Request\Http $request,
         \Sapient\Worldpay\Helper\CurlHelper $curlHelper,
-        \Magento\Framework\Filesystem\DriverInterface $fileDriver
+        \Magento\Framework\Filesystem\Driver\file $fileDriver
     ) {
         parent::__construct($context);
         $this->wplogger = $wplogger;
@@ -64,9 +64,6 @@ class Index extends \Magento\Framework\App\Action\Action
 
     public function execute()
     {
-               
-        
-        
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
         $certificateKey = $this->scopeConfig->getValue(

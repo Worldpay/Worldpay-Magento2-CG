@@ -12,6 +12,7 @@ use Magento\Vault\Model\Ui\VaultConfigProvider;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Vault\Api\PaymentTokenRepositoryInterface;
 
 /**
  * Communicate with WP server and gives back meaningful answer object
@@ -30,6 +31,10 @@ class WorldpayToken
       * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
       */
     private $transactionsFactory;
+    /**
+     * @var
+     */
+    private $paymentTokenRepository;
 
     /**
      * Constructor
@@ -41,6 +46,7 @@ class WorldpayToken
      * @param CreditCardTokenFactory $paymentTokenFactory
      * @param PaymentTokenManagementInterface $paymentTokenManagement
      * @param EncryptorInterface $encryptor
+     * @param PaymentTokenRepositoryInterface $paymentTokenRepository
      */
     public function __construct(
         SavedToken $savedtoken,
@@ -49,7 +55,8 @@ class WorldpayToken
         OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
         CreditCardTokenFactory $paymentTokenFactory,
         PaymentTokenManagementInterface $paymentTokenManagement,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        PaymentTokenRepositoryInterface $paymentTokenRepository
     ) {
         $this->savedtoken = $savedtoken;
         $this->wplogger = $wplogger;
@@ -58,6 +65,7 @@ class WorldpayToken
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->encryptor = $encryptor;
         $this->transactionFactory = $transactionsFactory;
+        $this->paymentTokenRepository = $paymentTokenRepository;
     }
 
     /**
@@ -219,13 +227,11 @@ class WorldpayToken
      */
     private function _updateToVault(TokenStateInterface $tokenState, $paymentObject, $authenticatedShopperId)
     {
-        $paymentToken = $this->getVaultPaymentToken($tokenState);
+        $paymentToken = $this->getVaultPaymentToken($tokenState, $paymentObject, $authenticatedShopperId);
         if (null !== $paymentToken) {
             $extensionAttributes = $this->getExtensionAttributes($paymentObject);
             $extensionAttributes->setVaultPaymentToken($paymentToken);
         }
-        // saves payment token manually.
-        // set all payment token attributes.
         if ($paymentToken->getEntityId() !== null) {
             $this->paymentTokenManagement->addLinkToOrderPayment(
                 $paymentToken->getEntityId(),
@@ -233,16 +239,6 @@ class WorldpayToken
             );
             return $this;
         }
-        $paymentToken->setCustomerId($authenticatedShopperId);
-        $paymentToken->setIsActive(true);
-        $paymentToken->setPaymentMethodCode($paymentObject->getMethod());
-        $additionalInformation = $paymentObject->getAdditionalInformation();
-        $additionalInformation[VaultConfigProvider::IS_ACTIVE_CODE] = true;
-        $paymentObject->setAdditionalInformation($additionalInformation);
-        $paymentToken->setIsVisible(true);
-        $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
-        $this->paymentTokenManagement->saveTokenWithPaymentLink($paymentToken, $paymentObject);
-        $extensionAttributes->setVaultPaymentToken($paymentToken);
     }
 
     /**
@@ -286,24 +282,54 @@ class WorldpayToken
      * @param TokenStateInterface $tokenElement
      * @return string
      */
-    protected function getVaultPaymentToken(TokenStateInterface $tokenElement)
+    protected function getVaultPaymentToken(TokenStateInterface $tokenElement, $paymentObject, $authenticatedShopperId)
     {
         // Check token existing in gateway response
         $token = $tokenElement->getTokenCode();
         if (empty($token)) {
             return null;
         }
-
-        /** @var PaymentTokenInterface $paymentToken */
-        $paymentToken = $this->paymentTokenFactory->create();
-        $paymentToken->setGatewayToken($token);
+        // Check if paymentToken exists already
+        $paymentToken = $this->paymentTokenManagement->getByGatewayToken(
+            $token,
+            'worldpay_cc',
+            $authenticatedShopperId
+        );
+        $paymentTokenSaveRequired = false;
+        // In case the payment token does not exist, create it based on the additionalData
+        if (is_null($paymentToken)) {
+            /** @var PaymentTokenInterface $paymentToken */
+            $paymentToken = $this->paymentTokenFactory->create();
+            $paymentToken->setGatewayToken($token);
+        }
+        else{
+            $paymentTokenSaveRequired = true;
+        }
         $paymentToken->setExpiresAt($this->getExpirationDate($tokenElement));
-
         $paymentToken->setTokenDetails($this->convertDetailsToJSON([
             'type' => str_replace("_CREDIT", "", $tokenElement->getPaymentMethod()),
             'maskedCC' => $this->getLastFourNumbers($tokenElement->getObfuscatedCardNumber()),
             'expirationDate'=> $this->getExpirationMonthAndYear($tokenElement)
         ]));
+        // If the token is updated, it needs to be saved to keep the changes
+        if ($paymentTokenSaveRequired) {
+            $this->paymentTokenRepository->save($paymentToken);
+        }
+        // saves payment token manually.
+        // set all payment token attributes.
+        else{
+            $paymentToken->setCustomerId($authenticatedShopperId);
+            $paymentToken->setIsActive(true);
+            $paymentToken->setPaymentMethodCode($paymentObject->getMethod());
+            $additionalInformation = $paymentObject->getAdditionalInformation();
+            $additionalInformation[VaultConfigProvider::IS_ACTIVE_CODE] = true;
+            $paymentObject->setAdditionalInformation($additionalInformation);
+            $paymentToken->setIsVisible(true);
+            $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
+            $this->paymentTokenManagement->saveTokenWithPaymentLink($paymentToken, $paymentObject);
+            $extensionAttributes = $this->getExtensionAttributes($paymentObject);
+            $extensionAttributes->setVaultPaymentToken($paymentToken);
+        }
         return $paymentToken;
     }
 

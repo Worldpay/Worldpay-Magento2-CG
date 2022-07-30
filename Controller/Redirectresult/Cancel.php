@@ -2,11 +2,11 @@
 /**
  * @copyright 2017 Sapient
  */
-namespace Sapient\Worldpay\Controller\Redirectresult;
+ namespace Sapient\Worldpay\Controller\Redirectresult;
 
-use Magento\Framework\View\Result\PageFactory;
-use Magento\Framework\App\Action\Context;
-use Sapient\Worldpay\Model\Payment\StateResponse;
+ use Magento\Framework\View\Result\PageFactory;
+ use Magento\Framework\App\Action\Context;
+ use Sapient\Worldpay\Model\Payment\StateResponse;
 
 /**
  * if got notification to get cancel order from worldpay then redirect to  cart page and display the notice

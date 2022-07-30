@@ -4,12 +4,6 @@ $storeCode= $block->getStoreCode();
 
 if (array_key_exists('chromepay', $param)) {
     ?>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-        var request = initPaymentRequest();
-        onBuyClicked(request);
-        }, false);</script>
-
     <?php
 }
 
@@ -28,20 +22,19 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
 /** @var $block \Sapient\Worldpay\Block\Webpayment */
 ?>
 <script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        var serviceWorkerUrl = "<?= /* @noEscape */ $block->getServiceWorkerUrl(); ?>";
-        var serviceWorkerScope = "<?= /* @noEscape */ $block->getServiceWorkerScope().'/'; ?>";
-        navigator.serviceWorker.register(serviceWorkerUrl, { scope: serviceWorkerScope })
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register("<?= /* @noEscape */ $block->getServiceWorkerUrl(); ?>", 
+            { scope: "<?= /* @noEscape */ $block->getServiceWorkerScope().'/'; ?>" })
             .then(function (registration)
             {
             console.log('Service worker registered successfully');
             }).catch(function (e)
             {
             console.error('Error during service worker registration:', e);
-            }); 
-    });
-}
+            });
+        });
+    }
 </script>
 <script>
     window.ChromepayButtonName = '<?= /* @noEscape */ $block->getChromepayButtonName() ?>';
@@ -54,6 +47,7 @@ if ('serviceWorker' in navigator) {
     window.isDynamic3DS2Enabled = '<?= /* @noEscape */ $block->isDynamic3DS2Enabled() ?>';
     window.is3DsEnabled = '<?= /* @noEscape */ $block->is3DsEnabled() ?>';
     window.jwtEventUrl = '<?= /* @noEscape */ $block->getJwtEventUrl() ?>';
+    window.isCheckoutCartPage = '<?= /* @noEscape */ $block->isCheckoutCartPage(); ?>';
     var envMode = '<?= /* @noEscape */ $block->getEnvMode() ?>';
     
     if(envMode == 'Test Mode') {
@@ -102,14 +96,12 @@ if ('serviceWorker' in navigator) {
             supportedMethods =  baseUrl+'worldpay/payment/pay';
     }
 
-
     const supportedInstruments = [{
-    //supportedMethods: 'basic-card',
     supportedMethods: supportedMethods,
-            data: {
+        data: {
             supportedNetworks: networks,
-                    supportedTypes: types
-            }
+            supportedTypes: types
+        }
     }];
     var isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
     var guestMaskedQuoteId = window.checkoutConfig.quoteData.entity_id;
@@ -119,9 +111,10 @@ if ('serviceWorker' in navigator) {
 
 <?php foreach ($block->getAllItems() as $item) { ?>
         {
-        label: "<?= /* @noEscape */ $item->getData('name') ?>",
-                amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
-            value: '<?= /* @noEscape */ $item->getData('price') ?>' }
+            label: "<?= /* @noEscape */ $item->getData('name') ?>",
+            amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
+            value: '<?= /* @noEscape */ $item->getData('price') ?>'
+         }
         },
 <?php } ?>
 
@@ -291,7 +284,8 @@ if ('serviceWorker' in navigator) {
             updateDetails(details, request.shippingOption, request.shippingAddress, resolve, reject);
         }));
     });
-    return request;
+    onBuyClicked(request);
+    
     } // ------------- End of initPaymentRequest fn ---------------
 
     var jwtUrl = baseUrl +'worldpay/hostedpaymentpage/jwt';
@@ -441,10 +435,6 @@ if ('serviceWorker' in navigator) {
     }else {
          placeOrder(instrumentResponse);
     }
-        //console.log('order created');
-        //console.log(orderCode);
-        //console.log('REDIRECTING');
-
     }).catch(function(err) {
         throw(err);
     });
@@ -466,10 +456,10 @@ if ('serviceWorker' in navigator) {
         apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/shipping-information';
     } else { // Api for guest customer
         apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + 
-                guestMaskedQuoteId + '/shipping-information';
+            guestMaskedQuoteId + '/shipping-information';
     }
-    var billingAddress = instrumentResponse.details.billingAddress;
-    if(typeof billingAddress == 'undefined' || billingAddress == null){
+    if(typeof instrumentResponse.details.billingAddress == 'undefined' 
+        || instrumentResponse.details.billingAddress == null){
         instrumentResponse.details.billingAddress = {};
         instrumentResponse.details.billingAddress = instrumentResponse.shippingAddress;
 

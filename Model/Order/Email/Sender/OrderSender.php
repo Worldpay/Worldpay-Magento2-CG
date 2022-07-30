@@ -160,7 +160,7 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
     {
         $emailSub = "Your payment has been confirmed with the bank and order has been processed successfully";
         $authSuccessMsg = "Once your package ships we will send you a tracking number.";
-        if(!$successFlag){
+        if (!$successFlag) {
             $emailSub = "Your payment has been declined by the bank and order has been cancelled";
             $authSuccessMsg = $emailSub;
         }
@@ -175,7 +175,7 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
             'created_at_formatted' => $order->getCreatedAtFormatted(2),
             'email_sub'=> $emailSub,
             'auth_success_message'=> $authSuccessMsg,
-            'order_data' => [               
+            'order_data' => [
                 'customer_name' => $order->getCustomerName(),
                 'is_not_virtual' => $order->getIsNotVirtual(),
                 'email_customer_note' => $order->getEmailCustomerNote(),

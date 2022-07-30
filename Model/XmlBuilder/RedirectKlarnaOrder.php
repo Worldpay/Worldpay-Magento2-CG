@@ -414,13 +414,21 @@ EOD;
         $this->_addCDATA($streetElement1, $address1);
         
         $postalCodeElement = $address->addChild('postalCode');
-        $this->_addCDATA($postalCodeElement, $postalCode);
+        //Zip code mandatory for worldpay, if not provided by customer we will pass manually
+        $zipCode = '00000';
+        //If Zip code provided by customer
+        if($postalCode){
+		    $zipCode = $postalCode;
+        }
+        $this->_addCDATA($postalCodeElement, $zipCode);
 
         $cityElement = $address->addChild('city');
         $this->_addCDATA($cityElement, $city);
 
-        $stateElement = $address->addChild('state');
-        $this->_addCDATA($stateElement, $state);
+        if($state){
+            $stateElement = $address->addChild('state');
+            $this->_addCDATA($stateElement, $state);
+        }
         
         $countryCodeElement = $address->addChild('countryCode');
         $this->_addCDATA($countryCodeElement, $countryCode);

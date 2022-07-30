@@ -46,20 +46,20 @@
                                     'width': $parent.getIcons(item.ccValue).width,
                                     'height': $parent.getIcons(item.ccValue).height
                                     }"></label>
-                        <!--/ko-->
-                        <!--ko if: (item.ccValue=='savedcard') -->
-                        <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}"><!-- ko i18n: 'Saved Cards'--><!-- /ko --></label>
-                        <!--/ko-->                      
+                        <!--/ko-->     
+                         <!--ko if: (item.ccValue=='savedcard') -->
+                         <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}"><!-- ko i18n: 'Saved Cards'--><!-- /ko --></label>
+                         <!--/ko-->               
                    </div>
                 <!--/ko-->
-                   <!-- ko if: (getSavedCardsCount() > 0)-->
+                  <!-- ko if: (getSavedCardsCount() > 0)-->
                     <!-- ko if: (getHppIntegrationType()  == 'iframe')-->
                     <div class="paymentmethods-radio-wrapper">
                         <label class="action label-saved-card" data-bind="click: loadSavedCards,text: $t('Use Saved Card')"></label>
                         
                         </div>
                         <!-- /ko -->
-                   <!-- /ko -->                
+                   <!-- /ko -->              
             </div>
 
             <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
@@ -152,8 +152,8 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-          <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='iframe')-->
-          <div class="actions-toolbar">
+         <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='iframe')-->
+         <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout hpp-checkout"
                         type="button"
@@ -171,8 +171,6 @@
          <!-- HPP IFRAME -->
 
          <!--/ko-->
-
-
          <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='full_page')-->
          <div class="actions-toolbar">
             <div class="primary">
@@ -191,9 +189,8 @@
          <div id="checkout-payment-worldpay-container"></div>
          <!-- HPP IFRAME -->
 
-         <!--/ko-->   
-
-        <!-- ko if: (getIntigrationMode() == 'direct')-->
+         <!--/ko-->  
+         <!-- ko if: (getIntigrationMode() == 'direct')-->
         <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"

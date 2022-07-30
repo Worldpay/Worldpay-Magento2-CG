@@ -8,75 +8,15 @@ $ccNumber = '';
 if ($params) {
     $ccNumber = str_replace(' ', '+', $params['instrument']);
 }
-$jwtApiKey = $block->getJwtApiKey();
-$jwtIssuer = $block->getJwtIssuer();
-$organisationalUnitId = $block->getOrganisationalUnitId();
 $ddcUrl = $block->getDdcUrl();
-$environmentMode = $block->getEnvironmentMode();
-$cookie = $block->getCookie();
-$phpdate = $block->getCurrentDate();
 ?>
 
 <form method="post" action="<?= /* @noEscape */ $ddcUrl;?>" id="collectionForm" name="collectionForm"> 
-    <input type="hidden" name="Bin" id="first_bin" value="" />
-    <input type="hidden" name="JWT" id="first_jwt" value="" />
+    <input type="hidden" name="Bin" id="first_bin" value="<?php echo base64_decode($ccNumber); ?>" />
+    <input type="hidden" name="JWT" id="first_jwt" value="<?php echo $block->getJwtToken(); ?>" />
 </form>
 
-<script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js"></script>
-<script language="Javascript">
-    //Decrypt bin number
-    var cNum = "<?= /* @noEscape */ $ccNumber?>";
-    var decodedBin = atob(cNum);
-    document.getElementById("first_bin").value = decodedBin;
-    
-    var header = {
-        "typ": "JWT",
-        "alg": "HS256"
-    };
-            
-    var iat = <?= /* @noEscape */ $phpdate?>; 
-    var jti = uuidv4();
-    var data = {
-        "jti": jti,
-        "iat": iat,
-        "iss": "<?= /* @noEscape */ $jwtIssuer;?>",
-        "OrgUnitId": "<?= /* @noEscape */ $organisationalUnitId;?>"              
-    };
-    var secret = "<?= /* @noEscape */ $jwtApiKey;?>";
-
-    var stringifiedHeader = CryptoJS.enc.Utf8.parse(JSON.stringify(header));
-    var encodedHeader = base64url(stringifiedHeader);
-
-    var stringifiedData = CryptoJS.enc.Utf8.parse(JSON.stringify(data));
-    var encodedData = base64url(stringifiedData);
-
-    var signature = encodedHeader + "." + encodedData;
-    signature = CryptoJS.HmacSHA256(signature, secret);
-    signature = base64url(signature);
-    var encodedJWT = encodedHeader + "." + encodedData + "." + signature;
-    
-    document.getElementById("first_jwt").value = encodedJWT;
-    function uuidv4() {
-        return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, function(c){
-            var crypto = window.crypto || window.msCrypto;
-            return (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-        });
-    }
-    
-    function base64url(source) {
-        // Encode in classical base64
-        var encodedSource = CryptoJS.enc.Base64.stringify(source);
-
-        // Remove padding equal characters
-        encodedSource = encodedSource.replace(/=+$/, "");
-
-        // Replace characters according to base64url specifications
-        encodedSource = encodedSource.replace(/\+/g, "-");
-        encodedSource = encodedSource.replace(/\//g, "_");
-
-        return encodedSource;
-    }
+<script language="Javascript">    
     window.onload = function()
     {
       // Auto submit form on page load

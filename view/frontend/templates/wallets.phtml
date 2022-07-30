@@ -1,0 +1,128 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Sapient\Worldpay\Block\Wallets $block */
+?>
+
+<?php if ($block->isWalletsEnabled()): ?>
+    <?php //if(!$block->isSubscriptionProduct()): ?>
+<div id="wp-wallet-pay" data-bind="scope:'wp-wallet-pay'"> 
+    <?= $block->getChildHtml(); ?>
+</div>
+<style>
+    .checkout-information{
+        width:54%;
+        float:left;
+        padding:10px;
+        border-right:1px solid #aaa;
+    }
+    .checkout-totals {
+        width:35%;
+        float:right;
+        padding:10px;
+    }
+    .checkout-actions{
+        clear:both;
+        display:block;
+        width:100%;
+    }
+    .checkout-actions button{
+            float:right;
+    }
+    .checkout-information .shipping-information-title , .checkout-information .billing-information-title{
+        padding-bottom: 10px;
+        color: #333;
+        font-weight: 100;
+        font-size: 2.6rem;
+        border-bottom: 1px solid #ccc;
+        margin: 0 0 20px;
+        position: relative;
+        font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
+        font-style: normal;
+    }
+    .checkout-information .customer-shipping-address-radio-wrapper , .checkout-information .shippingmethods-radio-wrapper , .checkout-information .customer-billing-address-radio-wrapper {
+        padding-bottom: 17px;
+        line-height: 25px;
+    }
+    .error-message{
+        color:red;
+    }
+    .ship-via{
+        clear:both;
+    }
+    .new-shipping, .new-billing{
+        width:50%;
+        float:right;
+        clear:both;
+        display:block;
+    }
+    .discount-code{
+        float: right;
+        margin-top: 10px;
+        clear: both;
+        display: block;
+        color: #1979c3;
+        cursor: pointer;
+        width:100%;
+        text-align:right;
+    }
+    .place-order-gpay{
+        background: #1979c3;
+    color: #fff;
+    margin-right: 19px;
+    }
+    .place-order-applepay{
+        background: #1979c3;
+    color: #fff;
+    margin-right: 19px;
+    }
+    .action-close{
+        display:none;
+    }
+
+    .gpay-button{
+        width:49%;
+    }
+    .gpay-card-info-container{
+        width:49%;
+    }
+
+    @media only screen and (max-width: 768px) {
+        .gpay-button{
+            width:100%;
+        }
+        .gpay-card-info-container{
+            width:100%;
+        }
+        .checkout-information{
+            width:100%;
+        }
+        .checkout-totals{
+            width:100%;
+        }
+        .cancel-gpay{
+            margin-top:10px;
+        }
+    }
+    @media only screen and (min-width: 769px) and (max-width: 820px) {
+        #instant-purchase .instant-purchase{
+            width:78%;
+        }        
+        #product-addtocart-button{
+            width:78%;
+        }
+    }
+    
+</style>
+<script type="text/x-magento-init">
+    {
+        "#wp-wallet-pay": {
+            "Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout();?>
+        }
+    }
+</script>
+    <?php //endif; ?>
+<?php endif; ?>

@@ -70,7 +70,12 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
     {
         if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isWalletsEnabled()
                 && !$this->worlpayhelper->getsubscriptionStatus()) {
-            return true;
+            if ($this->worlpayhelper->isGooglePayEnable() ||
+                $this->worlpayhelper->isSamsungPayEnable() ||
+                $this->worlpayhelper->isApplePayEnable()
+            ) {
+                   return true;
+            }
         }
         return false;
     }

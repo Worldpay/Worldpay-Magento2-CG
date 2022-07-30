@@ -390,7 +390,13 @@ EOD;
         $this->_addCDATA($streetElement, $street);
 
         $postalCodeElement = $address->addChild('postalCode');
-        $this->_addCDATA($postalCodeElement, $postalCode);
+        //Zip code mandatory for worldpay, if not provided by customer we will pass manually
+        $zipCode = '00000';
+        //If Zip code provided by customer
+        if($postalCode){
+		    $zipCode = $postalCode;
+        }
+        $this->_addCDATA($postalCodeElement, $zipCode);
 
         $cityElement = $address->addChild('city');
         $this->_addCDATA($cityElement, $city);

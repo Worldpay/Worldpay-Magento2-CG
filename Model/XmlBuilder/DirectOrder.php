@@ -696,7 +696,13 @@ EOD;
         $this->_addCDATA($streetElement, $street);
 
         $postalCodeElement = $address->addChild('postalCode');
-        $this->_addCDATA($postalCodeElement, $postalCode);
+        //Zip code mandatory for worldpay, if not provided by customer we will pass manually
+        $zipCode = '00000';
+        //If Zip code provided by customer
+        if($postalCode){
+		    $zipCode = $postalCode;
+        }
+        $this->_addCDATA($postalCodeElement, $zipCode);
 
         $cityElement = $address->addChild('city');
         $this->_addCDATA($cityElement, $city);
@@ -908,8 +914,12 @@ EOD;
      */
     private function _addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement)
     {
+        $isRecurringOrder =  isset($this->paymentDetails['isRecurringOrder'])? true : false;
         $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
         $storedCredentials['usage'] = "USED";
+        if($isRecurringOrder){
+            $storedCredentials['merchantInitiatedReason'] = "RECURRING";
+        }
         $storedCredentials->addChild('schemeTransactionIdentifier', $this->paymentDetails['transactionIdentifier']);
         return $storedCredentials;
     }

@@ -81,8 +81,8 @@ define([
             var fulltoken = data.paymentToken;
             if(window.isDynamic3DS2Enabled && (typeof fulltoken !== 'undefined')){
                 var paymentTok = fulltoken['summary'].split(", bin:")[0];
-                fulltoken['summary'] = paymentTok;
                 this.bin = fulltoken['summary'].split(", bin:")[1];
+                fulltoken['summary'] = paymentTok;                
                 if(this.bin !== null) {
                 var encryptedBin = btoa(this.bin);
                 window.sessionId = this.sessionId;

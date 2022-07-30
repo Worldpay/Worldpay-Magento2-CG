@@ -26,7 +26,7 @@ class Pending extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Model\Checkout\Service $checkoutservice
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
-     * @param \Sapient\Worldpay\Model\Payment\StateResponse $paymentStateResponse
+     * @param \Sapient\Worldpay\Model\Payment\StateResponseFactory $paymentStateResponse
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
      */
@@ -36,7 +36,7 @@ class Pending extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Sapient\Worldpay\Model\Checkout\Service $checkoutservice,
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
-        \Sapient\Worldpay\Model\Payment\StateResponse $paymentStateResponse,
+        \Sapient\Worldpay\Model\Payment\StateResponseFactory $paymentStateResponse,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
     ) {

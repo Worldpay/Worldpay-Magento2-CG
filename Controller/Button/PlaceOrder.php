@@ -183,6 +183,7 @@ class PlaceOrder extends Action
             $this->checkoutSession->setInstantPurchaseRedirectUrl($this->redirect->getRefererUrl());
             $this->checkoutSession->setInstantPurchaseMessage($message);
             $message = __('');
+            return $this->createResponse($message, true);
         } else {
             return $this->createResponse($message, true);
         }

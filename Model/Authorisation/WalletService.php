@@ -85,7 +85,7 @@ class WalletService extends \Magento\Framework\DataObject
             );
 
             $response = $this->paymentservicerequest->walletsOrder($walletOrderParams);
-/*        $response = '<?xml version="1.0" encoding="UTF-8"?>
+    /*    $response = '<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE paymentService PUBLIC "-//WorldPay//DTD WorldPay PaymentService v1//EN"
                                 "http://dtd.worldpay.com/paymentService_v1.dtd">
 <paymentService version="1.4" merchantCode="SAPIENTNITROECOMMERCEV1"><reply><orderStatus orderCode="gpay-2"><challengeRequired><threeDSChallengeDetails><threeDSVersion>1.0.2</threeDSVersion><transactionId3DS>1BqYFw0XafF2NQDwEsSF</transactionId3DS><acsURL><![CDATA[https://worldpay.com]]></acsURL><payload>eJxVUttOwzAM/ZVoz7CkYZR2MkaDIbGHjbGND4hSi1WiaUkyuvH1JN3defHx5dixDU/b6pv9knVlbR57SV/02BPCam2JxkvSG0sIU3JOfRErixCRCpnJJBdpnuQ9hPloQT8IBwYMBH0J/AhDqtVrZTyC0j/PkxkmZwF+sEFFdjK+dEW5Pcft/dAo59raFpjIu8F9+pABP5nAqIpwqZqSjGez0tuarch5tvS1JeCdG3S9Md7uMJMp8COAjf3GtffNkPO2bftuT2IiR1/XFfAYAPz8l/kmai4QbssCp3+T3XSl/2bjiXz/GF3KI/AYAYXyhFJIkYgkZWIwTLJhbKGzg6piJ/j6uWDiRogwl70BmlhntAfBfAkhrMaS0TvM4xxOCGjb1Ca0j2ENJx0KchpHRcEMtUwrW7DSsOmOKd1NIXQSA4Cff/byFnemfRj8/eD6xcV1jlisDBOUuci6ahEAj6n8cBj8cDxBuzqqfwFtzCg=</payload></threeDSChallengeDetails></challengeRequired></orderStatus></reply></paymentService>
@@ -126,6 +126,27 @@ class WalletService extends \Magento\Framework\DataObject
             );
 
             $response = $this->paymentservicerequest->applePayOrder($applePayOrderParams);
+            /* dummy Apple Pay Response , Please remove before release
+            $response = '<?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE paymentService PUBLIC "-//WorldPay//DTD WorldPay PaymentService v1//EN"
+                                            "http://dtd.worldpay.com/paymentService_v1.dtd">
+            <paymentService version="1.4" merchantCode="SAPIENTNITROECOM">
+            <reply><orderStatus orderCode="000001007-1646392522">
+            <payment><paymentMethod>ECMC-SSL</paymentMethod><paymentMethodDetail>
+            <card number="520424******2484" type="creditcard">
+            <expiryDate><date month="09" year="2022"/></expiryDate>
+            </card></paymentMethodDetail>
+            <amount value="3882" currencyCode="USD" exponent="2" debitCreditIndicator="credit"/>
+            <lastEvent>AUTHORISED</lastEvent>
+            <AuthorisationId id="516808"/><CVCResultCode description="B"/><AVSResultCode description="H"/>
+            <issuerCountryCode>US</issuerCountryCode><balance accountType="IN_PROCESS_AUTHORISED">
+            <amount value="3882" currencyCode="USD" exponent="2" debitCreditIndicator="credit"/></balance>
+            <riskScore Provider="FraudSight" finalScore="0"
+            id="27930203-0940-411d-b79c-f39648c684d9" message="low-risk"/>
+            <FraudSight score="0" id="27930203-0940-411d-b79c-f39648c684d9" message="low-risk">
+            <reasonCodes><reasonCode>SUSPECTED FRAUD</reasonCode>
+            </reasonCodes></FraudSight></payment></orderStatus></reply></paymentService>';
+             */
             $directResponse = $this->directResponse->setResponse($response);
             $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment);
             $this->_applyPaymentUpdate($directResponse, $payment);

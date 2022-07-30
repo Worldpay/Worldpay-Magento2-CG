@@ -1,5 +1,15 @@
 Latest releases for all supported version:
 
+For Magento 2.4.4
+
+Worldpay Plugin version: 2.4.4-rc0722
+1. Magento 2.4.4 compatible
+2. Apple pay available on PDP
+3. Google Pay available on PDP
+4. Logo/icon uploader for payment methods
+5. Security alert configuration
+6. Loading payment methods from multiple merchant codes.
+
 For Magento 2.4.3
 
 Worldpay Plugin version: 2.4.3-p20622

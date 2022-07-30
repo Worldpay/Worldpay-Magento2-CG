@@ -42,6 +42,7 @@ class Cancel extends \Magento\Backend\App\Action
      * @param \Sapient\Worldpay\Model\Adminhtml\Order\Service $adminorderservice
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Model\Payment\StateResponse $paymentStateResponse
+     * @param \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
      */
     public function __construct(
         Context $context,
@@ -51,7 +52,8 @@ class Cancel extends \Magento\Backend\App\Action
         \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice,
         \Sapient\Worldpay\Model\Adminhtml\Order\Service $adminorderservice,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
-        \Sapient\Worldpay\Model\Payment\StateResponse $paymentStateResponse
+        \Sapient\Worldpay\Model\Payment\StateResponse $paymentStateResponse,
+        \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
     ) {
        
         parent::__construct($context);
@@ -62,6 +64,7 @@ class Cancel extends \Magento\Backend\App\Action
         $this->adminorderservice = $adminorderservice;
         $this->authenticatinservice = $authenticatinservice;
         $this->paymentStateResponse = $paymentStateResponse;
+        $this->wpresponse = $wpresponse;
     }
     /**
      * Execute if payment is canceled
@@ -79,7 +82,7 @@ class Cancel extends \Magento\Backend\App\Action
         $params = $this->getRequest()->getParams();
         if ($this->authenticatinservice->requestAuthenticated($params)) {
             $this->_applyPaymentUpdate(
-                $this->paymentStateResponse->createFromCancelledResponse($params),
+                $this->wpresponse->createFromCancelledResponse($params),
                 $worldPayOrder
             );
         }

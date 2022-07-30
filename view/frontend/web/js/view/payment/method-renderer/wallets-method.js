@@ -147,6 +147,7 @@ define(
                 SavedcreditCardVerificationNumber:'',
                 cseData:null
             },
+            walletCCTypes : ccTypesArr,
             initialize: function () {
                 this._super();
                 this.selectedCCType(null);
