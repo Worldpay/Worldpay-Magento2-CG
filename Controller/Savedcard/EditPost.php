@@ -14,6 +14,7 @@ use Magento\Vault\Model\PaymentTokenManagement;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Exception;
 use Sapient\Worldpay\Helper\MyAccountException;
+use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Controller for Updating Saved card
@@ -33,6 +34,10 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
      * @var $helper
      */
     protected $helper;
+    /**
+     * @var Magento\Framework\Serialize\Serializer\Json
+     */
+    protected $serializer;
 
     /**
      * Constructor
@@ -48,6 +53,7 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
      * @param PaymentTokenRepositoryInterface $tokenRepository
      * @param PaymentTokenManagement $paymentTokenManagement
      * @param MyAccountException $helper
+     * @param Json $serializer
      */
     public function __construct(
         Context $context,
@@ -60,7 +66,8 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         PaymentTokenRepositoryInterface $tokenRepository,
         PaymentTokenManagement $paymentTokenManagement,
-        MyAccountException $helper
+        MyAccountException $helper,
+        Json $serializer
     ) {
         parent::__construct($context);
         $this->_storeManager = $storeManager;
@@ -73,6 +80,7 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
         $this->tokenRepository = $tokenRepository;
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->helper = $helper;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -249,7 +257,7 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
 
     private function convertDetailsToJSON($details)
     {
-        $json = \Zend_Json::encode($details);
+        $json = $this->serializer->serialize($details);
         return $json ? $json : '{}';
     }
     

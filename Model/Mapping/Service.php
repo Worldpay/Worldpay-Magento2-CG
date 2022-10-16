@@ -343,10 +343,10 @@ class Service
         } else {
             $paymentType = $this->_getRedirectPaymentType($paymentDetails);
             $updatedPaymentDetails = ['token_type' => $this->worldpayHelper->getMerchantTokenization()];
-        }        
+        }
         $savemyCard = isset($paymentDetails['additional_data']['save_my_card'])
         ? $paymentDetails['additional_data']['save_my_card'] : '';
-$storedCredentialsEnabled = isset($paymentDetails['additional_data']['stored_credentials_enabled'])
+        $storedCredentialsEnabled = isset($paymentDetails['additional_data']['stored_credentials_enabled'])
         ? $paymentDetails['additional_data']['stored_credentials_enabled'] : '';
 
         //level23 data
@@ -418,7 +418,6 @@ $storedCredentialsEnabled = isset($paymentDetails['additional_data']['stored_cre
                 'storedCredentialsEnabled' => $storedCredentialsEnabled,
                 
             ];
-
     }
     /**
      * Collect Klarna Order Parameters

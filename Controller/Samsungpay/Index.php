@@ -31,8 +31,8 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     public $quoteIdMaskFactory;
      /**
-     * @var $customerSession
-     */
+      * @var $customerSession
+      */
     public $customerSession;
     /**
      * Constructor
@@ -46,6 +46,9 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
+     * @param QuoteIdMaskFactory $quoteIdMaskFactory
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      */
     public function __construct(
         Context $context,
@@ -58,7 +61,8 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Sapient\Worldpay\Helper\CurlHelper $curlHelper,
         QuoteIdMaskFactory $quoteIdMaskFactory,
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Customer\Model\Session $customerSession,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper
     ) {
         parent::__construct($context);
         $this->wplogger = $wplogger;
@@ -71,6 +75,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->curlHelper = $curlHelper;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->customerSession=$customerSession;
+        $this->worldpayHelper = $worldpayHelper;
     }
     /**
      * Execute
@@ -102,19 +107,19 @@ class Index extends \Magento\Framework\App\Action\Action
         $baseUrl =  $this->_storeManager->getStore()->getBaseUrl();
         
          $quoteId = $this->request->getParam('quoteId');
-         if(!$this->customerSession->isLoggedIn()){
+        if (!$this->customerSession->isLoggedIn()) {
             $quoteIdMask = $this->quoteIdMaskFactory->create();
             $quoteIdMask->load($quoteId, 'masked_id');
             $quoteId = $quoteIdMask->getQuoteId();
-         }
+        }
          $quote = $this->quoteFactory->create()->load($quoteId);
-         $quoteData = $quote->getData();         
+         $quoteData = $quote->getData();
          $currency = $quote->getQuoteCurrencyCode();
-         $grandTotal =  $quote->getGrandTotal();        
+         $grandTotal =  $quote->getGrandTotal();
          $postFields = [];
          
          $callBack = $baseUrl . 'worldpay/samsungpay/CallBack';
-         
+         $exponent = $this->worldpayHelper->getCurrencyExponent($currency);
          $postFields['callback'] = $callBack;
          $postFields['paymentDetails']['service']['id'] = $serviceId;
          $postFields['paymentDetails']['orderNumber'] = 'sp-'.time();
@@ -123,7 +128,7 @@ class Index extends \Magento\Framework\App\Action\Action
          $postFields['paymentDetails']['protocol']['version'] = "80";
          $postFields['paymentDetails']['amount']['option'] = 'FORMAT_TOTAL_ESTIMATED_AMOUNT';
          $postFields['paymentDetails']['amount']['currency'] = $currency;
-         $postFields['paymentDetails']['amount']['total'] = $grandTotal;
+         $postFields['paymentDetails']['amount']['total'] = $this->_amountAsInt($grandTotal, $exponent);
          $postFields['paymentDetails']['merchant']['name'] = $shopName;
          $postFields['paymentDetails']['merchant']['url'] = $shopUrl;
          $postFields['paymentDetails']['merchant']['reference'] = 'ref-'.time();
@@ -160,5 +165,16 @@ class Index extends \Magento\Framework\App\Action\Action
             $this->wplogger->error($e->getMessage());
            
         }
+    }
+    /**
+     * Returns the rounded value of num to specified precision
+     *
+     * @param float $amount
+     * @param float $exponent
+     * @return int
+     */
+    private function _amountAsInt($amount, $exponent)
+    {
+        return round($amount, $exponent, PHP_ROUND_HALF_EVEN);
     }
 }

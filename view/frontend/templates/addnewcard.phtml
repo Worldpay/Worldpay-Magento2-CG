@@ -1,6 +1,4 @@
-<?php
-$storeCode = $block->getStoreCode();
-?>
+<?php $storeCode = $block->getStoreCode(); ?>
 <form class="form form-edit-account" name="addnewcardform" data-mage-init='{"validation":{}}'
       method="post" id="form_add_card" autocomplete="off">
     <fieldset class="fieldset info">
@@ -15,7 +13,7 @@ $storeCode = $block->getStoreCode();
 
         <div class="field card type required">
             <label class="label" for="card_type">
-                <span><?= /* @noEscape */$block->getCheckoutSpecificLabel('CO1') ?
+                <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO1') ?
                           $block->getCheckoutSpecificLabel('CO1') :
                           $block->escapeHtml(__('Credit Card Type'));
                 ?>
@@ -23,12 +21,12 @@ $storeCode = $block->getStoreCode();
      <!--       <span>Credit Card Type</span>-->
             </label>
             <div class="control">
-<?php $cctypes = $block->getCCtypes(); ?>
+            <?php $cctypes = $block->getCCtypes(); ?>
                 <select id="cc_type"
                         name="paymentType"
                         class="required-entry validate-cc-type-select control-select-new-card">
                     <option value="" selected="selected">
-                        <!--                Card type-->
+                    <!--  Card type-->
                     <?= /* @noEscape */ $block->getAccountLabelbyCode('IAVAC2') ?
                         $block->getAccountLabelbyCode('IAVAC2') : $block->escapeHtml(__('Card type'));
                     ?>
@@ -47,19 +45,18 @@ $storeCode = $block->getStoreCode();
 
         <div class="field card Number">
             <label class="label" for="card number">
-                <span>
-<?= /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
-    $block->getAccountLabelbyCode('AC3') : $block->escapeHtml(__('Card Number'))
-?>
-                </span>
+            <span>
+                <?= /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
+                    $block->getAccountLabelbyCode('AC3') : $block->escapeHtml(__('Card Number'))
+                ?>
+            </span>
             </label>
             <div class="control">
                 <input type="number" name="cardNumber" required='true' id="card_number" 
-                       title="
-                            <?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4')
-                                   ? $block->getCheckoutLabelbyCode('CO4') :
-                                     $block->escapeHtml(__('Card Holder Name'))?>"
-                       class="input-text required cardholder_name validate-cc-number 
+                    title="<?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4')
+                        ? $block->getCheckoutLabelbyCode('CO4') :
+                        $block->escapeHtml(__('Card Holder Name'))?>"
+                    class="input-text required cardholder_name validate-cc-number 
                        worldpay-cardholdername-length worldpay-cardnumber-valid">
             </div>
             <div id="card_number_msg" style="color:red;font-size: 1.2rem;"></div>
@@ -67,11 +64,11 @@ $storeCode = $block->getStoreCode();
 
         <div class="field card holder name">
             <label class="label" for="card holder name">
-                <span>
-<?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
-    $block->getCheckoutLabelbyCode('CO4') : $block->escapeHtml(__('Card Holder Name'))
-?>
-                </span>
+            <span>
+                <?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
+                    $block->getCheckoutLabelbyCode('CO4') : $block->escapeHtml(__('Card Holder Name'))
+                ?>
+            </span>
             </label>
             <div class="control">
                 <input type="text" name="cardHolderName" required='true' id="card-holder-name" 
@@ -96,10 +93,10 @@ $storeCode = $block->getStoreCode();
                         <select id="expiry_month" name="expiryMonth"
                                 class="month required validate-cc-exp required-entry worldpay-month-included 
                                 worldpay-month-length worldpay-month-range">
-<?php foreach ($block->getMonths() as $k => $v): ?>
+                            <?php foreach ($block->getMonths() as $k => $v): ?>
                                 <option value="<?= /* @noEscape */ $block->escapeHtml($k) ?>">
-    <?= /* @noEscape */ $block->escapeHtml($v) ?></option>
-<?php endforeach; ?>
+                                <?= /* @noEscape */ $block->escapeHtml($v) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
@@ -110,16 +107,16 @@ $storeCode = $block->getStoreCode();
                                 worldpay-year-included
                                 worldpay-year-length
                                 worldpay-year-range">
-<?php foreach ($block->getExpiryYears() as $k => $v): ?>
+                            <?php foreach ($block->getExpiryYears() as $k => $v): ?>
                                 <option value="<?= /* @noEscape */$block->escapeHtml($k) ?>">
-            <?= /* @noEscape */ $block->escapeHtml($v) ?></option>
-        <?php endforeach; ?>
+                                <?= /* @noEscape */ $block->escapeHtml($v) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
             </div>
         </div>
-<?php if ($block->requireCvcEnabled()): ?>
+    <?php if ($block->requireCvcEnabled()): ?>
             <div class="field required _required cvv">
                 <label for="cvv" class="label">
                     <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO5') ?
@@ -136,7 +133,7 @@ $storeCode = $block->getStoreCode();
                 </div>
                 <div id="cvv_msg" style="color:red;font-size: 1.2rem;"></div>
             </div> 
-<?php endif; ?>
+    <?php endif; ?>
         <!-- Disclaimer -->
         <label for="save-card" class="label">
             <?php if ($block->getStoredCredentialsEnabledValue() && $block->getDisclaimerMessageEnable()): ?> 
@@ -146,7 +143,7 @@ $storeCode = $block->getStoreCode();
                     
         <div title="Disclaimer!" id="dialog" style="display: none" align ="center" >
             <form id="disclaimer" name="disclaimer">
-                <div><?= $block->getDisclaimerText(); ?></div>
+                <div><?= /* @noEscape */ $block->getDisclaimerText(); ?></div>
             </form>
         </div>
         <div class="mage-error" generated="true" id="disclaimer-error"></div>
@@ -156,14 +153,14 @@ $storeCode = $block->getStoreCode();
                 <span><?php
                     print /* @noEscape */ $block->escapeHtml(
                         $block->getAccountLabelbyCode('IAVAC3') ?
-                                            $block->getAccountLabelbyCode('IAVAC3') : 'Default Billing Address'
+                        $block->getAccountLabelbyCode('IAVAC3') : 'Default Billing Address'
                     )
                     ?>
                 </span>
             </label>
             <div class="control">
                 <address>
-<?= $block->getPrimaryBillingAddressHtml() ?>
+        <?= $block->getPrimaryBillingAddressHtml() ?>
                 </address>
             </div>
         </div>

@@ -58,6 +58,7 @@ class Request
         $request = $this->_getRequest();
         $logger = $this->_wplogger;
         $url = $this->_getUrl();
+        $pluginTrackerDetails = $this->helper->getPluginTrackerdetails();
         $logger->info('Setting destination URL: ' . $url);
         $logger->info('Initialising request');
         $request->setOption(CURLOPT_POST, self::CURL_POST);
@@ -71,13 +72,13 @@ class Request
         // Cookie Set to 2nd 3DS request only.
         $cookie = $this->helper->getWorldpayAuthCookie();
         if ($this->helper->isThreeDSRequest() && $cookie != "") { // Check is 3DS request
-            $cookie = $cookie.';SameSite=None; Secure';
+            $cookie = $cookie.';SameSite=None';
             $request->setOption(CURLOPT_COOKIE, $cookie);
         }
         if ($this->helper->isDynamic3DS2Enabled() && $cookie != "") { // Check is 3DS2 request
             $request->setOption(CURLOPT_COOKIE, $cookie);
         }
-        $request->addCookie(CURLOPT_COOKIE, $cookie);
+        //$request->addCookie(CURLOPT_COOKIE, $cookie);
         $request->setTimeout(self::CURL_TIMEOUT);
         $request->setHeaders([
             'Content-Type'=> 'text/xml',
@@ -86,6 +87,37 @@ class Request
         $logger->info('Sending XML as: ' . $this->_getObfuscatedXmlLog($quote));
 
         $request->setOption(CURLOPT_HEADER, 1);
+        $request->setOption(
+            CURLOPT_HTTPHEADER,
+            ["content-type: application/json",
+               "MERCHANT_ID" => $pluginTrackerDetails['MERCHANT_ID'],
+               "API_USERNAME" => $pluginTrackerDetails['API_USERNAME'],
+               "MAGENTO_EDITION"=>$pluginTrackerDetails['MAGENTO_EDITION'],
+               "MAGENTO_VERSION"=>$pluginTrackerDetails['MAGENTO_VERSION'],
+               "PHP_VERSION"=> $pluginTrackerDetails['PHP_VERSION'],
+               "CURRENT_WORLDPAY_PLUGIN_VERSION"=>isset($pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION'])?
+               $pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION']:"",
+               "WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE" =>
+               isset($pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE'])?
+               $pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE']:"",
+               "UPGRADE_DATES" => isset($pluginTrackerDetails['UPGRADE_DATES'])?
+               $pluginTrackerDetails['UPGRADE_DATES']:""
+            ]
+        );
+        $logger->info('Sending additional headers as: ' . json_encode([
+                "MERCHANT_ID" => $pluginTrackerDetails['MERCHANT_ID'],
+                "API_USERNAME" => $pluginTrackerDetails['API_USERNAME'],
+                "MAGENTO_EDITION"=>$pluginTrackerDetails['MAGENTO_EDITION'],
+                "MAGENTO_VERSION"=>$pluginTrackerDetails['MAGENTO_VERSION'],
+                "PHP_VERSION"=> $pluginTrackerDetails['PHP_VERSION'],
+                "CURRENT_WORLDPAY_PLUGIN_VERSION"=>isset($pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION'])?
+                $pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION']:"",
+                "WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE" =>
+                isset($pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE'])?
+                $pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE']:"",
+                "UPGRADE_DATES" => isset($pluginTrackerDetails['UPGRADE_DATES'])?
+                $pluginTrackerDetails['UPGRADE_DATES']:""
+            ]));
         $request->setOption(CURLINFO_HEADER_OUT, 1);
         $request->post($url, $quote->saveXML());
 
@@ -116,14 +148,7 @@ class Request
         $body = array_pop($bits);
         $headers = implode("\r\n\r\n", $bits);
         // Extracting Cookie from Response Header.
-        if (preg_match("/set-cookie: (.+?)([\r\n]|$)/", $headers, $match)) {
-            // Keep a hold of the cookie returned incase we need to send a
-            // second order message after 3dSecure check
-            $logger->info('Cookie Get: ' . $match[1]);
-            $this->helper->setWorldpayAuthCookie($match[1]);
-        }
-        // if we get Set-Cookie instead of set-cookie
-        if (preg_match("/Set-Cookie: (.+?)([\r\n]|$)/", $headers, $match)) {
+        if (preg_match("/set-cookie: (.+?)([\r\n]|$)/i", $headers, $match)) {
             // Keep a hold of the cookie returned incase we need to send a
             // second order message after 3dSecure check
             $logger->info('Cookie Get: ' . $match[1]);

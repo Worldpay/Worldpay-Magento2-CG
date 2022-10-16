@@ -33,7 +33,4 @@
     <event name="checkout_onepage_controller_success_action">
         <observer name="worldpay_order_place_after" instance="Sapient\Worldpay\Observer\AfterPlaceOrder"/>
     </event>
-
-
-    
 </config>

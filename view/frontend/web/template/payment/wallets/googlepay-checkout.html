@@ -1,3 +1,5 @@
-<!-- ko if: ( isActive())-->
- <div id="wp-google-pay-btn"></div>
- <!-- /ko -->
+<div id="gpay-checkout-container" data-bind="afterRender: initGpayCheckout">
+    <!-- ko if: ( isActive())-->
+     <div id="wp-google-pay-btn"></div>
+     <!-- /ko -->
+</div>    

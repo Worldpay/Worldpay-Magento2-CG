@@ -9,11 +9,12 @@ if ($params) {
     $ccNumber = str_replace(' ', '+', $params['instrument']);
 }
 $ddcUrl = $block->getDdcUrl();
+$decoder = $block->getDecoder();
 ?>
 
 <form method="post" action="<?= /* @noEscape */ $ddcUrl;?>" id="collectionForm" name="collectionForm"> 
-    <input type="hidden" name="Bin" id="first_bin" value="<?php echo base64_decode($ccNumber); ?>" />
-    <input type="hidden" name="JWT" id="first_jwt" value="<?php echo $block->getJwtToken(); ?>" />
+    <input type="hidden" name="Bin" id="first_bin" value="<?= /* @noEscape */ $decoder->decode($ccNumber); ?>" />
+    <input type="hidden" name="JWT" id="first_jwt" value="<?= /* @noEscape */ $block->getJwtToken(); ?>" />
 </form>
 
 <script language="Javascript">    

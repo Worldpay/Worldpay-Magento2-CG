@@ -46,6 +46,10 @@
                                                                         <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/applepay-checkout</item>  
                                                                         <item name="displayArea" xsi:type="string">applepayCheckout</item>
                                                                     </item>
+                                                                    <item name="samsungpayCheckout" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/samsungpay-checkout</item>  
+                                                                        <item name="displayArea" xsi:type="string">samsungpayCheckout</item>
+                                                                    </item>
                                                                 </item>                                                          
                                                         </item>
                                                     </item>

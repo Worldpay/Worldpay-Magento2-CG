@@ -852,6 +852,12 @@ define(
             isActive: function() {
                 return true;
             },
+            isRegisteredUser: function(){
+                if(customer.isLoggedIn()){
+                    return true;
+                }
+                return false;
+            },
             paymentMethodSelection: function() {
                 return window.checkoutConfig.payment.ccform.paymentMethodSelection;
             },

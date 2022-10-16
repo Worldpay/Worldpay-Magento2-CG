@@ -34,10 +34,12 @@
         <div class="payment-method-cc-form">
             <!-- ko template: 'Sapient_Worldpay/payment/cc-form' --><!-- /ko -->
         </div>
+        <!-- ko if: ( isRegisteredUser() == true)-->   
         <div style="width: 100%; height:100%;display:inline-block;margin-bottom:20px;margin-top:10px">
         <span style="color:red;"><i>*<!-- ko i18n: getCheckoutLabels('CO21')--><!-- /ko -->
                 </i></span>
         </div>
+        <!--/ko-->
         
         <!-- ko foreach: getRegion('messages') -->
             <!-- ko template: getTemplate() --><!-- /ko -->

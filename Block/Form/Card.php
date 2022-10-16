@@ -277,6 +277,9 @@ class Card extends \Magento\Payment\Block\Form
         $adminQuote = $this->adminsessionquote->getQuote();
         $address = $adminQuote->getBillingAddress();
         $countryId = $address->getCountryId();
+        if (empty($countryId)) {
+            $countryId = $this->worldpayhelper->getDefaultCountry();
+        }
         $paymenttypes = $this->paymenttypes->getPaymentType($countryId);
         return json_decode($paymenttypes);
     }

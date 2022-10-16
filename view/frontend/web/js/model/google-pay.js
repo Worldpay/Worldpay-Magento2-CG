@@ -76,7 +76,7 @@
             }else{
                 $("#"+container).css(
                     {
-                        'width': "49%",
+                        'width': "88%",
                         'margin-bottom': "10px"
                     }
                 )

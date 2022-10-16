@@ -7,8 +7,7 @@
 /** @var \Sapient\Worldpay\Block\Wallets $block */
 ?>
 
-<?php if ($block->isWalletsEnabled()): ?>
-    <?php //if(!$block->isSubscriptionProduct()): ?>
+<?php if ($block->isWalletsEnabled()): ?>    
 <div id="wp-wallet-pay" data-bind="scope:'wp-wallet-pay'"> 
     <?= $block->getChildHtml(); ?>
 </div>
@@ -43,7 +42,9 @@
         font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif;
         font-style: normal;
     }
-    .checkout-information .customer-shipping-address-radio-wrapper , .checkout-information .shippingmethods-radio-wrapper , .checkout-information .customer-billing-address-radio-wrapper {
+    .checkout-information .customer-shipping-address-radio-wrapper ,
+    .checkout-information .shippingmethods-radio-wrapper , 
+    .checkout-information .customer-billing-address-radio-wrapper {
         padding-bottom: 17px;
         line-height: 25px;
     }

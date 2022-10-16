@@ -67,6 +67,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param SerializerInterface $serializer
      * @param \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries
      * @param \Magento\Backend\Model\Session\Quote $adminsessionquote
+     * @param \Magento\Framework\App\ProductMetadataInterface $productMetaData
      */
 
     public function __construct(
@@ -88,7 +89,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Sapient\Worldpay\Helper\Currencyexponents $currencyexponents,
         SerializerInterface $serializer,
         \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries,
-        \Magento\Backend\Model\Session\Quote $adminsessionquote
+        \Magento\Backend\Model\Session\Quote $adminsessionquote,
+        \Magento\Framework\App\ProductMetadataInterface $productMetaData
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
@@ -109,6 +111,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->serializer = $serializer;
         $this->klarnaCountries = $klarnaCountries;
         $this->adminsessionquote = $adminsessionquote;
+        $this->productMetaData = $productMetaData;
     }
     /**
      * Is WorldPay Enable or not
@@ -2170,7 +2173,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function isGlobalApmEnable()
     {
         return $this->_scopeConfig->getValue(
-            'worldpay/global_apm/enable_global_apm_call',
+            'worldpay/general_config/enable_global_apm_call',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
@@ -2315,7 +2318,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getBaseUrl()
     {
-        return $this->_storeManager->getStore()->getBaseUrl();
+        return $this->_scopeConfig->getValue("web/secure/base_url");
     }
     /**
      *  Check if googlepay enable on PDP
@@ -2442,5 +2445,83 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $storeId = $this->_storeManager->getStore()->getId();
         }
         return $storeId;
+    }
+    /**
+     * Get Current Worldpay Plugin
+     */
+    public function getCurrentWopayPluginVersion()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/general_config/plugin_tracker/current_wopay_plugin_version',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get Current Worldpay Plugin History
+     */
+    public function getWopayPluginVersionHistory()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/general_config/plugin_tracker/wopay_plugin_version_history',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get Plugin Upgrade Dates
+     */
+    public function getUpgradeDates()
+    {
+         return $this->_scopeConfig->getValue(
+             'worldpay/general_config/plugin_tracker/upgrade_dates',
+             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+         );
+    }
+    /**
+     * Get Plugin PHP Version
+     */
+    public function getPhpVersionUsed()
+    {
+        return phpversion();
+    }
+    /**
+     * Get Current Magento Version Details
+     */
+    public function getCurrentMagentoVersionDetails()
+    {
+        $magento['Edition'] = $this->productMetaData->getEdition();
+        $magento['Version'] = $this->productMetaData->getVersion();
+        return $magento;
+    }
+    /**
+     * Get Plugin Tracker Details
+     */
+    public function getPluginTrackerdetails()
+    {
+        $details=[];
+        $details['MERCHANT_ID'] = $this->_scopeConfig->getValue(
+            'worldpay/general_config/merchant_code',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        $details['API_USERNAME'] = $this->_scopeConfig->getValue(
+            'worldpay/general_config/xml_username',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        $magento = $this->getCurrentMagentoVersionDetails();
+        $details['MAGENTO_EDITION'] = $magento['Edition'];
+        $details['MAGENTO_VERSION'] = $magento['Version'];
+        $details['PHP_VERSION'] = $this->getPhpVersionUsed();
+        
+        if (($this->getCurrentWopayPluginVersion()!=null) && !empty($this->getCurrentWopayPluginVersion())) {
+            $details['CURRENT_WORLDPAY_PLUGIN_VERSION'] = $this->getCurrentWopayPluginVersion();
+        }
+        
+        if (($this->getWopayPluginVersionHistory()!=null) && !empty($this->getWopayPluginVersionHistory())) {
+            $details['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE'] = $this->getWopayPluginVersionHistory();
+        }
+        
+        if (($this->getUpgradeDates()!=null) && !empty($this->getUpgradeDates())) {
+            $details['UPGRADE_DATES'] = $this->getUpgradeDates();
+        }
+        return $details;
     }
 }

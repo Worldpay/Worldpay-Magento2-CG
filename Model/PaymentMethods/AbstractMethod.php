@@ -235,7 +235,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 $quote = $adminquote;
             }
         }
-
         $orderCode = $this->_generateOrderCode($quote);
 
         if (!empty($this->worlpayhelper->getOrderCodeFromCheckoutSession())) {
@@ -415,6 +414,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $cardType = $paymentdetails['additional_data']['cc_type'];
         if ($cardType == 'savedcard') {
             $cardType = $this->_getpaymentType();
+            if($mode == 'redirect'){
+                $tokenId = $this->getTokenIdByCode($paymentdetails['additional_data']['tokenCode']);
+                $this->registry->register('token_code',$tokenId);
+            }
         }
 
         $wpp->setData('order_id', $orderId);
@@ -854,5 +857,21 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             }
         }
         return $typePresent;
+    }
+    /**
+     * Get TokenId by token code
+     */
+    public function getTokenIdByCode($tokenCode){
+        $merchantTokenEnabled = $this->worlpayhelper->getMerchantTokenization();
+        $tokenType = $merchantTokenEnabled ? 'merchant' : 'shopper';
+        $savedCard= $this->_savecard->create()->getCollection()
+                ->addFieldToSelect(['method'])
+                ->addFieldToFilter('token_code', ['eq' => $tokenCode])
+                ->addFieldToFilter('token_type', ['eq' => $tokenType])
+                ->getData();
+        if ($savedCard) {
+            return $savedCard[0]['id'];
+        }
+        return "";
     }
 }

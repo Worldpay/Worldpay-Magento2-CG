@@ -10,19 +10,27 @@ class Jwt extends \Magento\Framework\View\Element\Template
      */
     
     protected $helper;
+
+    /**
+     * @var \Magento\Framework\Url\DecoderInterface
+     */
+    public $decoder;
     
     /**
      * Jwt constructor
      *
      * @param Context $context
      * @param string $helper
+     * @param \Magento\Framework\Url\DecoderInterface $decoder
      */
 
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
-        Data $helper
+        Data $helper,
+        \Magento\Framework\Url\DecoderInterface $decoder
     ) {
         $this->_helper = $helper;
+        $this->decoder = $decoder;
         parent::__construct($context);
     }
     /**
@@ -93,7 +101,8 @@ class Jwt extends \Magento\Framework\View\Element\Template
     /**
      * Create JWT Token
      */
-    public function getJwtToken(){
+    public function getJwtToken()
+    {
         $params = $this->getRequest()->getParams();
         $jwtApiKey = $this->getJwtApiKey();
         $jwtIssuer = $this->getJwtIssuer();
@@ -113,5 +122,12 @@ class Jwt extends \Magento\Framework\View\Element\Template
         $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
         $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
         return $jwt;
+    }
+    /**
+     * Get magento decoder class
+     */
+    public function getDecoder()
+    {
+        return $this->decoder;
     }
 }

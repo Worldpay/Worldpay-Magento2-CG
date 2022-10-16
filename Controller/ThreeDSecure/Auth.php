@@ -184,9 +184,10 @@ class Auth extends \Magento\Framework\App\Action\Action
                         </div>
                         <div class="iframe-content">
                             <iframe src="' . $challengeUrl . '" name="jwt_frm" id="jwt_frm"
-                                style="text-align: center; vertical-align: middle; height: 50%;
+                                style="text-align: center; vertical-align: middle; height: 400px;
                                 display: table-cell; margin: 0 25%;
-                                width: -webkit-fill-available; z-index:999999;">
+                                width: -moz-available; width: -webkit-fill-available;
+                                width: fill-available; z-index:999999; z-index:999999;">
                             </iframe>
                         </div>
                     </div>
