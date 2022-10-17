@@ -11,6 +11,7 @@ use Magento\Vault\Model\CreditCardTokenFactory;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
 use Magento\Vault\Model\Ui\VaultConfigProvider;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Updating Risk gardian
@@ -34,6 +35,11 @@ class UpdateWorldpayment
      * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
      */
     private $transactionsFactory;
+
+    /**
+     * @var Magento\Framework\Serialize\Serializer\Json
+     */
+    protected $serializer;
     /**
      * Constructor
      *
@@ -49,6 +55,7 @@ class UpdateWorldpayment
      * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
      * @param EncryptorInterface $encryptor
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
+     * @param Json $serializer
      */
     public function __construct(
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
@@ -62,7 +69,8 @@ class UpdateWorldpayment
         \Magento\Backend\Model\Session\Quote $session,
         \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
         EncryptorInterface $encryptor,
-        \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
+        \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
+        Json $serializer
     ) {
         $this->wplogger = $wplogger;
         $this->savedTokenFactory = $savedTokenFactory;
@@ -76,6 +84,7 @@ class UpdateWorldpayment
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->encryptor = $encryptor;
         $this->transactionFactory = $transactionsFactory;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -514,7 +523,7 @@ class UpdateWorldpayment
      */
     private function convertDetailsToJSON($details)
     {
-        $json = \Zend_Json::encode($details);
+        $json = $this->serializer->serialize($details);
         return $json ? $json : '{}';
     }
 

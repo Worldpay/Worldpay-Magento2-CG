@@ -2,6 +2,10 @@ Latest releases for all supported version:
 
 For Magento 2.4.4
 
+Worldpay Plugin version: 2.4.4-p11022
+1. Magento 2.4.4-p1 compatible
+2. Plugin tracker
+
 Worldpay Plugin version: 2.4.4-rc0722
 1. Magento 2.4.4 compatible
 2. Apple pay available on PDP

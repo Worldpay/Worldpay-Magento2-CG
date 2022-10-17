@@ -84,6 +84,7 @@ class Webpayment extends Template
      * @param SessionManagerInterface $session
      * @param SerializerInterface $serializer
      * @param Magento\Framework\View\Asset\Repository $assetRepo
+     * @param Magento\Framework\App\Request\Http $httpRequest
      * @param array $data
      */
     public function __construct(
@@ -549,7 +550,8 @@ class Webpayment extends Template
     /**
      * Check if Checkout Cart Page
      */
-    public function isCheckoutCartPage(){
+    public function isCheckoutCartPage()
+    {
         if ($this->httpRequest->getFullActionName() == 'checkout_cart_index') {
             return true;
         }

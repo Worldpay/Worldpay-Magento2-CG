@@ -208,6 +208,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['googleMerchantid'] = $this->worldpayHelper->googleMerchantid();
                 $config['payment']['ccform']['appleMerchantid'] = $this->worldpayHelper->appleMerchantId();
                 $config['payment']['ccform']['isApplePayEnable'] = $this->worldpayHelper->isApplePayEnable();
+                $config['payment']['ccform']['isSamsungPayEnable'] = $this->worldpayHelper->isSamsungPayEnable();
                 
                 if ($this->worldpayHelper->getEnvironmentMode()=='Live Mode') {
                     $config['payment']['general']['environmentMode'] = "PRODUCTION";

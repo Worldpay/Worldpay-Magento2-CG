@@ -50,7 +50,12 @@
                 env_mode : window.checkoutConfig.payment.general.environmentMode
             },
         },
-
+        initGpayCheckout: function () {
+            var self= this;
+            if(self.isActive() && ($('.gpay-card-info-container').length == 0)){
+                    self.addGooglePayButton();
+             }   
+        },
         initialize: function () { 
             this._super();
             var self=this;
@@ -61,7 +66,7 @@
                 if(settings.url.indexOf("worldpay/latam/types") != -1)
                 {
                     if(self.isActive() && ($('.gpay-card-info-container').length == 0)){
-                        self.addGooglePayButton();
+                        //self.addGooglePayButton();
                     }
                 }                
             });

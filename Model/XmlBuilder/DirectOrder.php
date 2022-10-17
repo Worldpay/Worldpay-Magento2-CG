@@ -699,8 +699,8 @@ EOD;
         //Zip code mandatory for worldpay, if not provided by customer we will pass manually
         $zipCode = '00000';
         //If Zip code provided by customer
-        if($postalCode){
-		    $zipCode = $postalCode;
+        if ($postalCode) {
+            $zipCode = $postalCode;
         }
         $this->_addCDATA($postalCodeElement, $zipCode);
 
@@ -847,7 +847,7 @@ EOD;
         if ($dfReferenceId) {
             $addisional3DsElement = $order->addChild('additional3DSData');
             $addisional3DsElement['dfReferenceId'] = $this->paymentDetails['dfReferenceId'];
-            $addisional3DsElement['challengeWindowSize'] = "390x400";
+            $addisional3DsElement['challengeWindowSize'] = "600x400";
             $addisional3DsElement['challengePreference'] = "challengeMandated";
             return $addisional3DsElement;
         }
@@ -917,7 +917,7 @@ EOD;
         $isRecurringOrder =  isset($this->paymentDetails['isRecurringOrder'])? true : false;
         $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
         $storedCredentials['usage'] = "USED";
-        if($isRecurringOrder){
+        if ($isRecurringOrder) {
             $storedCredentials['merchantInitiatedReason'] = "RECURRING";
         }
         $storedCredentials->addChild('schemeTransactionIdentifier', $this->paymentDetails['transactionIdentifier']);

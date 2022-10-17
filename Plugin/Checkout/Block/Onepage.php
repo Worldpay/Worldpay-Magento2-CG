@@ -6,6 +6,8 @@
 
 namespace Sapient\Worldpay\Plugin\Checkout\Block;
 
+use Magento\Framework\Serialize\Serializer\Json;
+
 class Onepage
 {
     /**
@@ -17,17 +19,24 @@ class Onepage
      * @var \Magento\Checkout\Model\Session
      */
     private $checkoutSession;
+    /**
+     * @var Magento\Framework\Serialize\Serializer\Json
+     */
+    protected $serializer;
 
     /**
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param Json $serializer
      */
     public function __construct(
         \Sapient\Worldpay\Helper\Recurring $recurringHelper,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        Json $serializer
     ) {
         $this->recurringHelper = $recurringHelper;
         $this->checkoutSession = $checkoutSession;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -41,7 +50,7 @@ class Onepage
     {
         $quote = $this->checkoutSession->getQuote();
         if ($quote && $this->recurringHelper->quoteContainsSubscription($quote)) {
-            $jsLayout = \Zend_Json::decode($result);
+            $jsLayout = $this->serializer->unserialize($result);
             if (isset(
                 $jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']
                 ['payment']['children']['afterMethods']['children']['giftCardAccount']
@@ -50,7 +59,7 @@ class Onepage
                     $jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']
                     ['payment']['children']['afterMethods']['children']['giftCardAccount']
                 );
-                $result = \Zend_Json::encode($jsLayout);
+                $result = $this->serializer->serialize($jsLayout);
             }
         }
 

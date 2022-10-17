@@ -11,8 +11,9 @@
     'ko',    
     'mage/storage',
     'mage/url',
-    'mage/translate'
-], function ($, ko,storage,urlBuilder,$t){
+    'mage/translate',
+	'samsungPay'
+], function ($, ko,storage,urlBuilder,$t, samsungPay){
     'use strict';  
 
     return {
@@ -226,7 +227,7 @@
             }
     
         },
-        setPaymentInformationAndPlaceOrder : function(checkoutObj){             
+        setPaymentInformationAndPlaceOrder : function(checkoutObj, samsungResponse = null){
                 var paymentDetails = {
                     "paymentMethod": checkoutObj.paymentDetails,
                     "billing_address": checkoutObj.billingAddress
@@ -235,6 +236,7 @@
                 var type="POST";
                 var guestMaskedQuoteId = checkoutObj.guest_masked_quote_id;
                 var orderApiUrl;
+				var cc_type = checkoutObj.paymentDetails.additional_data.cc_type;
                 if (checkoutObj.isCustomerLoggedIn) { //Api for logged in customer
                     orderApiUrl = BASE_URL + 'rest/'+checkoutObj.storecode+'/V1/carts/mine/payment-information';
                     type = 'POST';
@@ -262,6 +264,18 @@
                                 window.location.href = BASE_URL + 'checkout/cart?error=true';                                
                             }
                             console.log(orderResponse);
+							if(cc_type == 'SAMSUNGPAY-SSL'){
+								var cancel = urlBuilder.build('worldpay/samsungpay/CallBack');
+								var serviceId = window.checkoutConfig.payment.ccform.samsungServiceId;
+								var callback = urlBuilder.build('worldpay/samsungpay/CallBack');
+								var countryCode = window.checkoutConfig.defaultCountryId;
+								console.log('Authentication is success, Redirecting to Samsung Payment Page......');
+                                SamsungPay.connect(
+									samsungResponse.id, samsungResponse.href, serviceId, callback, cancel, countryCode,
+									samsungResponse.encInfo.mod, samsungResponse.encInfo.exp, samsungResponse.encInfo.keyId
+								);
+								return false;
+							}
                             if (orderResponse){
                                 // window.location.href = baseUrl + 'checkout/onepage/success';
                                 window.location.href = BASE_URL + 'worldpay/savedcard/redirect';

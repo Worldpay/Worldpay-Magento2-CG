@@ -104,6 +104,7 @@ EOD;
      * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
      */
     private $threeDSecureConfig;
+
     /**
      * @var Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration
      */
@@ -115,8 +116,8 @@ EOD;
     private $saveCardEnabled;
 
      /**
-     * @var array
-     */
+      * @var array
+      */
     private $storedCredentialsEnabled;
 
     /**
@@ -126,8 +127,7 @@ EOD;
      */
     public function __construct(array $args = [])
     {
-         $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure();
-
+        $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure();
         $this->tokenRequestConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration(
             $args['tokenRequestConfig']
         );
@@ -158,6 +158,8 @@ EOD;
      * @param mixed $exponent
      * @param string $cusDetails
      * @param array $orderLineItems
+     * @param string $savemyCard
+     * @param string $storedCredentialsEnabled = null
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -493,8 +495,8 @@ EOD;
         //Zip code mandatory for worldpay, if not provided by customer we will pass manually
         $zipCode = '00000';
         //If Zip code provided by customer
-        if($postalCode){
-		    $zipCode = $postalCode;
+        if ($postalCode) {
+            $zipCode = $postalCode;
         }
         $this->_addCDATA($postalCodeElement, $zipCode);
 
@@ -537,18 +539,18 @@ EOD;
     protected function _addPaymentDetailsElement($order)
     {
         $paymentDetailsElement = $order->addChild('paymentDetails');
-        $this->_addPaymentDetailsForTokenOrder($paymentDetailsElement);        
+        $this->_addPaymentDetailsForTokenOrder($paymentDetailsElement);
         $this->_addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement);
         $session = $paymentDetailsElement->addChild('session');
         $session['id'] = $this->paymentDetails['sessionId'];
         $session['shopperIPAddress'] = $this->paymentDetails['shopperIpAddress'];
     }
      /**
-     * Add stored credentials data and its child tag to xml
-     *
-     * @param element $paymentDetailsElement
-     * @return string
-     */
+      * Add stored credentials data and its child tag to xml
+      *
+      * @param element $paymentDetailsElement
+      * @return string
+      */
     protected function _addStoredCredentials($paymentDetailsElement)
     {
         $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
@@ -556,11 +558,11 @@ EOD;
         return $storedCredentials;
     }
      /**
-     * Add payment details for stored credentials data and its child tag to xml
-     *
-     * @param element $paymentDetailsElement
-     * @return string
-     */
+      * Add payment details for stored credentials data and its child tag to xml
+      *
+      * @param element $paymentDetailsElement
+      * @return string
+      */
     protected function _addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement)
     {
         $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');

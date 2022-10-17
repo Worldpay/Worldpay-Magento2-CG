@@ -466,8 +466,10 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     }
 
     //country code 
-    var regionId = getRegionById(instrumentResponse.details.billingAddress.country,instrumentResponse.details.billingAddress.region);
-    
+    var regionId = getRegionById(
+        instrumentResponse.details.billingAddress.country,
+        instrumentResponse.details.billingAddress.region
+        );    
     var fullName = instrumentResponse.details.billingAddress.recipient;
     var strArray = fullName.split(" ");
     var firstName = strArray[0];

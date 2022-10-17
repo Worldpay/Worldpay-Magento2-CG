@@ -13,6 +13,7 @@ use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Vault\Api\PaymentTokenRepositoryInterface;
+use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Communicate with WP server and gives back meaningful answer object
@@ -32,9 +33,13 @@ class WorldpayToken
       */
     private $transactionsFactory;
     /**
-     * @var
+     * @var PaymentTokenRepositoryInterface
      */
     private $paymentTokenRepository;
+    /**
+     * @var Magento\Framework\Serialize\Serializer\Json
+     */
+    protected $serializer;
 
     /**
      * Constructor
@@ -47,6 +52,7 @@ class WorldpayToken
      * @param PaymentTokenManagementInterface $paymentTokenManagement
      * @param EncryptorInterface $encryptor
      * @param PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param Json $serializer
      */
     public function __construct(
         SavedToken $savedtoken,
@@ -56,7 +62,8 @@ class WorldpayToken
         CreditCardTokenFactory $paymentTokenFactory,
         PaymentTokenManagementInterface $paymentTokenManagement,
         EncryptorInterface $encryptor,
-        PaymentTokenRepositoryInterface $paymentTokenRepository
+        PaymentTokenRepositoryInterface $paymentTokenRepository,
+        Json $serializer
     ) {
         $this->savedtoken = $savedtoken;
         $this->wplogger = $wplogger;
@@ -66,6 +73,7 @@ class WorldpayToken
         $this->encryptor = $encryptor;
         $this->transactionFactory = $transactionsFactory;
         $this->paymentTokenRepository = $paymentTokenRepository;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -280,6 +288,8 @@ class WorldpayToken
      * Retrive the vault payment token
      *
      * @param TokenStateInterface $tokenElement
+     * @param mixed $paymentObject
+     * @param string $authenticatedShopperId
      * @return string
      */
     protected function getVaultPaymentToken(TokenStateInterface $tokenElement, $paymentObject, $authenticatedShopperId)
@@ -297,12 +307,11 @@ class WorldpayToken
         );
         $paymentTokenSaveRequired = false;
         // In case the payment token does not exist, create it based on the additionalData
-        if (is_null($paymentToken)) {
+        if (empty($paymentToken)) {
             /** @var PaymentTokenInterface $paymentToken */
             $paymentToken = $this->paymentTokenFactory->create();
             $paymentToken->setGatewayToken($token);
-        }
-        else{
+        } else {
             $paymentTokenSaveRequired = true;
         }
         $paymentToken->setExpiresAt($this->getExpirationDate($tokenElement));
@@ -314,10 +323,9 @@ class WorldpayToken
         // If the token is updated, it needs to be saved to keep the changes
         if ($paymentTokenSaveRequired) {
             $this->paymentTokenRepository->save($paymentToken);
-        }
-        // saves payment token manually.
-        // set all payment token attributes.
-        else{
+        } else {
+        // saves payment token manually
+        // set all payment token attributes
             $paymentToken->setCustomerId($authenticatedShopperId);
             $paymentToken->setIsActive(true);
             $paymentToken->setPaymentMethodCode($paymentObject->getMethod());
@@ -375,7 +383,7 @@ class WorldpayToken
      */
     private function convertDetailsToJSON($details)
     {
-        $json = \Zend_Json::encode($details);
+        $json = $this->serializer->serialize($details);
         return $json ? $json : '{}';
     }
 }

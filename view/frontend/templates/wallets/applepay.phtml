@@ -6,9 +6,12 @@
 
 /** @var \Sapient\Worldpay\Block\ApplePay\Button $block */
 ?>
-<?php if ($block->isApplePayEnableonPdp()) {; ?>
+<?php if ($block->isApplePayEnableonPdp()) { ?>
 <div id="wp-apple-pay-btn">
-<apple-pay-button buttonstyle="<?= $block->isApplePayButtonColor() ?>" id = "apple-pay-buy" data-bind="visible: isAppleDevice,click: addtoCartandInitApplePay" type="<?= $block->isApplePayButtonType() ?>" locale="<?= $block->isApplePayButtonLocale() ?>">
+<apple-pay-button buttonstyle="<?= /* @noEscape */ $block->isApplePayButtonColor() ?>"
+    id = "apple-pay-buy" data-bind="visible: isAppleDevice,click: addtoCartandInitApplePay" 
+    type="<?= /* @noEscape */ $block->isApplePayButtonType() ?>" 
+    locale="<?= /* @noEscape */ $block->isApplePayButtonLocale() ?>">
 </apple-pay-button></div>
 <style>
 :root {

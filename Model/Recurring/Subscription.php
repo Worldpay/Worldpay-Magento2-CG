@@ -162,6 +162,10 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     private $transactionsFactory;
 
     /**
+     * @var \Magento\Framework\Registry
+     */
+    public $registryObj;
+    /**
      * Subscription model constructor.
      *
      * @param \Magento\Framework\Model\Context $context
@@ -209,6 +213,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $this->sortOrderBuilder = $sortOrderBuilder;
         $this->priceCurrency = $priceCurrency;
         $this->transactionsFactory = $transactionsFactory;
+        $this->registryObj = $registry;
     }
 
     /**
@@ -788,6 +793,11 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $transactions->setData('subscription_id', $this->getId());
         $transactions->setData('customer_id', $this->getCustomerId());
         $transactions->setData('original_order_id', $this->getOriginalOrderId());
+
+        if(!empty($this->registryObj->registry('token_code'))){
+            $transactions->setData('worldpay_token_id', $this->registryObj->registry('token_code'));
+            $this->registryObj->unregister('token_code');
+        }
         //$transactions->setData('worldpay_token_id', $this->getWorldpayTokenId());
         //$transactions->setData('worldpay_order_id', $this->getWorldpayOrderId());
         $transactions->setData('original_order_increment_id', $this->getOriginalOrderIncrementId());
