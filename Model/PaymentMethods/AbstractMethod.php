@@ -111,6 +111,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @param \Sapient\Worldpay\Model\Payment\PaymentTypes $paymenttypes
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Magento\Backend\Model\Auth\Session $authSession
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
+     * @param \Sapient\Worldpay\Model\Multishipping\OrderFactory $multishippingOrderFactory
+     * @param \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
      * @param array $data
@@ -145,6 +148,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         \Sapient\Worldpay\Model\Payment\PaymentTypes $paymenttypes,
         \Magento\Framework\App\RequestInterface $request,
         \Magento\Backend\Model\Auth\Session $authSession,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper,
+        \Sapient\Worldpay\Model\Multishipping\OrderFactory $multishippingOrderFactory,
+        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
@@ -184,6 +190,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->paymenttypes = $paymenttypes;
         $this->registry = $registry;
         $this->_request = $request;
+        $this->multishippingHelper = $multishippingHelper;
+        $this->multishippingOrderFactory = $multishippingOrderFactory;
+        $this->multishippingOrderCollection = $multishippingOrderCollection;
     }
     /**
      * Initializer
@@ -193,6 +202,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      */
     public function initialize($paymentAction, $stateObject)
     {
+        $this->multishippingHelper->checkIsMultishippingIssue();
         $payment = $this->getInfoInstance();
         $order = $payment->getOrder();
         $amount = $payment->formatAmount($order->getBaseTotalDue(), true);
@@ -235,7 +245,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 $quote = $adminquote;
             }
         }
-        $orderCode = $this->_generateOrderCode($quote);
+        $increment_id = '';
+        $orderId = $quote->getReservedOrderId();
+        if ($this->worlpayhelper->isMultiShipping($quote)) {
+            $increment_id = $mageOrder->getIncrementId();
+            $orderId = $increment_id;
+        }
+        $orderCode = $this->_generateOrderCode($quote, $increment_id);
 
         if (!empty($this->worlpayhelper->getOrderCodeFromCheckoutSession())) {
             $orderCode = $this->worlpayhelper->getOrderCodeFromCheckoutSession();
@@ -249,7 +265,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 $this->_checkpaymentapplicable($quote);
             }
             $this->_checkShippingApplicable($quote);
-            $this->_createWorldPayPayment($payment, $orderCode, $quote->getStoreId(), $quote->getReservedOrderId());
+            $this->_createWorldPayPayment($payment, $orderCode, $quote->getStoreId(), $orderId);
             
             $authorisationService = $this->getAuthorisationService($quote->getStoreId());
             $authorisationService->authorizePayment(
@@ -261,10 +277,16 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 $payment
             );
             $this->authSession->setOrderCode($orderCode);
+            if ($this->worlpayhelper->isMultiShipping($quote)) {
+                $this->multishippingHelper->setMultishippingOrderCode($orderCode);
+            }
         } catch (Exception $e) {
+            if ($this->worlpayhelper->isMultiShipping($quote)) {
+                $this->multishippingHelper->setMultishippingIssue($orderCode);
+            }
             $this->_wplogger->error($e->getMessage());
             $this->_wplogger->error('Authorising payment failed.');
-            $errormessage = $this->worlpayhelper->updateErrorMessage($e->getMessage(), $quote->getReservedOrderId());
+            $errormessage = $this->worlpayhelper->updateErrorMessage($e->getMessage(), $orderId);
             $this->_wplogger->error($errormessage);
             $this->authSession->setOrderCode(false);
             throw new \Magento\Framework\Exception\LocalizedException(
@@ -372,10 +394,14 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      *  Generate order code for reserved order
      *
      * @param Quote $quote
+     * @param string|null $increment_id
      * @return string
      */
-    private function _generateOrderCode($quote)
+    private function _generateOrderCode($quote, $increment_id = null)
     {
+        if (!empty($increment_id)) {
+            return $increment_id . '-' . time();
+        }
         return $quote->getReservedOrderId() . '-' . time();
     }
 
@@ -414,9 +440,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $cardType = $paymentdetails['additional_data']['cc_type'];
         if ($cardType == 'savedcard') {
             $cardType = $this->_getpaymentType();
-            if($mode == 'redirect'){
-                $tokenId = $this->getTokenIdByCode($paymentdetails['additional_data']['tokenCode']);
-                $this->registry->register('token_code',$tokenId);
+            if ($mode == 'redirect') {
+                $sessionOrderCode = $this->multishippingHelper->getOrderCodeFromSession();
+                if (!empty($sessionOrderCode)) {
+                    $tokenId = $this->getTokenIdByCode($paymentdetails['additional_data']['tokenCode']);
+                    $this->registry->register('token_code', $tokenId);
+                }
             }
         }
 
@@ -438,6 +467,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
         if ($paymentdetails['method'] == self::WORLDPAY_MOTO_TYPE) {
             $interactionType='MOTO';
+        }
+        if ($this->worlpayhelper->isMultiShipping()) {
+            $wpp->setData('is_multishipping_order', true);
         }
         if ($integrationType == self::DIRECT_MODEL && $this->worlpayhelper->isCseEnabled()) {
             $wpp->setData('client_side_encryption', true);
@@ -767,6 +799,13 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $orderStatus = $mageOrder->getStatus();
         $paymentStatus = $worldPayPayment->getPaymentStatus();
         if (strtoupper($orderStatus) !== 'CANCELED') {
+            /** Start Multishipping Code */
+            if ($this->worlpayhelper->isMultishippingOrder($mageOrder->getQuoteId())) {
+                throw new \Magento\Framework\Exception\LocalizedException(__(
+                    $this->multishippingHelper->getConfigValue($order, 'ACAM14')
+                ));
+            }
+            /** End Multishipping End */
             $xml = $this->paymentservicerequest->cancelOrder(
                 $payment->getOrder(),
                 $worldPayPayment,
@@ -858,10 +897,14 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         }
         return $typePresent;
     }
+
     /**
      * Get TokenId by token code
+     *
+     * @param string $tokenCode
      */
-    public function getTokenIdByCode($tokenCode){
+    public function getTokenIdByCode($tokenCode)
+    {
         $merchantTokenEnabled = $this->worlpayhelper->getMerchantTokenization();
         $tokenType = $merchantTokenEnabled ? 'merchant' : 'shopper';
         $savedCard= $this->_savecard->create()->getCollection()

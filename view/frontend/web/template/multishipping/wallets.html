@@ -1,0 +1,83 @@
+<style>
+    #wallets_APPLEPAY-SSL {
+        display: none;
+    }
+
+    #wallets_image_APPLEPAY-SSL {
+        display: none;
+    }
+
+    #wallets_label_APPLEPAY-SSL {
+        display: none;
+    }
+</style>
+<!--ko if: (walletCCTypes().length) -->
+
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+
+    <div class="payment-method-content">
+        <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
+            <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode()}">
+                <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
+                    <!-- ko if: (paymentMethodSelection()=='radio')-->
+                    <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
+                    <div class="paymentmethods-radio-wrapper">
+                        <input type="radio" data-bind="attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
+                                        'validate-one-required-by-name':true
+                                                }),id: 'wallets_' + item.ccValue}" name="wallets_type"></input>
+                        <!--ko if: $parent.getIcons(item.ccValue) -->
+                        <label
+                            data-bind="attr: {for: 'wallets_' + item.ccValue, id: 'wallets_image_' + item.ccValue}"><img
+                                data-bind="attr: {
+                                        'src': $parent.getIcons(item.ccValue).url,
+                                        'alt': item.ccLabel,
+                                        'width': $parent.getIcons(item.ccValue).width,
+                                        'height': $parent.getIcons(item.ccValue).height
+                                        }"></label>
+                        <!--/ko-->
+                        <!--ko ifnot: $parent.getIcons(item.ccValue) -->
+                        <label data-bind="attr: {for: 'wallets_' + item.ccValue, id: 'wallets_label_' + item.ccValue}">
+                            <!-- ko text: item.ccLabel -->
+                            <!-- /ko -->
+                        </label>
+                        <!--/ko-->
+                    </div>
+                    <!--/ko-->
+
+                    <!-- /ko -->
+                    <!-- ko if: (paymentMethodSelection()=='dropdown')-->
+                    <select name="wallets_type" class="select select-ccytpe" data-bind="
+                                           attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type', 'data-validate': JSON.stringify({required:true})},
+                                           options: availableCCTypes(),
+                                           optionsText: 'ccLabel',
+                                           value: selectedCCType,
+                                            optionsValue: 'ccValue',
+                                           optionsCaption: 'Select Your Payment Method',
+                                           event:{ change: checkPaymentTypes }"></select>
+                    <!--/ko-->
+                    <div class="mage-error" generated="true" id="saved-cvv-error"></div>
+                </div>
+            </fieldset>
+        </form>
+        <div id="wallet-type-error" class="mage-error" style="display:none"></div>
+        <div class="mage-error message message-error error" id="worldpay_wallets_multishipping_error"
+            style="display:none"></div>
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() -->
+        <!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
+            <!--/ko-->
+        </div>
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
+            <!--/ko-->
+        </div>
+    </div>
+</div>
+<!--/ko-->

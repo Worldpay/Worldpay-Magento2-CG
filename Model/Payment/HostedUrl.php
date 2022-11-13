@@ -126,6 +126,7 @@ class HostedUrl implements HostedUrlInterface
             $orderCode =  $this->_generateOrderCode($reservedOrderId);
             $this->checkoutsession->setIframePay(true);
             $this->checkoutsession->setHppOrderCode($orderCode);
+            $this->checkoutsession->setHppReservedOrderId($reservedOrderId);
             $redirectOrderParams = $this->mappingService->collectRedirectOrderParameters(
                 $orderCode,
                 $quote,

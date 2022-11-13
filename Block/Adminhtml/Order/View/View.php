@@ -19,16 +19,19 @@ class View extends \Magento\Backend\Block\Template
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\Registry $registry,
         \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper,
         array $data = []
     ) {
         $this->registry = $registry;
         $this->_worldpaymentFactory= $worldpaymentFactory;
+        $this->multishippingHelper = $multishippingHelper;
         parent::__construct($context, $data);
     }
      /**
@@ -81,5 +84,25 @@ class View extends \Magento\Backend\Block\Template
             return true;
         }
         return false;
+    }
+
+    /**
+     * Retrieve multishipping order id's
+     *
+     * @return string
+     */
+    public function getMultishippingOrderIds()
+    {
+        $order = $this->_getOrder();
+        $quote_id = $order->getQuoteId();
+        $inc_id = $order->getIncrementId();
+        $multishippingCollections = $this->multishippingHelper->getMultishippingCollections($quote_id, $inc_id);
+        $multishipping_orders = '';
+        foreach ($multishippingCollections as $multishippingCollection) {
+            $ms_order_id = $multishippingCollection->getOrderId();
+            $multishipping_orders .= ", $ms_order_id";
+        }
+        $multishipping_orders = substr($multishipping_orders, 1);
+        return $multishipping_orders;
     }
 }

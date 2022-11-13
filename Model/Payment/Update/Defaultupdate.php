@@ -15,15 +15,18 @@ class Defaultupdate extends \Sapient\Worldpay\Model\Payment\Update\Base implemen
      * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Payment\StateInterface $paymentState,
         \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment,
-        \Sapient\Worldpay\Helper\Data $configHelper
+        \Sapient\Worldpay\Helper\Data $configHelper,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
     ) {
         $this->_paymentState = $paymentState;
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
+        $this->multishippingHelper = $multishippingHelper;
     }
 
     /**
@@ -36,6 +39,10 @@ class Defaultupdate extends \Sapient\Worldpay\Model\Payment\Update\Base implemen
     {
         if (!empty($order)) {
             $this->_worldPayPayment->updateWorldPayPayment($this->_paymentState);
+            $worldpaypayment = $order->getWorldPayPayment();
+            if ($worldpaypayment->getIsMultishippingOrder()) {
+                $this->multishippingHelper->defaultUpdateMultishippingOrders($order);
+            }
         }
     }
 }

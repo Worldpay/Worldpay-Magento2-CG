@@ -1,12 +1,11 @@
 <!-- ko if: ( isActive())-->
 <form class="form" id="wp-samsung-pay-btn">
 	<fieldset>
-		<button class="action primary checkout" name = "Samsung Pay"
-			type="submit" data-bind="
+		<a href="javascript:void(0)" data-bind="
                             click: performPlaceOrder,
                             attr: {title: $t('Samsung Pay')}
-                            ">Samsung Pay
-			</button>
+                            "><img data-bind="attr: { src: require.toUrl('Sapient_Worldpay/images/cc/samsung-pay-button.svg') }" 
+             alt="Samsung Pay" class="samsungpay-payment"></a>
 	</fieldset>
 </form>
  <!-- /ko -->

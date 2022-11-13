@@ -11,8 +11,10 @@ define(
 'applePay',
 'Magento_Checkout/js/model/url-builder',
 'mage/url',
-'Magento_Customer/js/model/customer'
-], function ($, ko, Component, _, $t, quote, customerData, checkoutUtils, applePay, urlBuilder, url,customer) {
+'Magento_Customer/js/model/customer',
+'Sapient_Worldpay/js/action/place-multishipping-order',
+'Magento_Checkout/js/model/full-screen-loader'
+], function ($, ko, Component, _, $t, quote, customerData, checkoutUtils, applePay, urlBuilder, url,customer, placeMultishippingOrder, fullScreenLoader) {
 'use strict';
       
     
@@ -156,18 +158,19 @@ return Component.extend({
                     if(quote.shippingMethod()){
                         shippingrequired = true;
                     }
+                    var paymentData = {
+                        'method': "worldpay_wallets",
+                        'additional_data': {
+                            'cc_type': 'APPLEPAY-SSL',
+                            'appleResponse' : appleResponse,
+                            'dfReferenceId':   window.checkoutConfig.payment.ccform.sessionId
+                        }  
+                    }
                     var checkoutData = {
                         billingAddress :quote.billingAddress(),
                         shippingAddress: quote.shippingAddress(),
                         shippingMethod: quote.shippingMethod(),
-                        paymentDetails:{
-                            'method': "worldpay_wallets",
-                            'additional_data': {
-                                'cc_type': 'APPLEPAY-SSL',
-                                'appleResponse' : appleResponse,
-                                'dfReferenceId':   window.checkoutConfig.payment.ccform.sessionId
-                            }  
-                        },
+                        paymentDetails: paymentData,
                         storecode :window.checkoutConfig.storeCode,
                         quote_id : quote.getQuoteId(),
                         guest_masked_quote_id: quote.getQuoteId(),
@@ -175,7 +178,13 @@ return Component.extend({
                         isRequiredShipping : shippingrequired
                     }
                     console.log('Apple Pay Checkout Data ==>',checkoutData);
-                    checkoutUtils.setPaymentInformationAndPlaceOrder(checkoutData);
+                    if(window.checkoutConfig.payment.ccform.isMultishipping){ 
+                        fullScreenLoader.startLoader();                                                          
+                        placeMultishippingOrder(paymentData);
+                    }
+                    else{
+                        checkoutUtils.setPaymentInformationAndPlaceOrder(checkoutData);
+                    }
 
                     //self.placeOrder();       
                 }

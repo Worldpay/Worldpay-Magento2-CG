@@ -31,18 +31,21 @@ class Iframe extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param ResultFactory $resultPageFactory
+     * @param \Magento\Checkout\Model\Session $checkoutsession
      */
     public function __construct(
         Context $context,
         PageFactory $pageFactory,
         \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
-        ResultFactory $resultPageFactory
+        ResultFactory $resultPageFactory,
+        \Magento\Checkout\Model\Session $checkoutsession
     ) {
         $this->pageFactory = $pageFactory;
         $this->wplogger = $wplogger;
         $this->hppstate = $hppstate;
         $this->resultPageFactory = $resultPageFactory;
+        $this->checkoutsession = $checkoutsession;
         return parent::__construct($context);
     }
     /**
@@ -57,7 +60,7 @@ class Iframe extends \Magento\Framework\App\Action\Action
         $params = $this->getRequest()->getParams();
 
         $redirecturl = $this->_url->getBaseUrl();
-
+        $this->checkoutsession->unsHppOrderCode();
         if (isset($params['status'])) {
             $currenturl = $this->_url->getCurrentUrl();
             $redirecturl = str_replace("iframe/status/", "", $currenturl);

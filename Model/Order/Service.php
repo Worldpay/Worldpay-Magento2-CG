@@ -21,6 +21,7 @@ class Service
      * @param \Magento\Sales\Model\Service\CreditmemoService $CreditmemoService
      * @param \Magento\Sales\Model\Order\Creditmemo $creditmemo
      * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
+     * @param \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
      */
     public function __construct(
         \Magento\Sales\Model\Order $mageOrder,
@@ -33,7 +34,8 @@ class Service
         \Magento\Sales\Model\Order\Invoice $Invoice,
         \Magento\Sales\Model\Service\CreditmemoService $CreditmemoService,
         \Magento\Sales\Model\Order\Creditmemo $creditmemo,
-        \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
+        \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository,
+        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
     ) {
 
         $this->checkoutsession = $checkoutsession;
@@ -47,6 +49,7 @@ class Service
         $this->CreditmemoService = $CreditmemoService;
         $this->ordercreditmemo = $creditmemo;
         $this->creditmemoRepository = $creditmemoRepository;
+        $this->multishippingOrderCollection = $multishippingOrderCollection;
     }
 
     /**
@@ -105,6 +108,22 @@ class Service
         $order = $this->getAuthorisedOrder();
         $magentoorder = $order->getOrder();
         $this->emailsender->authorisedEmailSend($magentoorder, true);
+        // Start multishipping code
+        $worldpaypayment = $order->getWorldPayPayment();
+        if ($worldpaypayment->getIsMultishippingOrder()) {
+            $in_id = $order->getIncrementId();
+            $qte_id = $order->getQuoteId();
+            $multishippingOrders = $this->multishippingOrderCollection->getCollectionByOrderAndQuoteId($in_id, $qte_id);
+            if (!empty($multishippingOrders)) {
+                foreach ($multishippingOrders as $multishippingOrder) {
+                    $order_id = $multishippingOrder->getOrderId();
+                    $order = $this->getByIncrementId($order_id);
+                    $magentoorder = $order->getOrder();
+                    $this->emailsender->authorisedEmailSend($magentoorder, true);
+                }
+            }
+        }
+        // End multishipping code
     }
 
     /**

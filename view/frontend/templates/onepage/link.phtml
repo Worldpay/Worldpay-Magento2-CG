@@ -25,8 +25,12 @@ if((browserType && browserType[0] == 'Chrome') && !browserEdge) {
          && window.SubscriptionStatus == "" && window.ChromepayAvailable == '1') {
     var buttonObj = document.getElementById("checkout-now-bottom");
     buttonObj.value = window.ChromepayButtonName;
-    buttonObj.innerHTML = window.ChromepayButtonName;
+    buttonObj.innerHTML = window.ChromepayButtonName;    
  }else{
-     document.getElementById('checkout-now-bottom').style.visibility='hidden';
+    var buttonObj = document.getElementById("checkout-now-bottom");
+    buttonObj.style.visibility='hidden';
+    const parentObj = buttonObj.parentNode;
+    parentObj.style.height = '0';
+    parentObj.style.margin = '0';
  }
 </script>

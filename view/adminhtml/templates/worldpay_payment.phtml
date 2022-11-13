@@ -29,6 +29,29 @@ if ($isworldpayment) {
                 <td class="label"><label>Payment Model</label></td>
                 <td class="value"><strong><?= /* @noEscape */ ucwords($payment->getPaymentModel()) ?></strong></td>
             </tr>
+            <tr>
+                <td class="label"><label>Multishipping</label></td>
+                <td class="value">
+                    <strong><?= /* @noEscape */ ucwords($payment->getIsMultishippingOrder()? "YES" : "NO") ?>
+                    </strong>
+                </td>
+            </tr>
+            <?php if ($payment->getIsMultishippingOrder()): ?>
+            <tr>
+                <td class="label"><label>Multishipping Order Id</label></td>
+                <td class="value">
+                    <strong><?= /* @noEscape */ $payment->getWorldpayOrderId() ?>
+                    </strong>
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label>Multishipping Orders</label></td>
+                <td class="value">
+                    <strong><?= /* @noEscape */ $block->getMultishippingOrderIds() ?>
+                    </strong>
+                </td>
+            </tr>
+            <?php endif; ?>
             <?php if ($payment->getPaymentModel() == 'direct'): ?>
                 <tr>
                     <td class="label"><label>Client side encryption</label></td>

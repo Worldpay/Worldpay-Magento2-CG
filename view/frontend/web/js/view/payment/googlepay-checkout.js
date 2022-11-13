@@ -13,7 +13,9 @@
     'Magento_Checkout/js/model/step-navigator',
     'Magento_Checkout/js/model/quote',
     'Magento_Customer/js/model/customer',
-    'Sapient_Worldpay/js/model/checkout-utils'
+    'Sapient_Worldpay/js/model/checkout-utils',
+	'Sapient_Worldpay/js/action/place-multishipping-order',
+    'Magento_Checkout/js/model/full-screen-loader'
 ], function (
     $,
     _,
@@ -24,7 +26,9 @@
     stepNavigator,
     quote,
     customer,
-    checkoutUtils
+    checkoutUtils,
+    placeMultishippingOrder,
+    fullScreenLoader
 ) {
     'use strict';
 
@@ -120,25 +124,32 @@
                     if(quote.shippingMethod()){
                         shippingrequired = true;
                     }
-                var checkoutData = {
-                    billingAddress : quote.billingAddress(),
-                    shippingAddress: quote.shippingAddress(),
-                    shippingMethod: quote.shippingMethod(),
-                    paymentDetails:{
+                    var paymentData = {
                         'method': "worldpay_wallets",
                         'additional_data': {
                             'cc_type': 'PAYWITHGOOGLE-SSL',
                             'walletResponse' : JSON.stringify(paymentData),
                             'dfReferenceId':  window.checkoutConfig.payment.ccform.sessionId
-                        }  
-                    },
+                        }
+					}	
+                var checkoutData = {
+                    billingAddress : quote.billingAddress(),
+                    shippingAddress: quote.shippingAddress(),
+                    shippingMethod: quote.shippingMethod(),
+                    paymentDetails: paymentData,
                     storecode : window.checkoutConfig.storeCode,
                     quote_id : quote.getQuoteId(),
                     guest_masked_quote_id: maskedQuoteId,
                     isCustomerLoggedIn : customer.isLoggedIn(),
                     isRequiredShipping : shippingrequired
                 }
-                checkoutUtils.setPaymentInformationAndPlaceOrder(checkoutData);
+                if(window.checkoutConfig.payment.ccform.isMultishipping){                       
+                    fullScreenLoader.startLoader();                                                     
+                    placeMultishippingOrder(paymentData);
+                }
+                else{
+                    checkoutUtils.setPaymentInformationAndPlaceOrder(checkoutData);
+                }
             }).catch(function(err) {
                 // show error in developer console for debugging
                 console.error("Gpay Init Error:",err);

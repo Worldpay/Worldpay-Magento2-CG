@@ -40,6 +40,7 @@ class Failure extends \Magento\Framework\App\Action\Action
      * @param \TransactionsFactory $transactionsFactory
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      */
     public function __construct(
         Context $context,
@@ -49,7 +50,8 @@ class Failure extends \Magento\Framework\App\Action\Action
         SubscriptionFactory $subscriptionFactory,
         TransactionsFactory $transactionsFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender
+        \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
     ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
@@ -58,6 +60,7 @@ class Failure extends \Magento\Framework\App\Action\Action
         $this->transactionsFactory = $transactionsFactory;
         $this->checkoutSession = $checkoutSession;
         $this->emailsender = $emailsender;
+        $this->multishippingHelper = $multishippingHelper;
         return parent::__construct($context);
     }
     /**
@@ -94,6 +97,7 @@ class Failure extends \Magento\Framework\App\Action\Action
         }
         // send Payment Fail Email
         $this->emailsender->authorisedEmailSend($magentoorder, false);
+        $this->multishippingHelper->performMultishippingMessage($order, 'failure');
         return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
     }
     /**

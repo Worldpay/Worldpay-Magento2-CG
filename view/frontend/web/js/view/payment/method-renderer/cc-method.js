@@ -9,6 +9,7 @@ define(
         'Magento_Payment/js/model/credit-card-validation/validator',
         'mage/url',
         'Magento_Checkout/js/action/place-order',
+        'Sapient_Worldpay/js/action/place-multishipping-order',
         'Magento_Checkout/js/action/redirect-on-success',
         'ko',
         'Magento_Checkout/js/action/set-payment-information',
@@ -22,7 +23,7 @@ define(
         'jquery/ui'
     ],
     
-    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64) {
         'use strict';
         //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
@@ -163,10 +164,13 @@ define(
                 redirectAfterPlaceOrder: (window.checkoutConfig.payment.ccform.intigrationmode == 'direct') ? true : false,
                 direcTemplate: 'Sapient_Worldpay/payment/direct-cc',
                 redirectTemplate: 'Sapient_Worldpay/payment/redirect-cc',
+                multishippingDirectTemplate: 'Sapient_Worldpay/multishipping/direct-cc',
+                multishippingRedirectTemplate: 'Sapient_Worldpay/multishipping/redirect-cc',
                 cardHolderName:'',
                 SavedcreditCardVerificationNumber:'',
                 saveMyCard:false,
-                    cseData: null,
+                cseData: null,
+                multishipping: false
             },
                 totals: quote.getTotals(),
                 showCardTypeDropDown : ko.observable(),
@@ -269,6 +273,14 @@ define(
             filtercardajax: function(statusCheck){
                 var self = this;
                 var CreditCardPreSelected = jQuery('.paymentmethods-radio-wrapper [name="payment[cc_type]"]:checked');
+                /* Multishipping Code */
+                if(this.multishipping){
+					var MultishippingCreditCardPreSelected = jQuery('#p_method_worldpay_cc:checked');
+					if(MultishippingCreditCardPreSelected.length){
+                        jQuery('#payment-continue').html("<span>Place Order</span>");
+						this.selectPaymentMethod();
+					}
+				}
                 var APMPreSelected = jQuery('.paymentmethods-radio-wrapper [name="apm_type"]:checked');
                 var WalletPreSelected = jQuery('.paymentmethods-radio-wrapper [name="wallets_type"]:checked');
                 if(!statusCheck){
@@ -467,6 +479,7 @@ define(
                     }
                 );
                 $("#checkout-payment-worldpay-alert-message").show();
+                $("#parent-payment-continue").hide();
             },
             loadHppIframe : function(){
                 var self= this;
@@ -491,7 +504,12 @@ define(
                     window.checkoutConfig.CCMethodClass.redirectAfterPlaceOrder = false;
                     window.checkoutConfig.CCMethodClass.isIframecardPage = true;
                     
-                    window.checkoutConfig.CCMethodClass.placeOrder(); 
+                    if(window.checkoutConfig.CCMethodClass.multishipping){                                                        
+                        placeMultishippingOrder(window.checkoutConfig.CCMethodClass.getData());
+                    }
+                    else{
+                        window.checkoutConfig.CCMethodClass.placeOrder();
+                    }
                     $("#checkout-payment-worldpay-container").show();
                     require(["https://payments.worldpay.com/resources/hpp/integrations/embedded/js/hpp-embedded-integration-library.js"], function (worldpay) {
                         var checkoutWorldPayLibraryObject = new WPCL.Library();
@@ -552,7 +570,7 @@ define(
                                 self.afterIframeLoadActions();
                                 fullScreenLoader.stopLoader();
                             }                           
-                        });
+                        }, { once: true });
                         /******* If addeventlister not working */
                         setTimeout(function () {
                             if($('.loading-mask:visible').length)
@@ -674,7 +692,7 @@ define(
 
             initPaymentKeyEvents: function(){
                 var that = this;
-                $('.checkout-container').on('keyup', '.payment_cc_number', function(e){
+                $('.checkout-container, #multishipping-billing-form').on('keyup', '.payment_cc_number', function(e){
                     that.loadCCKeyDownEventAction(this, e);
                 })
             },
@@ -786,8 +804,14 @@ define(
 
             getTemplate: function(){
                 if (this.intigrationmode == 'direct') {
+                    if(this.multishipping){
+						return this.multishippingDirectTemplate;
+					}
                     return this.direcTemplate;
                 } else{
+                    if(this.multishipping){
+						return this.multishippingRedirectTemplate;
+					}
                     return this.redirectTemplate;
                 }
             },
@@ -851,12 +875,6 @@ define(
             },
             isActive: function() {
                 return true;
-            },
-            isRegisteredUser: function(){
-                if(customer.isLoggedIn()){
-                    return true;
-                }
-                return false;
             },
             paymentMethodSelection: function() {
                 return window.checkoutConfig.payment.ccform.paymentMethodSelection;
@@ -950,7 +968,8 @@ define(
                             'cpf': $('#' + this.getCode() + '_cpf').val(),
                             'instalment': $('#' + this.getCode() + '_instalment').val(),
                             'statement': this.statement,
-                            'shippingfee': this.getShippingFeeForBrazil()
+                            'shippingfee': this.getShippingFeeForBrazil(),
+                            'multishipping': this.multishipping
                     }
                 };
             },
@@ -1046,14 +1065,24 @@ define(
                                             }
                                             window.sessionId = this.dfReferenceId;
                                             //place order with direct CSE method
-                                            fullScreenLoader.stopLoader();
-                                            self.placeOrder();
+                                            if(window.checkoutConfig.payment.ccform.isMultishipping){  
+												placeMultishippingOrder(self.getData());
+											}
+											else{
+												fullScreenLoader.stopLoader();
+												self.placeOrder();
+											}
                                         }
                                     }
-                                }, false);
+                                }, { once: true });
                             } else {
-                                fullScreenLoader.stopLoader();
-                                self.placeOrder();
+                                if(window.checkoutConfig.payment.ccform.isMultishipping){  
+									placeMultishippingOrder(self.getData());
+								}
+								else{
+									fullScreenLoader.stopLoader();
+									self.placeOrder();
+								}
                             }
                         }
                       }
@@ -1130,14 +1159,24 @@ define(
                                                    // window.sessionId = data.SessionId;
                                                     window.sessionId = data.SessionId;
                                                     
-                                                     fullScreenLoader.stopLoader();
-                                                     self.placeOrder();
+                                                    if(window.checkoutConfig.payment.ccform.isMultishipping){                  
+														placeMultishippingOrder(self.getData());
+													}
+													else{                  
+														fullScreenLoader.stopLoader();
+														self.placeOrder();
+													}
                                                 }
                                             }
-                                        }, false);
+                                        }, { once: true });
                                     } else {
-                                        fullScreenLoader.stopLoader();
-                                        self.placeOrder();
+                                        if(window.checkoutConfig.payment.ccform.isMultishipping){  
+                                            placeMultishippingOrder(self.getData());
+                                        }
+                                        else{
+                                            fullScreenLoader.stopLoader();
+											self.placeOrder();
+                                        }
                                     }                                    
                                 });
                             } else{
@@ -1156,19 +1195,36 @@ define(
                                                 //window.sessionId = data.SessionId;
                                                 window.sessionId = data.SessionId;
                                                 //place order with direct CSE method
-                                                   fullScreenLoader.stopLoader();
+                                                if(window.checkoutConfig.payment.ccform.isMultishipping){
+                                                    placeMultishippingOrder(self.getData());
+                                                }
+                                                else{
+                                                    fullScreenLoader.stopLoader();
                                                     self.placeOrder();
+                                                }
                                             } 
                                         } 
-                                    }, false);
+                                    }, { once: true });
                                 } else {
-                                    fullScreenLoader.stopLoader();
-                                    self.placeOrder();
+                                    if(window.checkoutConfig.payment.ccform.isMultishipping){
+                                        placeMultishippingOrder(self.getData());
+                                    }
+                                    else{
+                                        fullScreenLoader.stopLoader();
+                                        self.placeOrder();
+                                    }
                                 }  
                             }
                         }else if(this.intigrationmode == 'redirect'){
                         //place order with Redirect CSE Method
-                        self.placeOrder();
+                        if(this.multishipping){
+                            fullScreenLoader.startLoader();
+                            placeMultishippingOrder(self.getData());
+                            
+                        }
+                        else{
+                            self.placeOrder();
+                        }
                     }
                 }else {
                     jQuery('.paymentmethods-radio-wrapper .mage-error').css("margin-top", "45px");

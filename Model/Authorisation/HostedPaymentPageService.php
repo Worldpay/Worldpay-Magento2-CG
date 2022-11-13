@@ -24,6 +24,7 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
      * @param \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate
      * @param \Magento\Checkout\Model\Session $checkoutsession
      * @param \Magento\Framework\UrlInterface $urlInterface
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
@@ -33,7 +34,8 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Helper\Registry $registryhelper,
         \Sapient\Worldpay\Model\Checkout\Hpp\State $hppstate,
         \Magento\Checkout\Model\Session $checkoutsession,
-        \Magento\Framework\UrlInterface $urlInterface
+        \Magento\Framework\UrlInterface $urlInterface,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
     ) {
         $this->mappingservice = $mappingservice;
         $this->paymentservicerequest = $paymentservicerequest;
@@ -43,6 +45,7 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
         $this->checkoutsession = $checkoutsession;
         $this->hppstate = $hppstate;
         $this->_urlInterface = $urlInterface;
+        $this->multishippingHelper = $multishippingHelper;
     }
     /**
      * Handles provides authorization data for Hosted Payment Page integration
@@ -65,6 +68,23 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
         $payment
     ) {
         $this->checkoutsession->setauthenticatedOrderId($mageOrder->getIncrementId());
+        /** Start Multishipping Code */
+        if ($this->multishippingHelper->isMultiShipping($quote)) {
+            $sessionOrderCode = $this->multishippingHelper->getOrderCodeFromSession();
+            if (!empty($sessionOrderCode)) {
+                $orgWorldpayPayment = $this->multishippingHelper->getOrgWorldpayId($sessionOrderCode);
+                $orgOrderId = $orgWorldpayPayment['order_id'];
+                $isOrg = false;
+                $this->multishippingHelper->_createWorldpayMultishipping($mageOrder, $sessionOrderCode, $isOrg);
+                $this->multishippingHelper->_copyWorldPayPayment($orgOrderId, $orderCode);
+                $payment->setIsTransactionPending(1);
+                return;
+            } else {
+                $isOrg = true;
+                $this->multishippingHelper->_createWorldpayMultishipping($mageOrder, $orderCode, $isOrg);
+            }
+        }
+        /** End Multishipping Code */
         if (empty($this->checkoutsession->getIframePay())) {
                $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
                    $orderCode,

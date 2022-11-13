@@ -1,0 +1,34 @@
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-content">
+        <!-- Credit Card Form-->
+        <div class="payment-method-cc-form">
+            <!-- ko template: 'Sapient_Worldpay/multishipping/cc-form' -->
+            <!-- /ko -->
+        </div>
+        <div style="width: 100%; height:100%;display:inline-block;margin-bottom:20px;margin-top:10px">
+            <span style="color:red;"><i>*
+                    <!-- ko i18n: getCheckoutLabels('CO21')-->
+                    <!-- /ko -->
+                </i></span>
+        </div>
+
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() -->
+        <!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
+            <!--/ko-->
+        </div>
+        </form>
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
+            <!--/ko-->
+        </div>
+
+    </div>
+</div>

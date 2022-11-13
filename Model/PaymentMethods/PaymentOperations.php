@@ -84,6 +84,11 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
         $orderStatus = $mageOrder->getStatus();
         $paymentStatus = $worldPayPayment->getPaymentStatus();
         if (strtoupper($orderStatus) !== 'CANCELED') {
+            if ($this->worlpayhelper->isMultishippingOrder($mageOrder->getQuoteId())) {
+                throw new \Magento\Framework\Exception\LocalizedException(__(
+                    $this->multishippingHelper->getConfigValue($order, 'ACAM14')
+                ));
+            }
             $xml = $this->paymentservicerequest->cancelOrder(
                 $payment->getOrder(),
                 $worldPayPayment,

@@ -31,6 +31,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Payment\StateResponse $paymentStateResponse
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      */
     public function __construct(
         Context $context,
@@ -41,7 +42,8 @@ class Cancel extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice,
         \Sapient\Worldpay\Model\Payment\StateResponseFactory $paymentStateResponse,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
-        \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
+        \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
     ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
@@ -51,6 +53,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $this->authenticatinservice = $authenticatinservice;
         $this->paymentStateResponse = $paymentStateResponse;
         $this->wpresponse = $wpresponse;
+        $this->multishippingHelper = $multishippingHelper;
         return parent::__construct($context);
     }
     /**
@@ -75,6 +78,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
                 $this->_applyPaymentUpdate($this->wpresponse->createFromCancelledResponse($params), $order);
             }
         }
+        $this->multishippingHelper->performMultishippingMessage($order, 'cancel');
         return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
     }
     /**

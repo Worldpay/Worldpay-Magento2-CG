@@ -70,6 +70,36 @@ class Order
     }
 
     /**
+     * Retrieve Quote Id
+     *
+     * @return int
+     */
+    public function getQuoteId()
+    {
+        return $this->getOrder()->getQuoteId();
+    }
+
+    /**
+     * Retrieve Increment Id
+     *
+     * @return int
+     */
+    public function getIncrementId()
+    {
+        return $this->getOrder()->getIncrementId();
+    }
+
+    /**
+     * Retrieve Order Id
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->getOrder()->getId();
+    }
+    
+    /**
      * Retrieve payment Method
      *
      * @return string

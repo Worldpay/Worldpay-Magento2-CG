@@ -16,15 +16,18 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
      * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
      * @param \Sapient\Worldpay\Helper\Data $configHelper
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Payment\StateInterface $paymentState,
         \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment,
-        \Sapient\Worldpay\Helper\Data $configHelper
+        \Sapient\Worldpay\Helper\Data $configHelper,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
     ) {
         $this->_paymentState = $paymentState;
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
+        $this->multishippingHelper = $multishippingHelper;
     }
 
     /**
@@ -32,18 +35,25 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
      *
      * @param Payment $payment
      * @param Order $order
+     * @param bool|null $isMultishipping
      */
-    public function apply($payment, $order = null)
+    public function apply($payment, $order = null, $isMultishipping = null)
     {
-       
         if (empty($order)) {
             $this->_applyUpdate($payment);
         } else {
             $this->_assertValidPaymentStatusTransition($order, $this->_getAllowedPaymentStatuses($order));
-            $this->_applyUpdate($order->getPayment(), $order);
+            $worldpaypayment = $order->getWorldPayPayment();
+            $isMultishipping = $worldpaypayment->getIsMultishippingOrder();
+            $this->_applyUpdate($order->getPayment(), $order, $isMultishipping);
             $this->_worldPayPayment->updateWorldPayPayment($this->_paymentState);
             $this->_worldPayPayment->updatePrimeroutingData($order->getPayment(), $this->_paymentState);
-            $this->_captureOrderIfAutoCaptureEnabled($order);
+            if (!$isMultishipping) {
+                $this->_captureOrderIfAutoCaptureEnabled($order);
+            }
+            if ($isMultishipping) {
+                $this->multishippingHelper->authrorisedMultishippingOrders($order);
+            }
         }
     }
 
@@ -52,8 +62,9 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
      *
      * @param Payment $payment
      * @param Order $order
+     * @param bool|null $isMultishipping
      */
-    private function _applyUpdate($payment, $order = null)
+    private function _applyUpdate($payment, $order = null, $isMultishipping = null)
     {
         $payment->setTransactionId(time());
         $payment->setIsTransactionClosed(0);
@@ -64,6 +75,10 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
             $currencysymbol = $this->_configHelper->getCurrencySymbol($currencycode);
             $amount = $this->_amountAsInt($this->_paymentState->getAmount());
             $magentoorder = $order->getOrder();
+            if ($isMultishipping) {
+                $amount = $this->multishippingHelper->formatAmount($magentoorder->getBaseTotalDue());
+                $currencysymbol = '';
+            }
             $magentoorder->addStatusToHistory(
                 $magentoorder->getStatus(),
                 'Authorized amount of '.$currencysymbol.''.$amount

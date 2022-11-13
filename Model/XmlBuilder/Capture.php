@@ -46,6 +46,7 @@ EOD;
      * @param string|array|float $exponent
      * @param Order $order
      * @param mixed $captureType
+     * @param bool $isMultishippingOrder
      * @param string|null $paymentType
      * @param array|null $invoicedItems
      * @return SimpleXMLElement $xml
@@ -58,6 +59,7 @@ EOD;
         $exponent,
         $order,
         $captureType,
+        $isMultishippingOrder,
         $paymentType = null,
         $invoicedItems = null
     ) {
@@ -68,6 +70,7 @@ EOD;
         $this->exponent = $exponent;
         $this->order = $order;
         $this->captureType = $captureType;
+        $this->isMultishippingOrder = $isMultishippingOrder;
         $this->invoicedItems = $invoicedItems;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
@@ -149,6 +152,14 @@ EOD;
         if ($this->captureType == 'partial' && $partialCapture) {
             $capture['reference']= 'Partial Capture';
         }
+        /** Start Multishipping code */
+        if ($this->captureType == 'partial' && $partialCapture && $this->isMultishippingOrder) {
+            $capture['reference']= 'Partial Capture - '.$this->order->getIncrementId();
+        }
+        if ($this->captureType == 'full' && $this->isMultishippingOrder) {
+            $capture['reference']= 'Capture - '.$this->order->getIncrementId();
+        }
+        /** End Multishipping code */
         return $capture;
     }
 

@@ -581,6 +581,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $exponent,
                 $order,
                 $captureType,
+                $wp->getIsMultishippingOrder(),
                 $wp->getPaymentType(),
                 $invoicedItems
             );
@@ -646,6 +647,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $exponent,
                 $order,
                 $captureType,
+                $wp->getIsMultishippingOrder(),
                 $wp->getPaymentType(),
                 $invoicedItems
             );

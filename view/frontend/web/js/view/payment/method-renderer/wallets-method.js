@@ -9,6 +9,7 @@ define(
         'Magento_Payment/js/model/credit-card-validation/validator',
         'mage/url',
         'Magento_Checkout/js/action/place-order',
+        'Sapient_Worldpay/js/action/place-multishipping-order',
         'Magento_Checkout/js/action/redirect-on-success',
         'ko',
         'Magento_Checkout/js/action/set-payment-information',
@@ -19,7 +20,7 @@ define(
         'googlePay',
         'samsungPay'
     ],
-    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, googlePay, samsungPay) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder,  redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, googlePay, samsungPay) {
         'use strict';
         var ccTypesArr = ko.observableArray([]);        
         
@@ -143,9 +144,11 @@ define(
             defaults: {
                 redirectAfterPlaceOrder: false,
                 direcTemplate: 'Sapient_Worldpay/payment/wallets',
+                multishippingDirectTemplate: 'Sapient_Worldpay/multishipping/wallets',
                 cardHolderName:'',
                 SavedcreditCardVerificationNumber:'',
-                cseData:null
+                cseData:null,
+                multishipping:false
             },
             walletCCTypes : ccTypesArr,
             initialize: function () {
@@ -174,6 +177,14 @@ define(
                 }
                 if (quote.billingAddress._latestValue == null) {
                     return;
+                }
+                /* Multishipping Code */
+                if(this.multishipping){
+                    var MultishippingWalletsPreSelected = jQuery('#p_method_worldpay_wallets:checked');
+                    if(MultishippingWalletsPreSelected.length){
+                        jQuery('#payment-continue').html("<span>Place Order</span>");
+                        this.selectPaymentMethod();
+                    }
                 }
                 var ccavailabletypes = this.getCcAvailableTypes();
                 var filtercclist = {};
@@ -216,6 +227,9 @@ define(
             },
 
             getTemplate: function(){
+                if(this.multishipping){
+                    return this.multishippingDirectTemplate;
+                }
                 return this.direcTemplate;
             },
             
@@ -298,14 +312,24 @@ define(
                                             }
                                             window.sessionId = this.dfReferenceId;
                                             //place order with direct CSE method
-                                            fullScreenLoader.stopLoader();
-                                            self.placeOrder();
+                                            if(window.checkoutConfig.payment.ccform.isMultishipping){                                                        
+                                                placeMultishippingOrder(self.getData());
+                                            }
+                                            else{
+                                                fullScreenLoader.stopLoader();
+                                                self.placeOrder();
+                                            }
                                         }
                                     }
-                                }, false);
+                                }, { once: true });
                             } else {
-                                fullScreenLoader.stopLoader();
-                                self.placeOrder();
+                                if(window.checkoutConfig.payment.ccform.isMultishipping){                                                        
+                                    placeMultishippingOrder(self.getData());
+                                }
+                                else{
+                                    fullScreenLoader.stopLoader();
+                                    self.placeOrder();
+                                }
                             }
                             //self.placeOrder();
                         }else {
@@ -381,7 +405,13 @@ define(
                             session.completePayment(status);
                         });
                         appleResponse = JSON.stringify(event.payment.token);
-                        self.placeOrder();       
+                        if(window.checkoutConfig.payment.ccform.isMultishipping){
+                            fullScreenLoader.startLoader();
+                            placeMultishippingOrder(self.getData(), response1);
+                        }
+                        else{
+                            self.placeOrder();
+                        }
                     }
 
                     session.oncancel = function(event) {
@@ -403,7 +433,13 @@ define(
                          response1 = JSON.parse(response); 
                          
                          if(response1.resultMessage == 'SUCCESS') {
-                             self.placeOrder();           
+                            if(window.checkoutConfig.payment.ccform.isMultishipping){
+                                fullScreenLoader.startLoader();
+                                placeMultishippingOrder(self.getData(), response1);
+                            }
+                            else{
+                                self.placeOrder();
+                            }
                            
                          }
 

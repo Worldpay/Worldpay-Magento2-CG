@@ -16,11 +16,17 @@ class WorldPayPayment
      * Constructor
      *
      * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      */
     public function __construct(
-        \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
+        \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment,
+        \Magento\Sales\Model\Order $order,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper
     ) {
         $this->worldpaypayment = $worldpaypayment;
+        $this->order = $order;
+        $this->worldpayHelper = $worldpayHelper;
     }
 
     /**
@@ -30,9 +36,13 @@ class WorldPayPayment
      */
     public function updateWorldpayPayment(\Sapient\Worldpay\Model\Payment\StateInterface $paymentState)
     {
-         $wpp = $this->worldpaypayment->create();
-
-        $wpp = $wpp->loadByWorldpayOrderId($paymentState->getOrderCode());
+        $isMultishipping = $this->worldpayHelper->isMultishippingOrder($this->order->getQuoteId());
+        $wpp = $this->worldpaypayment->create();
+        if ($isMultishipping) {
+            $wpp = $wpp->loadByPaymentId($this->order->getIncrementId());
+        } else {
+            $wpp = $wpp->loadByWorldpayOrderId($paymentState->getOrderCode());
+        }
 
         $wpp->setData('payment_status', $paymentState->getPaymentStatus());
         if (strpos($paymentState->getPaymentStatus(), "KLARNA") !== false) {

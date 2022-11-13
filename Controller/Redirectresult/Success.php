@@ -45,7 +45,13 @@ class Success extends \Magento\Framework\App\Action\Action
     {
         $this->wplogger->info('worldpay returned success url');
         $this->orderservice->redirectOrderSuccess();
+        $order = $this->orderservice->getAuthorisedOrder();
+        $worldpaypayment = $order->getWorldPayPayment();
         $this->orderservice->removeAuthorisedOrder();
+        if ($worldpaypayment->getIsMultishippingOrder()) {
+            $url = 'multishipping/checkout/success';
+            return $this->resultRedirectFactory->create()->setPath($url, ['_current' => true]);
+        }
         return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success', ['_current' => true]);
     }
 }

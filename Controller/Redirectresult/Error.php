@@ -46,6 +46,7 @@ class Error extends \Magento\Framework\App\Action\Action
      * @param \TransactionsFactory $transactionsFactory
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param CreditCardException $helper
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      */
     public function __construct(
         Context $context,
@@ -55,7 +56,8 @@ class Error extends \Magento\Framework\App\Action\Action
         SubscriptionFactory $subscriptionFactory,
         TransactionsFactory $transactionsFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
-        CreditCardException $helper
+        CreditCardException $helper,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
     ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
@@ -64,6 +66,7 @@ class Error extends \Magento\Framework\App\Action\Action
         $this->transactionsFactory = $transactionsFactory;
         $this->checkoutSession = $checkoutSession;
         $this->helper = $helper;
+        $this->multishippingHelper = $multishippingHelper;
         return parent::__construct($context);
     }
     /**
@@ -96,6 +99,7 @@ class Error extends \Magento\Framework\App\Action\Action
                 $transactions->delete();
             }
         }
+        $this->multishippingHelper->performMultishippingMessage($order, 'error');
         return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
     }
     /**
