@@ -1,0 +1,369 @@
+<?php
+
+/**
+ * Sapient 2022
+ */
+
+/**
+ * @extends Magento_Multishipping::checkout/billing.phtml
+ * @var \Magento\Multishipping\Block\Checkout\Billing $block
+ */
+?>
+<?php
+/** @var \Magento\Checkout\Helper\Data $checkoutHelper */
+$checkoutHelper = $block->getData('checkoutHelper');
+/** @var \Magento\Tax\Helper\Data $taxHelper */
+$taxHelper = $block->getData('taxHelper');
+?>
+<div id="checkout-loader" data-role="checkout-loader" class="loading-mask" data-mage-init='{"billingLoader": {}}'>
+    <div class="loader">
+        <img src="<?= $escaper->escapeUrl($block->getViewFileUrl('images/loader-1.gif')); ?>" 
+        alt="<?= $escaper->escapeHtml(__('Loading...')); ?>">
+    </div>
+</div>
+<?= /* @noEscape */ $secureRenderer->renderStyleAsTag('position: absolute;', 'div#checkout-loader .loader img') ?>
+<?php $checkoutConfig = /* @noEscape */ $block->getCheckoutData()->getSerializedCheckoutConfigs();
+$scriptString = <<<script
+    window.checkoutConfig = {$checkoutConfig};
+    window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
+    window.customerData = window.checkoutConfig.customerData;
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<div id="checkout" data-bind="scope:'checkoutMessages'">
+    <!-- ko template: getTemplate() -->
+    <!-- /ko -->
+    <script type="text/x-magento-init">
+        {
+            "#checkout": {
+                "Magento_Ui/js/core/app": {
+                   "components": {
+                        "checkoutMessages": {
+                            "component": "Magento_Ui/js/view/messages",
+                            "displayArea": "messages"
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</div>
+<form action="<?= $escaper->escapeUrl($block->getPostActionUrl()); ?>" method="post" id="multishipping-billing-form" 
+class="form multicheckout billing">
+    <div class="block block-billing">
+        <div class="block-content">            
+            <div class="box box-billing-method" id = "payment">
+                <hr>
+                <fieldset class="fieldset">
+                    <legend class="legend box-title">
+                        <div class="payment-title-wrapper">
+                            <span><?= $block->escapeHtml(__('Payment Method')); ?></span>
+                            <br>
+                            <span class="security-title">All transactions are secure and encrypted...</span>
+                        </div>
+                        <div class="payment-logo-wrapper">
+                            <img 
+                            data-bind="attr: { src: require.toUrl('Sapient_Worldpay/images/cc/worldpay-logo.png') }" 
+                            alt="worldpay logo" class="worldpay-logo-paymentscreen">
+                        </div>
+                    </legend><br>
+                    <div class="box-content">
+                        <?= $block->getChildHtml('payment_methods_before') ?>
+                        <?php /* Payment methods forms list */ ?>
+                        <dl class="checkout-payment-method" id="payment-methods">
+                            <?php
+                            $methods = $block->getMethods();
+                            $methodsCount = count($methods);
+                            $methodsForms = $block->hasFormTemplates() ? $block->getFormTemplates() : [];
+
+                            foreach ($methods as $_method):
+                                $code = $_method->getCode();
+                                $checked = $block->getSelectedMethodCode() === $code;
+
+                                if (isset($methodsForms[$code])) {
+                                    $block->setMethodFormTemplate($code, $methodsForms[$code]);
+                                }
+                                ?>
+                                <div data-bind="scope: 'payment_method_<?= $escaper->escapeHtml($code); ?>'">
+                                    <dt class="item-title">
+                                        <?php if ($methodsCount > 1): ?>
+                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>" 
+                                            value="<?= $escaper->escapeHtml($code); ?>" 
+                                            name="payment[method]" 
+                                            title="<?= $escaper->escapeHtml($_method->getTitle()) ?>" 
+                                            data-bind="
+                                                       value: getCode(),
+                                                       checked: isChecked,
+                                                       click: selectPaymentMethod,
+                                                       visible: isRadioButtonVisible()" 
+                                                       <?php if ($checked): ?> checked="checked" <?php endif; ?> 
+                                                        class="radio payment-method" />
+                                        <?php else: ?>
+                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>" 
+                                            value="<?= $escaper->escapeHtml($code); ?>" name="payment[method]" 
+                                            data-bind="
+                                                       value: getCode(),
+                                                       afterRender: selectPaymentMethod" checked="checked" 
+                                                       class="radio solo method" />
+                                        <?php endif; ?>
+                                        <label for="p_method_<?= $escaper->escapeHtml($code); ?>">
+                                            <?= $escaper->escapeHtml($_method->getTitle()) ?>
+                                        </label>
+                                        <!-- Start Worldpay plugin customization -->
+                                        <?php
+                                        if ($code == 'worldpay_cc' ||
+                                            $code == 'worldpay_apm' ||
+                                            $code == 'worldpay_wallets') {
+                                            ?>
+                                            <div class='accepted_cc'>
+                                                <span class='worldpay_cc_we_accept'>
+                                                    <!-- ko i18n: getCheckoutLabels('CO2')-->
+                                                    <!-- /ko -->
+                                                </span>
+                                                <div class="paymentoptions-icon-wrapper">
+                                                    <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
+                                                    <!--ko if: $parent.getIcons(item.ccValue) -->
+                                                    <div data-bind="attr: {for: 'direct_cc_' + item.ccValue}">
+                                                        <img 
+                                                        data-bind="attr: {
+                                                                   'src': $parent.getIcons(item.ccValue).url,
+                                                                    'alt': item.ccLabel,
+                                                                    'width': $parent.getIcons(item.ccValue).width,
+                                                                    'height': $parent.getIcons(item.ccValue).height
+                                                                    }"></div>
+                                                    <!--/ko-->
+                                                    <!--/ko-->
+
+                                                </div>
+                                            </div>
+                                        <?php } ?>
+
+                                        <!-- End Worldpay plugin customization -->
+                                    </dt>
+                                    <?php if ($html = $block->getChildHtml('payment.method.' . $code)): ?>
+                                        <dd class="item-content <?= $checked ? '' : 'no-display'; ?>">
+                                            <?= /* @noEscape */ $html; ?>
+                                        </dd>
+                                    <?php endif; ?>
+                                </div>
+
+                            <?php endforeach; ?>
+                        </dl>
+                        <?= $block->getChildHtml('payment_methods_wallets') ?>
+                        
+                        <?= $block->getChildHtml('payment_methods_after') ?>
+                        <?= $block->getChildHtml('checkout_billing_items') ?>
+                    </div>
+                    
+                </fieldset>
+                <div class="actions-toolbar wp-actions-toolbar">
+                    <div class="billing-totals">
+                        <strong class="box-title grand totals">
+                            <span class="billing-mark"><?= $block->escapeHtml(__('Grand Total:')); ?></span>
+                            <?= /* @noEscape */ $checkoutHelper->formatPrice($block->getTotal()); ?>
+                        </strong>
+                    </div>
+                    <div class="primary" id="parent-payment-continue">
+                        <button id="payment-continue" type="button" class="action primary continue">
+                            <span><?= $escaper->escapeHtml(__('Go to Review Your Order')); ?></span>
+                        </button>
+
+                    </div>
+                    <div class="secondary">
+                        <a href="<?= $escaper->escapeUrl($block->getBackUrl()); ?>" class="action back">
+                            <span><?= $escaper->escapeHtml(__('Back to Shipping Information')); ?></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-billing-address scroll">
+                <strong class="box-title">
+                    <span><?= $escaper->escapeHtml(__('Billing Address')); ?></span>
+                    <a href="<?= $escaper->escapeUrl($block->getSelectAddressUrl()); ?>" class="action">
+                        <span><?= $escaper->escapeHtml(__('Change')); ?></span>
+                    </a>
+                </strong>
+                <div class="box-content">
+                    <address>
+                        <?= /* @noEscape */ $block->getCheckoutData()->getAddressHtml($block->getAddress()); ?>
+                    </address>
+                </div>
+                <div class="block block-shipping">
+                    <div class="block-title shipping-information">
+                        <strong><?= $block->escapeHtml(__('Shipping Information')); ?></strong>
+                    </div>
+                    <?php $mergedCells = ($taxHelper->displayCartBothPrices() ? 2 : 1); ?>
+                    <?php foreach ($block->getShippingAddresses() as $index => $address): ?>
+                        <div class="block-content">
+                            <a name="<?= $block->escapeHtml($block->getAddressAnchorName($address->getId())); ?>"></a>
+                            <div class="title address-title-space">
+                                <strong><?= $block->escapeHtml(__('Address')); ?> <?= $block->escapeHtml($index + 1); ?>
+                                    <span>
+                                        <?= $block->escapeHtml(__('of')); ?>
+                                        <?= $block->escapeHtml($block->getShippingAddressCount()) ?>
+                                    </span>
+                                </strong>
+                            </div>
+                            <div class="box box-shipping-address wp-address-block">
+                                <strong class="box-title">
+                                    <span><?= $block->escapeHtml(__('Shipping To')); ?></span>
+                                    <a href="<?= $block->escapeUrl($block->getEditShippingAddressUrl($address)); ?>" 
+                                    class="action edit"><span><?= $block->escapeHtml(__('Edit')); ?></span></a>
+                                </strong>
+                                <div class="box-content">
+                                    <address>
+                                        <?= /* @noEscape */ $address->format('html') ?>
+                                    </address>
+                                </div>
+                            </div>
+
+                            <div class="box box-items wp-price-block">
+                                <div class="box-content">
+                                    <div class="order-review-wrapper table-wrapper">
+                                        <table class="items data table table-order-review" 
+                                        id="overview-table-<?= $block->escapeHtml($address->getId()); ?>">
+                                            <caption class="table-caption">
+                                                <?= $block->escapeHtml(__('Order Review')); ?>
+                                            </caption>
+                                            <thead>
+                                                <tr>
+                                                    <td colspan='4'>
+                                                        <strong><?= $block->escapeHtml(__('Price Info')); ?></strong>
+                                                    </td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?= /* @noEscape */ $block->renderTotals(
+                                                    $block->getShippingAddressTotals($address)
+                                                ); ?>
+                                            </tbody>
+                                            <tfoot>
+
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php if ($block->getQuote()->hasVirtualItems()): ?>
+                    <div class="block block-other">
+                        <?php $billingAddress = $block->getQuote()->getBillingAddress(); ?>
+                        <a name="<?= $block->escapeHtml($block->getAddressAnchorName($billingAddress->getId())); ?>">
+                        </a>
+                        <div class="block-title other-information">
+                            <strong><?= $block->escapeHtml(__('Other items in your order')); ?></strong>
+                        </div>
+                        <?php if ($error = $block->getAddressError($billingAddress)): ?>
+                            <div class="error-description"><?= $block->escapeHtml($error); ?></div>
+                        <?php endif; ?>
+                        <div class="block-content wp-price-block wp-virtual-block">
+
+                            <?php $mergedCells = ($taxHelper->displayCartBothPrices() ? 2 : 1); ?>
+                            <div class="order-review-wrapper table-wrapper">
+                                <table class="items data table table-order-review" id="virtual-overview-table">
+                                    <thead>
+                                        <tr>
+                                            <td colspan='4'>
+                                                <strong><?= $block->escapeHtml(__('Price Info')); ?></strong>
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?= /* @noEscape */ $block->renderTotals($block->getBillingAddressTotals()); ?>
+                                    </tbody>
+                                    <tfoot>
+
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+    </div>
+
+</form>
+<script>
+    if (document.querySelector('input[name="payment[method]"]')) {
+        document.querySelectorAll('input[name="payment[method]"]').forEach((elem) => {
+            elem.addEventListener("change", function(event) {
+                var item = event.target.value;
+                if (item == 'worldpay_cc' || item == 'worldpay_wallets' || item == 'worldpay_apm') {
+                    document.getElementById("payment-continue").innerHTML = "<span>Place Order</span>";
+                } else {
+                    document.getElementById("payment-continue").innerHTML = "<span>Go to Review Your Order</span>";
+                }
+            });
+        });
+    }
+</script>
+<?php $quoteBaseGrandTotal = (float)$block->getQuoteBaseGrandTotal();
+$scriptString = <<<script
+
+    require(['jquery', 'mage/mage'], function(jQuery) {
+        var addtocartForm = jQuery('#multishipping-billing-form');
+
+        addtocartForm.mage('payment', {
+            checkoutPrice: {$quoteBaseGrandTotal}
+        });
+
+        addtocartForm.mage('validation', {
+            errorPlacement: function(error, element) {
+                if (element.attr('data-validate') && element.attr('data-validate').indexOf('validate-cc-ukss') >= 0) {
+                    element.parents('form').find('[data-validation-msg="validate-cc-ukss"]').html(error);
+                } else {
+                    element.after(error);
+                }
+            }
+        });
+    });
+
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+
+<?php $scriptString = <<<script
+
+    //<![CDATA[
+    require(
+        [
+            'Magento_Checkout/js/model/quote',
+            'jquery',
+            'domReady!'
+        ], function(quote, $) {
+            quote.billingAddress({
+
+script;
+$scriptString .= "city: '" . $escaper->escapeJs($block->getAddress()->getCity()) . "'," . PHP_EOL;
+$scriptString .= "company: '" . $escaper->escapeJs($block->getAddress()->getCompany()) . "'," . PHP_EOL;
+$scriptString .= "countryId: '" . $escaper->escapeJs($block->getAddress()->getCountryId()) . "'," . PHP_EOL;
+$scriptString .= "customerAddressId: '" . $escaper->escapeJs($block->getAddress()->getCustomerAddressId()) . "',"
+    . PHP_EOL;
+$scriptString .= "customerId: '" . $escaper->escapeJs($block->getAddress()->getCustomerId()) . "'," . PHP_EOL;
+$scriptString .= "fax: '" . $escaper->escapeJs($block->getAddress()->getFax()) . "'," . PHP_EOL;
+$scriptString .= "firstname: '" . $escaper->escapeJs($block->getAddress()->getFirstname()) . "'," . PHP_EOL;
+$scriptString .= "lastname: '" . $escaper->escapeJs($block->getAddress()->getLastname()) . "'," . PHP_EOL;
+$scriptString .= "postcode: '" . $escaper->escapeJs($block->getAddress()->getPostcode()) . "'," . PHP_EOL;
+if (!empty($block->getAddress()->getRegionId())) {
+    $scriptString .= "regionId: '" . $escaper->escapeJs($block->getAddress()->getRegionId()) . "'," . PHP_EOL;
+}
+if (!empty($block->getAddress()->getRegionCode())) {
+    $scriptString .= "regionCode: '" . $escaper->escapeJs($block->getAddress()->getRegionCode()) . "'," . PHP_EOL;
+}
+if (!empty($block->getAddress()->getRegion())) {
+    $scriptString .= "region: '" . $escaper->escapeJs($block->getAddress()->getRegion()) . "'," . PHP_EOL;
+}
+$scriptString .= "street: " . /* @noEscape */ json_encode($block->getAddress()->getStreet()) . "," . PHP_EOL;
+$scriptString .= "telephone: '" . $escaper->escapeJs($block->getAddress()->getTelephone()) . "'" . PHP_EOL;
+$scriptString .= <<<script
+            });
+        });
+    //]]>
+
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>

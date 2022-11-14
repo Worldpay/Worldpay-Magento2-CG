@@ -1,0 +1,35 @@
+<?php
+// This template is loaded on the multi-shipping checkout page while selecting APM
+?>
+<script>
+    require([
+        'uiLayout',
+        'jquery'
+    ], function (layout, $) {
+        $(function () {
+            var paymentMethodData = {
+                method: 'worldpay_apm'
+            };
+            layout([
+                {
+                    component: 'Sapient_Worldpay/js/view/payment/multishipping/apm-method',
+                    name: 'payment_method_worldpay_apm',
+                    method: paymentMethodData.method,
+                    item: paymentMethodData
+                }
+            ]);
+            $('body').trigger('contentUpdated');
+        })
+    })
+</script>
+<fieldset id="payment_form_worldpay_apm" 
+class="worldpay_apm worldpay_apm_multishipping worldpay-ms standard-form fieldset items" 
+style="display: none;">
+
+  <div data-bind="scope: 'payment_method_worldpay_apm'">
+    <!-- ko template: getTemplate() -->
+    <!-- /ko -->
+
+  </div>
+
+</fieldset>

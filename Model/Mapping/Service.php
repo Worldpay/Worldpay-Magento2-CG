@@ -731,8 +731,14 @@ class Service
      */
     private function _getOrderLineItems($quote, $paymentType = null)
     {
+        $isMultiShipping = (bool)$quote->getIsMultiShipping();
         $orderitems = [];
         $orderitems['orderTaxAmount'] = $quote->getShippingAddress()->getData('tax_amount');
+        if ($paymentType == 'KLARNA-SSL' && $isMultiShipping) {
+            $totals = $quote->getTotals();
+            $msTax = (isset($totals['tax'])) ? $totals['tax']->getValue(): 0;
+            $orderitems['orderTaxAmount'] = $msTax;
+        }
         $orderitems['termsURL'] = $this->_urlBuilder->getUrl();
         $lineitem = [];
         $orderItems = $quote->getItemsCollection();
@@ -746,7 +752,6 @@ class Service
                 $totaltax = $_item->getTaxAmount() + $_item->getHiddenTaxAmount()
                         + $_item->getWeeeTaxAppliedRowAmount();
                 $discountamount = $_item->getDiscountAmount();
-
                 $lineitem['reference'] = $_item->getProductId();
                 $lineitem['name'] = $_item->getName();
                 $lineitem['productType'] = $_item->getProductType();
@@ -767,23 +772,48 @@ class Service
         }
 
         $lineitem = [];
-        $address = $quote->getShippingAddress();
-        if ($address->getShippingAmount() > 0) {
-            $totalAmount = $address->getShippingAmount() - $address->getShippingDiscountAmount();
-            $totaltax = $address->getShippingTaxAmount() + $address->getShippingHiddenTaxAmount();
+        if ($paymentType == 'KLARNA-SSL' && $isMultiShipping) {
+            $shippingAddresses = $quote->getAllShippingAddresses();
+            $shippingPrice = 0;
+            foreach ($shippingAddresses as $key => $address) {
+                $shippingMethodCode = $address->getShippingMethod();
+                if ($shippingMethodCode) {
+                    $rate = $address->getShippingRateByCode($shippingMethodCode);
+                    $shippingPrice += $rate->getPrice();
+                } else {
+                    $shippingPrice += $order->getShippingAmount();
+                }
+            }
             $lineitem['reference'] = 'Shipid';
             $lineitem['name'] = 'Shipping amount';
             $lineitem['productType'] = 'shipping';
             $lineitem['quantity'] = 1;
             $lineitem['quantityUnit'] = 'shipping';
-            $lineitem['unitPrice'] = $address->getShippingAmount() + $totaltax;
-            $lineitem['totalAmount'] = $totalAmount + $totaltax;
-            $lineitem['totalTaxAmount'] = $totaltax;
-            $lineitem['taxRate'] = (int) (($totaltax * 100) / $address->getShippingAmount());
-            if ($address->getShippingDiscountAmount() > 0) {
-                $lineitem['totalDiscountAmount'] = $address->getShippingDiscountAmount();
-            }
+            $lineitem['unitPrice'] = $shippingPrice + $msTax;
+            $lineitem['totalAmount'] = $shippingPrice + $msTax;
+            $lineitem['totalTaxAmount'] = $msTax;
+            $lineitem['taxRate'] = (int) (($msTax * 100) / $shippingPrice);
+            ;
             $orderitems['lineItem'][] = $lineitem;
+        } else {
+            $address = $quote->getShippingAddress();
+            if ($address->getShippingAmount() > 0) {
+                $totalAmount = $address->getShippingAmount() - $address->getShippingDiscountAmount();
+                $totaltax = $address->getShippingTaxAmount() + $address->getShippingHiddenTaxAmount();
+                $lineitem['reference'] = 'Shipid';
+                $lineitem['name'] = 'Shipping amount';
+                $lineitem['productType'] = 'shipping';
+                $lineitem['quantity'] = 1;
+                $lineitem['quantityUnit'] = 'shipping';
+                $lineitem['unitPrice'] = $address->getShippingAmount() + $totaltax;
+                $lineitem['totalAmount'] = $totalAmount + $totaltax;
+                $lineitem['totalTaxAmount'] = $totaltax;
+                $lineitem['taxRate'] = (int) (($totaltax * 100) / $address->getShippingAmount());
+                if ($address->getShippingDiscountAmount() > 0) {
+                    $lineitem['totalDiscountAmount'] = $address->getShippingDiscountAmount();
+                }
+                $orderitems['lineItem'][] = $lineitem;
+            }
         }
         
         if ($quote->getBaseCustomerBalAmountUsed() > 0) {
@@ -1418,6 +1448,9 @@ class Service
     {
         $billingAdress = $this->_getBillingAddress($quote);
         if ($billingAdress['countryCode']==='US') {
+            if ($this->worldpayHelper->isMultiShipping($quote)) {
+                return;
+            }
             if ($this->worldpayHelper->isPrimeRoutingEnabled()
                 && $this->worldpayHelper->isAdvancedPrimeRoutingEnabled()) {
                 $details['primerouting'] = $this->worldpayHelper->isPrimeRoutingEnabled();

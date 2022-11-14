@@ -13,13 +13,16 @@ class Factory
      *
      * @param \Sapient\Worldpay\Helper\Data $configHelper
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldpaymentmodel
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      */
     public function __construct(
         \Sapient\Worldpay\Helper\Data $configHelper,
-        \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldpaymentmodel
+        \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldpaymentmodel,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
     ) {
             $this->_configHelper = $configHelper;
             $this->worldpaymentmodel = $worldpaymentmodel;
+            $this->_multishippingHelper = $multishippingHelper;
     }
 
     /**
@@ -35,7 +38,8 @@ class Factory
                 return new \Sapient\Worldpay\Model\Payment\Update\Authorised(
                     $paymentState,
                     $this->worldpaymentmodel,
-                    $this->_configHelper
+                    $this->_configHelper,
+                    $this->_multishippingHelper
                 );
 
             case \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_CAPTURED:
@@ -84,28 +88,32 @@ class Factory
                 return new \Sapient\Worldpay\Model\Payment\Update\Refused(
                     $paymentState,
                     $this->worldpaymentmodel,
-                    $this->_configHelper
+                    $this->_configHelper,
+                    $this->_multishippingHelper
                 );
 
             case \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_ERROR:
                 return new \Sapient\Worldpay\Model\Payment\Update\Error(
                     $paymentState,
                     $this->worldpaymentmodel,
-                    $this->_configHelper
+                    $this->_configHelper,
+                    $this->_multishippingHelper
                 );
 
             case \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_PENDING_PAYMENT:
                 return new \Sapient\Worldpay\Model\Payment\Update\PendingPayment(
                     $paymentState,
                     $this->worldpaymentmodel,
-                    $this->_configHelper
+                    $this->_configHelper,
+                    $this->_multishippingHelper
                 );
 
             default:
                 return new \Sapient\Worldpay\Model\Payment\Update\Defaultupdate(
                     $paymentState,
                     $this->worldpaymentmodel,
-                    $this->_configHelper
+                    $this->_configHelper,
+                    $this->_multishippingHelper
                 );
         }
     }

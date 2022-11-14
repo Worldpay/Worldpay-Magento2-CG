@@ -29,6 +29,7 @@ class TokenService extends \Magento\Framework\DataObject
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      * @param \Sapient\Worldpay\Helper\Registry $registryhelper
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
@@ -39,7 +40,8 @@ class TokenService extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Sapient\Worldpay\Helper\Data $worldpayHelper,
-        \Sapient\Worldpay\Helper\Registry $registryhelper
+        \Sapient\Worldpay\Helper\Registry $registryhelper,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
     ) {
         $this->mappingservice = $mappingservice;
         $this->paymentservicerequest = $paymentservicerequest;
@@ -50,6 +52,7 @@ class TokenService extends \Magento\Framework\DataObject
         $this->checkoutSession = $checkoutSession;
         $this->worldpayHelper = $worldpayHelper;
         $this->registryhelper = $registryhelper;
+        $this->multishippingHelper = $multishippingHelper;
     }
 
     /**
@@ -70,6 +73,29 @@ class TokenService extends \Magento\Framework\DataObject
         $paymentDetails,
         $payment
     ) {
+        /** Start Multishipping Code */
+        if ($this->worldpayHelper->isMultiShipping($quote)) {
+            $sessionOrderCode = $this->multishippingHelper->getOrderCodeFromSession();
+            if (!empty($sessionOrderCode)) {
+                $orgWorldpayPayment = $this->multishippingHelper->getOrgWorldpayId($sessionOrderCode);
+                $orgOrderId = $orgWorldpayPayment['order_id'];
+                $isOrg = false;
+                $this->multishippingHelper->_createWorldpayMultishipping($mageOrder, $sessionOrderCode, $isOrg);
+                $this->multishippingHelper->_copyWorldPayPayment($orgOrderId, $orderCode);
+                $is3dsOrder = $this->multishippingHelper->is3dsOrder();
+                if ($is3dsOrder) {
+                    $payment->setIsTransactionPending(1);
+                } else {
+                    $payment->setTransactionId(time());
+                    $payment->setIsTransactionClosed(0);
+                }
+                return;
+            } else {
+                $isOrg = true;
+                $this->multishippingHelper->_createWorldpayMultishipping($mageOrder, $orderCode, $isOrg);
+            }
+        }
+        /** End Multishipping Code */
         $tokenOrderParams = $this->mappingservice->collectTokenOrderParameters(
             $orderCode,
             $quote,

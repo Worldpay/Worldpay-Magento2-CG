@@ -260,6 +260,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 
                 //Klarna Pay
                 $config['payment']['ccform']['klarnaTypesAndContries'] = $this->getKlarnaTypesAndContries();
+
+                //Multishipping
+                $config['payment']['ccform']['isMultishipping'] = $this->worldpayHelper->isMultiShipping();
             }
         }
         return $config;

@@ -43,6 +43,7 @@
     <preference for="Sapient\Worldpay\Api\LatAmInstalInterface" type="Sapient\Worldpay\Model\Payment\LatAmInstalTypes" />
     <preference for="Magento\Vault\Model\Method\Vault" type="Sapient\Worldpay\Model\PaymentMethods\CcVault" />
     <preference for="Magento\Sales\Model\Order\Email\Sender\OrderSender" type="Sapient\Worldpay\Model\Order\Email\Sender\OrderSender"/>
+    <preference for="Sapient\Worldpay\Api\MultishippingInterface" type="Sapient\Worldpay\Model\Multishipping\Multishipping" />
     <type name="Sapient\Worldpay\Model\PaymentMethods\CcVault">
         <arguments>
             <argument name="logger" xsi:type="object">Sapient\Worldpay\Logger\WorldpayLogger</argument>
@@ -115,4 +116,17 @@
     <type name="Magento\Sales\Block\Order\Item\Renderer\DefaultRenderer">
         <plugin name="worldpay_payment" type="Sapient\Worldpay\Block\Sales\Order\Item\Renderer\DefaultRendererPlugin" sortOrder="100"/>
     </type>
+    <!-- Multishipping -->
+    <type name="Magento\Multishipping\Model\Checkout\Type\Multishipping">
+        <arguments>
+            <argument name="paymentSpecification" xsi:type="object">multishippingPaymentSpecification</argument>
+        </arguments>
+    </type>
+    <virtualType name="multishippingPaymentSpecification" type="Magento\Payment\Model\Method\Specification\Composite">
+        <arguments>
+            <argument name="specifications" xsi:type="array">
+                <item name="enabled" xsi:type="string">Magento\Multishipping\Model\Payment\Method\Specification\Enabled</item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>

@@ -23,6 +23,7 @@ class RedirectService extends \Magento\Framework\DataObject
      * @param \Magento\Checkout\Model\Session $checkoutsession
      * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
@@ -33,7 +34,8 @@ class RedirectService extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Helper\Registry $registryhelper,
         \Magento\Checkout\Model\Session $checkoutsession,
         \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentlist,
-        \Sapient\Worldpay\Helper\Data $worldpayhelper
+        \Sapient\Worldpay\Helper\Data $worldpayhelper,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
     ) {
         $this->mappingservice = $mappingservice;
         $this->paymentservicerequest = $paymentservicerequest;
@@ -44,6 +46,7 @@ class RedirectService extends \Magento\Framework\DataObject
         $this->checkoutsession = $checkoutsession;
         $this->paymentlist = $paymentlist;
         $this->worldpayhelper = $worldpayhelper;
+        $this->multishippingHelper = $multishippingHelper;
     }
     /**
      * Handles provides authorization data for redirect
@@ -67,6 +70,23 @@ class RedirectService extends \Magento\Framework\DataObject
     ) {
 
         $this->checkoutsession->setauthenticatedOrderId($mageOrder->getIncrementId());
+        /** Start Multishipping Code */
+        if ($this->worldpayhelper->isMultiShipping($quote)) {
+            $sessionOrderCode = $this->multishippingHelper->getOrderCodeFromSession();
+            if (!empty($sessionOrderCode)) {
+                $orgWorldpayPayment = $this->multishippingHelper->getOrgWorldpayId($sessionOrderCode);
+                $orgOrderId = $orgWorldpayPayment['order_id'];
+                $isOrg = false;
+                $this->multishippingHelper->_createWorldpayMultishipping($mageOrder, $sessionOrderCode, $isOrg);
+                $this->multishippingHelper->_copyWorldPayPayment($orgOrderId, $orderCode);
+                $payment->setIsTransactionPending(1);
+                return;
+            } else {
+                $isOrg = true;
+                $this->multishippingHelper->_createWorldpayMultishipping($mageOrder, $orderCode, $isOrg);
+            }
+        }
+        /** End Multishipping Code */
         if ($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL') {
              $redirectOrderParams = $this->mappingservice->collectKlarnaOrderParameters(
                  $orderCode,

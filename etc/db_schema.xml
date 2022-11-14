@@ -30,6 +30,7 @@
     <column xsi:type="boolean" name="client_side_encryption" nullable="false" comment="Client side encryption"/>
     <column xsi:type="int" name="latam_instalments" padding="11" unsigned="false" nullable="true" identity="false" comment="Latin America Instalments"/>
     <column xsi:type="boolean" name="is_recurring_order" nullable="false" comment="Check Recurring Order"/>
+    <column xsi:type="boolean" name="is_multishipping_order" nullable="false" comment="Check Multishipping Order"/>
     <column xsi:type="boolean" name="is_primerouting_enabled" nullable="true" comment="PrimeRouting Enabled"/>
     <column xsi:type="text" name="primerouting_networkused" nullable="true" comment="PrimeRouting Network Used"/>
     <column xsi:type="text" name="source_type" nullable="true" comment="Issuer Insight Source Type"/>
@@ -285,5 +286,14 @@
     <index referenceId="WORLDPAY_RECURRING_TRANSACTIONS_WORLDPAY_ORDER_ID" indexType="btree">
       <column name="worldpay_order_id"/>
     </index>
+  </table>
+  <table name="worldpay_multishipping" resource="default" engine="innodb" comment="Multishipping Table">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="varchar" name="order_id"  nullable="false"  comment="Order Id" length="25"/>
+    <column xsi:type="int" name="quote_id" padding="11" unsigned="false" nullable="false" identity="false" comment="Quote Id"/>
+    <column xsi:type="varchar" name="worldpay_order_id" nullable="true" length="40" comment="WorldPay Order Id"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
   </table>
 </schema>

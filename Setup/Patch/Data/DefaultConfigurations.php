@@ -1157,6 +1157,9 @@ class DefaultConfigurations implements DataPatchInterface
         $index.'_13' => ["exception_code" => "ACAM13",
         "exception_messages" => "Detected only whitespace character for code",
         "exception_module_messages" => ""],
+        $index.'_14' => ["exception_code" => "ACAM14",
+        "exception_messages" => "This is multishipping order. You cannot able to cancelled the order",
+        "exception_module_messages" => ""],
         ];
             
         $exceptionCodes = $this->convertArrayToString($exceptionValues);

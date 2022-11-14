@@ -68,6 +68,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries
      * @param \Magento\Backend\Model\Session\Quote $adminsessionquote
      * @param \Magento\Framework\App\ProductMetadataInterface $productMetaData
+     * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
      */
 
     public function __construct(
@@ -90,7 +91,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         SerializerInterface $serializer,
         \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries,
         \Magento\Backend\Model\Session\Quote $adminsessionquote,
-        \Magento\Framework\App\ProductMetadataInterface $productMetaData
+        \Magento\Framework\App\ProductMetadataInterface $productMetaData,
+        \Magento\Quote\Model\QuoteFactory $quoteFactory
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
@@ -112,6 +114,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->klarnaCountries = $klarnaCountries;
         $this->adminsessionquote = $adminsessionquote;
         $this->productMetaData = $productMetaData;
+        $this->quoteFactory = $quoteFactory;
     }
     /**
      * Is WorldPay Enable or not
@@ -398,15 +401,17 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getWalletsTypes($code)
     {
         $activeMethods = [];
-        /*if ($this->isGooglePayEnable()) {
-            $activeMethods['PAYWITHGOOGLE-SSL'] = 'Google Pay';
-        }*/
+        if ($this->isMultiShipping()) {
+            if ($this->isGooglePayEnable()) {
+                $activeMethods['PAYWITHGOOGLE-SSL'] = 'Google Pay';
+            }
+            if ($this->isApplePayEnable()) {
+                $activeMethods['APPLEPAY-SSL'] = 'Apple Pay';
+            }
+        }
         if ($this->isSamsungPayEnable()) {
             $activeMethods['SAMSUNGPAY-SSL'] = 'Samsung Pay';
         }
-        /*if ($this->isApplePayEnable()) {
-            $activeMethods['APPLEPAY-SSL'] = 'Apple Pay';
-        }*/
         return $activeMethods;
     }
    /**
@@ -863,10 +868,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getOrderDescription()
     {
-        return $this->_scopeConfig->getValue(
+        $description = $this->_scopeConfig->getValue(
             'worldpay/general_config/order_description',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
+        if ($this->isMultiShipping()) {
+            return 'Multishipping - '.$description;
+        }
+        return $description;
     }
     /**
      * Get MotoTitle
@@ -2523,5 +2532,141 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $details['UPGRADE_DATES'] = $this->getUpgradeDates();
         }
         return $details;
+    }
+
+    /**
+     * Get Quote Data's
+     *
+     * @param int|null $quoteId
+     * @return Quote
+     */
+    public function getQuote($quoteId = null)
+    {
+        $quote = $this->_checkoutSession->getQuote();
+        return $quote;
+    }
+
+    /**
+     *  Check if Multishipping Enable in Admin end
+     *
+     * @return bool
+     */
+    public function isMultiShippingEnabledInCc()
+    {
+        $multishippingEnabled = false;
+        $isWorldPayEnabled = $this->isWorldPayEnable();
+        $isCreditCardEnabled = $this->isCreditCardEnabled();
+        $getsubscriptionStatus = $this->getsubscriptionStatus();
+        if ($isWorldPayEnabled && $isCreditCardEnabled && !$getsubscriptionStatus) {
+            $multishippingEnabled = $this->isMultishippingEnabled();
+        }
+        return $multishippingEnabled;
+    }
+
+    /**
+     *  Check if Multishipping Enable in Admin end
+     *
+     * @return bool
+     */
+    public function isMultiShippingEnabledInWallets()
+    {
+        $multishippingEnabled = false;
+        $isWorldPayEnabled = $this->isWorldPayEnable();
+        $isWalletsEnabled = $this->isWalletsEnabled();
+        $getsubscriptionStatus = $this->getsubscriptionStatus();
+        if ($isWorldPayEnabled && $isWalletsEnabled && !$getsubscriptionStatus) {
+            $multishippingEnabled = $this->isMultishippingEnabled();
+        }
+        return $multishippingEnabled;
+    }
+
+    /**
+     *  Check if Multishipping Enable in Admin end
+     *
+     * @return bool
+     */
+    public function isMultiShippingEnabledInApm()
+    {
+        $multishippingEnabled = false;
+        $isWorldPayEnabled = $this->isWorldPayEnable();
+        $isApmEnabled = $this->isApmEnabled();
+        $getsubscriptionStatus = $this->getsubscriptionStatus();
+        if ($isWorldPayEnabled && $isApmEnabled && !$getsubscriptionStatus) {
+            $multishippingEnabled = $this->isMultishippingEnabled();
+        }
+        return $multishippingEnabled;
+    }
+    
+    /**
+     * Get Multishipping Enabled
+     *
+     * @return string
+     */
+    public function isMultishippingEnabled()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/multishipping/enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    /**
+     *  Check if Quote is Multishipping
+     *
+     * @param Quote $quote
+     * @return bool
+     */
+    public function isMultiShipping($quote = null)
+    {
+        if (empty($quote)) {
+            $quote = $this->getQuote();
+        }
+
+        if (empty($quote)) {
+            return false;
+        }
+
+        return (bool)$quote->getIsMultiShipping();
+    }
+
+    /**
+     * Get Quote by quote id
+     *
+     * @param int $quoteId
+     * @return array
+     */
+    public function loadQuoteById($quoteId)
+    {
+        if (!isset($this->quotes)) {
+            $this->quotes = [];
+        }
+
+        if (!empty($this->quotes[$quoteId])) {
+            return $this->quotes[$quoteId];
+        }
+
+        $this->quotes[$quoteId] = $this->quoteFactory->create()->load($quoteId);
+
+        return $this->quotes[$quoteId];
+    }
+
+    /**
+     * Check if quote is mulishipping
+     *
+     * @param int $quoteId
+     * @return bool
+     */
+    public function isMultishippingOrder($quoteId)
+    {
+        if (empty($quoteId)) {
+            return false;
+        }
+
+        $quote = $this->loadQuoteById($quoteId);
+        if (!$quote || !$quote->getId()) {
+            return false;
+        }
+
+        return (bool)$quote->getIsMultiShipping();
     }
 }

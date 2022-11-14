@@ -37,15 +37,18 @@ class Service
      * @param \Sapient\Worldpay\Model\Payment\Update\Factory $paymentupdatefactory
      * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
      * @param \Sapient\Worldpay\Model\Worldpayment $worldpayPayment
+     * @param \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
      */
     public function __construct(
         \Sapient\Worldpay\Model\Payment\Update\Factory $paymentupdatefactory,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
-        \Sapient\Worldpay\Model\Worldpayment $worldpayPayment
+        \Sapient\Worldpay\Model\Worldpayment $worldpayPayment,
+        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
     ) {
         $this->paymentupdatefactory = $paymentupdatefactory;
         $this->paymentservicerequest = $paymentservicerequest;
         $this->worldpayPayment = $worldpayPayment;
+        $this->multishippingOrderCollection = $multishippingOrderCollection;
     }
     /**
      * Create Payment Update From WorldPay Xml
@@ -151,6 +154,22 @@ class Service
         $getAttibute = '';
         
         if (isset($nodes, $lastEvent[0], $partialCaptureReference[0])) {
+            /** Start Multishipping Code */
+            if ($lastEvent[0] == 'CAPTURED' && $worldPayPayment->getIsMultishippingOrder()
+                && (strpos($partialCaptureReference[0], "Partial Capture - ") !== false ||
+                strpos($partialCaptureReference[0], "Capture - ") !== false)) {
+                $worldpaypayment = $this->worldpayPayment->loadByPaymentId($worldPayPayment->getOrderId());
+                if (isset($worldpaypayment)) {
+                    $worldpaypayment->setData('payment_status', $lastEvent[0]);
+                    $worldpaypayment->save();
+                }
+                $magentoorder = $order->getOrder();
+                if ($magentoorder->hasInvoices() && $magentoorder->getBaseTotalDue() != 0) {
+                    $gatewayError = 'Sync status action not possible for this Partial Capture Order.';
+                    throw new \Magento\Framework\Exception\CouldNotDeleteException(__($gatewayError));
+                }
+            }
+            /** End Multishipping Code */
             if ($nodes && $lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture') {
                 $getAttibute = (array) $nodes[0]->attributes()['accountType'];
                 $getNodeValue = $getAttibute[0];
@@ -162,9 +181,10 @@ class Service
                     $worldpaypayment->setData('payment_status', $lastEvent[0]);
                     $worldpaypayment->save();
                 }
-                $gatewayError = 'Sync status action not possible for this Partial Captutre Order.';
+                $gatewayError = 'Sync status action not possible for this Partial Capture Order.';
                 throw new \Magento\Framework\Exception\CouldNotDeleteException(__($gatewayError));
             }
+            
         }
         return simplexml_load_string($rawXml);
     }

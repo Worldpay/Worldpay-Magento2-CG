@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+// Sapient 2022
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="checkout_success"
+                        template="Sapient_Worldpay::multishipping/success.phtml">
+            <arguments>
+                <argument name="checkout_data" xsi:type="object">Magento\Multishipping\Block\DataProviders\Success</argument>
+                <argument name="cacheable" xsi:type="boolean">false</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

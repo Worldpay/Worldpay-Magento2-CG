@@ -1,5 +1,11 @@
 Latest releases for all supported version:
 
+For Magento 2.4.5
+
+Worldpay Plugin version: 2.4.5-rc1122
+1. Magento 2.4.5 compatible
+2. Worldpay multishipping support
+
 For Magento 2.4.4
 
 Worldpay Plugin version: 2.4.4-p11022

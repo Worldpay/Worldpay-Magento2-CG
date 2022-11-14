@@ -34,9 +34,9 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
      * @var $helper
      */
     protected $helper;
-    /**
-     * @var Magento\Framework\Serialize\Serializer\Json
-     */
+     /**
+      * @var Magento\Framework\Serialize\Serializer\Json
+      */
     protected $serializer;
 
     /**

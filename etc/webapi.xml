@@ -24,4 +24,11 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <!-- Multishipping -->
+    <route url="/V1/worldpay/place_multishipping_order" method="POST">
+        <service class="Sapient\Worldpay\Api\MultishippingInterface" method="placeMultishippingOrder"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

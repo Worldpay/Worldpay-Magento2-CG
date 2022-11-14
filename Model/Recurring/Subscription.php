@@ -165,6 +165,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
      * @var \Magento\Framework\Registry
      */
     public $registryObj;
+
     /**
      * Subscription model constructor.
      *
@@ -793,8 +794,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $transactions->setData('subscription_id', $this->getId());
         $transactions->setData('customer_id', $this->getCustomerId());
         $transactions->setData('original_order_id', $this->getOriginalOrderId());
-
-        if(!empty($this->registryObj->registry('token_code'))){
+        if (!empty($this->registryObj->registry('token_code'))) {
             $transactions->setData('worldpay_token_id', $this->registryObj->registry('token_code'));
             $this->registryObj->unregister('token_code');
         }

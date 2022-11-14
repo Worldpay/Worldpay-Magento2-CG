@@ -77,6 +77,14 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
+        /* Start Multishipping code */
+        if ($this->worlpayhelper->isMultiShipping()) {
+            if ($this->worlpayhelper->isMultiShippingEnabledInApm()) {
+                return true;
+            }
+            return false;
+        }
+        /* End Multishipping code */
         if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isApmEnabled()
                 && !$this->worlpayhelper->getsubscriptionStatus()) {
             return true;

@@ -19,5 +19,41 @@ and open the template in the editor.
                 <sortable>false</sortable>
             </settings>
         </column>
+		<column name="worldpay_multishipping_id" class="Sapient\Worldpay\Ui\Component\Listing\Column\MultishippingId">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="label" xsi:type="string" translate="true">Worldpay Multishipping Id</item>
+                </item>
+            </argument>
+            <settings>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+		<column name="worldpay_payment_status" class="Sapient\Worldpay\Ui\Component\Listing\Column\WorldpayPaymentStatus">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="label" xsi:type="string" translate="true">Worldpay Payment Status</item>
+                </item>
+            </argument>
+            <settings>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+		<column name="invoice_status" class="Sapient\Worldpay\Ui\Component\Listing\Column\InvoiceStatus">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="label" xsi:type="string" translate="true">Capture / Invoice status</item>
+                </item>
+            </argument>
+            <settings>
+                <sortable>false</sortable>
+            </settings>
+        </column>
     </columns>
 </listing>

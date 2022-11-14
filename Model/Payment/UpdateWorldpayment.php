@@ -35,7 +35,6 @@ class UpdateWorldpayment
      * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
      */
     private $transactionsFactory;
-
     /**
      * @var Magento\Framework\Serialize\Serializer\Json
      */
@@ -55,6 +54,7 @@ class UpdateWorldpayment
      * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
      * @param EncryptorInterface $encryptor
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
+     * @param \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
      * @param Json $serializer
      */
     public function __construct(
@@ -70,6 +70,7 @@ class UpdateWorldpayment
         \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
         EncryptorInterface $encryptor,
         \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
+        \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
         Json $serializer
     ) {
         $this->wplogger = $wplogger;
@@ -84,6 +85,7 @@ class UpdateWorldpayment
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->encryptor = $encryptor;
         $this->transactionFactory = $transactionsFactory;
+        $this->worldpaypaymentmodel = $worldpaypaymentmodel;
         $this->serializer = $serializer;
     }
 
@@ -655,5 +657,66 @@ class UpdateWorldpayment
             $savereasoncode = $savereasoncode . "," . $reasoncode;
         }
         return ltrim($savereasoncode, ",");
+    }
+
+    /**
+     * Copy the Worldpay payment for other multishipping orders
+     *
+     * @param int $orgOrderId
+     * @param int $currentOrderCode
+     * @param string|null $type
+     */
+    public function copyWorldpayPaymentForMultiShipping($orgOrderId, $currentOrderCode, $type = null)
+    {
+        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($orgOrderId);
+        $wpp = $this->worldpaypayment->create();
+        if ($type) {
+            $wpp = $wpp->loadByPaymentId($currentOrderCode);
+        } else {
+            $wpp = $wpp->loadByWorldpayOrderId($currentOrderCode);
+        }
+        $wpp->setData('payment_status', $worldPayPayment->getData('payment_status'));
+        $wpp->setData('payment_model', $worldPayPayment->getData('payment_model'));
+        $wpp->setData('payment_type', $worldPayPayment->getData('payment_type'));
+        $wpp->setData('mac_verified', $worldPayPayment->getData('mac_verified'));
+        $wpp->setData('merchant_id', $worldPayPayment->getData('merchant_id'));
+        $wpp->setData('3d_verified', $worldPayPayment->getData('3d_verified'));
+        $wpp->setData('risk_score', $worldPayPayment->getData('risk_score'));
+        $wpp->setData('method', $worldPayPayment->getData('method'));
+        $wpp->setData('card_number', $worldPayPayment->getData('card_number'));
+        $wpp->setData('avs_result', $worldPayPayment->getData('avs_result'));
+        $wpp->setData('cvc_result', $worldPayPayment->getData('cvc_result'));
+        $wpp->setData('3d_secure_result', $worldPayPayment->getData('3d_secure_result'));
+        $wpp->setData('worldpay_order_id', $worldPayPayment->getData('worldpay_order_id'));
+        $wpp->setData('risk_provider', $worldPayPayment->getData('risk_provider'));
+        $wpp->setData('risk_provider_score', $worldPayPayment->getData('risk_provider_score'));
+        $wpp->setData('risk_provider_id', $worldPayPayment->getData('risk_provider_id'));
+        $wpp->setData('risk_provider_threshold', $worldPayPayment->getData('risk_provider_threshold'));
+        $wpp->setData('risk_provider_final', $worldPayPayment->getData('risk_provider_final'));
+        $wpp->setData('aav_address_result_code', $worldPayPayment->getData('aav_address_result_code'));
+        $wpp->setData('avv_postcode_result_code', $worldPayPayment->getData('avv_postcode_result_code'));
+        $wpp->setData('aav_cardholder_name_result_code', $worldPayPayment->getData('aav_cardholder_name_result_code'));
+        $wpp->setData('aav_telephone_result_code', $worldPayPayment->getData('aav_telephone_result_code'));
+        $wpp->setData('aav_email_result_code', $worldPayPayment->getData('aav_email_result_code'));
+        $wpp->setData('interaction_type', $worldPayPayment->getData('interaction_type'));
+        $wpp->setData('client_side_encryption', $worldPayPayment->getData('client_side_encryption'));
+        $wpp->setData('latam_instalments', $worldPayPayment->getData('latam_instalments'));
+        $wpp->setData('is_recurring_order', $worldPayPayment->getData('is_recurring_order'));
+        $wpp->setData('is_primerouting_enabled', $worldPayPayment->getData('is_primerouting_enabled'));
+        $wpp->setData('is_multishipping_order', $worldPayPayment->getData('is_multishipping_order'));
+        $wpp->setData('primerouting_networkused', $worldPayPayment->getData('primerouting_networkused'));
+        $wpp->setData('source_type', $worldPayPayment->getData('source_type'));
+        $wpp->setData('available_balance', $worldPayPayment->getData('available_balance'));
+        $wpp->setData('prepaid_card_type', $worldPayPayment->getData('prepaid_card_type'));
+        $wpp->setData('reloadable', $worldPayPayment->getData('reloadable'));
+        $wpp->setData('card_product_type', $worldPayPayment->getData('card_product_type'));
+        $wpp->setData('affluence', $worldPayPayment->getData('affluence'));
+        $wpp->setData('account_range_id', $worldPayPayment->getData('account_range_id'));
+        $wpp->setData('issuer_country', $worldPayPayment->getData('issuer_country'));
+        $wpp->setData('virtual_account_number', $worldPayPayment->getData('virtual_account_number'));
+        $wpp->setData('fraudsight_message', $worldPayPayment->getData('fraudsight_message'));
+        $wpp->setData('fraudsight_score', $worldPayPayment->getData('fraudsight_score'));
+        $wpp->setData('fraudsight_reasoncode', $worldPayPayment->getData('fraudsight_reasoncode'));
+        $wpp->save();
     }
 }

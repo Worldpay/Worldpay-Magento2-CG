@@ -9,6 +9,7 @@ define(
         'Magento_Payment/js/model/credit-card-validation/validator',
         'mage/url',
         'Magento_Checkout/js/action/place-order',
+        'Sapient_Worldpay/js/action/place-multishipping-order',
         'Magento_Checkout/js/action/redirect-on-success',
          'Magento_Checkout/js/model/error-processor',
         'Magento_Checkout/js/model/url-builder',
@@ -16,7 +17,7 @@ define(
         'Magento_Checkout/js/model/full-screen-loader',
         'ko'
     ],
-    function (Component, $, quote, customer,validator, url, placeOrderAction, redirectOnSuccessAction,errorProcessor, urlBuilder, storage, fullScreenLoader, ko) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,errorProcessor, urlBuilder, storage, fullScreenLoader, ko) {
         'use strict';
         var ccTypesArr = ko.observableArray([]);
         var paymentService = false;
@@ -76,11 +77,13 @@ define(
             defaults: {
                 redirectAfterPlaceOrder: false,
                 redirectTemplate: 'Sapient_Worldpay/payment/apm',
+                multishippingRedirectTemplate: 'Sapient_Worldpay/multishipping/apm',
                 idealBankType:null,
                 ach_accountType:null,
                 ach_accountnumber:null,
                 ach_routingNumber:null,
                 statementNarrative:null,
+                multishipping:false,
                 klarnaType:null
             },
 
@@ -113,6 +116,14 @@ define(
                 if (quote.billingAddress._latestValue == null) {
                     return;
                 }
+                /* Multishipping Code */
+                if(this.multishipping){
+					var MultishippingApmPreSelected = jQuery('#p_method_worldpay_apm:checked');
+					if(MultishippingApmPreSelected.length){
+                        jQuery('#payment-continue').html("<span>Place Order</span>");
+						this.selectPaymentMethod();
+					}
+				}
                 var ccavailabletypes = this.getCcAvailableTypes();
                 var filtercclist = {};
                 var cckey,ccvalue,typeKey,typeValue;
@@ -233,7 +244,10 @@ define(
             achemailaddress:ko.observable(),
             stmtNarrative:ko.observable(),
             getTemplate: function(){
-                    return this.redirectTemplate;
+                if(this.multishipping){
+                    return this.multishippingRedirectTemplate;
+                }
+                return this.redirectTemplate;
             },
 
             getCode: function() {
@@ -328,7 +342,13 @@ define(
                         
                     }
                     this.statementNarrative = this.stmtNarrative();
-                    self.placeOrder();
+                    if(window.checkoutConfig.payment.ccform.isMultishipping){  
+						fullScreenLoader.startLoader();					
+						placeMultishippingOrder(self.getData());
+					}
+					else{
+						self.placeOrder();
+					}
                 } else {
                     return $form.validation() && $form.validation('isValid');
                 }

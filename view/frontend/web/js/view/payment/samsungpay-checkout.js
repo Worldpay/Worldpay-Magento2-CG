@@ -11,8 +11,10 @@ define(
 'samsungPay',
 'Magento_Checkout/js/model/url-builder',
 'mage/url',
-'Magento_Customer/js/model/customer'
-], function ($, ko, Component, _, $t, quote, customerData, checkoutUtils, samsungPay, urlBuilder, url,customer) {
+'Magento_Customer/js/model/customer',
+'Sapient_Worldpay/js/action/place-multishipping-order',
+'Magento_Checkout/js/model/full-screen-loader'
+], function ($, ko, Component, _, $t, quote, customerData, checkoutUtils, samsungPay, urlBuilder, url,customer, placeMultishippingOrder, fullScreenLoader) {
 'use strict';
       
     
@@ -56,24 +58,31 @@ return Component.extend({
             if(quote.shippingMethod()){
                 shippingrequired = true;
             }
+            var paymentData = {
+                'method': "worldpay_wallets",
+                'additional_data': {
+                    'cc_type': 'SAMSUNGPAY-SSL',
+                    'dfReferenceId':  window.checkoutConfig.payment.ccform.sessionId
+                }  
+            }
             var checkoutData = {
                 billingAddress : quote.billingAddress(),
                 shippingAddress: quote.shippingAddress(),
                 shippingMethod: quote.shippingMethod(),
-                paymentDetails:{
-                    'method': "worldpay_wallets",
-                    'additional_data': {
-                        'cc_type': 'SAMSUNGPAY-SSL',
-                        'dfReferenceId':  window.checkoutConfig.payment.ccform.sessionId
-                    }  
-                },
+                paymentDetails: paymentData,
                 storecode : window.checkoutConfig.storeCode,
                 quote_id : quote.getQuoteId(),
                 guest_masked_quote_id: maskedQuoteId,
                 isCustomerLoggedIn : customer.isLoggedIn(),
                 isRequiredShipping : shippingrequired
             }
-            checkoutUtils.setPaymentInformationAndPlaceOrder(checkoutData, response1);
+            if(window.checkoutConfig.payment.ccform.isMultishipping){        
+                fullScreenLoader.startLoader();                                                   
+                placeMultishippingOrder(paymentData, response1);
+            }
+            else{
+                checkoutUtils.setPaymentInformationAndPlaceOrder(checkoutData, response1);
+            }
         }
     },
     isActive: function() {  

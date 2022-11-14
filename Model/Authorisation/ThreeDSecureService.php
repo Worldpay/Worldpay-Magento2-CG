@@ -28,6 +28,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
@@ -41,7 +42,8 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory $updateWorldPayPayment,
         \Magento\Customer\Model\Session $customerSession,
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
-        \Sapient\Worldpay\Helper\Data $worldpayHelper
+        \Sapient\Worldpay\Helper\Data $worldpayHelper,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
     ) {
         $this->paymentservicerequest = $paymentservicerequest;
         $this->wplogger = $wplogger;
@@ -55,6 +57,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
         $this->customerSession = $customerSession;
         $this->worldpaytoken = $worldpaytoken;
         $this->worldpayHelper = $worldpayHelper;
+        $this->multishippingHelper = $multishippingHelper;
     }
      /**
       * Get order id column value
@@ -143,8 +146,13 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
                     $this->_paymentUpdate = $this->paymentservice->createPaymentUpdateFromWorldPayXml(
                         $this->response->getXml()
                     );
+                    $worldpaypayment = $this->_order->getWorldPayPayment();
+                    $isMultishipping = false;
+                    if ($worldpaypayment->getIsMultishippingOrder()) {
+                        $isMultishipping = true;
+                    }
                     $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
-                    $this->_abortIfPaymentError($this->_paymentUpdate, $orderIncrementId);
+                    $this->_abortIfPaymentError($this->_paymentUpdate, $orderIncrementId, $isMultishipping);
                 }
             } else {
                 $errormessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM15');
@@ -198,19 +206,27 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
             return;
         }
     }
-
+    
     /**
      * Help to build url if payment is success
+     *
+     * @param bool|null $isMultishipping
      */
-    private function _handleAuthoriseSuccess()
+    private function _handleAuthoriseSuccess($isMultishipping = null)
     {
         if ($this->checkoutSession->getInstantPurchaseOrder()) {
             $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
             $this->checkoutSession->setWpResponseForwardUrl($redirectUrl);
         } else {
-            $this->checkoutSession->setWpResponseForwardUrl(
-                $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
-            );
+            if ($isMultishipping) {
+                $this->checkoutSession->setWpResponseForwardUrl(
+                    $this->urlBuilders->getUrl('multishipping/checkout/success', ['_secure' => true])
+                );
+            } else {
+                $this->checkoutSession->setWpResponseForwardUrl(
+                    $this->urlBuilders->getUrl('checkout/onepage/success', ['_secure' => true])
+                );
+            }
         }
     }
 
@@ -219,8 +235,9 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
      *
      * @param Object $paymentUpdate
      * @param string $orderId
+     * @param bool|null $isMultishipping
      */
-    private function _abortIfPaymentError($paymentUpdate, $orderId)
+    private function _abortIfPaymentError($paymentUpdate, $orderId, $isMultishipping = null)
     {
         $responseXml = $this->response->getXml();
         $orderStatus = $responseXml->reply->orderStatus;
@@ -266,7 +283,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
         } else {
             $this->orderservice->redirectOrderSuccess();
             $this->orderservice->removeAuthorisedOrder();
-            $this->_handleAuthoriseSuccess();
+            $this->_handleAuthoriseSuccess($isMultishipping);
             $this->_updateTokenData($this->response->getXml());
         }
     }
