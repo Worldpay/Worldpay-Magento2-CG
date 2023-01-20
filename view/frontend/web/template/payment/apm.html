@@ -8,6 +8,7 @@
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
         
          <!-- ko if: ( getCode()=='worldpay_apm')-->
+         <!-- ko if: billingCountryId -->
 
          <div class='accepted_cc'>
               
@@ -26,6 +27,7 @@
          <!--/ko-->
           </div>
          </div>
+           <!--/ko-->
           <!--/ko-->
           
           

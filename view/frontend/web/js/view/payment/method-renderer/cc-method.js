@@ -19,11 +19,12 @@ define(
         'Magento_Checkout/js/model/full-screen-loader',
         'hmacSha256',
         'encBase64',
+        'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Checkout/js/view/summary/abstract-total',
-        'jquery/ui'
+        'jquery/ui'        
     ],
     
-    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64,additionalValidators) {
         'use strict';
         //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
@@ -178,6 +179,7 @@ define(
                 isSaveThisCardVisible : ko.observable(true),
                 isSaveThisCardReadOnly : ko.observable(false),
                 isIframecardPage : false,
+                billingCountryId: ko.observable(),
             initialize: function () {
                 this._super();
                 this.selectedCCType(null);
@@ -199,6 +201,7 @@ define(
                         billingAddressCountryId = quote.billingAddress._latestValue.countryId;
                         that.filtercardajax(1);
                             that.getInstalmentValues(1);
+                            that.billingCountryId(billingAddressCountryId);
                             //that.reloadCpfSection();
                         paymentService = true;
                     }
@@ -488,6 +491,10 @@ define(
                if(!this.validateForms(paymentDetails)){
                    console.log("Validation error");
                    return false;
+               }
+               if(!additionalValidators.validate()){
+                    console.log("Validation Failed");
+                    return false;
                }
                 var serviceUrl = urlBuilder.createUrl('/worldpay/payment/hostedurl', {});
                 var payload = {
@@ -1000,6 +1007,11 @@ define(
                     var $cpfForm = $('#' + this.getCode() + '-cpf-form');
                 var cc_type_selected = this.getselectedCCType('payment[cc_type]');                
                     this.statement = $('#' + this.getCode() + '_statement').val();
+                
+                if(!additionalValidators.validate()){
+                    console.log("Validation Failed");
+                    return false;
+                }
                 // 3DS2 JWT create function 
                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                     var bin = this.creditCardNumber();

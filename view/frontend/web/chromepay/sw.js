@@ -1,7 +1,5 @@
 let payment_request_event = undefined;
 let payment_request_resolver = undefined;
-
-console.log("Service Worker");
 self.addEventListener('canmakepayment', function(e) {
   e.respondWith(true);
 });
@@ -13,8 +11,6 @@ self.addEventListener('paymentrequest', function(e) {
   e.respondWith(payment_request_resolver.promise);
   var url = self.location.href;
   var paymentFormPage = url.replace('sw.js', 'template/payment-form.html');
-  console.log(paymentFormPage);
-
   // The methodData here represents what the merchant supports. We could have a
   // payment selection screen, but for this simple demo if we see alipay in the list
   // we send the user through the alipay flow.
@@ -33,7 +29,6 @@ self.addEventListener('paymentrequest', function(e) {
 
 self.addEventListener('message', listener = function(e) {
   if (e.data == "payment_app_window_ready") {
-    console.log("In Service Worker ==== Chromepay");
     sendPaymentRequest();
     return;
   }
@@ -53,9 +48,7 @@ function sendPaymentRequest() {
     includeUncontrolled: false,
     type: 'window'
   };
-  console.log("Send Payment Request");
   clients.matchAll(options).then(function(clientList) {
-    console.log('Client Lists =====',clientList)
     for(var i = 0; i < clientList.length; i++) {
       // Might do more communications or checks to make sure the message is
       // posted to the correct window only.

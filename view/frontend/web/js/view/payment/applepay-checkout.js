@@ -81,7 +81,7 @@ return Component.extend({
         });
     },
     initApplePay: function(){
-                console.log("INIT APPLE PAY SESSION");
+                
                 var self= this;
                 var baseGrandTotal   = window.checkoutConfig.totalsData.base_subtotal;
                 var runningAmount = (Math.round(baseGrandTotal * 100) / 100).toFixed(2);
@@ -104,20 +104,16 @@ return Component.extend({
                 };
 
                 var session = new ApplePaySession(1, paymentRequest);
-                console.log("SESSION ====>",session);
 
                 // Merchant Validation
-                session.onvalidatemerchant = function (event) { 
-                    console.log("on Validate merchant", event);                       
+                session.onvalidatemerchant = function (event) {                     
                     var promise = self.performValidation(event.validationURL);
                     promise.then(function (merchantSession) {
-                        console.log("validate merchant promise");
                         session.completeMerchantValidation(merchantSession);
                     }); 
                 }
                 // Payment Method Selection
-                session.onpaymentmethodselected = function(event) {                    
-                    console.log("PAYMENT METHOD SELECTED", event);
+                session.onpaymentmethodselected = function(event) {   
                     var linkUrl = url.build('worldpay/applepay/index?u=getTotal');                         
                     var xhttp = new XMLHttpRequest();
                     xhttp.open("GET", linkUrl, false);
@@ -133,7 +129,6 @@ return Component.extend({
                 }
 
                 session.onpaymentauthorized = function (event) {
-                    console.log("ON PAYMENT AUTHORISED",event);
                     var promise = self.sendPaymentToken(event.payment.token);
 
                     promise.then(function (success) {   
@@ -146,7 +141,6 @@ return Component.extend({
                         session.completePayment(status);
                     });
                     appleResponse = JSON.stringify(event.payment.token);
-                    console.log("Apple Pay Response =====",appleResponse);
                    
                     var maskedQuoteId = "";
                     if(!customer.isLoggedIn()){
@@ -177,7 +171,6 @@ return Component.extend({
                         isCustomerLoggedIn : self.isUserLoggedIn(),
                         isRequiredShipping : shippingrequired
                     }
-                    console.log('Apple Pay Checkout Data ==>',checkoutData);
                     if(window.checkoutConfig.payment.ccform.isMultishipping){ 
                         fullScreenLoader.startLoader();                                                          
                         placeMultishippingOrder(paymentData);

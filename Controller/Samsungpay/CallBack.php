@@ -62,6 +62,8 @@ class CallBack extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory
      * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
      * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+     * @param \Sapient\Worldpay\Helper\MultiShipping $multishipping
+     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      */
     public function __construct(
         Context $context,
@@ -79,7 +81,7 @@ class CallBack extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory,
         \Sapient\Worldpay\Helper\CurlHelper $curlHelper,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
-        \Sapient\Worldpay\Helper\MultiShipping $multishipping,        
+        \Sapient\Worldpay\Helper\MultiShipping $multishipping,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
     ) {
         parent::__construct($context);
@@ -109,7 +111,7 @@ class CallBack extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $order = $this->_checkoutSession->getLastRealOrder();
-        if(empty($order->getId())){
+        if (empty($order->getId())) {
                 $order = $this->checkForMultishippingOrder();
         }
         $orderDetails = $order->getData();
@@ -205,7 +207,7 @@ class CallBack extends \Magento\Framework\App\Action\Action
                             $resultRedirect->setPath('worldpay/wallets/multishippingsuccess');
                         } else {
                             $resultRedirect->setPath('worldpay/wallets/success');
-                        }                        
+                        }
                         $this->_checkoutSession->unsauthenticatedOrderId();
                         return $resultRedirect;
                     } else {
@@ -222,14 +224,14 @@ class CallBack extends \Magento\Framework\App\Action\Action
         } else {
             $quoteId = $order->getQuoteId();
             $quote = $this->quoteFactory->create()->load($quoteId);
-            if($quote->getIsMultiShipping()){
+            if ($quote->getIsMultiShipping()) {
                     $this->multishipping->cancelMultishippingOrders($order);
                     $this->_checkoutSession->unsMultishippingOrderCode();
                     $quote = $this->quoteRepository->get($order->getQuoteId());
                     $quote->setIsActive(1)->setReservedOrderId(null);
                     $this->quoteRepository->save($quote);
-                    $this->_checkoutSession->replaceQuote($quote)->unsLastRealOrderId();                   
-            }else{
+                    $this->_checkoutSession->replaceQuote($quote)->unsLastRealOrderId();
+            } else {
                         $this->orderManagement->cancel($orderId);
                         $this->_checkoutSession->restoreQuote();
             }
@@ -238,13 +240,14 @@ class CallBack extends \Magento\Framework\App\Action\Action
             
             return $resultRedirect;
         }
-    }    
+    }
     /**
      * CHeck If multishipping Order
      */
-    public function checkForMultishippingOrder(){
-        $this->wplogger->info(json_encode($this->_checkoutSession->getData(),true));
-        if($this->_checkoutSession->getData('multishipping_order_code')){
+    public function checkForMultishippingOrder()
+    {
+        $this->wplogger->info(json_encode($this->_checkoutSession->getData(), true));
+        if ($this->_checkoutSession->getData('multishipping_order_code')) {
                 $orderIncrementId = current(explode('-', $this->_checkoutSession->getData('multishipping_order_code')));
                 $order = $this->orderFactory->create()->loadByIncrementId($orderIncrementId);
             return $order;

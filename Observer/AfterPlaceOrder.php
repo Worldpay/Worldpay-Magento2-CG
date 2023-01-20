@@ -52,7 +52,16 @@ class AfterPlaceOrder implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $order = $observer->getEvent()->getOrder();
-        if ($this->customerSession->getActiveQuoteId()) {
+        $payment = $order->getPayment();
+        $method = $payment->getMethodInstance();
+        $methodCode = $method->getCode();
+        if ($methodCode == 'worldpay_paybylink') {
+            $this->checkoutSession->unsPayByLinkRedirecturl();
+        }
+        $this->wplogger->info("#########################################");
+        $this->wplogger->info($this->customerSession->getActiveQuoteId());
+        $this->wplogger->info("#########################################");
+        if (!empty($this->customerSession->getActiveQuoteId())) {
             if ($order->getId()) {
                 try {
                     /** @var $inActiveQuote \Magento\Quote\Model\Quote */
@@ -69,10 +78,8 @@ class AfterPlaceOrder implements ObserverInterface
                     );
                     $this->wplogger->info($e->getMessage());
                 }
-
                 $this->customerSession->unsActiveQuoteId();
             }
-           
         }
         return $this;
     }

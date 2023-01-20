@@ -107,6 +107,9 @@
                 <send_email_to_worldpay>0</send_email_to_worldpay>
                 <wp_team_email>adobe@fisglobal.com</wp_team_email>
             </wp_error_alerts>
+            <paybylink_config>
+                <paybylink_button_name>Share Order</paybylink_button_name>
+            </paybylink_config>
         </worldpay>
         <payment>
             <worldpay_cc>
@@ -162,6 +165,15 @@
                 <sort_order>12</sort_order>
                 <can_use_for_worldpay_subscription>0</can_use_for_worldpay_subscription>
             </worldpay_moto>
+			<worldpay_paybylink>
+                <title>Pay By Link</title>
+                <model>Sapient\Worldpay\Model\PaymentMethods\PayByLink</model>
+                <active>1</active>
+                <allow_specific>0</allow_specific>
+                <payment_action>authorize</payment_action>
+                <sort_order>13</sort_order>
+                <can_use_for_worldpay_subscription>0</can_use_for_worldpay_subscription>
+            </worldpay_paybylink>
         </payment>
     </default>
 </config>

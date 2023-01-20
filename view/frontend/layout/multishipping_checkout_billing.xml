@@ -11,7 +11,7 @@
         <css src="Sapient_Worldpay::css/worldpay.css" />         
     </head>
     <body>
-        <referenceBlock class="Sapient\Worldpay\Block\Checkout\Multishipping\Billing" name="checkout_billing" template="Sapient_Worldpay::multishipping/billing/billing.phtml">
+        <referenceBlock class="Sapient\Worldpay\Block\Checkout\Multishipping\Billing" name="checkout_billing">
             <arguments>
                 <argument name="checkout_data" xsi:type="object">Magento\Multishipping\Block\DataProviders\Billing</argument>
                 <argument name="form_templates" xsi:type="array">
@@ -24,7 +24,7 @@
             <block class="Magento\Checkout\Block\Cart\Totals" name="totals"/>
         </referenceBlock>
         <referenceBlock name="checkout_billing">
-            <block class="Sapient\Worldpay\Block\WalletsPay" name="payment_methods_wallets" template="Sapient_Worldpay::multishipping-wallets.phtml">
+            <block class="Sapient\Worldpay\Block\WalletsPay" name="payment_methods_wallets" template="Sapient_Worldpay::multishipping-wallets.phtml" ifconfig="worldpay/general_config/enable_worldpay">
             <arguments>
                     <argument name="jsLayout" xsi:type="array">
                         <item name="components" xsi:type="array">

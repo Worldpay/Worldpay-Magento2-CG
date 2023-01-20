@@ -15,23 +15,22 @@
     <div class="payment-method-outer-content">
         <div class="wp-payment-method-wallets">
             <!-- <div class="payment-googlepay-checkout"> -->
-                <!-- ko foreach: $parent.getRegion('googlepayCheckout') -->
-                <!-- ko template: getTemplate() -->
-                <!-- /ko -->
-                <!-- /ko -->
+            <!-- ko foreach: $parent.getRegion('googlepayCheckout') -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
+            <!-- /ko -->
             <!-- </div> -->
-            <div class="payment-applepay-checkout">
-                <!-- ko foreach: $parent.getRegion('applepayCheckout') -->
-                <!-- ko template: getTemplate() -->
-                <!-- /ko -->
-                <!-- /ko -->
-            </div>
-            <div class="payment-samsungpay-checkout">
-                <!-- ko foreach: $parent.getRegion('samsungpayCheckout') -->
-                <!-- ko template: getTemplate() -->
-                <!-- /ko -->
-                <!-- /ko -->
-            </div>
+            <!-- apple pay -->
+            <!-- ko foreach: $parent.getRegion('applepayCheckout') -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- sammsung pay-->
+            <!-- ko foreach: $parent.getRegion('samsungpayCheckout') -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
+            <!-- /ko -->
+
         </div>
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() -->

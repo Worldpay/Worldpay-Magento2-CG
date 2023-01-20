@@ -98,6 +98,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @param \Sapient\Worldpay\Model\Authorisation\MotoRedirectService $motoredirectservice
      * @param \Sapient\Worldpay\Model\Authorisation\HostedPaymentPageService $hostedpaymentpageservice
      * @param \Sapient\Worldpay\Model\Authorisation\WalletService $walletService
+     * @param \Sapient\Worldpay\Model\Authorisation\PayByLinkService $paybylinkservice
      * @param \Sapient\Worldpay\Helper\Registry $registryhelper
      * @param \Magento\Framework\UrlInterface $urlBuilder
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
@@ -135,6 +136,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         \Sapient\Worldpay\Model\Authorisation\MotoRedirectService $motoredirectservice,
         \Sapient\Worldpay\Model\Authorisation\HostedPaymentPageService $hostedpaymentpageservice,
         \Sapient\Worldpay\Model\Authorisation\WalletService $walletService,
+        \Sapient\Worldpay\Model\Authorisation\PayByLinkService $paybylinkservice,
         \Sapient\Worldpay\Helper\Registry $registryhelper,
         \Magento\Framework\UrlInterface $urlBuilder,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
@@ -174,6 +176,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->tokenservice = $tokenservice;
         $this->hostedpaymentpageservice = $hostedpaymentpageservice;
         $this->walletService = $walletService;
+        $this->paybylinkservice = $paybylinkservice;
         $this->quoteRepository = $quoteRepository;
         $this->registryhelper = $registryhelper;
         $this->urlbuilder = $urlBuilder;
@@ -251,6 +254,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             $increment_id = $mageOrder->getIncrementId();
             $orderId = $increment_id;
         }
+        $paymentAdditionalData = $payment->getData('additional_data');
         $orderCode = $this->_generateOrderCode($quote, $increment_id);
 
         if (!empty($this->worlpayhelper->getOrderCodeFromCheckoutSession())) {
@@ -441,11 +445,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         if ($cardType == 'savedcard') {
             $cardType = $this->_getpaymentType();
             if ($mode == 'redirect') {
-                $sessionOrderCode = $this->multishippingHelper->getOrderCodeFromSession();
-                if (!empty($sessionOrderCode)) {
-                    $tokenId = $this->getTokenIdByCode($paymentdetails['additional_data']['tokenCode']);
-                    $this->registry->register('token_code', $tokenId);
-                }
+                $tokenId = $this->getTokenIdByCode($paymentdetails['additional_data']['tokenCode']);
+				if(empty($this->registry->registry('token_code'))){
+					$this->registry->register('token_code', $tokenId);
+				}
             }
         }
 

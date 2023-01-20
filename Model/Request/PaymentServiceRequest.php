@@ -885,7 +885,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $spoofCountryId = $this->getCountryCodeSpoof($countryCodeSpoofs, $paymentOptionsParams['countryCode']);
         }
         $countryId = ($spoofCountryId)? $spoofCountryId : $paymentOptionsParams['countryCode'];
-        $this->_wplogger->info('########## Submitting payment otions request ##########');
+        $this->_wplogger->info('########## Submitting payment options request ##########');
         $this->xmlpaymentoptions = new \Sapient\Worldpay\Model\XmlBuilder\PaymentOptions();
         $paymentOptionsXml = $this->xmlpaymentoptions->build(
             $paymentOptionsParams['merchantCode'],

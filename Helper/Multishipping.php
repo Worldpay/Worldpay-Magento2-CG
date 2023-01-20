@@ -138,7 +138,7 @@ class Multishipping
         $this->checkoutSession->unsMultishippingIssue();
         if ($cc_type != 'SAMSUNGPAY-SSL') {
             $this->checkoutSession->unsMultishippingOrderCode();
-        }        
+        }
         if (empty($quoteId)) {
             $response['status'] = 'error';
             $error = 'Could not place order: Your checkout session has expired.';

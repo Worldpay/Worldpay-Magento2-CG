@@ -50,6 +50,10 @@
                                                                         <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/samsungpay-checkout</item>  
                                                                         <item name="displayArea" xsi:type="string">samsungpayCheckout</item>
                                                                     </item>
+                                                                    <item name="paybylinkCheckout" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/paybylink-checkout</item>  
+                                                                        <item name="displayArea" xsi:type="string">paybylinkCheckout</item>
+                                                                    </item>
                                                                 </item>                                                          
                                                         </item>
                                                     </item>

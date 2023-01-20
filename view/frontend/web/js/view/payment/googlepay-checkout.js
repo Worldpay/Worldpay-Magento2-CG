@@ -102,8 +102,6 @@
         },
         initCheckout: function(){
             var self = this;
-            console.log(self);
-            console.log(window.googleCheckout);
             var ginitData = {
                 "env_mode": window.googleCheckout.googlepayOptions.env_mode,
                 "currencyCode": window.googleCheckout.googlepayOptions.currencyCode,
@@ -113,8 +111,7 @@
                 "tokenizationSpecification": window.googleCheckout.googlepayOptions.tokenizationSpecification,
                 "totalPrice": window.googleCheckout.getGrandTotal()
             }
-            GooglePayModel.initGooglePay(ginitData).then(function(paymentData){             
-                    console.log(paymentData);
+            GooglePayModel.initGooglePay(ginitData).then(function(paymentData){   
                     var maskedQuoteId = "";
                     if(!customer.isLoggedIn()){
                         maskedQuoteId = quote.getQuoteId();

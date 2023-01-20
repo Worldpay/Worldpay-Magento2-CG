@@ -48,7 +48,6 @@
             var self = this;
             const paymentsClient = self.getGooglePaymentsClient(initData);
             paymentsClient.isReadyToPay(self.getGoogleIsReadyToPay(initData)).then(function(response){
-                console.log('Gpay response ==>',response);
                 if (response.result) {
                    const button =
                     paymentsClient.createButton({

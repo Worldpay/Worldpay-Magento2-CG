@@ -68,14 +68,7 @@ class Jwt extends \Magento\Framework\View\Element\Template
 
     public function getDdcUrl()
     {
-        $ddcurl = '';
-        $mode = $this->_helper->getEnvironmentMode();
-        if ($mode == 'Test Mode') {
-            $ddcurl =  $this->_helper->isTestDdcUrl();
-        } else {
-            $ddcurl =  $this->_helper->isProductionDdcUrl();
-        }
-        return $ddcurl;
+        return $this->_helper->getDdcUrl();
     }
     /**
      * Return Cookie
@@ -103,25 +96,7 @@ class Jwt extends \Magento\Framework\View\Element\Template
      */
     public function getJwtToken()
     {
-        $params = $this->getRequest()->getParams();
-        $jwtApiKey = $this->getJwtApiKey();
-        $jwtIssuer = $this->getJwtIssuer();
-        $orgUnitId = $this->getOrganisationalUnitId();
-        $iat = $this->getCurrentDate();
-        $jwtTokenId    = base64_encode(random_bytes(16));
-        $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
-        $payload = json_encode([
-            'jti' => $jwtTokenId,
-            'iat' => $iat,
-            'iss' => $jwtIssuer,
-            'OrgUnitId' => $orgUnitId,
-        ]);
-        $base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
-        $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
-        $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $jwtApiKey, true);
-        $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
-        $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
-        return $jwt;
+        return $this->_helper->createJwtToken();
     }
     /**
      * Get magento decoder class

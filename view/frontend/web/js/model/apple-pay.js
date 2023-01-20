@@ -20,7 +20,7 @@
         onPlaceOrder : function(){
             var method = "worldpay_wallets";
             var cc_type = 'APPLEPAY-SSL';
-            console.log("triggered once orderplaced");
+            
         },
         getPaymentRequest : function(){
             var self= this;
@@ -38,7 +38,7 @@
                 supportedNetworks: ['amex', 'masterCard', 'visa' ],
                 merchantCapabilities: [ 'supports3DS']
             };
-            console.log(paymentRequest);
+            
             return paymentRequest;
         },
         doMerchantValidation : function(){

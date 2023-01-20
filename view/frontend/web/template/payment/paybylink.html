@@ -1,0 +1,15 @@
+<!-- ko if: ( isActive())-->
+<div class = "wp-pay-by-link">
+    <button class="action primary checkout" 
+            name = "Share Order"
+            type="submit" 
+            data-bind="
+                    click: performPlaceOrder,
+                    css: {disabled: !isPlaceOrderActionAllowed()},
+                    attr: {title: $t('Share Order')} ">
+            <span data-bind="text: getpaybylinkText()"></span>
+    </button>
+    <div id="paybylink-email"></div>     
+</div>
+ <!-- /ko -->
+ 
