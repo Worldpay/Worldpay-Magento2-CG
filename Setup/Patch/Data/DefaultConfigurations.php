@@ -989,6 +989,9 @@ class DefaultConfigurations implements DataPatchInterface
             $index . '_28' => ["exception_code" => "CCAM28",
                 "exception_messages" => "Invalid Card Holder Name.Please Refresh and check again",
                 "exception_module_messages" => ""],
+            $index . '_29' => ["exception_code" => "CCAM29",
+                "exception_messages" => "Order has already been paid",
+                "exception_module_messages" => ""],
         ];
 
         $exceptionCodes = $this->convertArrayToString($exceptionValues);

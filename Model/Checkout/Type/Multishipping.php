@@ -124,36 +124,34 @@ class Multishipping extends \Magento\Multishipping\Model\Checkout\Type\Multiship
          $failedOrders = [];
          /** @var OrderInterface[] $successfulOrders */
          $successfulOrders = [];
-         foreach ($orders as $order) {
-             if (isset($exceptionList[$order->getIncrementId()])) {
-                 $failedOrders[] = $order;
-             } else {
-                 $successfulOrders[] = $order;
-             }
-         }
+        foreach ($orders as $order) {
+            if (isset($exceptionList[$order->getIncrementId()])) {
+                $failedOrders[] = $order;
+            } else {
+                $successfulOrders[] = $order;
+            }
+        }
 
          $placedAddressItems = [];
-         foreach ($successfulOrders as $order) {
-             $orderIds[$order->getId()] = $order->getIncrementId();
-             if ($order->getCanSendNewEmailFlag()) {
-                 //$this->orderSender->send($order);
-             }
-             $placedAddressItems = $this->getPlacedAddressItems($order);
-         }
+		 $orderIds = [];
+        foreach ($successfulOrders as $order) {
+            $orderIds[$order->getId()] = $order->getIncrementId();
+            $placedAddressItems = $this->getPlacedAddressItems($order);
+        }
 
          $addressErrors = [];
-         if (!empty($failedOrders)) {
-             $this->removePlacedItemsFromQuote($shippingAddresses, $placedAddressItems);
-             $addressErrors = $this->getQuoteAddressErrors(
-                 $failedOrders,
-                 $shippingAddresses,
-                 $exceptionList
-             );
-         } else {
-             $this->_checkoutSession->setLastQuoteId($this->getQuote()->getId());
-             $this->getQuote()->setIsActive(false);
-             $this->quoteRepository->save($this->getQuote());
-         }
+        if (!empty($failedOrders)) {
+            $this->removePlacedItemsFromQuote($shippingAddresses, $placedAddressItems);
+            $addressErrors = $this->getQuoteAddressErrors(
+                $failedOrders,
+                $shippingAddresses,
+                $exceptionList
+            );
+        } else {
+            $this->_checkoutSession->setLastQuoteId($this->getQuote()->getId());
+            $this->getQuote()->setIsActive(false);
+            $this->quoteRepository->save($this->getQuote());
+        }
 
          $this->_session->setOrderIds($orderIds);
          $this->_session->setAddressErrors($addressErrors);

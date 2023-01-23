@@ -144,6 +144,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     public function getConfig()
     {
         $config = [];
+        /* Worldpay Plugin Enable */
+        $config['payment']['general']['worldPayEnable'] = $this->worldpayHelper->isWorldPayEnable();
         $params = ['_secure' => $this->request->isSecure()];
         foreach ($this->methodCodes as $code) {
             if ($this->methods[$code]->isAvailable()) {
@@ -263,6 +265,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
 
                 //Multishipping
                 $config['payment']['ccform']['isMultishipping'] = $this->worldpayHelper->isMultiShipping();
+                 //Pay By Link
+                 $config['payment']['ccform']['isPayByLinkEnable'] = $this->worldpayHelper->isPayByLinkEnable();
+                 $config['payment']['ccform']['payByLinkButtonName'] = $this->worldpayHelper->getPayByLinkButtonName();
             }
         }
         return $config;

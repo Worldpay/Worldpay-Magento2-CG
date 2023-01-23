@@ -13,6 +13,11 @@ class WorldPayPayment
 {
 
     /**
+     * @var array
+     */
+
+    public $apmMethods = ['ACH_DIRECT_DEBIT-SSL','SEPA_DIRECT_DEBIT-SSL'];
+    /**
      * Constructor
      *
      * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
@@ -47,6 +52,22 @@ class WorldPayPayment
         $wpp->setData('payment_status', $paymentState->getPaymentStatus());
         if (strpos($paymentState->getPaymentStatus(), "KLARNA") !== false) {
             $wpp->setData('payment_type', $paymentState->getPaymentMethod());
+        }
+        if (!empty($wpp->getData('payment_type'))) {
+            if (strtolower($wpp->getData('payment_type')) == "all") {
+                if (!in_array(
+                    strtoupper($paymentState->getPaymentMethod()),
+                    $this->apmMethods
+                )) {
+                    $wpp->setData('payment_type', str_replace(
+                        ["_CREDIT","_DEBIT","_ELECTRON"],
+                        "",
+                        $paymentState->getPaymentMethod()
+                    ));
+                } else {
+                    $wpp->setData('payment_type', str_replace("_CREDIT", "", $paymentState->getPaymentMethod()));
+                }
+            }
         }
         $wpp->setData('card_number', $paymentState->getCardNumber());
         $wpp->setData('avs_result', $paymentState->getAvsResultCode());

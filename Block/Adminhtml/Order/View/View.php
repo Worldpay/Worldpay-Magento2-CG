@@ -80,7 +80,7 @@ class View extends \Magento\Backend\Block\Template
         $paymentMethod= $this->getPaymentMethod();
         if ($paymentMethod=='worldpay_cc' || $paymentMethod=='worldpay_apm'
                 || $paymentMethod=='worldpay_moto' || $paymentMethod=='worldpay_cc_vault'
-                || $paymentMethod=='worldpay_wallets') {
+                || $paymentMethod=='worldpay_wallets' || $paymentMethod=='worldpay_paybylink') {
             return true;
         }
         return false;

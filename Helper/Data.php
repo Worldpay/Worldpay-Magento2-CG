@@ -44,6 +44,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var SessionManagerInterface
      */
     protected $session;
+    
+    /**
+     * @var worldpaypaymentmodel
+     */
+    protected $worldpaypaymentmodel;
 
     /**
      * Constructor
@@ -69,6 +74,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Backend\Model\Session\Quote $adminsessionquote
      * @param \Magento\Framework\App\ProductMetadataInterface $productMetaData
      * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+     * @param \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
      */
 
     public function __construct(
@@ -92,7 +98,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Sapient\Worldpay\Helper\KlarnaCountries $klarnaCountries,
         \Magento\Backend\Model\Session\Quote $adminsessionquote,
         \Magento\Framework\App\ProductMetadataInterface $productMetaData,
-        \Magento\Quote\Model\QuoteFactory $quoteFactory
+        \Magento\Quote\Model\QuoteFactory $quoteFactory,
+        \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
@@ -115,6 +122,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->adminsessionquote = $adminsessionquote;
         $this->productMetaData = $productMetaData;
         $this->quoteFactory = $quoteFactory;
+        $this->worldpaypaymentmodel = $worldpaypaymentmodel;
     }
     /**
      * Is WorldPay Enable or not
@@ -328,6 +336,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/cc_config/title',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get credit Card Payment Methods
+     *
+     * @return string
+     */
+    public function getCcPaymentMethods()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/cc_config/paymentmethods',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
@@ -2456,6 +2476,91 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $storeId;
     }
     /**
+     * Function to create jwt token
+     */
+    public function createJwtToken()
+    {
+        $jwtApiKey = $this->isJwtApiKey();
+        $jwtIssuer = $this->isJwtIssuer();
+        $orgUnitId = $this->isOrganisationalUnitId();
+        $iat = $this->getCurrentDate();
+        $jwtTokenId    = base64_encode(random_bytes(16));
+        $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
+        $payload = json_encode([
+            'jti' => $jwtTokenId,
+            'iat' => $iat,
+            'iss' => $jwtIssuer,
+            'OrgUnitId' => $orgUnitId,
+        ]);
+        $base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
+        $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
+        $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $jwtApiKey, true);
+        $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
+        $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
+        return $jwt;
+    }
+
+    /**
+     * Get current date
+     */
+    public function getCurrentDate()
+    {
+        $curdate = date("Y-m-d H:i:s");
+        return strtotime(date("Y-m-d H:i:s", strtotime($curdate)). " -1 min");
+    }
+
+    /**
+     * Get DDC url
+     */
+    public function getDdcUrl()
+    {
+        $ddcurl = '';
+        $mode = $this->getEnvironmentMode();
+        if ($mode == 'Test Mode') {
+            $ddcurl =  $this->isTestDdcUrl();
+        } else {
+            $ddcurl =  $this->isProductionDdcUrl();
+        }
+        return $ddcurl;
+    }
+
+    /**
+     * Create Second JWT token
+     *
+     * @param String $redirectUrl
+     * @param Array $payload
+     */
+    public function createSecondJWTtoken($redirectUrl, array $payload)
+    {
+        $jwtApiKey = $this->isJwtApiKey();
+        $jwtIssuer = $this->isJwtIssuer();
+        $orgUnitId = $this->isOrganisationalUnitId();
+        $iat = $this->getCurrentDate();
+        $jwtTokenId    = base64_encode(random_bytes(16));
+        $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
+        $payload = json_encode([
+            'jti' => $jwtTokenId,
+            'iat' => $iat,
+            'iss' => $jwtIssuer,
+            'OrgUnitId' => $orgUnitId,
+            'ReturnUrl' => $redirectUrl,
+            'Payload' => [
+                'ACSUrl' => $payload['ACSUrl'],
+                'Payload'=> $payload['Payload'],
+                'TransactionId'=> $payload['TransactionId'],
+
+            ],
+            'ObjectifyPayload'=> true
+        ]);
+        $base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
+        $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
+        $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $jwtApiKey, true);
+        $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
+        $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
+        return $jwt;
+    }
+
+    /**
      * Get Current Worldpay Plugin
      */
     public function getCurrentWopayPluginVersion()
@@ -2668,5 +2773,32 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return (bool)$quote->getIsMultiShipping();
+    }
+     /**
+      *  Check if Pay By Link enable
+      */
+    public function isPayByLinkEnable()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/paybylink_config/enable',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get Pay by Link Button Name
+     */
+    public function getPayByLinkButtonName()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/paybylink_config/paybylink_button_name',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * GetWorldpayPayment Model
+     */
+    public function getWorldpayPaymentModel()
+    {
+        return $this->worldpaypaymentmodel;
     }
 }

@@ -71,8 +71,6 @@ define([
         _addCard: function () {
             var self = this;
             var isBillingFound = this.options.isBilling;
-            console.log(this.options.addCardLocation);
-            console.log(this.options.isBilling);
             confirm({
                 content: this.options.confirmMessage,
                 actions: {

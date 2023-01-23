@@ -325,7 +325,7 @@
                 var bin = jQuery('[name=cardNumber]').val();
                 var binNew = bin.substring(0, 6);
                 createJwt(binNew);
-                window.sessionId = '<?= /* @noEscape */ $block->getSessionId(); ?>';
+                window.sessionId = '';
                 window.addEventListener("message", function (event) {
                     console.log("inside listener");
                     var data = JSON.parse(event.data);

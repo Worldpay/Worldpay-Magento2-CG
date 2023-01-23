@@ -7,10 +7,8 @@
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
         
          <!-- ko if: ( getCode()=='worldpay_cc')-->
-
-         <div class='accepted_cc'>
-            
-             <span class='worldpay_cc_we_accept'><!-- ko i18n: getCheckoutLabels('CO2')--><!-- /ko --></span>
+         <div   class='accepted_cc'>            
+             <span data-bind="if: isPlaceOrderActionAllowed()" class='worldpay_cc_we_accept'><!-- ko i18n: getCheckoutLabels('CO2')--><!-- /ko --></span>
              
              <div class="paymentoptions-icon-wrapper">
          <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
@@ -30,15 +28,14 @@
           
     </div>
     <div class="payment-method-content">
-        <!-- Credit Card Form-->
-        <div class="payment-method-cc-form">
-            <!-- ko template: 'Sapient_Worldpay/payment/cc-form' --><!-- /ko -->
-        </div>
-        <div style="width: 100%; height:100%;display:inline-block;margin-bottom:20px;margin-top:10px">
-        <span style="color:red;"><i>*<!-- ko i18n: getCheckoutLabels('CO21')--><!-- /ko -->
-                </i></span>
-        </div>
-        
+            <!-- Credit Card Form-->        
+            <div  class="payment-method-cc-form">
+                <!-- ko template: 'Sapient_Worldpay/payment/cc-form' --><!-- /ko -->
+            </div>       
+            <div data-bind="if: isPlaceOrderActionAllowed()" style="width: 100%; height:100%;display:inline-block;margin-bottom:20px;margin-top:10px">
+            <span style="color:red;"><i>*<!-- ko i18n: getCheckoutLabels('CO21')--><!-- /ko -->
+                    </i></span>
+            </div>
         <!-- ko foreach: getRegion('messages') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->

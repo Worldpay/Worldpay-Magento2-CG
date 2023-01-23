@@ -373,7 +373,8 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
                     var bin = instrumentResponse.details.cardNumber;;
                     var binNew = bin.substring(0,6);
                     createJwt(binNew);
-                    window.sessionId ='<?= /* @noEscape */ $block->getSessionId(); ?>';
+                   
+                   window.sessionId ='';
         
                     window.addEventListener("message", function(event) {
                     var data = JSON.parse(event.data);

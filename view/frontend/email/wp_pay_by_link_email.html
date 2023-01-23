@@ -1,0 +1,45 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@vars {
+"var mail_subject|raw":"Mail Subject",
+"var customerName|raw":"Customer Full Name",
+"var orderId":"Order Id",
+"var order_total|": "Order Total",
+"var shipping_address|raw":"Shipping Address",
+"var formated_shipping|raw":"Formated Shipping",
+"var paybylink_url":"Pay by link Url"
+} @-->
+<!--@subject {{var mail_subject|raw }} @-->
+{{template config_path="design/email/header_template"}}
+
+<table>
+    <tr class="email-intro">
+        <td>
+            <p class="greeting"> {{trans "Dear"}} {{var customerName}}, </p>
+            <p>{{trans "Your Order" }} <b>{{var orderId }} </b> {{trans "has been created but not confirmed. Please complete the payment using the below button."}}</p>
+            <table style="width: 120px;text-align:center;border:none;">
+                <tr>
+                    <td style="border-radius:4px;padding:9.0pt 13.5pt 9.0pt 13.5pt;background-color:#1979c3;"><a href = {{var paybylink_url}} style="color: #fff;">
+                        {{trans "Pay Now"}}</a></td>
+                </tr>
+            </table>  
+        </td>
+    </tr>
+        <table class="order-details">
+            <td class="address-details">
+                <h3><b>{{trans "Shipping Info"}}</b></h3>
+                <p>{{var formated_shipping|raw}}</p>
+            </td>
+            <td class="method-info">
+                <h3><b>{{trans "Order Total"}}</b></h3>
+                <p>{{var order_total }}</p>
+            </td>
+        </table>
+    </tr>
+</table>
+  
+{{template config_path="design/email/footer_template"}} 

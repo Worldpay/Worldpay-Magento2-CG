@@ -11,8 +11,9 @@
     <template id="wp_sales_email_order_template" label="New Order" file="wp_redirect_order_new.html" type="html" module="Sapient_Worldpay" area="frontend"/>
     <template id="wp_sales_email_order_guest_template" label="New Order for Guest" file="wp_redirect_order_new_guest.html" type="html" module="Sapient_Worldpay" area="frontend"/>
 
-      <template id="wp_auth_sales_email_order_template" label="New Order" file="wp_auth_sales_email_order_template.html" type="html" module="Sapient_Worldpay" area="frontend"/>
+    <template id="wp_auth_sales_email_order_template" label="New Order" file="wp_auth_sales_email_order_template.html" type="html" module="Sapient_Worldpay" area="frontend"/>
     <template id="wp_auth_sales_email_order_guest_template" label="New Order for Guest" file="wp_auth_sales_email_order_guest_template.html" type="html" module="Sapient_Worldpay" area="frontend"/>
+    <template id="wp_sales_email_paybylink" label="Pay By link" file="wp_pay_by_link_email.html" type="html" module="Sapient_Worldpay" area="frontend"/>
 
 
 

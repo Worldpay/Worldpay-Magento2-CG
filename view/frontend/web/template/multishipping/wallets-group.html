@@ -2,18 +2,14 @@
     <div class="payment-method-outer-content">
         <div class="wp-payment-method-wallets">
 			<!-- ko foreach: getRegion('google-pay-js') -->
-			<!-- ko template: getTemplate() --><!-- /ko -->
+				<!-- ko template: getTemplate() --><!-- /ko -->
 			<!--/ko-->
-			<div class="payment-applepay-checkout">
-				<!-- ko foreach: getRegion('apple-pay-js') -->
+			<!-- ko foreach: getRegion('apple-pay-js') -->
 				<!-- ko template: getTemplate() --><!-- /ko -->
-				<!-- /ko -->
-			</div>
-			<div class="payment-samsungpay-checkout">
-				<!-- ko foreach: getRegion('samsung-pay-js') -->
+			<!-- /ko -->
+			<!-- ko foreach: getRegion('samsung-pay-js') -->
 				<!-- ko template: getTemplate() --><!-- /ko -->
-				 <!-- /ko -->
-			</div>
+			<!-- /ko -->
 		</div>
     </div>
 </div>

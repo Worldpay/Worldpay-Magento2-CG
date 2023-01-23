@@ -1,10 +1,7 @@
 <?php
-
 /**
  * Sapient 2022
- */
-
-/**
+ *
  * @extends Magento_Multishipping::checkout/billing.phtml
  * @var \Magento\Multishipping\Block\Checkout\Billing $block
  */
@@ -55,6 +52,7 @@ class="form multicheckout billing">
             <div class="box box-billing-method" id = "payment">
                 <hr>
                 <fieldset class="fieldset">
+                    <?php if ($block->isWorldpayEnable()): ?>
                     <legend class="legend box-title">
                         <div class="payment-title-wrapper">
                             <span><?= $block->escapeHtml(__('Payment Method')); ?></span>
@@ -67,6 +65,7 @@ class="form multicheckout billing">
                             alt="worldpay logo" class="worldpay-logo-paymentscreen">
                         </div>
                     </legend><br>
+                    <?php endif; ?>
                     <div class="box-content">
                         <?= $block->getChildHtml('payment_methods_before') ?>
                         <?php /* Payment methods forms list */ ?>

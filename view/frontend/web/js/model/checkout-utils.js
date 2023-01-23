@@ -122,7 +122,6 @@
                                             }                                
                                             window.location.href = BASE_URL + 'checkout/cart?error=true';                                
                                         }
-                                        console.log(orderResponse);
                                         if (orderResponse){
                                             // window.location.href = baseUrl + 'checkout/onepage/success';
                                             window.location.href = BASE_URL + 'worldpay/savedcard/redirect';
@@ -161,8 +160,7 @@
                    
                 } else { // Api for guest customer
                     apiUrl = BASE_URL + 'rest/'+checkoutObj.storecode+'/V1/guest-carts/' + 
-                            guestMaskedQuoteId + '/billing-address';
-                   
+                            guestMaskedQuoteId + '/billing-address';                   
                 }
 
                 self.sendRequest(
@@ -171,7 +169,6 @@
                     JSON.stringify(customerDetails)
                 ).done(
                     function(apiresponse){ 
-                        console.log("Billing Information Response",apiresponse);
                         var paymentDetails = {
                             "paymentMethod": checkoutObj.paymentDetails,
                             "billing_address": checkoutObj.billingAddress
@@ -199,8 +196,7 @@
                                             $(".error-message").html(orderResponse['message']);
                                         }                                
                                         window.location.href = BASE_URL + 'checkout/cart?error=true';                                
-                                    }
-                                    console.log(orderResponse);
+                                    }                                    
                                     if (orderResponse){
                                         // window.location.href = baseUrl + 'checkout/onepage/success';
                                         window.location.href = BASE_URL + 'worldpay/savedcard/redirect';
@@ -223,76 +219,82 @@
                     $("body").trigger('processStop');
                     $(".error-message").html(orderResponse['message']);
                 });
-
             }
-    
         },
         setPaymentInformationAndPlaceOrder : function(checkoutObj, samsungResponse = null){
-                var paymentDetails = {
-                    "paymentMethod": checkoutObj.paymentDetails,
-                    "billing_address": checkoutObj.billingAddress
-                };
-                var self=this;
-                var type="POST";
-                var guestMaskedQuoteId = checkoutObj.guest_masked_quote_id;
-                var orderApiUrl;
-				var cc_type = checkoutObj.paymentDetails.additional_data.cc_type;
-                if (checkoutObj.isCustomerLoggedIn) { //Api for logged in customer
-                    orderApiUrl = BASE_URL + 'rest/'+checkoutObj.storecode+'/V1/carts/mine/payment-information';
-                    type = 'POST';
-                } else { // Api for guest customer
-                    orderApiUrl = BASE_URL + 'rest/'+checkoutObj.storecode+'/V1/guest-carts/' + guestMaskedQuoteId + '/payment-information';
-                    paymentDetails.cartId = checkoutObj.guest_masked_quote_id;
-                    paymentDetails.email = checkoutObj.billingAddress.email;
-                    
-              
-                }
-                $("body").trigger('processStart');
-                self.sendRequest(
-                    type,
-                    orderApiUrl,
-                    JSON.stringify(paymentDetails)
-                ).done(
-                    function (apiresponse){
-                        var orderResponse  = (apiresponse);   
-                        //$("body").trigger('processStop');
-                            if(isNaN(orderResponse)){
-                                if(orderResponse.hasOwnProperty("message") && orderResponse['message'].indexOf('3DS2')!==-1) {
-                                    //window.location.href = baseUrl + 'checkout/cart?error=true&message=error';
-                                    $(".error-message").html(orderResponse['message']);
-                                }                                
-                                window.location.href = BASE_URL + 'checkout/cart?error=true';                                
+            var paymentDetails = {
+                "paymentMethod": checkoutObj.paymentDetails,
+                "billing_address": checkoutObj.billingAddress
+            };
+            var self=this;
+            var type="POST";
+            var guestMaskedQuoteId = checkoutObj.guest_masked_quote_id;
+            var orderApiUrl;
+            var cc_type = checkoutObj.paymentDetails.additional_data.cc_type;
+            if (checkoutObj.isCustomerLoggedIn) { //Api for logged in customer
+                orderApiUrl = BASE_URL + 'rest/'+checkoutObj.storecode+'/V1/carts/mine/payment-information';
+                type = 'POST';
+            } else { // Api for guest customer
+                orderApiUrl = BASE_URL + 'rest/'+checkoutObj.storecode+'/V1/guest-carts/' + guestMaskedQuoteId + '/payment-information';
+                paymentDetails.cartId = checkoutObj.guest_masked_quote_id;
+                paymentDetails.email = checkoutObj.billingAddress.email;
+                
+            
+            }
+            $("body").trigger('processStart');
+            self.sendRequest(
+                type,
+                orderApiUrl,
+                JSON.stringify(paymentDetails)
+            ).done(
+                function (apiresponse){
+                    var orderResponse  = (apiresponse);   
+                    //$("body").trigger('processStop');
+                        if(isNaN(orderResponse)){
+                            if(orderResponse.hasOwnProperty("message") && orderResponse['message'].indexOf('3DS2')!==-1) {
+                                //window.location.href = baseUrl + 'checkout/cart?error=true&message=error';
+                                $(".error-message").html(orderResponse['message']);
+                            }                                
+                            window.location.href = BASE_URL + 'checkout/cart?error=true';                                
+                        }                        
+                        if(cc_type == 'SAMSUNGPAY-SSL'){
+                            var cancel = urlBuilder.build('worldpay/samsungpay/CallBack');
+                            var serviceId = window.checkoutConfig.payment.ccform.samsungServiceId;
+                            var callback = urlBuilder.build('worldpay/samsungpay/CallBack');
+                            var countryCode = window.checkoutConfig.defaultCountryId;
+                            console.log('Authentication is success, Redirecting to Samsung Payment Page......');
+                            SamsungPay.connect(
+                                samsungResponse.id, samsungResponse.href, serviceId, callback, cancel, countryCode,
+                                samsungResponse.encInfo.mod, samsungResponse.encInfo.exp, samsungResponse.encInfo.keyId
+                            );
+                            return false;
+                        }
+                        if (orderResponse){
+
+                            if(typeof checkoutObj.paymentDetails.method !='undefined'){
+
+                                if(checkoutObj.paymentDetails.method == 'worldpay_paybylink'){
+                                    window.location.href = BASE_URL + 'worldpay/paybylink/orderplaced';
+                                    return;
+                                }
                             }
-                            console.log(orderResponse);
-							if(cc_type == 'SAMSUNGPAY-SSL'){
-								var cancel = urlBuilder.build('worldpay/samsungpay/CallBack');
-								var serviceId = window.checkoutConfig.payment.ccform.samsungServiceId;
-								var callback = urlBuilder.build('worldpay/samsungpay/CallBack');
-								var countryCode = window.checkoutConfig.defaultCountryId;
-								console.log('Authentication is success, Redirecting to Samsung Payment Page......');
-                                SamsungPay.connect(
-									samsungResponse.id, samsungResponse.href, serviceId, callback, cancel, countryCode,
-									samsungResponse.encInfo.mod, samsungResponse.encInfo.exp, samsungResponse.encInfo.keyId
-								);
-								return false;
-							}
-                            if (orderResponse){
-                                // window.location.href = baseUrl + 'checkout/onepage/success';
-                                window.location.href = BASE_URL + 'worldpay/savedcard/redirect';
-                            }else{
-                                window.location.href = BASE_URL + 'checkout/cart?error=true&message=error';
-                                //$(".error-message").html(orderResponse['message']);
-                            }
-                            $("body").trigger('processStop');
-                    }
-                ).fail(
-                    function (response) {
-                        var orderResponse = JSON.parse(response.responseText);
+
+                            // window.location.href = baseUrl + 'checkout/onepage/success';
+                            window.location.href = BASE_URL + 'worldpay/savedcard/redirect';
+                        }else{
+                            window.location.href = BASE_URL + 'checkout/cart?error=true&message=error';
+                            //$(".error-message").html(orderResponse['message']);
+                        }
                         $("body").trigger('processStop');
-                        $(".error-message").html(orderResponse['message']);
-                        console.log("Error:", response); 
-                    }
-                )
+                }
+            ).fail(
+                function (response) {
+                    var orderResponse = JSON.parse(response.responseText);
+                    $("body").trigger('processStop');
+                    $(".error-message").html(orderResponse['message']);
+                    console.log("Error:", response); 
+                }
+            )
                 
 
         },    

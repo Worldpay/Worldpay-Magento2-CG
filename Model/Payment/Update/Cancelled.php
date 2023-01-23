@@ -10,6 +10,7 @@ class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements U
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
+
     /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
@@ -34,6 +35,23 @@ class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements U
     public function apply($payment, $order = null)
     {
         if (!empty($order)) {
+
+            $payment = $order->getPayment();
+            $method = $payment->getMethodInstance();
+            $methodCode = $method->getCode();
+            if ($methodCode == 'worldpay_paybylink') {
+                $worldPayPayment = $this->_configHelper->getWorldpayPaymentModel()
+                ->loadByPaymentId($order->getIncrementId());
+                $isRedirectOrder = $worldPayPayment->getData('payment_model');
+                $wpPaymentStatus = $worldPayPayment->getData('payment_status');
+                if ($isRedirectOrder &&
+                $wpPaymentStatus == \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION) {
+                    $order->cancel()->save();
+                    $this->_worldPayPayment->updateWorldPayPayment($this->_paymentState);
+                    return;
+                }
+            }
+
             $this->_assertValidPaymentStatusTransition($order, $this->_getAllowedPaymentStatuses());
             $order->cancel();
             $this->_worldPayPayment->updateWorldPayPayment($this->_paymentState);

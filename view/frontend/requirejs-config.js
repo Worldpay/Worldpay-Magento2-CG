@@ -50,7 +50,6 @@ var config = {
             worldpayPriceSubscription: 'Sapient_Worldpay/js/price-subscription',
             "Magento_Checkout/template/minicart/content.html": "Sapient_Worldpay/template/minicart/content.html",
             "Magento_Checkout/template/payment.html": "Sapient_Worldpay/template/payment.html",
-            "Magento_Checkout/template/payment-methods/list.html": "Sapient_Worldpay/template/payment-methods/list.html",
             newcard:            'Sapient_Worldpay/js/newcard',
             "validation": "mage/validation/validation"
         }
@@ -73,6 +72,9 @@ var config = {
             },
             'Magento_Checkout/js/view/minicart': {
                 'Sapient_Worldpay/js/minicart-mixin': true
+            },
+            'Magento_Checkout/js/view/payment/list': {
+                'Sapient_Worldpay/js/list-mixin': true
             }
         }
     }

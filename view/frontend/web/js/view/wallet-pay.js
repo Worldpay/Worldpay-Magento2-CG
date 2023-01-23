@@ -120,7 +120,6 @@
            
              this.countriesDropDown.subscribe(function(e){
                 if($('#country').length){
-                    console.log("Here");
                       var updater = new RegionUpdater(
                             'country', 'region',
                             'region_id',
@@ -143,13 +142,9 @@
             });
 
             this.isBillingAddressSameAsShipping.subscribe(function(e){
-                console.log('Is Billing Shipping Addres ',e);
                
                 setTimeout(function(){
-                    console.log($('#billing_country'));
-                    console.log($(".country-container").html());
-                    if($('#billing_country').length){
-                        console.log("Billing Here");
+                   if($('#billing_country').length){
                           var updater = new RegionUpdater(
                                 'billing_country', 'billing_region',
                                 'billing_region_id',
@@ -164,7 +159,6 @@
             this.showNewBillingAddress.subscribe(function(e){
                 setTimeout(function(){
                     if($('#billing_country').length){
-                        console.log("Billing Here");
                           var updater = new RegionUpdater(
                                 'billing_country', 'billing_region',
                                 'billing_region_id',
@@ -224,17 +218,14 @@
             var self = this;
             var discountForm = $("#discount-form");
             if (!(discountForm.validation() && discountForm.validation('isValid'))) {
-                console.log("Please fill required fields");
                 return;
             }  
             if(!self.currentQuoteid){
-                console.log($t("Quote id not found"));
                 return false;
             }
 
             if(!self.isUserLoggedIn()){
                 if(!self.currentQuoteMaskedId){
-                    console.log($t("Quote mask id not found"));
                     return false;
                 }                    
             }
@@ -263,13 +254,11 @@
         cancelCoupon: function(){
             var self = this;
             if(!self.currentQuoteid){
-                console.log($t("Quote id not found"));
                 return false;
             }
 
             if(!self.isUserLoggedIn()){
                 if(!self.currentQuoteMaskedId){
-                    console.log($t("Quote mask id not found"));
                     return false;
                 }
                     
@@ -321,7 +310,6 @@
             if($("#customer-email").length){
                 var accountForm = $("#account-form");
                     if (!(accountForm.validation() && accountForm.validation('isValid'))) {
-                        console.log("Form Error");
                         return;
                     }                
             }
@@ -329,7 +317,6 @@
                 if($("#new-address-form").length){
                     var addressForm = $("#new-address-form");
                     if (!(addressForm.validation() && addressForm.validation('isValid'))) {
-                        console.log("Form Error");
                         return;
                     }   
                 }
@@ -349,7 +336,6 @@
                     if($("#new-billingaddress-form").length){ // if user clicks new address
                         var billingAddressForm = $("#new-billingaddress-form");
                             if (!(billingAddressForm.validation() && billingAddressForm.validation('isValid'))) {
-                                console.log("Billing Address form Error");
                                 return;
                             }   
                         }else{ 
@@ -365,7 +351,6 @@
                         if($("#new-billingaddress-form").length){
                             var billingAddressForm = $("#new-billingaddress-form");
                                 if (!(billingAddressForm.validation() && billingAddressForm.validation('isValid'))) {
-                                    console.log("Billing Address form Error");
                                     return;
                                 }   
                             }                   
@@ -389,7 +374,6 @@
             }            
             
             if(window.walletpayObj.isApplePayPurchase()){
-                console.log("In Apple Pay Purchase");
                 if (window.ApplePaySession) {
                     window.walletpayObj.initApplePaySession();
                 }                
@@ -492,7 +476,6 @@
             var shippingMethod = window.walletpayObj.selectedShippingMethod();
             
             if(shippingAddress.length == 0 || (typeof shippingAddress.city =='undefined')){
-                console.log("Fething new address");
                 if($("#new-address-form").length){
                     self.fetchShippingNewAddress();
                 }
@@ -501,7 +484,6 @@
             self.fetchShippingByAddress(shippingAddress);
         },
         setBillingAddressFromExistingAddress : function(address){
-            console.log("Selected Address",address);
             var self = this,selectedAddress={};
             if(typeof address.firstname!='undefined'){
                 selectedAddress.firstname = address.firstname;
@@ -542,7 +524,6 @@
         },
         fetchShippingByAddress : function(address){
             var self = this,apiUrl=null,selectedAddress={};
-            console.log("Fetching Shipping by address",address);
             if(typeof address.firstname!='undefined'){
                 selectedAddress.firstname = address.firstname;
             }
@@ -579,12 +560,10 @@
                 address : selectedAddress               
             };
             if(!window.walletpayObj.currentQuoteid){
-                console.log($t("Quote id not found"));
                 return false;
             }
             if(!window.walletpayObj.isUserLoggedIn()){
                 if(!window.walletpayObj.currentQuoteMaskedId){
-                    console.log($t("Quote mask id not found"));
                     return false;
                 }                    
             }
@@ -647,7 +626,6 @@
                     shippingFormData.region_id = 0;
                 }
             }
-            console.log("SHipping Form data",shippingFormData);
             window.walletpayObj.selectedShippingAddress(shippingFormData);
             self.fetchShippingByAddress(shippingFormData);
         },
@@ -748,7 +726,6 @@
                         apiUrl, 
                         JSON.stringify(payload)
                     ).done(function(response){
-                        console.log(response);
                         $("body").trigger('processStop');
                         location.reload();
                         that.closeModal();
@@ -770,16 +747,13 @@
                         var shippingAddress = self.getShippingAddress();
                         //var BillingAddress = self.getShippingAddress();
                         if(shippingAddress){
-                            console.log("Fetching Shipping Method");
                             var shippingMethod = self.fetchShippingByAddress(shippingAddress);
                         }
                     }else{
                         var guestShippingAddress = {
                             country_id: "US",                     
                         }
-                        console.log("Fethcing Guest Shipping Method",guestShippingAddress);
                         var shippingMethod = self.fetchShippingByAddress(guestShippingAddress);
-                        console.log("Fethcing Guest Shipping Method",shippingMethod);
                     }
                 }
             };
@@ -850,7 +824,6 @@
                 triggerCheckout = false;
             
             if (!(addTocartFormData.form.validation() && addTocartFormData.form.validation('isValid'))) {
-                console.log("Product add to cart error");
                 return;
             }
             var cart = customerData.get('cart');             
@@ -885,10 +858,8 @@
                         'response': res
                     });
                     if(res.backUrl){ 
-                        console.log(res.backUrl.indexOf("checkout"));
                         if (res.backUrl.indexOf("checkout") > -1) {
                         }else{
-                            console.log("here");
                             location.reload(); // out of stock
                             return false;
                         }                       
@@ -940,42 +911,6 @@
                                 triggerCheckout = false;
                              }
                         });
- 
-                    /*cart.subscribe(function () {                        
-                        if(window.walletpayObj.isEnableRestoreCart()){
-                            console.log("RestoreCart Enabled");
-                            if (cart().quote_id != quoteId && triggerCheckout === true) {
-                                showMiniCheckout = true;
-                            }
-                        }else{
-                            console.log("RestoreCart Disabled");
-                            if (cart().summary_count !== count && triggerCheckout === true) {
-                                showMiniCheckout = true;
-                            }
-                        }
-                        if (showMiniCheckout == true && triggerCheckout === true) {
-                            /*$("body").trigger('processStop');
-                            count = cart().summary_count;
-                            window.walletpayObj.isCartContainVirtualProduct(cart().items);
-                            window.walletpayObj.currentQuoteid =cart().quote_id;
-                            window.walletpayObj.currentQuoteMaskedId =cart().quote_masked_id;
-                            window.walletpayObj.initCheckout();
-                            window.walletpayObj.grandtotal(cart().subtotalAmount);
-                            window.walletpayObj.grandtotalFormatted(priceUtils.formatPrice(cart().subtotalAmount, window.walletpayObj.priceFormat));
-                            window.walletpayObj.updateTotalSegments( {  
-                                   
-                                subtotal : {
-                                    "title" : 'Subtotal',
-                                    "value" : cart().subtotalAmount
-                                },
-                                grandtotal:{
-                                    "title" : 'Grand Total',
-                                    "value" : cart().subtotalAmount
-                                }
-                            });                           
-                            triggerCheckout = false;
-                        }
-                    });*/
                   
                 },
                 /** @inheritdoc */
@@ -993,7 +928,6 @@
 
                 /** @inheritdoc */
                 complete: function (res) {
-                    console.log("Complete: ", res);
                     if (res.state() === 'rejected') {
                         location.reload();
                     }
@@ -1022,8 +956,7 @@
             self.isApplePayPurchase(true);
             self.addtoCartAndInitCheckout();
         },
-        initApplePaySession : function() {           
-            console.log("INIT APPLE PAY SESSION");
+        initApplePaySession : function() {  
             var self= this;
             var cartData = customerData.get('cart');
             //var baseGrandTotal   = cartData().subtotalAmount;
@@ -1047,29 +980,17 @@
                 //merchantCapabilities: [ 'supports3DS', 'supportsEMV', 'supportsCredit', 'supportsDebit' ]
                 merchantCapabilities: [ 'supports3DS'] //production changes
             };
-            console.log(window.walletpayObj.selectedShippingAddress());
-            console.log("Apple Pay , Payment Request Values ",paymentRequest);
             var session = new ApplePaySession(1, paymentRequest);
-            console.log("SESSION ====>",session);
 
             // Merchant Validation
-            session.onvalidatemerchant = function (event) {
-                console.log("on Validate merchant", event);                       
+            session.onvalidatemerchant = function (event) {                      
                 var promise = window.walletpayObj.applePayPerformValidation(event.validationURL);
                 promise.then(function (merchantSession) {
-                    console.log("validate merchant promise");
                     session.completeMerchantValidation(merchantSession);
                 }); 
             }
             // Payment Method Selection
-            session.onpaymentmethodselected = function(event) {                    
-                console.log("PAYMENT METHOD SELECTED", event);
-               /* var linkUrl = url.build('worldpay/applepay/index?u=getTotal');                         
-                var xhttp = new XMLHttpRequest();
-                xhttp.open("GET", linkUrl, false);
-                xhttp.setRequestHeader("Content-type", "application/json");
-                xhttp.send();
-                var finalTotal = xhttp.responseText.slice(1, -1); // removing quotes */
+            session.onpaymentmethodselected = function(event) { 
                 var runningTotal = window.walletpayObj.grandtotal();
                 var newTotal = { type: 'final', label: 'Order Total', amount: runningTotal };
                 var newLineItems =[{type: 'final',label: subTotalDescr, amount: runningAmount }];
@@ -1077,7 +998,6 @@
             }
             // Payment Authorization
             session.onpaymentauthorized = function (event) {
-                console.log("ON PAYMENT AUTHORISED",event);
                 var promise = window.walletpayObj.applePaySendPaymentToken(event.payment.token);
                 promise.then(function (success) {   
                     var status;
@@ -1089,7 +1009,6 @@
                     session.completePayment(status);
                 });
                 appleResponse = JSON.stringify(event.payment.token);
-                console.log("Apple Pay Response =====",appleResponse);
                 var checkoutData = {
                     billingAddress :window.walletpayObj.selectedBillingAddress(),
                     shippingAddress: window.walletpayObj.selectedShippingAddress(),
@@ -1108,7 +1027,6 @@
                     isCustomerLoggedIn : window.walletpayObj.isUserLoggedIn(),
                     isRequiredShipping : window.walletpayObj.isRequiredShipping()
                 }
-                console.log('Apple Pay Checkout Data ==>',checkoutData);
                 checkoutUtils.placeorder(checkoutData);       
             }
             session.oncancel = function(event) {

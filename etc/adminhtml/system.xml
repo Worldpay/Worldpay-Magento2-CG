@@ -1272,6 +1272,19 @@
                     <comment>Set to yes if you want to enable the Worldpay Payment methods on multishipping orders.</comment>
                 </field>
             </group>
+             <!-- Worldpay Pay By Link -->
+            <group id="paybylink_config" translate="label"  sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Worldpay Pay By Link</label>               
+                <field id="enable" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Pay By Link </label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If set "Yes", it will enable shopper to do a quick checkout using pay by link.</comment>                  
+                </field>
+                <field id="paybylink_button_name" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Pay By Link Button Name</label>
+                    <depends><field id="enable">1</field></depends>
+                </field>
+            </group>
         </section>
         <!-- New Tab for Worldpay exceptions -->
         <section id="worldpay_exceptions" translate="label" type="text" sortOrder="402" showInDefault="1" showInWebsite="1" showInStore="1">

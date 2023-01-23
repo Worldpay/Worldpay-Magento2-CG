@@ -118,24 +118,19 @@ class RedirectService extends \Magento\Framework\DataObject
             );
             $response = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
         }
+        $paymentType = $redirectOrderParams['paymentType'];
         if ($paymentDetails['additional_data']['cc_type'] == 'savedcard') {
-            $successUrl = $this->_buildRedirectUrl(
-                $this->_getRedirectResponseModel()->getRedirectLocation($response),
-                null,
-                $this->_getCountryForQuote($quote),
-                $this->_getLanguageForLocale()
-            );
-        } else {
-            $successUrl = $this->_buildRedirectUrl(
-                $this->_getRedirectResponseModel()->getRedirectLocation($response),
-                $redirectOrderParams['paymentType'],
-                $this->_getCountryForQuote($quote),
-                $this->_getLanguageForLocale()
-            );
+            $paymentType = null;
         }
+        $redirectLocation = $this->_getRedirectResponseModel()->getRedirectLocation($response);
 
+        $successUrl = $this->_buildRedirectUrl(
+            $redirectLocation,
+            $paymentType,
+            $this->_getCountryForQuote($quote),
+            $this->_getLanguageForLocale()
+        );
         $payment->setIsTransactionPending(1);
-
         $this->registryhelper->setworldpayRedirectUrl($successUrl);
         $this->checkoutsession->setWpRedirecturl($successUrl);
     }

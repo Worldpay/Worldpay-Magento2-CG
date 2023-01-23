@@ -77,6 +77,7 @@ class TokenService extends \Magento\Framework\DataObject
         if ($this->worldpayHelper->isMultiShipping($quote)) {
             $sessionOrderCode = $this->multishippingHelper->getOrderCodeFromSession();
             if (!empty($sessionOrderCode)) {
+				$this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
                 $orgWorldpayPayment = $this->multishippingHelper->getOrgWorldpayId($sessionOrderCode);
                 $orgOrderId = $orgWorldpayPayment['order_id'];
                 $isOrg = false;

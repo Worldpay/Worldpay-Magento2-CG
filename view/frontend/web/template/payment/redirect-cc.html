@@ -8,8 +8,8 @@
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
         
          <!-- ko if: ( getCode()=='worldpay_cc')-->
-
-         <div class='accepted_cc'>
+        
+         <div data-bind="if: isPlaceOrderActionAllowed()" class='accepted_cc'>
               
              <span class='worldpay_cc_we_accept'>We Accept</span>
              
@@ -159,6 +159,7 @@
                         type="button"
                         data-bind="
                             click: loadHppIframe,
+                            css: {disabled: !isPlaceOrderActionAllowed()},
                             attr: {title: getCheckoutLabels('CO27')}">
                     <span data-bind="text: getCheckoutLabels('CO27')"></span>
                 </button>
@@ -178,6 +179,7 @@
                         type="button"
                         data-bind="
                             click: preparePayment,
+                            css: {disabled: !isPlaceOrderActionAllowed()},
                             attr: {title: getCheckoutLabels('CO27')}">
                     <span data-bind="text: getCheckoutLabels('CO27')"></span>
                 </button>

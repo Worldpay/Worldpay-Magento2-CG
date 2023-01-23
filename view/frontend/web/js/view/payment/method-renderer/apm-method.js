@@ -15,9 +15,10 @@ define(
         'Magento_Checkout/js/model/url-builder',
         'mage/storage',
         'Magento_Checkout/js/model/full-screen-loader',
-        'ko'
+        'ko',
+        'Magento_Checkout/js/model/payment/additional-validators'
     ],
-    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,errorProcessor, urlBuilder, storage, fullScreenLoader, ko) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,errorProcessor, urlBuilder, storage, fullScreenLoader, ko,additionalValidators) {
         'use strict';
         var ccTypesArr = ko.observableArray([]);
         var paymentService = false;
@@ -86,6 +87,8 @@ define(
                 multishipping:false,
                 klarnaType:null
             },
+            
+            billingCountryId: ko.observable(),
 
             initialize: function () {
                 this._super();
@@ -103,6 +106,7 @@ define(
                     if (quote.billingAddress._latestValue != null && quote.billingAddress._latestValue.countryId != billingAddressCountryId) {
                         billingAddressCountryId = quote.billingAddress._latestValue.countryId;
                         that.filterajax(1);
+                        that.billingCountryId(billingAddressCountryId);
                         paymentService = true;                 
                     }
                });
@@ -328,6 +332,10 @@ define(
                 var self = this;
                 var $form = $('#' + this.getCode() + '-form');
                 if($form.validation() && $form.validation('isValid')){
+                    if(!additionalValidators.validate()){
+                        console.log("Validation Failed");
+                        return false;
+                    }
                     if (this.getselectedCCType() =='IDEAL-SSL') {
                         this.idealBankType = this.selectedIdealBank();
                     }else if(isKlarna && this.getselectedCCType() == 'KLARNA-SSL'){

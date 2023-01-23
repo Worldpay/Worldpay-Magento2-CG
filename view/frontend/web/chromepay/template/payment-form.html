@@ -213,13 +213,24 @@ select {
 	width: 40%;
 	float:right;
 }
-
+@media only screen and (max-width: 600px) {
+  select {
+        width: 100%;
+        margin-bottom: 5px;
+ }
+#complete-payment {
+        font-size: 14px;
+}
+#cancel-payment{
+        font-size:14px;
+}
+}
     </style>
   </head>
   <body>
     <main>
     
-      <form action="#" onsubmit="payWithCreditCard()" method="post">
+      <form action="javascript:void(0);" onsubmit="payWithCreditCard()" method="post">
 
         <h1>Enter details</h1>
 
@@ -342,7 +353,6 @@ select {
       
       
       navigator.serviceWorker.addEventListener('message', e => {
-          console.log('service worker === ',e);
         paymentRequestClient = e.source;
         
         methodData = e.data["methodData"];
@@ -350,7 +360,7 @@ select {
       
         //populatePaymentInstrumentsList();
       });
-      console.log(navigator.serviceWorker);
+      
       navigator.serviceWorker.controller.postMessage('payment_app_window_ready');
       
       function cancel() {
