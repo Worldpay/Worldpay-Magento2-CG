@@ -81,29 +81,26 @@ class Request
         //$request->addCookie(CURLOPT_COOKIE, $cookie);
         $request->setTimeout(self::CURL_TIMEOUT);
         $request->setHeaders([
-            'Content-Type'=> 'text/xml',
-            'Expect'=>''
+            'Content-Type' => 'text/xml',
+            'Expect' => '',
+            "MERCHANT_ID" => $pluginTrackerDetails['MERCHANT_ID'],
+            "API_USERNAME" => $pluginTrackerDetails['API_USERNAME'],
+            "MAGENTO_EDITION" => $pluginTrackerDetails['MAGENTO_EDITION'],
+            "MAGENTO_VERSION" => $pluginTrackerDetails['MAGENTO_VERSION'],
+            "PHP_VERSION" => $pluginTrackerDetails['PHP_VERSION'],
+            "CURRENT_WORLDPAY_PLUGIN_VERSION" => isset($pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION'])
+                ? $pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION']
+                : "",
+            "WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE" => isset($pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE'])
+                ? $pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE']
+                : "",
+            "UPGRADE_DATES" => isset($pluginTrackerDetails['UPGRADE_DATES'])
+                ? $pluginTrackerDetails['UPGRADE_DATES']
+                : ""
         ]);
         $logger->info('Sending XML as: ' . $this->_getObfuscatedXmlLog($quote));
 
         $request->setOption(CURLOPT_HEADER, 1);
-        $request->setOption(
-            CURLOPT_HTTPHEADER,
-            ["content-type: application/json",
-               "MERCHANT_ID" => $pluginTrackerDetails['MERCHANT_ID'],
-               "API_USERNAME" => $pluginTrackerDetails['API_USERNAME'],
-               "MAGENTO_EDITION"=>$pluginTrackerDetails['MAGENTO_EDITION'],
-               "MAGENTO_VERSION"=>$pluginTrackerDetails['MAGENTO_VERSION'],
-               "PHP_VERSION"=> $pluginTrackerDetails['PHP_VERSION'],
-               "CURRENT_WORLDPAY_PLUGIN_VERSION"=>isset($pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION'])?
-               $pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION']:"",
-               "WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE" =>
-               isset($pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE'])?
-               $pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE']:"",
-               "UPGRADE_DATES" => isset($pluginTrackerDetails['UPGRADE_DATES'])?
-               $pluginTrackerDetails['UPGRADE_DATES']:""
-            ]
-        );
         $logger->info('Sending additional headers as: ' . json_encode([
                 "MERCHANT_ID" => $pluginTrackerDetails['MERCHANT_ID'],
                 "API_USERNAME" => $pluginTrackerDetails['API_USERNAME'],
