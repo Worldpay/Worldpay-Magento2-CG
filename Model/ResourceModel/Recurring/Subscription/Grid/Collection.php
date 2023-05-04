@@ -22,6 +22,7 @@ class Collection extends SubscriptionCollection implements SearchResultInterface
      * @param \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy
      * @param \Magento\Framework\Event\ManagerInterface $eventManager
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\App\ResourceConnection $resourceConnection
      * @param string $eventPrefix
      * @param string $eventObject
      * @param string $model
@@ -36,6 +37,7 @@ class Collection extends SubscriptionCollection implements SearchResultInterface
         \Magento\Framework\Data\Collection\Db\FetchStrategyInterface $fetchStrategy,
         \Magento\Framework\Event\ManagerInterface $eventManager,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Framework\App\ResourceConnection $resourceConnection,
         $eventPrefix,
         $eventObject,
         $model = \Magento\Framework\View\Element\UiComponent\DataProvider\Document::class,
@@ -48,6 +50,7 @@ class Collection extends SubscriptionCollection implements SearchResultInterface
             $fetchStrategy,
             $eventManager,
             $storeManager,
+            $resourceConnection,
             $connection,
             $resource
         );
