@@ -18,6 +18,46 @@ class Card extends \Magento\Payment\Block\Form
      * @var worldpayPaymentsMoto
      */
     private $worldpayPaymentsMoto;
+
+     /**
+      * @var \Sapient\Worldpay\Model\WorldpayConfigProvider
+      */
+    private $configProvider;
+
+     /**
+      * @var \Magento\Framework\Registry
+      */
+    private $_coreRegistry;
+
+     /**
+      * @var \Magento\Backend\Model\Session\Quote
+      */
+    private $adminquotesession;
+
+     /**
+      * @var \Sapient\Worldpay\Helper\Data
+      */
+    private $worldpayhelper;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Payment\LatAmInstalTypes
+      */
+    private $latamtypes;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    private $wplogger;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Payment\PaymentTypes
+      */
+    private $paymenttypes;
+
+      /**
+       * @var \Magento\Backend\Model\Session\Quote
+       */
+    private $adminsessionquote;
     /**
      * Constructor
      *

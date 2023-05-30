@@ -86,4 +86,23 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
             ->addFieldToFilter('order_id', ['eq' => $order_id]);
         return $collection->getFirstItem();
     }
+
+    /**
+     * Fetch Multishipping Order ids
+     *
+     * @param int $quoteId
+     * @return array
+     */
+    public function getMultishippingOrderIds($quoteId)
+    {
+        $connection = $this->getConnection();
+        $select = $connection->select()->from(
+            ['wms' => $this->getTable('worldpay_multishipping')],
+            ['order_id']
+        )->where(
+            'wms.quote_id = :quote_id'
+        );
+
+        return $connection->fetchAll($select, [':quote_id' => $quoteId]);
+    }
 }

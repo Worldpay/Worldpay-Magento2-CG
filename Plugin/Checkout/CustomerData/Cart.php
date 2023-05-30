@@ -35,7 +35,12 @@ class Cart
     protected $wplogger;
 
     /**
-     * @var quoteIdToMaskedQuoteId
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $wpHelper;
+
+    /**
+     * @var QuoteIdToMaskedQuoteIdInterface
      */
     protected $quoteIdToMaskedQuoteId;
 

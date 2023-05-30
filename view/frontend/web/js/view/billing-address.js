@@ -1,8 +1,8 @@
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Magento_Checkout/js/view/billing-address
+ *
+ * Applepay and other modifications
  */
-
 define([
     'ko',
     'underscore',
@@ -18,7 +18,8 @@ define([
     'Magento_Checkout/js/action/set-billing-address',
     'Magento_Ui/js/model/messageList',
     'mage/translate',
-    'Magento_Checkout/js/model/billing-address-postcode-validator'
+    'Magento_Checkout/js/model/billing-address-postcode-validator',
+    'Magento_Checkout/js/model/address-converter'
 ],
 function (
     ko,
@@ -35,99 +36,14 @@ function (
     setBillingAddressAction,
     globalMessageList,
     $t,
-     billingAddressPostcodeValidator
+    billingAddressPostcodeValidator,
+    addressConverter
 ) {
     'use strict';
-
     var lastSelectedBillingAddress = null,
-        newAddressOption = {
-            /**
-             * Get new address label
-             * @returns {String}
-             */
-            getAddressInline: function () {
-                return $t('New Address');
-            },
-            customerAddressId: null
-        },
-        countryData = customerData.get('directory-data'),
-        addressOptions = addressList().filter(function (address) {
-            return address.getType() == 'customer-address'; //eslint-disable-line eqeqeq
-        });
+        addressUpadated = false
 
-    addressOptions.push(newAddressOption);
-
-    return Component.extend({
-        defaults: {
-            template: 'Magento_Checkout/billing-address',
-            actionsTemplate: 'Magento_Checkout/billing-address/actions',
-            formTemplate: 'Magento_Checkout/billing-address/form',
-            detailsTemplate: 'Magento_Checkout/billing-address/details',
-            links: {
-                isAddressFormVisible: '${$.billingAddressListProvider}:isNewAddressSelected'
-            }
-        },
-        currentBillingAddress: quote.billingAddress,
-        addressOptions: addressOptions,
-        customerHasAddresses: addressOptions.length > 1,
-
-        /**
-         * Init component
-         */
-        initialize: function () {
-            this._super();
-            quote.paymentMethod.subscribe(function () {
-                checkoutDataResolver.resolveBillingAddress();
-            }, this);
-            billingAddressPostcodeValidator.initFields(this.get('name') + '.form-fields');
-        },
-
-        /**
-         * @return {exports.initObservable}
-         */
-        initObservable: function () {
-            this._super()
-                .observe({
-                    selectedAddress: null,
-                    isAddressDetailsVisible: quote.billingAddress() != null,
-                    isAddressFormVisible: !customer.isLoggedIn() || addressOptions.length === 1,
-                    isAddressSameAsShipping: false,
-                    saveInAddressBook: 1
-                });
-
-            quote.billingAddress.subscribe(function (newAddress) {
-                if (quote.isVirtual()) {
-                    this.isAddressSameAsShipping(false);
-                } else {
-                    this.isAddressSameAsShipping(
-                        newAddress != null &&
-                        newAddress.getCacheKey() == quote.shippingAddress().getCacheKey() //eslint-disable-line eqeqeq
-                    );
-                }
-
-                if (newAddress != null && newAddress.saveInAddressBook !== undefined) {
-                    this.saveInAddressBook(newAddress.saveInAddressBook);
-                } else {
-                    this.saveInAddressBook(1);
-                }
-                this.isAddressDetailsVisible(true);
-            }, this);
-
-            return this;
-        },
-
-        canUseShippingAddress: ko.computed(function () {
-            return !quote.isVirtual() && quote.shippingAddress() && quote.shippingAddress().canUseForBilling();
-        }),
-
-        /**
-         * @param {Object} address
-         * @return {*}
-         */
-        addressOptionsText: function (address) {
-            return address.getAddressInline();
-        },
-
+    let mixin = {
         /**
          * @return {Boolean}
          */
@@ -143,47 +59,44 @@ function (
                 this.isAddressDetailsVisible(false);
             }
             checkoutData.setSelectedBillingAddress(null);
-            
-            
-            
-        if (window.ApplePaySession) {
-        //var merchantIdentifier = '<?=PRODUCTION_MERCHANTIDENTIFIER?>';
-        var merchantIdentifier = window.checkoutConfig.payment.ccform.appleMerchantid;
-        var promise = ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
-        promise.then(function (canMakePayments) {
-               if (canMakePayments) {
-                   var wallets_APPLEPAY = document.getElementById("wallets_APPLEPAY-SSL");
-                   var wallets_image_APPLEPAY = document.getElementById("wallets_image_APPLEPAY-SSL");
-                   var wallets_label_APPLEPAY = document.getElementById("wallets_label_APPLEPAY-SSL");
-                   
-                   if(wallets_APPLEPAY) {
-                       //document.getElementById("wallets_APPLEPAY-SSL").style.display = "block";
-                       document.getElementById("wallets_APPLEPAY-SSL").style.display = "table-cell";
-                   }
-                   if(wallets_image_APPLEPAY) {
-                       document.getElementById("wallets_image_APPLEPAY-SSL").style.display = "table-cell";
-                   }
-                   if(wallets_label_APPLEPAY) {
-                       document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "table-cell";
-                   }
-                  
-                     
-               } 
-             }); 
-     } 
-                   
-                   
-
+            // Worldpay - Applepay modification start
+            if (window.ApplePaySession) {
+                //var merchantIdentifier = '<?=PRODUCTION_MERCHANTIDENTIFIER?>';
+                var merchantIdentifier = window.checkoutConfig.payment.ccform.appleMerchantid;
+                var promise = ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
+                promise.then(function (canMakePayments) {
+                       if (canMakePayments) {
+                           var wallets_APPLEPAY = document.getElementById("wallets_APPLEPAY-SSL");
+                           var wallets_image_APPLEPAY = document.getElementById("wallets_image_APPLEPAY-SSL");
+                           var wallets_label_APPLEPAY = document.getElementById("wallets_label_APPLEPAY-SSL");
+                           
+                           if(wallets_APPLEPAY) {
+                               //document.getElementById("wallets_APPLEPAY-SSL").style.display = "block";
+                               document.getElementById("wallets_APPLEPAY-SSL").style.display = "table-cell";
+                           }
+                           if(wallets_image_APPLEPAY) {
+                               document.getElementById("wallets_image_APPLEPAY-SSL").style.display = "table-cell";
+                           }
+                           if(wallets_label_APPLEPAY) {
+                               document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "table-cell";
+                           }
+                          
+                             
+                       } 
+                     }); 
+             } 
+            // Worldpay - Applepay modification end
             return true;
         },
-
         /**
          * Update address action
          */
-        updateAddress: function () {
+            updateAddress: function () {
             var addressData, newBillingAddress;
 
-            if (this.selectedAddress() && this.selectedAddress() != newAddressOption) { //eslint-disable-line eqeqeq
+            addressUpadated = true;
+
+            if (this.selectedAddress() && !this.isAddressFormVisible()) {
                 selectBillingAddress(this.selectedAddress());
                 checkoutData.setSelectedBillingAddress(this.selectedAddress().getKey());
             } else {
@@ -202,44 +115,44 @@ function (
                     }
                     addressData['save_in_address_book'] = this.saveInAddressBook() ? 1 : 0;
                     newBillingAddress = createBillingAddress(addressData);
-
                     // New address must be selected as a billing address
                     selectBillingAddress(newBillingAddress);
                     checkoutData.setSelectedBillingAddress(newBillingAddress.getKey());
                     checkoutData.setNewCustomerBillingAddress(addressData);
                 }
             }
+            setBillingAddressAction(globalMessageList);
             this.updateAddresses();
-            
-                   if (window.ApplePaySession) {
-        //var merchantIdentifier = '<?=PRODUCTION_MERCHANTIDENTIFIER?>';
-        var merchantIdentifier = window.checkoutConfig.payment.ccform.appleMerchantid;
-        var promise = ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
-        promise.then(function (canMakePayments) {
-               if (canMakePayments) {
-                   var wallets_APPLEPAY = document.getElementById("wallets_APPLEPAY-SSL");
-                   var wallets_image_APPLEPAY = document.getElementById("wallets_image_APPLEPAY-SSL");
-                   var wallets_label_APPLEPAY = document.getElementById("wallets_label_APPLEPAY-SSL");
-                   
-                   if(wallets_APPLEPAY) {
-                       //document.getElementById("wallets_APPLEPAY-SSL").style.display = "block";
-                       document.getElementById("wallets_APPLEPAY-SSL").style.display = "inline";
-                   }
-                   if(wallets_image_APPLEPAY) {
-                       document.getElementById("wallets_image_APPLEPAY-SSL").style.display = "inline";
-                   }
-                   if(wallets_label_APPLEPAY) {
-                       document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "inline";
-                   }
-                  
-                     
-               } 
-             }); 
-     } 
-            
-                  
-                  
+            // Worldpay - Applepay modification start
+            if (window.ApplePaySession) {
+                //var merchantIdentifier = '<?=PRODUCTION_MERCHANTIDENTIFIER?>';
+                var merchantIdentifier = window.checkoutConfig.payment.ccform.appleMerchantid;
+                var promise = ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
+                promise.then(function (canMakePayments) {
+                        if (canMakePayments) {
+                            var wallets_APPLEPAY = document.getElementById("wallets_APPLEPAY-SSL");
+                            var wallets_image_APPLEPAY = document.getElementById("wallets_image_APPLEPAY-SSL");
+                            var wallets_label_APPLEPAY = document.getElementById("wallets_label_APPLEPAY-SSL");
+                            
+                            if(wallets_APPLEPAY) {
+                                //document.getElementById("wallets_APPLEPAY-SSL").style.display = "block";
+                                document.getElementById("wallets_APPLEPAY-SSL").style.display = "inline";
+                            }
+                            if(wallets_image_APPLEPAY) {
+                                document.getElementById("wallets_image_APPLEPAY-SSL").style.display = "inline";
+                            }
+                            if(wallets_label_APPLEPAY) {
+                                document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "inline";
+                            }
+                            
+                                
+                        } 
+                        }); 
+                }                    
+            // Worldpay - Applepay modification end
         },
-
-    });
-});                                                                                                                            
+    };
+    return function (target) {
+        return target.extend(mixin);
+    };
+});

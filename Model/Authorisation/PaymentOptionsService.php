@@ -8,6 +8,22 @@ use Exception;
 
 class PaymentOptionsService extends \Magento\Framework\DataObject
 {
+    /**
+     * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+     */
+    protected $mappingservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
+     */
+    protected $paymentservicerequest;
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayhelper;
    
     /**
      * Constructor
@@ -40,14 +56,18 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
         $countryId,
         $paymenttype
     ) {
+
+        $isMultishipping = false;
+        if ($this->worldpayhelper->isMultiShipping()) {
+            $isMultishipping = true;
+        }
         $paymentOptionParams = $this->mappingservice->collectPaymentOptionsParameters(
             $countryId,
-            $paymenttype
+            $paymenttype,
+            $isMultishipping
         );
-
-        $response = $this->paymentservicerequest->paymentOptionsByCountry($paymentOptionParams);
+        $response = $this->paymentservicerequest->paymentOptionsByCountry($paymentOptionParams, $isMultishipping);
         $responsexml = simplexml_load_string($response);
-
         $paymentoptions =  $this->getPaymentOptions($responsexml);
         
         if ($this->worldpayhelper->isGlobalApmEnable()) {

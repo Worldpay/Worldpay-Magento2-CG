@@ -16,6 +16,25 @@ class Savedcard extends \Magento\Framework\View\Element\Template
      * @var \Magento\Customer\Model\Session
      */
     protected $_customerSession;
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worlpayhelper;
+    /**
+     * @var \Magento\Customer\Helper\Session\CurrentCustomerAddress
+     */
+    protected $currentCustomerAddress;
+
+     /**
+      * @var \Magento\Customer\Model\Address\Config
+      */
+    protected $_addressConfig;
+
+     /**
+      * @var \Magento\Customer\Model\Address\Mapper
+      */
+    protected $addressMapper;
+
      /**
       * @var SerializerInterface
       */

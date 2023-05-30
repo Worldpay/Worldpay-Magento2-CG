@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd" label="WP Paybylink Multishipping Email addderesses" design_abstraction="custom">
+    <body>
+        <block class="Sapient\Worldpay\Block\Multishipping\Paybylink\Email\Addresses" name="wp_multishipping_email_paybylink_addresses" template="Sapient_Worldpay::multishipping/email/address.phtml" cacheable="false">
+        </block>
+    </body>
+</page>

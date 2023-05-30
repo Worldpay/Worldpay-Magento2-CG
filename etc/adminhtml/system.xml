@@ -347,11 +347,11 @@
                     </field>
                      <field id="certification_key" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Apple Pay Certification Key</label>
-                        <comment>Location of the ApplePay.key.pem. eg. /var/www/html/cert/.  Files should be have read access by the webserver</comment>
+                        <comment>Location of the ApplePay.key.pem. eg. /var/www/html/cert/ApplePay.key.pem.  Files should be have read access by the webserver</comment>
                     </field> 
                      <field id="certification_crt" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Apple Pay Certification Path</label>
-                        <comment>Location of the ApplePay.crt.pem. eg. /var/www/html/cert/.  Files should be have read access by the webserver</comment>
+                        <comment>Location of the ApplePay.crt.pem. eg. /var/www/html/cert/ApplePay.crt.pem.  Files should be have read access by the webserver</comment>
                     </field> 
                     <field id="certification_password" translate="label" type="password" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Apple Pay Certification Password</label>
@@ -477,17 +477,31 @@
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="paymentmethods" translate="label" type="multiselect" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                 <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                </field>
+                <field id="paymentmethods" translate="label" type="multiselect" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Methods</label>
                     <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethodsApm</source_model>
                 </field>
-                <field id="achaccounttypes" translate="label" type="multiselect" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="achaccounttypes" translate="label" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>ACH Account Types</label>
                     <source_model>Sapient\Worldpay\Model\Config\Source\ACHAccountTypes</source_model>
                 </field>
-                <field id="title" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Title</label>
+                <field id="sepa_mandate_types" translate="label" type="multiselect" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SEPA Mandate Types</label>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\SEPAMandateTypes</source_model>
                 </field>
+                <field id="sepa_merchant_no" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SEPA Merchant Number</label>
+					<comment>For this detail, You must connect with your Worldpay contact.</comment>
+                </field>
+
+                <field id="sepa_e_mandate" translate="label" type="textarea" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>SEPA E-Mandate</label>
+					<comment>You must ensure you display the official wording to your shoppers so they can agree to be debited. This is official wording which is to be used to constitute a SEPA-compliant mandate. Without this official wording, shoppers can easily reverse the direct debit with their bank..</comment>
+                </field>
+               
             </group>
             <!-- KLARNA -->
             <group id="klarna_config" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -1095,25 +1109,6 @@
                                 <depends><field id="enabled">1</field></depends>
                         </field>            
                     </group>
-                    <group id="qiwi_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Qiwi </label>
-                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Use Custom Logo</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        </field> 
-                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                                <label>Logo</label>
-                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
-                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
-                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
-                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
-                                <ul style="margin-left: 2em;">
-                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
-                                </ul>
-                                ]]></comment>
-                                <depends><field id="enabled">1</field></depends>
-                        </field>            
-                    </group>
                     <group id="sepa_direct_debit_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>SEPA (One off transactions) </label>
                         <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -1266,10 +1261,30 @@
             <!-- Worldpay Multishipping -->
             <group id="multishipping" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Worldpay Multishipping</label>
-                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable multishipping</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Set to yes if you want to enable the Worldpay Payment methods on multishipping orders.</comment>
+                </field>
+                <field id="ms_merchant_code" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Code</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>Enter the merchant code for Multishipping orders. If it is blank, global merchant code entered under General configuration will be applicable.</comment>
+                </field>
+                <field id="ms_xml_username" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Username</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>Enter the merchant username for Multishipping orders. If it is blank, global merchant username entered under General configuration will be applicable.</comment>
+                </field>
+                <field id="ms_xml_password" translate="label" type="password" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Password</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>Enter the merchant password for Multishipping orders. If it is blank, global merchant password entered under General configuration will be applicable.</comment>
+                </field>
+                <field id="ms_xml_installationId" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Installation Id</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>Enter the merchant Installation Id for Multishipping orders. If it is blank, global merchant Installation Id entered under HPP configuration will be applicable.</comment>
                 </field>
             </group>
              <!-- Worldpay Pay By Link -->
@@ -1284,7 +1299,76 @@
                     <label>Pay By Link Button Name</label>
                     <depends><field id="enable">1</field></depends>
                 </field>
+                <field id="pbl_merchant_code" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Code</label>                    
+                    <comment>Enter the merchant code for Paybylink orders. If it is blank, global merchant code entered under General configuration will be applicable.</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="pbl_xml_username" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Username</label>                    
+                    <comment>Enter the merchant username for Paybylink orders. If it is blank, global merchant username entered under General configuration will be applicable.</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="pbl_xml_password" translate="label" type="password" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Password</label>
+                    <comment>Enter the merchant password for Paybylink orders. If it is blank, global merchant password entered under General configuration will be applicable.</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="pbl_xml_installationId" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Installation Id</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>Enter the merchant Installation Id for Pay By Link orders. If it is blank, global merchant Installation Id entered under HPP configuration will be applicable.</comment>
+                </field>
+                <field id="paybylink_expiry_time" translate="label" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Pay By Link Expiry Time</label>
+                    <depends><field id="enable">1</field></depends>
+                    <validate>validate-no-empty validate-digits validate-digits-range digits-range-1-48</validate>
+                    <comment>Pay By Link will be expired based on the above entered value. The value must be entered in the range between 1 to 48 hours.</comment>
+                </field>
+                <field id="paybylink_resend_link" translate="label" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Pay By Link Resend Option </label>
+					<depends><field id="enable">1</field></depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If set "Yes", expiry lifetime will be doubled once.</comment>                  
+                </field>				
             </group>
+            <!-- Recurring Merchant Code Configuration -->
+            <group id="recurring_merchant_config" translate="label" type="text" sortOrder="111" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Recurring Merchant Configuration</label>
+                <field id="recurring_merchant_code" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recurring Merchant Code</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>Enter the merchant code for Recurring orders. If it is blank, global merchnat code entered under General configuration will be applicable.</comment>
+                </field>
+                <field id="recurring_username" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recurring Merchant Username</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>Enter the username for this Recurring specific Merchant code. If it is blank, global XML username entered under General configuration will be applicable.</comment>
+                </field>
+                <field id="recurring_password" translate="label" type="password" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recurring Merchant Password</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>Enter the password for this Recurring specific Merchant code. If it is blank, global XML password entered under General configuration will be applicable.</comment>
+                </field>
+            </group>
+             <!-- End Recurring Merchant Code Configuration -->
+
+            <!-- Dynamic Capture Delay -->
+            <group id="dynamic_capture_delay" translate="label" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Dynamic Capture Delay</label>
+                <field id="capture_delay" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Capture Delay</label>                   
+                    <source_model>Sapient\Worldpay\Model\Config\Source\CaptureDelay</source_model>
+                    <comment><![CDATA[<strong>0</strong> - Automatically captures immediately<br/><strong>1-14</strong>  - Sets the number of days to delay capture by <br/><strong>OFF</strong> - Disables capture completely (you have to capture with an order modification)<br/><strong>DEFAULT</strong>  - Uses the default preconfigured value set on the merchantCode]]></comment>
+                </field> 
+                <field id="capture_delay_custom_value" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Capture Delay (in no of days)</label>
+                    <validate>required-entry validate-digits validate-not-negative-number validate-digits-range digits-range-1-14</validate>
+                    <depends><field id="capture_delay">custom</field></depends>
+                    <comment>Sets the number of days to delay capture by</comment>
+                </field>             
+            </group>
+             <!-- End Dynamic Capture Delay -->
         </section>
         <!-- New Tab for Worldpay exceptions -->
         <section id="worldpay_exceptions" translate="label" type="text" sortOrder="402" showInDefault="1" showInWebsite="1" showInStore="1">

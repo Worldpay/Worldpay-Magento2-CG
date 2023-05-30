@@ -33,6 +33,11 @@ class Button extends Template
      * @var SessionManagerInterface
      */
     protected $session;
+    
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
 
     /**
      * Button constructor.

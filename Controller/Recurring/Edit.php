@@ -37,24 +37,32 @@ class Edit extends \Magento\Framework\App\Action\Action
     private $helper;
 
     /**
+     * @var \Magento\Customer\Model\Url
+     */
+    private $customerUrl;
+
+    /**
      * @param Context $context
      * @param Session $customerSession
      * @param PageFactory $resultPageFactory
      * @param SubscriptionFactory $subscriptionFactory
      * @param Sapient\Worldpay\Helper\GeneralException $helper
+     * @param \Magento\Customer\Model\Url $customerUrl
      */
     public function __construct(
         Context $context,
         Session $customerSession,
         PageFactory $resultPageFactory,
         SubscriptionFactory $subscriptionFactory,
-        \Sapient\Worldpay\Helper\GeneralException $helper
+        \Sapient\Worldpay\Helper\GeneralException $helper,
+        \Magento\Customer\Model\Url $customerUrl
     ) {
         $this->customerSession = $customerSession;
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
         $this->subscriptionFactory = $subscriptionFactory;
         $this->helper = $helper;
+        $this->customerUrl = $customerUrl;
     }
 
     /**
@@ -65,8 +73,7 @@ class Edit extends \Magento\Framework\App\Action\Action
      */
     public function dispatch(RequestInterface $request)
     {
-        $loginUrl = $this->_objectManager->get(\Magento\Customer\Model\Url::class)->getLoginUrl();
-
+        $loginUrl = $this->customerUrl->getLoginUrl();
         if (!$this->customerSession->authenticate($loginUrl)) {
             $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
         }

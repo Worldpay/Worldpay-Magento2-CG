@@ -24,6 +24,12 @@ class CreditCardException extends \Magento\Framework\App\Config\Value
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManager;
+     /**
+      * Store manager interface
+      *
+      * @var \Sapient\Worldpay\Helper\CreditCardException
+      */
+    private $creditcardexception;
     
     /**
      * @param \Magento\Framework\Model\Context $context

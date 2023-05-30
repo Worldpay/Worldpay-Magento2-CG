@@ -5,6 +5,10 @@ namespace Sapient\Worldpay\Model\PaymentMethods;
 class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
 {
     /**
+     * @var object
+     */
+    public $_response;
+    /**
      * Update status for void order abstract method
      *
      * @param array $order
@@ -50,7 +54,8 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
 
         $paymenttype = $worldPayPayment->getPaymentType();
         $isPrimeRoutingRequest = $worldPayPayment->getIsPrimeroutingEnabled();
-        if (($paymenttype === 'ACH_DIRECT_DEBIT-SSL' || $isPrimeRoutingRequest)
+        if (($paymenttype === 'ACH_DIRECT_DEBIT-SSL' ||
+         $isPrimeRoutingRequest)
                 && !($worldPayPayment->getPaymentStatus() === 'VOIDED')) {
             $xml = $this->paymentservicerequest->voidSale(
                 $payment->getOrder(),

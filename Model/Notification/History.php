@@ -8,7 +8,10 @@ use Sapient\Worldpay\Api\HistoryInterface;
 
 class History implements HistoryInterface
 {
-
+    /**
+     * @var \Sapient\Worldpay\Model\HistoryNotification
+     */
+    protected $historyNotification;
     /**
      * Constructor
      *

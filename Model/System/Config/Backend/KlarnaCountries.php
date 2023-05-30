@@ -9,7 +9,13 @@ namespace Sapient\Worldpay\Model\System\Config\Backend;
  */
 class KlarnaCountries extends \Magento\Framework\App\Config\Value
 {
-    
+     
+     /**
+      *
+      * @var \Sapient\Worldpay\Helper\KlarnaCountries
+      */
+    private $klarnaCountries;
+
     /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry

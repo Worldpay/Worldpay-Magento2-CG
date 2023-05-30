@@ -9,10 +9,53 @@ use Sapient\Worldpay\Helper\CreditCardException;
 class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
 {
 
-     /**
-      * @var CreditCardException
-      */
+    /**
+     * @var CreditCardException
+     */
     protected $helper;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+    /**
+     * @var \Magento\Framework\Controller\Result\JsonFactory
+     */
+    protected $resultJsonFactory;
+
+    /**
+     * @var string
+     */
+    protected $urlBuilder;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+    /**
+     * @var \Magento\Sales\Model\OrderFactory
+     */
+    protected $orderFactory;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
+    protected $orderSender;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Authorisation\ThreeDSecureChallenge
+     */
+    protected $threedscredirectresponse;
+
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    protected $urlBuilders;
+    /**
+     * @var \Magento\Framework\Session\SessionManagerInterface
+     */
+    protected $session;
+
     /**
      * Constructor
      *

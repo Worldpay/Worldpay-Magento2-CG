@@ -14,17 +14,40 @@ class Auth extends \Magento\Framework\App\Action\Action
 {
 
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
      * @var \Magento\Checkout\Model\Session
      */
     protected $checkoutSession;
+
+    /**
+     * @var \Magento\Framework\View\Result\PageFactory
+     */
+    protected $_resultPageFactory;
+
     /**
      * @var _assetRepo
      */
     protected $_assetRepo;
+
+     /**
+      * @var \Sapient\Worldpay\Helper\Data
+      */
+    protected $worldpayHelper;
+
     /**
-     * @var request
+     * @var ResultFactory
+     */
+    protected $resultFactory;
+
+    /**
+     * @var \Magento\Framework\App\Request\Http
      */
     protected $request;
+
     /**
      * @var _cookieManager
      */

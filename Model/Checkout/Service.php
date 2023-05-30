@@ -9,6 +9,20 @@ use Magento\Checkout\Model\Cart as CustomerCart;
 class Service
 {
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    private $checkoutsession;
+
+    /**
+     * @var CustomerCart
+     */
+    private $cart;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    private $wplogger;
+    /**
      * Constructor
      *
      * @param Session $checkoutsession

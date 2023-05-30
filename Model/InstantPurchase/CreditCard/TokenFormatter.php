@@ -15,6 +15,25 @@ class TokenFormatter implements PaymentTokenFormatterInterface
       * @var \Sapient\Worldpay\Model\WorldpaymentFactory
       */
     protected $_worldpaymentFactory;
+     /**
+      * @var \Sapient\Worldpay\Logger\WorldpayLogger
+      */
+    protected $wplogger;
+
+     /**
+      * @var \Sapient\Worldpay\Model\SavedTokenFactory
+      */
+    protected $savecard;
+
+     /**
+      * @var \Sapient\Worldpay\Helper\Data
+      */
+    protected $wpdata;
+
+     /**
+      * @var \Sapient\Worldpay\Model\ResourceModel\SavedToken
+      */
+    protected $savedtoken;
     /**
      * @var baseCardTypes
      */

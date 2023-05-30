@@ -12,6 +12,20 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
     private $_configHelper;
 
     /**
+     * @var \Sapient\Worldpay\Model\Payment\StateInterface
+     */
+    public $paymentState;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\WorldPayPayment
+     */
+    public $_worldPayPayment;
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    public $multishippingHelper;
+    
+    /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment
@@ -109,7 +123,7 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
                 \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_AUTHORISED
              ];
         }
-        if ($this->_isACHIntegrationMode($order)) {
+        if ($this->_isACHIntegrationMode($order) || $this->_isSEPAIntegrationMode($order)) {
               return [
                 \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION,
                 \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_AUTHORISED,
@@ -198,6 +212,20 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
     private function _isACHIntegrationMode(\Sapient\Worldpay\Model\Order $order)
     {
         if ($order->getPaymentType() === 'ACH_DIRECT_DEBIT-SSL') {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if integration mode is sepa
+     *
+     * @param \Sapient\Worldpay\Model\Order $order
+     * @return bool
+     */
+    private function _isSEPAIntegrationMode(\Sapient\Worldpay\Model\Order $order)
+    {
+        if ($order->getPaymentType() === 'SEPA_DIRECT_DEBIT-SSL') {
             return true;
         }
         return false;

@@ -9,39 +9,37 @@
         
          <!-- ko if: ( getCode()=='worldpay_apm')-->
          <!-- ko if: billingCountryId -->
-
-         <div class='accepted_cc'>
-              
-             <span class='worldpay_cc_we_accept'><!-- ko i18n: getCheckoutLabels('CO2')--><!-- /ko --></span>
-             
-             <div class="paymentoptions-icon-wrapper">
-         <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
-         <!--ko if: $parent.getIcons(item.ccValue) -->
-                        <div data-bind="attr: {for: 'direct_cc_' + item.ccValue}"><img data-bind="attr: {
-                                    'src': $parent.getIcons(item.ccValue).url,
-                                    'alt': item.ccLabel,
-                                    'width': $parent.getIcons(item.ccValue).width,
-                                    'height': $parent.getIcons(item.ccValue).height
-                                    }"></div>
-                    <!--/ko-->
-         <!--/ko-->
+         <div class='accepted_cc'>  
+            <span class='worldpay_cc_we_accept'><!-- ko i18n: getCheckoutLabels('CO2')--><!-- /ko --></span>
+            <div class="paymentoptions-icon-wrapper">
+            <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
+            <!--ko if: $parent.getIcons(item.ccValue) -->
+            <div data-bind="attr: {for: 'direct_cc_' + item.ccValue}">
+                <img data-bind="attr: {
+                        'src': $parent.getIcons(item.ccValue).url,
+                        'alt': item.ccLabel,
+                        'width': $parent.getIcons(item.ccValue).width,
+                        'height': $parent.getIcons(item.ccValue).height
+                        }">
+            </div>
+            <!--/ko-->
+            <!--/ko-->
           </div>
          </div>
            <!--/ko-->
-          <!--/ko-->
-          
-          
+          <!--/ko-->         
     </div>
-    <div class="payment-method-content">
+    <div data-bind="attr: {'class': 'payment-method-content ' + getCode() + '-onepage'}">
 
         <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
             <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
             <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
+				<div class="control">
                 <!-- ko if: (paymentMethodSelection()=='radio')-->
                 
                     <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
                         <div class="paymentmethods-radio-wrapper">
-                        <input type="radio"  data-bind="event:{ change: $parent.checkPaymentTypes },attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
+                        <input type="radio"  data-bind="event:{ change: $parent.checkPaymentTypes.bind($parent,item) },attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
                                         'validate-one-required-by-name':true
                                                 }),id: 'apm_' + item.ccValue}" name="apm_type"></input>
                        <!--ko if: $parent.getIcons(item.ccValue) -->
@@ -64,9 +62,9 @@
                             <!--/ko-->
                         <!--/ko-->
                     </div>
-                <!--/ko-->
-                
+                <!--/ko-->            
             <!-- /ko -->
+			</div>   
                 <!-- ko if: (paymentMethodSelection()=='dropdown')-->
                     <select name="apm_type" class="select select-ccytpe"
                                             data-bind="
@@ -78,7 +76,6 @@
                                            optionsCaption: 'Select Your Payment Method',
                                            event:{ change: checkPaymentTypes }"></select>
                 <!--/ko-->
-
             </div>
             <div class="field type required ideal-block" data-bind="visible: false">
             <select name="ideal_bank" class="select select-ccytpe" disabled
@@ -230,6 +227,89 @@
                 </div>
 
             </div>
+            <div class="control field type required sepa-block" data-bind="visible: false">
+                <label data-bind="attr: {for: getCode() + '_sepa_mandate_type'}" class="label">
+                    <span>
+                        <!--ko if: getCheckoutLabels('CO29') -->
+                               <!-- ko i18n: getCheckoutLabels('CO29')-->
+                                <!-- /ko -->
+                        <!--/ko-->
+
+                        <!--ko ifnot: getCheckoutLabels('CO29') -->
+                               <!-- ko i18n: 'Mandate Type'-->
+                                <!-- /ko -->
+                        <!--/ko-->
+                    </span>
+                </label>
+                <div class="field type required sepa-mandate-type" style="margin-bottom:10px;">
+                    <select name="sepa_pay" class="select select-ccytpe" disabled data-bind="attr: {id: 'sepa_pay', 'data-validate': JSON.stringify({required:true})},
+                           options: getSEPAEMandateTypes(),
+                           optionsText: 'accountText',
+                           value: selectedSEPAMandateType,
+                           enable: isActive($parents),
+                           optionsValue: 'accountCode',
+                           optionsCaption: 'Select Mandate Type'">
+                    </select>
+                </div>
+
+                <label data-bind="attr: {for: getCode() + '_sepa_iban'}" class="label">
+                    <span>
+                        <!--ko if: getCheckoutLabels('CO30') -->
+                               <!-- ko i18n: getCheckoutLabels('CO30')-->
+                                <!-- /ko -->
+                        <!--/ko-->
+
+                        <!--ko ifnot: getCheckoutLabels('CO30') -->
+                               <!-- ko i18n: 'IBAN'-->
+                                <!-- /ko -->
+                        <!--/ko-->
+                    </span>
+                </label>
+                <div class="field type required sepa-iban" style="margin-bottom:10px;">
+
+                    <input type="text"                        
+                        style="width: 225px;" name="sepa-iban" class="input-text" value="" data-bind="attr: {
+                                autocomplete: off,
+                                id: getCode() + '_sepa_iban',
+                                title: $t('IBAN'),
+                                'data-container': getCode() + '-sepa-iban',
+                                'data-validate': JSON.stringify({'required':true})},
+                                enable: isActive($parents),
+                                value: sepaIban,
+                                valueUpdate: 'keyup'"></input>
+
+                </div>
+
+                <label data-bind="attr: {for: getCode() + '_sepa_account_holder_name'}" class="label">
+                    <span>
+                        <!--ko if: getCheckoutLabels('CO31') -->
+                               <!-- ko i18n: getCheckoutLabels('CO31')-->
+                                <!-- /ko -->
+                        <!--/ko-->
+
+                        <!--ko ifnot: getCheckoutLabels('CO31') -->
+                               <!-- ko i18n: 'Account Holder Name'-->
+                                <!-- /ko -->
+                        <!--/ko-->
+                    </span>
+
+
+                </label>
+                <div class="field type required sepa-account-holder-name" style="margin-bottom:10px;">
+
+                    <input type="text"
+                        style="width: 225px;" name="sepa-account-holder-name" class="input-text" value="" data-bind="attr: {
+                                autocomplete: off,
+                                id: getCode() + '_sepa_account_holder_name',
+                                title: $t('Account Holder Name'),
+                                'data-container': getCode() + '-sepa-account-holder-name',
+                                'data-validate': JSON.stringify({'required':true})},
+                                enable: isActive($parents),
+                                value: sepaAccountHolderName,
+                                valueUpdate: 'keyup'"></input>
+
+                </div>
+            </div>
         <div class="field type statment-narrative" data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative_div'},visible: false">
             <label data-bind="attr: {for: getCode() + '_statement'}" class="label">
                 <span><!-- ko i18n: getCheckoutLabels('CO12')--><!-- /ko --></span> 
@@ -256,6 +336,23 @@
                     <strong>Statement Narrative</strong> guidelines of the selected payment method 
                     before entering the <strong>Purpose of transaction.</strong></small></div>
         </div>
+
+        <!-- ko if: (paymentMethodSelectedType() == 'SEPA_DIRECT_DEBIT-SSL')-->
+        <div class="field type sepa_e-mandate">
+            <input type="checkbox" class="required-entry"
+            data-bind="attr: {
+                        'id': 'sepa_e_mandate_condition',
+                        'name': 'sepa_e_mandate_condition',
+                        'value': 'sepa_e_mandate_condition_true'
+                        }"/>
+            <label class="label sepa_e-mandate-label" for="sepa_e_mandate_condition">
+                <span data-bind="html: getSepaEmandateTerms()"></span>            
+            </label>
+        </div>
+        <!--/ko -->
+       
+
+
         <div class="field"></div>
         </fieldset>
         </form>

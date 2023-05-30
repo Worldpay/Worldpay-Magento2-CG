@@ -32,6 +32,12 @@ define(
                 if (!this.validatePaymentMethod())
                     return;
 
+
+                if ($('.checkout-agreements').find('input[type="checkbox"]:not(:checked)').length > 0) {
+                    $('#checkout-agreement-error-msg').css('display', 'block');
+                    return false;
+                }
+
                 var $form = $('#' + this.getCode() + '-form');
                 if (this.getselectedCCType('payment[cc_type]') == undefined && $('#saved-Card-Visibility-Enabled').css('display') == 'none') {
                     $('#cc_type-error').css('display', 'block');

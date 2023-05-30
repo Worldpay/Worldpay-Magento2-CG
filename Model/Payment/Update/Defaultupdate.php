@@ -11,6 +11,10 @@ class Defaultupdate extends \Sapient\Worldpay\Model\Payment\Update\Base implemen
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
     /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
+    /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
      * @param \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment

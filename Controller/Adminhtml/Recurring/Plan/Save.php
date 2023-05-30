@@ -23,6 +23,15 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManager;
+    /**
+     * @var \Magento\Framework\Locale\FormatInterface
+     */
+    private $localeFormat;
+
+    /**
+     * @var \Laminas\Uri\Uri
+     */
+    private $uri;
 
     /**
      * Constructor

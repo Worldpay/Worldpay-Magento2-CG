@@ -11,6 +11,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 class SendPayByLinkEmail extends \Magento\Framework\App\Helper\AbstractHelper
 {
     public const WORLDPAY_SALES_EMAIL_PAYBYLINK_TEMPLATE = "wp_sales_email_paybylink";
+    public const WORLDPAY_SALES_EMAIL_PAYBYLINK_MULTISHIPPING_TEMPLATE = "wp_sales_email_paybylink_multishipping";
     
     /**
      * @var ScopeConfigInterface
@@ -20,15 +21,29 @@ class SendPayByLinkEmail extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
     protected $wplogger;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager;
+
+     /**
+      * @var \Magento\Framework\Translate\Inline\StateInterface
+      */
+    protected $inlineTranslation;
+    /**
+     * @var \Sapient\Worldpay\Model\Mail\Template\EmailTransportBuilder
+     */
+    protected $transportBuilder;
     /**
      * @var \Magento\Customer\Model\Session
      */
       protected $_customerSession;
     
-      /**
-       * @var CheckoutSession
-       */
-        private $checkoutSession;
+    /**
+     * @var CheckoutSession
+     */
+    private $checkoutSession;
     /**
      * SendPayByLinkEmail constructor
      *
@@ -87,6 +102,21 @@ class SendPayByLinkEmail extends \Magento\Framework\App\Helper\AbstractHelper
         return [];
     }
     /**
+     * Get Customer Emails
+     *
+     * @param string $customerEmail
+     */
+    public function getCustomerEmailForResend($customerEmail)
+    {
+        if (!empty($customerEmail)) {
+            $allEmails = explode(',', $customerEmail);
+            if (!empty($allEmails)) {
+                return $allEmails;
+            }
+        }
+        return [];
+    }
+    /**
      * Send Email
      *
      * @param array $params
@@ -96,12 +126,26 @@ class SendPayByLinkEmail extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $senderDetails = $this->getAdminContactEmail();
         $templateId = self::WORLDPAY_SALES_EMAIL_PAYBYLINK_TEMPLATE;
+        if ($params['is_multishipping']) {
+            $templateId = self::WORLDPAY_SALES_EMAIL_PAYBYLINK_MULTISHIPPING_TEMPLATE;
+        }
 
         try {
             // template variables pass here
             $templateVars = $params;
-            $templateVars['mail_subject'] = __("WORLDPAY: ").
+            $subject = __("WORLDPAY: ").
             "Pay by Link for Order".' '.$this->checkoutSession->getAuthenticatedOrderId();
+
+            if ($params['is_multishipping']) {
+                $subject = __("WORLDPAY: ").
+                "Pay by Link for Multishipping Order".' '.$params['orderId'];
+            }
+
+            if ($params['is_resend']) {
+                $subject = __("WORLDPAY: ").
+                "Resend Pay by Link for Order".' '.$params['orderId'];
+            }
+            $templateVars['mail_subject'] = $subject;
             $storeId = $this->storeManager->getStore()->getId();
             $from = ['email' => $senderDetails['email'], 'name' => $senderDetails['name']];
             $this->inlineTranslation->suspend();
@@ -149,7 +193,11 @@ class SendPayByLinkEmail extends \Magento\Framework\App\Helper\AbstractHelper
     {
         try {
             if ($this->isEnablePayByLink()) {
-                $customerEmail = $this->getCustomerEmail();
+                if ($params['is_resend']) {
+                    $customerEmail = $this->getCustomerEmailForResend($params['customerEmail']);
+                } else {
+                    $customerEmail = $this->getCustomerEmail();
+                }
                 if (!empty($customerEmail)) {
                     foreach ($customerEmail as $recipientEmail) {
                         $this->sendEmail($params, $recipientEmail);

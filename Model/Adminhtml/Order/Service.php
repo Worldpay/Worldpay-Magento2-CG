@@ -7,6 +7,15 @@ namespace Sapient\Worldpay\Model\Adminhtml\Order;
 class Service
 {
     /**
+     * @var \Magento\Backend\Model\Session\Quote
+     */
+    protected $adminsessionquote;
+
+    /**
+     * @var \Magento\Sales\Model\AdminOrder\Create
+     */
+    protected $adminordercreate;
+    /**
      * Service constructor
      *
      * @param \Magento\Backend\Model\Session\Quote $adminsessionquote

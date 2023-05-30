@@ -74,11 +74,20 @@ EOD;
      * @var array|string
      */
     private $exponent;
+      /**
+       * @var string
+       */
+    private $paymentType;
 
     /**
-     * @var Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration
+     * @var \Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration
      */
     protected $tokenRequestConfig;
+
+    /**
+     * @var string $captureDelay
+     */
+    protected $captureDelay;
 
     /**
      * Build xml for processing Request
@@ -94,6 +103,7 @@ EOD;
      * @param float $billingAddress
      * @param string $shopperEmail
      * @param array|string $exponent
+     * @param string $captureDelay
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -111,7 +121,8 @@ EOD;
         $billingAddress,
         //$shopperId,
         $shopperEmail,
-        $exponent
+        $exponent,
+        $captureDelay
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -125,6 +136,7 @@ EOD;
         $this->billingAddress = $billingAddress;
         $this->shopperEmail = $shopperEmail;
         $this->exponent = $exponent;
+        $this->captureDelay = $captureDelay;
         //$this->acceptHeader = $acceptHeader;
         //$this->userAgentHeader = $userAgentHeader;
 
@@ -159,6 +171,9 @@ EOD;
     {
         $order = $submit->addChild('order');
         $order['orderCode'] = $this->orderCode;
+        if ($this->captureDelay!="") {
+            $order['captureDelay'] = $this->captureDelay;
+        }
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
         $this->_addPaymentDetailsElement($order);

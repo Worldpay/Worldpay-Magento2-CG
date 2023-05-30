@@ -9,6 +9,11 @@ namespace Sapient\Worldpay\Model\Response;
  */
 class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
 {
+
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    public $_urlBuilder;
     /**
      * Constructor
      *

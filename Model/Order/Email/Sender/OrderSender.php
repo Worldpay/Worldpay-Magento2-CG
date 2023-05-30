@@ -22,6 +22,16 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
     public const XML_PATH_AUTHORISED_EMAIL_TEMPLATE = 'wp_auth_sales_email_order_template';
 
     /**
+     * @var  \Sapient\Worldpay\Model\Worldpayment
+     */
+    public $worldpaypaymentmodel;
+
+     /**
+      * @var  \Magento\Framework\App\Config\ScopeConfigInterface
+      */
+    public $scopeConfig;
+
+    /**
      * Constructor
      *
      * @param Template $templateContainer

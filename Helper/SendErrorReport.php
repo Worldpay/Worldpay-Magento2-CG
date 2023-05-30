@@ -21,6 +21,21 @@ class SendErrorReport extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
     protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Mail\Template\EmailTransportBuilder
+     */
+    protected $transportBuilder;
+
+    /**
+     * @var \Magento\Framework\Translate\Inline\StateInterface
+     */
+    protected $inlineTranslation;
+    
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager;
     
     /**
      * SendErrorReport constructor

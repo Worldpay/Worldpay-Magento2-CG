@@ -16,9 +16,11 @@ define(
         'mage/storage',
         'Magento_Checkout/js/model/full-screen-loader',
         'ko',
-        'Magento_Checkout/js/model/payment/additional-validators'
+        'Magento_Checkout/js/model/payment/additional-validators',
+        'Magento_Checkout/js/action/set-billing-address',
+        'Magento_Ui/js/model/messageList'
     ],
-    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,errorProcessor, urlBuilder, storage, fullScreenLoader, ko,additionalValidators) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,errorProcessor, urlBuilder, storage, fullScreenLoader, ko,additionalValidators,setBillingAddressAction,globalMessageList) {
         'use strict';
         var ccTypesArr = ko.observableArray([]);
         var paymentService = false;
@@ -83,6 +85,9 @@ define(
                 ach_accountType:null,
                 ach_accountnumber:null,
                 ach_routingNumber:null,
+                sepa_iban:null,
+                sepa_accountHolderName:null,
+                sepa_mandateType:null,
                 statementNarrative:null,
                 multishipping:false,
                 klarnaType:null
@@ -101,6 +106,7 @@ define(
             initObservable: function () {
                 var that = this;
                 this._super();
+                that.billingCountryId(billingAddressCountryId);
                 quote.billingAddress.subscribe(function (newAddress) {
                     that.checkPaymentTypes();
                     if (quote.billingAddress._latestValue != null && quote.billingAddress._latestValue.countryId != billingAddressCountryId) {
@@ -125,6 +131,7 @@ define(
 					var MultishippingApmPreSelected = jQuery('#p_method_worldpay_apm:checked');
 					if(MultishippingApmPreSelected.length){
                         jQuery('#payment-continue').html("<span>Place Order</span>");
+                        document.getElementById("checkout-agreement-div").style.display = "block";
 						this.selectPaymentMethod();
 					}
 				}
@@ -150,11 +157,14 @@ define(
                         var response = JSON.parse(apiresponse);
                         var klarnaTypes = {};
                         if(response.length){
+                            if(quote.isVirtual()){
+                                setBillingAddressAction(globalMessageList);
+                            }
                             $.each(response, function(responsekey, value){
                                 var found = false;
                                 $.each(ccavailabletypes, function(key, value){
                                     if(response[responsekey] == key.toUpperCase()){
-                                       if((integrationMode === 'redirect' && key !== 'ACH_DIRECT_DEBIT-SSL')
+                                       if((integrationMode === 'redirect' && (key !== 'ACH_DIRECT_DEBIT-SSL' || key !== 'SEPA_DIRECT_DEBIT-SSL'))
                                             || integrationMode === 'direct' ){
                                         found = true;
                                         cckey = key;
@@ -237,6 +247,7 @@ define(
                     }
                 }
             },
+            paymentMethodSelectedType : ko.observable(),
             selectedCCType : ko.observable(),
             selectedIdealBank:ko.observable(),
             selectedACHAccountType:ko.observable(),
@@ -246,6 +257,9 @@ define(
             achchecknumber: ko.observable(),
             achcompanyname: ko.observable(),
             achemailaddress:ko.observable(),
+            selectedSEPAMandateType: ko.observable(),
+            sepaIban: ko.observable(),
+            sepaAccountHolderName: ko.observable(),
             stmtNarrative:ko.observable(),
             getTemplate: function(){
                 if(this.multishipping){
@@ -268,6 +282,10 @@ define(
                 var accounttypes = window.checkoutConfig.payment.ccform.achdetails;
                 return accounttypes[code];
             },
+            getSEPAMandateTypes: function(code) {
+                var mandatetypes = window.checkoutConfig.payment.ccform.sepadetails;
+                return mandatetypes[code];
+            },
             /**
              * @override
              */
@@ -284,6 +302,9 @@ define(
                         'ach_checknumber': this.ach_checknumber,
                         'ach_companyname': this.ach_companyname,
                         'ach_emailaddress': this.ach_emailaddress,
+                        'sepa_mandateType': this.sepa_mandateType,
+                        'sepa_iban': this.sepa_iban,
+                        'sepa_accountHolderName': this.sepa_accountHolderName,
                         'statementNarrative': this.statementNarrative
                     }
                 };
@@ -312,6 +333,18 @@ define(
                                     };
                                 });
                 return ko.observableArray(accounttypes);
+            },
+            getSEPAEMandateTypes : function() {
+                var mandatetypes = _.map(window.checkoutConfig.payment.ccform.sepadetails, function (value, key) {
+                                           return {
+                                              'accountCode': key,
+                                              'accountText': value
+                                    };
+                                });
+                return ko.observableArray(mandatetypes);
+            },
+            getSepaEmandateTerms : function(){
+                return window.checkoutConfig.payment.ccform.sepa_e_mandate;
             },
             showACH : function() {
                 if(isACH && this.getselectedCCType() == 'ACH_DIRECT_DEBIT-SSL'){
@@ -349,6 +382,11 @@ define(
                         this.ach_emailaddress = this.achemailaddress();
                         
                     }
+                    else if(this.getselectedCCType() == 'SEPA_DIRECT_DEBIT-SSL'){
+                        this.sepa_mandateType = this.getSEPAMandateTypes(this.selectedSEPAMandateType());
+                        this.sepa_iban = this.sepaIban();
+                        this.sepa_accountHolderName = this.sepaAccountHolderName();                        
+                    }
                     this.statementNarrative = this.stmtNarrative();
                     if(window.checkoutConfig.payment.ccform.isMultishipping){  
 						fullScreenLoader.startLoader();					
@@ -368,29 +406,40 @@ define(
             },
 
             afterPlaceOrder: function (data, event) {
-                if(this.getselectedCCType()=='ACH_DIRECT_DEBIT-SSL'){
+                if(this.getselectedCCType()=='ACH_DIRECT_DEBIT-SSL' || this.getselectedCCType()=='SEPA_DIRECT_DEBIT-SSL'){
                        window.location.replace(url.build('worldpay/threedsecure/auth'));
                 }else{
                 window.location.replace(url.build('worldpay/redirectresult/redirect'));
             }
             },
             checkPaymentTypes: function (data, event){
+                var self = this;
                if (data && data.ccValue) {
+                    self.paymentMethodSelectedType(data.ccValue);
                     if (data.ccValue=='IDEAL-SSL') {
                         $(".ideal-block").show();
                         $("#ideal_bank").prop('disabled',false);
                         $(".ach-block").hide();
                         $(".klarna-block").hide();
+                        $(".sepa-block").hide();
                     }else if(data.ccValue=='ACH_DIRECT_DEBIT-SSL'){
                         $(".ach-block").show();
                         $("#ach_pay").prop('disabled',false);
                         $(".ideal-block").hide();
                         $(".klarna-block").hide();
+                        $(".sepa-block").hide();
+                    }else if(data.ccValue=='SEPA_DIRECT_DEBIT-SSL'){
+                        $(".sepa-block").show();
+                        $("#sepa_pay").prop('disabled',false);
+                        $(".ideal-block").hide();
+                        $(".klarna-block").hide();
+                        $(".ach-block").hide();
                     }else if(isKlarna && data.ccValue=='KLARNA-SSL'){
                         $(".klarna-block").show();
                         $("#klarna_pay").prop('disabled',false);
                         $(".ideal-block").hide();
                         $(".ach-block").hide();
+                        $(".sepa-block").hide();
                     }else{
                         $("#ideal_bank").prop('disabled',true);
                         $(".ideal-block").hide();
@@ -398,6 +447,7 @@ define(
                         $(".ach-block").hide();
                         $("#klarna_pay").prop('disabled',true);
                         $(".klarna-block").hide();
+                        $(".sepa-block").hide();
                     }
                      $(".statment-narrative").show();
                 }else if(data){
@@ -406,16 +456,25 @@ define(
                         $("#ideal_bank").prop('disabled',false);
                         $(".ach-block").hide();
                         $(".klarna-block").hide();
+                        $(".sepa-block").hide();
                     }else if (data.selectedCCType() && data.selectedCCType() == 'ACH_DIRECT_DEBIT-SSL') {
                         $(".ach-block").show();
                         $("#ach_pay").prop('disabled',false);
                         $(".ideal-block").hide();
                         $(".klarna-block").hide();
+                        $(".sepa-block").hide();
+                    }else if (data.selectedCCType() && data.selectedCCType() == 'SEPA_DIRECT_DEBIT-SSL') {
+                        $(".sepa-block").show();
+                        $("#sepa_pay").prop('disabled',false);
+                        $(".ideal-block").hide();
+                        $(".klarna-block").hide();
+                        $(".ach-block").hide();
                     }else if (isKlarna && data.selectedCCType() && data.selectedCCType() == 'KLARNA-SSL') {
                         $(".klarna-block").show();
                         $("#klarna_pay").prop('disabled',false);
                         $(".ideal-block").hide();
                         $(".ach-block").hide();
+                        $(".sepa-block").hide();
                     }
                     else{
                         $("#ideal_bank").prop('disabled',true);
@@ -424,6 +483,7 @@ define(
                         $(".ach-block").hide();
                         $("#klarna_pay").prop('disabled',true);
                         $(".klarna-block").hide();
+                        $(".sepa-block").hide();
                     }
                      $(".statment-narrative").show();
                 }else {
@@ -434,6 +494,7 @@ define(
                     $(".ideal-block").hide();
                     $(".ach-block").hide();
                     $(".klarna-block").hide();
+                    $(".sepa-block").hide();
                 }
             }
         });

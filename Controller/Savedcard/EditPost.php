@@ -38,7 +38,38 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
       * @var Magento\Framework\Serialize\Serializer\Json
       */
     protected $serializer;
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $_storeManager;
 
+    /**
+     * @var SavedTokenFactory
+     */
+    protected $savecard;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Token\Service
+     */
+    protected $_tokenService;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Token\WorldpayToken
+     */
+    protected $_worldpayToken;
+    /**
+     * @var \Sapient\Worldpay\Model\Token\WorldpayToken
+     */
+    protected $wplogger;
+    /**
+     * @var PaymentTokenRepositoryInterface
+     */
+    protected $tokenRepository;
+
+    /**
+     * @var PaymentTokenManagement
+     */
+    protected $paymentTokenManagement;
     /**
      * Constructor
      *

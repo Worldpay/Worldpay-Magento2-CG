@@ -7,7 +7,8 @@
  <div if="isPaymentMethodsAvailable()"
  class="items payment-methods">
 <div repeat="foreach: paymentGroupsList, item: '$group'"
-     class="payment-group">
+     class="" data-bind="attr: { class: 'payment-group '+$group().displayArea }">
+     <!-- ko if: ($group().displayArea == 'payment-methods-items-worldpay') -->
      <div class="payment-titlelogo-wrapper" if="isWorldPayEnable()">
           <div class="payment-title-wrapper">
                <h2 if="getRegion($group().displayArea)().length"
@@ -27,7 +28,14 @@
           </div>
       </div>
 
-
+      <!-- /ko-->
+      <!-- ko if: ($group().displayArea == 'payment-methods-items-default') -->
+      <div class="other-payment-methods-wrapper">
+          <div class="payment-title-wrapper">
+               <h2 class="step-title" data-bind="text: $t('Other Payment Methods')"></h2>
+          </div>         
+      </div>
+      <!-- /ko -->
     <each args="data: getRegion($group().displayArea), as: 'method'" render="">
 </div>
 </div>

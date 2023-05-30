@@ -4,8 +4,41 @@
  */
 namespace Sapient\Worldpay\Logger;
 
+use DateTimeZone;
+use Monolog\Handler\HandlerInterface;
+
 class WorldpayLogger extends \Monolog\Logger
 {
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    public $scopeConfig;
+
+    /**
+     * Constructor
+     *
+     * @param string $name
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param array $handlers
+     * @param array $processors
+     * @param DateTimeZone $timezone
+     *
+     */
+    public function __construct(
+        string $name,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        array $handlers = [],
+        array $processors = [],
+        ?DateTimeZone $timezone = null
+    ) {
+        $this->scopeConfig = $scopeConfig;
+        parent::__construct(
+            $name,
+            $handlers,
+            $processors,
+            $timezone ?: new DateTimeZone(date_default_timezone_get() ?: 'UTC')
+        );
+    }
     /**
      * Adds a log record.
      *
@@ -17,9 +50,8 @@ class WorldpayLogger extends \Monolog\Logger
      */
     public function addRecord($level, $message, array $context = [], $datetime = null) : bool
     {
-        $ObjectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $logEnabled = (bool) $ObjectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
-                            ->getValue('worldpay/general_config/enable_logging');
+        $logEnabled = (bool) $this->scopeConfig->getValue('worldpay/general_config/enable_logging');
+
         if ($logEnabled) {
             return parent::addRecord($level, $message, $context);
         }

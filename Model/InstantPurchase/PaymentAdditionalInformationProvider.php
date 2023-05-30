@@ -11,6 +11,18 @@ use Sapient\Worldpay\Logger\WorldpayLogger;
 class PaymentAdditionalInformationProvider implements PaymentAdditionalInformationProviderInterface
 {
     /**
+     * @var WorldpayLogger
+     */
+    protected $logger;
+     /**
+      * @var \Magento\Framework\Session\SessionManagerInterface
+      */
+    protected $session;
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+    /**
      * Constructor
      *
      * @param WorldpayLogger $logger

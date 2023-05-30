@@ -9,11 +9,11 @@ use Magento\Framework\Event\ObserverInterface;
 class AddExtraDataToTransport implements ObserverInterface
 {
     /**
-     * @var worldpaypayment
+     * @var \Sapient\Worldpay\Model\WorldpaymentFactory
      */
     protected $worldpaypayment;
     /**
-     * @var wpHelper
+     * @var \Sapient\Worldpay\Helper\Data
      */
     protected $wpHelper;
     /**

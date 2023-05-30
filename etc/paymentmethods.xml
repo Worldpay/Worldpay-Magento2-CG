@@ -151,14 +151,6 @@
                 </areas>
                 <capture_request>1</capture_request>
             </ALIPAY-SSL>
-            <QIWI-SSL>
-                <title>Qiwi</title>
-                <areas>
-                    <area>KZ</area>
-                    <area>RU</area>
-                </areas>
-                <capture_request>1</capture_request>
-            </QIWI-SSL>
              <SEPA_DIRECT_DEBIT-SSL>
                 <title>SEPA (One off transactions)</title>
                 <areas>
@@ -782,14 +774,6 @@
                 </areas>
                 <capture_request>1</capture_request>
             </ALIPAY-SSL>
-            <QIWI-SSL>
-                <title>Qiwi</title>
-                <areas>
-                    <area>KZ</area>
-                    <area>RU</area>
-                </areas>
-                <capture_request>1</capture_request>
-            </QIWI-SSL>
              <SEPA_DIRECT_DEBIT-SSL>
                 <title>SEPA (One off transactions)</title>
                 <areas>

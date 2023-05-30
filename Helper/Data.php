@@ -51,6 +51,90 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $worldpaypaymentmodel;
 
     /**
+     * @var \Sapient\Worldpay\Model\Utilities\PaymentMethods
+     */
+    public $paymentlist;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Merchantprofile
+     */
+    public $merchantprofile;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    public $_checkoutSession;
+
+    /**
+     * @var \Magento\Sales\Model\OrderFactory
+     */
+    public $orderFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
+    public $recurringHelper;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\ExtendedResponseCodes
+     */
+    public $extendedResponseCodes;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Instalmentconfig
+     */
+    public $instalmentconfig;
+
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
+     */
+    public $orderCollectionFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\SavedTokenFactory
+     */
+    public $_savecard;
+
+     /**
+      * @var \Magento\Sales\Model\Order\ItemFactory
+      */
+    public $_itemFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Currencyexponents
+     */
+    public $currencyexponents;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\KlarnaCountries
+     */
+    public $klarnaCountries;
+
+    /**
+     * @var \Magento\Backend\Model\Session\Quote
+     */
+    public $adminsessionquote;
+
+    /**
+     * @var \Magento\Framework\App\ProductMetadataInterface
+     */
+    public $productMetaData;
+
+     /**
+      * @var \Magento\Quote\Model\QuoteFactory
+      */
+    public $quoteFactory;
+
+     /**
+      * @var \Magento\Framework\Locale\CurrencyInterface
+      */
+    public $localecurrency;
+    /**
+     * @var mixed
+     */
+    public $quotes;
+
+    /**
      * Constructor
      *
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
@@ -387,7 +471,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $allApmMethods = [
             'CHINAUNIONPAY-SSL' => 'Union Pay',
             'IDEAL-SSL' => 'IDEAL',
-            'QIWI-SSL' => 'Qiwi',
             //'YANDEXMONEY-SSL' => 'Yandex.Money',
             'PAYPAL-EXPRESS' => 'PayPal',
             'SOFORT-SSL' => 'SoFort EU',
@@ -407,7 +490,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $activeMethods = [];
         foreach ($configMethods as $method) {
             if ($this->paymentlist->checkCurrency($code, $method)) {
-                $activeMethods[$method] = $allApmMethods[$method];
+                if (isset($allApmMethods[$method])) {
+                    $activeMethods[$method] = $allApmMethods[$method];
+                }
             }
         }
         return $activeMethods;
@@ -421,13 +506,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getWalletsTypes($code)
     {
         $activeMethods = [];
-        if ($this->isMultiShipping()) {
-            if ($this->isGooglePayEnable()) {
-                $activeMethods['PAYWITHGOOGLE-SSL'] = 'Google Pay';
-            }
-            if ($this->isApplePayEnable()) {
-                $activeMethods['APPLEPAY-SSL'] = 'Apple Pay';
-            }
+        if ($this->isGooglePayEnable()) {
+            $activeMethods['PAYWITHGOOGLE-SSL'] = 'Google Pay';
+        }
+        if ($this->isApplePayEnable()) {
+            $activeMethods['APPLEPAY-SSL'] = 'Apple Pay';
         }
         if ($this->isSamsungPayEnable()) {
             $activeMethods['SAMSUNGPAY-SSL'] = 'Samsung Pay';
@@ -893,9 +976,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
         if ($this->isMultiShipping()) {
-            return 'Multishipping - '.$description;
+            return $this->getMultiShippingOrderDescription();
         }
         return $description;
+    }
+
+    /**
+     * Get Multishipping OrderDescription
+     *
+     * @return string
+     */
+    public function getMultiShippingOrderDescription()
+    {
+        $description = $this->_scopeConfig->getValue(
+            'worldpay/general_config/order_description',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return __('Multishipping - ').$description;
     }
     /**
      * Get MotoTitle
@@ -2608,18 +2705,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
     /**
      * Get Plugin Tracker Details
+     *
+     * @param string $username
+     * @param SimpleXMLElement $xmlQuote
      */
-    public function getPluginTrackerdetails()
+    public function getPluginTrackerdetails($username, $xmlQuote)
     {
         $details=[];
-        $details['MERCHANT_ID'] = $this->_scopeConfig->getValue(
-            'worldpay/general_config/merchant_code',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-        $details['API_USERNAME'] = $this->_scopeConfig->getValue(
-            'worldpay/general_config/xml_username',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+
+        $xmlquoteData  = clone($xmlQuote);
+        $quoteData = new \SimpleXmlElement($xmlquoteData->saveXML());
+        $merchantCode = (string) $quoteData['merchantCode'];
+        $details['MERCHANT_ID'] = $merchantCode;
+        $details['API_USERNAME'] = $username;
         $magento = $this->getCurrentMagentoVersionDetails();
         $details['MAGENTO_EDITION'] = $magento['Edition'];
         $details['MAGENTO_VERSION'] = $magento['Version'];
@@ -2795,10 +2893,299 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
+     * Get Pay by Link Expirt Lifetime
+     */
+    public function getPayByLinkExpiryTime()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/paybylink_config/paybylink_expiry_time',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Check if Pay By Link resend option enable
+     */
+    public function isPayByLinkResendEnable()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/paybylink_config/paybylink_resend_link',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
      * GetWorldpayPayment Model
      */
     public function getWorldpayPaymentModel()
     {
         return $this->worldpaypaymentmodel;
+    }
+    /**
+     * Get Recurring MerchantCode
+     *
+     * @return string
+     */
+    public function getRecurringMerchantCode()
+    {
+        $recurringMerchantCode = $this->_scopeConfig->getValue(
+            'worldpay/recurring_merchant_config/recurring_merchant_code',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return $recurringMerchantCode;
+    }
+    /**
+     * Get Recurring Merchant Username
+     *
+     * @return string
+     */
+    public function getRecurringUsername()
+    {
+        $recurringMerchantUn = $this->_scopeConfig->getValue(
+            'worldpay/recurring_merchant_config/recurring_username',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return $recurringMerchantUn;
+    }
+    /**
+     * Get Recurring Merchant Password
+     *
+     * @return string
+     */
+    public function getRecurringPassword()
+    {
+        $recurringMerchantPw = $this->_scopeConfig->getValue(
+            'worldpay/recurring_merchant_config/recurring_password',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return $recurringMerchantPw;
+    }
+
+    /**
+     *  Check if Pay By Link merchant code
+     */
+    public function getPayByLinkMerchantCode()
+    {
+        $paybyLinkMC = $this->_scopeConfig->getValue(
+            'worldpay/paybylink_config/pbl_merchant_code',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return $paybyLinkMC;
+    }
+
+    /**
+     * Get Pay by Link Merchant username
+     */
+    public function getPayByLinkMerchantUsername()
+    {
+        $paybyLinkUn = $this->_scopeConfig->getValue(
+            'worldpay/paybylink_config/pbl_xml_username',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return $paybyLinkUn;
+    }
+
+    /**
+     * Get Pay by Link merchant password
+     */
+    public function getPayByLinkMerchantPassword()
+    {
+        $paybyLinkPw = $this->_scopeConfig->getValue(
+            'worldpay/paybylink_config/pbl_xml_password',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return $paybyLinkPw;
+    }
+
+    /**
+     *  Get multishipping merchant code
+     */
+    public function getMultishippingMerchantCode()
+    {
+        $multishippingMC = $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_merchant_code',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return $multishippingMC;
+    }
+
+    /**
+     * Get multishipping Merchant username
+     */
+    public function getMultishippingMerchantUsername()
+    {
+        $multishippingUn = $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_xml_username',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return $multishippingUn;
+    }
+
+    /**
+     * Get multishipping merchant password
+     */
+    public function getMultishippingMerchantPassword()
+    {
+        $multishippingPw = $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_xml_password',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return $multishippingPw;
+    }
+    /**
+     * Get multishipping Installation Id
+     */
+    public function getMultishippingInstallationId()
+    {
+        $multishippingIID = $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_xml_installationId',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return $multishippingIID;
+    }
+
+    /**
+     * Get PaybyLink Installation Id
+     */
+    public function getPayByLinkInstallationId()
+    {
+        $pblIId = $this->_scopeConfig->getValue(
+            'worldpay/paybylink_config/pbl_xml_installationId',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return $pblIId;
+    }
+    
+    /**
+     * Calculate Pay By Link Resend expiry time
+     *
+     * @param int $expiryTime
+     * @retrun int
+     */
+    public function calculatePblResendExpiryTime($expiryTime)
+    {
+        return $expiryTime * 2;
+    }
+    
+    /**
+     * Find Pay By Link Interval time between order date and current date
+     *
+     * @param string $currentDate
+     * @param string $orderDate
+     * @retrun int
+     */
+    public function findPblOrderIntervalTime($currentDate, $orderDate)
+    {
+        return round(abs(strtotime($currentDate) - strtotime($orderDate))/3600, 0);
+    }
+    
+    /**
+     * Find Pay By Link expiry date and time
+     *
+     * @param string $currentDate
+     * @param string $expiryTime
+     * @retrun int
+     */
+    public function findPblOrderExpiryTime($currentDate, $expiryTime)
+    {
+        return strtotime(date("Y-m-d H:i:s", strtotime($currentDate)) . " -$expiryTime hour");
+    }
+    
+    /**
+     * Find Pay By Link expiry date and time
+     *
+     * @param string $minDate
+     * @retrun array
+     */
+    public function findFromToPblDateAndTime($minDate)
+    {
+        $dates = [];
+        $cronMinDate = date('Y-m-d H:i', $minDate).':00';
+        $maxDate = strtotime(date("Y-m-d H:i:s", strtotime($cronMinDate)) . " +59 seconds");
+        $cronMaxDate = date('Y-m-d H:i:s', $maxDate);
+        $dates['from'] = $cronMinDate;
+        $dates['to'] = $cronMaxDate;
+        
+        return $dates;
+    }
+    /**
+     * Get Capture Delay value
+     */
+    public function getCaptureDelayValues()
+    {
+        $captureDelay = $this->_scopeConfig->getValue(
+            'worldpay/dynamic_capture_delay/capture_delay',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        if ($captureDelay == \Sapient\Worldpay\Model\Config\Source\CaptureDelay::CUSTOM_CAPTURE_DELAY_KEY) {
+            $captureDelay = $this->_scopeConfig->getValue(
+                'worldpay/dynamic_capture_delay/capture_delay_custom_value',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
+        return $captureDelay;
+    }
+    /**
+     * Get SEPA Details
+     *
+     * @return string
+     */
+    public function getSEPADetails()
+    {
+        $integrationmode = $this->getCcIntegrationMode();
+        $apmmethods = $this->getApmTypes('worldpay_apm');
+        if (strtoupper($integrationmode) === 'DIRECT' &&
+                array_key_exists("SEPA_DIRECT_DEBIT-SSL", $apmmethods)) {
+            $data = $this->getSEPAMandateTypes();
+            if (!empty($data)) {
+                return explode(",", $data);
+            }
+        }
+        return [];
+    }
+    /**
+     * Get SEPA E-Mandate
+     * 
+     * @return string
+     */
+    public function getSepaEmandate(){
+        return $this->_scopeConfig->getValue(
+            'worldpay/apm_config/sepa_e_mandate',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get SEPA Mandate Types
+     *
+     * @return string
+     */
+    public function getSEPAMandateTypes()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/apm_config/sepa_mandate_types',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get SEPA Merchant Number
+     *
+     * @return string
+     */
+
+    public function getSEPAMerchantNo()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/apm_config/sepa_merchant_no',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get Order By OrderIncrementId
+     *
+     * @param string $orderIncId
+     * @return string
+     */
+    public function getOrderByOrderIncId($orderIncId)
+    {
+        return $this->orderFactory->create()->loadByIncrementId($orderIncId);
     }
 }

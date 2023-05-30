@@ -19,6 +19,16 @@ class Token
      */
     protected $_request;
 
+     /**
+      * @var \Sapient\Worldpay\Helper\Data
+      */
+    protected $worldpayhelper;
+
+    /**
+     * @var \Magento\Framework\Session\SessionManager
+     */
+    protected $_session;
+
     /**
      * Constructor
      *

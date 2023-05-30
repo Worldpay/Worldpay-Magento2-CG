@@ -11,7 +11,10 @@ use Magento\Framework\Exception\CouldNotSaveException;
  */
 class ExtendedResponseCodes extends \Magento\Framework\App\Config\Value
 {
-    
+    /**
+     * @var \Sapient\Worldpay\Helper\ExtendedResponseCodes
+     */
+    protected $extendedResponseCodes;
     /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry

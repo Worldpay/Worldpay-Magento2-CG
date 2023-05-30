@@ -13,6 +13,21 @@ class WorldPayPayment
 {
 
     /**
+     * @var \Sapient\Worldpay\Model\WorldpaymentFactory
+     */
+    protected $worldpaypayment;
+
+     /**
+      * @var \Magento\Sales\Model\Order
+      */
+    protected $order;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+
+    /**
      * @var array
      */
 
@@ -53,7 +68,7 @@ class WorldPayPayment
         if (strpos($paymentState->getPaymentStatus(), "KLARNA") !== false) {
             $wpp->setData('payment_type', $paymentState->getPaymentMethod());
         }
-        if (!empty($wpp->getData('payment_type'))) {
+        if (!empty($wpp->getData('payment_type')) && !empty($paymentState->getPaymentMethod())) {
             if (strtolower($wpp->getData('payment_type')) == "all") {
                 if (!in_array(
                     strtoupper($paymentState->getPaymentMethod()),
@@ -69,6 +84,7 @@ class WorldPayPayment
                 }
             }
         }
+        $wpp->setData('merchant_id', $paymentState->getMerchantCode());
         $wpp->setData('card_number', $paymentState->getCardNumber());
         $wpp->setData('avs_result', $paymentState->getAvsResultCode());
         $wpp->setData('cvc_result', $paymentState->getCvcResultCode());

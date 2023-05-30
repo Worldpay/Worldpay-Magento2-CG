@@ -28,6 +28,11 @@ class KlarnaCountries
      * @var SerializerInterface
      */
     private $serializer;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Config\Source\KlarnaCountries
+     */
+    protected $klarnaCountries;
     
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig

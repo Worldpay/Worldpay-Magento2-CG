@@ -17,6 +17,43 @@ class Factory
 {
    /**  @var \Magento\Store\Model\Store*/
     private $store;
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
+     * @var Repository
+     */
+    private $assetRepo;
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+
+      /**
+       * @var \Sapient\Worldpay\Logger\WorldpayLogger
+       */
+    private $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    private $worldpayhelper;
+     /**
+      * @var \Magento\Quote\Api\CartRepositoryInterface
+      */
+    private $quoteRepository;
+
+       /**
+        * @var \Magento\Sales\Model\Order
+        */
+    private $mageorder;
+
+    /**
+     * @var object
+     */
+    private $state;
 
     /**
      * Factory constructor

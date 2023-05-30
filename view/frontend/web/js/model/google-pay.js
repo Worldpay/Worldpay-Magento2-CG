@@ -54,6 +54,7 @@
                         buttonColor : initData.google_btn_customisation.buttonColor,
                         buttonType : initData.google_btn_customisation.buttonType,
                         buttonLocale : initData.google_btn_customisation.buttonLocale,
+						buttonSizeMode : initData.google_btn_customisation.buttonSizeMode,
                         onClick: callback
                     });
                     document.getElementById(container).appendChild(button);

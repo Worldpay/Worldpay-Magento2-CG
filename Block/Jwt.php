@@ -6,10 +6,10 @@ use Sapient\Worldpay\Helper\Data;
 class Jwt extends \Magento\Framework\View\Element\Template
 {
     /**
-     * @var Sapient\Worldpay\Helper\Data;
+     * @var Data;
      */
     
-    protected $helper;
+    protected $_helper;
 
     /**
      * @var \Magento\Framework\Url\DecoderInterface
@@ -19,7 +19,7 @@ class Jwt extends \Magento\Framework\View\Element\Template
     /**
      * Jwt constructor
      *
-     * @param Context $context
+     * @param \Magento\Framework\View\Element\Template\Context $context
      * @param string $helper
      * @param \Magento\Framework\Url\DecoderInterface $decoder
      */

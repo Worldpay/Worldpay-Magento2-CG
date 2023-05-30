@@ -9,6 +9,7 @@
         <module name="Magento_Vault"/>
         <module name="Magento_Catalog"/>       
         <module name="Magento_Multishipping"/>
+        <module name="Magento_CheckoutAgreements" />
     </sequence>
   </module>
 </config>

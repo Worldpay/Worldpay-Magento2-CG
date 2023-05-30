@@ -11,7 +11,8 @@
 "var order_total|": "Order Total",
 "var shipping_address|raw":"Shipping Address",
 "var formated_shipping|raw":"Formated Shipping",
-"var paybylink_url":"Pay by link Url"
+"var paybylink_url":"Pay by link Url",
+"var pblexpirytime": "Pay by link expiry time"
 } @-->
 <!--@subject {{var mail_subject|raw }} @-->
 {{template config_path="design/email/header_template"}}
@@ -20,7 +21,8 @@
     <tr class="email-intro">
         <td>
             <p class="greeting"> {{trans "Dear"}} {{var customerName}}, </p>
-            <p>{{trans "Your Order" }} <b>{{var orderId }} </b> {{trans "has been created but not confirmed. Please complete the payment using the below button."}}</p>
+            <p>{{trans "Thanks for your business. Your order has been successfully generated " }}<b>{{var orderId }} </b></p>
+            <p>{{trans "This is to inform you that your payment can be made by clicking below secure link."}}</p>
             <table style="width: 120px;text-align:center;border:none;">
                 <tr>
                     <td style="border-radius:4px;padding:9.0pt 13.5pt 9.0pt 13.5pt;background-color:#1979c3;"><a href = {{var paybylink_url}} style="color: #fff;">
@@ -29,16 +31,34 @@
             </table>  
         </td>
     </tr>
-        <table class="order-details">
-            <td class="address-details">
-                <h3><b>{{trans "Shipping Info"}}</b></h3>
-                <p>{{var formated_shipping|raw}}</p>
-            </td>
-            <td class="method-info">
-                <h3><b>{{trans "Order Total"}}</b></h3>
-                <p>{{var order_total }}</p>
-            </td>
-        </table>
+    <tr>
+        <td>
+            {{trans "Please note that the link will get expired "}}<b>{{var pblexpirytime }} </b>
+        </td>
+    </tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+        <td>
+            {{trans "Here are the details of your generated order,"}}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table class="order-details">
+                <td class="address-details">
+                    <h3><b>{{trans "Shipping Info"}}</b></h3>
+                    <p>{{var formated_shipping|raw}}</p>
+                </td>
+                <td class="method-info">
+                    <h3><b>{{trans "Order Total"}}</b></h3>
+                    <p>{{var order_total }}</p>
+                </td>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>{{trans "If you have queries about this payment, or would you like to chat, feel free to contact us."}}</td>
     </tr>
 </table>
   

@@ -24,6 +24,11 @@ class SubscriptionPlans extends \Magento\Catalog\Block\Product\AbstractProduct
     private $encoder;
 
     /**
+     * @var Data
+     */
+    private $worldpayHelper;
+
+    /**
      * @param \Magento\Catalog\Block\Product\Context $context
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param Json $encoder

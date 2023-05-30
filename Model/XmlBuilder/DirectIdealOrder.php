@@ -92,7 +92,23 @@ EOD;
      * @var Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration
      */
     private $tokenRequestConfig;
+     /**
+      * @var string $captureDelay
+      */
+    private $captureDelay;
 
+    /**
+     * @var string
+     */
+    private $callbackurl;
+    /**
+     * @var string
+     */
+    private $bankcode;
+     /**
+     * @var string
+     */
+    private $shopperId;
     /**
      * Constructor
      *
@@ -129,6 +145,7 @@ EOD;
      * @param string $callbackurl
      * @param string $ccbank
      * @param array|string $exponent
+     * @param string $captureDelay
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -149,7 +166,8 @@ EOD;
         $hideAddress,
         $callbackurl,
         $ccbank,
-        $exponent
+        $exponent,
+        $captureDelay
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -169,6 +187,7 @@ EOD;
         $this->callbackurl = $callbackurl;
         $this->bankcode = $ccbank;
         $this->exponent = $exponent;
+        $this->captureDelay = $captureDelay;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -213,7 +232,9 @@ EOD;
                 $order['hideContact'] = 'false';
             }
         }
-
+        if ($this->captureDelay!="") {
+            $order['captureDelay'] = $this->captureDelay;
+        }
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
         $this->_addOrderContentElement($order);

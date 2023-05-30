@@ -6,4 +6,7 @@
     <event name="checkout_allow_guest">
         <observer name="worldpay_payment_checkout_allow_guest" instance="Sapient\Worldpay\Observer\IsAllowedGuestCheckoutObserver"/>
     </event>
+    <event name="layout_load_before">
+        <observer name="layout_load_before_worldpay_multishipping" instance="Sapient\Worldpay\Observer\MultishippingLayoutLoadBefore" />
+    </event>
 </config>

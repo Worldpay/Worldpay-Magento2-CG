@@ -39,6 +39,12 @@ class MultishippingId extends Column
      * @var OrderRepositoryInterface
      */
     protected $_orderRepository;
+
+    /**
+     *
+     * @var Data
+     */
+    protected $helper;
     
     /**
      * Mulishipping Id constructor

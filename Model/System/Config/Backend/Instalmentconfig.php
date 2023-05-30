@@ -10,6 +10,12 @@ namespace Sapient\Worldpay\Model\System\Config\Backend;
 class Instalmentconfig extends \Magento\Framework\App\Config\Value
 {
     
+     /**
+      *
+      * @var \Sapient\Worldpay\Helper\Instalmentconfig
+      */
+    private $instalmentconfig;
+
     /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry

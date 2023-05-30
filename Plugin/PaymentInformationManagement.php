@@ -22,7 +22,7 @@ class PaymentInformationManagement
      */
     private $cartManagement;
     /**
-     * @var LoggerInterface
+     * @var WorldpayLogger
      */
     private $logger;
     /**
@@ -37,7 +37,7 @@ class PaymentInformationManagement
     /**
      * PaymentInformationManagement constructor.
      * @param CartManagementInterface $cartManagement
-     * @param LoggerInterface $logger
+     * @param WorldpayLogger $logger
      * @param MethodList $methodList
      * @param bool $checkMethods
      */

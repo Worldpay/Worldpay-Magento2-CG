@@ -25,6 +25,12 @@ class CurrencyExponents extends \Magento\Framework\App\Config\Value
      */
     private $storeManager;
 
+     /**
+      *
+      * @var \Sapient\Worldpay\Helper\Currencyexponents
+      */
+    private $currencyexponent;
+
     /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry

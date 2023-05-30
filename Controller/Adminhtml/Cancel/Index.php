@@ -21,6 +21,30 @@ class Index extends \Magento\Backend\App\Action
      * @var $pageFactory
      */
     protected $pageFactory;
+
+     /**
+      * @var \Sapient\Worldpay\Logger\WorldpayLogger
+      */
+    protected $wplogger;
+     /**
+      * @var \Sapient\Worldpay\Model\Payment\Service
+      */
+    protected $paymentservice;
+     /**
+      * @var \Sapient\Worldpay\Model\Order\Service
+      */
+    protected $orderservice;
+
+     /**
+      * @var JsonFactory
+      */
+    protected $resultJsonFactory;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Token\WorldpayToken
+      */
+    protected $worldpaytoken;
+
     /**
      * @var $_rawBody
      */

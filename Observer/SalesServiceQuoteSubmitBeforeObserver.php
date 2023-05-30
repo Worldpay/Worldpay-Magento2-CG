@@ -24,7 +24,10 @@ class SalesServiceQuoteSubmitBeforeObserver implements ObserverInterface
      * @var \Sapient\Worldpay\Model\Recurring\Order\Address\ToSubscriptionAddress
      */
     private $orderAddressToSubscriptionAddress;
-
+    /**
+     * @var \Magento\Framework\DataObject\Copy
+     */
+    private $objectCopyService;
     /**
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param \Sapient\Worldpay\Model\Recurring\Order\Item\ToSubscription $orderItemToSubscription

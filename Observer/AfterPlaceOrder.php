@@ -11,10 +11,35 @@ use Magento\Framework\Event\ObserverInterface;
 class AfterPlaceOrder implements ObserverInterface
 {
    
-      /**
-       * @var \Sapient\Worldpay\Helper\Recurring
-       */
+    /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
     private $wplogger;
+
+     /**
+      * @var \Magento\Quote\Api\CartRepositoryInterface
+      */
+    private $quoteRepository;
+
+     /**
+      * @var \Magento\Checkout\Model\Session
+      */
+    private $checkoutSession;
+
+     /**
+      * @var \Magento\Customer\Model\Session
+      */
+    private $customerSession;
+    
+    /**
+     * @var \Magento\Framework\Controller\ResultFactory
+     */
+    private $responseFactory;
+
+    /**
+     * @var \Magento\Customer\CustomerData\SectionPoolInterface
+     */
+    private $sectionPoolInterface;
 
     /**
      * Constructor function

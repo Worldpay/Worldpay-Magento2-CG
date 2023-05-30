@@ -19,6 +19,16 @@ class Challenge extends \Magento\Framework\App\Action\Action
      * @var $cookieMetadataFactory
      */
     protected $cookieMetadataFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
     /**
      * Constructor
      *

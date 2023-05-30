@@ -65,8 +65,33 @@ class Webpayment extends Template
     private $serializer;
 
     /**
-     * @var httpRequest
+     * @var Data
      */
+    protected $_helper;
+
+     /**
+      * @var AbstractCart
+      */
+    protected $_cart;
+
+     /**
+      * @var Session
+      */
+    protected $_customerSession;
+
+     /**
+      * @var \Magento\Integration\Model\Oauth\TokenFactory
+      */
+    protected $_tokenModelFactory;
+
+     /**
+      * @var SessionManagerInterface
+      */
+    protected $session;
+
+     /**
+      * @var \Magento\Framework\App\Request\Http
+      */
     protected $httpRequest;
     
     /**

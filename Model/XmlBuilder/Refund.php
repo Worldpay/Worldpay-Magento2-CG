@@ -39,7 +39,22 @@ EOD;
      * @var mixed
      */
     private $exponent;
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+      protected $scopeConfig;
 
+    /**
+     * Refund constructor
+     *
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     */
+    public function __construct(
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+    ) {
+        $this->scopeConfig = $scopeConfig;
+    }
+    
     /**
      * Build xml for processing Request
      *
@@ -122,11 +137,9 @@ EOD;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
         $amountElement['currencyCode'] = $this->currencyCode;
         $amountElement['exponent'] = $this->exponent;
-        
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
         
-        $level23DataEnabled = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+        $level23DataEnabled = $this->scopeConfig
                         ->getValue('worldpay/level23_config/level23', $storeScope);
         
          //Level23 data changes
@@ -167,13 +180,12 @@ EOD;
             $purchase->addChild('customerReference', $order->getCustomerId());
         }
          
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
         
-        $cardAcceptorTaxId = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+        $cardAcceptorTaxId = $this->scopeConfig
                         ->getValue('worldpay/level23_config/CardAcceptorTaxId', $storeScope);
         
-        $dutyAmount = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+        $dutyAmount = $this->scopeConfig
                         ->getValue('worldpay/level23_config/duty_amount', $storeScope);
         
         $purchase->addChild('cardAcceptorTaxId', $cardAcceptorTaxId);

@@ -20,7 +20,7 @@ class Onepage
      */
     private $checkoutSession;
     /**
-     * @var Magento\Framework\Serialize\Serializer\Json
+     * @var \Magento\Framework\Serialize\Serializer\Json
      */
     protected $serializer;
 

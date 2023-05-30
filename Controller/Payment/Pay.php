@@ -16,16 +16,16 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 class Pay extends \Magento\Framework\App\Action\Action
 {
     /**
-     * @var PAYMENT_MANIFEST_JSON
+     * @var string
      */
     public const PAYMENT_MANIFEST_JSON = 'payment-manifest.json';
     /**
-     * @var MANIFEST_JSON
+     * @var string
      */
     public const MANIFEST_JSON = 'manifest.json';
 
     /**
-     * @var curlHelper
+     * @var \Sapient\Worldpay\Helper\CurlHelper
      */
     public $curlHelper;
     /**
@@ -36,6 +36,51 @@ class Pay extends \Magento\Framework\App\Action\Action
      * @var _assetRepo
      */
     protected $_assetRepo;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    public $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    public $paymentservice;
+
+    /**
+     * @var JsonFactory
+     */
+    public $resultJsonFactory;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    public $scopeConfig;
+    
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    public $request;
+
+    /**
+     * @var \Magento\Framework\Filesystem
+     */
+    public $_filesystem;
+
+    /**
+     * @var \Magento\Framework\Setup\JsonPersistor
+     */
+    public $jsonPersistor;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    public $wpHelper;
+
+    /**
+     * @var \Magento\Framework\Filesystem\Io\File
+     */
+    public $file;
    
     /**
      * Constructor

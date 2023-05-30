@@ -4,19 +4,19 @@ namespace Sapient\Worldpay\Model\InstantPurchase\CreditCard;
 class AvailabilityChecker implements \Magento\InstantPurchase\PaymentMethodIntegration\AvailabilityCheckerInterface
 {
     /**
-     * @var Config
+     * @var \Sapient\Worldpay\Helper\Data
      */
     private $config;
     /**
-     * @var wplogger
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
     private $wplogger;
 
      /**
       * Constructor
       *
-      * @param Sapient\Worldpay\Helper\Data $worldpayHelper
-      * @param Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
       */
     public function __construct(
         \Sapient\Worldpay\Helper\Data $worldpayHelper,

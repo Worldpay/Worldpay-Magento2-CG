@@ -11,6 +11,28 @@ use Exception;
 class CancelCheckout extends \Magento\Framework\App\Action\Action implements HttpPostActionInterface
 {
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+    /**
+     * @var \Magento\Framework\Controller\Result\JsonFactory
+     */
+    protected $_resultPageFactory;
+    /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
+    protected $quoteRepository;
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
+    protected $customerSession;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Action\Context $context

@@ -24,6 +24,87 @@ class PayByLinkService extends \Magento\Framework\DataObject
      */
     protected $_storeManager;
 
+     /**
+      * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+      */
+    protected $mappingservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
+     */
+    protected $paymentservicerequest;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Registry
+     */
+    protected $registryhelper;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    protected $paymentservice;
+    
+    /**
+     * @var \Sapient\Worldpay\Model\Response\RedirectResponse
+     */
+    protected $redirectresponse;
+    /**
+     * @var \Sapient\Worldpay\Model\Utilities\PaymentMethods
+     */
+    protected $paymentlist;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutsession;
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    protected $_urlBuilder;
+         
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayhelper;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\SendPayByLinkEmail
+     */
+    protected $payByLinkEmail;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Request
+     */
+    protected $_request;
+
+    /**
+     * @var \Magento\Framework\Message\ManagerInterface
+     */
+    protected $_messageManager;
+
+    /**
+     * @var \Magento\Checkout\Model\Cart
+     */
+    protected $cart;
+    /**
+     * @var \Magento\Customer\Model\Address\Config
+     */
+    protected $_addressConfig;
+
+    /**
+     * @var \Magento\Framework\Pricing\Helper\Data
+     */
+    protected $pricingHelper;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
+
     /**
      * MotoRedirectService constructor
      *
@@ -44,6 +125,7 @@ class PayByLinkService extends \Magento\Framework\DataObject
      * @param \Magento\Checkout\Model\Cart $cart
      * @param \Magento\Customer\Model\Address\Config $addressConfig
      * @param \Magento\Framework\Pricing\Helper\Data $pricingHelper
+     * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
      */
     public function __construct(
         \Sapient\Worldpay\Model\Mapping\Service $mappingservice,
@@ -62,7 +144,8 @@ class PayByLinkService extends \Magento\Framework\DataObject
         \Magento\Framework\Message\ManagerInterface $messageManager,
         \Magento\Checkout\Model\Cart $cart,
         \Magento\Customer\Model\Address\Config $addressConfig,
-        \Magento\Framework\Pricing\Helper\Data $pricingHelper
+        \Magento\Framework\Pricing\Helper\Data $pricingHelper,
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
     ) {
         $this->mappingservice = $mappingservice;
         $this->paymentservicerequest = $paymentservicerequest;
@@ -81,6 +164,7 @@ class PayByLinkService extends \Magento\Framework\DataObject
         $this->cart = $cart;
         $this->_addressConfig = $addressConfig;
         $this->pricingHelper = $pricingHelper;
+        $this->multishippingHelper = $multishippingHelper;
     }
 
     /**
@@ -104,14 +188,36 @@ class PayByLinkService extends \Magento\Framework\DataObject
         $payment
     ) {
         $this->checkoutsession->setauthenticatedOrderId($mageOrder->getIncrementId());
-
+        /** Start Multishipping Code */
+        $isMultishipping = false;
+        if ($this->multishippingHelper->isMultiShipping($quote)) {
+            $isMultishipping = true;
+            $sessionOrderCode = $this->multishippingHelper->getOrderCodeFromSession();
+            if (!empty($sessionOrderCode)) {
+                $orgWorldpayPayment = $this->multishippingHelper->getOrgWorldpayId($sessionOrderCode);
+                $orgOrderId = $orgWorldpayPayment['order_id'];
+                $isOrg = false;
+                $this->multishippingHelper->_createWorldpayMultishipping($mageOrder, $sessionOrderCode, $isOrg);
+                $this->multishippingHelper->_copyWorldPayPayment($orgOrderId, $orderCode);
+                $payment->setIsTransactionPending(1);
+                return;
+            } else {
+                $isOrg = true;
+                $this->multishippingHelper->_createWorldpayMultishipping($mageOrder, $orderCode, $isOrg);
+            }
+        }
+        /** End Multishipping Code */
+        $paymentDetails['is_paybylink_order'] = 1;
         $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
             $orderCode,
             $quote,
             $orderStoreId,
             $paymentDetails
         );
-
+        $redirectOrderParams['is_paybylink_order'] = 1;
+        if ($isMultishipping) {
+            $redirectOrderParams['isMultishippingOrder'] = 1;
+        }
         $responseXml = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
 
         $successUrl = $this->_buildRedirectUrl(
@@ -120,24 +226,46 @@ class PayByLinkService extends \Magento\Framework\DataObject
             $this->_getCountryForQuote($quote),
             $orderCode
         );
+        $this->wplogger->info('Multishipping Payment URL =>');
+        $this->wplogger->info($successUrl);
         $payment->setIsTransactionPending(1);
         $this->registryhelper->setworldpayRedirectUrl($successUrl);
         $this->checkoutsession->setPayByLinkRedirecturl($successUrl);
         $paybylink_url = $this->_storeManager->getStore()
-                              ->getBaseUrl().'worldpay/paybylink/process?orderkey='.$orderCode;
-       
+        ->getBaseUrl().'worldpay/paybylink/process?orderkey='.$orderCode;
+        $this->wplogger->info('Pay By link URl '.$paybylink_url);
         $grandTotal = $this->getFormatGrandTotal($mageOrder);
         $address = $mageOrder->getShippingAddress();
         if (empty($address)) {
             $address = $mageOrder->getBillingAddress();
         }
+        $quote_id = $quote->getId();
         $formatedAddress = $this->getFormatAddressByCode($address->getData());
+        $multishippingOrderIds = $this->multishippingHelper->getMultishippingOrdersIds($quote_id);
         $this->payByLinkEmail->sendPayBylinkEmail([
             'paybylink_url'=>$paybylink_url,
             'orderId'=> $mageOrder->getIncrementId(),
             'order_total'=> $grandTotal,
             'formated_shipping'=> $formatedAddress,
-            'customerName' => $mageOrder->getCustomerFirstName().' '.$mageOrder->getCustomerLastName()]);
+            'customerName' => $mageOrder->getCustomerFirstName().' '.$mageOrder->getCustomerLastName(),
+            'is_multishipping' => $isMultishipping,
+            'is_resend' => false,
+            'customerEmail' => false,
+            'quote_id' => $quote_id,
+            'pblexpirytime' => $this->getPayByLinkExpiryTime(),
+            'multishipping_order_ids'=> $multishippingOrderIds
+        ]);
+    }
+
+    /**
+     * Get PBL expiry time
+     * 
+     */
+    public function getPayByLinkExpiryTime(){
+        $currentDate = date('Y-m-d H:i:s');
+        $pblExpiryConfiguration = $this->worldpayhelper->getPayByLinkExpiryTime();
+        $interval = date("Y-m-d H:i:s", $this->worldpayhelper->findPblOrderExpiryTime($currentDate, $pblExpiryConfiguration));
+        return $interval;
     }
 
     /**
@@ -189,6 +317,7 @@ class PayByLinkService extends \Magento\Framework\DataObject
         $this->checkoutsession->setauthenticatedOrderId($mageOrder->getIncrementId());
 
         try {
+            $paymentDetails['is_paybylink_order'] = 1;
             $redirectOrderParams = $this->mappingservice->collectRedirectOrderParameters(
                 $orderCode,
                 $quote,
@@ -197,15 +326,32 @@ class PayByLinkService extends \Magento\Framework\DataObject
             );
             /* Sending Order Inquiry */
             $this->xmlinquiry = new \Sapient\Worldpay\Model\XmlBuilder\Inquiry();
+
+            $merchantCode = $redirectOrderParams['merchantCode'];
+            $merchantUsername = $this->worldpayhelper->getXmlUsername($redirectOrderParams['paymentType']);
+            $merchantPassword = $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentType']);
+            $installationId = $this->worldpayhelper->getInstallationId($redirectOrderParams['paymentType']);
+            // pbl merchant configurations
+            $pblMerchantUn = $this->worldpayhelper->getPayByLinkMerchantUsername();
+            $pblMerchantPw = $this->worldpayhelper->getPayByLinkMerchantPassword();
+            $pblMerchantCode = $this->worldpayhelper->getPayByLinkMerchantCode();
+            $pblInstallationId = $this->worldpayhelper->getPayByLinkInstallationId();
+
+            $merchantUsername = !empty($pblMerchantUn) ? $pblMerchantUn : $merchantUsername ;
+            $merchantPassword = !empty($pblMerchantPw) ? $pblMerchantPw : $merchantPassword ;
+            $merchantCode = !empty($pblMerchantCode) ? $pblMerchantCode : $merchantCode ;
+            $installationId = !empty($pblInstallationId) ? $pblInstallationId : $installationId ;
+           
             $inquirySimpleXml = $this->xmlinquiry->build(
-                $redirectOrderParams['merchantCode'],
+                $merchantCode,
                 $orderCode
             );
             /* Response Order Inquiry */
             $responseInquiry = $this->_sendRequest(
                 dom_import_simplexml($inquirySimpleXml)->ownerDocument,
-                $this->worldpayhelper->getXmlUsername($redirectOrderParams['paymentType']),
-                $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentType'])
+                $merchantUsername,
+                $merchantPassword,
+                \Sapient\Worldpay\Model\Request\PaymentServiceRequest::SEND_ADDITIONAL_HEADER
             );
 
             $paymentService = new \SimpleXmlElement($responseInquiry);
@@ -214,6 +360,11 @@ class PayByLinkService extends \Magento\Framework\DataObject
 
             if (!empty($error) && $error[0] == 'Could not find payment for order') {
                 $this->wplogger->info('Could not find payment for order ########'.$orderCode);
+                if ($quote->getIsMultiShipping()) {
+                    $multiDesc = $this->worldpayhelper->getMultiShippingOrderDescription();
+                    $redirectOrderParams['orderDescription'] = $multiDesc;
+                }
+                $redirectOrderParams['is_paybylink_order'] = 1;
                 $responseXml = $this->paymentservicerequest->redirectOrder($redirectOrderParams);
                 $successUrl = $this->_buildRedirectUrl(
                     $responseXml,
@@ -390,11 +541,12 @@ class PayByLinkService extends \Magento\Framework\DataObject
      * @param SimpleXmlElement $xml
      * @param string $username
      * @param string $password
+     * @param bool $additionalHeader
      * @return SimpleXmlElement $response
      */
-    protected function _sendRequest($xml, $username, $password)
+    protected function _sendRequest($xml, $username, $password, $additionalHeader)
     {
-        $response = $this->_request->sendRequest($xml, $username, $password);
+        $response = $this->_request->sendRequest($xml, $username, $password, $additionalHeader);
         return $response;
     }
     /**

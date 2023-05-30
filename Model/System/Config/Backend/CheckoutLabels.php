@@ -26,6 +26,11 @@ class CheckoutLabels extends \Magento\Framework\App\Config\Value
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManager;
+     /**
+      *
+      * @var \Sapient\Worldpay\Helper\CheckoutLabels
+      */
+    private $checkoutLabels;
 
     /**
      * @param \Magento\Framework\Model\Context $context

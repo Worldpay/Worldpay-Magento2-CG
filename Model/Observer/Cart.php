@@ -10,6 +10,25 @@ use Exception;
 class Cart implements ObserverInterface
 {
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    private $wplogger;
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+    private $orderservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Checkout\Service
+     */
+    private $checkoutservice;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    private $checkoutsession;
+
+    /**
      * Constructor
      *
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger

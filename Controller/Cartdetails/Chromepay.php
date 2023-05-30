@@ -19,6 +19,11 @@ class Chromepay extends \Magento\Framework\App\Action\Action
      * @var $_authSession
      */
     protected $_authSession;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
     /**
      * Constructor
      *

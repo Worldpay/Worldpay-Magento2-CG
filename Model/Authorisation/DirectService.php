@@ -17,6 +17,51 @@ class DirectService extends \Magento\Framework\DataObject
      * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
      */
     protected $updateWorldPayPayment;
+
+      /**
+       * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+       */
+    protected $mappingservice;
+
+      /**
+       * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
+       */
+    protected $paymentservicerequest;
+
+      /**
+       * @var \Sapient\Worldpay\Logger\WorldpayLogger
+       */
+    protected $wplogger;
+
+      /**
+       * @var \Sapient\Worldpay\Model\Response\DirectResponse
+       */
+    protected $directResponse;
+
+      /**
+       * @var  \Sapient\Worldpay\Model\Payment\Service
+       */
+    protected $paymentservice;
+
+      /**
+       * @var \Sapient\Worldpay\Helper\Data
+       */
+    protected $worldpayHelper;
+
+      /**
+       * @var \Sapient\Worldpay\Helper\Registry
+       */
+    protected $registryhelper;
+    
+      /**
+       * @var \Magento\Framework\UrlInterface
+       */
+    protected $urlBuilders;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
     
     /**
      * @var \Magento\Framework\DataObject\Copy
@@ -118,6 +163,14 @@ class DirectService extends \Magento\Framework\DataObject
                 $paymentDetails
             );
             $response = $this->paymentservicerequest->achOrder($directOrderParams);
+        } elseif ($paymentDetails['additional_data']['cc_type'] == 'SEPA_DIRECT_DEBIT-SSL') {
+            $directOrderParams = $this->mappingservice->collectSEPAOrderParameters(
+                $orderCode,
+                $quote,
+                $orderStoreId,
+                $paymentDetails
+            );
+            $response = $this->paymentservicerequest->sepaOrder($directOrderParams);
         } else {
             $directOrderParams = $this->mappingservice->collectDirectOrderParameters(
                 $orderCode,

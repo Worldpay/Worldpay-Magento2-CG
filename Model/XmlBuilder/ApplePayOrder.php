@@ -45,6 +45,41 @@ EOD;
      */
     private $exponent;
 
+     /**
+      * @var string $captureDelay
+      */
+    private $captureDelay;
+
+    /**
+     * @var string
+     */
+    private $shopperEmail;
+    /**
+     * @var string
+     */
+    private $protocolVersion;
+
+    /**
+     * @var string
+     */
+    private $signature;
+    /**
+     * @var array | string
+     */
+    private $data;
+    /**
+     * @var string
+     */
+    private $ephemeralPublicKey;
+    /**
+     * @var string
+     */
+    private $publicKeyHash;
+    /**
+     * @var string
+     */
+    private $transactionId;
+
     /**
      * Build xml for processing Request
      *
@@ -62,6 +97,7 @@ EOD;
      * @param string $publicKeyHash
      * @param string $transactionId
      * @param string|array|float $exponent
+     * @param string $captureDelay
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -78,7 +114,8 @@ EOD;
         $ephemeralPublicKey,
         $publicKeyHash,
         $transactionId,
-        $exponent
+        $exponent,
+        $captureDelay
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -94,6 +131,7 @@ EOD;
         $this->publicKeyHash = $publicKeyHash;
         $this->transactionId = $transactionId;
         $this->exponent = $exponent;
+        $this->captureDelay = $captureDelay;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -126,7 +164,9 @@ EOD;
         $order = $submit->addChild('order');
         $order['orderCode'] = $this->orderCode;
         $order['shopperLanguageCode'] = "en";
-
+        if ($this->captureDelay!="") {
+            $order['captureDelay'] = $this->captureDelay;
+        }
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
         $this->_addPaymentDetailsElement($order);
