@@ -57,13 +57,18 @@ EOD;
      */
     private $sessionId;
     /**
-     * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
+     * @var \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
      */
     protected $threeDSecureConfig;
     /**
      * @var string
      */
     private $cusDetails;
+
+    /**
+     * @var string
+     */
+    private $shopperEmail;
     /**
      * @var string
      */
@@ -84,7 +89,30 @@ EOD;
      * @var string
      */
     protected $userAgentHeader;
-    
+    /**
+     * @var string $captureDelay
+     */
+    protected $captureDelay;
+
+    /**
+     * @var string
+     */
+    protected $protocolVersion;
+
+    /**
+     * @var string
+     */
+    protected $signature;
+
+    /**
+     * @var string
+     */
+    protected $signedMessage;
+
+    /**
+     * @var array
+     */
+    protected $billingAddress;
      /**
       * Constructor
       *
@@ -119,7 +147,8 @@ EOD;
      * @param string $shopperIpAddress
      * @param array $paymentDetails
      * @param float $exponent
-     * @return SimpleXMLElement $xml
+     * @param string $captureDelay
+     * @return \SimpleXMLElement $xml
      */
     public function build(
         $merchantCode,
@@ -139,7 +168,8 @@ EOD;
         $cusDetails,
         $shopperIpAddress,
         $paymentDetails,
-        $exponent
+        $exponent,
+        $captureDelay
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -159,6 +189,7 @@ EOD;
         $this->shopperIpAddress = $shopperIpAddress;
         $this->paymentDetails = $paymentDetails;
         $this->exponent = $exponent;
+        $this->captureDelay = $captureDelay;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -257,6 +288,9 @@ EOD;
             $session = $order->addChild('session');
             $session['id'] = $this->paymentDetails['sessionId'];
             return $order;
+        }
+        if ($this->captureDelay!="") {
+            $order['captureDelay'] = $this->captureDelay;
         }
         $order['shopperLanguageCode'] = "en";
         $this->_addDescriptionElement($order);

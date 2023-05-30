@@ -10,6 +10,30 @@ class PluginVersionHistory extends \Magento\Framework\App\Config\Value
 {
     /* Module Name */
     public const MODULE_NAME = 'Sapient_Worldpay';
+     /**
+      *
+      * @var \Sapient\Worldpay\Logger\WorldpayLogger
+      */
+    private $wplogger;
+     /**
+      * @var \Magento\Framework\App\Config\ScopeConfigInterface
+      */
+    private $scopeConfig;
+
+     /**
+      * @var \Magento\Framework\App\Config\Storage\WriterInterface
+      */
+    private $configWriter;
+
+    /**
+     * @var \Magento\Framework\App\Cache\Manager
+     */
+    private $cacheManager;
+
+    /**
+     * @var \Sapient\Worldpay\Model\System\Config\Backend\CurrentPluginVersion
+     */
+    private $currentversionconfig;
 
      /**
       * Constructor

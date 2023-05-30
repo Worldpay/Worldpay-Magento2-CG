@@ -14,7 +14,7 @@ class Pay extends \Magento\Framework\App\Action\Action
 {
 
     /**
-     * @var Magento\Framework\View\Result\PageFactory
+     * @var \Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;
 
@@ -22,6 +22,21 @@ class Pay extends \Magento\Framework\App\Action\Action
      * @var \Sapient\Worldpay\Model\Checkout\Hpp\State
      */
     protected $_status;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Checkout\Hpp\State
+     */
+    protected $hppstate;
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayhelper;
+
     /**
      * Constructor
      *

@@ -17,17 +17,30 @@ class Index extends \Magento\Framework\App\Action\Action implements HttpGetActio
     private $customerSession;
 
     /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    private $worldpayHelper;
+
+    /**
+     * @var \Magento\Customer\Model\Url
+     */
+    private $customerUrl;
+
+    /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Magento\Customer\Model\Url $customerUrl
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Customer\Model\Session $customerSession,
-        \Sapient\Worldpay\Helper\Data $worldpayHelper
+        \Sapient\Worldpay\Helper\Data $worldpayHelper,
+        \Magento\Customer\Model\Url $customerUrl
     ) {
         $this->customerSession = $customerSession;
         $this->worldpayHelper = $worldpayHelper;
+        $this->customerUrl = $customerUrl;
         parent::__construct($context);
     }
 
@@ -39,8 +52,7 @@ class Index extends \Magento\Framework\App\Action\Action implements HttpGetActio
      */
     public function dispatch(RequestInterface $request)
     {
-        $loginUrl = $this->_objectManager->get(\Magento\Customer\Model\Url::class)->getLoginUrl();
-
+        $loginUrl = $this->customerUrl->getLoginUrl();
         if (!$this->customerSession->authenticate($loginUrl)) {
             $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
         }

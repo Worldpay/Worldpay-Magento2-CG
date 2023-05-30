@@ -44,6 +44,19 @@ EOD;
      * @var mixed
      */
     private $exponent;
+    /**
+     * @var string $captureDelay
+     */
+    private $captureDelay;
+
+    /**
+     * @var string
+     */
+    private $shopperEmail;
+    /**
+     * @var array
+     */
+    private $data;
 
     /**
      * Build xml for processing Request
@@ -57,6 +70,7 @@ EOD;
      * @param string $shopperEmail
      * @param array $data
      * @param mixed $exponent
+     * @param string $captureDelay
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -68,7 +82,8 @@ EOD;
         $paymentType,
         $shopperEmail,
         $data,
-        $exponent
+        $exponent,
+        $captureDelay
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -79,6 +94,7 @@ EOD;
         $this->shopperEmail = $shopperEmail;
         $this->data = $data;
         $this->exponent = $exponent;
+        $this->captureDelay = $captureDelay;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -110,6 +126,9 @@ EOD;
         $order = $submit->addChild('order');
         $order['orderCode'] = $this->orderCode;
         $order['shopperLanguageCode'] = "en";
+        if ($this->captureDelay!="") {
+            $order['captureDelay'] = $this->captureDelay;
+        }
 
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);

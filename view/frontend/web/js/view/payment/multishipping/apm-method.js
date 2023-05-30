@@ -32,6 +32,10 @@ define(
                 if (!this.validatePaymentMethod())
                     return;
 
+                if ($('.checkout-agreements').find('input[type="checkbox"]:not(:checked)').length > 0) {
+                    $('#checkout-agreement-error-msg').css('display', 'block');
+                    return false;
+                }
                 var $form = $('#' + this.getCode() + '-form');
                 if (this.getselectedCCType() == undefined) {
                     $('#apm-type-error').css('display', 'block');

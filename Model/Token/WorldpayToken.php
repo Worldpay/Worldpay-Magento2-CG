@@ -37,15 +37,39 @@ class WorldpayToken
      */
     private $paymentTokenRepository;
     /**
-     * @var Magento\Framework\Serialize\Serializer\Json
+     * @var \Magento\Framework\Serialize\Serializer\Json
      */
     protected $serializer;
+
+     /**
+      * @var SavedToken
+      */
+    protected $savedtoken;
+
+     /**
+      * @var \Sapient\Worldpay\Logger\WorldpayLogger
+      */
+    protected $wplogger;
+
+    /**
+     * @var CreditCardTokenFactory
+     */
+    protected $paymentTokenFactory;
+     /**
+      * @var OrderPaymentExtensionInterfaceFactory
+      */
+    protected $paymentExtensionFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
+     */
+    protected $transactionFactory;
 
     /**
      * Constructor
      *
      * @param SavedToken $savedtoken
-     * @param Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
      * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
      * @param CreditCardTokenFactory $paymentTokenFactory
@@ -79,9 +103,9 @@ class WorldpayToken
     /**
      * Update token of the given customer
      *
-     * @param Sapient\WorldPay\Model\Token $token
+     * @param \Sapient\WorldPay\Model\Token $token
      * @param \Magento\Customer\Model\Customer $customer
-     * @throws Sapient\Worldpay\Model\Token\AccessDeniedException
+     * @throws \Sapient\Worldpay\Model\Token\AccessDeniedException
      */
     public function updateTokenByCustomer(SavedToken $token, \Magento\Customer\Model\Customer $customer)
     {

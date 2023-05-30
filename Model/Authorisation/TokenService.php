@@ -8,14 +8,52 @@ use Exception;
 
 class TokenService extends \Magento\Framework\DataObject
 {
-    /**
-     * @var \Magento\Backend\Model\Auth\Session
-     */
-    protected $_session;
+     /**
+      * @var \Sapient\Worldpay\Model\Mapping\Service
+      */
+    protected $mappingservice;
     /**
      * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
      */
     protected $updateWorldPayPayment;
+
+      /**
+       * @var \Sapient\Worldpay\Logger\WorldpayLogger
+       */
+    protected $wplogger;
+     
+    /**
+     * @var \Sapient\Worldpay\Model\Response\DirectResponse
+     */
+    protected $directResponse;
+    
+     /**
+      * @var \Sapient\Worldpay\Model\Payment\Service
+      */
+    protected $paymentservice;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+      */
+    protected $paymentservicerequest;
+     /**
+      * @var \Sapient\Worldpay\Helper\Registry
+      */
+    protected $registryhelper;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+    
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
 
     /**
      * TokenService constructor
@@ -77,7 +115,7 @@ class TokenService extends \Magento\Framework\DataObject
         if ($this->worldpayHelper->isMultiShipping($quote)) {
             $sessionOrderCode = $this->multishippingHelper->getOrderCodeFromSession();
             if (!empty($sessionOrderCode)) {
-				$this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
+                $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
                 $orgWorldpayPayment = $this->multishippingHelper->getOrgWorldpayId($sessionOrderCode);
                 $orgOrderId = $orgWorldpayPayment['order_id'];
                 $isOrg = false;

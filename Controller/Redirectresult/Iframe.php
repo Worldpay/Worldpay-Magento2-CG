@@ -21,7 +21,27 @@ class Iframe extends \Magento\Framework\App\Action\Action
     /**
      * @var \Sapient\Worldpay\Model\Checkout\Hpp\State
      */
-    protected $_status;
+    protected $hppstate;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+     /**
+      * @var ResultFactory
+      */
+    protected $resultPageFactory;
+
+     /**
+      * @var \Magento\Checkout\Model\Session
+      */
+    protected $checkoutsession;
+
+    /**
+     * @var mixed
+     */
+    public $_status;
 
     /**
      * Constructor

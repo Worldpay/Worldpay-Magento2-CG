@@ -10,7 +10,7 @@ namespace Sapient\Worldpay\Model\Utilities;
 class PaymentMethods
 {
     /**
-     * @var SimpleXMLElement
+     * @var \SimpleXMLElement
      */
     protected static $_xml;
 
@@ -19,6 +19,35 @@ class PaymentMethods
      */
     protected $_xmlLocation;
 
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $_storeManager;
+
+     /**
+      * @var \Magento\Framework\App\Config\ScopeConfigInterface
+      */
+    protected $scopeConfig;
+
+     /**
+      * @var \Sapient\Worldpay\Logger\WorldpayLogger
+      */
+    protected $wplogger;
+
+     /**
+      * @var \Magento\Checkout\Model\Session
+      */
+    protected $checkoutsession;
+    
+     /**
+      * @var \Magento\Backend\Model\Session\Quote
+      */
+    protected $adminsessionquote;
+    
+     /**
+      * @var \Magento\Backend\Model\Auth\Session
+      */
+    protected $authSession;
     public const PAYMENT_METHOD_PATH = '/paymentMethods/';
     public const TYPE_PATH = '/types/';
 

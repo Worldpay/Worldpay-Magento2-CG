@@ -6,10 +6,10 @@ use Sapient\Worldpay\Helper\Data;
 class Challenge extends \Magento\Framework\View\Element\Template
 {
     /**
-     * @var Sapient\Worldpay\Helper\Data;
+     * @var \Sapient\Worldpay\Helper\Data;
      */
     
-    protected $helper;
+    protected $_helper;
     
     /**
      * @var \Magento\Checkout\Model\Session

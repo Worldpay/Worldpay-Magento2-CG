@@ -125,7 +125,7 @@
                 <!--  <span>CVV</span> -->
                 </label>
                 <div class="control">
-                    <input type="number" autocomplete="off" length="4" id="cvv"
+                    <input type="password" autocomplete="off" maxlength="4" length="4" id="cvv"
                            class="input-text required cvv saved-cvv-number required-entry 
                            validate-card-cvv validate-length maximum-length-4"
                            name="cvc"
@@ -210,24 +210,36 @@
             document.body.appendChild(iframe);
         }
         function validateCVV() {
-            if (document.addnewcardform.paymentType.value == "AMEX-SSL") {
-                if (document.getElementById('cvv').value.length != 4) {
-                    document.getElementById("cvv_msg")
-                            .innerHTML = "Please, Enter 4 digit valid Card Verification Number";
-                    document.addnewcardform.cvc.focus();
-                    return false;
+            var cvv = document.getElementById('cvv').value;
+            var numbers = /^[0-9]+$/;
+            if(cvv.match(numbers)){
+                document.getElementById("cvv_msg")
+                                .innerHTML = '';
+                if (document.addnewcardform.paymentType.value == "AMEX-SSL") {
+                    if (document.getElementById('cvv').value.length != 4) {
+                        document.getElementById("cvv_msg")
+                                .innerHTML = "Please, Enter 4 digit valid Card Verification Number";
+                        document.addnewcardform.cvc.focus();
+                        return false;
+                    } else {
+                        return true;
+                    }
                 } else {
-                    return true;
+                    if (document.getElementById('cvv').value.length != 3) {
+                        document.getElementById("cvv_msg")
+                                .innerHTML = "Please, Enter 3 digit valid Card Verification Number";
+                        document.addnewcardform.cvc.focus();
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
-            } else {
-                if (document.getElementById('cvv').value.length != 3) {
-                    document.getElementById("cvv_msg")
-                            .innerHTML = "Please, Enter 3 digit valid Card Verification Number";
-                    document.addnewcardform.cvc.focus();
-                    return false;
-                } else {
-                    return true;
-                }
+            }
+            else {
+                document.getElementById("cvv_msg")
+                            .innerHTML = "Please enter a valid number in this field";
+                document.addnewcardform.cvc.focus();
+                return false;
             }
         }
         
@@ -268,6 +280,8 @@
         
         function checkCardTypeValidity()
         {
+          document.getElementById("card_number_msg")
+                            .innerHTML = '';
           var cardType = document.addnewcardform.paymentType.value;
           var cardNumberType = getCardType();
           var typeErrorMsg = 'Card number entered does not match with card type selected';

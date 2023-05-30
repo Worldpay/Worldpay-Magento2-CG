@@ -10,6 +10,16 @@ class AuthenticationService extends \Magento\Framework\DataObject
 {
 
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $_wplogger;
+
+     /**
+      * @var \Sapient\Worldpay\Helper\Data
+      */
+    protected $worldpayhelper;
+
+    /**
      * Constructor
      *
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger

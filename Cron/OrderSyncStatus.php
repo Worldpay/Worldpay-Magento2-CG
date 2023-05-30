@@ -39,6 +39,35 @@ class OrderSyncStatus
      * @var _tokenState
      */
     private $_tokenState;
+
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
+     */
+    private $_orderCollectionFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    private $worldpayhelper;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    private $paymentservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+    private $orderservice;
+
+    /**
+     * @var JsonFactory
+     */
+    private $resultJsonFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Token\WorldpayToken
+     */
+    private $worldpaytoken;
     
     /**
      * Constructor
@@ -124,7 +153,7 @@ class OrderSyncStatus
     {
         if ($this->orderCollectionFactory === null) {
 
-            $this->orderCollectionFactory = ObjectManager::getInstance()->get(CollectionFactoryInterface::class);
+            $this->orderCollectionFactory = $this->_orderCollectionFactory;
         }
         return $this->orderCollectionFactory;
     }

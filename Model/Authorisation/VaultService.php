@@ -12,6 +12,49 @@ class VaultService extends \Magento\Framework\DataObject
      * @var \Magento\Checkout\Model\Session
      */
     protected $checkoutSession;
+
+      /**
+       * @var \Sapient\Worldpay\Model\Mapping\Service
+       */
+    protected $mappingservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
+     */
+    protected $updateWorldPayPayment;
+
+      /**
+       * @var \Sapient\Worldpay\Logger\WorldpayLogger
+       */
+    protected $wplogger;
+     
+    /**
+     * @var \Sapient\Worldpay\Model\Response\DirectResponse
+     */
+    protected $directResponse;
+    
+     /**
+      * @var \Sapient\Worldpay\Model\Payment\Service
+      */
+    protected $paymentservice;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+      */
+    protected $paymentservicerequest;
+     /**
+      * @var \Sapient\Worldpay\Helper\Registry
+      */
+    protected $registryhelper;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+    
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
     /**
      * VaultService constructor
      *

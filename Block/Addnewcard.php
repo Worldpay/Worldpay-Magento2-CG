@@ -15,6 +15,39 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
       */
     protected $_customerSession;
     /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+
+    /**
+     * @var \Magento\Customer\Helper\Session\CurrentCustomerAddress
+     */
+    protected $currentCustomerAddress;
+
+    /**
+     * @var \Magento\Customer\Model\Address\Config
+     */
+    protected $_addressConfig;
+    /**
+     * @var \Magento\Customer\Model\Address\Mapper
+     */
+    protected $addressMapper;
+     /**
+      * @var \Magento\Framework\App\Config\ScopeConfigInterface
+      */
+    protected $scopeConfig;
+
+     /**
+      * @var \Magento\Framework\Message\ManagerInterface
+      */
+    protected $_messageManager;
+
+     /**
+      * @var \Magento\Integration\Model\Oauth\TokenFactory
+      */
+    protected $_tokenModelFactory;
+
+    /**
      * @var array
      */
     protected static $_months;

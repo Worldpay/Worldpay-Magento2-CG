@@ -41,6 +41,12 @@ class FraudisightMessage extends Column
      * @var OrderRepositoryInterface
      */
     protected $_orderRepository;
+
+     /**
+      *
+      * @var Data
+      */
+    protected $helper;
     
     /**
      * FraudisightMessage constructor

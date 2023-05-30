@@ -9,6 +9,11 @@ namespace Sapient\Worldpay\Model\System\Config\Backend;
  */
 class Merchantprofile extends \Magento\Framework\App\Config\Value
 {
+     /**
+      *
+      * @var \Sapient\Worldpay\Helper\Merchantprofile
+      */
+    private $merchantprofile;
     
     /**
      * @param \Magento\Framework\Model\Context $context

@@ -6,6 +6,11 @@ namespace Sapient\Worldpay\Model\Payment;
 
 class WpResponse
 {
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\StateResponseFactory
+     */
+    public $stateResponse;
     /**
      * Constructor
      *
@@ -31,6 +36,22 @@ class WpResponse
         // extract merchantcode
         $extractMerchantCode = explode('^', $orderkey);
         $merchantCode = $extractMerchantCode[1];
+        return new \Sapient\Worldpay\Model\Payment\StateResponse(
+            $orderCode,
+            $merchantCode,
+            \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_CANCELLED,
+            null
+        );
+    }
+    /**
+     * Create From Pay By Link Cancelled Response
+     *
+     * @param string $orderCode
+     * @param string $merchantCode
+     * @return string
+     */
+    public function createFromPblCancelledResponse($orderCode, $merchantCode)
+    {
         return new \Sapient\Worldpay\Model\Payment\StateResponse(
             $orderCode,
             $merchantCode,

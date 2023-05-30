@@ -20,6 +20,16 @@ class Redirect extends \Magento\Framework\App\Action\Action
     protected $pageFactory;
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutsession;
+
+    /**
+     * @var \Magento\Sales\Model\Order
+     */
+    protected $mageOrder;
+
+    /**
      * Constructor
      *
      * @param Context $context

@@ -95,6 +95,14 @@ EOD;
      * @var array|string
      */
     private $orderContent;
+    /**
+     * @var string $captureDelay
+     */
+    private $captureDelay;
+    /**
+     * @var array
+     */
+    private $orderlineitems;
 
     /**
      * RedirectKlarnaOrder constructor
@@ -128,6 +136,7 @@ EOD;
      * @param array|string $exponent
      * @param string $sessionData
      * @param array|string $orderContent
+     * @param string $captureDelay
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -149,7 +158,8 @@ EOD;
         $orderlineitems,
         $exponent,
         $sessionData,
-        $orderContent
+        $orderContent,
+        $captureDelay
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -170,7 +180,7 @@ EOD;
         $this->exponent = $exponent;
         $this->sessionData = $sessionData;
         $this->orderContent = $orderContent;
-
+        $this->captureDelay = $captureDelay;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -213,6 +223,10 @@ EOD;
                 $order['fixContact'] = 'false';
                 $order['hideContact'] = 'false';
             }
+        }
+
+        if ($this->captureDelay!="") {
+            $order['captureDelay'] = $this->captureDelay;
         }
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);

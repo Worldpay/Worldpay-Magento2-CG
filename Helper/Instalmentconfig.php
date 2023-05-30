@@ -36,24 +36,32 @@ class Instalmentconfig
      * @var SerializerInterface
      */
     private $serializer;
+
+    /**
+     * @var \Magento\Framework\Serialize\Serializer\Json
+     */
+    protected $json;
     
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Math\Random $mathRandom
      * @param \Sapient\Worldpay\Model\Config\Source\InstalmentTypes $instalmentTypes
      * @param SerializerInterface $serializer
+     * @param \Magento\Framework\Serialize\Serializer\Json $json
      */
 
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Math\Random $mathRandom,
         \Sapient\Worldpay\Model\Config\Source\InstalmentTypes $instalmentTypes,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        \Magento\Framework\Serialize\Serializer\Json $json
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->mathRandom = $mathRandom;
         $this->instalmentTypes = $instalmentTypes;
         $this->serializer = $serializer;
+        $this->json = $json;
     }
 
     /**
@@ -328,9 +336,9 @@ class Instalmentconfig
         }
 
         if ($this->isSerialized($value)) {
-            $unserializer = ObjectManager::getInstance()->get(\Magento\Framework\Unserialize\Unserialize::class);
+            $unserializer = $this->serializer;
         } else {
-            $unserializer = ObjectManager::getInstance()->get(\Magento\Framework\Serialize\Serializer\Json::class);
+            $unserializer = $this->json;
         }
 
         return $unserializer->unserialize($value);

@@ -45,6 +45,50 @@ class CallBack extends \Magento\Framework\App\Action\Action
     public $quoteRepository;
 
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    protected $paymentservice;
+
+    /**
+     * @var JsonFactory
+     */
+    protected $resultJsonFactory;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    protected $request;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+     */
+    protected $_paymentservicerequest;
+
+    /**
+     * @var \Magento\Backend\Model\Auth\Session
+     */
+    protected $_authSession;
+
+    /**
+     * @var \Sapient\Worldpay\Model\WorldpaymentFactory
+     */
+    protected $_worldpaymentFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\CurlHelper
+     */
+    protected $curlHelper;
+
+    /**
      * Constructor
      *
      * @param Context $context

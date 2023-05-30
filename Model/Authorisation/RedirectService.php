@@ -9,8 +9,53 @@ use Exception;
 class RedirectService extends \Magento\Framework\DataObject
 {
 
+    /**
+     * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+     */
+    protected $mappingservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
+     */
+    protected $paymentservicerequest;
+     /**
+      * @var \Sapient\Worldpay\Logger\WorldpayLogger
+      */
+    protected $wplogger;
+
     /** @var \Sapient\Worldpay\Model\Response\RedirectResponse */
     protected $_redirectResponseModel;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Payment\Service
+      */
+    protected $paymentservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Response\RedirectResponse
+     */
+    protected $redirectresponse;
+    /**
+     * @var \Sapient\Worldpay\Helper\Registry
+     */
+    protected $registryhelper;
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutsession;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Utilities\PaymentMethods
+     */
+    protected $paymentlist;
+          
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayhelper;
+    
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
 
     /**
      * Constructor

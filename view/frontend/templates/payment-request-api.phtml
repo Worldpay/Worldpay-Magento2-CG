@@ -1,7 +1,0 @@
-<?php
-$userAgent = $block->getUserAgent();
-if (strpos($userAgent, 'Chrome') !== false
- || strpos($userAgent, 'CriOS') !== false) {
-    ?>
-    <?= /* @noEscape */ $block->getPaymentApiScript(); ?>
-<?php } ?>

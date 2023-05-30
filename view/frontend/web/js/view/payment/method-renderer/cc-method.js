@@ -20,11 +20,13 @@ define(
         'hmacSha256',
         'encBase64',
         'Magento_Checkout/js/model/payment/additional-validators',
+        'Magento_Checkout/js/action/set-billing-address',
+        'Magento_Ui/js/model/messageList',
         'Magento_Checkout/js/view/summary/abstract-total',
         'jquery/ui'        
     ],
     
-    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64,additionalValidators) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64,additionalValidators,setBillingAddressAction,globalMessageList) {
         'use strict';
         //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
@@ -281,6 +283,7 @@ define(
 					var MultishippingCreditCardPreSelected = jQuery('#p_method_worldpay_cc:checked');
 					if(MultishippingCreditCardPreSelected.length){
                         jQuery('#payment-continue').html("<span>Place Order</span>");
+                        document.getElementById("checkout-agreement-div").style.display = "block";
 						this.selectPaymentMethod();
 					}
 				}
@@ -312,6 +315,9 @@ define(
                     function (apiresponse) {
                            var response = JSON.parse(apiresponse);
                             if(response.length){
+                                if(quote.isVirtual()){
+                                    setBillingAddressAction(globalMessageList);
+                                }
                                 if (savedcardlists.length) {
                                     $.each(savedcardlists, function(key, value){
                                         var method = savedcardlists[key]['method'];

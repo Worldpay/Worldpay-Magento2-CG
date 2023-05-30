@@ -20,6 +20,11 @@ class Orderplaced extends \Magento\Checkout\Controller\Onepage implements HttpGe
     protected $orderservice;
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutsession;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Action\Context $context
@@ -87,7 +92,7 @@ class Orderplaced extends \Magento\Checkout\Controller\Onepage implements HttpGe
     public function execute()
     {
         $session = $this->getOnepage()->getCheckout();
-        if (!$this->_objectManager->get(\Magento\Checkout\Model\Session\SuccessValidator::class)->isValid()) {
+        if (!$this->isValid()) {
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
         $session->clearQuote();
@@ -102,5 +107,22 @@ class Orderplaced extends \Magento\Checkout\Controller\Onepage implements HttpGe
         );
         
         return $resultPage;
+    }
+
+    /**
+     * Check if valid quote
+     *
+     * @return bool
+     */
+    public function isValid()
+    {
+        if (!$this->checkoutsession->getLastSuccessQuoteId()) {
+            return false;
+        }
+
+        if (!$this->checkoutsession->getLastQuoteId() || !$this->checkoutsession->getLastOrderId()) {
+            return false;
+        }
+        return true;
     }
 }

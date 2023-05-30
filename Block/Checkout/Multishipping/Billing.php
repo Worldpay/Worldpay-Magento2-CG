@@ -60,6 +60,10 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
      * @var \Sapient\Worldpay\Helper\Data
      */
     protected $wpHelper;
+    /**
+     * @var CheckoutHelper
+     */
+    protected $checkoutHelper;
 
     /**
      * Constructor
@@ -74,10 +78,10 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
      * @param PriceCurrencyInterface $priceCurrency
      * @param \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector
      * @param \Magento\Quote\Model\Quote\TotalsReader $totalsReader
-     * @param Sapient\Worldpay\Helper\Data $wpHelper
+     * @param CheckoutHelper $checkoutHelper
+     * @param \Sapient\Worldpay\Helper\Data $wpHelper
      * @param array $data
      * @param array $additionalChecks
-     * @param ?CheckoutHelper $checkoutHelper = null
      */
 
     public function __construct(
@@ -91,15 +95,16 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
         PriceCurrencyInterface $priceCurrency,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         \Magento\Quote\Model\Quote\TotalsReader $totalsReader,
+        CheckoutHelper $checkoutHelper,
         \Sapient\Worldpay\Helper\Data $wpHelper,
         array $data = [],
-        array $additionalChecks = [],
-        ?CheckoutHelper $checkoutHelper = null,
+        array $additionalChecks = []
     ) {
         $this->_multishipping = $multishipping;
         $this->_checkoutSession = $checkoutSession;
         $this->paymentSpecification = $paymentSpecification;
-        $data['checkoutHelper'] = $checkoutHelper ?? ObjectManager::getInstance()->get(CheckoutHelper::class);
+        $this->checkoutHelper = $checkoutHelper;
+        $data['checkoutHelper'] = $this->checkoutHelper;
         $this->_taxHelper = $taxHelper;
         $data['taxHelper'] = $this->_taxHelper;
         $this->wpHelper = $wpHelper;
@@ -124,12 +129,8 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
      */
     protected function _prepareLayout()
     {
-        if ($this->isWorldpayEnable()) {
-            $this->setTemplate('Sapient_Worldpay::multishipping/billing/billing.phtml');
-            $this->pageConfig->addBodyClass('worldpay-multishipping');
-        } else {
-            $this->setTemplate('Magento_Multishipping::checkout/billing.phtml');
-        }
+        $this->setTemplate('Sapient_Worldpay::multishipping/billing/billing.phtml');
+        $this->pageConfig->addBodyClass('worldpay-multishipping');
         return parent::_prepareLayout();
     }
     /**
@@ -383,5 +384,46 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
     public function isWorldpayEnable()
     {
         return $this->wpHelper->isWorldPayEnable();
+    }
+    /**
+     * Get worldpay method code
+     */
+    public function getWorldpayMethodsCode()
+    {
+        return [
+            'worldpay_cc',
+            'worldpay_apm',
+            'worldpay_wallets'
+        ];
+    }
+    /**
+     * Get Worldpay Methods
+     */
+    public function getWorldpayMethods()
+    {
+        $allMethods = $this->getMethods();
+        $wpMethods = $this->getWorldpayMethodsCode();
+        $wpPaymentMethods = [];
+        foreach ($allMethods as $method) {
+            if (in_array($method->getCode(), $wpMethods)) {
+                $wpPaymentMethods[] = $method;
+            }
+        }
+        return $wpPaymentMethods;
+    }
+    /**
+     * Get other Payment methods
+     */
+    public function getOtherPaymentMethods()
+    {
+        $allMethods = $this->getMethods();
+        $wpMethods = $this->getWorldpayMethodsCode();
+        $otherPaymentMethods = [];
+        foreach ($allMethods as $method) {
+            if (!in_array($method->getCode(), $wpMethods)) {
+                $otherPaymentMethods[] = $method;
+            }
+        }
+        return $otherPaymentMethods;
     }
 }

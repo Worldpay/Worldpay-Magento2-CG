@@ -65,6 +65,108 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @var array
      */
     protected $paymentdetailsdata;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+     */
+    protected $paymentservicerequest;
+    /**
+     * @var \Sapient\Worldpay\Model\Authorisation\RedirectService
+     */
+    protected $redirectservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Authorisation\TokenService
+     */
+    protected $tokenservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Authorisation\HostedPaymentPageService
+     */
+    protected $hostedpaymentpageservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Authorisation\WalletService
+     */
+    protected $walletService;
+    /**
+     * @var \Sapient\Worldpay\Model\Authorisation\PayByLinkService
+     */
+    protected $paybylinkservice;
+    /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
+    protected $quoteRepository;
+    /**
+     * @var \Sapient\Worldpay\Helper\Registry
+     */
+    protected $registryhelper;
+
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    protected $urlbuilder;
+    /**
+     * @var \Sapient\Worldpay\Model\Worldpayment
+     */
+    protected $worldpaypaymentmodel;
+    /**
+     * @var \Magento\Framework\Pricing\Helper\Data
+     */
+    protected $pricinghelper;
+    /**
+     * @var \Sapient\Worldpay\Model\Response\AdminhtmlResponse
+     */
+    protected $adminhtmlresponse;
+    /**
+     * @var \Sapient\Worldpay\Model\Utilities\PaymentMethods
+     */
+    protected $paymentutils;
+    /**
+     * @var \Magento\Backend\Model\Session\Quote
+     */
+    protected $adminsessionquote;
+    /**
+     * @var \Sapient\Worldpay\Model\SavedTokenFactory
+     */
+    protected $_savecard;
+    /**
+     * @var \Magento\Backend\Model\Auth\Session
+     */
+    protected $authSession;
+    /**
+     * @var \Sapient\Worldpay\Model\Authorisation\MotoRedirectService
+     */
+    protected $motoredirectservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\PaymentTypes
+     */
+    protected $paymenttypes;
+
+    /**
+     * @var \Magento\Framework\Registry
+     */
+    protected $registry;
+
+    /**
+     * @var \Magento\Framework\App\RequestInterface
+     */
+    protected $_request;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Multishipping\OrderFactory
+     */
+    protected $multishippingOrderFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection
+     */
+    protected $multishippingOrderCollection;
+
     /**
      * Availability option
      *
@@ -430,7 +532,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         if ($paymentdetails['method'] == self::WORLDPAY_WALLETS_TYPE) {
             $integrationType = 'direct';
         }
-        if ($paymentdetails['additional_data']['cc_type'] === 'ACH_DIRECT_DEBIT-SSL') {
+        if ($paymentdetails['additional_data']['cc_type'] === 'ACH_DIRECT_DEBIT-SSL' ||
+        $paymentdetails['additional_data']['cc_type'] === 'SEPA_DIRECT_DEBIT-SSL') {
             $integrationType = 'direct';
         }
         $mode = $this->worlpayhelper->getCcIntegrationMode();
@@ -446,9 +549,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             $cardType = $this->_getpaymentType();
             if ($mode == 'redirect') {
                 $tokenId = $this->getTokenIdByCode($paymentdetails['additional_data']['tokenCode']);
-				if(empty($this->registry->registry('token_code'))){
-					$this->registry->register('token_code', $tokenId);
-				}
+                if (empty($this->registry->registry('token_code'))) {
+                    $this->registry->register('token_code', $tokenId);
+                }
             }
         }
 
@@ -532,7 +635,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                         $payment->getOrder(),
                         $worldPayPayment,
                         $amount,
-                        $captureArray
+                        $captureArray,
+                        $payment->getMethod()
                     );
                 } else {
                     $this->_wplogger->info("Partial Capture is disabled or not supported.");

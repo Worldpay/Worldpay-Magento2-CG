@@ -16,6 +16,11 @@ class Redirect extends \Magento\Framework\App\Action\Action
     protected $checkoutSession;
 
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+
+     protected $wplogger;
+    /**
      * Constructor
      *
      * @param Context $context

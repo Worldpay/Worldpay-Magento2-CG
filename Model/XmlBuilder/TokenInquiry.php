@@ -19,12 +19,12 @@ class TokenInquiry
 EOD;
 
     /**
-     * @var Mage_Customer_Model_Customer
+     * @var \Magento\Customer\Model\Customer
      */
     private $customer;
 
     /**
-     * @var Sapient_WorldPay_Model_Token
+     * @var \Sapient\WorldPay\Model\Token
      */
     private $tokenModel;
 

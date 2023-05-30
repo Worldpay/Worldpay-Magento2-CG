@@ -16,7 +16,7 @@ class Website implements \Magento\Framework\Option\ArrayInterface
     private $storeManager;
 
     /**
-     * @var directoryHelper
+     * @var Data
      */
     private $directoryHelper;
 

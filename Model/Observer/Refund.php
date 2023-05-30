@@ -10,6 +10,19 @@ use Exception;
 class Refund implements ObserverInterface
 {
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    public $wplogger;
+     /**
+      * @var \Magento\Framework\Pricing\Helper\Data
+      */
+    public $pricinghelper;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    public $checkoutsession;
+    /**
      * Constructor
      *
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger

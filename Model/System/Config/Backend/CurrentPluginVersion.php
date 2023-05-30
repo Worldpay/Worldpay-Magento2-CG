@@ -12,6 +12,24 @@ class CurrentPluginVersion extends \Magento\Framework\App\Config\Value
     public const MODULE_NAME = 'Sapient_Worldpay';
 
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+     /**
+      * @var \Magento\Framework\Component\ComponentRegistrarInterface
+      */
+    protected $componentRegistrar;
+
+    /**
+     * @var \Magento\Framework\Filesystem\Directory\ReadFactory
+     */
+    protected $readFactory;
+    /**
+     * @var \Magento\Framework\App\Config\Storage\WriterInterface
+     */
+    protected $configWriter;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\Model\Context $context

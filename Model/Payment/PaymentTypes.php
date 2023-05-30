@@ -9,6 +9,10 @@ use Sapient\Worldpay\Api\PaymentTypeInterface;
 class PaymentTypes implements PaymentTypeInterface
 {
     /**
+     * @var \Sapient\Worldpay\Model\Authorisation\PaymentOptionsService
+     */
+    public $paymentoptionsservice;
+    /**
      * Constructor
      *
      * @param \Sapient\Worldpay\Model\Authorisation\PaymentOptionsService $paymentoptionsservice

@@ -50,32 +50,40 @@ class="form multicheckout billing">
     <div class="block block-billing">
         <div class="block-content">            
             <div class="box box-billing-method" id = "payment">
-                <hr>
                 <fieldset class="fieldset">
-                    <?php if ($block->isWorldpayEnable()): ?>
-                    <legend class="legend box-title">
-                        <div class="payment-title-wrapper">
-                            <span><?= $block->escapeHtml(__('Payment Method')); ?></span>
-                            <br>
-                            <span class="security-title">All transactions are secure and encrypted...</span>
-                        </div>
-                        <div class="payment-logo-wrapper">
-                            <img 
-                            data-bind="attr: { src: require.toUrl('Sapient_Worldpay/images/cc/worldpay-logo.png') }" 
-                            alt="worldpay logo" class="worldpay-logo-paymentscreen">
-                        </div>
-                    </legend><br>
-                    <?php endif; ?>
+                   
                     <div class="box-content">
-                        <?= $block->getChildHtml('payment_methods_before') ?>
+                        
                         <?php /* Payment methods forms list */ ?>
-                        <dl class="checkout-payment-method" id="payment-methods">
-                            <?php
-                            $methods = $block->getMethods();
-                            $methodsCount = count($methods);
-                            $methodsForms = $block->hasFormTemplates() ? $block->getFormTemplates() : [];
+                        <?php
+                             $methods = $block->getMethods();
+                             $methodsCount = count($methods);
+                             $methodsForms = $block->hasFormTemplates() ? $block->getFormTemplates() : [];
 
-                            foreach ($methods as $_method):
+                             $wpMethods = $block->getWorldpayMethods();
+                             $otherPaymentMethods = $block->getOtherPaymentMethods();
+                        ?>
+                        <?php if (count($wpMethods) > 0): ?>
+                        <dl class="checkout-payment-method worldpay-methods" id="payment-methods">
+                            <?php if ($block->isWorldpayEnable()): ?>
+                        <legend class="legend box-title">
+                            <div class="payment-title-wrapper">
+                                <span><?= $block->escapeHtml(__('Payment Method')); ?></span>
+                                <br>
+                                <span class="security-title">All transactions are secure and encrypted...</span>
+                            </div>
+                            <div class="payment-logo-wrapper">
+                                <img 
+                                data-bind="attr: { 
+                                    src: require.toUrl('Sapient_Worldpay/images/cc/worldpay-logo.png') 
+                                }" 
+                                alt="worldpay logo" class="worldpay-logo-paymentscreen">
+                                <?= $block->getChildHtml('payment_method_paybylink') ?>
+                            </div>
+                        </legend><br>
+                        <?php endif; ?>
+                            <?php
+                            foreach ($wpMethods as $_method):
                                 $code = $_method->getCode();
                                 $checked = $block->getSelectedMethodCode() === $code;
 
@@ -139,16 +147,105 @@ class="form multicheckout billing">
 
                                         <!-- End Worldpay plugin customization -->
                                     </dt>
-                                    <?php if ($html = $block->getChildHtml('payment.method.' . $code)): ?>
+                                     <?php if ($html = $block->getChildHtml('payment.method.' . $code)): ?>
+                                        <dd class="item-content wp-method-contents <?= $checked ? '' : 'no-display'; ?>"
+                                        >
+                                            <?= /* @noEscape */ $html; ?>
+                                        </dd>
+                                    <?php endif; ?>
+                                </div>
+
+                             <?php endforeach; ?>
+                        </dl>
+                            <?= $block->getChildHtml('payment_methods_wallets') ?>
+                        <?php endif; ?>
+                        <?php if (count($otherPaymentMethods) > 0): ?>
+                            <div class="other-payment-methods-wrapper">
+                                <div class="payment-title-wrapper">
+                                    <h2 class="step-title">Other Payment Methods</h2>
+                                </div>         
+                            </div>
+                            <?= $block->getChildHtml('payment_methods_before') ?>
+                        <!-- Default Payment Methods START -->
+                        <dl class="checkout-payment-method mage-default" id="payment-methods-default">
+                            <?php
+                            foreach ($methods as $_method):
+                                $code = $_method->getCode();
+                                $checked = $block->getSelectedMethodCode() === $code;
+                                if (in_array($code, $block->getWorldpayMethodsCode())) {
+                                    continue;
+                                }
+                                if (isset($methodsForms[$code])) {
+                                    $block->setMethodFormTemplate($code, $methodsForms[$code]);
+                                }
+                                ?>
+                                <div data-bind="scope: 'payment_method_<?= $escaper->escapeHtml($code); ?>'">
+                                    <dt class="item-title">
+                                        <?php if ($methodsCount > 1): ?>
+                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>" 
+                                            value="<?= $escaper->escapeHtml($code); ?>" 
+                                            name="payment[method]" 
+                                            title="<?= $escaper->escapeHtml($_method->getTitle()) ?>" 
+                                            data-bind="
+                                                       value: getCode(),
+                                                       checked: isChecked,
+                                                       click: selectPaymentMethod,
+                                                       visible: isRadioButtonVisible()" 
+                                                       <?php if ($checked): ?> checked="checked" <?php endif; ?> 
+                                                        class="radio payment-method" />
+                                        <?php else: ?>
+                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>" 
+                                            value="<?= $escaper->escapeHtml($code); ?>" name="payment[method]" 
+                                            data-bind="
+                                                       value: getCode(),
+                                                       afterRender: selectPaymentMethod" checked="checked" 
+                                                       class="radio solo method" />
+                                        <?php endif; ?>
+                                        <label for="p_method_<?= $escaper->escapeHtml($code); ?>">
+                                            <?= $escaper->escapeHtml($_method->getTitle()) ?>
+                                        </label>
+                                        <!-- Start Worldpay plugin customization -->
+                                        <?php
+                                        if ($code == 'worldpay_cc' ||
+                                            $code == 'worldpay_apm' ||
+                                            $code == 'worldpay_wallets') {
+                                            ?>
+                                            <div class='accepted_cc'>
+                                                <span class='worldpay_cc_we_accept'>
+                                                    <!-- ko i18n: getCheckoutLabels('CO2')-->
+                                                    <!-- /ko -->
+                                                </span>
+                                                <div class="paymentoptions-icon-wrapper">
+                                                    <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
+                                                    <!--ko if: $parent.getIcons(item.ccValue) -->
+                                                    <div data-bind="attr: {for: 'direct_cc_' + item.ccValue}">
+                                                        <img 
+                                                        data-bind="attr: {
+                                                                   'src': $parent.getIcons(item.ccValue).url,
+                                                                    'alt': item.ccLabel,
+                                                                    'width': $parent.getIcons(item.ccValue).width,
+                                                                    'height': $parent.getIcons(item.ccValue).height
+                                                                    }"></div>
+                                                    <!--/ko-->
+                                                    <!--/ko-->
+
+                                                </div>
+                                            </div>
+                                        <?php } ?>
+
+                                        <!-- End Worldpay plugin customization -->
+                                    </dt>
+                                     <?php if ($html = $block->getChildHtml('payment.method.' . $code)): ?>
                                         <dd class="item-content <?= $checked ? '' : 'no-display'; ?>">
                                             <?= /* @noEscape */ $html; ?>
                                         </dd>
                                     <?php endif; ?>
                                 </div>
 
-                            <?php endforeach; ?>
+                             <?php endforeach; ?>
                         </dl>
-                        <?= $block->getChildHtml('payment_methods_wallets') ?>
+                        <!-- END Default Payment Methods -->
+                        <?php endif; ?>
                         
                         <?= $block->getChildHtml('payment_methods_after') ?>
                         <?= $block->getChildHtml('checkout_billing_items') ?>
@@ -156,6 +253,14 @@ class="form multicheckout billing">
                     
                 </fieldset>
                 <div class="actions-toolbar wp-actions-toolbar">
+                <div id="checkout-agreement-div" style="display:none">
+                    <?= /* @noEscape */ $block->getChildHtml('agreements') ?>
+                    <div id="checkout-agreement-error-msg" style="display:none">
+                        <span id="checkout-agreement-error-msg-span" style="color:red">
+                        <?= $block->escapeHtml(__('Please accept all Terms & Conditions')); ?>
+                    </span>
+                    </div>
+                </div>
                     <div class="billing-totals">
                         <strong class="box-title grand totals">
                             <span class="billing-mark"><?= $block->escapeHtml(__('Grand Total:')); ?></span>
@@ -293,9 +398,17 @@ class="form multicheckout billing">
                 var item = event.target.value;
                 if (item == 'worldpay_cc' || item == 'worldpay_wallets' || item == 'worldpay_apm') {
                     document.getElementById("payment-continue").innerHTML = "<span>Place Order</span>";
+                    document.querySelectorAll('.wp-method-contents').forEach((elem) => {
+                        elem.classList.remove("no-display");
+                    });                    
+                    document.getElementById("checkout-agreement-div").style.display = "block";
                 } else {
+                    document.querySelectorAll('.wp-method-contents').forEach((elem) => {
+                        elem.classList.add("no-display");
+                    });                    
                     document.getElementById("payment-continue").innerHTML = "<span>Go to Review Your Order</span>";
-                }
+                    document.getElementById("checkout-agreement-div").style.display = "none";
+                }               
             });
         });
     }
@@ -304,13 +417,13 @@ class="form multicheckout billing">
 $scriptString = <<<script
 
     require(['jquery', 'mage/mage'], function(jQuery) {
-        var addtocartForm = jQuery('#multishipping-billing-form');
+        var multiShippingForm = jQuery('#multishipping-billing-form');
 
-        addtocartForm.mage('payment', {
+        multiShippingForm.mage('payment', {
             checkoutPrice: {$quoteBaseGrandTotal}
         });
 
-        addtocartForm.mage('validation', {
+        multiShippingForm.mage('validation', {
             errorPlacement: function(error, element) {
                 if (element.attr('data-validate') && element.attr('data-validate').indexOf('validate-cc-ukss') >= 0) {
                     element.parents('form').find('[data-validation-msg="validate-cc-ukss"]').html(error);
@@ -319,7 +432,7 @@ $scriptString = <<<script
                 }
             }
         });
-    });
+ });
 
 script;
 ?>

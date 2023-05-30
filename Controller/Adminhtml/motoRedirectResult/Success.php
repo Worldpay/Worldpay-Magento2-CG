@@ -15,6 +15,21 @@ use Exception;
 class Success extends \Magento\Backend\App\Action
 {
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+
+    protected $orderservice;
+
+    /**
+     * @var JsonFactory
+     */
+    protected $resultJsonFactory;
+    /**
      * Constructor
      *
      * @param Context $context

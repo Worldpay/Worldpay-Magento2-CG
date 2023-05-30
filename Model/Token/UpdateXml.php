@@ -12,12 +12,12 @@ use Sapient\Worldpay\Model\SavedToken;
 class UpdateXml implements UpdateInterface
 {
     /**
-     * @var SimpleXMLElement
+     * @var \SimpleXMLElement
      */
     private $_xml;
 
     /**
-     * @param SimpleXMLElement $xml
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {

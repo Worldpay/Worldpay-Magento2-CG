@@ -87,6 +87,61 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * @var curlHelper
      */
     protected $curlHelper;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $_storeManager;
+
+    /**
+     * @var \Magento\Customer\Model\CustomerFactory
+     */
+    protected $customerFactory;
+
+    /**
+     * @var \Magento\Customer\Api\CustomerRepositoryInterface
+     */
+    protected $customerRepository;
+
+    /**
+     * @var \Magento\Sales\Model\Service\OrderService
+     */
+    protected $orderService;
+
+    /**
+     * @var \Magento\Quote\Model\Quote\Payment
+     */
+    protected $payment;
+
+     /**
+      * @var \Magento\Checkout\Model\Cart
+      */
+    protected $cart;
+
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
+    protected $customerSession;
+
+    /**
+     * @var \Magento\Integration\Model\Oauth\TokenFactory
+     */
+    protected $tokenModelFactory;
+
+    /**
+     * @var \Magento\Quote\Model\QuoteFactory
+     */
+    protected $quote;
+
+    /**
+     * @var \Magento\Quote\Model\QuoteManagement
+     */
+    protected $quoteManagement;
+
+    /**
+     * @var \Magento\Integration\Model\Oauth\TokenFactory
+     */
+    protected $_tokenModelFactory;
     /**
      * Recurring constructor
      * @param \Magento\Framework\App\Helper\Context $context
@@ -145,15 +200,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $this->localeDate = $localeDate;
         $this->scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
-        $this->_product = $product;
-        $this->_formkey = $formkey;
         $this->quote = $quote;
         $this->quoteManagement = $quoteManagement;
         $this->customerFactory = $customerFactory;
         $this->customerRepository = $customerRepository;
         $this->orderService = $orderService;
         $this->payment = $payment;
-        $this->_cart = $cart;
         $this->_customerSession = $customerSession;
         $this->_tokenModelFactory = $tokenModelFactory;
         $this->serializer = $serializer;
@@ -607,8 +659,6 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $customer->loadByEmail($orderData['email']);// load customet by email address
         $customerToken = $this->_tokenModelFactory->create();
         $tokenKey = $customerToken->createCustomerToken($customer->getId())->getToken();
-        $savedShippingMethod = explode('_', $orderData['shipping_method']);
-        
         $quoteId = $this->createEmptyQuote($tokenKey);
         $itemData = [];
         $itemData['cartItem'] = ['sku' => $orderData['product_sku'],
@@ -621,20 +671,22 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $this->updateCartItem($cartId, $itemId, $price, $orderData['qty']);
         $addressData = [];
         $addressData['address'] = $orderData['shipping_address'];
-        $shippingMethodResponse = $this->getShippingMethods($tokenKey, json_encode($addressData));
-        foreach ($shippingMethodResponse as $shippingMethod) {
-            if ($shippingMethod['carrier_code'] == $savedShippingMethod[0]) {
-                $shippingCarrierCode = $shippingMethod['carrier_code'];
-                $shippingMethodCode = $shippingMethod['method_code'];
+        if (!empty($orderData['shipping_method'])) {
+            $savedShippingMethod = explode('_', $orderData['shipping_method']);
+            $shippingMethodResponse = $this->getShippingMethods($tokenKey, json_encode($addressData));
+            foreach ($shippingMethodResponse as $shippingMethod) {
+                if ($shippingMethod['carrier_code'] == $savedShippingMethod[0]) {
+                    $shippingCarrierCode = $shippingMethod['carrier_code'];
+                    $shippingMethodCode = $shippingMethod['method_code'];
+                }
             }
+            $shippingInformation = [];
+            $shippingInformation['addressInformation']['shipping_address'] = $orderData['shipping_address'];
+            $shippingInformation['addressInformation']['billing_address'] = $orderData['billing_address'];
+            $shippingInformation['addressInformation']['shipping_carrier_code'] = $shippingCarrierCode;
+            $shippingInformation['addressInformation']['shipping_method_code'] = $shippingMethodCode;
+            $shippingResponse = $this->setShippingInformation($tokenKey, json_encode($shippingInformation));
         }
-        $shippingInformation = [];
-        $shippingInformation['addressInformation']['shipping_address'] = $orderData['shipping_address'];
-        $shippingInformation['addressInformation']['billing_address'] = $orderData['billing_address'];
-        $shippingInformation['addressInformation']['shipping_carrier_code'] = $shippingCarrierCode;
-        $shippingInformation['addressInformation']['shipping_method_code'] = $shippingMethodCode;
-                
-        $shippingResponse = $this->setShippingInformation($tokenKey, json_encode($shippingInformation));
         $paymentData = json_encode($paymentData);
         $orderId = $this->orderPayment($tokenKey, $paymentData);
         return $orderId;

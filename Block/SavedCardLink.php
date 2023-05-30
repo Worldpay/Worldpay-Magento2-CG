@@ -28,6 +28,14 @@ class SavedCardLink extends \Magento\Framework\View\Element\Html\Link\Current
     
     protected $_scopeConfig = null;
     /**
+     * @var WorldpayConfigProvider
+     */
+    protected $config;
+    /**
+     * @var Data
+     */
+    protected $helper;
+    /**
      * Constructor
      *
      * @param string $context

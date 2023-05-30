@@ -62,13 +62,6 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     public $session;
     
     /**
-     * Locale model
-     *
-     * @var \Magento\Framework\Locale\ResolverInterface
-     */
-    protected $localeResolver;
-    
-    /**
      * @var SerializerInterface
      */
     private $serializer;
@@ -77,6 +70,51 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @var fileDriver
      */
     protected $fileDriver;
+
+     /**
+      * @var \Magento\Customer\Model\Session
+      */
+    protected $customerSession;
+
+     /**
+      * @var \Magento\Backend\Model\Session\Quote
+      */
+    protected $adminquotesession;
+
+     /**
+      * @var SavedTokenFactory
+      */
+    protected $savedTokenFactory;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Utilities\PaymentMethods
+      */
+    protected $paymentmethodutils;
+
+     /**
+      * @var \Magento\Backend\Model\Auth\Session
+      */
+    protected $backendAuthSession;
+
+     /**
+      * @var Repository
+      */
+    protected $assetRepo;
+
+     /**
+      * @var RequestInterface
+      */
+    protected $request;
+
+     /**
+      * @var Source
+      */
+    protected $assetSource;
+
+     /**
+      * @var \Magento\Framework\Locale\ResolverInterface
+      */
+    protected $localeResolver;
     
     /**
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
@@ -252,6 +290,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['latAmCountries'] = $this->worldpayHelper->getConfigCountries();
                 //ACH Pay
                 $config['payment']['ccform']['achdetails'] = $this->worldpayHelper->getACHDetails();
+                //Sepa Pay
+                $config['payment']['ccform']['sepadetails'] = $this->worldpayHelper->getSEPADetails();
+                $config['payment']['ccform']['sepa_e_mandate'] = $this->worldpayHelper->getSepaEmandate();
                 //Prime Routing
                 $config['payment']['ccform']['isPrimeRoutingEnabled'] = $this->worldpayHelper->isPrimeRoutingEnabled();
                 

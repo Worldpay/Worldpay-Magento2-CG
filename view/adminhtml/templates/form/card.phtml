@@ -124,8 +124,8 @@ $serializedFormData = $block->getJsonData($wpData);
 <!--            <span>CVV</span>-->
        </label>
         <div class="admin__field-control control" id="wp_cvc_container">
-         <input type="number" autocomplete="off"
-                   class="input-text cvv saved-cvv-number required-entry validate-cc-cvn"
+         <input type="password" autocomplete="off"
+                   class="input-text cvv saved-cvv-number required-entry validate-cc-cvn validate-digits"
                    name="payment[cvv]"
                    value="" />
         </div>
@@ -192,8 +192,8 @@ $serializedFormData = $block->getJsonData($wpData);
 <!--                    <span>CVN</span>-->
                   </label>
                 <div class="admin__field-control control" id="wp_cvc_container">
-                 <input type="number" autocomplete="off"
-                           class="input-text cvv saved-cvv-number required-entry"
+                 <input type="password" autocomplete="off"
+                           class="input-text cvv saved-cvv-number required-entry validate-digits"
                            name="payment[saved_cc_cid]"
                            value="" />
                 </div>

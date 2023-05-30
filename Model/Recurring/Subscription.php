@@ -167,6 +167,11 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     public $registryObj;
 
     /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
+    private $recurringHelper;
+
+    /**
      * Subscription model constructor.
      *
      * @param \Magento\Framework\Model\Context $context

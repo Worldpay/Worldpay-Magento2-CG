@@ -1,0 +1,66 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@vars {
+"var mail_subject|raw":"Mail Subject",
+"var customerName|raw":"Customer Full Name",
+"var orderId":"Order Id",
+"var order_total|": "Order Total",
+"var shipping_address|raw":"Shipping Address",
+"var formated_shipping|raw":"Formated Shipping",
+"var paybylink_url":"Pay by link Url"
+"var quote_id" : "quote_id"
+"var pblexpirytime": "Pay by link expiry time"
+"var multishipping_order_ids" : "Multishipping Order Ids"
+} @-->
+<!--@subject {{var mail_subject|raw }} @-->
+{{template config_path="design/email/header_template"}}
+
+<table>
+    <tr class="email-intro">
+        <td>
+            <p class="greeting"> {{trans "Dear"}} {{var customerName}}, </p>
+            <p>{{trans "Thanks for your business. Your multishipping order has been successfully generated " }}<b>{{var orderId }} </b></p>
+            <p>{{trans "This is to inform you that your payment can be made by clicking below secure link."}}</p>
+            <table style="width: 120px;text-align:center;border:none;">
+                <tr>
+                    <td style="border-radius:4px;padding:9.0pt 13.5pt 9.0pt 13.5pt;background-color:#1979c3;"><a href = {{var paybylink_url}} style="color: #fff;">
+                        {{trans "Pay Now"}}</a></td>
+                </tr>
+            </table>  
+        </td>
+    </tr>
+    <tr>
+        <td>
+            {{trans "Please note that the link will get expired "}}<b>{{var pblexpirytime }} </b>
+        </td>
+    </tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+        <td>
+            {{trans "Here are the details of your generated order,"}}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table class="order-details">
+                <td class="shipping-information" style="width:48%; float:left">
+                    {{layout handle="wp_paybylink_multishipping_email_address" quote_id=$quote_id area="frontend"}}
+                </td>
+                <td class="method-info" style="width:48%; float:left">
+                    <h3><b>{{trans "Order Total"}}</b></h3>
+                    <p>{{var order_total }}</p>
+                </td>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>{{trans "If you have queries about this payment, or would you like to chat, feel free to contact us."}}</td>
+    </tr>
+</table>
+  
+{{template config_path="design/email/footer_template"}} 

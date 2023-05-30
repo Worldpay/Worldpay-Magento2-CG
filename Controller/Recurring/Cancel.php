@@ -39,24 +39,33 @@ class Cancel extends \Magento\Framework\App\Action\Action
     private $helper;
 
     /**
+     * @var \Magento\Customer\Model\Url
+     */
+
+    private $customerUrl;
+
+    /**
      * @param Context $context
      * @param Session $customerSession
      * @param SubscriptionFactory $subscriptionFactory
      * @param TransactionsFactory $transactionFactory
      * @param MyAccountException $helper
+     * @param \Magento\Customer\Model\Url $customerUrl
      */
     public function __construct(
         Context $context,
         Session $customerSession,
         SubscriptionFactory $subscriptionFactory,
         TransactionsFactory $transactionFactory,
-        MyAccountException $helper
+        MyAccountException $helper,
+        \Magento\Customer\Model\Url $customerUrl
     ) {
         parent::__construct($context);
         $this->customerSession = $customerSession;
         $this->subscriptionFactory = $subscriptionFactory;
         $this->transactionFactory = $transactionFactory;
         $this->helper = $helper;
+        $this->customerUrl = $customerUrl;
     }
 
     /**
@@ -67,8 +76,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
      */
     public function dispatch(RequestInterface $request)
     {
-        $loginUrl = $this->_objectManager->get(\Magento\Customer\Model\Url::class)->getLoginUrl();
-
+        $loginUrl = $this->customerUrl->getLoginUrl();
         if (!$this->customerSession->authenticate($loginUrl)) {
             $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
         }

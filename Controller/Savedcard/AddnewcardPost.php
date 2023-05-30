@@ -72,6 +72,75 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
 
     protected $helper;
 
+     /**
+      * @var \Magento\Framework\Controller\Result\JsonFactory
+      */
+     protected $resultJsonFactory;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $_storeManager;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Magento\Customer\Api\AddressRepositoryInterface
+     */
+    protected $addressRepository;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+     */
+    protected $_paymentservicerequest;
+
+    /**
+     * @var \Magento\Framework\Session\SessionManagerInterface
+     */
+    protected $session;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Response\DirectResponse
+     */
+    protected $directResponse;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
+     */
+    protected $updateWorldPayPayment;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    protected $paymentservice;
+
+    /**
+     * @var \Magento\Integration\Model\Oauth\TokenFactory
+     */
+    protected $_tokenModelFactory;
+
+    /**
+     * @var \Magento\SalesSequence\Model\Manager
+     */
+    protected $sequenceManager;
+     /**
+      * @var \Sapient\Worldpay\Helper\Registry
+      */
+    protected $registryhelper;
+
     /**
      * Constructor
      *

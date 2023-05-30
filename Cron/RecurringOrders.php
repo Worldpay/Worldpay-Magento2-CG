@@ -64,7 +64,52 @@ class RecurringOrders
      * @var CollectionFactory
      */
     private $addressCollectionFactory;
-    
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    private $worldpayhelper;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    protected $paymentservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+    protected $orderservice;
+
+    /**
+     * @var JsonFactory
+     */
+    protected $resultJsonFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\SavedToken
+     */
+    protected $worldpaytoken;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
+    protected $recurringhelper;
+
+      /**
+       * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
+       */
+    protected $transactionFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Recurring\PlanFactory
+     */
+    protected $planFactory;
+
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
+     */
+    protected $_orderCollectionFactory;
+     
     /**
      * Constructor
      *
@@ -78,7 +123,7 @@ class RecurringOrders
      * @param \Sapient\Worldpay\Model\Recurring\Subscription $subscriptions
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\Transactions $recurringTransactions
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\Address $subscriptionAddress
-     * @param Sapient\Worldpay\Helper\Recurring $recurringhelper
+     * @param \Sapient\Worldpay\Helper\Recurring $recurringhelper
      * @param SubscriptionFactory $subscriptionFactory
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
      * @param \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
@@ -129,8 +174,12 @@ class RecurringOrders
                 $totalInfo = $this->getTotalDetails($recurringOrderData);
                 if ($totalInfo && isset($totalInfo['tokenData'][0])) {
                     $orderDetails = $totalInfo['orderDetails'][0];
-                    $addressDetails['shipping'] = $totalInfo['addressData'][1];
                     $addressDetails['billing'] = $totalInfo['addressData'][0];
+                    if (!empty($totalInfo['addressData'][1])) {
+                        $addressDetails['shipping'] = $totalInfo['addressData'][1];
+                    } else {
+                        $addressDetails['shipping'] = $totalInfo['addressData'][0];
+                    }
                     $subscriptionDetails = $totalInfo['subscriptionData'][0];
                     $tokenDetails = $totalInfo['tokenData'][0];
                     $orderData = [
@@ -289,7 +338,7 @@ class RecurringOrders
     {
         if ($this->orderCollectionFactory === null) {
 
-            $this->orderCollectionFactory = ObjectManager::getInstance()->get(CollectionFactoryInterface::class);
+            $this->orderCollectionFactory = $this->_orderCollectionFactory;
         }
         return $this->orderCollectionFactory;
     }

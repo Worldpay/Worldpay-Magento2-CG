@@ -8,6 +8,17 @@ class Factory
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\WorldPayPayment
+     */
+    private $worldpaymentmodel;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    private $_multishippingHelper;
+
     /**
      * Constructor
      *

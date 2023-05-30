@@ -12,4 +12,9 @@
             </argument>
         </arguments>
     </virtualType>
+    <!-- Sale order grid -->
+    <type name="Magento\Sales\Model\ResourceModel\Order\Grid\Collection">
+        <plugin name="wpSalesOrderGrid" type="\Sapient\Worldpay\Plugin\SalesOrderGridPlugin" />
+    </type>
 </config>
+

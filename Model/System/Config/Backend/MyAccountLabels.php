@@ -27,6 +27,11 @@ class MyAccountLabels extends \Magento\Framework\App\Config\Value
      */
     private $storeManager;
 
+     /**
+      *
+      * @var \Sapient\Worldpay\Helper\MyAccountLabels
+      */
+    private $myAccountLabels;
     /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry

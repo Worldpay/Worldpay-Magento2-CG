@@ -6,7 +6,10 @@ namespace Sapient\Worldpay\Block\Adminhtml\Form\Field;
 
 class Paymentmethod extends \Magento\Framework\View\Element\Html\Select
 {
-    
+    /**
+     * @var \Sapient\Worldpay\Model\Utilities\PaymentMethods
+     */
+    public $paymentutils;
     /**
      * Paymentmethod constructor.
      *

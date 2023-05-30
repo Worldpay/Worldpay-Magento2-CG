@@ -19,7 +19,7 @@ abstract class ResponseAbstract
     public const PAYMENT_DETAILS_ERROR = 7;
 
     /**
-     * @var SimpleXmlElement
+     * @var \SimpleXmlElement
      */
     protected $_responseXml;
     /**

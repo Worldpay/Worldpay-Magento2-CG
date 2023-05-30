@@ -21,7 +21,10 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\StateInterface
      * @var amount
      */
     public $amount;
-
+    /**
+     * @var string
+     */
+    public $merchantCode;
     /**
      * Constructor
      *

@@ -32,6 +32,43 @@ class Cancel extends \Magento\Backend\App\Action
     private $_paymentUpdate;
 
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    protected $paymentservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+
+    protected $orderservice;
+
+    /**
+     * @var JsonFactory
+     */
+    protected $resultJsonFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Adminhtml\Order\Service
+     */
+    protected $adminorderservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Request\AuthenticationService
+     */
+    protected $authenticatinservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\StateResponse
+     */
+    protected $paymentStateResponse;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\WpResponse
+     */
+    protected $wpresponse;
+    /**
      * Constructor
      *
      * @param Context $context

@@ -37,6 +37,54 @@ EOD;
     private $exponent;
 
     /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+     /**
+      * @var \Magento\Store\Model\StoreManagerInterface
+      */
+    protected $storeManager;
+
+    /**
+     * @var Order $order
+     */
+    protected $order;
+
+    /**
+     * @var mixed
+     */
+    protected $captureType;
+
+    /**
+     * @var bool
+     */
+    protected $isMultishippingOrder;
+
+    /**
+     * @var string|null
+     */
+    protected $paymentType;
+
+    /**
+     * @var array|null
+     */
+    protected $invoicedItems;
+
+     /**
+      * Capture constructor
+      *
+      * @param Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+      * @param Magento\Store\Model\StoreManagerInterface $storeManager
+      */
+
+    public function __construct(
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Store\Model\StoreManagerInterface $storeManager
+    ) {
+        $this->scopeConfig = $scopeConfig;
+        $this->storeManager = $storeManager;
+    }
+    /**
      * Build xml for processing Request
      *
      * @param string $merchantCode
@@ -81,12 +129,8 @@ EOD;
         $orderModification = $this->_addOrderModificationElement($modify);
         $capture = $this->_addCapture($orderModification);
         $this->_addCaptureElement($capture);
-        
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
-        
-        $level23DataEnabled = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
-                        ->getValue('worldpay/level23_config/level23', $storeScope);
+        $level23DataEnabled = $this->scopeConfig->getValue('worldpay/level23_config/level23', $storeScope);
         
          //Level23 data changes
         $countryCode = $order->getBillingAddress()->getCountryId();
@@ -140,13 +184,11 @@ EOD;
     private function _addCapture($orderModification)
     {
         $capture = $orderModification->addChild('capture');
-        
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
         
-        $autoInvoice = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+        $autoInvoice = $this->scopeConfig
                 ->getValue('worldpay/general_config/capture_automatically', $storeScope);
-        $partialCapture = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+        $partialCapture = $this->scopeConfig
                 ->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
         //check the partial capture
         if ($this->captureType == 'partial' && $partialCapture) {
@@ -182,12 +224,11 @@ EOD;
         $amountElement['exponent'] = $this->exponent;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
         
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
         
-        $autoInvoice = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+        $autoInvoice = $this->scopeConfig
                         ->getValue('worldpay/general_config/capture_automatically', $storeScope);
-        $partialCapture = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+        $partialCapture = $this->scopeConfig
                         ->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
        
         //check the partial capture
@@ -244,13 +285,12 @@ EOD;
             $purchase->addChild('customerReference', $order->getCustomerId());
         }
          
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
         
-        $cardAcceptorTaxId = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+        $cardAcceptorTaxId = $this->scopeConfig
                         ->getValue('worldpay/level23_config/CardAcceptorTaxId', $storeScope);
         
-        $dutyAmount = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)
+        $dutyAmount = $this->scopeConfig
                         ->getValue('worldpay/level23_config/duty_amount', $storeScope);
         
          $taxAmount = $order->getTaxAmount();
@@ -444,8 +484,7 @@ EOD;
         $this->_addCDATA($orderTaxAmountElement, $this->_amountAsInt($order->getTaxAmount()));
         
         //terms url
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $store = $objectManager->get(\Magento\Store\Model\StoreManagerInterface::class)->getStore();
+        $store = $this->storeManager->getStore();
         $termsURLElement = $orderLinesElement->addChild('termsURL');
         $this->_addCDATA($termsURLElement, $store->getBaseUrl());
         

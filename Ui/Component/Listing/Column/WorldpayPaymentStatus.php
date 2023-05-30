@@ -39,6 +39,12 @@ class WorldpayPaymentStatus extends Column
      * @var OrderRepositoryInterface
      */
     protected $_orderRepository;
+
+    /**
+     *
+     * @var Data
+     */
+    protected $helper;
     
     /**
      * Worldpay Payment Status constructor

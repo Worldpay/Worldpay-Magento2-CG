@@ -39,6 +39,12 @@ class InvoiceStatus extends Column
      * @var OrderRepositoryInterface
      */
     protected $_orderRepository;
+
+    /**
+     *
+     * @var Data
+     */
+    protected $helper;
     
     /**
      * Invoice Status constructor

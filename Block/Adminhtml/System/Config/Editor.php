@@ -8,6 +8,10 @@ use Magento\Cms\Model\Wysiwyg\Config as WysiwygConfig;
 class Editor extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
+     * @var WysiwygConfig
+     */
+    protected $_wysiwygConfig;
+    /**
      * @var  Registry
      */
     protected $_coreRegistry;

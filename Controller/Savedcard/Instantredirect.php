@@ -20,6 +20,11 @@ class Instantredirect extends \Magento\Framework\App\Action\Action
     protected $redirect;
    
     /**
+     * @var \Sapient\Worldpay\Model\Token\WorldpayToken
+     */
+    protected $wplogger;
+
+    /**
      * Constructor
      *
      * @param Context $context

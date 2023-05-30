@@ -49,6 +49,11 @@ class FormPost extends \Magento\Framework\App\Action\Action
     protected $helper;
 
     /**
+     * @var \Magento\Customer\Model\Url
+     */
+    private $customerUrl;
+
+    /**
      * @param Context $context
      * @param Session $customerSession
      * @param Validator $validator
@@ -56,6 +61,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
      * @param PaymentTokenFactory $tokenFactory
      * @param CollectionFactory $regionCollectionFactory
      * @param MyAccountException $helper
+     * @param \Magento\Customer\Model\Url $customerUrl
      */
     public function __construct(
         Context $context,
@@ -64,7 +70,8 @@ class FormPost extends \Magento\Framework\App\Action\Action
         SubscriptionFactory $subscriptionFactory,
         PaymentTokenFactory $tokenFactory,
         CollectionFactory $regionCollectionFactory,
-        MyAccountException $helper
+        MyAccountException $helper,
+        \Magento\Customer\Model\Url $customerUrl
     ) {
         parent::__construct($context);
         $this->customerSession = $customerSession;
@@ -73,6 +80,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
         $this->tokenFactory = $tokenFactory;
         $this->regionCollectionFactory = $regionCollectionFactory;
         $this->helper = $helper;
+        $this->customerUrl = $customerUrl;
     }
 
     /**
@@ -83,8 +91,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
      */
     public function dispatch(RequestInterface $request)
     {
-        $loginUrl = $this->_objectManager->get(\Magento\Customer\Model\Url::class)->getLoginUrl();
-
+        $loginUrl = $this->customerUrl->getLoginUrl();
         if (!$this->customerSession->authenticate($loginUrl)) {
             $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
         }

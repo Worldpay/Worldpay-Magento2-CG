@@ -8,9 +8,9 @@ use Magento\Framework\Session\SessionManagerInterface;
 class Service
 {
     /**
-     * @var _logger
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
-    protected $_logger;
+    protected $wplogger;
     /**
      * @var savedTokenFactory
      */
@@ -19,10 +19,6 @@ class Service
      * @var _scopeConfig
      */
     protected $_scopeConfig;
-    /**
-     * @var session
-     */
-    protected $session;
     /**
      * @var THIS_TRANSACTION
      */
@@ -59,6 +55,36 @@ class Service
       * @var NO_CHANGE
       */
     public const NO_CHANGE = 'noChange';
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+
+     /**
+      * @var \Sapient\Worldpay\Model\SavedToken
+      */
+    protected $savedtoken;
+
+     /**
+      * @var \Magento\Framework\UrlInterface
+      */
+    protected $_urlBuilder;
+
+     /**
+      * @var \Magento\Framework\Session\SessionManagerInterface
+      */
+    protected $session;
+
+     /**
+      * @var \Magento\Customer\Model\Session
+      */
+    protected $customerSession;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
+    protected $recurringHelper;
     /**
      * Constructor
      *
@@ -123,6 +149,10 @@ class Service
             $orderLineItems = $this->_getL23OrderLineItems($quote, $vaultPaymentDetails['brand'].'-SSL');
             $vaultPaymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
         }
+        $isMultiShippingOrder = 0;
+        if ((bool)$quote->getIsMultiShipping()) {
+            $isMultiShippingOrder = 1;
+        }
         
         return [
             'orderCode' => $orderCode,
@@ -151,7 +181,8 @@ class Service
             'shopperId' => $quote->getCustomerId(),
             'exponent' => $exponent,
             'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote),
-            'orderLineItems' => $orderLineItems
+            'orderLineItems' => $orderLineItems,
+            'isMultishippingOrder' => $isMultiShippingOrder
         ];
     }
     /**
@@ -202,7 +233,11 @@ class Service
         }
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
-          
+        $isMultiShippingOrder = 0;
+        if ((bool)$quote->getIsMultiShipping()) {
+            $isMultiShippingOrder = 1;
+        }
+
         return [
                 'orderCode' => $orderCode,
                 'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -235,7 +270,8 @@ class Service
                 'shippingfee' => $shippingFee,
                 'exponent' => $exponent,
                 'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote),
-                'orderLineItems' => $orderLineItems
+                'orderLineItems' => $orderLineItems,
+                'isMultishippingOrder' => $isMultiShippingOrder
             ];
     }
     /**
@@ -358,6 +394,10 @@ class Service
             $orderLineItems = $this->_getL23OrderLineItems($quote, $paymentType);
             $updatedPaymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
         }
+
+        if (!empty($paymentDetails['is_paybylink_order'])) {
+            $orderLineItems = $this->_getOrderLineItems($quote, 'null');
+        }
              
         if ($paymentDetails['additional_data']['cc_type'] !== 'savedcard') {
             $updatedPaymentDetails['cardType'] = $paymentType;
@@ -380,6 +420,10 @@ class Service
         }
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
+        $isMultiShippingOrder = 0;
+        if ((bool)$quote->getIsMultiShipping()) {
+            $isMultiShippingOrder = 1;
+        }
         return [
                 'orderCode' => $orderCode,
                 'merchantCode' => $this->worldpayHelper->
@@ -416,6 +460,7 @@ class Service
                 'orderLineItems' => $orderLineItems,
                 'saveCardEnabled' => $savemyCard,
                 'storedCredentialsEnabled' => $storedCredentialsEnabled,
+                'isMultishippingOrder' => $isMultiShippingOrder
                 
             ];
     }
@@ -446,6 +491,10 @@ class Service
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
         $countryCode = $quote->getBillingAddress()->getCountryId();
+        $isMultiShippingOrder = 0;
+        if ((bool)$quote->getIsMultiShipping()) {
+            $isMultiShippingOrder = 1;
+        }
         return [
             'orderCode' => $orderCode,
             'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -475,7 +524,8 @@ class Service
             'shopperId' => $quote->getCustomerId(),
             'exponent' => $exponent,
             'sessionData' => $this->_getSessionDetails($paymentDetails, $countryCode),
-            'orderContent' => $orderContent
+            'orderContent' => $orderContent,
+            'isMultishippingOrder' => $isMultiShippingOrder
         ];
     }
     /**
@@ -527,7 +577,16 @@ class Service
             $orderLineItems = $this->_getL23OrderLineItems($quote, $paymentType);
             $updatedPaymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
         }
-
+        $merchantCode = $this->worldpayHelper->getMerchantCode($paymentType);
+        if (isset($updatedPaymentDetails['isRecurringOrder'])) {
+            if ($updatedPaymentDetails['isRecurringOrder'] == 1) {
+                $merchantCode = $this->worldpayHelper->getRecurringMerchantCode($paymentType);
+            }
+        }
+        $isMultiShippingOrder = 0;
+        if ((bool)$quote->getIsMultiShipping()) {
+            $isMultiShippingOrder = 1;
+        }
         return [
             'orderCode' => $orderCode,
                 'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentType),
@@ -561,7 +620,8 @@ class Service
                 'shippingfee' => $shippingFee,
                 'exponent' => $exponent,
                 'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote),
-                'orderLineItems' => $orderLineItems
+                'orderLineItems' => $orderLineItems,
+                'isMultishippingOrder' => $isMultiShippingOrder
             ];
     }
     /**
@@ -596,6 +656,10 @@ class Service
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
         
+        $isMultiShippingOrder = 0;
+        if ((bool)$quote->getIsMultiShipping()) {
+            $isMultiShippingOrder = 1;
+        }
         return [
             'orderCode' => $orderCode,
             'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -617,7 +681,63 @@ class Service
             'orderStoreId' => $orderStoreId,
             'shopperId' => $quote->getCustomerId(),
             'statementNarrative' => $stmtNarrative,
-            'exponent' => $exponent
+            'exponent' => $exponent,
+            'isMultishippingOrder' => $isMultiShippingOrder
+        ];
+    }
+    /**
+     * Collect SEPA Order Parameters
+     *
+     * @param string $orderCode
+     * @param int $quote
+     * @param string $orderStoreId
+     * @param array $paymentDetails
+     * @return array
+     */
+    public function collectSEPAOrderParameters(
+        $orderCode,
+        $quote,
+        $orderStoreId,
+        $paymentDetails
+    ) {
+        $reservedOrderId = $quote->getReservedOrderId();
+        $stmtNarrative = '';
+        $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
+        if (array_key_exists($paymentDetails['additional_data']['cc_type'], $apmPaymentTypes)
+                && (isset($paymentDetails['additional_data']['statementNarrative']))) {
+            $stmtNarrative = $paymentDetails['additional_data']['statementNarrative'];
+            $stmtNarrative = strlen($stmtNarrative)>15?substr($stmtNarrative, 0, 15):$stmtNarrative;
+        }
+        $currencyCode = $quote->getQuoteCurrencyCode();
+        $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
+        
+        $isMultiShippingOrder = 0;
+        if ((bool)$quote->getIsMultiShipping()) {
+            $isMultiShippingOrder = 1;
+        }
+        return [
+            'orderCode' => $orderCode,
+            'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
+            'orderDescription' => $this->_getOrderDescription($reservedOrderId),
+            'currencyCode' => $quote->getQuoteCurrencyCode(),
+            'amount' => $quote->getGrandTotal(),
+            'paymentDetails' => $this->_getPaymentDetails($paymentDetails),
+            'shopperEmail' => $quote->getCustomerEmail(),
+            'acceptHeader' => php_sapi_name() !== "cli" ? filter_input(INPUT_SERVER, 'HTTP_ACCEPT') : '',
+            'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
+                INPUT_SERVER,
+                'HTTP_USER_AGENT',
+                FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+                FILTER_FLAG_STRIP_LOW
+            ) : '',
+            'shippingAddress' => $this->_getShippingAddress($quote),
+            'billingAddress' => $this->_getSepaBillingAddress($quote),
+            'method' => $paymentDetails['method'],
+            'orderStoreId' => $orderStoreId,
+            'shopperId' => $quote->getCustomerId(),
+            'statementNarrative' => $stmtNarrative,
+            'exponent' => $exponent,
+            'isMultishippingOrder' => $isMultiShippingOrder
         ];
     }
     /**
@@ -625,14 +745,21 @@ class Service
      *
      * @param Int $countryId
      * @param string $paymenttype
+     * @param boolean $ismultishipping
      * @return array
      */
     public function collectPaymentOptionsParameters(
         $countryId,
-        $paymenttype
+        $paymenttype,
+        $ismultishipping = false
     ) {
+        $merchantCode = $this->worldpayHelper->getMerchantCode($paymenttype);
+        if ($ismultishipping) {
+            $msMC = $this->worldpayHelper->getMultishippingMerchantCode();
+            $merchantCode = !empty($msMC) ? $msMC : $merchantCode;
+        }
         return [
-            'merchantCode' => $this->worldpayHelper->getMerchantCode($paymenttype),
+            'merchantCode' => $merchantCode,
             'countryCode' => $countryId,
             'paymentType' => $paymenttype
         ];
@@ -723,6 +850,16 @@ class Service
         return $this->_getKlarnaAddress($quote->getBillingAddress());
     }
     /**
+     * Collect Sepa Billing Address - This function is used for SEPA alone
+     *
+     * @param int $quote
+     * @return array
+     */
+    private function _getSepaBillingAddress($quote)
+    {
+        return $this->_getSepaAddress($quote->getBillingAddress());
+    }
+    /**
      * Collect Order Line Items
      *
      * @param int $quote
@@ -792,8 +929,15 @@ class Service
             $lineitem['unitPrice'] = $shippingPrice + $msTax;
             $lineitem['totalAmount'] = $shippingPrice + $msTax;
             $lineitem['totalTaxAmount'] = $msTax;
-            $lineitem['taxRate'] = (int) (($msTax * 100) / $shippingPrice);
-            ;
+
+            $lineItemTaxRate = 0;
+            if ($msTax > 0) {
+                if ($shippingPrice > 0) {
+                    $lineItemTaxRate = (int) (($msTax * 100) / $shippingPrice);
+                }
+            }
+
+            $lineitem['taxRate'] = $lineItemTaxRate;
             $orderitems['lineItem'][] = $lineitem;
         } else {
             $address = $quote->getShippingAddress();
@@ -872,6 +1016,25 @@ class Service
         ];
     }
     /**
+     * Collect Address - This function is used for SEPA alone
+     *
+     * @param array $address
+     * @return array
+     */
+    private function _getSepaAddress($address)
+    {
+        return [
+            'firstName' => $address->getFirstname(),
+            'lastName' => $address->getLastname(),
+            'street' => $address->getData('street'),
+            'postalCode' => $address->getPostcode(),
+            'city' => $address->getCity(),
+            'state' => $address->getData('region'),
+            'countryCode' => $address->getCountryId(),
+            'telephone' => $address->getData('telephone'),
+        ];
+    }
+    /**
      * Collect Klarna Address
      *
      * @param array $address
@@ -929,6 +1092,18 @@ class Service
             }
             $details['sessionId'] = $this->session->getSessionId();
             $details['shopperIpAddress'] = $this->_getClientIPAddress();
+            return $details;
+        }
+
+        if ($paymentDetails['additional_data']['cc_type'] == "SEPA_DIRECT_DEBIT-SSL") {
+            
+            $details = [
+               'paymentType' => $paymentDetails['additional_data']['cc_type'],
+               'sepaMandateType' => $paymentDetails['additional_data']['sepa_mandateType'],
+               'sepaIban' => $paymentDetails['additional_data']['sepa_iban'],
+               'sepaAccountHolderName' => $paymentDetails['additional_data']['sepa_accountHolderName']
+            ];
+            $details['sepaMerchantNumber'] = $this->worldpayHelper->getSEPAMerchantNo();
             return $details;
         }
         
@@ -1119,7 +1294,10 @@ class Service
         $reservedOrderId = $quote->getReservedOrderId();
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
-
+        $isMultiShippingOrder = 0;
+        if ((bool)$quote->getIsMultiShipping()) {
+            $isMultiShippingOrder = 1;
+        }
         //Google Pay
         if ($paymentDetails['additional_data']['cc_type'] == 'PAYWITHGOOGLE-SSL') {
             if ($paymentDetails['additional_data']['walletResponse']) {
@@ -1175,7 +1353,8 @@ class Service
                     'paymentDetails' => $paymentDetails,
                     'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
                     'shopperIpAddress' => $this->_getClientIPAddress(),
-                    'exponent' => $exponent
+                    'exponent' => $exponent,
+                    'isMultishippingOrder' => $isMultiShippingOrder
                 ];
             }
         }
@@ -1214,7 +1393,8 @@ class Service
                     'ephemeralPublicKey' => $ephemeralPublicKey,
                     'publicKeyHash' => $publicKeyHash,
                     'transactionId' => $transactionId,
-                    'exponent' => $exponent
+                    'exponent' => $exponent,
+                    'isMultishippingOrder' => $isMultiShippingOrder
                 ];
             }
         }

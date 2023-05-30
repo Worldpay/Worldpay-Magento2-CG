@@ -1742,6 +1742,21 @@ class DefaultConfigurations implements DataPatchInterface
                         'wpay_label_code' => 'CO28',
                         'wpay_label_desc'=> $iframeCheckOutMsg,
                         'wpay_custom_label'=> ""
+                    ],
+                    [
+                        'wpay_label_code' => 'CO29',
+                        'wpay_label_desc'=> 'Mandate Type',
+                        'wpay_custom_label'=> ''
+                    ],
+                    [
+                        'wpay_label_code' => 'CO30',
+                        'wpay_label_desc'=> 'IBAN',
+                        'wpay_custom_label'=> ''
+                    ],
+                    [
+                        'wpay_label_code' => 'CO31',
+                        'wpay_label_desc'=> "Account Holder Name",
+                        'wpay_custom_label'=> ''
                     ]
                 ];
                 foreach ($newLabels as $label) {
