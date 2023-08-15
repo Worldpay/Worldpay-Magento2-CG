@@ -20,6 +20,59 @@ class Cancel extends \Magento\Framework\App\Action\Action
     protected $pageFactory;
 
     /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+    protected $orderservice;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    protected $paymentservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Checkout\Service
+     */
+    protected $checkoutservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Request\AuthenticationService
+     */
+    protected $authenticatinservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\StateResponse
+     */
+    protected $paymentStateResponse;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\WpResponse
+     */
+    protected $wpresponse;
+
+    /**
+     * @var \Magento\Sales\Model\Order
+     */
+    protected $order;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\MultishippingStateResponse
+     */
+    protected $multishippingStateResponse;
+
+    /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
+    protected $quoteRepository;
+
+    /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection
+     */
+    protected $wpMultishippingCollection;
+
+    /**
      * Constructor
      *
      * @param Context $context
@@ -31,7 +84,10 @@ class Cancel extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Payment\StateResponse $paymentStateResponse
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
-     * @param \Magento\Sales\Model\Order $orderItemsDetails
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Sapient\Worldpay\Model\Payment\MultishippingStateResponse $multishippingStateResponse
+     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+     * @param \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $wpMultishippingCollection
      */
     public function __construct(
         Context $context,
@@ -43,7 +99,10 @@ class Cancel extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Payment\StateResponseFactory $paymentStateResponse,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse,
-        \Magento\Sales\Model\Order $orderItemsDetails
+        \Magento\Sales\Model\Order $order,
+        \Sapient\Worldpay\Model\Payment\MultishippingStateResponse $multishippingStateResponse,
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
+        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $wpMultishippingCollection
     ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
@@ -53,7 +112,10 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $this->authenticatinservice = $authenticatinservice;
         $this->paymentStateResponse = $paymentStateResponse;
         $this->wpresponse = $wpresponse;
-        $this->orderItemsDetails = $orderItemsDetails;
+        $this->order = $order;
+        $this->multishippingStateResponse = $multishippingStateResponse;
+        $this->quoteRepository = $quoteRepository;
+        $this->wpMultishippingCollection = $wpMultishippingCollection;
         return parent::__construct($context);
     }
     /**
@@ -68,15 +130,37 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $this->wplogger->info('Params :  '.json_encode($params, true));
         if (!empty($params['orderKey'])) {
             preg_match('/\^(\d+)-/', $params['orderKey'], $matches);
-            $order = $this->orderItemsDetails->loadByIncrementId($matches[1]);
+            $order = $this->order->loadByIncrementId($matches[1]);
             if ($order->getId()) {
                 $magentoorder = $order;
-                $notice = $this->_getCancellationNoticeForOrder($order);
-                $this->messageManager->addNotice($notice);
-                $params = $this->getRequest()->getParams();
-                if ($this->authenticatinservice->requestAuthenticated($params)) {
-                    if (isset($params['orderKey'])) {
-                        $this->_applyPaymentUpdate($this->wpresponse->createFromCancelledResponse($params), $order);
+                $quoteId = $order->getQuoteId();
+                $quoteObj = $this->quoteRepository->get($quoteId);
+                if ($quoteObj->getIsMultiShipping()) {
+                    $params = $this->getRequest()->getParams();
+                    $multiShippingOrders =  $this->wpMultishippingCollection->getMultishippingOrderIds($quoteId);
+                    if (count($multiShippingOrders) > 0) {
+                        foreach ($multiShippingOrders as $orderId) {
+                            $orderObj = $this->order->loadByIncrementId($orderId);
+                            $notice = $this->_getCancellationNoticeForOrder($order);
+                            $this->messageManager->addNotice($notice);
+                            $this->_applyPaymentUpdate(
+                                $this->multishippingStateResponse->createResponse(
+                                    $params,
+                                    $magentoorder->getIncrementId(),
+                                    'cancelled'
+                                ),
+                                $orderObj
+                            );
+                        }
+                    }
+                } else {
+                    $notice = $this->_getCancellationNoticeForOrder($order);
+                    $this->messageManager->addNotice($notice);
+                    $params = $this->getRequest()->getParams();
+                    if ($this->authenticatinservice->requestAuthenticated($params)) {
+                        if (isset($params['orderKey'])) {
+                            $this->_applyPaymentUpdate($this->wpresponse->createFromCancelledResponse($params), $order);
+                        }
                     }
                 }
                 return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);

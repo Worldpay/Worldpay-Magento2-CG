@@ -41,6 +41,12 @@ class FraudisightMessage extends Column
      * @var OrderRepositoryInterface
      */
     protected $_orderRepository;
+
+     /**
+      *
+      * @var Data
+      */
+    protected $helper;
     
     /**
      * FraudisightMessage constructor
@@ -81,6 +87,9 @@ class FraudisightMessage extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
+                if(!in_array($item['payment_method'],$this->helper->getWpPaymentMethods())){
+                    continue;
+                }
 
                 $worldpaypayment=$this->_worldpaypayment->loadByPaymentId($item["increment_id"]);
                 $fraudsightMessage = $worldpaypayment->getFraudsightMessage();

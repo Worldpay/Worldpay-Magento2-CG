@@ -16,6 +16,11 @@ class Multishippingredirect extends \Magento\Framework\App\Action\Action
     protected $checkoutSession;
 
     /**
+     * @var \Sapient\Worldpay\Model\Token\WorldpayToken
+     */
+    protected $wplogger;
+
+    /**
      * Constructor
      *
      * @param Context $context

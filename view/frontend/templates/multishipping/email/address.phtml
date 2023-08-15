@@ -1,0 +1,24 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+
+/** @var $block \Sapient\Worldpay\Block\Multishipping\Paybylink\Email */
+?>
+<?php $quote = $block->getQuote() ?>
+<?php if ($quote): ?>
+    <?php $shipmentAddress = $quote->getAllShippingAddresses(); ?>
+    <table class="order-details">
+    <?php foreach ($shipmentAddress as $address): ?>
+        <tr>
+            <td class="address-details">
+                <h3><b>Shipping Info</b></h3>
+                <p><?= $block->getFormatAddressByCode($address); ?></p>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </table>
+<?php endif; ?>

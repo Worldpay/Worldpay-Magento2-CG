@@ -119,6 +119,19 @@ EOD;
       * @var array
       */
     private $storedCredentialsEnabled;
+    /**
+     * @var string
+     */
+    private $captureDelay;
+
+    /**
+     * @var string
+     */
+    private $shopperId;
+    /**
+     * @var array
+     */
+    public $paymentDetails;
 
     /**
      * Constructor
@@ -158,6 +171,7 @@ EOD;
      * @param mixed $exponent
      * @param string $cusDetails
      * @param array $orderLineItems
+     * @param string $captureDelay
      * @param string $savemyCard
      * @param string $storedCredentialsEnabled = null
      * @return SimpleXMLElement $xml
@@ -184,6 +198,7 @@ EOD;
         $exponent,
         $cusDetails,
         $orderLineItems,
+        $captureDelay,
         $savemyCard = null,
         $storedCredentialsEnabled = null
     ) {
@@ -208,6 +223,7 @@ EOD;
         $this->exponent = $exponent;
         $this->cusDetails = $cusDetails;
         $this->orderLineItems = $orderLineItems;
+        $this->captureDelay = $captureDelay;
 
         $this->saveCardEnabled = $savemyCard;
         $this->storedCredentialsEnabled = $storedCredentialsEnabled;
@@ -255,7 +271,9 @@ EOD;
                 $order['hideContact'] = 'false';
             }
         }
-
+        if ($this->captureDelay!="") {
+            $order['captureDelay'] = $this->captureDelay;
+        }
         $this->_addDescriptionElement($order);
         $amountElement = $order->addChild('amount');
         $this->_addAmountElement($amountElement, $this->currencyCode, $this->exponent, $this->amount);

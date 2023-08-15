@@ -13,10 +13,19 @@ use Magento\Framework\App\Action\Context;
 class Success extends \Magento\Framework\App\Action\Action
 {
     /**
-     * @var Magento\Framework\View\Result\PageFactory
+     * @var \Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;
 
+     /**
+      * @var \Sapient\Worldpay\Model\Order\Service
+      */
+    protected $orderservice;
+
+     /**
+      * @var \Sapient\Worldpay\Logger\WorldpayLogger
+      */
+    protected $wplogger;
     /**
      * Constructor
      *

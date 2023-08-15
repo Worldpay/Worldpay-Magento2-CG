@@ -23,7 +23,37 @@ class Index extends \Magento\Framework\App\Action\Action
      * @var curlHelper
      */
     public $curlHelper;
-  
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    public $wplogger;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    public $paymentservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+    public $orderservice;
+    /**
+     * @var JsonFactory
+     */
+    public $resultJsonFactory;
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    public $request;
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    public $scopeConfig;
+    /**
+     * @var \Magento\Checkout\Model\Cart
+     */
+    public $cart;
+
     /**
      * Constructor
      *
@@ -33,6 +63,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\Request\Http $request
+     * @param \Magento\Checkout\Model\Cart $cart
      * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
      * @param \Magento\Framework\Filesystem\Driver\file $fileDriver
      */
@@ -44,6 +75,7 @@ class Index extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Payment\Service $paymentservice,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\App\Request\Http $request,
+        \Magento\Checkout\Model\Cart $cart,
         \Sapient\Worldpay\Helper\CurlHelper $curlHelper,
         \Magento\Framework\Filesystem\Driver\file $fileDriver
     ) {
@@ -53,6 +85,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->resultJsonFactory = $resultJsonFactory;
         $this->scopeConfig = $scopeConfig;
         $this->request = $request;
+        $this->cart = $cart;
         $this->curlHelper = $curlHelper;
         $this->fileDriver = $fileDriver;
     }
@@ -82,12 +115,8 @@ class Index extends \Magento\Framework\App\Action\Action
           $validation_url = $this->request->getParam('u');
          
         if ($validation_url == 'getTotal') {
-             
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $cart = $objectManager->get(\Magento\Checkout\Model\Cart::class);
-
-            $subTotal = $cart->getQuote()->getSubtotal();
-            $grandTotal = $cart->getQuote()->getGrandTotal();
+            $subTotal = $this->cart->getQuote()->getSubtotal();
+            $grandTotal = $this->cart->getQuote()->getGrandTotal();
             
             $resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
             $resultJson->setData($grandTotal);

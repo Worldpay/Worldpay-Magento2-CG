@@ -25,6 +25,16 @@ class Edit extends \Magento\Framework\App\Action\Action
     protected $customerSession;
 
     /**
+     * @var SavedTokenFactory
+     */
+    protected $savecard;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+
+    /**
      * Constructor
      *
      * @param Context $context

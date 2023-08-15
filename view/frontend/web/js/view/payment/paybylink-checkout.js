@@ -6,24 +6,15 @@ define(
         'underscore',
         'mage/translate',
         'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Customer/js/customer-data',
         'Sapient_Worldpay/js/model/checkout-utils',
         'Magento_Checkout/js/model/url-builder',
         'mage/url',
         'Magento_Customer/js/model/customer',
         'Magento_Checkout/js/model/payment/additional-validators'
-    ], function ($, ko, Component, _, $t, quote, customerData, checkoutUtils, urlBuilder, url, customer,additionalValidators) {
+    ], function ($, ko, Component, _, $t, quote, fullScreenLoader, customerData, checkoutUtils, urlBuilder, url, customer,additionalValidators) {
         'use strict';
-
-
-        var paymentService = false;
-        var billingAddressCountryId = "";
-        var paymentToken = "";
-        var merchantId = '';
-        var response = '';
-        var response1 = '';
-        var dfReferenceId = "";
-        var debug = true;
 
         return Component.extend({
             defaults: {
@@ -71,9 +62,8 @@ define(
                     guest_masked_quote_id: maskedQuoteId,
                     isCustomerLoggedIn: customer.isLoggedIn(),
                     isRequiredShipping: shippingrequired
-                }
+                }                
                 checkoutUtils.setPaymentInformationAndPlaceOrder(checkoutData);
-
             },            
             getpaybylinkText: function(){
                 return window.checkoutConfig.payment.ccform.payByLinkButtonName;

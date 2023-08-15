@@ -14,7 +14,26 @@ use Exception;
  */
 class Failure extends \Magento\Backend\App\Action
 {
-  
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+
+    protected $orderservice;
+
+    /**
+     * @var JsonFactory
+     */
+    protected $resultJsonFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Adminhtml\Order\Service
+     */
+    protected $adminorderservice;
     /**
      * Constructor
      *

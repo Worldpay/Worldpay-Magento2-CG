@@ -18,6 +18,17 @@ class Redirect implements ObserverInterface
      * @var _url
      */
     protected $_url;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutsession;
+
      /**
       * Constructor
       *

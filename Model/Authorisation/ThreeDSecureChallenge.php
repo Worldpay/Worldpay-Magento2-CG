@@ -12,7 +12,60 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
     protected $updateWorldPayPayment;
 
     public const CART_URL = 'checkout/cart';
+     /**
+      * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
+      */
+    protected $paymentservicerequest;
+    
+     /**
+      * @var \Sapient\Worldpay\Logger\WorldpayLogger
+      */
+    protected $wplogger;
+    
+    /**
+     * @var \Sapient\Worldpay\Model\Response\DirectResponse
+     */
+    protected $directResponse;
+    
+     /**
+      * @var \Sapient\Worldpay\Model\Payment\Service
+      */
+    protected $paymentservice;
 
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    protected $urlBuilders;
+     /**
+      * @var \Sapient\Worldpay\Model\Order\Service
+      */
+    protected $orderservice;
+       /**
+        * @var \Magento\Framework\Message\ManagerInterface
+        */
+    protected $_messageManager;
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
+    protected $customerSession;
+     /**
+      * @var \Sapient\Worldpay\Model\Token\WorldpayToken
+      */
+    protected $worldpaytoken;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+    
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
     /**
      * ThreeDSecureChallenge Constructor
      *

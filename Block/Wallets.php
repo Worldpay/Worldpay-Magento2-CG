@@ -36,6 +36,41 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
      */
     protected $session;
 
+     /**
+      * @var \Sapient\Worldpay\Helper\Data
+      */
+    protected $worldpayHelper;
+
+     /**
+      * @var \Sapient\Worldpay\Logger\WorldpayLogger
+      */
+    protected $wplogger;
+
+     /**
+      * @var CustomerRepository
+      */
+    protected $customerRepository;
+
+     /**
+      * @var CustomerSession
+      */
+    protected $customerSession;
+
+     /**
+      * @var CustomerAddressDataProvider
+      */
+    protected $customerAddressData;
+
+      /**
+       * @var \Magento\Directory\Helper\Data
+       */
+    protected $directoryData;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
+    protected $recurringHelper;
+
     /**
      * Button constructor
      *
@@ -54,7 +89,7 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
     public function __construct(
         \Magento\Catalog\Block\Product\Context $context,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Session\SessionManagerInterface $session,
+        SessionManagerInterface $session,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Helper\Data $helper,
         CustomerRepository $customerRepository,

@@ -52,6 +52,22 @@
                     </argument>
             </arguments>
             </block>
+            <block class="Sapient\Worldpay\Block\Paybylink" name="payment_method_paybylink" template="Sapient_Worldpay::multishipping-paybylink.phtml">
+            <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="paybylink-js-field" xsi:type="array">
+                                <item name="component" xsi:type="string">uiComponent</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">Sapient_Worldpay/multishipping/paybylink</item>
+                                    <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/multishipping/paybylink</item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+            </arguments>
+            </block>
+            <block class="Magento\CheckoutAgreements\Block\Agreements" name="checkout.multishipping.agreements" as="agreements" template="Magento_CheckoutAgreements::additional_agreements.phtml"/>
         </referenceBlock>
     </body>
 </page>

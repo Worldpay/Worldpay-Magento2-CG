@@ -20,7 +20,7 @@ use Magento\Directory\Helper\Data;
 
 //use Sapient\Worldpay\Model\Ui\CcConfigProvider;
 
-class Edit extends \Magento\Framework\View\Element\Template
+class Edit extends Template
 {
     /**
      * @var \Sapient\Worldpay\Model\Recurring\Subscription|null
@@ -54,6 +54,10 @@ class Edit extends \Magento\Framework\View\Element\Template
      * @var IconsProvider
      */
     private $iconsProvider;
+    /**
+     * @var Data
+     */
+    private $helper;
 
     /**
      * @param Template\Context $context

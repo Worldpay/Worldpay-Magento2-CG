@@ -13,9 +13,24 @@ class Service
 {
 
     /**
-     * @var Sapient\WorldPay\Model\Request\PaymentServiceRequest
+     * @var \Sapient\WorldPay\Model\Request\PaymentServiceRequest
      */
     protected $_paymentServiceRequest;
+
+     /**
+      * @var \Sapient\Worldpay\Logger\WorldpayLogger
+      */
+    protected $_wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Update\Factory
+     */
+    protected $paymentupdatefactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Worldpayment
+     */
+    protected $worldpayPayment;
 
     /**
      * Constructor
@@ -40,10 +55,10 @@ class Service
     /**
      * Send token update request to WP server and gives back the answer
      *
-     * @param Sapient\Worldpay\Model\Token $tokenModel
+     * @param \Sapient\Worldpay\Model\Token $tokenModel
      * @param \Magento\Customer\Model\Customer $customer
      * @param int $storeId
-     * @return Sapient\Worldpay\Model\Token\UpdateXml
+     * @return \Sapient\Worldpay\Model\Token\UpdateXml
      */
     public function getTokenUpdate(
         SavedToken $tokenModel,

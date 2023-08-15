@@ -28,6 +28,16 @@ class Button extends Template
     protected $session;
 
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+
+    /**
      * Button constructor.
      * @param Context $context
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
@@ -36,7 +46,7 @@ class Button extends Template
      */
     public function __construct(
         Context $context,
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        WorldpayLogger $wplogger,
         \Sapient\Worldpay\Helper\Data $helper,
         array $data = []
     ) {

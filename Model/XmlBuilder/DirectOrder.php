@@ -138,12 +138,24 @@ EOD;
     protected $tokenRequestConfig;
 
     /**
+     * @var string $captureDelay
+     */
+    protected $captureDelay;
+
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
+    protected $customerSession;
+    /**
      * Constructor
-     *
+     * @param \Magento\Customer\Model\Session $customerSession
      * @param array $args
      */
-    public function __construct(array $args = [])
-    {
+    public function __construct(
+        \Magento\Customer\Model\Session $customerSession,
+        array $args = []
+    ) {
+        $this->customerSession = $customerSession;
         $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure(
             $args['threeDSecureConfig']['isDynamic3D'],
             $args['threeDSecureConfig']['is3DSecure']
@@ -179,6 +191,7 @@ EOD;
      * @param array|string $exponent
      * @param mixed $primeRoutingData
      * @param array $orderLineItems
+     * @param string $captureDelay
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -204,7 +217,8 @@ EOD;
         $shippingfee,
         $exponent,
         $primeRoutingData,
-        $orderLineItems
+        $orderLineItems,
+        $captureDelay
     ) {
         
         $this->merchantCode = $merchantCode;
@@ -230,6 +244,7 @@ EOD;
         $this->exponent = $exponent;
         $this->primeRoutingData =$primeRoutingData;
         $this->orderLineItems = $orderLineItems;
+        $this->captureDelay = $captureDelay;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -332,6 +347,10 @@ EOD;
             $session = $order->addChild('session');
             $session['id'] = $this->paymentDetails['sessionId'];
             return $order;
+        }
+
+        if ($this->captureDelay!="") {
+            $order['captureDelay'] = $this->captureDelay;
         }
         
         $this->_addDescriptionElement($order);
@@ -1016,10 +1035,8 @@ EOD;
         $purchase = $branchSpecificExtension->addChild('purchase');
         
         $customerId = '';
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $customerSession = $objectManager->get(\Magento\Customer\Model\Session::class);
-        if ($customerSession->isLoggedIn()) {
-            $customerId =  $customerSession->getCustomer()->getId();
+        if ($this->customerSession->isLoggedIn()) {
+            $customerId =  $this->customerSession->getCustomer()->getId();
         }
            
         if (!empty($customerId)) {

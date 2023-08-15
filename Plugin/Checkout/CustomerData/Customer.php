@@ -17,14 +17,29 @@ use Magento\Customer\Api\CustomerRepositoryInterface as CustomerRepository;
 class Customer
 {
     /**
-     * @var wplogger
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
     protected $wplogger;
 
     /**
-     * @var currentCustomer
+     * @var \Sapient\Worldpay\Helper\Data
      */
+    protected $wpHelper;
+
+     /**
+      * @var CurrentCustomer
+      */
     protected $currentCustomer;
+
+     /**
+      * @var CustomerAddressDataProvider
+      */
+    protected $customerAddressData;
+    
+     /**
+      * @var CustomerRepository
+      */
+    protected $customerRepository;
 
     /**
      * Constructor Function

@@ -7,7 +7,7 @@ ul{
 }
 
 .payment-method._active {
-    border: 2px solid #000;
+    border: 1px solid #000;
     background-color: transparent;
 }
 .payment-method._active .payment-method-title {
@@ -19,6 +19,9 @@ ul{
     align-items: center;
     padding: 10px 0;
     min-height: 43px;
+}
+.checkout-payment-method .payment-method._active .payment-method-title {
+    border: 1px solid #000;
 }
 .payment-method-title > label {
     flex-basis: 28%;
@@ -198,6 +201,7 @@ span.cc-card-type {
 
 .payment-titlelogo-wrapper {
     display: flex;
+    padding:10px;
 }
 .payment-applepay-checkout {
     width: 30%;
@@ -227,7 +231,6 @@ span.cc-card-type {
     max-width: 180px;
     display: block;
     margin-left: auto;
-    margin-right: auto;    
 }
 .ach-block {
    font-weight: 600; 
@@ -318,16 +321,6 @@ span.cc-card-type {
     width: 94% !important;
     margin-bottom: 10px;
 }
-#wp-google-pay-btn iframe{
-    margin-left: 0px;
-}
-.gpay-card-info-iframe {
-    width: 194px !important;
-    max-width: fit-content !important;
-  }
-.gpay-card-info-iframe{
-    width: 240px;
-}
 .gpay-card-info-container{
     min-width: 100%!important;
 }
@@ -340,7 +333,11 @@ span.cc-card-type {
 }
 .payment-title-wrapper{
     margin-top: auto;
-    width: 39%;
+    width: 40%;
+}
+.payment-title-wrapper-multishipping{
+    margin-top: auto;
+    width: 40%;
 }
 .payment-samsungpay-checkout button{
     margin-left:10px;
@@ -351,13 +348,16 @@ span.cc-card-type {
     padding-bottom: 15px;
 }
 .wp-pay-by-link {
-    width: 90%;
+    width: 100%;
     margin-bottom: 20px;
-    display: flex;
+    text-align: right;
 }
 .wp-pay-by-link button{
     height: 40px;
     width: 180px;
+}
+.multishipping-paybylink-button{
+    padding: 7px 15px !important;
 }
 .payment-samsungpay-checkout{
     width: 30%;
@@ -403,25 +403,73 @@ li#payment.checkout-payment-method {
     background: #fdf0d5;
     color: #6f4400;
  }
+.multicheckout .box-billing-method .fieldset .legend.box-title{
+	display:flex;
+}
 /* Custom select */
 @media only screen and (max-width: 600px) {
     .wp-pay-by-link button{
-        margin-left: 40px !important;
+        margin-left: 0px !important;
     }
   }
 @media only screen and (max-width: 768px) {
+    .multicheckout .box-billing-method .fieldset .legend.box-title {
+        display: block !important;
+    }
+    .payment-logo-wrapper img {
+        margin-right: auto;
+        margin-bottom: 5px;
+    }
+    .payment-title-wrapper .step-title, .payment-title-wrapper p {
+        text-align: center;
+    }
+    .multicheckout .payment-title-wrapper {
+        text-align: center !important;
+    }
+    .multicheckout .payment-logo-wrapper {
+        padding-top: 10px;
+    }
+    .multicheckout .actions-toolbar>.primary {
+        margin-right: 10px;
+        margin-left: 10px;
+    }
+    .wp-pay-by-link {
+        display: flex;
+        margin-bottom: 10px;
+    }
     .multicheckout .block-billing .box-billing-method {
         width: 100%  !important;
         padding-right: 0 !important;
     }
+    .multishipping-checkout-billing .wp-actions-toolbar, .multishipping-checkout-billing .checkout-payment-giftcardaccount{
+        padding: 10px 10px 10px 10px;
+    }
+    .payment-title-wrapper-multishipping{
+        margin-left: 10px;
+        width:100%;
+    }
+    .multicheckout .block-content .box:last-child{
+        width:76%;
+    }
+    .multishipping-checkout-billing .payment-logo-wrapper{
+        width: 100%;
+    }
     .multicheckout .block-billing .box-billing-address {
         width: 100% !important;
+        padding-left:0px !important;
     }
-    .multicheckout .box-title span, .multicheckout .box-title span.security-title{
+    .multicheckout .box-title span{
+        margin-left: 0px !important;
+    }
+    .multicheckout .box-title span.security-title, .multicheckout .box-title .payment-title-wrapper span, .multicheckout .box-content .payment-title-wrapper .step-title, .multicheckout .box-content .checkout-payment-giftcardaccount .note, .multicheckout .box-title span.billing-mark{
         margin-left: 5px !important;
     }
     .multicheckout label[for=p_method_worldpay_cc], .multicheckout label[for=p_method_worldpay_wallets], .multicheckout label[for=p_method_worldpay_apm]{
         width: 100% !important;
+    }
+    .multicheckout .box-content .order-review-wrapper {
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
     }
     .wp-price-block td{
         width: 100% !important;
@@ -434,8 +482,14 @@ li#payment.checkout-payment-method {
         display: inline-block;
         width:100%;
     }
+    .payment-titlelogo-wrapper {
+        display: block !important;
+    }
     .payment-title-wrapper{
         width:100%;
+    }
+    .multicheckout .box-title .payment-title-wrapper {
+        width: 100% !important;        
     }
     .payment-applepay-checkout{
         width:100%;
@@ -457,7 +511,7 @@ li#payment.checkout-payment-method {
     }
     .samsungpay-payment{
         width: 100% !important;
-        height: 47px !important;
+        height: 40px !important;
     }
    .payment-method-outer-content .payment-applepay-checkout{
         width: 100%!important;
@@ -484,52 +538,62 @@ li#payment.checkout-payment-method {
         padding-left:0;
     }
     .wp-pay-by-link button{
-        width: 98%;
+        width: 60%;
         margin-left: 0;
+    }
+    .wp-price-block .table > tbody > tr > th, .wp-price-block .table > tbody > tr > td{        
+        padding:5px 5px 7px 0px !important;
     }
     
 }
 
-@media only screen and  (min-width: 768px) and (max-width: 820px) {
-    .multicheckout .block-billing .box-billing-method {
-        width: 100% !important;
-        padding-right: 0 !important;
-    }
-    .multicheckout .block-billing .box-billing-address {
-        width: 100% !important;
-    }
+@media only screen and  (min-width: 768px) and (max-width: 820px) {    
     .wp-price-block td{
         width: 100% !important;
     }
-    .wp-price-block th{
-        display: none !important;
-    }
     .multicheckout .box-title span, .multicheckout .box-title span.security-title{
-        margin-left: 5px !important;
+        margin-left: 0px !important;
     }
     .multicheckout label[for=p_method_worldpay_cc], .multicheckout label[for=p_method_worldpay_wallets], .multicheckout label[for=p_method_worldpay_apm]{
         width: 100% !important;
     }
     .gpay-card-info-container {width: 100%;}
+
     .payment-logo-wrapper{
         display: inline-block;
-        width:100%;
+        width:50%;
     }
-    .payment-title-wrapper{
-        width:100%;
+    .payment-title-wrapper {
+        width: 50% !important;
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+    .worldpay-multishipping .multicheckout .payment-logo-wrapper{
+        display: block !important;
+    }
+    .payment-logo-wrapper img {
+        margin-right: 0px !important;
+        margin-bottom: 5px;
     }
     .payment-applepay-checkout{
         width:100%;
+    }
+    .wp-pay-by-link {
+        display: block !important;
+        width: 96% !important;
+    }
+    .payment-title-wrapper .step-title {
+        padding: 13px 0 !important;
     }
     #wp-google-pay-btn, .payment-applepay-checkout, .payment-samsungpay-checkout{
         clear:both;
     }
     .samsungpay-payment{
         width: 100% !important;
-        height: 47px !important;
+        height: 40px !important;
     }
     .payment-samsungpay-checkout{
-        padding-top:10px;
+        padding-top:0px;
     }
     .payment-samsungpay-checkout button{
         margin-left:0;
@@ -545,22 +609,26 @@ li#payment.checkout-payment-method {
         width:100%;
     }
     .payment-method-outer-content .wp-payment-method-wallets{
-        display: unset;
+        flex-wrap: wrap;
     }
     .payment-method-outer-content .wp-payment-method-wallets div{
         margin-left: 0;
     } 
+    .wp-payment-method-wallets > * {
+        padding-left: 7px;
+        padding-top: 10px;
+    }
     #gpay-checkout-container {
-        width: 100%;
+        width: 48%;
     } 
     .payment-method-outer-content #wp-google-pay-btn {
         width: 100% !important;
     }
    .payment-method-outer-content .payment-applepay-checkout{
-        width: 100%!important;
+        width: 48%!important;
     }
     .payment-method-outer-content .payment-samsungpay-checkout{
-        width: 100%!important;
+        width: 48%!important;
     }
     .payment-method-outer-content #wp-samsung-pay-btn fieldset{
         padding-right: 0;
@@ -569,11 +637,20 @@ li#payment.checkout-payment-method {
         margin-left: auto;
     }
     .wp-pay-by-link button{
-        margin-left: 120px;
+        margin-left: 0px;
+        width: 180px;
+        max-width: 180px;
+        margin-right: 15px;
     }  
     .wp-pay-by-link{
-        margin-left: 0px;
+        margin-left: 15px;
     } 
+    .multishipping-paybylink-button{
+        margin-left: 180px;
+    }
+    .worldpay-multishipping .multicheckout .block-billing .box-billing-method{
+        padding-top: 0px !important;
+    }
 }
 
 /* Portrait */
@@ -597,24 +674,42 @@ li#payment.checkout-payment-method {
   and (-webkit-min-device-pixel-ratio: 1.5) {
     .wp-pay-by-link {
         width: 100%;
-        margin-bottom: 20px;
-        margin-left: 133px;
-      }
+        margin-bottom: 10px;
+    }
+    .multicheckout .wp-pay-by-link {
+        width: 100%;
+        margin-bottom: 0px;
+    }
 
 }
 
 @media screen and (min-width: 900px) {    
     .payment-logo-wrapper img {
-        margin-bottom:10px;   
+        margin-bottom:5px;   
     }
-    .wp-pay-by-link {
+    .multicheckout .wp-pay-by-link {
         width: 100%;
-        margin-left: 133px;
+    }
+    .multicheckout .wp-pay-by-link span {
+        font-weight: 600 !important;
+        font-size: 1.4rem !important;
+    }
+    .multicheckout .worldpay-methods .payment-title-wrapper {
+        margin: auto !important;
     }
 }
 
 @media screen and (max-width: 980px) {
-   
+    .payment-logo-wrapper img {
+        margin-right: auto;
+    }    
+    .wp-pay-by-link {
+        display: flex;
+        margin-bottom: 10px;
+        align-items: center;
+        justify-content: center;
+        width: 100% !important;
+    }
     #wp-samsung-pay-btn a{
         padding-left: 0 !important;
     }
@@ -622,8 +717,11 @@ li#payment.checkout-payment-method {
         padding: 0 !important;
     }
     .payment-titlelogo-wrapper {
-        display: block;
+        display: flex;
         margin: 0 10px;
+    }
+    .multicheckout .box-billing-method .fieldset .legend.box-title{
+        display: block;
     }
     .payment-title-wrapper .step-title {
         padding: 5px 0;
@@ -699,19 +797,21 @@ li#payment.checkout-payment-method {
     max-width: 180px;
     display: block;
     margin-left: auto;
-    margin-right: auto;
 }
 .multicheckout .box-billing-method .fieldset .legend.box-title{
 	display:flex;
+    width: 100%;
 }
-.multicheckout .box-billing-method .fieldset .legend.box-title .payment-title-wrapper{
-	width:100%;
+.multicheckout .box-title .payment-title-wrapper {
+    width: 40%;
+    float: left;
 }
 .worldpay-multishipping .multicheckout .block-billing .box-billing-method{
 	border: 1px solid #ccc;
 	padding-bottom:25px;
 	padding-right: 25px;
-	width:65%;
+	width:63%;
+    padding-top:20px;
 }
 .multicheckout .block-billing .box-billing-address{	
 	width:35%;
@@ -749,7 +849,7 @@ dd:empty {
     background-color: tomato !important;
 }
 .multicheckout .checkout-payment-method .worldpay-ms{
-	border: 2px solid #000;
+	border: 1px solid #000;
 	background-color: transparent;
 	margin:0;
 	padding:15px 40px 15px 31px;
@@ -860,7 +960,7 @@ dd:empty {
     margin-top:20px;
 }
 div.scroll {
-    margin:4px, 4px;
+    margin:4px 4px;
     padding:4px;
     height: 500px;
     overflow-x: hidden;
@@ -909,8 +1009,140 @@ div.scroll {
     border-radius: 4px;
     padding: 0px 10px;
     width: 90%;
-	height: 47px;
+	height: 40px;
 }
 #wp-samsung-pay-btn a{
     padding-left: 0px;
 }
+.payment-methods-items-worldpay{
+    border: 1px solid #000;
+}
+.payment-methods-items-worldpay .payment-method-title.field.choice{
+    border-top: 1px solid #000;
+    border-left: none;
+    border-right: none;
+}
+#payment-methods-worldpay{
+    margin-top:26px;
+}
+.payment-methods-items-worldpay .payment-method._active{
+    border:none;
+}
+.payment-methods-items-default .payment-method._active{
+    border-top: none;
+    border-bottom: 1px solid #000;
+}
+.payment-methods-items-default .payment-method._active .payment-method-title{
+    border-top:1px solid #000;
+    border-left: none;
+    border-right: none;
+}
+.payment-method._active .worldpay_apm-onepage {
+    border-bottom:1px solid #000;
+}
+.other-payment-methods-wrapper h2.step-title {
+    margin-bottom: 10px !important;
+}
+.multishipping #use-customer-balance {
+    cursor: pointer;
+    margin-left: 35px;
+}
+@media only screen and (min-width: 768px) and (max-width: 1024px)  { 
+    .payment-titlelogo-wrapper {
+        display: flex !important;
+    }
+    .payment-title-wrapper .step-title, .payment-title-wrapper p {
+        text-align: left !important;
+    }
+    .wp-price-block th {
+        display:block !important;
+        width:80% !important;
+    }
+    .wp-price-block td{
+        width:20% !important;
+    }
+    .multicheckout .block-billing .box-billing-method {
+        padding-left:0px !important;
+    }
+    .multicheckout .box-billing-method .fieldset .legend.box-title {        
+        margin: 0 10px;
+    }
+    .multicheckout .payment-logo-wrapper {
+        padding-top: 12px;
+        padding-right: 25px;
+    }
+	.multicheckout #payment-continue {
+        margin-left: 5px;
+    }
+    .worldpay-multishipping .multicheckout .block-billing .box-billing-method {
+        padding-right: 0px !important;
+    }
+    .multicheckout .block-billing .box-billing-address {
+        padding-left: 10px !important;
+    }
+    .wp-price-block .table > tbody > tr > th, .wp-price-block .table > tbody > tr > td {
+        padding: 0px 0px 5px 0px !important;
+    }
+    .multicheckout .block-billing .box-billing-address {
+        padding-top:20px !important;
+    }
+    .multicheckout .actions-toolbar .secondary {
+        text-align:left !important;
+    }
+    .multicheckout .box-content .checkout-payment-giftcardaccount .note, .multicheckout .box-title span.billing-mark {
+        margin-left: 10px !important;      
+    }	
+    .multicheckout .payment-title-wrapper .step-title {
+        padding-left: 10px !important;
+    }
+    .multicheckout .box-billing-method .fieldset .legend.box-title{
+        display:flex !important;
+    }
+    .multicheckout .payment-title-wrapper {
+        text-align: left !important;
+    }
+    .payment-method-outer-content .wp-payment-method-wallets{
+        display: flex;
+    }  
+    .payment-methods-items-worldpay .actions-toolbar:before, .payment-methods-items-worldpay .actions-toolbar:after {
+        content: '';
+        display: table;
+    }
+    .checkout-payment-method .payment-methods-items-worldpay .payment-method-content>.actions-toolbar>.primary .action.primary {
+        width: 130px;
+    }
+    .multicheckout .actions-toolbar .primary {
+        float: left;
+    }
+    .multicheckout .actions-toolbar .secondary .action.back {
+        float: none;
+    }
+    .multicheckout .actions-toolbar>.primary {
+        margin-right: 30px;
+    }
+    .checkout-payment-method .payment-methods-items-worldpay .actions-toolbar>.primary {
+        text-align: right;
+    }
+ }
+
+ #checkout-agreement-error-msg{
+    margin-top:10px;
+ }
+
+ #checkout-agreement-div{
+    margin-bottom:10px;
+ }
+
+ #sepa_e_mandate_condition{
+    width: 3%;
+    float: left;
+ }
+ .sepa_e-mandate-label{
+    width: 94%;
+    float: right;
+    padding-right: 10px;
+ }
+ #sepa_e_mandate_condition-error{
+    width:100%;
+    float:left;
+ }

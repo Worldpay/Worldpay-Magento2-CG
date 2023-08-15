@@ -17,7 +17,42 @@ class Pending extends \Magento\Framework\App\Action\Action
      * @var Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;
+
+       /**
+        * @var \Sapient\Worldpay\Logger\WorldpayLogger
+        */
+    protected $wplogger;
+
+   /**
+    * @var \Sapient\Worldpay\Model\Order\Service
+    */
+    protected $orderservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Checkout\Service
+     */
+    protected $checkoutservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    protected $paymentservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\StateResponseFactory
+     */
+    protected $paymentStateResponse;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\WpResponse
+     */
+    protected $wpresponse;
     
+    /**
+     * @var object
+     */
+    protected $_paymentUpdate;
+
     /**
      * Constructor
      *

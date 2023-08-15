@@ -25,6 +25,47 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
      * @var cookieMetadataFactory
      */
     protected $cookieMetadataFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Magento\Framework\Controller\Result\JsonFactory
+     */
+    protected $resultJsonFactory;
+
+    /**
+     * @var string
+     */
+    protected $urlBuilder;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+
+    /**
+     * @var \Magento\Sales\Model\OrderFactory
+     */
+    protected $orderFactory;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
+    protected $orderSender;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Authorisation\ThreeDSecureService
+     */
+    protected $threedsredirectresponse;
+
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    protected $urlBuilders;
+
     /**
      * Constructor
      *

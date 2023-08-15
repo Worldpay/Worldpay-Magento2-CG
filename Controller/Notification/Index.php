@@ -46,6 +46,39 @@ class Index extends \Magento\Framework\App\Action\Action
      */
 
     protected $fileDriver;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    public $wplogger;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    public $paymentservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+    public $orderservice;
+    /**
+     * @var JsonFactory
+     */
+    public $resultJsonFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Token\WorldpayToken
+     */
+    public $worldpaytoken;
+
+    /**
+     * @var object
+     */
+    public $_paymentUpdate;
+
+    /**
+     * @var object
+     */
+     public $_order;
+     
     /**
      * Constructor
      *

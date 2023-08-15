@@ -1,6 +1,6 @@
 <?php
 $isworldpayment=$block->isWorldpayPayment();
-if ($isworldpayment) {
+if ($isworldpayment):
     $payment = $block->getWorldPaymentsDetails();
     ?>
 
@@ -193,9 +193,28 @@ if ($isworldpayment) {
                             <b><?= /* @noEscape */ $payment->getFraudsightReasoncode() ?></b>
                         </div>
                     </td>
+            </tr> 
+            <tr>
+                <td style="padding-top: .5em;" colspan="2">
+                    <span style="font-weight:600;font-size:1.7rem;">Worldpay Merchant Information</span>
+                </td>
             </tr>
-            
+            <tr>
+                <td class="label"><label>Merchant Code</label></td>
+                <td class="value"><strong><?= /* @noEscape */ $payment->getMerchantId() ?></strong></td>
+            </tr>
+            <tr>
+                <td class="label"><label>XML Username</label></td>
+                <td class="value">
+                    <strong>
+                        <?= /* @noEscape */ $block->getXmluserName(
+                            $payment->getPaymentType(),
+                            $payment->getIsMultishippingOrder()
+                        ) ?>
+                    </strong>
+                </td>
+            </tr>            
             </table>
 
-<?php } ?>
+<?php endif; ?>
 

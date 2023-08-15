@@ -10,6 +10,10 @@ class PendingPayment extends \Sapient\Worldpay\Model\Payment\Update\Base impleme
 {
     /** @var \Sapient\Worldpay\Helper\Data */
     private $_configHelper;
+     /**
+      * @var \Sapient\Worldpay\Helper\Multishipping
+      */
+    protected $multishippingHelper;
     /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState

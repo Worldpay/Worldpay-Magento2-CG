@@ -27,6 +27,20 @@ class SubscriptionsLink extends \Magento\Framework\View\Element\Html\Link\Curren
      * @var _scopeConfig
      */
     protected $_scopeConfig = null;
+    /**
+     * @var Subscriptions
+     */
+    protected $subscriptionconfig;
+
+     /**
+      * @var Recurring
+      */
+    protected $helper;
+
+      /**
+       * @var Recurring
+       */
+    protected $worldpayHelper;
 
     /**
      * Constructor

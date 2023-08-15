@@ -57,6 +57,16 @@ class HostedUrl implements HostedUrlInterface
     * @var quoteIdMaskFactory
     */
     protected $quoteIdMaskFactory;
+
+    /**
+     * @var Repository
+     */
+    protected $assetRepo;
+
+    /**
+     * @var mixed
+     */
+    protected $store;
     
     /**
      * Constructor

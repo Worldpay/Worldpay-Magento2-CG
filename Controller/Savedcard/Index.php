@@ -19,6 +19,12 @@ class Index extends \Magento\Framework\App\Action\Action
      * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+
     /**
      * Constructor
      *

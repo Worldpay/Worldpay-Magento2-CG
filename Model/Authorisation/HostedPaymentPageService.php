@@ -13,6 +13,48 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
     protected $_status;
     /** @var  \Sapient\Worldpay\Model\Response\RedirectResponse */
     protected $_redirectResponseModel;
+    /**
+     * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+     */
+    protected $mappingservice;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
+     */
+    protected $paymentservicerequest;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Registry
+     */
+    protected $registryhelper;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutsession;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Checkout\Hpp\State
+     */
+    protected $hppstate;
+
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    protected $_urlInterface;
+    /**
+     * @var \Sapient\Worldpay\Model\Response\RedirectResponse
+     */
+    protected $redirectresponse;
+    
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
 
     /**
      * Constructor

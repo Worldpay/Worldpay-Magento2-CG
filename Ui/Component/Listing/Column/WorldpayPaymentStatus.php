@@ -39,6 +39,12 @@ class WorldpayPaymentStatus extends Column
      * @var OrderRepositoryInterface
      */
     protected $_orderRepository;
+
+    /**
+     *
+     * @var Data
+     */
+    protected $helper;
     
     /**
      * Worldpay Payment Status constructor
@@ -79,6 +85,9 @@ class WorldpayPaymentStatus extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
+                if(!in_array($item['payment_method'],$this->helper->getWpPaymentMethods())){
+                    continue;
+                }
                 $worldpaypayment=$this->_worldpaypayment->loadByPaymentId($item["increment_id"]);
                 $paymentStatus = $worldpaypayment->getPaymentStatus();
                 if (empty($paymentStatus)) {

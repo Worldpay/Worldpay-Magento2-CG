@@ -18,6 +18,12 @@ class GeneralException extends \Magento\Framework\App\Config\Value
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     private $storeManager;
+
+     /**
+      *
+      * @var \Sapient\Worldpay\Helper\GeneralException
+      */
+    private $generalexception;
     /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry

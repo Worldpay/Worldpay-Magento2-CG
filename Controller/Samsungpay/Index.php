@@ -34,6 +34,36 @@ class Index extends \Magento\Framework\App\Action\Action
       * @var $customerSession
       */
     public $customerSession;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    public $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    public $paymentservice;
+
+     /**
+      * @var JsonFactory
+      */
+    protected $resultJsonFactory;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+     /**
+      * @var \Magento\Framework\App\Request\Http
+      */
+    protected $request;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
     /**
      * Constructor
      *

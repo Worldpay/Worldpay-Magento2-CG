@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
 <body>
-       <referenceBlock name="head.additional">
-        <block class="Sapient\Worldpay\Block\PaymentRequestApi" name="payment-shim-js" template="Sapient_Worldpay::payment-request-api.phtml"/>
-    </referenceBlock>
         <referenceContainer name="header-wrapper">
      <block class="Sapient\Worldpay\Block\Webpayment" name="sapient.web.payment" template="Sapient_Worldpay::webpayment.phtml"/>
         </referenceContainer>

@@ -18,6 +18,49 @@ class WalletService extends \Magento\Framework\DataObject
      */
     protected $updateWorldPayPayment;
 
+      /**
+       * @var \Sapient\Worldpay\Model\Mapping\Service
+       */
+    protected $mappingservice;
+
+      /**
+       * @var \Sapient\Worldpay\Logger\WorldpayLogger
+       */
+    protected $wplogger;
+     
+    /**
+     * @var \Sapient\Worldpay\Model\Response\DirectResponse
+     */
+    protected $directResponse;
+     /**
+      * @var \Sapient\Worldpay\Model\Payment\Service
+      */
+    protected $paymentservice;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+      */
+    protected $paymentservicerequest;
+     /**
+      * @var \Sapient\Worldpay\Helper\Registry
+      */
+    protected $registryhelper;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+    
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
+
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    protected $urlBuilders;
+
     /**
      * WalletService constructor
      *

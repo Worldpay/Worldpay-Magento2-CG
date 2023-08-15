@@ -6,7 +6,7 @@ namespace Sapient\Worldpay\Model\Payment;
 
 class Service
 {
-
+    public const INTERACTION_TYPE_MS = "ECOM_MULTISHIPPING";
     /**
      * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
      */
@@ -31,6 +31,26 @@ class Service
      * @var _helper
      */
     protected $_helper;
+
+    /**
+     * @var paymentupdatefactory
+     */
+    protected $paymentupdatefactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+     */
+    protected $paymentservicerequest;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Worldpayment
+     */
+    protected $worldpayPayment;
+
+    /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection
+     */
+    protected $multishippingOrderCollection;
     /**
      * Constructor
      *
@@ -134,13 +154,18 @@ class Service
         if (!$worldPayPayment) {
             return false;
         }
+        $interactionType = $worldPayPayment->getInteractionType();
+        if ($worldPayPayment->getIsMultishippingOrder()) {
+            $interactionType = self::INTERACTION_TYPE_MS;
+        }
+
         $rawXml = $this->paymentservicerequest->inquiry(
             $worldPayPayment->getMerchantId(),
             $worldPayPayment->getWorldpayOrderId(),
             $worldPayPayment->getStoreId(),
             $order->getPaymentMethodCode(),
             $worldPayPayment->getPaymentType(),
-            $worldPayPayment->getInteractionType()
+            $interactionType
         );
         
         $paymentService = new \SimpleXmlElement($rawXml);

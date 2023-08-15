@@ -92,6 +92,7 @@
                     "buttonColor" : 'black',
                     "buttonType" : 'buy',
                     "buttonLocale" : 'en',
+					"buttonSizeMode" : 'fill'
                 }
             }            
             GooglePayModel.addGooglePayButton(

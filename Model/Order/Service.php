@@ -8,6 +8,54 @@ class Service
 {
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutsession;
+    /**
+     * @var \Magento\Sales\Model\Order
+     */
+    protected $mageorder;
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
+    protected $emailsender;
+    /**
+     * @var \Magento\Sales\Model\Service\InvoiceService
+     */
+    protected $_invoiceService;
+    /**
+     * @var \Magento\Framework\DB\Transaction
+     */
+    protected $_transaction;
+    /**
+     * @var \Sapient\Worldpay\Model\Worldpayment
+     */
+    protected $worldpaypaymentmodel;
+    /**
+     * @var \Magento\Sales\Model\Order\CreditmemoFactory
+     */
+    protected $creditmemoFactory;
+    /**
+     * @var \Magento\Sales\Model\Order\Invoice
+     */
+    protected $Invoice;
+    /**
+     * @var \Magento\Sales\Model\Service\CreditmemoService
+     */
+    protected $CreditmemoService;
+    /**
+     * @var \Magento\Sales\Model\Order\Creditmemo
+     */
+    protected $ordercreditmemo;
+    /**
+     * @var \Magento\Sales\Api\CreditmemoRepositoryInterface
+     */
+    protected $creditmemoRepository;
+    /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection
+     */
+    protected $multishippingOrderCollection;
+    /**
      * Constructor
      *
      * @param \Magento\Sales\Model\Order $mageOrder

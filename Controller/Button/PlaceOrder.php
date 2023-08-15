@@ -77,6 +77,15 @@ class PlaceOrder extends Action
     private $orderRepository;
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    private $checkoutSession;
+    /**
+     * @var \Magento\Framework\App\Response\RedirectInterface
+     */
+    private $redirect;
+
+    /**
      * @param Context $context
      * @param StoreManagerInterface $storeManager
      * @param Session $customerSession

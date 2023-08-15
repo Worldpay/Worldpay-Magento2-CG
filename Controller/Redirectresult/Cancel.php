@@ -15,9 +15,49 @@
 class Cancel extends \Magento\Framework\App\Action\Action
 {
     /**
-     * @var Magento\Framework\View\Result\PageFactory
+     * @var \Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+    protected $orderservice;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Checkout\Service
+     */
+    protected $checkoutservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    protected $paymentservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Request\AuthenticationService
+     */
+    protected $authenticatinservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\StateResponse
+     */
+    protected $paymentStateResponse;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\WpResponse
+     */
+    protected $wpresponse;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
 
     /**
      * Constructor

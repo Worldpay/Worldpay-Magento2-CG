@@ -40,6 +40,74 @@ class Multishipping
     public $generalexception;
 
     /**
+     * @var \Magento\Multishipping\Model\Checkout\Type\Multishipping\State
+     */
+    public $state;
+    /**
+     * @var \Magento\Framework\Session\SessionManagerInterface
+     */
+    public $session;
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    public $checkoutSession;
+    /**
+     * @var \Magento\Framework\Message\ManagerInterface
+     */
+    public $messageManager;
+    /**
+     * @var \Magento\Framework\Event\ManagerInterface
+     */
+    public $eventManager;
+    /**
+     * @var \Sapient\Worldpay\Model\Checkout\Type\MultishippingFactory
+     */
+    public $multishippingCheckoutFactory;
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    public $helper;
+    /**
+     * @var \Sapient\Worldpay\Model\Multishipping\OrderFactory
+     */
+    public $multishippingOrderFactory;
+    /**
+     * @var \Sapient\Worldpay\Model\Multishipping\Order
+     */
+    public $multishippingOrder;
+    /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection
+     */
+    public $multishippingOrderCollection;
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    public $request;
+    
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
+     */
+    public $updateWorldPayPayment;
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+    public $orderservice;
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    public $storeManager;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
+    public $emailsender;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\CreditCardException
+     */
+    public $exceptionHelper;
+
+    /**
      * Constructor
      *
      * @param \Magento\Multishipping\Model\Checkout\Type\Multishipping\State $state
@@ -164,7 +232,7 @@ class Multishipping
             // Redirect to the success page
             $this->state->setCompleteStep(State::STEP_OVERVIEW);
             $this->state->setActiveStep(State::STEP_SUCCESS);
-            if ($cc_type == 'ACH_DIRECT_DEBIT-SSL') {
+            if ($cc_type == 'ACH_DIRECT_DEBIT-SSL' || $cc_type == 'SEPA_DIRECT_DEBIT-SSL') {
                 $url = $this->getUrl('worldpay/savedcard/Multishippingredirect');
                 $response['redirect'] = $url;
             } elseif ($cc_type == 'APPLEPAY-SSL') {
@@ -621,5 +689,15 @@ class Multishipping
         $storeid = $order->getStoreId();
         $store = $this->storeManager->getStore($storeid)->getCode();
         return $this->generalexception->getConfigValue($paymenttype, $store, $scope);
+    }
+    /**
+     * Get multishipping order ids
+     *
+     * @param string $quoteId
+     */
+    public function getMultishippingOrdersIds($quoteId)
+    {
+        $multiShippingOrders =  $this->multishippingOrderCollection->getMultishippingOrderIds($quoteId);
+        return $multiShippingOrders;
     }
 }

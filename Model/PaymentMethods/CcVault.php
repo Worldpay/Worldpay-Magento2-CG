@@ -99,6 +99,53 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
     protected static $paymentDetails;
 
     /**
+     * @var WorldpayLogger
+     */
+    protected $logger;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Authorisation\VaultService
+      */
+    protected $vaultService;
+
+     /**
+      * @var \Magento\Quote\Api\CartRepositoryInterface
+      */
+    protected $quoteRepository;
+
+     /**
+      * @var \Sapient\Worldpay\Helper\Data
+      */
+    protected $worlpayhelper;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Worldpayment
+      */
+    protected $worldpaypaymentmodel;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Worldpayment
+      */
+    protected $worldpaypayment;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Utilities\PaymentMethods
+      */
+    protected $paymentutils;
+     /**
+      * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
+      */
+    protected $paymentservicerequest;
+     /**
+      * @var \Sapient\Worldpay\Model\Response\AdminhtmlResponse
+      */
+    protected $adminhtmlresponse;
+     /**
+      * @var \Magento\Framework\Registry
+      */
+    protected $registry;
+
+    /**
      * CcVault constructor
      *
      * @param ConfigInterface $config

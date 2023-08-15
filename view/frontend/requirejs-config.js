@@ -54,11 +54,6 @@ var config = {
             "validation": "mage/validation/validation"
         }
     },
-    mixins: {
-        "Magento_Checkout/js/view/billing-address": {
-            "Sapient_Worldpay/js/view/billing-address": true
-        }
-    },
     config: {
         mixins: {
             'Magento_Catalog/js/price-box': {
@@ -75,6 +70,9 @@ var config = {
             },
             'Magento_Checkout/js/view/payment/list': {
                 'Sapient_Worldpay/js/list-mixin': true
+            },
+            "Magento_Checkout/js/view/billing-address": {
+                "Sapient_Worldpay/js/view/billing-address": true
             }
         }
     }

@@ -9,6 +9,39 @@ namespace Sapient\Worldpay\Model\System\Config\Backend;
  */
 class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
 {
+
+     /**
+      *
+      * @var \Sapient\Worldpay\Logger\WorldpayLogger
+      */
+    private $wplogger;
+
+     /**
+      * Store manager interface
+      *
+      * @var \Magento\Store\Model\StoreManagerInterface
+      */
+    private $storeManager;
+
+     /**
+      * @var \Magento\Framework\App\Config\ScopeConfigInterface
+      */
+    private $scopeConfig;
+
+     /**
+      * @var \Magento\Framework\App\Config\Storage\WriterInterface
+      */
+    private $configWriter;
+
+    /**
+     * @var \Magento\Framework\App\Cache\Manager
+     */
+    private $cacheManager;
+
+    /**
+     * @var \Sapient\Worldpay\Model\System\Config\Backend\PluginVersionHistory
+     */
+    private $versionhistory;
     /**
      * Constructor
      *

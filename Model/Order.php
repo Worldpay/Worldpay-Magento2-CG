@@ -13,6 +13,51 @@ class Order
      * @var order
      */
     private $_order;
+
+    /**
+     * @var \Magento\Sales\Model\Service\InvoiceService
+     */
+    private $_invoiceService;
+
+    /**
+     * @var \Magento\Framework\DB\Transaction
+     */
+    private $_transaction;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Worldpayment
+     */
+    private $worldpaypaymentmodel;
+
+    /**
+     * @var \Magento\Sales\Model\Order\CreditmemoFactory
+     */
+    private $creditmemoFactory;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Invoice
+     */
+    private $Invoice;
+
+     /**
+      * @var \Magento\Sales\Model\Service\CreditmemoService
+      */
+    private $CreditmemoService;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Creditmemo
+     */
+    private $creditmemo;
+
+    /**
+     * @var \Magento\Sales\Api\CreditmemoRepositoryInterface
+     */
+    private $creditmemoRepository;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Creditmemo
+     */
+    private $ordercreditmemo;
     
     /**
      * Constructor

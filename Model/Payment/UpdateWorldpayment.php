@@ -36,9 +36,68 @@ class UpdateWorldpayment
      */
     private $transactionsFactory;
     /**
-     * @var Magento\Framework\Serialize\Serializer\Json
+     * @var \Magento\Framework\Serialize\Serializer\Json
      */
     protected $serializer;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    public $wplogger;
+    /**
+     * @var SavedTokenFactory
+     */
+    public $savedTokenFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    public $worldpayHelper;
+
+    /**
+     * @var \Magento\Framework\Message\ManagerInterface
+     */
+    public $_messageManager;
+
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
+    public $customerSession;
+
+     /**
+      * @var OrderPaymentExtensionInterfaceFactory
+      */
+    public $paymentExtensionFactory;
+
+    /**
+     * @var CreditCardTokenFactory
+     */
+    public $paymentTokenFactory;
+
+     /**
+      * @var \Magento\Backend\Model\Session\Quote
+      */
+    public $quotesession;
+
+     /**
+      * @var \Magento\Vault\Api\PaymentTokenRepositoryInterface
+      */
+    public $paymentTokenRepository;
+
+     /**
+      * @var EncryptorInterface
+      */
+    public $encryptor;
+
+     /**
+      * @var \Sapient\Worldpay\Model\Worldpayment
+      */
+    public $worldpaypaymentmodel;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
+     */
+    public $transactionFactory;
     /**
      * Constructor
      *

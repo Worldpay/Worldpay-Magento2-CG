@@ -28,6 +28,12 @@ class AdminLabels extends \Magento\Framework\App\Config\Value
     private $storeManager;
 
     /**
+     *
+     * @var \Sapient\Worldpay\Helper\AdminLabels
+     */
+    private $adminLabels;
+
+    /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config

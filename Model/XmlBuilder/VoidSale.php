@@ -44,7 +44,7 @@ EOD;
      * @param float $amount
      * @param float $exponent
      * @param string|null $paymentType
-     * @return SimpleXMLElement $xml
+     * @return \SimpleXMLElement $xml
      */
     public function build($merchantCode, $orderCode, $currencyCode, $amount, $exponent, $paymentType = null)
     {

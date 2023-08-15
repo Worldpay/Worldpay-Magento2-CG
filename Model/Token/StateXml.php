@@ -10,7 +10,7 @@ namespace Sapient\Worldpay\Model\Token;
 class StateXml implements \Sapient\Worldpay\Model\Token\StateInterface
 {
     /**
-     * @var SimpleXMLElement
+     * @var \SimpleXMLElement
      */
     private $_xml;
     /**
@@ -35,7 +35,7 @@ class StateXml implements \Sapient\Worldpay\Model\Token\StateInterface
     private $_orderStatusNode;
 
     /**
-     * @param SimpleXMLElement $xml
+     * @param \SimpleXMLElement $xml
      */
     public function __construct(\SimpleXMLElement $xml)
     {

@@ -29,6 +29,31 @@ class Failure extends \Magento\Framework\App\Action\Action
      */
     private $transactionsFactory;
 
+     /**
+      * @var \Sapient\Worldpay\Model\Order\Service
+      */
+    private $orderservice;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+       /**
+        * @var \Magento\Checkout\Model\Session
+        */
+    protected $checkoutSession;
+
+   /**
+    * @var \Sapient\Worldpay\Helper\Multishipping
+    */
+    protected $multishippingHelper;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
+    protected $emailsender;
+
     /**
      * Constructor
      *

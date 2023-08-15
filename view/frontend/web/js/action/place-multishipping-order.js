@@ -21,7 +21,6 @@ define(
             };
 
             var serviceUrl = urlBuilder.createUrl('/worldpay/place_multishipping_order', {});
-
             storage.post(serviceUrl, JSON.stringify(payload))
                 .done(function (result) {
                     fullScreenLoader.stopLoader();
@@ -42,6 +41,12 @@ define(
                             samsungResponse.encInfo.mod, samsungResponse.encInfo.exp, samsungResponse.encInfo.keyId
                         );
                         return false;
+                    }
+                    if (response.cc_type == 'ALL') {
+                        if(response.method == 'worldpay_paybylink' && response.status == 'success'){
+                            window.location.href = BASE_URL + 'worldpay/paybylink_multishipping/orderplaced';
+                            return false;
+                        }
                     }
                     if (response.redirect) {
                         return $.mage.redirect(response.redirect);

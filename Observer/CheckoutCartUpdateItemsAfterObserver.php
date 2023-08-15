@@ -36,10 +36,13 @@ class CheckoutCartUpdateItemsAfterObserver implements ObserverInterface
         $info = $observer->getEvent()->getInfo();
 
         foreach ($info->getData() as $itemId => $itemInfo) {
-            $item = $quote->getItemById($itemId);
-            if ($this->recurringHelper->getSelectedPlan($item->getProduct())) {
-                $item->setQty(1);
+            if (!empty($itemInfo)) {
+                $item = $quote->getItemById($itemId);
+                if ($this->recurringHelper->getSelectedPlan($item->getProduct())) {
+                    $item->setQty(1);
+                }
             }
+            
         }
     }
 }

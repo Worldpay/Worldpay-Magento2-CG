@@ -12,11 +12,49 @@ use Magento\Customer\Api\CustomerRepositoryInterface as CustomerRepository;
 class AddtoCartBefore implements ObserverInterface
 {
    
-      /**
-       * @var \Sapient\Worldpay\Helper\Recurring
-       */
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
     private $wplogger;
 
+    /**
+     * @var \Magento\Quote\Api\CartRepositoryInterface
+     */
+    private $quoteRepository;
+     /**
+      * @var \Magento\Customer\Model\Session
+      */
+    private $customerSession;
+
+     /**
+      * @var \Magento\Checkout\Model\Cart
+      */
+    private $customerCart;
+
+     /**
+      * @var \Sapient\Worldpay\Helper\Data
+      */
+    private $wpHelper;
+
+     /**
+      * @var \Magento\Quote\Model\QuoteManagement
+      */
+    private $quoteManagement;
+
+    /**
+     * @var \Magento\Customer\Api\CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    private $checkoutSession;
     /**
      * Constructor function
      *

@@ -53,6 +53,32 @@ class Index extends \Magento\Backend\App\Action
     private $abstractMethod;
 
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    private $wplogger;
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+
+    private $paymentservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+
+    private $orderservice;
+
+    /**
+     * @var JsonFactory
+     */
+    private $resultJsonFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Token\WorldpayToken
+     */
+    private $worldpaytoken;
+
+    /**
      * Constructor
      *
      * @param Context $context

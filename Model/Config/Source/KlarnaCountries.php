@@ -9,11 +9,11 @@ namespace Sapient\Worldpay\Model\Config\Source;
 class KlarnaCountries implements \Magento\Framework\Option\ArrayInterface
 {
     /**
-     * @var _countryCollectionFactory
+     * @var \Magento\Directory\Model\ResourceModel\Country\CollectionFactory
      */
     protected $_countryCollectionFactory;
     /**
-     * @var _scopeConfig
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $_scopeConfig;
 

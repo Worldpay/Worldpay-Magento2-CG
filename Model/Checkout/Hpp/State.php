@@ -12,6 +12,11 @@ class State
     public const SESSION_KEY_URL = 'worldpay_hpp_redirect_url';
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    public $session;
+
+    /**
      * State constructor
      *
      * @param \Magento\Checkout\Model\Session $checkoutsession

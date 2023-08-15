@@ -6,6 +6,44 @@ namespace Sapient\Worldpay\Controller\ThreeDSecure;
 
 class ChallengeRedirectResponse extends \Magento\Framework\App\Action\Action
 {
+    
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+    /**
+     * @var \Magento\Framework\Controller\Result\JsonFactory
+     */
+    protected $resultJsonFactory;
+
+    /**
+     * @var string
+     */
+    protected $urlBuilder;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+    /**
+     * @var \Magento\Sales\Model\OrderFactory
+     */
+    protected $orderFactory;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
+    protected $orderSender;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Authorisation\ThreeDSecureChallenge
+     */
+    protected $threedscredirectresponse;
+
+    /**
+     * @var \Magento\Framework\View\Result\PageFactory
+     */
+    protected $_resultPageFactory;
     /**
      * Constructor
      *

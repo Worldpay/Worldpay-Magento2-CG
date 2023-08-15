@@ -10,6 +10,14 @@ use Exception;
 class Success extends \Magento\Framework\App\Action\Action
 {
     /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+    /**
+     * @var \Magento\Framework\View\Result\PageFactory
+     */
+    protected $_resultPageFactory;
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Action\Context $context

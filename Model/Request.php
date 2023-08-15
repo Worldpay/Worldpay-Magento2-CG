@@ -19,7 +19,16 @@ class Request
     /**
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
-    protected $_logger;
+    protected $_wplogger;
+     /**
+      * @var \Sapient\Worldpay\Helper\Data
+      */
+    protected $helper;
+
+     /**
+      * @var \Magento\Framework\HTTP\Client\Curl
+      */
+    protected $curl;
 
     public const CURL_POST = true;
     public const CURL_RETURNTRANSFER = true;
@@ -50,15 +59,16 @@ class Request
       * @param array $quote
       * @param string $username
       * @param string $password
+      * @param bool $additionalHeader
       * @return SimpleXMLElement body
       * @throws Exception
       */
-    public function sendRequest($quote, $username, $password)
+    public function sendRequest($quote, $username, $password, $additionalHeader = false)
     {
         $request = $this->_getRequest();
         $logger = $this->_wplogger;
         $url = $this->_getUrl();
-        $pluginTrackerDetails = $this->helper->getPluginTrackerdetails();
+        $pluginTrackerDetails = $this->helper->getPluginTrackerdetails($username, $quote);
         $logger->info('Setting destination URL: ' . $url);
         $logger->info('Initialising request');
         $request->setOption(CURLOPT_POST, self::CURL_POST);
@@ -80,31 +90,28 @@ class Request
         }
         //$request->addCookie(CURLOPT_COOKIE, $cookie);
         $request->setTimeout(self::CURL_TIMEOUT);
-        $request->setHeaders([
+        $headersArray = [
             'Content-Type'=> 'text/xml',
             'Expect'=>''
-        ]);
+        ];
         $logger->info('Sending XML as: ' . $this->_getObfuscatedXmlLog($quote));
-
         $request->setOption(CURLOPT_HEADER, 1);
-        $request->setOption(
-            CURLOPT_HTTPHEADER,
-            ["content-type: application/json",
-               "MERCHANT_ID" => $pluginTrackerDetails['MERCHANT_ID'],
-               "API_USERNAME" => $pluginTrackerDetails['API_USERNAME'],
-               "MAGENTO_EDITION"=>$pluginTrackerDetails['MAGENTO_EDITION'],
-               "MAGENTO_VERSION"=>$pluginTrackerDetails['MAGENTO_VERSION'],
-               "PHP_VERSION"=> $pluginTrackerDetails['PHP_VERSION'],
-               "CURRENT_WORLDPAY_PLUGIN_VERSION"=>isset($pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION'])?
-               $pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION']:"",
-               "WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE" =>
-               isset($pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE'])?
-               $pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE']:"",
-               "UPGRADE_DATES" => isset($pluginTrackerDetails['UPGRADE_DATES'])?
-               $pluginTrackerDetails['UPGRADE_DATES']:""
-            ]
-        );
-        $logger->info('Sending additional headers as: ' . json_encode([
+
+        if ($additionalHeader) {
+            $headersArray['MERCHANT_ID'] = $pluginTrackerDetails['MERCHANT_ID'];
+            $headersArray['API_USERNAME'] = $pluginTrackerDetails['API_USERNAME'];
+            $headersArray['MAGENTO_EDITION'] = $pluginTrackerDetails['MAGENTO_EDITION'];
+            $headersArray['MAGENTO_VERSION'] = $pluginTrackerDetails['MAGENTO_VERSION'];
+            $headersArray['PHP_VERSION'] = $pluginTrackerDetails['PHP_VERSION'];
+            $headersArray['CURRENT_WORLDPAY_PLUGIN_VERSION'] = isset($pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION'])?
+            $pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION']:"";
+            $headersArray['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE'] =  isset($pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE'])?
+            $pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE']:"";
+
+            $headersArray['UPGRADE_DATES'] = isset($pluginTrackerDetails['UPGRADE_DATES'])?
+            $pluginTrackerDetails['UPGRADE_DATES']:"";
+            
+            $logger->info('Sending additional headers as: ' . json_encode([
                 "MERCHANT_ID" => $pluginTrackerDetails['MERCHANT_ID'],
                 "API_USERNAME" => $pluginTrackerDetails['API_USERNAME'],
                 "MAGENTO_EDITION"=>$pluginTrackerDetails['MAGENTO_EDITION'],
@@ -118,6 +125,9 @@ class Request
                 "UPGRADE_DATES" => isset($pluginTrackerDetails['UPGRADE_DATES'])?
                 $pluginTrackerDetails['UPGRADE_DATES']:""
             ]));
+        }
+        $request->setHeaders($headersArray);
+
         $request->setOption(CURLINFO_HEADER_OUT, 1);
         $request->post($url, $quote->saveXML());
 
@@ -133,17 +143,22 @@ class Request
         }
         if (!$result || ($request->getStatus() != self::SUCCESS)) {
             $logger->info('Request could not be sent.');
+            $errorMessage = $this->findErrorMessage($result);
             $logger->info($result);
-            $logger->info('########### END OF REQUEST - FAILURE WHILST TRYING TO SEND REQUEST ###########');
+            $logger->info('########### END OF REQUEST - FAILURE WHILE TRYING TO SEND REQUEST ###########');
+            if (!empty($errorMessage)) {
+                $errorMessage = $errorMessage.".";
+            }
+            $errorMessage .= 'Worldpay api service not available';
             throw new \Magento\Framework\Exception\LocalizedException(
-                __('Worldpay api service not available')
+                __($errorMessage)
             );
         }
         $logger->info('Request successfully sent');
         $logger->info($result);
         // extract headers
        
-         // extract headers
+        // extract headers
         $bits = explode("\r\n\r\n", $result);
         $body = array_pop($bits);
         $headers = implode("\r\n\r\n", $bits);
@@ -164,7 +179,7 @@ class Request
      */
     protected function _getObfuscatedXmlLog($quote)
     {
-        $elems = ['cardNumber', 'cvc'];
+        $elems = ['cardNumber', 'cvc', 'iban', 'telephoneNumber'];
         $_xml  = clone($quote);
 
         foreach ($elems as $_e) {
@@ -199,5 +214,26 @@ class Request
         }
 
         return $this->_request;
+    }
+    /**
+     * Find Error message from header response
+     *
+     * @param string $response
+     */
+    private function findErrorMessage($response)
+    {
+        $headerbits = explode("\r\n\r\n", $response);
+        $remainingBody = array_pop($headerbits);
+        $errorMsg = "";
+        if (!empty($remainingBody)) {
+            $responseXml = new \SimpleXmlElement($remainingBody);
+            try {
+                $errorMsg = $responseXml->head->title;
+            } catch (\Exception $e) {
+                $this->_wplogger->info(__('Could not parse error body xml'));
+            }
+
+        }
+        return $errorMsg;
     }
 }

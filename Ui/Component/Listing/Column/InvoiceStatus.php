@@ -39,6 +39,12 @@ class InvoiceStatus extends Column
      * @var OrderRepositoryInterface
      */
     protected $_orderRepository;
+
+    /**
+     *
+     * @var Data
+     */
+    protected $helper;
     
     /**
      * Invoice Status constructor
@@ -76,6 +82,9 @@ class InvoiceStatus extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
+                if(!in_array($item['payment_method'],$this->helper->getWpPaymentMethods())){
+                    continue;
+                }
                 $order = $this->_orderRepository->get($item['entity_id']);
                 if ($order->hasInvoices()) {
                     if ($order->getBaseTotalDue() == 0) {

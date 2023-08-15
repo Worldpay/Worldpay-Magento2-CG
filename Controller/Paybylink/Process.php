@@ -26,6 +26,56 @@ class Process extends \Magento\Framework\App\Action\Action
     protected $quoteFactory;
 
     /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+    protected $orderservice;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Magento\Sales\Model\Order
+     */
+    protected $orderItemsDetails;
+
+    /**
+     * @var \Magento\Sales\Model\Order
+     */
+    protected $worldpayhelper;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    protected $paymentservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Request\AuthenticationService
+     */
+    protected $authenticatinservice;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\WpResponse
+     */
+    protected $wpresponse;
+
+    /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $_checkoutSession;
+
+    /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection
+     */
+    protected $wpMultishippingCollection;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\MultishippingStateResponse
+     */
+    protected $multishippingStateResponse;
+
+    /**
      * Constructor
      *
      * @param \Magento\Framework\App\Action\Context $context
@@ -36,6 +86,13 @@ class Process extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Framework\Controller\Result\Redirect $resultRedirectFactory
      * @param \Magento\Sales\Model\Order $orderItemsDetails
+     * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
+     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
+     * @param \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice
+     * @param \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $wpMultishippingCollection
+     * @param \Sapient\Worldpay\Model\Payment\MultishippingStateResponse $multishippingStateResponse
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -45,7 +102,14 @@ class Process extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\PaymentMethods\PayByLink $paybylink,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Framework\Controller\Result\Redirect $resultRedirectFactory,
-        \Magento\Sales\Model\Order $orderItemsDetails
+        \Magento\Sales\Model\Order $orderItemsDetails,
+        \Sapient\Worldpay\Helper\Data $worldpayhelper,
+        \Sapient\Worldpay\Model\Payment\Service $paymentservice,
+        \Sapient\Worldpay\Model\Request\AuthenticationService $authenticatinservice,
+        \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse,
+        \Magento\Checkout\Model\Session $checkoutSession,
+        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $wpMultishippingCollection,
+        \Sapient\Worldpay\Model\Payment\MultishippingStateResponse $multishippingStateResponse
     ) {
         $this->request = $request;
         $this->orderservice = $orderservice;
@@ -54,6 +118,13 @@ class Process extends \Magento\Framework\App\Action\Action
         $this->wplogger = $wplogger;
         $this->resultRedirectFactory = $resultRedirectFactory;
         $this->orderItemsDetails = $orderItemsDetails;
+        $this->worldpayhelper = $worldpayhelper;
+        $this->paymentservice = $paymentservice;
+        $this->authenticatinservice = $authenticatinservice;
+        $this->wpresponse = $wpresponse;
+        $this->_checkoutSession = $checkoutSession;
+        $this->wpMultishippingCollection = $wpMultishippingCollection;
+        $this->multishippingStateResponse = $multishippingStateResponse;
 
         return parent::__construct($context);
     }
@@ -79,6 +150,47 @@ class Process extends \Magento\Framework\App\Action\Action
             $magentoorder = $order->getOrder();
             $quoteId  = $magentoorder->getQuoteId();
             $quote  = $this->getPaybylinkquote($quoteId);
+            /* Start Expiry Code */
+            $currentDate = date("Y-m-d H:i:s");
+            $orderDate = $orderInfo->getCreatedAt();
+            $interval = $this->worldpayhelper->findPblOrderIntervalTime($currentDate, $orderDate);
+            $expiryTime = $this->worldpayhelper->getPayByLinkExpiryTime();
+            $isResendEnable = $this->worldpayhelper->isPayByLinkResendEnable();
+            if ($isResendEnable) {
+                $expiryTime = $this->worldpayhelper->calculatePblResendExpiryTime($expiryTime);
+            }
+            if ($interval >= $expiryTime) {
+                $this->wplogger->info('Pay by link expired. Cancelling the order.');
+                $this->_checkoutSession->setauthenticatedOrderId($order->getIncrementId());
+                $worldPayPayment = $order->getWorldPayPayment();
+                $merchantCode = $worldPayPayment->getMerchantId();
+                if ($quote->getIsMultiShipping()) {
+                    $multiShippingOrders =  $this->wpMultishippingCollection->getMultishippingOrderIds($quoteId);
+                    if (count($multiShippingOrders) > 0) {
+                        foreach ($multiShippingOrders as $orderId) {
+                            $orderObj = $this->orderItemsDetails->loadByIncrementId($orderId);
+                            $notice = $this->_getCancellationNoticeForOrder($orderObj);
+                            $this->messageManager->addNotice($notice);
+                            $this->_applyPaymentUpdate(
+                                $this->multishippingStateResponse->createCancelledResponse(
+                                    $orderCode,
+                                    $merchantCode
+                                ),
+                                $orderObj
+                            );
+                        }
+                    }
+                } else {
+                    $notice = $this->_getCancellationNoticeForOrder($order);
+                    $this->messageManager->addNotice($notice);
+                    $this->_applyPaymentUpdate(
+                        $this->wpresponse->createFromPblCancelledResponse($orderCode, $merchantCode),
+                        $orderInfo
+                    );
+                }
+                return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
+            }
+            /* End Expiry Code */
             $payment = $magentoorder->getPayment();
             $paymentDetails = [];
             $paymentDetails['additional_data']['cc_type'] = 'ALL';
@@ -100,6 +212,41 @@ class Process extends \Magento\Framework\App\Action\Action
         } else {
             $this->wplogger->info('Order not found.Redirecting to checkout cart page');
             return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
+        }
+    }
+
+    /**
+     * Get Cancellation NoticeFor Order
+     *
+     * @param array $order
+     * @return string
+     */
+    private function _getCancellationNoticeForOrder($order)
+    {
+
+        $incrementId = $order->getIncrementId();
+        $message = $incrementId === null
+           ? __('Order Cancelled')
+           : __('Order #'. $incrementId.' Cancelled');
+
+        return $message;
+    }
+
+    /**
+     * Apply Payment Update
+     *
+     * @param string $paymentState
+     * @param array $order
+     * @return string
+     */
+    private function _applyPaymentUpdate($paymentState, $order)
+    {
+        try {
+            $this->_paymentUpdate = $this->paymentservice
+                       ->createPaymentUpdateFromWorldPayResponse($paymentState);
+            $this->_paymentUpdate->apply($order->getPayment(), $order);
+        } catch (\Exception $e) {
+            $this->wplogger->error($e->getMessage());
         }
     }
 

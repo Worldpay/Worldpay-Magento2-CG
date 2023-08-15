@@ -35,6 +35,26 @@ class Error extends \Magento\Framework\App\Action\Action
      */
     protected $helper;
 
+     /**
+      * @var \Sapient\Worldpay\Model\Order\Service
+      */
+    protected $orderservice;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+     /**
+      * @var \Magento\Checkout\Model\Session
+      */
+    protected $checkoutSession;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Multishipping
+     */
+    protected $multishippingHelper;
+
     /**
      * Constructor
      *

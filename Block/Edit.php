@@ -14,6 +14,11 @@ class Edit extends \Magento\Framework\View\Element\Template
       * @var \Magento\Customer\Model\Session
       */
     protected $_customerSession;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
      /**
       * @var array
       */

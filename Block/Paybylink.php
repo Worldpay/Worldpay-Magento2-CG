@@ -7,6 +7,7 @@ namespace Sapient\Worldpay\Block;
 
 use Magento\Customer\Model\Context;
 use Magento\Sales\Model\Order;
+use Magento\Framework\Serialize\Serializer\Json;
 
 class Paybylink extends \Magento\Framework\View\Element\Template
 {
@@ -24,11 +25,24 @@ class Paybylink extends \Magento\Framework\View\Element\Template
      * @var \Magento\Framework\App\Http\Context
      */
     protected $httpContext;
+    /**
+     * @var \Magento\Customer\Model\Url
+     */
+    protected $_customerUrl;
 
     /**
-     * @var Session
+     * @var \Magento\Customer\Model\Session
      */
     private $customerSession;
+
+    /**
+     * @var array
+     */
+    protected $jsLayout;
+    /**
+     * @var \Magento\Framework\Serialize\Serializer\Json
+     */
+    protected $serializer;
 
     /**
      * @param \Magento\Framework\View\Element\Template\Context $context
@@ -37,6 +51,7 @@ class Paybylink extends \Magento\Framework\View\Element\Template
      * @param \Magento\Framework\App\Http\Context $httpContext
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Customer\Model\Url $customerUrl
+     * @param Json $serializer
      * @param array $data
      */
     public function __construct(
@@ -46,6 +61,7 @@ class Paybylink extends \Magento\Framework\View\Element\Template
         \Magento\Framework\App\Http\Context $httpContext,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Customer\Model\Url $customerUrl,
+        Json $serializer,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -55,6 +71,8 @@ class Paybylink extends \Magento\Framework\View\Element\Template
         $this->httpContext = $httpContext;
         $this->customerSession = $customerSession;
         $this->_customerUrl = $customerUrl;
+        $this->jsLayout = isset($data['jsLayout']) && is_array($data['jsLayout']) ? $data['jsLayout'] : [];
+        $this->serializer = $serializer;
     }
 
     /**
@@ -162,5 +180,15 @@ class Paybylink extends \Magento\Framework\View\Element\Template
             return true;
         }
         return false;
+    }
+
+    /**
+     * Get JS layout
+     *
+     * @return string
+     */
+    public function getJsLayout()
+    {
+        return $this->serializer->serialize($this->jsLayout);
     }
 }

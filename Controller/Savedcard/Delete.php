@@ -40,6 +40,41 @@ class Delete extends \Magento\Framework\App\Action\Action
      */
     protected $resultRedirect;
 
+     /**
+      * @var StoreManagerInterface
+      */
+    protected $_storeManager;
+
+    /**
+     * @var SavedTokenFactory
+     */
+    protected $savecard;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Token\Service
+     */
+    protected $_tokenService;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Token\WorldpayToken
+     */
+    protected $_worldpayToken;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var PaymentTokenRepositoryInterface
+     */
+    protected $tokenRepository;
+
+    /**
+     * @var PaymentTokenManagement
+     */
+    protected $paymentTokenManagement;
+
     /**
      * Constructor
      *
