@@ -86,6 +86,7 @@ class PluginVersionHistory extends \Magento\Framework\App\Config\Value
                 && (isset($value['newData']) && !empty($value['newData']))) {
             $data = $value['oldData'].",".$value['newData'];
             $data =(array_unique(explode(",", $data)));
+            $data = array_slice($data,-3,3,true);
             $data = implode(",", $data);
             $this->setValue($data);
             $this->configWriter->save(
@@ -118,14 +119,15 @@ class PluginVersionHistory extends \Magento\Framework\App\Config\Value
                 && (isset($value['newData']) && !empty($value['newData']))) {
             $data = $value['oldData'].",".$value['newData'];
             $data =(array_unique(explode(",", $data)));
+            $data = array_slice($data,-3,3,true);
             $data = implode(",", $data);
-            $this->setValue($data);
+            $this->setValue(trim($data,','));
             $this->configWriter->save(
                 'worldpay/general_config/plugin_tracker/wopay_plugin_version_history',
                 $data
             );
         } elseif (isset($value['newData'])) {
-            $this->setValue($value['newData']);
+            $this->setValue(trim($value['newData']),',');
             $this->configWriter->save(
                 'worldpay/general_config/plugin_tracker/wopay_plugin_version_history',
                 $value['newData']

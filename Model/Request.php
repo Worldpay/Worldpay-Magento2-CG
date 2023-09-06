@@ -59,16 +59,14 @@ class Request
       * @param array $quote
       * @param string $username
       * @param string $password
-      * @param bool $additionalHeader
       * @return SimpleXMLElement body
       * @throws Exception
       */
-    public function sendRequest($quote, $username, $password, $additionalHeader = false)
+    public function sendRequest($quote, $username, $password)
     {
         $request = $this->_getRequest();
         $logger = $this->_wplogger;
         $url = $this->_getUrl();
-        $pluginTrackerDetails = $this->helper->getPluginTrackerdetails($username, $quote);
         $logger->info('Setting destination URL: ' . $url);
         $logger->info('Initialising request');
         $request->setOption(CURLOPT_POST, self::CURL_POST);
@@ -96,41 +94,9 @@ class Request
         ];
         $logger->info('Sending XML as: ' . $this->_getObfuscatedXmlLog($quote));
         $request->setOption(CURLOPT_HEADER, 1);
-
-        if ($additionalHeader) {
-            $headersArray['MERCHANT_ID'] = $pluginTrackerDetails['MERCHANT_ID'];
-            $headersArray['API_USERNAME'] = $pluginTrackerDetails['API_USERNAME'];
-            $headersArray['MAGENTO_EDITION'] = $pluginTrackerDetails['MAGENTO_EDITION'];
-            $headersArray['MAGENTO_VERSION'] = $pluginTrackerDetails['MAGENTO_VERSION'];
-            $headersArray['PHP_VERSION'] = $pluginTrackerDetails['PHP_VERSION'];
-            $headersArray['CURRENT_WORLDPAY_PLUGIN_VERSION'] = isset($pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION'])?
-            $pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION']:"";
-            $headersArray['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE'] =  isset($pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE'])?
-            $pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE']:"";
-
-            $headersArray['UPGRADE_DATES'] = isset($pluginTrackerDetails['UPGRADE_DATES'])?
-            $pluginTrackerDetails['UPGRADE_DATES']:"";
-            
-            $logger->info('Sending additional headers as: ' . json_encode([
-                "MERCHANT_ID" => $pluginTrackerDetails['MERCHANT_ID'],
-                "API_USERNAME" => $pluginTrackerDetails['API_USERNAME'],
-                "MAGENTO_EDITION"=>$pluginTrackerDetails['MAGENTO_EDITION'],
-                "MAGENTO_VERSION"=>$pluginTrackerDetails['MAGENTO_VERSION'],
-                "PHP_VERSION"=> $pluginTrackerDetails['PHP_VERSION'],
-                "CURRENT_WORLDPAY_PLUGIN_VERSION"=>isset($pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION'])?
-                $pluginTrackerDetails['CURRENT_WORLDPAY_PLUGIN_VERSION']:"",
-                "WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE" =>
-                isset($pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE'])?
-                $pluginTrackerDetails['WORLDPAY_PLUGIN_VERSION_USED_TILL_DATE']:"",
-                "UPGRADE_DATES" => isset($pluginTrackerDetails['UPGRADE_DATES'])?
-                $pluginTrackerDetails['UPGRADE_DATES']:""
-            ]));
-        }
         $request->setHeaders($headersArray);
-
         $request->setOption(CURLINFO_HEADER_OUT, 1);
         $request->post($url, $quote->saveXML());
-
         $result = $request->getBody();
 
         // logging Headder for 3DS request to check Cookie.

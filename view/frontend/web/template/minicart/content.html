@@ -62,7 +62,7 @@
                         translate="'Proceed to Checkout'">
                 </button>
                 <!-- ko if:getSubscriptionStatus() == false -->	
-                <if args="isCheckoutCartPage == 1">
+                <if args="window.isCheckoutCartPage == 1">
                     <if args="chromepayEnabled == 1">	
                         <if args="chromePaymentMode == 'direct'">	
                             <if args="isChromium == '1'">	

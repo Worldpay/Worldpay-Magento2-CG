@@ -51,6 +51,7 @@ var config = {
             "Magento_Checkout/template/minicart/content.html": "Sapient_Worldpay/template/minicart/content.html",
             "Magento_Checkout/template/payment.html": "Sapient_Worldpay/template/payment.html",
             newcard:            'Sapient_Worldpay/js/newcard',
+            disclaimerPopup:    'Sapient_Worldpay/js/model/disclaimer-popup',
             "validation": "mage/validation/validation"
         }
     },

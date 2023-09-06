@@ -137,11 +137,11 @@
         <!-- Disclaimer -->
         <label for="save-card" class="label">
             <?php if ($block->getStoredCredentialsEnabledValue() && $block->getDisclaimerMessageEnable()): ?> 
-                <span>(<a href="javascript:void(0)" id="btnShow">Important Disclaimer!</a>)</span>
+                <span>(<a href="javascript:void(0)" role="important-disclaimer">Important Disclaimer!</a>)</span>
             <?php endif; ?>
         </label>
                     
-        <div title="Disclaimer!" id="dialog" style="display: none" align ="center" >
+        <div title="Disclaimer!" id="dialog" style="display: none">
             <form id="disclaimer" name="disclaimer">
                 <div><?= /* @noEscape */ $block->getDisclaimerText(); ?></div>
             </form>
@@ -198,7 +198,6 @@
         var baseUrl = '<?= /* @noEscape */ $block->getBaseUrl() ?>';
         var typeCamMsg = '<?= /* @noEscape */ $block->getCreditCardSpecificexception('CTYP01') ?>';
         var jwtUrl = baseUrl + 'worldpay/hostedpaymentpage/jwt';
-        var disclaimerFlag=null;
         function createJwt(cardNumber) {
             var bin = cardNumber;
             var encryptedBin = btoa(bin);
@@ -457,62 +456,26 @@
         window.onConfirmBtn = onConfirmBtn;
         $(document).ready(function (){
           window.disclaimerDialogue=null;
-          
+          disclaimerFlag=null;
         });
-         $("#btnShow").click(function (){
-            mandatoryMessage= parseInt("<?= /* @noEscape */
+    });    
+</script>
+
+<script type="text/x-magento-init">
+    {
+        ".page-main": {
+            "disclaimerPopup": {
+                "disclaimer": "a[role='important-disclaimer']",
+                "mandatoryMessage": "<?= /* @noEscape */
                 $block->escapeHtml(!empty($block->getDisclaimerMessageMandatory())
-                ?$block->getDisclaimerMessageMandatory():0); ?>"); 
-            disclaimerMessageEnabled = parseInt("<?= /* @noEscape */
+                ?$block->getDisclaimerMessageMandatory():0); ?>",
+                "disclaimerMessageEnabled": "<?= /* @noEscape */
                 $block->escapeHtml(!empty($block->getDisclaimerMessageEnable())
-                ?$block->getDisclaimerMessageEnable():0); ?>");
-            storedCredentials = parseInt("<?= /* @noEscape */
+                ?$block->getDisclaimerMessageEnable():0); ?>",
+                "storedCredentials": "<?= /* @noEscape */
                 $block->escapeHtml(!empty($block->getStoredCredentialsEnabledValue())
-                ?$block->getStoredCredentialsEnabledValue():0); ?>");
-            that=this;     
-        $("#dialog").dialog({
-                    autoResize: true,
-                    show: "clip",
-                    hide: "clip",
-                    height: 350,
-                    width: 450,
-                    autoOpen: false,
-                    modal: true,
-                    position:
-                    {
-                        my: "center",
-                        at: "center",
-                        of: window
-                    },
-                    draggable: false,
-                    buttons: {
-                        Agree: function() { 
-                            $( this ).dialog( "close" );
-                            disclaimerFlag = true;
-                            window.disclaimerDialogue = true;
-                            $('#disclaimer-error').css('display', 'none');
-                            $('#save_newcard').prop( "disabled", false );
-                        },
-                        Disagree: function() { 
-                            $( this ).dialog( "close" );
-                            disclaimerFlag = false;
-                            window.disclaimerDialogue = false;
-                             $('#disclaimer-error').css('display', 'none');
-                             if (mandatoryMessage){
-                                $('#save_newcard').prop( "disabled", true );
-                            }
-                            
-                        }
-                    },
-                    open: function (type, data) {
-                        $(this).parent().appendTo("#disclaimer");
-                    }
-        });
-        if(storedCredentials && disclaimerMessageEnabled){
-        $('#dialog').dialog('open');
-         }
-    });
-    });
-   
-    
+                ?$block->getStoredCredentialsEnabledValue():0); ?>"
+            }
+        }
+    }
 </script>

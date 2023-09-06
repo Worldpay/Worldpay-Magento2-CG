@@ -42,6 +42,10 @@ EOD;
      */
     private $amount;
     /**
+     * @var string
+     */
+    private $orderContent;
+    /**
      * @var array
      */
     protected $paymentDetails;
@@ -97,6 +101,7 @@ EOD;
      * @param string $orderDescription
      * @param string $currencyCode
      * @param float $amount
+     * @param string $orderContent
      * @param string $paymentType
      * @param array $paymentDetails
      * @param string $shippingAddress
@@ -112,6 +117,7 @@ EOD;
         $orderDescription,
         $currencyCode,
         $amount,
+        $orderContent,
         $paymentType,
         $paymentDetails,
         //$cardAddress,
@@ -129,6 +135,7 @@ EOD;
         $this->orderDescription = $orderDescription;
         $this->currencyCode = $currencyCode;
         $this->amount = $amount;
+        $this->orderContent = $orderContent;
         $this->paymentType = $paymentType;
         $this->paymentDetails = $paymentDetails;
         //$this->cardAddress = $cardAddress;
@@ -176,6 +183,7 @@ EOD;
         }
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
+        $this->_addOrderContentElement($order);
         $this->_addPaymentDetailsElement($order);
         $this->_addShopperElement($order);
         $this->_addShippingElement($order);
@@ -201,7 +209,18 @@ EOD;
         $description = $order->addChild('description');
         $this->_addCDATA($description, $this->orderDescription);
     }
-
+    
+    /**
+     * Add OrderContent tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
+    private function _addOrderContentElement($order)
+    {
+        $orderContent = $order->addChild('orderContent');
+        $this->_addCDATA($orderContent, $this->orderContent);
+    }
+    
     /**
      * Add amount and its child tag to xml
      *

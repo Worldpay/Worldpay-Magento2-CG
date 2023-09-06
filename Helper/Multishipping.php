@@ -599,7 +599,7 @@ class Multishipping
      */
     public function getQuote($quoteId = null)
     {
-        $quote = $this->_checkoutSession->getQuote();
+        $quote = $this->checkoutSession->getQuote();
         return $quote;
     }
     /**
@@ -692,10 +692,11 @@ class Multishipping
     }
     /**
      * Get multishipping order ids
-     * 
+     *
      * @param string $quoteId
      */
-    public function getMultishippingOrdersIds($quoteId){
+    public function getMultishippingOrdersIds($quoteId)
+    {
         $multiShippingOrders =  $this->multishippingOrderCollection->getMultishippingOrderIds($quoteId);
         return $multiShippingOrders;
     }

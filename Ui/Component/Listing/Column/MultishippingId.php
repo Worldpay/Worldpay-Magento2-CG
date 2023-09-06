@@ -85,6 +85,9 @@ class MultishippingId extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
+                if (!in_array($item['payment_method'], $this->helper->getWpPaymentMethods())) {
+                    continue;
+                }
                 $worldpaypayment=$this->_worldpaypayment->loadByPaymentId($item["increment_id"]);
                 $isMultishipping = $worldpaypayment->getIsMultishippingOrder();
                 if ($isMultishipping) {

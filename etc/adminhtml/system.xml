@@ -1286,6 +1286,100 @@
                     <depends><field id="enabled">1</field></depends>
                     <comment>Enter the merchant Installation Id for Multishipping orders. If it is blank, global merchant Installation Id entered under HPP configuration will be applicable.</comment>
                 </field>
+                 <!-- Multishipping Mobile Wallet -->
+                <group id="ms_wallets_config" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Mobile Wallets</label>
+                    <!-- Multishipping Apple Pay -->
+                    <group id="ms_apple_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="1" showInStore="1">
+                        <label>Apple Pay</label>
+                        <!--Apple Pay  enabled-->
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                        <field id="ms_certification_key" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Apple Pay Certification Key</label>
+                            <comment>Location of the ApplePay.key.pem. eg. /var/www/html/cert/.  Files should be have read access by the webserver</comment>
+                        </field>
+                        <field id="ms_certification_crt" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Apple Pay Certification Path</label>
+                            <comment>Location of the ApplePay.crt.pem. eg. /var/www/html/cert/.  Files should be have read access by the webserver</comment>
+                        </field>
+                        <field id="ms_certification_password" translate="label" type="password" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Apple Pay Certification Password</label>
+                            <comment>Password set during the export of p12 file.</comment>
+                        </field>
+                        <field id="ms_merchant_name" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Merchant Name</label>
+                            <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                        </field>
+                        <field id="ms_domain_name" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Domain Name</label>
+                            <comment>eg. mydomain.com</comment>
+                        </field>
+                    </group>
+                    <!-- Multishipping Google Pay -->
+                    <group id="ms_gpay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="2" showInStore="1">
+                        <label>Google Pay</label>
+                        <!--Google Pay  enabled-->
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                        <field id="paymentmethods" translate="label" type="multiselect" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                            <label>Payment Methods</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethods</source_model>
+                        </field>
+                        <field id="authmethods" translate="label" type="multiselect" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                            <label>Authentication Methods Supported By Google</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\AuthMethods</source_model>
+                        </field>
+                        <field id="ms_gpay_gateway_merchantname" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Gateway Name</label>
+                            <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                        </field> 
+                        <field id="ms_gpay_gateway_merchantid" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Gateway MerchantId</label>
+                            <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                        </field> 
+                        <field id="ms_gpay_merchantid" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Google MerchantId</label>
+                            <comment>This field only required for production mode. This can be generated from merchant's Google account</comment>
+                        </field> 
+                        <field id="ms_gpay_merchantname" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Google MerchantName</label>
+                        </field> 
+                        <field id="ms_gpay_test_cardholdername" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Test 3DS CardHolderName</label>
+                        </field>
+                    </group>
+                    <!-- Multishipping Samsung Pay -->
+                    <group id="ms_samsung_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="3" showInStore="1">
+                        <label>Samsung Pay</label>
+                        <!--Samsung Pay  enabled-->
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                    
+                        <field id="ms_service_id" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Service Id</label>
+                        </field> 
+                        
+                        <field id="ms_samsung_merchant_shop_name" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Samsung Merchant Shop Name</label>
+                        </field> 
+                        
+                        <field id="ms_samsung_order_description" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Samsung Order Description</label>
+                        </field> 
+                        
+                        <field id="ms_samsung_merchant_shop_url" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Samsung Merchant Shop URL</label>
+                        </field> 
+                    </group>
+                    
+                </group>
             </group>
              <!-- Worldpay Pay By Link -->
             <group id="paybylink_config" translate="label"  sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">

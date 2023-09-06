@@ -39,6 +39,10 @@ EOD;
     /**
      * @var string
      */
+    private $orderContent;
+    /**
+     * @var string
+     */
     private $paymentType;
     /**
      * @var float
@@ -113,6 +117,14 @@ EOD;
      * @var array
      */
     protected $billingAddress;
+    /**
+     * @var string
+     */
+    protected $echoData;
+    /**
+     * @var string
+     */
+    protected $shopperId;
      /**
       * Constructor
       *
@@ -134,6 +146,7 @@ EOD;
      * @param string $orderDescription
      * @param string $currencyCode
      * @param float $amount
+     * @param string $orderContent
      * @param string $paymentType
      * @param string $shopperEmail
      * @param string $acceptHeader
@@ -156,6 +169,7 @@ EOD;
         $orderDescription,
         $currencyCode,
         $amount,
+        $orderContent,
         $paymentType,
         $shopperEmail,
         $acceptHeader,
@@ -176,6 +190,7 @@ EOD;
         $this->orderDescription = $orderDescription;
         $this->currencyCode = $currencyCode;
         $this->amount = $amount;
+        $this->orderContent = $orderContent;
         $this->paymentType = $paymentType;
         $this->shopperEmail = $shopperEmail;
         $this->acceptHeader = $acceptHeader;
@@ -295,6 +310,7 @@ EOD;
         $order['shopperLanguageCode'] = "en";
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
+        $this->_addOrderContentElement($order);
         $this->_addPaymentDetailsElement($order);
         $this->_addShopperElement($order);
         $this->_addDynamic3DSElement($order);
@@ -438,6 +454,17 @@ EOD;
     {
         $description = $order->addChild('description');
         $this->_addCDATA($description, $this->orderDescription);
+    }
+    
+    /**
+     * Add OrderContent tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
+    private function _addOrderContentElement($order)
+    {
+        $orderContent = $order->addChild('orderContent');
+        $this->_addCDATA($orderContent, $this->orderContent);
     }
 
     /**

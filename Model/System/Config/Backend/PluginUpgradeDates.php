@@ -9,7 +9,8 @@ namespace Sapient\Worldpay\Model\System\Config\Backend;
  */
 class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
 {
-
+    /* Module Name */
+    public const MODULE_NAME = 'Sapient_Worldpay';
      /**
       *
       * @var \Sapient\Worldpay\Logger\WorldpayLogger
@@ -42,6 +43,11 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
      * @var \Sapient\Worldpay\Model\System\Config\Backend\PluginVersionHistory
      */
     private $versionhistory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\System\Config\Backend\CurrentPluginVersion
+     */
+    private $currentversionconfig;
     /**
      * Constructor
      *
@@ -51,6 +57,7 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
      * @param \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Sapient\Worldpay\Model\System\Config\Backend\CurrentPluginVersion $currentversionconfig
      * @param \Magento\Framework\App\Cache\Manager $cacheManager
      * @param \Sapient\Worldpay\Model\System\Config\Backend\PluginVersionHistory $versionhistory
      * @param \Magento\Framework\App\Config\Storage\WriterInterface $configWriter
@@ -65,6 +72,7 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Sapient\Worldpay\Model\System\Config\Backend\CurrentPluginVersion $currentversionconfig,
         \Magento\Framework\App\Cache\Manager $cacheManager,
         \Sapient\Worldpay\Model\System\Config\Backend\PluginVersionHistory $versionhistory,
         \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
@@ -75,6 +83,7 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
         $this->wplogger = $wplogger;
         $this->scopeConfig = $scopeConfig;
         $this->configWriter = $configWriter;
+        $this->currentversionconfig = $currentversionconfig;
         $this->cacheManager = $cacheManager;
         $this->versionhistory = $versionhistory;
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
@@ -91,8 +100,13 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
         $value = $this->getUpgradeDates();
         if ((isset($value['oldData']) && !empty($value['oldData'])) &&
                 (isset($value['newData']) && !empty($value['newData']))) {
-            $data = $value['oldData'].",".$value['newData'];
+            if($value['is_new_version']){
+                $data = $value['oldData'].",".$value['newData'];
+            }else{
+                $data = $value['oldData'];
+            }
             $data =(array_unique(explode(",", $data)));
+            $data = array_slice($data,-3,3,true);
             $data = implode(",", $data);
             $this->setValue($data);
             $this->configWriter->save(
@@ -118,13 +132,18 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
      * @return void
      */
     public function beforeSave()
-    {
+    {   
         $value = $this->getValue();
         $value = $this->getUpgradeDates();
         if ((isset($value['oldData']) && !empty($value['oldData'])) &&
                 (isset($value['newData']) && !empty($value['newData']))) {
-            $data = $value['oldData'].",".$value['newData'];
+            if($value['is_new_version']){
+                $data = $value['oldData'].",".$value['newData'];
+            }else{
+                $data = $value['oldData'];
+            }
             $data =(array_unique(explode(",", $data)));
+            $data = array_slice($data,-3,3,true);
             $data = implode(",", $data);
             $this->setValue($data);
             $this->configWriter->save(
@@ -152,7 +171,6 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
             'worldpay/general_config/plugin_tracker/current_wopay_plugin_version',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
-        
         //plugin upgrade dates
         $currentHistoryData = $this->scopeConfig->getValue(
             'worldpay/general_config/plugin_tracker/upgrade_dates',
@@ -163,28 +181,47 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
             'worldpay/general_config/plugin_tracker/wopay_plugin_version_history',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
-        
         if (isset($currentHistoryData) && !empty($currentHistoryData)) {
             $value['oldData'] = $currentHistoryData;
         }
+        //check new version
+        $currentVersion['newVersion'] = $this->currentversionconfig->getModuleVersion(self::MODULE_NAME);
+        if ($currentPluginData &&
+                (isset($currentVersion['newVersion']) && $currentVersion['newVersion'] == $currentPluginData)) {
+            $value['newVersion'] = $currentPluginData;
+        } else {
+            $value['newVersion'] = isset($currentVersion['newVersion'])?$currentVersion['newVersion']:"";
+        }
+        $currentVersionHistoryDataAry = explode(',', $currentVersionHistoryData);
+        $value['is_new_version'] = false;
+        if(!in_array($value['newVersion'],$currentVersionHistoryDataAry)){
+            $value['is_new_version'] = true;
+        }
         
         $pastversions =  $this->getVersionHistoryDetails()!=null? $this->getVersionHistoryDetails()
-                :$currentVersionHistoryData;
+                :$currentVersionHistoryData;      
         if (isset($pastversions)) {
             $versionHistoryData = explode(',', $pastversions);
         }
         
-        if (empty($currentHistoryData)) {
-            $value['newData'] = date("d-m-Y");
+        if (empty($currentHistoryData)) {            
+            $value['newData'] = date("d-m-Y").' - ('.$pastversions.')';;
             return $value;
         } else {
             $datesHistoryData = explode(',', $currentHistoryData);
         }
-
         if (empty($currentPluginData) ||
                 (!empty($currentPluginData) && empty($currentVersionHistoryData)
-                && (empty($value['oldData']))) || (count($versionHistoryData) != count($datesHistoryData))) {
-            $data = date("d-m-Y");
+                && (empty($value['oldData']))) || (count($versionHistoryData) != count($datesHistoryData))
+                ) {
+                    
+            if(count($versionHistoryData) >= 2 ) {
+                $recentPluginVersion = array_slice($versionHistoryData, -2, 2, false);               
+                $data = date("d-m-Y").' - ('.$recentPluginVersion[0].' to '.$recentPluginVersion[1].')';
+
+            }else{ 
+                $data = date("d-m-Y").' ('.$versionHistoryData[0].')';
+            }            
             $value['newData'] = $data;
             if (isset($value['oldData']) && ($value['oldData'] == $value['newData'])) {
                 $value['oldData'] = "";

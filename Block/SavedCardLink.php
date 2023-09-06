@@ -17,7 +17,6 @@ use Sapient\Worldpay\Helper\Data;
 /**
  * Description of SavedCardLink
  *
- * @author aatrai
  */
 class SavedCardLink extends \Magento\Framework\View\Element\Html\Link\Current
 {

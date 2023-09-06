@@ -11,7 +11,6 @@
  */
 namespace Sapient\Worldpay\Block\Multishipping\Paybylink\Email;
 
-
 /**
  * Sales Order Email items.
  *
@@ -35,14 +34,15 @@ class Addresses extends \Magento\Framework\View\Element\Template
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
     protected $quoteRepository;
+
      /**
-     * constructor
-     *
-     * @param \Magento\Backend\Block\Template\Context $context
-     * @param  \Magento\Customer\Model\Address\Config $addressConfig,
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-     * @param array $data
-     */
+      * constructor      *
+      * @param \Magento\Backend\Block\Template\Context $context
+      * @param \Magento\Customer\Model\Address\Config $addressConfig
+      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+      * @param array $data
+      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Customer\Model\Address\Config $addressConfig,
@@ -62,7 +62,7 @@ class Addresses extends \Magento\Framework\View\Element\Template
     public function getQuote()
     {
         $quote_id = $this->getData('quote_id');
-        $quote = $this->quoteRepository->get($quote_id);   
+        $quote = $this->quoteRepository->get($quote_id);
         return $quote;
     }
 
@@ -72,9 +72,9 @@ class Addresses extends \Magento\Framework\View\Element\Template
      * @param array $address
      * @return array
      */
-     public function getFormatAddressByCode($address)
-     {
-         $renderer = $this->_addressConfig->getFormatByCode('html')->getRenderer();
-         return $renderer->renderArray($address);
-     }
+    public function getFormatAddressByCode($address)
+    {
+        $renderer = $this->_addressConfig->getFormatByCode('html')->getRenderer();
+        return $renderer->renderArray($address);
+    }
 }

@@ -89,11 +89,17 @@ return Component.extend({
         if(!window.checkoutConfig.payment.ccform.isWalletsEnabled){
             return false;
         }
-        if(!window.checkoutConfig.payment.ccform.isSamsungPayEnable){
-            return false;
-        }
         if(window.checkoutConfig.payment.ccform.isSubscribed){
             return false;
+        }
+        if(window.checkoutConfig.payment.ccform.isMultishipping){  
+            if(!window.checkoutConfig.payment.ccform.isMsSamsungPayEnable){
+                return false;
+            }
+        }else{
+            if(!window.checkoutConfig.payment.ccform.isSamsungPayEnable){
+                return false;
+            }
         }
         return true;
     }

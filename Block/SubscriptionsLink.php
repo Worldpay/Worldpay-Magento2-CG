@@ -18,13 +18,12 @@ use Sapient\Worldpay\Helper\Data;
 /**
  * Description of SubscriptionsLink
  *
- * @author aatrai
  */
 class SubscriptionsLink extends \Magento\Framework\View\Element\Html\Link\Current
 {
 
     /**
-     * @var _scopeConfig
+     * @var $_scopeConfig
      */
     protected $_scopeConfig = null;
     /**

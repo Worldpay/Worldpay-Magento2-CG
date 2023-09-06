@@ -6,7 +6,6 @@ namespace Sapient\Worldpay\Model\Config\Source;
 /**
  * Description of RoutingPrefernce
  *
- * @author aatrai
  */
 class RoutingPreference implements \Magento\Framework\Option\ArrayInterface
 {
