@@ -74,7 +74,7 @@ class CurrentPluginVersion extends \Magento\Framework\App\Config\Value
         $value = $this->getValue();
         $moduleVersion = $this->getModuleVersion(self::MODULE_NAME);
         if (isset($moduleVersion)) {
-            $this->setValue($moduleVersion);
+            $this->setValue(trim($moduleVersion),',');
             $this->configWriter->save(
                 'worldpay/general_config/plugin_tracker/current_wopay_plugin_version',
                 $moduleVersion

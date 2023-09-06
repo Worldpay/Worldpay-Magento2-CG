@@ -161,7 +161,7 @@ EOD;
      */
     private function _amountAsInt($amount)
     {
-        return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
+        return round((float)$amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
     }
     
      /**

@@ -15,6 +15,7 @@ use Magento\Framework\Controller\ResultFactory;
 
 class CallBack extends \Magento\Framework\App\Action\Action
 {
+    public const SAMSUMG_CONFIG_PATH = "worldpay/multishipping/ms_wallets_config/ms_samsung_pay_wallets_config/";
     /**
      * @var $orderFactory
      */
@@ -175,6 +176,24 @@ class CallBack extends \Magento\Framework\App\Action\Action
         $environmentMode = $this->scopeConfig->
                 getValue('worldpay/general_config/environment_mode', $storeScope);
 
+        $quoteId = $order->getQuoteId();
+        $quote = $this->quoteFactory->create()->load($quoteId);
+        /** Multishipping Samsung Pay Configuration */
+        if ($quote->getIsMultiShipping()) {
+            
+            $msServiceId = $this->scopeConfig->
+                getValue(self::SAMSUMG_CONFIG_PATH.'ms_service_id', $storeScope);
+        
+            $msOrderDescription = $this->scopeConfig->
+                    getValue(self::SAMSUMG_CONFIG_PATH.'ms_samsung_order_description', $storeScope);
+        
+            $msMerchantCode = $this->scopeConfig->
+                    getValue('worldpay/multishipping/ms_merchant_code', $storeScope);
+            
+            $serviceId = !empty($msServiceId) ? $msServiceId : $serviceId;
+            $orderDescription = !empty($msOrderDescription) ? $msOrderDescription : $orderDescription;
+            $merchantCode = !empty($msMerchantCode) ? $msMerchantCode : $merchantCode;
+        }
         if ($environmentMode == 'Test Mode') {
             $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions/paymentCredentials/"
                     . $refId . '?serviceId=' . $serviceId;
@@ -224,8 +243,6 @@ class CallBack extends \Magento\Framework\App\Action\Action
                     $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
                     $grandTotal = $orderDetails['grand_total'];
                     if ($isMultishipping) {
-                        $quoteId = $order->getQuoteId();
-                        $quote = $this->quoteFactory->create()->load($quoteId);
                         $grandTotal = $quote->getGrandTotal();
                     }
                     $samsungPayOrderParams = [];
@@ -266,8 +283,6 @@ class CallBack extends \Magento\Framework\App\Action\Action
                 $this->wplogger->error($e->getMessage());
             }
         } else {
-            $quoteId = $order->getQuoteId();
-            $quote = $this->quoteFactory->create()->load($quoteId);
             if ($quote->getIsMultiShipping()) {
                     $this->multishipping->cancelMultishippingOrders($order);
                     $this->_checkoutSession->unsMultishippingOrderCode();

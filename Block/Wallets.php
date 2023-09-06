@@ -188,8 +188,12 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
         ['gpaybutton_locale']  = $this->worldpayHelper->getGpayButtonLocale();
         
         $this->jsLayout['components']['wp-wallet-pay']['config']['purchaseUrl'] = $purchaseUrl;
-        $this->jsLayout['components']['wp-wallet-pay']['config']['sessionId']   = $this->session->getSessionId();
-        $this->jsLayout['components']['wp-wallet-pay']['config']['store_code'] = $this->getCurrentStoreCode();
+        $this->jsLayout['components']['wp-wallet-pay']['config']
+            ['sessionId']   = $this->session->getSessionId();
+        $this->jsLayout['components']['wp-wallet-pay']['config']
+            ['store_code'] = $this->getCurrentStoreCode();
+        $this->jsLayout['components']['wp-wallet-pay']['config']
+            ['default_country_code'] = $this->worldpayHelper->getStoreDefaultCountry();
 
         $this->jsLayout['components']['wp-wallet-pay']['config']
         ['countriesHtml'] = $this->getCountriesHtml(null, 'country_id', 'country', 'Country');

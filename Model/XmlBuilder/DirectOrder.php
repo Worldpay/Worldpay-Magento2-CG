@@ -43,6 +43,10 @@ EOD;
      */
     private $amount;
     /**
+     * @var string
+     */
+    private $orderContent;
+    /**
      * @var array
      */
     protected $paymentDetails;
@@ -173,6 +177,7 @@ EOD;
      * @param string $orderDescription
      * @param string $currencyCode
      * @param float $amount
+     * @param string $orderContent
      * @param array $paymentDetails
      * @param array $cardAddress
      * @param string $shopperEmail
@@ -200,6 +205,7 @@ EOD;
         $orderDescription,
         $currencyCode,
         $amount,
+        $orderContent,
         $paymentDetails,
         $cardAddress,
         $shopperEmail,
@@ -226,6 +232,7 @@ EOD;
         $this->orderDescription = $orderDescription;
         $this->currencyCode = $currencyCode;
         $this->amount = $amount;
+        $this->orderContent = $orderContent;
         $this->paymentDetails = $paymentDetails;
         $this->cardAddress = $cardAddress;
         $this->shopperEmail = $shopperEmail;
@@ -273,7 +280,7 @@ EOD;
         $paResponse,
         $echoData
     ) {
-         $this->merchantCode = $merchantCode;
+        $this->merchantCode = $merchantCode;
         $this->paResponse = $paResponse;
         $this->echoData = $echoData;
         $this->orderCode = $orderCode;
@@ -355,6 +362,7 @@ EOD;
         
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
+        $this->_addOrderContentElement($order);
         $this->_addPaymentDetailsElement($order);
         $this->_addShopperElement($order);
         if (!isset($this->paymentDetails['myaccountSave'])) {
@@ -388,7 +396,7 @@ EOD;
         $this->_addAdditional3DsElement($order);
         $this->_addExemptionEngineElement($order);
         $this->_addFraudSightData($order);
-        
+
         return $order;
     }
 
@@ -405,6 +413,17 @@ EOD;
         } else {
             $this->_addCDATA($description, $this->orderDescription);
         }
+    }
+
+    /**
+     * Add OrderContent tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
+    private function _addOrderContentElement($order)
+    {
+        $orderContent = $order->addChild('orderContent');
+        $this->_addCDATA($orderContent, $this->orderContent);
     }
 
     /**
@@ -922,6 +941,10 @@ EOD;
     {
         $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
         $storedCredentials['usage'] = "FIRST";
+        $isSubscriptionOrder = isset($this->paymentDetails['subscription_order'])? true : false;
+        if ($isSubscriptionOrder) {
+            $storedCredentials['customerInitiatedReason'] = "RECURRING";
+        }
         return $storedCredentials;
     }
     

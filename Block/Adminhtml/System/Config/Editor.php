@@ -38,7 +38,12 @@ class Editor extends \Magento\Config\Block\System\Config\Form\Field
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
         $element->setWysiwyg(true);
-        $element->setConfig($this->_wysiwygConfig->getConfig($element));
+        $confgiData = $this->_wysiwygConfig->getConfig($element);
+        $confgiData->setplugins([]);
+        $confgiData->setadd_variables(0);
+        $confgiData->setadd_widgets(0);
+        
+        $element->setConfig($confgiData);
         return parent::_getElementHtml($element);
     }
 }

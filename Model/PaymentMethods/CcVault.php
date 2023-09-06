@@ -144,6 +144,13 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
       * @var \Magento\Framework\Registry
       */
     protected $registry;
+    
+    /**
+     * response
+     *
+     * @var string
+     */
+    protected $_response;
 
     /**
      * CcVault constructor

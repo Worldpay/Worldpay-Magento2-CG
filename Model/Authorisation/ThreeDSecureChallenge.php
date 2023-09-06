@@ -214,6 +214,9 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
             if ($e->getMessage() === 'Asymmetric transaction rollback.') {
                 $errorMessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM16');
                 $this->_messageManager->addError(__($errorMessage));
+            } else if ($e->getMessage()=== 'Unique constraint violation found') {
+                $errorMessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM22');
+                $this->_messageManager->addError(__($errorMessage));
             } else {
                 $this->_messageManager->getMessages(true);
                 $this->_messageManager->

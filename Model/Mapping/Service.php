@@ -1096,7 +1096,6 @@ class Service
         }
 
         if ($paymentDetails['additional_data']['cc_type'] == "SEPA_DIRECT_DEBIT-SSL") {
-            
             $details = [
                'paymentType' => $paymentDetails['additional_data']['cc_type'],
                'sepaMandateType' => $paymentDetails['additional_data']['sepa_mandateType'],

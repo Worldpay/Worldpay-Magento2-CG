@@ -1,0 +1,42 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<table class="data table table-totals">
+    <tbody>
+        <tr class="totals productinfo-header">
+            <td width="30%" class="product-img"><%= "Product" %>
+            </td>
+            <td width="40%" align="center"  class="product-name">
+                <span class="name"><%= 'Name' %></span>
+            </td>
+            <td width="30%" align="center" class="product-price">
+                <span class="name"><%= 'Price' %></span>
+            </td>
+        </tr>
+        <% _.each(data.segment, function(segment,key) { %>
+            <tr class="totals <%= key %>">
+                <td width="30%" class="product-img">
+                    <span class="image"><img class="product-image-pdp" src="<%= segment.image %>" alt="<%= segment.image %>"></span>                    
+                </td>
+                <td width="40%" align="center"  class="product-name">
+                    <span class="name"><%= segment.name %></span>
+                </td>
+                <td width="30%" align="center" class="product-price">
+                    <span class="name"><%= segment.subtotal %></span>
+                </td>
+            </tr>
+        <% }); %>
+    </tbody>
+</table>
+<style>
+    .checkout-information .productinfo-header{
+        border-left: 1px solid #aaa;
+        border-right: 1px solid #aaa;
+    }
+    .checkout-information .productInfo{
+        border: 1px solid #aaa;
+    }
+</style>

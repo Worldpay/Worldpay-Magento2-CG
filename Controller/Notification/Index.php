@@ -66,7 +66,7 @@ class Index extends \Magento\Framework\App\Action\Action
 
     /**
      * @var \Sapient\Worldpay\Model\Token\WorldpayToken
-    */
+     */
     public $worldpaytoken;
 
     /**

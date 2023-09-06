@@ -13,7 +13,6 @@ use Exception;
 /**
  * Description of Index
  *
- * @author aatrai
  */
 class Index extends \Magento\Backend\App\Action
 {

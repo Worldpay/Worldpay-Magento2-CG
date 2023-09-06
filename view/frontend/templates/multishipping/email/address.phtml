@@ -9,14 +9,14 @@
 /** @var $block \Sapient\Worldpay\Block\Multishipping\Paybylink\Email */
 ?>
 <?php $quote = $block->getQuote() ?>
-<?php if ($quote) : ?>
+<?php if ($quote): ?>
     <?php $shipmentAddress = $quote->getAllShippingAddresses(); ?>
     <table class="order-details">
-    <?php foreach ($shipmentAddress as $address) : ?>
+    <?php foreach ($shipmentAddress as $address): ?>
         <tr>
             <td class="address-details">
                 <h3><b>Shipping Info</b></h3>
-                <p><?php echo $block->getFormatAddressByCode($address); ?></p>
+                <p><?= $block->escapeHtml($block->getFormatAddressByCode($address)); ?></p>
             </td>
         </tr>
     <?php endforeach; ?>

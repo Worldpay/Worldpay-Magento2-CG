@@ -164,7 +164,7 @@ define(
                                 var found = false;
                                 $.each(ccavailabletypes, function(key, value){
                                     if(response[responsekey] == key.toUpperCase()){
-                                       if((integrationMode === 'redirect' && (key !== 'ACH_DIRECT_DEBIT-SSL' || key !== 'SEPA_DIRECT_DEBIT-SSL'))
+                                        if((integrationMode === 'redirect' && key !== 'ACH_DIRECT_DEBIT-SSL' && key!='SEPA_DIRECT_DEBIT-SSL')
                                             || integrationMode === 'direct' ){
                                         found = true;
                                         cckey = key;

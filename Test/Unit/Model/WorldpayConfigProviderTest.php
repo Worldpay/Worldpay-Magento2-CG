@@ -44,7 +44,6 @@ class WorldpayConfigProviderTest extends TestCase
     protected $ALL_APM_METHODS = [
         'CHINAUNIONPAY-SSL' => 'Union Pay',
         'IDEAL-SSL' => 'IDEAL',
-        'QIWI-SSL' => 'Qiwi',
         //'YANDEXMONEY-SSL' => 'Yandex.Money',
         'PAYPAL-EXPRESS' => 'PayPal',
         'SOFORT-SSL' => 'SoFort EU',

@@ -91,13 +91,17 @@ class DataTest extends TestCase
     /**
      * @var string
      */
-    protected $APM_TYPES = 'CHINAUNIONPAY-SSL,IDEAL-SSL,QIWI-SSL,PAYPAL-EXPRESS,'
+    protected $APM_TYPES = 'CHINAUNIONPAY-SSL,IDEAL-SSL,PAYPAL-EXPRESS,'
             . 'SOFORT-SSL,GIROPAY-SSL,ALIPAY-SSL,SEPA_DIRECT_DEBIT-SSL,'
             . 'KLARNA-SSL,PRZELEWY-SSL,MISTERCASH-SSL,ACH_DIRECT_DEBIT-SSL';
     /**
      * @var string
      */
     protected $ACH_BANK_ACC_TYPES = 'Checking,Savings,Corporate,Corp Savings';
+    /**
+     * @var string
+     */
+    protected $SEPA_MANDATE_TYPES = 'ONE-OFF, RECURRING';
     /**
      * @var string
      */
@@ -110,7 +114,6 @@ class DataTest extends TestCase
     protected $ALL_APM_METHODS = [
             'CHINAUNIONPAY-SSL' => 'Union Pay',
             'IDEAL-SSL' => 'IDEAL',
-            'QIWI-SSL' => 'Qiwi',
             //'YANDEXMONEY-SSL' => 'Yandex.Money',
             'PAYPAL-EXPRESS' => 'PayPal',
             'SOFORT-SSL' => 'SoFort EU',
@@ -394,7 +397,6 @@ class DataTest extends TestCase
                 ->withConsecutive(
                     ['worldpay_apm','CHINAUNIONPAY-SSL'],
                     ['worldpay_apm','IDEAL-SSL'],
-                    ['worldpay_apm','QIWI-SSL'],
                     ['worldpay_apm','PAYPAL-EXPRESS'],
                     ['worldpay_apm','SOFORT-SSL'],
                     ['worldpay_apm','GIROPAY-SSL'],
@@ -425,7 +427,6 @@ class DataTest extends TestCase
                 ->withConsecutive(
                     ['worldpay_apm','CHINAUNIONPAY-SSL'],
                     ['worldpay_apm','IDEAL-SSL'],
-                    ['worldpay_apm','QIWI-SSL'],
                     ['worldpay_apm','PAYPAL-EXPRESS'],
                     ['worldpay_apm','SOFORT-SSL'],
                     ['worldpay_apm','GIROPAY-SSL'],
@@ -439,7 +440,7 @@ class DataTest extends TestCase
                 ->willReturn(true);
         $this->assertEquals(explode(",", $this->ACH_BANK_ACC_TYPES), $this->dataObj->getACHDetails());
     }
-     
+       
     public function testGetACHBankAccountTypes()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -448,7 +449,46 @@ class DataTest extends TestCase
                 ->willReturn($this->ACH_BANK_ACC_TYPES);
         $this->assertEquals($this->ACH_BANK_ACC_TYPES, $this->dataObj->getACHBankAccountTypes());
     }
-     
+    
+    public function testGetSEPADetails()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->withConsecutive(
+                    ['worldpay/cc_config/integration_mode',\Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/apm_config/paymentmethods',\Magento\Store\Model\ScopeInterface::SCOPE_STORE],
+                    ['worldpay/apm_config/sepa_mandate_types',\Magento\Store\Model\ScopeInterface::SCOPE_STORE]
+                )
+                ->will($this->onConsecutiveCalls('Direct', $this->APM_TYPES, $this->SEPA_MANDATE_TYPES));
+         
+        $this->paymentlist->expects($this->any())
+                ->method('checkCurrency')
+                ->withConsecutive(
+                    ['worldpay_apm','CHINAUNIONPAY-SSL'],
+                    ['worldpay_apm','IDEAL-SSL'],
+                    ['worldpay_apm','PAYPAL-EXPRESS'],
+                    ['worldpay_apm','SOFORT-SSL'],
+                    ['worldpay_apm','GIROPAY-SSL'],
+                    ['worldpay_apm','ALIPAY-SSL'],
+                    ['worldpay_apm','SEPA_DIRECT_DEBIT-SSL'],
+                    ['worldpay_apm','KLARNA-SSL'],
+                    ['worldpay_apm','PRZELEWY-SSL'],
+                    ['worldpay_apm','MISTERCASH-SSL'],
+                    ['worldpay_apm','ACH_DIRECT_DEBIT-SSL']
+                )
+                ->willReturn(true);
+        $this->assertEquals(explode(",", $this->SEPA_MANDATE_TYPES), $this->dataObj->getSEPADetails());
+    }
+    
+    public function testGetSEPAMandateTypes()
+    {
+        $this->scopeConfigMock->expects($this->any())
+                ->method('getValue')
+                ->with('worldpay/apm_config/sepa_mandate_types', \Magento\Store\Model\ScopeInterface::SCOPE_STORE)
+                ->willReturn($this->SEPA_MANDATE_TYPES);
+        $this->assertEquals($this->SEPA_MANDATE_TYPES, $this->dataObj->getSEPAMandateTypes());
+    }
+    
     public function testIsIframeIntegration()
     {
         $this->scopeConfigMock->expects($this->any())

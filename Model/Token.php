@@ -28,7 +28,14 @@ class Token
      * @var \Magento\Framework\Session\SessionManager
      */
     protected $_session;
-
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\DirectOrderToken
+     */
+    protected $xmlDirectOrderToken;
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $_wplogger;
     /**
      * Constructor
      *

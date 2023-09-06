@@ -2,7 +2,7 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
- define([
+define([
     'ko',
     'jquery',
     'underscore',
@@ -13,19 +13,20 @@
     'mage/template',
     'mage/translate',
     'Magento_Catalog/js/product/view/product-ids-resolver',
-    'Magento_Catalog/js/product/view/product-info-resolver',   
+    'Magento_Catalog/js/product/view/product-info-resolver',
     'Magento_Customer/js/model/customer',
-    'mage/storage', 
+    'mage/storage',
     'Magento_Ui/js/modal/modal',
     'Magento_Customer/js/model/address-list',
     'Magento_Catalog/js/price-utils',
     'text!Sapient_Worldpay/template/wallets/total-segments.html',
+    'text!Sapient_Worldpay/template/wallets/pdp-cart-info.html',
     'Sapient_Worldpay/js/model/google-pay',
     'Sapient_Worldpay/js/model/checkout-utils',
     'Sapient_Worldpay/js/model/region-updator',
     'Sapient_Worldpay/js/model/apple-pay',
-    'mage/validation'   
-], function (ko, $, _, Component, confirm, customerData, url, mageTemplate, $t,idsResolver, productInfoResolver,customer,storage,modal,addressList,priceUtils,totalsegmentsTemplate,GooglePayModel,checkoutUtils,RegionUpdater,ApplePayModel) {
+    'mage/validation'
+], function (ko, $, _, Component, confirm, customerData, url, mageTemplate, $t,idsResolver, productInfoResolver,customer,storage,modal,addressList,priceUtils,totalsegmentsTemplate,pdpCartTemplate,GooglePayModel,checkoutUtils,RegionUpdater,ApplePayModel) {
     'use strict';
 
     var appleResponse = "";
@@ -39,11 +40,11 @@
                 baseRequest : {
                      apiVersion: 2,
                      apiVersionMinor: 0
-                 }               
+                 }
             },
-           
+
             productFormSelector: '#product_addtocart_form'
-            
+
         },
         priceFormat :{
             decimalSymbol: ".",
@@ -54,7 +55,7 @@
             precision: 2,
             requiredPrecision: 2
         },
-        
+
         storeCode :'default',
         gpayLoaded: false,
         messagesSelector: '[data-placeholder="messages"]',
@@ -76,6 +77,7 @@
         currencyCode : ko.observable('USD'),
         isLoadingCheckoutActions: ko.observable(false),
         totalsegments : ko.observable(),
+        getPDPcartInfo: ko.observable(),
         isApplied :ko.observable(null),
         couponCode :ko.observable(null),
         countriesDropDown :ko.observable(null),
@@ -85,89 +87,35 @@
         isApplePayPurchase : ko.observable(false),
         showNewBillingAddress : ko.observable(false),
         isAppleDevice : ko.observable(false),
+        isUserActiveSession: ko.observable(false),
         /** @inheritdoc */
-        initialize: function () {            
+        initialize: function () {
             this._super();
-            window.walletpayObj = this;  
+            window.walletpayObj = this;
             var self = this;
-            this.customerData = customerData.get('customer')();
-            var sections = ['cart','customer'];
-            customerData.reload(sections, true);
-            this.addGooglePayPurchaseBtn();
-            this.addApplePayButton(); 
-            this.isApplePayPurchase(false);
-            if(this.isUserLoggedIn()){    
+
+            customerData.getInitCustomerData().done(function(){
+                self.customerData = customerData.get('customer')();
+                if(self.customerData.firstname){
+                    self.addGooglePayPurchaseBtn();
+                    self.addApplePayButton();
+                    self.isApplePayPurchase(false);
+                    self.isUserActiveSession(true);
+                }else{
+                    self.addGooglePayPurchaseBtn();
+                    self.addApplePayButton();
+                    self.isApplePayPurchase(false);
+                    self.isUserActiveSession(false);
+                }
+            });
+
+            if(this.isUserLoggedIn()){
                 var existingCustomerDetails = customerData.get('customer')();
                 this.customeraddresses(existingCustomerDetails.customer_address);
             }
-            mageTemplate(totalsegmentsTemplate)
+            mageTemplate(totalsegmentsTemplate);
+            mageTemplate(pdpCartTemplate);
 
-            /** Total segments **/
-             this.updateTotalSegments(
-                {  
-                                   
-                    subtotal : {
-                        "title" : 'Subtotal',
-                        "value" : this.grandtotalFormatted()
-                    },
-                    grandtotal:{
-                        "title" : 'Grand Total',
-                        "value" : this.grandtotalFormatted()
-                    }
-                }
-             )
-
-           
-             this.countriesDropDown.subscribe(function(e){
-                if($('#country').length){
-                      var updater = new RegionUpdater(
-                            'country', 'region',
-                            'region_id',
-                            JSON.parse(self.regionJson), 'hide', true
-                        );
-                        updater.update();
-
-                        // bind reload payment sections
-                        $("#country").on('change',function(){
-                            self.reloadSections();
-                        });
-                        $("#region_id").on('change',function(){
-                            self.reloadSections();
-                        });
-                        $("#region").on('blur',function(){
-                            self.reloadSections();
-                        });
-
-                }  
-            });
-
-            this.isBillingAddressSameAsShipping.subscribe(function(e){
-               
-                setTimeout(function(){
-                   if($('#billing_country').length){
-                          var updater = new RegionUpdater(
-                                'billing_country', 'billing_region',
-                                'billing_region_id',
-                                JSON.parse(self.regionJson), 'hide', true
-                            );
-                            updater.update();    
-                    } 
-                },150);
-               
-            });
-
-            this.showNewBillingAddress.subscribe(function(e){
-                setTimeout(function(){
-                    if($('#billing_country').length){
-                          var updater = new RegionUpdater(
-                                'billing_country', 'billing_region',
-                                'billing_region_id',
-                                JSON.parse(self.regionJson), 'hide', true
-                            );
-                            updater.update();    
-                    } 
-                },150);
-            })
             this.isBillingAddressSameAsShipping(true);
 
             this.isRequiredShipping.subscribe(function(isrequired){
@@ -176,7 +124,7 @@
                     self.isBillingAddressSameAsShipping(false);
                 }
             })
-            
+
 
             $("#worldpay-add-plan").on('click',function(){
                 if($('#worldpay-add-plan').is(":checked")){
@@ -200,7 +148,7 @@
         updateTotalSegments : function(segments){
             var self = this;
             var allsegments = {},totalsTemplate = "",confirmData=null;
-            _.each(segments,function(val , key){                
+            _.each(segments,function(val , key){
                 allsegments[key] = {
                     "title" : val.title,
                     "value" : priceUtils.formatPrice(val.value, self.priceFormat),
@@ -214,12 +162,32 @@
                 data: confirmData
             }));
         },
+        updatePdpCartSegments: function(segments){
+            var self = this;
+            var allsegments = {},pdpCart = "",confirmData=null;
+            _.each(segments,function(val , key){
+                allsegments[key] = {
+                    "name" : val.name,
+                    "image" : val.image,
+                    "options": val.options,
+                    "subtotal": val.subtotal
+                };
+            });
+            pdpCart = mageTemplate(pdpCartTemplate),
+
+            confirmData = {
+                segment :allsegments
+            }
+            self.getPDPcartInfo(pdpCart({
+                data: confirmData
+            }));
+        },
         applyCoupon : function(){
             var self = this;
             var discountForm = $("#discount-form");
             if (!(discountForm.validation() && discountForm.validation('isValid'))) {
                 return;
-            }  
+            }
             if(!self.currentQuoteid){
                 return false;
             }
@@ -227,7 +195,7 @@
             if(!self.isUserLoggedIn()){
                 if(!self.currentQuoteMaskedId){
                     return false;
-                }                    
+                }
             }
 
             var quoteObj = {
@@ -261,7 +229,7 @@
                 if(!self.currentQuoteMaskedId){
                     return false;
                 }
-                    
+
             }
 
             var quoteObj = {
@@ -283,100 +251,32 @@
                 $("body").trigger('processStop');
             });
         },
-        showNewAddressForm : function(){   
+        showNewAddressForm : function(){
             var self = this;
-                $("#new-address-form").toggle(); 
+                $("#new-address-form").toggle();
         },
         showNewBillingAddressForm : function (){
             var self= this;
             if(self.showNewBillingAddress() == false){
                 self.showNewBillingAddress(true);
             }else if(self.showNewBillingAddress() == true){
-                self.showNewBillingAddress(false); 
-            }           
+                self.showNewBillingAddress(false);
+            }
         },
         sameAsShippingAddress : function(){
             var self = window.walletpayObj;
             if(self.isBillingAddressSameAsShipping() == false){
-                self.isBillingAddressSameAsShipping(true);              
+                self.isBillingAddressSameAsShipping(true);
             }else{
-                self.isBillingAddressSameAsShipping(false);             
+                self.isBillingAddressSameAsShipping(false);
             }
-            return true;          
+            return true;
         },
         preparePayment : function(isApplePay){
-            var self = this;            
-            $(".error-message").html("");
-            if($("#customer-email").length){
-                var accountForm = $("#account-form");
-                    if (!(accountForm.validation() && accountForm.validation('isValid'))) {
-                        return;
-                    }                
-            }
-            if(self.isRequiredShipping()){
-                if($("#new-address-form").length){
-                    var addressForm = $("#new-address-form");
-                    if (!(addressForm.validation() && addressForm.validation('isValid'))) {
-                        return;
-                    }   
-                }
-                // validate shipping method
-                if (!$("input[name='shipping_method[gpay]']:checked").val()) {
-                    $(".g-pay-ship-method-error").show();
-                    return false;
-                }else{
-                    $(".g-pay-ship-method-error").hide();
-                }
-            }
-            // validate billing address
-            if(!self.isBillingAddressSameAsShipping()){
-                if($("input[name='billing_address[gpay]']").length){
-
-
-                    if($("#new-billingaddress-form").length){ // if user clicks new address
-                        var billingAddressForm = $("#new-billingaddress-form");
-                            if (!(billingAddressForm.validation() && billingAddressForm.validation('isValid'))) {
-                                return;
-                            }   
-                        }else{ 
-
-                            if (!$("input[name='billing_address[gpay]']:checked").val()) {
-                                $(".g-pay-billing-address-error").show();
-                                return false;
-                            }else{
-                                $(".g-pay-billing-address-error").hide();
-                            }
-                        }
-                    }else{ // for guest user or for new billing address
-                        if($("#new-billingaddress-form").length){
-                            var billingAddressForm = $("#new-billingaddress-form");
-                                if (!(billingAddressForm.validation() && billingAddressForm.validation('isValid'))) {
-                                    return;
-                                }   
-                            }                   
-                    }
-            }else{
-                    $(".g-pay-billing-address-error").hide();
-            }
-            if($("#new-billingaddress-form").length){
-                var billingAddressFormData = checkoutUtils.fetchValuesFromAddressForm('#new-billingaddress-form');
-                window.walletpayObj.selectedBillingAddress(billingAddressFormData);
-            }
-			if($('#new-address-form').is(':visible')){
-                var shippingAddressFormData = checkoutUtils.fetchValuesFromAddressForm('#new-address-form');
-                window.walletpayObj.selectedShippingAddress(shippingAddressFormData);
-				if(self.isBillingAddressSameAsShipping()){
-					window.walletpayObj.selectedBillingAddress(shippingAddressFormData);
-				}
-            }
-            if( $("#wp-customer-email").length){
-                window.walletpayObj.selectedBillingAddress().email = $("#wp-customer-email").val();
-            }            
-            
             if(window.walletpayObj.isApplePayPurchase()){
                 if (window.ApplePaySession) {
                     window.walletpayObj.initApplePaySession();
-                }                
+                }
             }else{
                 var ginitData = {
                     "env_mode": window.walletpayObj.env_mode,
@@ -387,7 +287,7 @@
                     "tokenizationSpecification": window.walletpayObj.googlepayOptions.tokenizationSpecification,
                     "totalPrice": window.walletpayObj.grandtotal()
                 }
-                GooglePayModel.initGooglePay(ginitData).then(function(paymentData){             
+                GooglePayModel.initGooglePay(ginitData).then(function(paymentData){
                     var checkoutData = {
                         billingAddress :window.walletpayObj.selectedBillingAddress(),
                         shippingAddress: window.walletpayObj.selectedShippingAddress(),
@@ -398,13 +298,21 @@
                                 'cc_type': 'PAYWITHGOOGLE-SSL',
                                 'walletResponse' : JSON.stringify(paymentData),
                                 'dfReferenceId':  window.walletpayObj.sessionId
-                            }  
+                            }
                         },
                         storecode :window.walletpayObj.store_code,
                         quote_id : window.walletpayObj.currentQuoteid,
                         guest_masked_quote_id: window.walletpayObj.currentQuoteMaskedId,
                         isCustomerLoggedIn : window.walletpayObj.isUserLoggedIn(),
                         isRequiredShipping : window.walletpayObj.isRequiredShipping()
+                    }
+
+
+
+                    if(window.walletpayObj.isUserLoggedIn()){
+                        window.walletpayObj.selectedBillingAddress().email = window.walletpayObj.customerDetails.email;
+                    }else{
+                        window.walletpayObj.selectedBillingAddress().email = paymentData.email;
                     }
                     checkoutUtils.placeorder(checkoutData);
                 }).catch(function(err) {
@@ -420,7 +328,7 @@
                 customerDataAddress = customerData.get('customer')();
                 window.walletpayObj.customerData = customerDataAddress;
                 window.walletpayObj.customeraddresses(customerDataAddress.customer_address);
-                if(typeof window.walletpayObj.customerData.customer_address !=='undefined'){                
+                if(typeof window.walletpayObj.customerData.customer_address !=='undefined'){
                     addressList = window.walletpayObj.customerData.customer_address;
                     _.each(addressList,function(address){
                         if(address.default_billing){
@@ -428,17 +336,17 @@
                             selectedAddress.lastname = address.lastname;
                             selectedAddress.street = address.street;
                             selectedAddress.city = address.city;
-                            selectedAddress.region_id = address.region_id;                            
+                            selectedAddress.region_id = address.region_id;
                             selectedAddress.country_id = address.country_id;
                             selectedAddress.postcode = address.postcode;
-                            selectedAddress.telephone = address.telephone;                            
+                            selectedAddress.telephone = address.telephone;
                             selectedAddress.save_in_address_book = address.save_in_address_book;
                             if(typeof address.region.region!='undefined'){
                                 selectedAddress.region= address.region.region;
                             }
                         }
                     });
-                } 
+                }
             }
             return selectedAddress;
         },
@@ -448,7 +356,7 @@
                 customerDataAddress = customerData.get('customer')();
                 window.walletpayObj.customerData = customerDataAddress;
                 window.walletpayObj.customeraddresses(customerDataAddress.customer_address);
-                if(typeof window.walletpayObj.customerData.customer_address !=='undefined'){                
+                if(typeof window.walletpayObj.customerData.customer_address !=='undefined'){
                     addressList = window.walletpayObj.customerData.customer_address;
                     _.each(addressList,function(address){
                         if(address.default_shipping){
@@ -456,10 +364,10 @@
                             selectedAddress.lastname = address.lastname;
                             selectedAddress.street = address.street;
                             selectedAddress.city = address.city;
-                            selectedAddress.region_id = address.region_id;                            
+                            selectedAddress.region_id = address.region_id;
                             selectedAddress.country_id = address.country_id;
                             selectedAddress.postcode = address.postcode;
-                            selectedAddress.telephone = address.telephone;                            
+                            selectedAddress.telephone = address.telephone;
                             selectedAddress.save_in_address_book = address.save_in_address_book;
                             if(typeof address.region.region!='undefined'){
                                 selectedAddress.region= address.region.region;
@@ -474,7 +382,7 @@
             var self = this;
             var shippingAddress = window.walletpayObj.selectedShippingAddress();
             var shippingMethod = window.walletpayObj.selectedShippingMethod();
-            
+
             if(shippingAddress.length == 0 || (typeof shippingAddress.city =='undefined')){
                 if($("#new-address-form").length){
                     self.fetchShippingNewAddress();
@@ -522,6 +430,156 @@
                 window.walletpayObj.fetchTotals(selectedAddress,{});
             }
         },
+        fetchDefaultShippingRates: function(){
+            var selectedAddress = {
+                'firstname': '',
+                'lastname': '',
+                'street': [],
+                'city': '',
+                'region_id': 0,
+                'postcode': '',
+                'country_id': window.walletpayObj.default_country_code,
+            }
+            var payload = {
+                address : selectedAddress
+            };
+            if(!window.walletpayObj.currentQuoteid){
+                return false;
+            }
+            if(!window.walletpayObj.isUserActiveSession()){
+                if(!window.walletpayObj.currentQuoteMaskedId){
+                    return false;
+                }
+            }
+            var checkoutObj = {
+                isCustomerLoggedIn : window.walletpayObj.isUserLoggedIn(),
+                store_code : window.walletpayObj.storeCode,
+                guest_masked_quote_id : window.walletpayObj.currentQuoteMaskedId,
+                payload : payload
+            }
+            window.walletpayObj.isLoadingShippingMethod(true);
+            checkoutUtils.fetchShippingRates(
+                checkoutObj
+            ).done(
+                function (apiresponse) {
+                    var response = (apiresponse);
+                    var shippingMethodList = [];
+                    if(response.length){
+                        _.each(response,function(value){
+                            var titledesc = priceUtils.formatPrice(value.amount, window.walletpayObj.priceFormat)+' '+value.carrier_title+' - '+ value.method_title;
+                            shippingMethodList.push({
+                                "id": value.carrier_code+'_'+value.method_code,
+                                "description": titledesc,
+                                "amount": value.amount,
+                                "carrier_code": value.carrier_code,
+                                "carrier_title": value.carrier_title,
+                                "method_code": value.method_code,
+                                "method_title": value.method_title,
+                            });
+                        })
+                        if(typeof selectedAddress.region_id=='undefined'){
+                            selectedAddress.region_id = 0;
+                        }
+                        if(selectedAddress.region_id==''){
+                            selectedAddress.region_id = 0;
+                        }
+
+                        $.localStorage.set('wp-default-shipping-method', shippingMethodList);
+                        $.localStorage.set('wp-default-shipping-address', selectedAddress);
+
+                    }
+                }
+            ).fail(
+                function (response) {
+                    console.log("Error:", response);
+                    window.walletpayObj.isLoadingShippingMethod(false);
+                }
+            )
+        },
+        fetchRatesByDynamicAddress : function(address,callback){
+            var self = this,apiUrl=null,selectedAddress={};
+            if(typeof address.firstname!='undefined'){
+                selectedAddress.firstname = address.firstname;
+            }
+            if(typeof address.lastname!='undefined'){
+                selectedAddress.lastname = address.lastname;
+            }
+            if(typeof address.street!='undefined'){
+                selectedAddress.street = address.street;
+            }
+            if(typeof address.city!='undefined'){
+                selectedAddress.city = address.city;
+            }
+            if(typeof address.region_id!='undefined'){
+                selectedAddress.region_id = address.region_id;
+            }
+            if(typeof address.country_id!='undefined'){
+                selectedAddress.country_id = address.country_id;
+            }
+            if(typeof address.postcode!='undefined'){
+                selectedAddress.postcode = address.postcode;
+            }
+            if(typeof address.telephone!='undefined'){
+                selectedAddress.telephone = address.telephone;
+            }
+            if(typeof address.save_in_address_book!='undefined'){
+                selectedAddress.save_in_address_book = address.save_in_address_book;
+            }
+            if(typeof address.region!='undefined'  && address.region!==null){
+                if(typeof address.region.region!='undefined'){
+                    selectedAddress.region= address.region.region;
+                }
+            }
+            var payload = {
+                address : selectedAddress
+            };
+            if(!window.walletpayObj.currentQuoteid){
+                return false;
+            }
+            if(!window.walletpayObj.isUserLoggedIn()){
+                if(!window.walletpayObj.currentQuoteMaskedId){
+                    return false;
+                }
+            }
+            var checkoutObj = {
+                isCustomerLoggedIn : window.walletpayObj.isUserLoggedIn(),
+                store_code : window.walletpayObj.storeCode,
+                guest_masked_quote_id : window.walletpayObj.currentQuoteMaskedId,
+                payload : payload
+            }
+            window.walletpayObj.isLoadingShippingMethod(true);
+            checkoutUtils.fetchShippingRates(
+                checkoutObj
+            ).done(
+                function (apiresponse) {
+                    var response = (apiresponse);
+                    var shippingMethodList = [];
+                    if(response.length){
+                        _.each(response,function(value){
+                            var titledesc = priceUtils.formatPrice(value.amount, window.walletpayObj.priceFormat)+' '+value.carrier_title+' - '+ value.method_title;
+                            shippingMethodList.push({
+                                "id": value.carrier_code+'_'+value.method_code,
+                                "description": titledesc,
+                                "amount": value.amount,
+                                "carrier_code": value.carrier_code,
+                                "carrier_title": value.carrier_title,
+                                "method_code": value.method_code,
+                                "method_title": value.method_title,
+                            });
+                        });
+                        $.localStorage.set('wp-default-shipping-method', shippingMethodList);
+                        $.localStorage.set('wp-default-shipping-address', selectedAddress);
+                        callback();
+                    }
+                    window.walletpayObj.isLoadingShippingMethod(false);
+                }
+            ).fail(
+                function (response) {
+                    console.log("Error:", response);
+                    window.walletpayObj.isLoadingShippingMethod(false);
+                }
+            )
+        },
         fetchShippingByAddress : function(address){
             var self = this,apiUrl=null,selectedAddress={};
             if(typeof address.firstname!='undefined'){
@@ -557,7 +615,7 @@
                 }
             }
             var payload = {
-                address : selectedAddress               
+                address : selectedAddress
             };
             if(!window.walletpayObj.currentQuoteid){
                 return false;
@@ -565,7 +623,7 @@
             if(!window.walletpayObj.isUserLoggedIn()){
                 if(!window.walletpayObj.currentQuoteMaskedId){
                     return false;
-                }                    
+                }
             }
             var checkoutObj = {
                 isCustomerLoggedIn : window.walletpayObj.isUserLoggedIn(),
@@ -578,9 +636,9 @@
                 checkoutObj
             ).done(
                 function (apiresponse) {
-                    var response = (apiresponse);             
+                    var response = (apiresponse);
                     var shippingMethodList = [];
-                    if(response.length){ 
+                    if(response.length){
                         _.each(response,function(value){
                             var titledesc = priceUtils.formatPrice(value.amount, window.walletpayObj.priceFormat)+' '+value.carrier_title+' - '+ value.method_title;
                             shippingMethodList.push({
@@ -592,35 +650,35 @@
                                 "method_code": value.method_code,
                                 "method_title": value.method_title,
                             });
-                        })     
+                        })
                         if(typeof selectedAddress.region_id=='undefined'){
                             selectedAddress.region_id = 0;
                         }
                         if(selectedAddress.region_id==''){
                             selectedAddress.region_id = 0;
                         }
-                        
+
                         window.walletpayObj.availableShippingMethods(shippingMethodList);
-                        window.walletpayObj.selectedShippingAddress(selectedAddress);                        
-                        window.walletpayObj.selectedBillingAddress(selectedAddress);  
-                        
+                        window.walletpayObj.selectedShippingAddress(selectedAddress);
+                        window.walletpayObj.selectedBillingAddress(selectedAddress);
+
                         if(window.walletpayObj.isUserLoggedIn()){
                             window.walletpayObj.selectedBillingAddress().email = window.walletpayObj.customerDetails.email;
                         }
                     }
-                    window.walletpayObj.isLoadingShippingMethod(false); 
+                    window.walletpayObj.isLoadingShippingMethod(false);
                 }
             ).fail(
                 function (response) {
                     console.log("Error:", response);
-                    window.walletpayObj.isLoadingShippingMethod(false);  
+                    window.walletpayObj.isLoadingShippingMethod(false);
                 }
             )
-        },        
+        },
         fetchShippingNewAddress : function(){
             var self = this;
             var shippingFormData = checkoutUtils.fetchValuesFromAddressForm('#new-address-form');
-            
+
             if(typeof shippingFormData.region_id!='undefined'){
                 if(shippingFormData.region_id == ""){
                     shippingFormData.region_id = 0;
@@ -673,25 +731,25 @@
                     window.walletpayObj.grandtotalFormatted(response.base_grand_total);
                     window.walletpayObj.currencyCode(response.quote_currency_code);
                     window.walletpayObj.isLoadingCheckoutActions(false);
-                    self.updateTotalSegments(response.total_segments);                     
+                    self.updateTotalSegments(response.total_segments);
                 }
             ).fail(
                 function (response) {
                     window.walletpayObj.isLoadingCheckoutActions(false);
                 }
             )
-        },        
-        initCheckout : function(){             
-            var self = this;                
+        },
+        initCheckout : function(){
+            var self = this;
             var gpayButtontext = self.googlepayOptions.gpay_button_popup_text;
             var applepayButtontext = self.applepayOptions.applePayPopUpButtonText;
             if(gpayButtontext == ''){
-                gpayButtontext = $.mage.__('Place Order with GooglePay'); 
-            } 
+                gpayButtontext = $.mage.__('Place Order with GooglePay');
+            }
             if(applepayButtontext == ''){
-                applepayButtontext = $.mage.__('Place Order with ApplePay'); 
-            }          
-            
+                applepayButtontext = $.mage.__('Place Order with ApplePay');
+            }
+
             var popupButtons = [];
             // googlepay button if enabled
             if(self.googlepayOptions.isgooglepayenabledonpdp && self.isApplePayPurchase() == false){
@@ -723,7 +781,7 @@
                     var payload = {};
                     $("body").trigger('processStart');
                     storage.post(
-                        apiUrl, 
+                        apiUrl,
                         JSON.stringify(payload)
                     ).done(function(response){
                         $("body").trigger('processStop');
@@ -741,6 +799,7 @@
                 innerScroll: true,
                 clickableOverlay : false,
                 buttons: popupButtons,
+                modalClass: 'wp-wallets-pay-modal',
                 opened : function(){
                     $(".action-close").hide();
                     if(self.isUserLoggedIn()){
@@ -751,7 +810,7 @@
                         }
                     }else{
                         var guestShippingAddress = {
-                            country_id: "US",                     
+                            country_id: window.walletpayObj.default_country_code,
                         }
                         var shippingMethod = self.fetchShippingByAddress(guestShippingAddress);
                     }
@@ -764,15 +823,17 @@
                 self.BillingCountriesDropDown(self.billingCountriesHtml);
         },
         isUserLoggedIn : function(){
-            var self=this,customer = customerData.get('customer')();
+
+            return this.isUserActiveSession();
+           /* var self=this,customer = customerData.get('customer')();
             if (customer.fullname && customer.firstname)
             {
                 return true;
             }
             if(typeof self.customerDetails.email !='undefined'){
                 return true;
-            }            
-            return false;
+            }
+            return false;*/
         },
         isValidJson : function(jsonString){
             var json = null;
@@ -813,7 +874,7 @@
                 'form' : form,
                 'productIds': productIds,
                 'productInfo': productInfo
-            }            
+            }
         },
         isEnableRestoreCart : function(){
             return false;
@@ -822,13 +883,13 @@
             var self = this,
                 addTocartFormData = window.walletpayObj.addtocartFormData(),
                 triggerCheckout = false;
-            
+
             if (!(addTocartFormData.form.validation() && addTocartFormData.form.validation('isValid'))) {
                 return;
             }
-            var cart = customerData.get('cart');             
-            
-            $( window.walletpayObj.minicartSelector).trigger('contentLoading');            
+            var cart = customerData.get('cart');
+
+            $( window.walletpayObj.minicartSelector).trigger('contentLoading');
             var formData = new FormData(addTocartFormData.form[0]);
             if(typeof cart().quote_id!='undefined'){
                 formData.set("existing_quote_id",cart().quote_id);
@@ -849,7 +910,7 @@
 
                 /** @inheritdoc */
                 success: function (res) {
-                    var eventData, parameters;                   
+                    var eventData, parameters;
                     $(document).trigger('ajax:addToCart', {
                         'sku': addTocartFormData.form.data().productSku,
                         'productIds': addTocartFormData.productIds,
@@ -857,14 +918,14 @@
                         'form': addTocartFormData.form,
                         'response': res
                     });
-                    if(res.backUrl){ 
+                    if(res.backUrl){
                         if (res.backUrl.indexOf("checkout") > -1) {
                         }else{
                             location.reload(); // out of stock
                             return false;
-                        }                       
+                        }
                     }
-                   
+
                     if (res.messages) {
                         $( window.walletpayObj.messagesSelector).html(res.messages);
                     }
@@ -872,8 +933,8 @@
                     if (res.minicart) {
                         $( window.walletpayObj.minicartSelector).replaceWith(res.minicart);
                         $( window.walletpayObj.minicartSelector).trigger('contentUpdated');
-                    }                    
-                    
+                    }
+
                     triggerCheckout = true;
                     /** Init Google Pay popup after cart refresh  */
                     var cart = customerData.get('cart');
@@ -882,12 +943,12 @@
                     if(typeof cart().quote_id !='undefined'){
                         quoteId = cart().quote_id;
                     }
-            
+
                     var showMiniCheckout = false;
                     var currentItemId = formData.get('item');
-                        cart.subscribe(function (changedCart) { 
+                        cart.subscribe(function (changedCart) {
                             if(triggerCheckout == true){
-                                 $("body").trigger('processStop');                            
+                                 $("body").trigger('processStop');
                                 count = changedCart.summary_count;
                                 if(count > 0){
                                     window.walletpayObj.isCartContainVirtualProduct(changedCart.items,currentItemId);
@@ -896,8 +957,8 @@
                                     window.walletpayObj.initCheckout();
                                     window.walletpayObj.grandtotal(changedCart.subtotalAmount);
                                     window.walletpayObj.grandtotalFormatted(priceUtils.formatPrice(changedCart.subtotalAmount, window.walletpayObj.priceFormat));
-                                    window.walletpayObj.updateTotalSegments( {  
-                                        
+                                    window.walletpayObj.updateTotalSegments( {
+
                                         subtotal : {
                                             "title" : 'Subtotal',
                                             "value" : changedCart.subtotalAmount
@@ -906,12 +967,30 @@
                                             "title" : 'Grand Total',
                                             "value" : changedCart.subtotalAmount
                                         }
-                                    });           
-                                }                
+                                    });
+                                    window.walletpayObj.fetchDefaultShippingRates();
+
+                                    var productInfo ={};
+                                    _.each(changedCart.items,function(value,key){
+                                        productInfo.name = value.product_name;
+                                        productInfo.options = value.options;
+                                        productInfo.image = value.product_image.src;
+                                        productInfo.subtotal = changedCart.subtotal;
+
+                                    });
+
+
+                                     /** PDP segments **/
+                                     window.walletpayObj.updatePdpCartSegments(
+                                        {
+                                            productInfo : productInfo
+                                        }
+                                    )
+                                }
                                 triggerCheckout = false;
                              }
                         });
-                  
+
                 },
                 /** @inheritdoc */
                 error: function (res) {
@@ -956,7 +1035,7 @@
             self.isApplePayPurchase(true);
             self.addtoCartAndInitCheckout();
         },
-        initApplePaySession : function() {  
+        initApplePaySession : function() {
             var self= this;
             var cartData = customerData.get('cart');
             //var baseGrandTotal   = cartData().subtotalAmount;
@@ -980,59 +1059,7 @@
                 //merchantCapabilities: [ 'supports3DS', 'supportsEMV', 'supportsCredit', 'supportsDebit' ]
                 merchantCapabilities: [ 'supports3DS'] //production changes
             };
-            var session = new ApplePaySession(1, paymentRequest);
-
-            // Merchant Validation
-            session.onvalidatemerchant = function (event) {                      
-                var promise = window.walletpayObj.applePayPerformValidation(event.validationURL);
-                promise.then(function (merchantSession) {
-                    session.completeMerchantValidation(merchantSession);
-                }); 
-            }
-            // Payment Method Selection
-            session.onpaymentmethodselected = function(event) { 
-                var runningTotal = window.walletpayObj.grandtotal();
-                var newTotal = { type: 'final', label: 'Order Total', amount: runningTotal };
-                var newLineItems =[{type: 'final',label: subTotalDescr, amount: runningAmount }];
-                session.completePaymentMethodSelection( newTotal, newLineItems );
-            }
-            // Payment Authorization
-            session.onpaymentauthorized = function (event) {
-                var promise = window.walletpayObj.applePaySendPaymentToken(event.payment.token);
-                promise.then(function (success) {   
-                    var status;
-                    if (success){
-                        status = ApplePaySession.STATUS_SUCCESS;
-                    } else {
-                        status = ApplePaySession.STATUS_FAILURE;
-                    }
-                    session.completePayment(status);
-                });
-                appleResponse = JSON.stringify(event.payment.token);
-                var checkoutData = {
-                    billingAddress :window.walletpayObj.selectedBillingAddress(),
-                    shippingAddress: window.walletpayObj.selectedShippingAddress(),
-                    shippingMethod: window.walletpayObj.selectedShippingMethod(),
-                    paymentDetails:{
-                        'method': "worldpay_wallets",
-                        'additional_data': {
-                            'cc_type': 'APPLEPAY-SSL',
-                            'appleResponse' : appleResponse,
-                            'dfReferenceId':  window.walletpayObj.sessionId
-                        }
-                    },
-                    storecode :window.walletpayObj.store_code,
-                    quote_id : window.walletpayObj.currentQuoteid,
-                    guest_masked_quote_id: window.walletpayObj.currentQuoteMaskedId,
-                    isCustomerLoggedIn : window.walletpayObj.isUserLoggedIn(),
-                    isRequiredShipping : window.walletpayObj.isRequiredShipping()
-                }
-                checkoutUtils.placeorder(checkoutData);       
-            }
-            session.oncancel = function(event) {
-                console.log("Apple Pay session cancelled");
-            }
-            session.begin();
+            ApplePayModel.initApplePaySession(paymentRequest);
         },
         // Send Payment token
         applePaySendPaymentToken : function(paymentToken){
@@ -1048,10 +1075,10 @@
         applePayPerformValidation:  function (valURL) {
             return new Promise(function(resolve, reject) {
                 var xhr = new XMLHttpRequest();
-                xhr.onload = function() {      
+                xhr.onload = function() {
                     var finaldata = this.responseText.slice(1, -1);
                     var finaldata = finaldata.replace(/\\/g, '');
-                    
+
                     var data = JSON.parse(finaldata);
                     resolve(data);
                 };
@@ -1065,8 +1092,17 @@
         addApplePayButton : function(){
             var self= this;
             if (window.ApplePaySession) {
-                self.isAppleDevice(true);                
+                var merchantIdentifier = window.walletpayObj.applepayOptions.appleMerchantId;
+                var promise = ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
+                promise.then(function (canMakePayments) {
+                    if (canMakePayments) {
+                        self.isAppleDevice(true);
+                    }
+                });
+                self.isAppleDevice(true);
+
+
             }
-        }    
+        }
     });
 });

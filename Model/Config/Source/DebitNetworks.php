@@ -5,7 +5,6 @@ namespace Sapient\Worldpay\Model\Config\Source;
 /**
  * Description of DebitNetworks
  *
- * @author aatrai
  */
 class DebitNetworks extends \Magento\Framework\App\Config\Value
 {

@@ -27,17 +27,22 @@ define(
     var response1 = '';
     var dfReferenceId = "";
     var debug = true;
-
+    var appleMerchantId = window.checkoutConfig.payment.ccform.appleMerchantid;
     if(window.checkoutConfig.payment.general.environmentMode == 'PRODUCTION'){
         merchantId = "merchantId:"+window.checkoutConfig.payment.ccform.googleMerchantid;
     }
-
+    if(window.checkoutConfig.payment.ccform.isMultishipping){
+        var msAppleMerchantid = window.checkoutConfig.payment.ccform.msAppleMerchantid;
+        if(msAppleMerchantid){
+            appleMerchantId = msAppleMerchantid;
+        }
+    }
 return Component.extend({
     defaults: {
         template: 'Sapient_Worldpay/payment/wallets/applepay-checkout',
         applepayOptions:{
         env_mode : window.checkoutConfig.payment.general.environmentMode,
-        merchantIdentifier : window.checkoutConfig.payment.ccform.appleMerchantid,
+        merchantIdentifier : appleMerchantId,
         countryCode : window.checkoutConfig.defaultCountryId,
         currencyCode : window.checkoutConfig.quoteData.quote_currency_code,
         subTotalDescr : "Cart Subtotal",
@@ -192,8 +197,15 @@ return Component.extend({
         if(!window.checkoutConfig.payment.ccform.isWalletsEnabled){
             return false;
         }
-        if(!window.checkoutConfig.payment.ccform.isApplePayEnable){
-            return false;
+        if(window.checkoutConfig.payment.ccform.isMultishipping){
+            if(!window.checkoutConfig.payment.ccform.isMsApplePayEnable){
+                return false;
+            }
+        }
+        else {
+            if(!window.checkoutConfig.payment.ccform.isApplePayEnable){
+                return false;
+            }
         }
         if(window.checkoutConfig.payment.ccform.isSubscribed){
             return false;
