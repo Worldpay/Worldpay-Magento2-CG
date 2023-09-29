@@ -23,4 +23,5 @@
     <type name="Magento\Customer\CustomerData\Customer">
         <plugin name="add_customer_address" type="Sapient\Worldpay\Plugin\Checkout\CustomerData\Customer"/>
     </type>
+    <preference for="Magento\Multishipping\Block\Checkout\Link" type="Sapient\Worldpay\Block\MultishippingCheckoutLink" />
 </config>

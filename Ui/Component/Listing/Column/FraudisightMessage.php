@@ -87,7 +87,7 @@ class FraudisightMessage extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                if(!in_array($item['payment_method'],$this->helper->getWpPaymentMethods())){
+                if (!in_array($item['payment_method'], $this->helper->getWpPaymentMethods())) {
                     continue;
                 }
 

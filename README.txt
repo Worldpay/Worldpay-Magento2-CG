@@ -2,6 +2,10 @@ Latest releases for all supported version:
 
 For Magento 2.4.5
 
+Worldpay Plugin version: 2.4.5-p30923
+1. Magento 2.4.5-p3 compatible
+
+
 Worldpay Plugin version: 2.4.5-p20823
 1. Magento 2.4.5-p2 compatible
 2. SEPA Direct Debit

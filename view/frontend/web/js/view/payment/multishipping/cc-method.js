@@ -2,11 +2,13 @@ define(
     [
         'Sapient_Worldpay/js/view/payment/method-renderer/cc-method',
         'jquery',
+        'Sapient_Worldpay/js/model/disclaimer-confirm',
         'domReady!'
     ],
     function (
         Component,
-        $
+        $,
+        disclaimerConfirm
     ) {
         'use strict';
         var paymentService = false;
@@ -96,8 +98,10 @@ define(
                     this.showError($.mage.__('Please choose a payment method.'));
 
                 return isValid;
+            },
+            disclaimerPopup: function(){
+                disclaimerConfirm.openDisclaimer();
             }
-
         });
     }
 );

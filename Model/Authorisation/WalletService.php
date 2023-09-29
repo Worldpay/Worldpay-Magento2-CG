@@ -219,6 +219,12 @@ class WalletService extends \Magento\Framework\DataObject
             </reasonCodes></FraudSight></payment></orderStatus></reply></paymentService>';
              */
             $directResponse = $this->directResponse->setResponse($response);
+            if ($paymentDetails['additional_data']['cc_type'] == 'APPLEPAY-SSL') {
+                $responseXml=$directResponse->getXml();
+                $orderStatus = $responseXml->reply->orderStatus;
+                $paymentxml=$orderStatus->payment;
+                $paymentxml->paymentMethod[0] = 'APPLEPAY-SSL';
+            }
             $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment);
             $this->_applyPaymentUpdate($directResponse, $payment);
         }

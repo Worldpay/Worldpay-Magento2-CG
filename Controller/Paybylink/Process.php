@@ -138,6 +138,9 @@ class Process extends \Magento\Framework\App\Action\Action
     {
         $this->wplogger->info('Pay by link Process controller executed.');
         $orderCode = $this->request->getParam('orderkey');
+        if (empty($orderCode)) {
+            return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
+        }
         $orderIncrementId = current(explode('-', $orderCode));
         $orderInfo = $this->orderItemsDetails->loadByIncrementId($orderIncrementId);
         if ($orderInfo->getId()) {

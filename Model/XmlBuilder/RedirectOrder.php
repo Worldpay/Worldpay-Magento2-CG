@@ -42,6 +42,10 @@ EOD;
     /**
      * @var string
      */
+    private $orderContent;
+    /**
+     * @var string
+     */
     private $paymentType;
     /**
      * @var string
@@ -155,6 +159,7 @@ EOD;
      * @param string $orderDescription
      * @param string $currencyCode
      * @param float $amount
+     * @param string $orderContent
      * @param string $paymentType
      * @param string $shopperEmail
      * @param string $statementNarrative
@@ -182,6 +187,7 @@ EOD;
         $orderDescription,
         $currencyCode,
         $amount,
+        $orderContent,
         $paymentType,
         $shopperEmail,
         $statementNarrative,
@@ -207,6 +213,7 @@ EOD;
         $this->orderDescription = $orderDescription;
         $this->currencyCode = $currencyCode;
         $this->amount = $amount;
+        $this->orderContent = $orderContent;
         $this->paymentType = $paymentType;
         $this->shopperEmail = $shopperEmail;
         $this->statementNarrative = $statementNarrative;
@@ -277,6 +284,7 @@ EOD;
         $this->_addDescriptionElement($order);
         $amountElement = $order->addChild('amount');
         $this->_addAmountElement($amountElement, $this->currencyCode, $this->exponent, $this->amount);
+        $this->_addOrderContentElement($order);
         if (isset($this->paymentDetails['paymentType']) && $this->paymentDetails['paymentType'] == "TOKEN-SSL") {
             $this->_addPaymentDetailsElement($order);
         } else {
@@ -303,6 +311,17 @@ EOD;
         }
         $this->_addFraudSightData($order);
         return $order;
+    }
+
+    /**
+     * Add OrderContent tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
+    private function _addOrderContentElement($order)
+    {
+        $orderContent = $order->addChild('orderContent');
+        $this->_addCDATA($orderContent, $this->orderContent);
     }
 
     /**

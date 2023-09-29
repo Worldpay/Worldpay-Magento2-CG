@@ -82,7 +82,7 @@ class InvoiceStatus extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                if(!in_array($item['payment_method'],$this->helper->getWpPaymentMethods())){
+                if (!in_array($item['payment_method'], $this->helper->getWpPaymentMethods())) {
                     continue;
                 }
                 $order = $this->_orderRepository->get($item['entity_id']);

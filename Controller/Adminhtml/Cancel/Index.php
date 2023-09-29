@@ -10,11 +10,6 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Exception;
 
-/**
- * Description of Index
- *
- * @author aatrai
- */
 class Index extends \Magento\Backend\App\Action
 {
     /**

@@ -276,7 +276,7 @@ EOD;
     private function _addOrderContentElement($order)
     {
         $orderContent = $order->addChild('orderContent');
-        $this->_addCDATA($orderContent, $this->orderDescription);
+        $this->_addCDATA($orderContent, $this->orderContent);
     }
 
     /**

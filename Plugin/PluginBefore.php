@@ -115,8 +115,6 @@ class PluginBefore
                     ['label' => __('Sync Status'), 'onclick' => 'setLocation("'.$syncurl.'")', 'class' => 'reset'],
                     -1
                 );
-            
-             
             //Cancel button function to send order-modification request to Cancel Order.
                 $cancelurl = $this->_urlBuilder->getUrl(
                     "worldpay/cancel/index",

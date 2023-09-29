@@ -259,13 +259,16 @@ class PayByLinkService extends \Magento\Framework\DataObject
 
     /**
      * Get PBL expiry time
-     *
      */
     public function getPayByLinkExpiryTime()
     {
         $currentDate = date('Y-m-d H:i:s');
         $pblExpiryConfiguration = $this->worldpayhelper->getPayByLinkExpiryTime();
-        $interval = date("Y-m-d H:i:s", $this->worldpayhelper->findPblOrderExpiryTime($currentDate, $pblExpiryConfiguration));
+        $interval = date("Y-m-d H:i:s", $this->worldpayhelper
+            ->findPblOrderExpiryTime(
+                $currentDate,
+                $pblExpiryConfiguration
+            ));
         return $interval;
     }
 
