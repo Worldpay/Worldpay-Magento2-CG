@@ -68,7 +68,7 @@ class="form multicheckout billing">
                             <?php if ($block->isWorldpayEnable()): ?>
                         <legend class="legend box-title">
                             <div class="payment-title-wrapper">
-                                <span><?= $block->escapeHtml(__('Payment Method')); ?></span>
+                                <span><?= $escaper->escapeHtml(__('Payment Method')); ?></span>
                                 <br>
                                 <span class="security-title">All transactions are secure and encrypted...</span>
                             </div>
@@ -257,13 +257,13 @@ class="form multicheckout billing">
                     <?= /* @noEscape */ $block->getChildHtml('agreements') ?>
                     <div id="checkout-agreement-error-msg" style="display:none">
                         <span id="checkout-agreement-error-msg-span" style="color:red">
-                        <?= $block->escapeHtml(__('Please accept all Terms & Conditions')); ?>
+                        <?= $escaper->escapeHtml(__('Please accept all Terms & Conditions')); ?>
                     </span>
                     </div>
                 </div>
                     <div class="billing-totals">
                         <strong class="box-title grand totals">
-                            <span class="billing-mark"><?= $block->escapeHtml(__('Grand Total:')); ?></span>
+                            <span class="billing-mark"><?= $escaper->escapeHtml(__('Grand Total:')); ?></span>
                             <?= /* @noEscape */ $checkoutHelper->formatPrice($block->getTotal()); ?>
                         </strong>
                     </div>
@@ -294,25 +294,26 @@ class="form multicheckout billing">
                 </div>
                 <div class="block block-shipping">
                     <div class="block-title shipping-information">
-                        <strong><?= $block->escapeHtml(__('Shipping Information')); ?></strong>
+                        <strong><?= $escaper->escapeHtml(__('Shipping Information')); ?></strong>
                     </div>
                     <?php $mergedCells = ($taxHelper->displayCartBothPrices() ? 2 : 1); ?>
                     <?php foreach ($block->getShippingAddresses() as $index => $address): ?>
                         <div class="block-content">
-                            <a name="<?= $block->escapeHtml($block->getAddressAnchorName($address->getId())); ?>"></a>
+                            <a name="<?= $escaper->escapeHtml($block->getAddressAnchorName($address->getId())); ?>"></a>
                             <div class="title address-title-space">
-                                <strong><?= $block->escapeHtml(__('Address')); ?> <?= $block->escapeHtml($index + 1); ?>
+                                <strong><?= $escaper->escapeHtml(__('Address')); ?> 
+                        <?= $escaper->escapeHtml($index + 1); ?>
                                     <span>
-                                        <?= $block->escapeHtml(__('of')); ?>
-                                        <?= $block->escapeHtml($block->getShippingAddressCount()) ?>
+                                        <?= $escaper->escapeHtml(__('of')); ?>
+                                        <?= $escaper->escapeHtml($block->getShippingAddressCount()) ?>
                                     </span>
                                 </strong>
                             </div>
                             <div class="box box-shipping-address wp-address-block">
                                 <strong class="box-title">
-                                    <span><?= $block->escapeHtml(__('Shipping To')); ?></span>
-                                    <a href="<?= $block->escapeUrl($block->getEditShippingAddressUrl($address)); ?>" 
-                                    class="action edit"><span><?= $block->escapeHtml(__('Edit')); ?></span></a>
+                                    <span><?= $escaper->escapeHtml(__('Shipping To')); ?></span>
+                                    <a href="<?= $escaper->escapeUrl($block->getEditShippingAddressUrl($address)); ?>" 
+                                    class="action edit"><span><?= $escaper->escapeHtml(__('Edit')); ?></span></a>
                                 </strong>
                                 <div class="box-content">
                                     <address>
@@ -325,14 +326,14 @@ class="form multicheckout billing">
                                 <div class="box-content">
                                     <div class="order-review-wrapper table-wrapper">
                                         <table class="items data table table-order-review" 
-                                        id="overview-table-<?= $block->escapeHtml($address->getId()); ?>">
+                                        id="overview-table-<?= $escaper->escapeHtml($address->getId()); ?>">
                                             <caption class="table-caption">
-                                                <?= $block->escapeHtml(__('Order Review')); ?>
+                                                <?= $escaper->escapeHtml(__('Order Review')); ?>
                                             </caption>
                                             <thead>
                                                 <tr>
                                                     <td colspan='4'>
-                                                        <strong><?= $block->escapeHtml(__('Price Info')); ?></strong>
+                                                        <strong><?= $escaper->escapeHtml(__('Price Info')); ?></strong>
                                                     </td>
                                                 </tr>
                                             </thead>
@@ -354,13 +355,13 @@ class="form multicheckout billing">
                 <?php if ($block->getQuote()->hasVirtualItems()): ?>
                     <div class="block block-other">
                         <?php $billingAddress = $block->getQuote()->getBillingAddress(); ?>
-                        <a name="<?= $block->escapeHtml($block->getAddressAnchorName($billingAddress->getId())); ?>">
+                        <a name="<?= $escaper->escapeHtml($block->getAddressAnchorName($billingAddress->getId())); ?>">
                         </a>
                         <div class="block-title other-information">
-                            <strong><?= $block->escapeHtml(__('Other items in your order')); ?></strong>
+                            <strong><?= $escaper->escapeHtml(__('Other items in your order')); ?></strong>
                         </div>
                         <?php if ($error = $block->getAddressError($billingAddress)): ?>
-                            <div class="error-description"><?= $block->escapeHtml($error); ?></div>
+                            <div class="error-description"><?= $escaper->escapeHtml($error); ?></div>
                         <?php endif; ?>
                         <div class="block-content wp-price-block wp-virtual-block">
 
@@ -370,7 +371,7 @@ class="form multicheckout billing">
                                     <thead>
                                         <tr>
                                             <td colspan='4'>
-                                                <strong><?= $block->escapeHtml(__('Price Info')); ?></strong>
+                                                <strong><?= $escaper->escapeHtml(__('Price Info')); ?></strong>
                                             </td>
                                         </tr>
                                     </thead>

@@ -77,24 +77,24 @@ class Button extends Template
     /**
      * Get Apple pay Button Type
      */
-    public function isApplePayButtonType()
+    public function isApplePayButtonTypePdp()
     {
-        return $this->worldpayHelper->getApplePayButtonType();
+        return $this->worldpayHelper->getApplePayButtonTypePdp();
     }
 
     /**
      * Get Apple pay Button Color
      */
-    public function isApplePayButtonColor()
+    public function isApplePayButtonColorPdp()
     {
-        return $this->worldpayHelper->getApplePayButtonColor();
+        return $this->worldpayHelper->getApplePayButtonColorPdp();
     }
 
     /**
      * Get Apple pay Button Locale or not
      */
-    public function isApplePayButtonLocale()
+    public function isApplePayButtonLocalePdp()
     {
-        return $this->worldpayHelper->getApplePayButtonLocale();
+        return $this->worldpayHelper->getApplePayButtonLocalePdp();
     }
 }

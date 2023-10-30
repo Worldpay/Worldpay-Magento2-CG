@@ -27,22 +27,25 @@ class Delete extends \Magento\Framework\App\Action\Action
      * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
+    
     /**
      * @var helper
      */
     protected $helper;
+    
     /**
      * @var vaultPaymentToken
      */
     protected $vaultPaymentToken;
+    
     /**
      * @var resultRedirect
      */
     protected $resultRedirect;
 
-     /**
-      * @var StoreManagerInterface
-      */
+    /**
+     * @var StoreManagerInterface
+     */
     protected $_storeManager;
 
     /**
@@ -76,6 +79,10 @@ class Delete extends \Magento\Framework\App\Action\Action
     protected $paymentTokenManagement;
 
     /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+    /**
      * Constructor
      *
      * @param StoreManagerInterface $storeManager
@@ -86,6 +93,7 @@ class Delete extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Model\Token\Service $tokenService
      * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      * @param PaymentTokenRepositoryInterface $tokenRepository
      * @param PaymentTokenManagement $paymentTokenManagement
      * @param MyAccountException $helper
@@ -101,6 +109,7 @@ class Delete extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Token\Service $tokenService,
         \Sapient\Worldpay\Model\Token\WorldpayToken $worldpayToken,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper,
         PaymentTokenRepositoryInterface $tokenRepository,
         PaymentTokenManagement $paymentTokenManagement,
         MyAccountException $helper,
@@ -115,6 +124,7 @@ class Delete extends \Magento\Framework\App\Action\Action
         $this->_tokenService = $tokenService;
         $this->_worldpayToken = $worldpayToken;
         $this->wplogger = $wplogger;
+        $this->worldpayHelper = $worldpayHelper;
         $this->tokenRepository = $tokenRepository;
         $this->paymentTokenManagement = $paymentTokenManagement;
         $this->helper = $helper;
@@ -137,6 +147,11 @@ class Delete extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        $resultRedirect = $this->resultRedirectFactory->create();
+        if (!$this->worldpayHelper->isWorldPayEnable()) {
+            $resultRedirect->setPath('noroute');
+            return $resultRedirect;
+        }
         $id = $this->getRequest()->getParam('id');
         if ($id) {
             try {
@@ -174,7 +189,7 @@ class Delete extends \Magento\Framework\App\Action\Action
                 }
             }
         }
-        $resultRedirect = $this->resultRedirectFactory->create();
+        
         $resultRedirect->setPath('worldpay/savedcard/index');
         return $resultRedirect;
     }

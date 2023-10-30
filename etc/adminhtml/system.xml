@@ -726,6 +726,10 @@
                 <field id="end_date_label" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>End Date Label</label>
                 </field>
+                <field id="recurring_order_buffer_time" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recurring Order Buffer Time (in days)</label>
+                    <validate>validate-number validate-zero-or-greater validate-not-negative-number</validate>
+                </field>
             </group>
             <!-- Miscellaneous -->
             <group id="miscellaneous" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -1174,41 +1178,33 @@
                     <label>Wallets Logo Config </label>
                     <group id="applepay_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Apple Pay </label>
-                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Use Custom Logo</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        </field> 
-                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                                <label>Logo</label>
-                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
-                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
-                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
-                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
-                                <ul style="margin-left: 2em;">
-                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
-                                </ul>
-                                ]]></comment>
-                                <depends><field id="enabled">1</field></depends>
-                        </field>            
+                        <field id="applepay_button_color" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Button Color</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\ApplePay\ButtonColor</source_model>
+                        </field>
+                        <field id="applepay_button_type" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Button Type</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\ApplePay\ButtonTypes</source_model>
+                        </field>
+                        <field id="applepay_button_locale" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Button Locale</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\ApplePay\ButtonLocale</source_model>
+                        </field>          
                     </group>
                     <group id="paywithgoogle_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Google Pay </label>
-                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Use Custom Logo</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        </field> 
-                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                                <label>Logo</label>
-                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
-                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
-                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
-                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
-                                <ul style="margin-left: 2em;">
-                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
-                                </ul>
-                                ]]></comment>
-                                <depends><field id="enabled">1</field></depends>
-                        </field>            
+                        <field id="gpay_button_color" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>GooglePay button color</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\GooglePay\ButtonColor</source_model>
+                        </field>
+                        <field id="gpay_button_type" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>GooglePay button type</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\GooglePay\ButtonTypes</source_model>
+                        </field>
+                        <field id="gpay_button_locale" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>GooglePay button locale</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\GooglePay\ButtonLocale</source_model>
+                        </field>      
                     </group>
                     <group id="samsungpay_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Samsung Pay </label>

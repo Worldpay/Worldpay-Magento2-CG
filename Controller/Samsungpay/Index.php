@@ -115,6 +115,11 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        $resultRedirect = $this->resultRedirectFactory->create();
+        if (!$this->worldpayHelper->isWorldPayEnable()) {
+            $resultRedirect->setPath('noroute');
+             return $resultRedirect;
+         }
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         
         $serviceId = $this->scopeConfig->
@@ -144,6 +149,7 @@ class Index extends \Magento\Framework\App\Action\Action
             $quoteIdMask->load($quoteId, 'masked_id');
             $quoteId = $quoteIdMask->getQuoteId();
         }
+
          $quote = $this->quoteFactory->create()->load($quoteId);
          $quoteData = $quote->getData();
          $currency = $quote->getQuoteCurrencyCode();

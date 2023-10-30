@@ -30,22 +30,29 @@ class Redirect extends \Magento\Framework\App\Action\Action
     protected $mageOrder;
 
     /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
+    /**
      * Constructor
      *
      * @param Context $context
      * @param PageFactory $pageFactory
      * @param \Magento\Checkout\Model\Session $checkoutsession
      * @param \Magento\Sales\Model\Order $mageOrder
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      */
     public function __construct(
         Context $context,
         PageFactory $pageFactory,
         \Magento\Checkout\Model\Session $checkoutsession,
-        \Magento\Sales\Model\Order $mageOrder
+        \Magento\Sales\Model\Order $mageOrder,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper
     ) {
         $this->pageFactory = $pageFactory;
         $this->checkoutsession = $checkoutsession;
         $this->mageOrder = $mageOrder;
+        $this->worldpayHelper = $worldpayHelper;
         return parent::__construct($context);
     }
    /**
@@ -55,10 +62,15 @@ class Redirect extends \Magento\Framework\App\Action\Action
     */
     public function execute()
     {
+        $resultRedirect = $this->resultRedirectFactory->create();
+        if (!$this->worldpayHelper->isWorldPayEnable()) {
+           $resultRedirect->setPath('noroute');
+            return $resultRedirect;
+        }
         $redirecturl = $this->checkoutsession->getWpRedirecturl();
         $this->checkoutsession->unsWpRedirecturl();
         $this->checkoutsession->unsIframePay();
         $this->checkoutsession->unsHppOrderCode();
-        return $this->resultRedirectFactory->create()->setUrl($redirecturl);
+        return $resultRedirect->setUrl($redirecturl);
     }
 }

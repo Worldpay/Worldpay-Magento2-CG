@@ -164,9 +164,9 @@ define([
                 "allowedCardNetworks": self.gPayPaymentMethods(),
                 "tokenizationSpecification": self.gpayTokenizationSpecification(),
                 "google_btn_customisation" : {
-                    "buttonColor" : 'black',
-                    "buttonType" : 'buy',
-                    "buttonLocale" : 'en',
+                    "buttonColor" : window.checkoutConfig.payment.ccform.gpayButtonColor,
+                    "buttonType" : window.checkoutConfig.payment.ccform.gpayButtonType,
+                    "buttonLocale" : window.checkoutConfig.payment.ccform.gpayButtonLocale,
                     "buttonSizeMode" : 'fill'
                 }
             }            

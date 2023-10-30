@@ -1810,7 +1810,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     public function collectPluginTrackerDetails($paymentType)
     {
         $pluginTrackerDetails = $this->worldpayhelper->getPluginTrackerdetails();
-        $pluginTrackerDetails['additional_detail'] = $paymentType;
+        $pluginTrackerDetails['additional_details']['transaction_method'] = $paymentType;
         return json_encode($pluginTrackerDetails);
     }
 }

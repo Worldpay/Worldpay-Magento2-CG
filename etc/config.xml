@@ -117,6 +117,23 @@
                 <capture_delay>default</capture_delay>
                 <capture_delay_custom_value>1</capture_delay_custom_value>
             </dynamic_capture_delay>
+            <subscriptions>
+                <recurring_order_buffer_time>5</recurring_order_buffer_time>
+            </subscriptions>
+            <payment_method_logo_config>
+                <wallet>
+                    <applepay_ssl>
+                        <applepay_button_color>black</applepay_button_color>
+                        <applepay_button_type>buy</applepay_button_type>
+                        <applepay_button_locale>en-GB</applepay_button_locale>
+                    </applepay_ssl>
+                    <paywithgoogle_ssl>
+                        <gpay_button_color>default</gpay_button_color>
+                        <gpay_button_type>buy</gpay_button_type>
+                        <gpay_button_locale>en</gpay_button_locale>
+                    </paywithgoogle_ssl>
+                </wallet>
+            </payment_method_logo_config>
         </worldpay>
         <payment>
             <worldpay_cc>

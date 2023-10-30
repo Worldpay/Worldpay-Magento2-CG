@@ -16,8 +16,6 @@ define(
 'Magento_Checkout/js/model/full-screen-loader'
 ], function ($, ko, Component, _, $t, quote, customerData, checkoutUtils, applePay, urlBuilder, url,customer, placeMultishippingOrder, fullScreenLoader) {
 'use strict';
-      
-    
     var paymentService = false;
     var billingAddressCountryId = "";
     var appleResponse = "";
@@ -27,6 +25,7 @@ define(
     var response1 = '';
     var dfReferenceId = "";
     var debug = true;
+    var applepayConfig = [];
     var appleMerchantId = window.checkoutConfig.payment.ccform.appleMerchantid;
     if(window.checkoutConfig.payment.general.environmentMode == 'PRODUCTION'){
         merchantId = "merchantId:"+window.checkoutConfig.payment.ccform.googleMerchantid;
@@ -49,6 +48,7 @@ return Component.extend({
         lineItemLabel : "Order Total"
         } 
     },
+    applepayConfig: ko.observableArray([]),
 
     /**
      * @returns {*}
@@ -56,6 +56,11 @@ return Component.extend({
     initialize: function () {
         this._super();
         var self = this;
+        this.applepayConfig({
+            color : window.checkoutConfig.payment.ccform.applePayButtonColor,
+            type : window.checkoutConfig.payment.ccform.applePayButtonType,
+            locale : window.checkoutConfig.payment.ccform.applePayButtonLocale
+        });
         return this;
     },
     sendPaymentToken : function(paymentToken){

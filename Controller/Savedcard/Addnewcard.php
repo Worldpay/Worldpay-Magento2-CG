@@ -53,11 +53,16 @@ class Addnewcard extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        $resultRedirect = $this->resultRedirectFactory->create();
         if (!$this->customerSession->isLoggedIn()) {
-            $resultRedirect = $this->resultRedirectFactory->create();
             $resultRedirect->setPath('customer/account/login');
             return $resultRedirect;
         }
+        if (!$this->worldpayHelper->isWorldPayEnable()) {
+            $resultRedirect->setPath('noroute');
+            return $resultRedirect;
+        }
+        
         $resultPage = $this->_resultPageFactory->create();
         $resultPage->getConfig()->getTitle()->set(
             $this->worldpayHelper->getAccountLabelbyCode('IAVAC1') ?

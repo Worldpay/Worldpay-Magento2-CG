@@ -179,13 +179,13 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
         ['isgooglepayenabledonpdp']  = $this->isGooglePayEnableonPdp();
 
         $this->jsLayout['components']['wp-wallet-pay']['config']['googlepayOptions']
-        ['gpaybutton_color']  = $this->worldpayHelper->getGpayButtonColor();
+        ['gpaybutton_color']  = $this->worldpayHelper->getGpayButtonColorPdp();
 
         $this->jsLayout['components']['wp-wallet-pay']['config']['googlepayOptions']
-        ['gpaybutton_type']  = $this->worldpayHelper->getGpayButtonType();
+        ['gpaybutton_type']  = $this->worldpayHelper->getGpayButtonTypePdp();
 
         $this->jsLayout['components']['wp-wallet-pay']['config']['googlepayOptions']
-        ['gpaybutton_locale']  = $this->worldpayHelper->getGpayButtonLocale();
+        ['gpaybutton_locale']  = $this->worldpayHelper->getGpayButtonLocalePdp();
         
         $this->jsLayout['components']['wp-wallet-pay']['config']['purchaseUrl'] = $purchaseUrl;
         $this->jsLayout['components']['wp-wallet-pay']['config']
@@ -215,16 +215,16 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
         ['applepayOptions']['isApplePayEnableonPdp']  =  $this->isApplePayEnableonPdp();
 
         $this->jsLayout['components']['wp-wallet-pay']['config']
-        ['applepayOptions']['applePayPopUpButtonText']  =  $this->getApplePayPopupPlaceOrderText();
+        ['applepayOptions']['applePayPopUpButtonText']  =  $this->getApplePayPopupPlaceOrderTextPdp();
 
         $this->jsLayout['components']['wp-wallet-pay']['config']
-        ['applepayOptions']['applePayButtonColor']  =  $this->worldpayHelper->getApplePayButtonColor();
+        ['applepayOptions']['applePayButtonColor']  =  $this->worldpayHelper->getApplePayButtonColorPdp();
 
         $this->jsLayout['components']['wp-wallet-pay']['config']
-        ['applepayOptions']['applePayButtonType']  =  $this->worldpayHelper->getApplePayButtonType();
+        ['applepayOptions']['applePayButtonType']  =  $this->worldpayHelper->getApplePayButtonTypePdp();
 
         $this->jsLayout['components']['wp-wallet-pay']['config']
-        ['applepayOptions']['applePayButtonLocale']  =  $this->worldpayHelper->getApplePayButtonLocale();
+        ['applepayOptions']['applePayButtonLocale']  =  $this->worldpayHelper->getApplePayButtonLocalePdp();
 
         return parent::getJsLayout();
     }
@@ -342,11 +342,11 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
     }
 
     /**
-     * Get Apple pay button popup text
+     * Get Apple pay button popup text for PDP
      */
-    public function getApplePayPopupPlaceOrderText()
+    public function getApplePayPopupPlaceOrderTextPdp()
     {
-        return $this->worldpayHelper->getApplePayPopupPlaceOrderText();
+        return $this->worldpayHelper->getApplePayPopupPlaceOrderTextPdp();
     }
     /**
      *  Check if subscription is enabled

@@ -16,7 +16,7 @@
         <tr>
             <td class="address-details">
                 <h3><b>Shipping Info</b></h3>
-                <p><?= $block->escapeHtml($block->getFormatAddressByCode($address)); ?></p>
+                <p><?= $escaper->escapeHtml($block->getFormatAddressByCode($address)); ?></p>
             </td>
         </tr>
     <?php endforeach; ?>
