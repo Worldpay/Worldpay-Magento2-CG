@@ -331,12 +331,15 @@ define([
         getGoogleTransactionInfo : function(){
             var cart = customerData.get('cart');
             var totalAmount = cart().subtotalAmount;
+            if(window.walletpayObj){
+                totalAmount = window.walletpayObj.grandtotal();
+            }
             return {
             displayItems: [
                 {
                   label: "Subtotal",
                   type: "SUBTOTAL",
-                  price: parseFloat(cart().subtotalAmount).toFixed(2),
+                  price: parseFloat(totalAmount).toFixed(2),
                 },
               ],
               countryCode: 'US',

@@ -87,7 +87,14 @@
     .gpay-card-info-container{
         width:49%;
     }
-
+    button.gpay-button:hover,
+    button.gpay-button:focus,
+    button.gpay-button:active{
+        background-origin: content-box;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: contain;
+    }
     @media only screen and (max-width: 768px) {
         .gpay-button{
             width:100%;

@@ -100,13 +100,13 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
         $value = $this->getUpgradeDates();
         if ((isset($value['oldData']) && !empty($value['oldData'])) &&
                 (isset($value['newData']) && !empty($value['newData']))) {
-            if($value['is_new_version']){
+            if ($value['is_new_version']) {
                 $data = $value['oldData'].",".$value['newData'];
-            }else{
+            } else {
                 $data = $value['oldData'];
             }
             $data =(array_unique(explode(",", $data)));
-            $data = array_slice($data,-3,3,true);
+            $data = array_slice($data, -3, 3, true);
             $data = implode(",", $data);
             $this->setValue($data);
             $this->configWriter->save(
@@ -132,18 +132,18 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
      * @return void
      */
     public function beforeSave()
-    {   
+    {
         $value = $this->getValue();
         $value = $this->getUpgradeDates();
         if ((isset($value['oldData']) && !empty($value['oldData'])) &&
                 (isset($value['newData']) && !empty($value['newData']))) {
-            if($value['is_new_version']){
+            if ($value['is_new_version']) {
                 $data = $value['oldData'].",".$value['newData'];
-            }else{
+            } else {
                 $data = $value['oldData'];
             }
             $data =(array_unique(explode(",", $data)));
-            $data = array_slice($data,-3,3,true);
+            $data = array_slice($data, -3, 3, true);
             $data = implode(",", $data);
             $this->setValue($data);
             $this->configWriter->save(
@@ -194,18 +194,19 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
         }
         $currentVersionHistoryDataAry = explode(',', $currentVersionHistoryData);
         $value['is_new_version'] = false;
-        if(!in_array($value['newVersion'],$currentVersionHistoryDataAry)){
+        if (!in_array($value['newVersion'], $currentVersionHistoryDataAry)) {
             $value['is_new_version'] = true;
         }
         
         $pastversions =  $this->getVersionHistoryDetails()!=null? $this->getVersionHistoryDetails()
-                :$currentVersionHistoryData;      
+                :$currentVersionHistoryData;
         if (isset($pastversions)) {
             $versionHistoryData = explode(',', $pastversions);
         }
         
-        if (empty($currentHistoryData)) {            
-            $value['newData'] = date("d-m-Y").' - ('.$pastversions.')';;
+        if (empty($currentHistoryData)) {
+            $value['newData'] = date("d-m-Y").' - ('.$pastversions.')';
+            ;
             return $value;
         } else {
             $datesHistoryData = explode(',', $currentHistoryData);
@@ -215,13 +216,13 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
                 && (empty($value['oldData']))) || (count($versionHistoryData) != count($datesHistoryData))
                 ) {
                     
-            if(count($versionHistoryData) >= 2 ) {
-                $recentPluginVersion = array_slice($versionHistoryData, -2, 2, false);               
+            if (count($versionHistoryData) >= 2) {
+                $recentPluginVersion = array_slice($versionHistoryData, -2, 2, false);
                 $data = date("d-m-Y").' - ('.$recentPluginVersion[0].' to '.$recentPluginVersion[1].')';
 
-            }else{ 
+            } else {
                 $data = date("d-m-Y").' ('.$versionHistoryData[0].')';
-            }            
+            }
             $value['newData'] = $data;
             if (isset($value['oldData']) && ($value['oldData'] == $value['newData'])) {
                 $value['oldData'] = "";

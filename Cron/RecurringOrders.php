@@ -242,7 +242,8 @@ class RecurringOrders
     public function getRecurringOrderIds()
     {
         $curdate = date("Y-m-d");
-        $fiveDays = strtotime(date("Y-m-d", strtotime($curdate)) . " +5 day");
+        $orderBufferTime = "+".$this->recurringhelper->getRecurringOrderBufferTime()." day";
+        $fiveDays = strtotime(date("Y-m-d", strtotime($curdate)) . " ".$orderBufferTime);
         $cronDate = date('Y-m-d', $fiveDays);
         $result = $this->transactionCollectionFactory->getCollection()
                 ->addFieldToFilter('status', ['eq' => 'active'])

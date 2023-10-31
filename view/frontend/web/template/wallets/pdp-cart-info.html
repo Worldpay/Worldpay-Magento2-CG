@@ -9,10 +9,10 @@
         <tr class="totals productinfo-header">
             <td width="30%" class="product-img"><%= "Product" %>
             </td>
-            <td width="40%" align="center"  class="product-name">
+            <td width="50%" align="center"  class="product-name">
                 <span class="name"><%= 'Name' %></span>
             </td>
-            <td width="30%" align="center" class="product-price">
+            <td width="20%" align="center" class="product-price">
                 <span class="name"><%= 'Price' %></span>
             </td>
         </tr>
@@ -21,10 +21,17 @@
                 <td width="30%" class="product-img">
                     <span class="image"><img class="product-image-pdp" src="<%= segment.image %>" alt="<%= segment.image %>"></span>                    
                 </td>
-                <td width="40%" align="center"  class="product-name">
-                    <span class="name"><%= segment.name %></span>
+                <td width="50%" align="center"  class="product-name">
+                    <span class="name"><%= segment.name %> </span>
+                    <div class="product-item-details">
+                        <dl class="item-options">
+                            <% _.each(segment.options, function(options, key) { %>
+                            <dt><%= options.label %></dt><dd><%= options.value %></dd>
+                            <% }); %>
+                        </dl>
+                    </div>
                 </td>
-                <td width="30%" align="center" class="product-price">
+                <td width="20%" align="center" class="product-price">
                     <span class="name"><%= segment.subtotal %></span>
                 </td>
             </tr>
@@ -38,5 +45,25 @@
     }
     .checkout-information .productInfo{
         border: 1px solid #aaa;
+    }
+    .product-item-details {
+        display: table-cell;
+        padding-bottom: 35px;
+        vertical-align: top;
+        white-space: normal;
+        width: 99%;
+    }
+    .item-options {
+        display: grid;
+        text-align: center;
+        margin-top: 10px;
+    }
+    dt {
+        grid-column-start: 1;
+    }
+    dd {    
+        grid-column-start: 2;
+        margin-bottom: 5px;
+        margin-left: 10px;
     }
 </style>

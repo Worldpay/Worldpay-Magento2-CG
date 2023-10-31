@@ -22,8 +22,8 @@ require([
                  'Your order number is: %1.',
                  sprintf(
                      '<a href="%s" class="order-number"><strong>%s</strong></a>',
-                     $block->escapeHtml($block->getViewOrderUrl()),
-                     $block->escapeHtml($block->getOrderId())
+                     $escaper->escapeHtml($block->getViewOrderUrl()),
+                     $escaper->escapeHtml($block->getOrderId())
                  )
              )  ?>
             </p>
@@ -31,7 +31,7 @@ require([
             <p>
             <?= /* @noEscape */ __(
                 'Your order # is: <span>%1</span>.',
-                $block->escapeHtml($block->getOrderId())
+                $escaper->escapeHtml($block->getOrderId())
             ) ?>
             </p>
         <?php endif;?>

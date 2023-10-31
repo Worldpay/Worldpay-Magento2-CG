@@ -2,15 +2,19 @@ Latest releases for all supported version:
 
 For Magento 2.4.6
 
+Worldpay Plugin version: 2.4.6-p21023
+1. Magento 2.4.6-p2 compatible
+2. PHP 8.2 compatibility
+
 Worldpay Plugin version: 2.4.6-p10923
 1. Magento 2.4.6-p1 compatible
 2. SEPA Direct
-2. PHP 8.2 compatibility
+3. PHP 8.2 compatibility
 
 Worldpay Plugin version: 2.4.6-rc0523
 1. Magento 2.4.6 compatible
 2. Pay by link for multishipping orders
-2. PHP 8.2 compatibility
+3. PHP 8.2 compatibility
 
 For Magento 2.4.5 
 

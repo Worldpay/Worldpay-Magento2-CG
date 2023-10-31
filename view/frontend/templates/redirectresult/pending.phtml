@@ -1,6 +1,6 @@
 <?php /** @var $block \Magento\Checkout\Block\Onepage\Success */
-$orderUrl = $block->escapeHtml($block->getViewOrderUrl());
-$orderId = $block->escapeHtml($block->getOrderId());
+$orderUrl = $escaper->escapeHtml($block->getViewOrderUrl());
+$orderId = $escaper->escapeHtml($block->getOrderId());
 $errorMsg = '<a href="%s" class="order-number"><strong>%s</strong></a>';
 ?>
 <div class="checkout-success">
@@ -8,7 +8,7 @@ $errorMsg = '<a href="%s" class="order-number"><strong>%s</strong></a>';
         <?php if ($block->getCanViewOrder()):?>
             <p><?= /* @noEscape */ __('Your order number is: %1.', sprintf($errorMsg, $orderUrl, $orderId)) ?></p>
         <?php  else:?>
-            <p><?= /* @noEscape */ __('Your order # is: <span>%1</span>.', $block->escapeHtml($block->getOrderId()))
+            <p><?= /* @noEscape */ __('Your order # is: <span>%1</span>.', $escaper->escapeHtml($block->getOrderId()))
             ?>
             </p>
         <?php endif;?>

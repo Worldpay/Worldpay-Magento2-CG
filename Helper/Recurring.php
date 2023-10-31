@@ -962,7 +962,6 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         
         return $label;
     }
-
     /**
      * Get the list of admin labels
      *
@@ -1096,6 +1095,18 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->scopeConfig->getValue(
             'worldpay/general_config/enable_worldpay',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get Recurring Order Buffer Time
+     *
+     * @return string
+     */
+    public function getRecurringOrderBufferTime()
+    {
+        return $this->scopeConfig->getValue(
+            'worldpay/subscriptions/recurring_order_buffer_time',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }

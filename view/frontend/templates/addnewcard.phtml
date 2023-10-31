@@ -6,16 +6,16 @@
         <legend class="legend">
             <span><?= /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?
                     $block->getAccountLabelbyCode('AC8') :
-                    $block->escapeHtml(__('Card Information'))
+                    $escaper->escapeHtml(__('Card Information'))
             ?>
             </span>
         </legend><br>
 
         <div class="field card type required">
-            <label class="label" for="card_type">
+            <label class="label" for="paymentType">
                 <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO1') ?
                           $block->getCheckoutSpecificLabel('CO1') :
-                          $block->escapeHtml(__('Credit Card Type'));
+                          $escaper->escapeHtml(__('Credit Card Type'));
                 ?>
                 </span>
      <!--       <span>Credit Card Type</span>-->
@@ -24,11 +24,11 @@
             <?php $cctypes = $block->getCCtypes(); ?>
                 <select id="cc_type"
                         name="paymentType"
-                        class="required-entry validate-cc-type-select control-select-new-card">
+                        class="required-entry validate-cc-type-select control-select-new-card paymentType">
                     <option value="" selected="selected">
                     <!--  Card type-->
                     <?= /* @noEscape */ $block->getAccountLabelbyCode('IAVAC2') ?
-                        $block->getAccountLabelbyCode('IAVAC2') : $block->escapeHtml(__('Card type'));
+                        $block->getAccountLabelbyCode('IAVAC2') : $escaper->escapeHtml(__('Card type'));
                     ?>
                     </option>
                     <?php
@@ -41,13 +41,11 @@
                 </select>
             </div>
         </div>
-
-
-        <div class="field card Number">
+        <div class="field card Number required">
             <label class="label" for="card number">
             <span>
                 <?= /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
-                    $block->getAccountLabelbyCode('AC3') : $block->escapeHtml(__('Card Number'))
+                    $block->getAccountLabelbyCode('AC3') : $escaper->escapeHtml(__('Card Number'))
                 ?>
             </span>
             </label>
@@ -55,18 +53,18 @@
                 <input type="number" name="cardNumber" required='true' id="card_number" 
                     title="<?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4')
                         ? $block->getCheckoutLabelbyCode('CO4') :
-                        $block->escapeHtml(__('Card Holder Name'))?>"
+                        $escaper->escapeHtml(__('Card Holder Name'))?>"
                     class="input-text required cardholder_name validate-cc-number 
-                       worldpay-cardholdername-length worldpay-cardnumber-valid">
+                       worldpay-cardholdername-length worldpay-cardnumber-valid cardNumber">
             </div>
             <div id="card_number_msg" style="color:red;font-size: 1.2rem;"></div>
         </div>
 
-        <div class="field card holder name">
+        <div class="field card holder name required">
             <label class="label" for="card holder name">
             <span>
                 <?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
-                    $block->getCheckoutLabelbyCode('CO4') : $block->escapeHtml(__('Card Holder Name'))
+                    $block->getCheckoutLabelbyCode('CO4') : $escaper->escapeHtml(__('Card Holder Name'))
                 ?>
             </span>
             </label>
@@ -74,17 +72,17 @@
                 <input type="text" name="cardHolderName" required='true' id="card-holder-name" 
                        title="<?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
                         $block->getCheckoutLabelbyCode('CO4') :
-                        $block->escapeHtml(__('Card Holder Name'))?>"
-                       class="input-text required cardholder_name worldpay-cardholdername-length">
+                        $escaper->escapeHtml(__('Card Holder Name'))?>"
+                       class="input-text required cardholder_name worldpay-cardholdername-length cardHolderName">
             </div>
         </div>
 
-        <div class="field card expiry month">
+        <div class="field card expiry month required">
             <label class="label" for="expiry">
                 <span>
                     <?= /* @noEscape */ $block->getAccountLabelbyCode('AC10')
                             ? $block->getAccountLabelbyCode('AC10') :
-                              $block->escapeHtml(__('Expiry Month/Year'))?>
+                              $escaper->escapeHtml(__('Expiry Month/Year'))?>
                 </span>
             </label>
             <div class="fields group group-2">
@@ -92,10 +90,10 @@
                     <div class="control">
                         <select id="expiry_month" name="expiryMonth"
                                 class="month required validate-cc-exp required-entry worldpay-month-included 
-                                worldpay-month-length worldpay-month-range">
+                                worldpay-month-length worldpay-month-range expiryMonth">
                             <?php foreach ($block->getMonths() as $k => $v): ?>
-                                <option value="<?= /* @noEscape */ $block->escapeHtml($k) ?>">
-                                <?= /* @noEscape */ $block->escapeHtml($v) ?></option>
+                                <option value="<?= /* @noEscape */ $escaper->escapeHtml($k) ?>">
+                                <?= /* @noEscape */ $escaper->escapeHtml($v) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -106,10 +104,10 @@
                                 class="year required required-entry
                                 worldpay-year-included
                                 worldpay-year-length
-                                worldpay-year-range">
+                                worldpay-year-range expiryYear">
                             <?php foreach ($block->getExpiryYears() as $k => $v): ?>
-                                <option value="<?= /* @noEscape */$block->escapeHtml($k) ?>">
-                                <?= /* @noEscape */ $block->escapeHtml($v) ?></option>
+                                <option value="<?= /* @noEscape */$escaper->escapeHtml($k) ?>">
+                                <?= /* @noEscape */ $escaper->escapeHtml($v) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -120,14 +118,14 @@
             <div class="field required _required cvv">
                 <label for="cvv" class="label">
                     <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO5') ?
-                    $block->getCheckoutSpecificLabel('CO5') : $block->escapeHtml(__('CVV'));
+                    $block->getCheckoutSpecificLabel('CO5') : $escaper->escapeHtml(__('CVV'));
                     ?></span>
                 <!--  <span>CVV</span> -->
                 </label>
                 <div class="control">
                     <input type="password" autocomplete="off" maxlength="4" length="4" id="cvv"
                            class="input-text required cvv saved-cvv-number required-entry 
-                           validate-card-cvv validate-length maximum-length-4"
+                           validate-card-cvv validate-length maximum-length-4 cvc"
                            name="cvc"
                            value="" style="width:12%"/>
                 </div>
@@ -137,11 +135,17 @@
         <!-- Disclaimer -->
         <label for="save-card" class="label">
             <?php if ($block->getStoredCredentialsEnabledValue() && $block->getDisclaimerMessageEnable()): ?> 
-                <span>(<a href="javascript:void(0)" role="important-disclaimer">Important Disclaimer!</a>)</span>
+                <span>(<a href="javascript:void(0)" role="important-disclaimer">
+                <?php
+                    print /* @noEscape */ $escaper->escapeHtml(
+                        $block->getCheckoutLabels('CO9') ?
+                        $block->getCheckoutLabels('CO9') : 'Important Disclaimer!'
+                    )
+                ?></a>)
+                </span>
             <?php endif; ?>
         </label>
-                    
-        <div title="Disclaimer!" id="dialog" style="display: none">
+        <div title="Disclaimer!" id="dialog" style="display: none" >
             <form id="disclaimer" name="disclaimer">
                 <div><?= /* @noEscape */ $block->getDisclaimerText(); ?></div>
             </form>
@@ -151,7 +155,7 @@
         <div class="field billing-address">
             <label class="label" for="billing-address">
                 <span><?php
-                    print /* @noEscape */ $block->escapeHtml(
+                    print /* @noEscape */ $escaper->escapeHtml(
                         $block->getAccountLabelbyCode('IAVAC3') ?
                         $block->getAccountLabelbyCode('IAVAC3') : 'Default Billing Address'
                     )
@@ -179,10 +183,10 @@
                         id ="save_newcard"
                         title="
                             <?= /* @noEscape */ $block->getAccountLabelbyCode('AC39') ?
-                            $block->getAccountLabelbyCode('AC39') : $block->escapeHtml(__('Save'))?>">
+                            $block->getAccountLabelbyCode('AC39') : $escaper->escapeHtml(__('Save'))?>">
                     <span>
                         <?= /* @noEscape */ $block->getAccountLabelbyCode('AC39') ?
-                            $block->getAccountLabelbyCode('AC39') : $block->escapeHtml(__('Save'))?>
+                            $block->getAccountLabelbyCode('AC39') : $escaper->escapeHtml(__('Save'))?>
                     </span>
                 </button>
             </div>
@@ -190,7 +194,6 @@
     </fieldset>
 </form>
 <script>
-    
     require(['jquery',
         'mage/url',
         'prototype'
@@ -198,6 +201,7 @@
         var baseUrl = '<?= /* @noEscape */ $block->getBaseUrl() ?>';
         var typeCamMsg = '<?= /* @noEscape */ $block->getCreditCardSpecificexception('CTYP01') ?>';
         var jwtUrl = baseUrl + 'worldpay/hostedpaymentpage/jwt';
+        
         function createJwt(cardNumber) {
             var bin = cardNumber;
             var encryptedBin = btoa(bin);
@@ -208,6 +212,7 @@
             iframe.style.display = "none";
             document.body.appendChild(iframe);
         }
+
         function validateCVV() {
             var cvv = document.getElementById('cvv').value;
             var numbers = /^[0-9]+$/;
@@ -276,50 +281,92 @@
                     return 'MAESTRO-SSL'
                 }
         }
-        
         function checkCardTypeValidity()
         {
-          document.getElementById("card_number_msg")
+            
+            document.getElementById("card_number_msg")
                             .innerHTML = '';
-          var cardType = document.addnewcardform.paymentType.value;
-          var cardNumberType = getCardType();
-          var typeErrorMsg = 'Card number entered does not match with card type selected';
-          var cardTypeErrorDisplay = typeCamMsg ? typeCamMsg : typeErrorMsg;
-                    if (cardType === cardNumberType) {
-                        return true;
-                    }else if ((cardType === 'CB-SSL' || cardType === 'CARTEBLEUE-SSL')
-                            && cardNumberType === 'ECMC-SSL') {
-                        return true;
-                    }
-                    else {
-                        document.getElementById("card_number_msg")
-                            .innerHTML = cardTypeErrorDisplay;
-                        return false;
-                    }
+            var cardType = document.addnewcardform.paymentType.value;
+            var cardNumberType = getCardType();
+            var typeErrorMsg = 'Card number entered does not match with card type selected';
+            var cardTypeErrorDisplay = typeCamMsg ? typeCamMsg : typeErrorMsg;
+            if (cardType === cardNumberType) {
+                return true;
+            }else if ((cardType === 'CB-SSL' || cardType === 'CARTEBLEUE-SSL')
+                    && cardNumberType === 'ECMC-SSL') {
+                return true;
+            }
+            else {
+                document.getElementById("card_number_msg")
+                    .innerHTML = cardTypeErrorDisplay;
+                return false;
+            }
         }
-        
+        function checkEmptyValidation (){
+            var valid = false;
+            var paymentType = document.addnewcardform.paymentType.value;
+            var cardNumber = document.addnewcardform.cardNumber.value;        
+            var cardHolderName = document.addnewcardform.cardHolderName.value;
+            var expiryMonth = document.addnewcardform.expiryMonth.value;
+            var expiryYear = document.addnewcardform.expiryYear.value;
+            var cvc = document.addnewcardform.cvc.value;
+            const errorHtml = [paymentType,cardNumber,cardHolderName,expiryMonth,expiryYear,cvc];           
+           
+            jQuery.each(errorHtml, function(index, value){  
+                if(!value){
+                    valid = false;
+                    displayError(index);
+                    return false;
+                }else{
+                    valid = true;
+                    jQuery(".errmsg").remove();                     
+                }
+            });
+            return valid;   
+        }
+      
+        function displayError(index){
+            const errorHtml = [
+                            'paymentType',
+                            'cardNumber',
+                            'cardHolderName',
+                            'expiryMonth',
+                            'expiryYear',
+                            'cvc'
+                        ];
+            var value = errorHtml[index];
+            jQuery('.'+value).after(
+                '<span class="errmsg" style="color:red;font-size: 1.2rem;">This field is required</span>'
+            );
+            jQuery('.'+value).focus();                       
+        }
+                
         function onConfirmBtn() {
+            let valid = checkEmptyValidation();
+            if(!valid){
+                return false;
+            }
             var isCvcRequired =  <?= /* @noEscape */
-                $block->escapeHtml(!empty($block->requireCvcEnabled())
+                $escaper->escapeHtml(!empty($block->requireCvcEnabled())
                 ?$block->requireCvcEnabled(): 0); ?>;
             var isCvvValid = isCvcRequired == true ? validateCVV() : true;
             var cvvValid = isCvvValid && checkCardTypeValidity();
             
             mandatoryMessage= parseInt("<?= /* @noEscape */
-                $block->escapeHtml(!empty($block->getDisclaimerMessageMandatory())
+                $escaper->escapeHtml(!empty($block->getDisclaimerMessageMandatory())
                 ?$block->getDisclaimerMessageMandatory():0); ?>");
             disclaimerMessageEnabled = parseInt("<?= /* @noEscape */
-                $block->escapeHtml(!empty($block->getDisclaimerMessageEnable())
+                $escaper->escapeHtml(!empty($block->getDisclaimerMessageEnable())
                 ?$block->getDisclaimerMessageEnable():0); ?>");
             storedCredentials = parseInt("<?= /* @noEscape */
-                $block->escapeHtml(!empty($block->getStoredCredentialsEnabledValue())
+                $escaper->escapeHtml(!empty($block->getStoredCredentialsEnabledValue())
                 ?$block->getStoredCredentialsEnabledValue():0); ?>");
             if (cvvValid && jQuery('#form_add_card').valid() && !(window.isDynamic3DS2Enabled)) {
                 document.getElementById('save_newcard').disabled=true;
                 if(mandatoryMessage && disclaimerMessageEnabled && window.disclaimerDialogue === null){
                         $('#disclaimer-error').css('display', 'block');
                             $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
-            return false;
+                        return false;
                     } 
                 /*if((window.is3DsEnabled)) {
                 createPayment3DS();
@@ -455,25 +502,24 @@
         }
         window.onConfirmBtn = onConfirmBtn;
         $(document).ready(function (){
-          window.disclaimerDialogue=null;
+          window.disclaimerDialogue=null; 
           disclaimerFlag=null;
         });
-    });    
+    });
 </script>
-
 <script type="text/x-magento-init">
     {
         ".page-main": {
             "disclaimerPopup": {
                 "disclaimer": "a[role='important-disclaimer']",
                 "mandatoryMessage": "<?= /* @noEscape */
-                $block->escapeHtml(!empty($block->getDisclaimerMessageMandatory())
+                $escaper->escapeHtml(!empty($block->getDisclaimerMessageMandatory())
                 ?$block->getDisclaimerMessageMandatory():0); ?>",
                 "disclaimerMessageEnabled": "<?= /* @noEscape */
-                $block->escapeHtml(!empty($block->getDisclaimerMessageEnable())
+                $escaper->escapeHtml(!empty($block->getDisclaimerMessageEnable())
                 ?$block->getDisclaimerMessageEnable():0); ?>",
                 "storedCredentials": "<?= /* @noEscape */
-                $block->escapeHtml(!empty($block->getStoredCredentialsEnabledValue())
+                $escaper->escapeHtml(!empty($block->getStoredCredentialsEnabledValue())
                 ?$block->getStoredCredentialsEnabledValue():0); ?>"
             }
         }

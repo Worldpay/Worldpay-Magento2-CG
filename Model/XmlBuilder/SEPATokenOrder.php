@@ -39,7 +39,7 @@ EOD;
     /**
      * @var string
      */
-    private $orderContent; 
+    private $orderContent;
     /**
      * @var array
      */

@@ -8,10 +8,10 @@
 ?>
 <?php if ($block->isApplePayEnableonPdp()) { ?>
 <div id="wp-apple-pay-btn">
-<apple-pay-button buttonstyle="<?= /* @noEscape */ $block->isApplePayButtonColor() ?>"
+<apple-pay-button buttonstyle="<?= /* @noEscape */ $block->isApplePayButtonColorPdp() ?>"
     id = "apple-pay-buy" data-bind="visible: isAppleDevice,click: addtoCartandInitApplePay" 
-    type="<?= /* @noEscape */ $block->isApplePayButtonType() ?>" 
-    locale="<?= /* @noEscape */ $block->isApplePayButtonLocale() ?>">
+    type="<?= /* @noEscape */ $block->isApplePayButtonTypePdp() ?>" 
+    locale="<?= /* @noEscape */ $block->isApplePayButtonLocalePdp() ?>">
 </apple-pay-button></div>
 <style>
 :root {

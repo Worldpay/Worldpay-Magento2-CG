@@ -22,11 +22,12 @@ define(
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Checkout/js/action/set-billing-address',
         'Magento_Ui/js/model/messageList',
+        'Sapient_Worldpay/js/model/disclaimer-confirm',
         'Magento_Checkout/js/view/summary/abstract-total',
         'jquery/ui'        
     ],
     
-    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64,additionalValidators,setBillingAddressAction,globalMessageList) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64,additionalValidators,setBillingAddressAction,globalMessageList,disclaimerConfirm) {
         'use strict';
         //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
@@ -39,11 +40,6 @@ define(
         var disclaimerFlag = null;
         window.disclaimerDialogue = null;
         var ccPayTypes = ko.observableArray([]);
-
-       
-       
-
-        
         var ccMethodClass = this;
         if (quote.billingAddress()) {
             billingAddressCountryId = quote.billingAddress._latestValue.countryId;
@@ -105,10 +101,6 @@ define(
                     }
                 }
             }
-
-
-
-
         //Regex for valid card number.
         function evaluateRegex(data, re) {
             var patt = new RegExp(re);
@@ -146,8 +138,7 @@ define(
                     }
                     }
                 }
-            }
-            
+            }           
            
         // 3DS2 part Start
         
@@ -198,17 +189,17 @@ define(
                 var that = this;
                 this._super();
                     this._super().observe(['cpfData']);
-                quote.billingAddress.subscribe(function (newAddress) {
-                    if (quote.billingAddress._latestValue != null  && quote.billingAddress._latestValue.countryId != billingAddressCountryId) {
-                        billingAddressCountryId = quote.billingAddress._latestValue.countryId;
-                        that.filtercardajax(1);
-                            that.getInstalmentValues(1);
-                            that.billingCountryId(billingAddressCountryId);
-                            //that.reloadCpfSection();
-                        paymentService = true;
-                    }
-                });
-            return this;
+                    quote.billingAddress.subscribe(function (newAddress) {
+                        if (quote.billingAddress._latestValue != null  && quote.billingAddress._latestValue.countryId != billingAddressCountryId) {
+                            billingAddressCountryId = quote.billingAddress._latestValue.countryId;
+                            that.filtercardajax(1);
+                                that.getInstalmentValues(1);
+                                that.billingCountryId(billingAddressCountryId);
+                                //that.reloadCpfSection();
+                            paymentService = true;
+                        }
+                    });
+                    return this;
                 },
                 /**
                  * cpf reload
@@ -304,9 +295,6 @@ define(
                  var payload = {
                     countryId: quote.billingAddress._latestValue.countryId
                 };
-              
-
-
                  fullScreenLoader.startLoader();
 
                  storage.post(
@@ -370,7 +358,6 @@ define(
                                 'ccValue': key,
                                 'ccLabel': value
                             };
-
                           
                          });
                          fullScreenLoader.stopLoader();
@@ -1264,44 +1251,7 @@ define(
                 }
             },
             disclaimerPopup: function(){
-                var that = this;
-                $("#dialog").dialog({
-                    autoResize: true,
-                    show: "clip",
-                    hide: "clip",
-                    height: 350,
-                    width: 450,
-                    autoOpen: false,
-                    modal: true,
-                    position:
-                    {
-                        my: "center",
-                        at: "center",
-                        of: window
-                    },
-                    draggable: false,
-                    buttons: {
-                        Agree: function() { 
-                            $( this ).dialog( "close" );
-                            that.disclaimerFlag = true;
-                            window.disclaimerDialogue = true;
-                        },
-                        Disagree: function() { 
-                            $( this ).dialog( "close" );
-                            that.disclaimerFlag = false;
-                            window.disclaimerDialogue = false;
-                            if(that.isStoredCredentialsEnabled() && that.isDisclaimerMessageEnabled()){
-                                that.saveMyCard = '';
-                                $('#' + that.getCode() + '_save_card').prop( "checked", false );
-                            }
-                        }
-                    },
-                    open: function (type, data) {
-                        $(this).parent().appendTo("#disclaimer");
-                    }
-                });
-                $('#dialog').parent().css('position', 'absolute');
-                $('#dialog').dialog('open');            
+                disclaimerConfirm.openDisclaimer();
             },
             getIntigrationMode: function(){
                 return window.checkoutConfig.payment.ccform.intigrationmode;

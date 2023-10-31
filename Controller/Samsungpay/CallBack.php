@@ -155,6 +155,11 @@ class CallBack extends \Magento\Framework\App\Action\Action
 
     public function execute()
     {
+        $resultRedirect = $this->resultRedirectFactory->create();
+        if (!$this->worldpayHelper->isWorldPayEnable()) {
+           $resultRedirect->setPath('noroute');
+            return $resultRedirect;
+        }
         $order = $this->_checkoutSession->getLastRealOrder();
         if (empty($order->getId())) {
                 $order = $this->checkForMultishippingOrder();
@@ -262,7 +267,6 @@ class CallBack extends \Magento\Framework\App\Action\Action
                     $lastEvent = $paymentService->xpath('//lastEvent');
 
                     if ($lastEvent[0] == 'AUTHORISED') {
-                        $resultRedirect = $this->resultRedirectFactory->create();
                         if ($isMultishipping) {
                             $this->_checkoutSession->unsMultishippingOrderCode();
                             $resultRedirect->setPath('worldpay/wallets/multishippingsuccess');
@@ -272,7 +276,6 @@ class CallBack extends \Magento\Framework\App\Action\Action
                         $this->_checkoutSession->unsauthenticatedOrderId();
                         return $resultRedirect;
                     } else {
-                        $resultRedirect = $this->resultRedirectFactory->create();
                         $resultRedirect->setPath('worldpay/Redirectresult/cancel');
                         $this->orderManagement->cancel($orderId);
                         $this->_checkoutSession->restoreQuote();
@@ -294,7 +297,6 @@ class CallBack extends \Magento\Framework\App\Action\Action
                         $this->orderManagement->cancel($orderId);
                         $this->_checkoutSession->restoreQuote();
             }
-            $resultRedirect = $this->resultRedirectFactory->create();
             $resultRedirect->setPath('worldpay/Redirectresult/cancel');
             
             return $resultRedirect;

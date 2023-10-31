@@ -26,6 +26,11 @@ class Success extends \Magento\Framework\App\Action\Action
       * @var \Sapient\Worldpay\Logger\WorldpayLogger
       */
     protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Data
+     */
+    protected $worldpayHelper;
     /**
      * Constructor
      *
@@ -33,16 +38,19 @@ class Success extends \Magento\Framework\App\Action\Action
      * @param PageFactory $pageFactory
      * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      */
     public function __construct(
         Context $context,
         PageFactory $pageFactory,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
+        \Sapient\Worldpay\Helper\Data $worldpayHelper,
     ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
         $this->wplogger = $wplogger;
+        $this->worldpayHelper = $worldpayHelper;
         return parent::__construct($context);
     }
    /**
@@ -52,6 +60,11 @@ class Success extends \Magento\Framework\App\Action\Action
     */
     public function execute()
     {
+        $resultRedirect = $this->resultRedirectFactory->create();
+        if (!$this->worldpayHelper->isWorldPayEnable()) {
+            $resultRedirect->setPath('noroute');
+            return $resultRedirect;
+        }
         $this->wplogger->info('worldpay returned success url');
         $this->orderservice->redirectOrderSuccess();
         $order = $this->orderservice->getAuthorisedOrder();
@@ -59,8 +72,8 @@ class Success extends \Magento\Framework\App\Action\Action
         $this->orderservice->removeAuthorisedOrder();
         if ($worldpaypayment->getIsMultishippingOrder()) {
             $url = 'multishipping/checkout/success';
-            return $this->resultRedirectFactory->create()->setPath($url, ['_current' => true]);
+            return $resultRedirect->setPath($url, ['_current' => true]);
         }
-        return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success', ['_current' => true]);
+        return $resultRedirect->setPath('checkout/onepage/success', ['_current' => true]);
     }
 }

@@ -87,7 +87,6 @@ define(
                 ach_routingNumber:null,
                 sepa_iban:null,
                 sepa_accountHolderName:null,
-                sepa_mandateType:null,
                 statementNarrative:null,
                 multishipping:false,
                 klarnaType:null
@@ -282,10 +281,6 @@ define(
                 var accounttypes = window.checkoutConfig.payment.ccform.achdetails;
                 return accounttypes[code];
             },
-            getSEPAMandateTypes: function(code) {
-                var mandatetypes = window.checkoutConfig.payment.ccform.sepadetails;
-                return mandatetypes[code];
-            },
             /**
              * @override
              */
@@ -302,7 +297,6 @@ define(
                         'ach_checknumber': this.ach_checknumber,
                         'ach_companyname': this.ach_companyname,
                         'ach_emailaddress': this.ach_emailaddress,
-                        'sepa_mandateType': this.sepa_mandateType,
                         'sepa_iban': this.sepa_iban,
                         'sepa_accountHolderName': this.sepa_accountHolderName,
                         'statementNarrative': this.statementNarrative
@@ -383,7 +377,6 @@ define(
                         
                     }
                     else if(this.getselectedCCType() == 'SEPA_DIRECT_DEBIT-SSL'){
-                        this.sepa_mandateType = this.getSEPAMandateTypes(this.selectedSEPAMandateType());
                         this.sepa_iban = this.sepaIban();
                         this.sepa_accountHolderName = this.sepaAccountHolderName();                        
                     }

@@ -1,15 +1,24 @@
 <!-- ko if: ( isActive())-->
-  <div class="payment-applepay-checkout">
-    <apple-pay-button buttonstyle="black" click="initApplePay" type="buy" locale="en-GB"></apple-pay-button>
-    <style>
-        apple-pay-button {
-          --apple-pay-button-width: 110px;
-          --apple-pay-button-height: 37px;
-          --apple-pay-button-border-radius: 5px;
-          --apple-pay-button-padding: 5px 0px;
-          display: inline-block;
-          width:100%;
-    }
-    </style>
-  </div>
+<div class="payment-applepay-checkout">
+  <apple-pay-button 
+  data-bind="
+    click: initApplePay,
+    attr: {
+          type: applepayConfig()['type'],
+          buttonstyle: applepayConfig()['color'],
+          locale: applepayConfig()['locale'] 
+        }"
+  >
+  </apple-pay-button>
+  <style>
+      apple-pay-button {
+        --apple-pay-button-width: 110px;
+        --apple-pay-button-height: 37px;
+        --apple-pay-button-border-radius: 5px;
+        --apple-pay-button-padding: 5px 0px;
+        display: inline-block;
+        width:100%;
+  }
+  </style>
+</div>
 <!-- /ko -->

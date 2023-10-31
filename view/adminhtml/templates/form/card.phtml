@@ -1,5 +1,5 @@
 <?php
-$clientKey = $block->escapeHtml($block->getClientKey());
+$clientKey = $escaper->escapeHtml($block->getClientKey());
 
 
 $saveCardEnabled = $block->saveCardEnabled();
@@ -23,7 +23,7 @@ $wpData = [
 $serializedFormData = $block->getJsonData($wpData);
 ?>
 <fieldset class="admin__fieldset payment-method"
-          id="payment_form_<?= $block->escapeHtml($block->getMethodCode()) ?>"
+          id="payment_form_<?= $escaper->escapeHtml($block->getMethodCode()) ?>"
           style="display: none"
           data-mage-init='{"worldpayForm":<?= /* @noEscape */ $serializedFormData; ?>}'>
    <div class="admin__field _required">
