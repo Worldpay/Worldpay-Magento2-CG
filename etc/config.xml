@@ -13,7 +13,7 @@
                 <enabled>1</enabled>
                 <title>Credit Cards</title>
                 <paymentmethods>AMEX-SSL,VISA-SSL,ECMC-SSL</paymentmethods>
-                <cse_enabled>0</cse_enabled>
+                <cse_enabled>1</cse_enabled>
                 <require_cvc>1</require_cvc>
                 <integration_mode>direct</integration_mode>
             </cc_config>
@@ -199,5 +199,12 @@
                 <can_use_for_worldpay_subscription>0</can_use_for_worldpay_subscription>
             </worldpay_paybylink>
         </payment>
+        <dev>
+            <js>
+               <minify_exclude>
+                  <exclude_name>../chromepay/sw.js</exclude_name>
+                </minify_exclude>
+             </js>
+        </dev>
     </default>
 </config>

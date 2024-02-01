@@ -192,7 +192,7 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
         } else {
             $value['newVersion'] = isset($currentVersion['newVersion'])?$currentVersion['newVersion']:"";
         }
-        $currentVersionHistoryDataAry = explode(',', $currentVersionHistoryData);
+        $currentVersionHistoryDataAry = explode(',', (string) $currentVersionHistoryData);
         $value['is_new_version'] = false;
         if (!in_array($value['newVersion'], $currentVersionHistoryDataAry)) {
             $value['is_new_version'] = true;

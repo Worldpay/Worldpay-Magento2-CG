@@ -102,6 +102,13 @@ return Component.extend({
             }
         }
         return true;
+    },
+    samsungPayButton: function(){
+        var paybuttonPath = window.checkoutConfig.payment.ccform.samsungPayButton;
+        if(!paybuttonPath){
+            paybuttonPath = 'pay-card';
+        }
+        return require.toUrl('Sapient_Worldpay/images/samsungpay/'+paybuttonPath+'.png');
     }
 });
 });

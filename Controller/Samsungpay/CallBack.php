@@ -1,6 +1,5 @@
 <?php
 
-//error_reporting(0);
 /**
  * @copyright 2017 Sapient
  */
@@ -157,7 +156,7 @@ class CallBack extends \Magento\Framework\App\Action\Action
     {
         $resultRedirect = $this->resultRedirectFactory->create();
         if (!$this->worldpayHelper->isWorldPayEnable()) {
-           $resultRedirect->setPath('noroute');
+            $resultRedirect->setPath('noroute');
             return $resultRedirect;
         }
         $order = $this->_checkoutSession->getLastRealOrder();

@@ -1230,6 +1230,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+
+    /**
+     * Get Samsung Pay Button Type
+     *
+     * @return string
+     */
+    public function getSamsungPayButtonType()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/wallet/samsungpay_ssl/samsungpay_button_type',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
     /**
      * Get is Dynamic 3DS2 Enabled
      *
@@ -2785,11 +2799,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $mageDetails = [];
         $mageDetails['platform'] = __('Magento');
-        if($this->productMetaData->getEdition()){
-           $mageDetails['edition'] = __('Magento_').$this->productMetaData->getEdition();
+        if ($this->productMetaData->getEdition()) {
+            $mageDetails['edition'] = __('Magento_').$this->productMetaData->getEdition();
         }
-        if($this->productMetaData->getVersion()){
-           $mageDetails['version'] = $this->productMetaData->getVersion();
+        if ($this->productMetaData->getVersion()) {
+            $mageDetails['version'] = $this->productMetaData->getVersion();
         }
         return $mageDetails;
     }

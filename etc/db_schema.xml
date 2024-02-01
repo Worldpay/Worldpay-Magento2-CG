@@ -296,4 +296,29 @@
       <column name="id"/>
     </constraint>
   </table>
+  <table name="worldpay_subscription_edit_history" resource="default" engine="innodb" comment="Worldpay Subscription Edit History">
+    <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
+    <column xsi:type="int" name="subscription_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Subscription Id"/>
+    <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Customer Id"/>
+    <column xsi:type="text" name="old_data" nullable="false" comment="Old Subscription Data"/>
+    <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+    <column xsi:type="timestamp" name="modified_date" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Modified At"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="entity_id"/>
+    </constraint>
+  </table>
+  <table name="worldpay_subscription_skip_orders" resource="default" engine="innodb" comment="Worldpay Subscription Edit History">
+    <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
+    <column xsi:type="int" name="subscription_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Subscription Id"/>
+    <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Customer Id"/>
+    <column xsi:type="smallint" name="is_skipped" padding="5" unsigned="true" nullable="false" default="1" identity="false" comment="Is Skipped"/>
+    <column xsi:type="timestamp" name="old_recurring_date" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Old Recurring Date"/>
+    <column xsi:type="timestamp" name="new_recurring_date" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="New Recurring Date"/>
+    <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+    <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated At"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="entity_id"/>
+    </constraint>
+  </table>
+
 </schema>

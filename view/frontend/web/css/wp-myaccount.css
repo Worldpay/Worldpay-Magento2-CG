@@ -1,0 +1,191 @@
+.wp-right {
+    text-align: right !important;
+}
+.wp-error{
+    color: #e02b27;
+    font-size: 1.2rem;
+}
+.mb-20{
+    margin-bottom: 20px;
+}
+.mb-30{
+    margin-bottom: 30px;
+}
+.worldpay-savedcard-addnewcard .form-edit-account #dialog{
+    display: none;
+}
+.worldpay-savedcard-addnewcard .form-edit-account #cvv{
+    width:12%;
+}
+
+.worldpay-recurring-edit .box-order-billing-address .box-content{
+    padding-left: 10px;
+}
+.worldpay-recurring-edit .box-order-shipping-address .box-title{
+    margin-left: 30px!important;
+}
+.worldpay-recurring-edit .box-order-shipping-address .box-content{
+    padding-left: 40px;
+    border-left: 1.5px solid #808080a3;
+}
+.worldpay-recurring-edit .field.product-name,
+.worldpay-recurring-edit .field.plan{
+    width: 25%;
+    float: left;
+    clear: none;
+}
+.worldpay-recurring-edit .field.plan{
+    border-left: 1.5px solid #808080a3;
+    padding-left: 30px;
+}
+.worldpay-recurring-edit .payment-method p,
+.worldpay-recurring-edit .payment-method span{
+    float: left;
+    padding-right: 40px;
+}
+@media only screen and (max-width: 768px){
+    .worldpay-recurring-edit .account .column.main .block:not(.widget) .block-content .box:last-child {
+        margin-bottom: 30px;
+    }
+    .worldpay-recurring-edit .box-order-shipping-address .box-title{
+        margin-left: 0px!important;
+    }
+    .worldpay-recurring-edit .box-order-shipping-address .box-content{
+        padding-left: 10px;
+        border-left: none;
+        margin-bottom: 20px;
+    }
+    .worldpay-recurring-edit .field.plan{
+        border-left: none;
+        padding-left: 0px;
+    }
+    .worldpay-recurring-edit .field.product-name,
+    .worldpay-recurring-edit .field.plan{
+        width: 100%;
+        float: none;
+        clear: none;
+    }    
+    .worldpay-recurring-edit .payment-method span{
+        padding-bottom: 30px;
+    }
+    .worldpay-recurring-edit .modal-popup.modal-slide {
+        left: 25px;
+        right: 25px;
+    }
+    .worldpay-recurring-edit .all-recurring-order-mobile{
+        display: block;
+        margin: 10px 0;
+    }
+    .worldpay-recurring-edit .all-recurring-order-desktop{
+        display: none;
+    }
+    .worldpay-recurring-edit .upcoming-delivery.desktop{
+        display: none;
+    }
+    .modal-popup .modal-footer .add-new-btn {
+        float: right;
+    }
+}
+.worldpay-recurring-edit .skip-next-order a.action.primary{
+    float: none;
+}
+.worldpay-recurring-edit .skip-next-order strong{
+    color: #eb5202;
+}
+@media only screen and (min-width: 768px){
+    .worldpay-recurring-edit .actions-toolbar{
+        text-align: right;
+    }
+    .worldpay-recurring-edit h1.page-title{
+        margin-bottom: 15px;
+    }
+    .worldpay-recurring-edit .skip-next-order{
+        margin-top: -50px;
+    }    
+    .worldpay-recurring-edit .upcoming-delivery{
+        float: right;
+        margin-top: 6px;
+        font-size: 11px!important;
+    }
+    .worldpay-recurring-edit .upcoming-delivery.mobile{
+        display: none;
+    }
+    
+    .worldpay-recurring-edit .all-recurring-order-mobile{
+        display: none;
+    }
+    .worldpay-recurring-edit .all-recurring-order-desktop{
+        display: block;
+        float: right;
+        margin-top: 6px;
+    }
+    .modal-popup .modal-footer .add-new-btn {
+        float: left;
+    }
+}
+.worldpay-recurring-edit .change-shipping-address-modal .shipping-modal-body-content label,
+.worldpay-recurring-edit .change-shipping-address-modal .shipping-information-title span,
+.worldpay-recurring-edit .change-payment-method-modal .payment-modal-body-content .label{
+    font-weight: 600;
+}
+.worldpay-recurring-edit .change-shipping-address-modal #ship-address-dropdown,
+.worldpay-recurring-edit .change-shipping-address-modal .shipping-information-content{
+    margin-top: 8px;
+}
+.worldpay-recurring-edit .change-shipping-address-modal .successmsg,
+.worldpay-recurring-edit .change-payment-method-modal .successmsg{
+    color: #006400;;
+}
+.worldpay-recurring-edit .modal-popup .action-close{
+    display: none;
+}
+.worldpay-recurring-edit .modal-popup .modal-footer{
+    padding-bottom: 2rem;
+    padding-top: 2rem;
+}
+.worldpay-recurring-edit .modal-popup .modal-header h1{
+    color: #333;
+    font-weight: bold;
+    font-size:1em;
+    margin-top:-10px;
+}
+.worldpay-recurring-edit .modal-popup.modal-slide .modal-inner-wrap {
+    margin: 10rem auto;
+    height: auto!important;
+}
+.worldpay-recurring-edit .change-payment-method-modal .modal-content {
+    max-height: 35vh;
+    overflow: auto;
+}
+.worldpay-recurring-edit .change-payment-method-modal .paymentmethods-radio-wrapper{
+    margin: 10px 0;
+}
+.worldpay-recurring-edit .change-payment-method-modal .paymentmethods-radio-wrapper span.expired {
+    color: red;
+}
+.worldpay-recurring-edit #change-shipping-address,
+.worldpay-recurring-edit #change-payment-method {
+    cursor: pointer;
+}
+#change_shipping_modal .error,
+#change_payment_modal .error{
+    color:#ed0b02;
+}
+#change_shipping_modal .success,
+#change_payment_modal .success{
+    color: #008000;
+}
+.upcoming-delivery{
+    background: #eb5202;
+    color: white;
+    border-radius: 5px;
+    font-size: 9px;
+    padding: 2px 5px;
+    width: fit-content;
+    animation: blinker 2s linear infinite;
+}
+@keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+}

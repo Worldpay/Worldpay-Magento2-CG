@@ -8,6 +8,9 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="customer_account"/>
+    <head>
+        <css src="Sapient_Worldpay::css/wp-myaccount.css" />         
+    </head>
     <body>
         <referenceContainer name="content">
             <block class="Sapient\Worldpay\Block\Recurring\Customer\Subscriptions" name="subscription_list"

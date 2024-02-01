@@ -8,9 +8,9 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="customer_account"/>
-<!--    <head>
-        <css src="Sapient_Worldpay::styles.css"/>
-    </head>-->
+    <head>
+        <css src="Sapient_Worldpay::css/wp-myaccount.css" />         
+    </head>
     <body>
         <referenceContainer name="content">
             <block class="Sapient\Worldpay\Block\Recurring\Customer\Subscriptions\Edit"
@@ -18,6 +18,16 @@
                    template="recurring/customer/subscription/edit.phtml"
                    cacheable="false"
             />
+            <block class="Sapient\Worldpay\Block\Recurring\Customer\Subscriptions\OrderInfo" as="worldpay_recurring_orderinfo" name="worldpay.recurring.sales.order.info" after="subscription_edit">
+                 
+                 <container name="recurring.additional.info" as="recurring_additional_info"/>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="recurring.additional.info">
+                <block class="Sapient\Worldpay\Block\Recurring\Customer\Subscriptions\OrderInfo\AddressInfo" as="worldpay_recurring_addressinfo" name="worldpay.recurring.sales.order.info.address" cacheable="false">
+                 </block>
+                <block class="Magento\Framework\View\Element\Template" as="worldpay_recurring_tokens" name="worldpay.recurring.sales.order.tokens"  template="Sapient_Worldpay::recurring/edit/tokens.phtml" cacheable="false">
+                </block>
         </referenceContainer>
     </body>
 </page>

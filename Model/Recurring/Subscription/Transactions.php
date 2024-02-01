@@ -21,7 +21,7 @@ class Transactions extends AbstractModel
     private $subscription;
 
     /**
-     * Transactions constructor
+     * Initialize resource model
      *
      * @return void
      */
@@ -123,5 +123,20 @@ class Transactions extends AbstractModel
         }
         $id = $this->getResource()->loadById($entityId);
             return $this->load($id);
+    }
+
+    /**
+     * Load Subscription Active order Details
+     *
+     * @param int $subscriptionId
+     * @return array
+     */
+    public function loadBySubscriptionIdActive($subscriptionId)
+    {
+        if (!$subscriptionId) {
+            return;
+        }
+        $id = $this->getResource()->loadBySubscriptionIdActive($subscriptionId);
+           return $this->load($id);
     }
 }
