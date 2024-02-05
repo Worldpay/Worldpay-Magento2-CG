@@ -1,4 +1,11 @@
 Latest releases for all supported version:
+For Magento 2.4.7
+
+Worldpay Plugin version: 2.4.7-rc0124
+1. Magento 2.4.7-beta2 compatible
+2. PHP 8.2 & 8.1 ompatibility
+3. Scurity enhancement for Client side encryption
+4. Enhanced feature Subscription & Recurring
 
 For Magento 2.4.6
 

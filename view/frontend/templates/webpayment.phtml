@@ -555,12 +555,26 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     let expiryMonth = instrumentResponse.details.expiryMonth;
     let expiryYear = instrumentResponse.details.expiryYear;
     let encyptedCseData = cseData.length>0 ? cseData : null;
-     
-    //Add payment information and place the order
-    var paymentDetails = {
-    "paymentMethod": {
-    "method": "worldpay_cc",
-            "additional_data": {
+    var additionalData = "";
+    if(encyptedCseData){
+        additionalData = {
+                    "cc_cid" : "",
+                    "cc_type" : "",
+                    "cc_exp_year" : "",
+                    "cc_exp_month" : "",
+                    "cc_number" : "",
+                    "cc_name" : "",
+                    "save_my_card" : false,
+                    "cse_enabled" : isClientSideEncryptionEnabled(),
+                    "encryptedData" : encyptedCseData,
+                    "tokenCode" : null,
+                    "isSavedCardPayment" : false,
+                    "isChromePay" : "1",
+                    "dfReferenceId": window.sessionId
+            }
+
+    }else{
+        additionalData = {
             "cc_cid" : cvc,
                     "cc_type" : cardType,
                     "cc_exp_year" : expiryYear,
@@ -575,6 +589,16 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
                     "isChromePay" : "1",
                     "dfReferenceId": window.sessionId
             }
+
+    }
+
+
+
+    //Add payment information and place the order
+    var paymentDetails = {
+    "paymentMethod": {
+    "method": "worldpay_cc",
+            "additional_data": additionalData
     },
             "billing_address": {
             "email": instrumentResponse.payerEmail,

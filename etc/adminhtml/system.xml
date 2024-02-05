@@ -104,13 +104,23 @@
                     <label>Payment Methods</label>
                     <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethodsCC</source_model>
                 </field>
+                <field id="cse_custom_popup" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\System\Config\CsePopup</frontend_model>
+                </field>
                 <field id="cse_enabled" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Client Side Encryption Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Highly Recommended: Client Side Encryption must be enabled to secure shoppers card details]]> 
+                    </comment>
                 </field>
                 <field id="cse_public_key" translate="label" type="textarea" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Public Key</label>
                     <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="cse_enabled">1</field>
+                    </depends>
                 </field>
                 <field id="require_cvc" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Require CVC</label>
@@ -730,6 +740,15 @@
                     <label>Recurring Order Buffer Time (in days)</label>
                     <validate>validate-number validate-zero-or-greater validate-not-negative-number</validate>
                 </field>
+                <field id="recurring_order_reminder_email" translate="label" type="select" sortOrder="18" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recurring Order Reminder Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <comment>Will be  send 10 days before buffer time</comment>
+                </field>
+                <field id="skip_order_notification_email" translate="label" type="select" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Skip Order Notification Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
             </group>
             <!-- Miscellaneous -->
             <group id="miscellaneous" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -1207,23 +1226,11 @@
                         </field>      
                     </group>
                     <group id="samsungpay_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Samsung Pay </label>
-                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Use Custom Logo</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        </field> 
-                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                                <label>Logo</label>
-                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
-                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
-                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
-                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
-                                <ul style="margin-left: 2em;">
-                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
-                                </ul>
-                                ]]></comment>
-                                <depends><field id="enabled">1</field></depends>
-                        </field>            
+                        <label>Samsung Pay </label>       
+                        <field id="samsungpay_button_type" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Button Type</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\SamsungPayButtonTypes</source_model>
+                        </field>  
                     </group>                    
                     <depends>
                         <field id="worldpay/payment_method_logo_config/payment_method_logo_config_enabled">1</field>

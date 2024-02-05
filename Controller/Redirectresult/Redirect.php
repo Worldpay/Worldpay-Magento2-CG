@@ -64,7 +64,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
     {
         $resultRedirect = $this->resultRedirectFactory->create();
         if (!$this->worldpayHelper->isWorldPayEnable()) {
-           $resultRedirect->setPath('noroute');
+            $resultRedirect->setPath('noroute');
             return $resultRedirect;
         }
         $redirecturl = $this->checkoutsession->getWpRedirecturl();

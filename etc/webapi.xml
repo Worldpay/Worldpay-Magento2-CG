@@ -31,4 +31,28 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+     <route url="/V1/worldpay/mine/estimate-recurring-shipping-methods" method="POST">
+        <service class="Sapient\Worldpay\Api\RecurringShippingMethodInterface" method="getShippingMethod"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+     <route url="/V1/worldpay/mine/update-recurring-shipment" method="POST">
+        <service class="Sapient\Worldpay\Api\UpdateRecurringShipmentInterface" method="updateRecurringShipment"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/worldpay/mine/get-customer-payment-tokens" method="POST">
+        <service class="Sapient\Worldpay\Api\CustomerPaymentTokenInterface" method="getAllPaymentTokens"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/worldpay/mine/update-recurring-payment-token" method="POST">
+        <service class="Sapient\Worldpay\Api\UpdateRecurringTokenInterface" method="updateRecurringPaymentToken"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

@@ -91,4 +91,21 @@ class Transactions extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $id = $this->getConnection()->fetchOne($sql);
         return $id;
     }
+
+    /**
+     * Load Active Transcation detail by $subscriptionId
+     *
+     * @param int $subscriptionId
+     * @return int $id
+     */
+    public function loadBySubscriptionIdActive($subscriptionId)
+    {
+        $active = "active";
+        $table = $this->getMainTable();
+        $where = $this->getConnection()->quoteInto("subscription_id = ?", $subscriptionId);
+        $whereTwo = $this->getConnection()->quoteInto("status = ?", $active);
+        $sql = $this->getConnection()->select()->from($table, ['entity_id'])->where($where)->where($whereTwo);
+        $id = $this->getConnection()->fetchOne($sql);
+        return $id;
+    }
 }

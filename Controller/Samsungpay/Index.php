@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+
 /**
  * @copyright 2017 Sapient
  */
@@ -119,7 +119,7 @@ class Index extends \Magento\Framework\App\Action\Action
         if (!$this->worldpayHelper->isWorldPayEnable()) {
             $resultRedirect->setPath('noroute');
              return $resultRedirect;
-         }
+        }
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         
         $serviceId = $this->scopeConfig->

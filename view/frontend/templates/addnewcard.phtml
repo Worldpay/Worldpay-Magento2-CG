@@ -57,7 +57,7 @@
                     class="input-text required cardholder_name validate-cc-number 
                        worldpay-cardholdername-length worldpay-cardnumber-valid cardNumber">
             </div>
-            <div id="card_number_msg" style="color:red;font-size: 1.2rem;"></div>
+            <div id="card_number_msg" class="wp-error"></div>
         </div>
 
         <div class="field card holder name required">
@@ -127,9 +127,9 @@
                            class="input-text required cvv saved-cvv-number required-entry 
                            validate-card-cvv validate-length maximum-length-4 cvc"
                            name="cvc"
-                           value="" style="width:12%"/>
+                           value=""/>
                 </div>
-                <div id="cvv_msg" style="color:red;font-size: 1.2rem;"></div>
+                <div id="cvv_msg" class="wp-error"></div>
             </div> 
     <?php endif; ?>
         <!-- Disclaimer -->
@@ -145,7 +145,7 @@
                 </span>
             <?php endif; ?>
         </label>
-        <div title="Disclaimer!" id="dialog" style="display: none" >
+        <div title="Disclaimer!" id="dialog">
             <form id="disclaimer" name="disclaimer">
                 <div><?= /* @noEscape */ $block->getDisclaimerText(); ?></div>
             </form>
@@ -335,9 +335,7 @@
                             'cvc'
                         ];
             var value = errorHtml[index];
-            jQuery('.'+value).after(
-                '<span class="errmsg" style="color:red;font-size: 1.2rem;">This field is required</span>'
-            );
+            jQuery('.'+value).after('<span class="errmsg wp-error">This field is required</span>');
             jQuery('.'+value).focus();                       
         }
                 
