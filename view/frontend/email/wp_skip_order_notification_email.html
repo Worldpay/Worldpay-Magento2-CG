@@ -1,0 +1,58 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@vars {
+"var mail_subject|raw":"Mail Subject",
+"var customerName|raw":"Customer Full Name",
+"var recurring_date":"Recurring Date",
+"var orderId":"Order Id",
+"var order_data.formattedBillingAddress|raw":"Billing Address",
+"var order_data.formattedShippingAddress|raw":"Shipping Address",
+"var order_data.payment_html|raw":"Payment Details",
+"var order_data.order.shipping_description":"Shipping Description",
+"var shipping_msg":"Shipping message",
+"var order_data.order":"Order",
+"var order_data.order_id": "Order DB Id",
+"var order_data.is_not_virtual":"Order Type"
+} @-->
+<!--@subject {{var mail_subject|raw }} @-->
+{{template config_path="design/email/header_template"}}
+<p>{{trans "Hi"}} {{var customerName}},</p><br>
+<p>Your next recurring order (<b style="color: red;">{{var recurring_date}}</b>) has been skipped successfully.</p>
+<h2>{{trans "Order Information"}}:</h2>
+<table class="order-details">
+    <tr>
+        <td class="address-details">
+            <h3>{{trans "Billing Info"}}</h3>
+            <p>{{var order_data.formattedBillingAddress|raw}}</p>
+        </td>
+        {{depend order_data.is_not_virtual}}
+        <td class="address-details">
+            <h3>{{trans "Shipping Info"}}</h3>
+            <p>{{var order_data.formattedShippingAddress|raw}}</p>
+        </td>
+        {{/depend}}
+    </tr>
+    <tr>
+        <td class="method-info">
+            <h3>{{trans "Payment Method"}}</h3>
+            {{var order_data.payment_html|raw}}
+        </td>
+        {{depend order_data.is_not_virtual}}
+        <td class="method-info">
+            <h3>{{trans "Shipping Method"}}</h3>
+            <p>{{var order_data.order.shipping_description}}</p>
+            {{if shipping_msg}}
+            <p>{{var shipping_msg}}</p>
+            {{/if}}
+        </td>
+        {{/depend}}
+    </tr>
+</table>
+{{layout handle="sales_email_order_items" order_id=$order_data.order_id area="frontend"}}
+<br><br>
+<p>{{trans "If you have any questions or encounter any issues, feel free to reach out to our customer support."}} </p>
+{{template config_path="design/email/footer_template"}} 

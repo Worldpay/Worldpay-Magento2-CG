@@ -599,7 +599,7 @@ class Multishipping
      */
     public function getQuote($quoteId = null)
     {
-        $quote = $this->_checkoutSession->getQuote();
+        $quote = $this->checkoutSession->getQuote();
         return $quote;
     }
     /**

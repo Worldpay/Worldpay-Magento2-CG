@@ -7,6 +7,7 @@ namespace Sapient\Worldpay\Helper;
 
 use Sapient\Worldpay\Model\Config\Source\Interval;
 use Sapient\Worldpay\Model\Config\Source\TrialInterval;
+use Sapient\Worldpay\Model\Recurring\Subscription\Transactions;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -15,7 +16,8 @@ use Magento\Framework\Serialize\SerializerInterface;
 class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 {
     public const PENDING_RECURRING_PAYMENT_ORDER_STATUS = 'pending_recurring_payment';
-
+    public const RECURRING_ORDER_SKIP_DAYS_UPTO = 9;
+    
     /**
      * Product type ids supported to act as subscriptions
      *
@@ -142,6 +144,21 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Integration\Model\Oauth\TokenFactory
      */
     protected $_tokenModelFactory;
+
+    /**
+     * @var $orderRepository
+     */
+    protected $orderRepository;
+    /**
+     * @var \Magento\Customer\Model\Address\Config
+     */
+    protected $_addressConfig;
+
+    /**
+     * @var CollectionFactory
+     */
+    private $transactionCollectionFactory;
+
     /**
      * Recurring constructor
      * @param \Magento\Framework\App\Helper\Context $context
@@ -166,6 +183,9 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory
      * @param SerializerInterface $serializer
      * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
+     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
+     * @param \Magento\Customer\Model\Address\Config $addressConfig
+     * @param Transactions $recurringTransactions
      */
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
@@ -189,7 +209,10 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Integration\Model\Oauth\TokenFactory $tokenModelFactory,
         SerializerInterface $serializer,
-        \Sapient\Worldpay\Helper\CurlHelper $curlHelper
+        \Sapient\Worldpay\Helper\CurlHelper $curlHelper,
+        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
+        \Magento\Customer\Model\Address\Config $addressConfig,
+        Transactions $recurringTransactions
     ) {
         parent::__construct($context);
         $this->plansCollectionFactory = $plansCollectionFactory;
@@ -210,6 +233,9 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_tokenModelFactory = $tokenModelFactory;
         $this->serializer = $serializer;
         $this->curlHelper = $curlHelper;
+        $this->orderRepository = $orderRepository;
+        $this->_addressConfig = $addressConfig;
+        $this->transactionCollectionFactory = $recurringTransactions;
     }
 
     /**
@@ -962,7 +988,6 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         
         return $label;
     }
-
     /**
      * Get the list of admin labels
      *
@@ -1098,5 +1123,113 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             'worldpay/general_config/enable_worldpay',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
+    }
+    /**
+     * Get Recurring Order Buffer Time
+     *
+     * @return string
+     */
+    public function getRecurringOrderBufferTime()
+    {
+        return $this->scopeConfig->getValue(
+            'worldpay/subscriptions/recurring_order_buffer_time',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get Recurring Order Reminder Email Template
+     *
+     * @return string
+     */
+    public function getRecurringOrderReminderEmail()
+    {
+        return $this->scopeConfig->getValue(
+            'worldpay/subscriptions/recurring_order_reminder_email',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get Order Details
+     *
+     * @param int $orderId
+     */
+    public function getOrderDetails($orderId)
+    {   
+        $order = $this->orderRepository->get($orderId);
+        $billingAddress = $order->getBillingAddress()->getData();
+        $formattedShippingAddress = '';
+        if ($order->getIsNotVirtual()) {
+            $shippingAddress = $order->getShippingAddress()->getData();
+            $formattedShippingAddress = $this->getFormatAddressByCode($shippingAddress);
+        }
+        
+        $paymentMethod = $order->getPayment()->getAdditionalInformation('method_title');
+        $orderDetails = [
+            'order' => $order,
+            'order_id' => $order->getId(),
+            'payment_html' => $paymentMethod,
+            'formattedBillingAddress' => $this->getFormatAddressByCode($billingAddress),
+            'formattedShippingAddress' => $formattedShippingAddress,
+            'is_not_virtual' => $order->getIsNotVirtual()
+        ];
+        return $orderDetails;
+    }
+
+    /**
+     * Format Shipping Address
+     *
+     * @param array $address
+     * @return array
+     */
+    public function getFormatAddressByCode($address)
+    {
+        $renderer = $this->_addressConfig->getFormatByCode('html')->getRenderer();
+        return $renderer->renderArray($address);
+    }
+
+    /**
+     * Get next recurring order
+     *
+     * @param int $subscriptionId
+     * @param int $customerId
+     * @return array
+     */
+    public function getNextRecurringOrder($subscriptionId,$customerId)
+    {
+        $nextOrder = $this->getNextRecurringOrderCollection($subscriptionId,$customerId);
+        if (!empty($nextOrder)) {
+            $curdate = date("Y-m-d");
+            $skipDays = self::RECURRING_ORDER_SKIP_DAYS_UPTO;
+            $days = $this->getRecurringOrderBufferTime() + $skipDays;
+            $endDate = strtotime(date("Y-m-d", strtotime($curdate)) . " +".$days." day");
+            $nextOrderDate = strtotime($nextOrder->getRecurringDate());
+            $recurringEndDate = strtotime($nextOrder->getRecurringEndDate());
+            if (($nextOrderDate <= $endDate) && ($nextOrderDate <= $recurringEndDate)) {
+                return $nextOrder;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get next recurring order collection
+     *
+     * @param int $subscriptionId
+     * @param int $customerId
+     * @return array
+     */
+    public function getNextRecurringOrderCollection($subscriptionId,$customerId)
+    {
+        $curdate = date("Y-m-d");
+        $collection = $this->transactionCollectionFactory->getCollection()
+                ->addFieldToFilter('status', ['eq' => 'active'])
+                ->addFieldToFilter('subscription_id', ['eq' => $subscriptionId])
+                ->addFieldToFilter('customer_id', ['eq' => $customerId])
+                ->addFieldToFilter('recurring_date', ['gteq' => $curdate]);
+        if ($collection->getSize()) {
+            return $collection->getFirstItem();
+        }
+        return false;
     }
 }

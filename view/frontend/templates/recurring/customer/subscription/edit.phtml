@@ -3,34 +3,80 @@
  * Copyright © 2018 Worldpay, LLC. All rights reserved.
  * See LICENSE.txt for license details.
  */
-
-
 ?>
 <?php
 /**
  * @var $block \Sapient\Worldpay\Block\Recurring\Customer\Subscriptions\Edit
  */
 ?>
+
 <form class="worldpay-subscription-edit" action="<?= /* @noEscape */  $block->getSaveUrl() ?>"
       method="post" id="worldpay-subscription-edit" enctype="multipart/form-data" 
       data-hasrequired="<?= /* @noEscape */  __('* Required Fields') ?>">
+    <div class="actions-toolbar">
+        <div class="skip-next-order">
+        <?php
+            $nextOrder = $block->getNextRecurringOrder();
+        if (!empty($nextOrder)): ?>
+                <a href="javascript:void(0)"
+                    id="skiporder" class="action primary"
+                    rel="noopener">
+                    <span><?= /* @noEscape */ __('Skip Next Order') ?></span>
+                </a>
+                <span><?= /* @noEscape */ __('Scheduled on') ?></span>
+                <strong id="next-orderdate">
+                    <?= /* @noEscape */  $nextOrder->getRecurringDate() ?>
+                </strong>
+            <?php endif; ?>
+        </div>
+        <div class="all-recurring-order-mobile">
+            <?php if (!empty($nextOrder)): ?>
+                <span class="upcoming-delivery mobile">
+                    <?= /* @noEscape */ __('Upcoming Delivery') ?>
+                </span>
+            <?php endif; ?>
+            <?php if($block->getRecurringOrderCollection() > 0 ): ?>
+                <a href="<?= /* @noEscape */  $block->getViewAllRecurringOrder() ?>"
+                    class="action" rel="noopener">
+                    <span><?= /* @noEscape */ __('View All Recurring Order') ?></span>
+                </a>
+            <?php endif; ?>
+        </div>
+    </div>
     <fieldset class="fieldset subscription">
         <?= /* @noEscape */  $block->getBlockHtml('formkey')?>
-        <legend class="legend"><span><?= /* @noEscape */  $block->getMyAccountLabels('AC25') ?></span></legend>
+        <div class="">
+            <legend class="legend">
+                <span><?= /* @noEscape */  $block->getMyAccountLabels('AC25') ?></span>
+                <?php if($block->getRecurringOrderCollection() > 0 ): ?>
+                    <a href="<?= /* @noEscape */  $block->getViewAllRecurringOrder() ?>"
+                        class="action all-recurring-order-desktop"
+                        rel="noopener">
+                    <span><?= /* @noEscape */ __('View All Recurring Order') ?></span>
+                </a>
+                <?php endif; ?>
+                <?php if (!empty($nextOrder)): ?>
+                    <span class="upcoming-delivery desktop">
+                        <?= /* @noEscape */ __('Upcoming Delivery') ?>
+                    </span>
+                <?php endif; ?>    
+            </legend>
+        </div>
+        
         <div class="field product-name">
             <label class="label" for="product_name">
                 <span>
-        <?= /* @noEscape */  $block->escapeHtml($block->getMyAccountLabels('AC26')) ?>
+        <?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC26')) ?>
                 </span></label>
             <div class="control">
-                <span><?= $block->escapeHtml(__($block->getSubscription()->getProductName())); ?></span>
+                <span><?= $escaper->escapeHtml(__($block->getSubscription()->getProductName())); ?></span>
             </div>
         </div>
         <?php if ($block->getPlans()): ?>
             <div class="field plan">
                 <label class="label" for="plan">
                     <span>
-            <?= /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC27')) ?>
+            <?= /* @noEscape */ $escaper->escapeHtml($block->getMyAccountLabels('AC27')) ?>
                     </span>
                 </label>
                 <?php foreach ($block->getPlans() as $plan): ?>
@@ -51,112 +97,6 @@
             </div>
         <?php endif; ?>
     </fieldset>
-    <fieldset class="fieldset billing">
-       <legend class="legend"><span><?= /* @noEscape */  $block->getMyAccountLabels('AC31') ?></span></legend>
-        <div class="field firstname required">
-            <label class="label" for="firstname"><span><?= /* @noEscape */  $block->escapeHtml(
-                $block->getMyAccountLabels('AC32')
-            ) ?></span></label>
-            <div class="control">
-                <input type="text" name="firstname" data-validate="{required : true, maxlength : 25}"
-                       value="<?= /* @noEscape */  $block->escapeHtml(
-                           $block->getSubscription()->getBillingAddress()->getFirstname()
-                       ) ?>"
-                               id="firstname" class="input-text"
-                               title="<?= /* @noEscape */  $block->escapeHtml(__('First Name')) ?>"/>
-            </div>
-        </div>
-        <div class="field lastname required">
-            <label class="label" for="lastname"><span><?= /* @noEscape */  $block->escapeHtml(
-                $block->getMyAccountLabels('AC33')
-            )
-                                        ?></span></label>
-            <div class="control">
-                <input type="text" name="lastname" data-validate="{required : true, maxlength : 25}"
-                       value="<?= /* @noEscape */  $block->escapeHtml(
-                           $block->getSubscription()->getBillingAddress()->getLastname()
-                       ) ?>"
-                               id="lastname" class="input-text" 
-                               title="<?= /* @noEscape */  $block->escapeHtml(__('Last Name')) ?>"/>
-            </div>
-        </div>
-        <div class="field street required">
-            <label class="label" for="street">
-                <span>
-                <?= /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC34')) ?>
-                </span></label>
-            <div class="control">
-                <input type="text" name="street" data-validate="{required : true, maxlength : 35}"
-                       value="<?= /* @noEscape */  $block->escapeHtml(
-                           $block->getSubscription()->getBillingAddress()->getStreet()
-                       ) ?>"
-                               id="street" class="input-text" 
-                               title="<?= /* @noEscape */  $block->escapeHtml(__('Address')) ?>"/>
-            </div>
-        </div>
-        <div class="field city required">
-            <label class="label" for="city">
-                <span><?= /* @noEscape */  $block->getMyAccountLabels('AC35') ?></span></label>
-            <div class="control">
-                <input type="text" name="city"
-                       data-validate="{required : true, maxlength : 35}"
-                       value="<?= /* @noEscape */
-                        $block->escapeHtml($block->getSubscription()->getBillingAddress()->getCity()) ?>" 
-                        title="<?= /* @noEscape */  __('City') ?>" class="input-text" id="city" 
-                        title="<?= /* @noEscape */  __('City') ?>"/>
-            </div>
-        </div>
-        <div class="field region required">
-            <label class="label" for="region_id"><span><?= /* @noEscape */  __('State/Province') ?></span></label>
-            <div class="control">
-                <select id="region_id" name="region_id" title="<?= /* @noEscape */
-                $block->getMyAccountLabels('AC38') ?>" class="validate-select">
-                    <option value=""><?= /* @noEscape */  __('Please select a region, state or province.') ?></option>
-                </select>
-                <input type="text" id="region" name="region" value="<?= /* @noEscape */  $block->escapeHtml(
-                    $block->getSubscription()->getBillingAddress()->getRegion()
-                ) ?>"  title="<?= /* @noEscape */  __('State/Province') ?>" 
-                class="input-text required-entry"/>
-            </div>
-        </div>
-        <div class="field zip required">
-            <label class="label" for="zip">
-                <span><?= /* @noEscape */  $block->getMyAccountLabels('AC36') ?></span></label>
-            <div class="control">
-                <input type="text" name="postcode" 
-                       data-validate="{required : true, maxlength : 20}" 
-                       value="<?= /* @noEscape */
-                        $block->escapeHtml($block->getSubscription()->getBillingAddress()->getPostcode()) ?>"
-                title="<?= /* @noEscape */  __('Zip/Postal Code') ?>" 
-                id="zip" class="input-text validate-zip-international"/>
-            </div>
-        </div>
-        <div class="field country required">
-            <label class="label" for="country">
-                <span>
-                <?= /* @noEscape */  $block->getMyAccountLabels('AC37') ?>
-                </span>
-            </label>
-            <div class="control"><?= /* @noEscape */
-                $block->getLayout()->createBlock(\Magento\Directory\Block\Data::class)->getCountryHtmlSelect(
-                    $block->getSubscription()->getBillingAddress()->getCountryId()
-                ) ?>
-            </div>
-        </div>
-    </fieldset>
-
-    <div class="actions-toolbar">
-        <div class="primary">
-            <button
-                    type="submit"
-                    class="action save primary"
-                    data-action="save-subscription"
-                    title="<?= /* @noEscape */  $block->escapeHtml($block->getMyAccountLabels('AC28')); ?>"
-            >
-                <span><?= /* @noEscape */  $block->escapeHtml($block->getMyAccountLabels('AC28')); ?></span>
-            </button>
-        </div>
-    </div>
 </form>
 <script type="text/x-magento-init">
     {
@@ -177,4 +117,36 @@
             }
         }
     }
+</script>
+<script>
+    require(['jquery',
+        'mage/url',
+        'prototype'
+    ], function ($, urlBuilder) { 
+        $('#skiporder').on("click", function(event) {
+            $.ajax({
+                url: urlBuilder.build('worldpay/skiporder/'),
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    subscriptionId: <?= $escaper->escapeHtml(__($block->getSubscription()->getSubscriptionId())) ?>,
+                    nextOrder: '<?= $escaper->escapeHtml(__($block->getNextOrderDate())) ?>',
+                },
+                /** Show loader before send */
+                    beforeSend: function() {
+                        $('body').trigger('processStart');
+                    },
+                    success: function(data, status, xhr) {
+                        console.log(data);
+                        location.reload();
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        console.log('Error happens. Try again.');
+                        console.log(errorThrown);
+                    }
+                }).always(function () {
+                $('body').trigger('processStop');
+            });
+        });           
+    });
 </script>

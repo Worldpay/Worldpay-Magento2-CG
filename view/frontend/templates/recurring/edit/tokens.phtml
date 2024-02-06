@@ -1,0 +1,17 @@
+<div id="change_payment_modal" style="display:none">
+    <div class="payment-modal-body-content">
+    <p class="successmsg" data-bind="i18n: successmsg(), attr: {class: msgColor() }"></p>
+        <p class="label"><?= $escaper->escapeHtml(__('Your Saved Card')) ?></p>
+        <!-- ko if: (availableTokens().length)-->
+              <!-- ko foreach: {data: availableTokens(), as: 'item'} -->
+                     <!-- ko if: (item.card_number)-->
+                        <div class="paymentmethods-radio-wrapper">
+                                <input type="radio"  data-bind="attr: {'value': item.token_id,id: 'recurring_pay_method' + item.token_code}" name="available_recurring_tokens" >               
+                                <label data-bind="attr: {for: 'recurring_pay_method' + item.token_code},i18n: $parent.getCartLabel.bind(this,item)"></label>   
+                                <span data-bind="attr: {for: 'recurring_pay_method' + item.token_code},i18n: $parent.getCartLabelMessage.bind(this,item)" class="expired"></span>                 
+                        </div>
+                    <!-- /ko -->
+              <!-- /ko -->
+        <!--/ko-->
+    </div>
+</div>

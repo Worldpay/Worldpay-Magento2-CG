@@ -13,9 +13,9 @@ namespace Sapient\Worldpay\Block;
  */
 class MultishippingCheckoutLink extends \Magento\Multishipping\Block\Checkout\Link
 {
-      /**
-       * @var \Sapient\Worldpay\Helper\Recurring
-       */
+    /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
     protected $_sapientHelper;
     /**
      * @param \Magento\Framework\View\Element\Template\Context $context
@@ -33,13 +33,12 @@ class MultishippingCheckoutLink extends \Magento\Multishipping\Block\Checkout\Li
         parent::__construct($context, $helper, $data);
     }
 
-     /**
-      * Render Quote information and return result html
-      *
-      * @return string
-      */
-      
-    public function _toHtml ()
+    /**
+     * Check Multishipping checkout isavailable
+     *
+     * @return string
+     */
+    public function _toHtml()
     {
         if (!$this->helper->isMultishippingCheckoutAvailable()) {
             return '';

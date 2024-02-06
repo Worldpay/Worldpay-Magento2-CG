@@ -27,7 +27,7 @@
                 <input type="radio" onchange="valueRadioChanged()"
                        name="worldpay_subscription_plan"
                        id="worldpay_subscription_plan_<?= /* @noEscape */ $block->buildPlanOptionId($plan) ?>"
-                       value="<?= /* @noEscape */  $block->escapeHtml($plan->getId()) ?>"
+                       value="<?= /* @noEscape */  $escaper->escapeHtml($plan->getId()) ?>"
                         <?php if ($block->isPlanSelected($plan)): ?>checked
                         <?php endif; ?>/>
                 <label class="label" 

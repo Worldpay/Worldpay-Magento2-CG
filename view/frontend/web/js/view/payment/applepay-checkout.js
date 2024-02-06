@@ -16,8 +16,6 @@ define(
 'Magento_Checkout/js/model/full-screen-loader'
 ], function ($, ko, Component, _, $t, quote, customerData, checkoutUtils, applePay, urlBuilder, url,customer, placeMultishippingOrder, fullScreenLoader) {
 'use strict';
-      
-    
     var paymentService = false;
     var billingAddressCountryId = "";
     var appleResponse = "";
@@ -27,23 +25,30 @@ define(
     var response1 = '';
     var dfReferenceId = "";
     var debug = true;
-
+    var applepayConfig = [];
+    var appleMerchantId = window.checkoutConfig.payment.ccform.appleMerchantid;
     if(window.checkoutConfig.payment.general.environmentMode == 'PRODUCTION'){
         merchantId = "merchantId:"+window.checkoutConfig.payment.ccform.googleMerchantid;
     }
-
+    if(window.checkoutConfig.payment.ccform.isMultishipping){
+        var msAppleMerchantid = window.checkoutConfig.payment.ccform.msAppleMerchantid;
+        if(msAppleMerchantid){
+            appleMerchantId = msAppleMerchantid;
+        }
+    }
 return Component.extend({
     defaults: {
         template: 'Sapient_Worldpay/payment/wallets/applepay-checkout',
         applepayOptions:{
         env_mode : window.checkoutConfig.payment.general.environmentMode,
-        merchantIdentifier : window.checkoutConfig.payment.ccform.appleMerchantid,
+        merchantIdentifier : appleMerchantId,
         countryCode : window.checkoutConfig.defaultCountryId,
         currencyCode : window.checkoutConfig.quoteData.quote_currency_code,
         subTotalDescr : "Cart Subtotal",
         lineItemLabel : "Order Total"
         } 
     },
+    applepayConfig: ko.observableArray([]),
 
     /**
      * @returns {*}
@@ -51,6 +56,11 @@ return Component.extend({
     initialize: function () {
         this._super();
         var self = this;
+        this.applepayConfig({
+            color : window.checkoutConfig.payment.ccform.applePayButtonColor,
+            type : window.checkoutConfig.payment.ccform.applePayButtonType,
+            locale : window.checkoutConfig.payment.ccform.applePayButtonLocale
+        });
         return this;
     },
     sendPaymentToken : function(paymentToken){
@@ -192,8 +202,15 @@ return Component.extend({
         if(!window.checkoutConfig.payment.ccform.isWalletsEnabled){
             return false;
         }
-        if(!window.checkoutConfig.payment.ccform.isApplePayEnable){
-            return false;
+        if(window.checkoutConfig.payment.ccform.isMultishipping){
+            if(!window.checkoutConfig.payment.ccform.isMsApplePayEnable){
+                return false;
+            }
+        }
+        else {
+            if(!window.checkoutConfig.payment.ccform.isApplePayEnable){
+                return false;
+            }
         }
         if(window.checkoutConfig.payment.ccform.isSubscribed){
             return false;

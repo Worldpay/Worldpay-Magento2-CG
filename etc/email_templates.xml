@@ -15,4 +15,6 @@
     <template id="wp_auth_sales_email_order_guest_template" label="New Order for Guest" file="wp_auth_sales_email_order_guest_template.html" type="html" module="Sapient_Worldpay" area="frontend"/>
     <template id="wp_sales_email_paybylink" label="Pay By link" file="wp_pay_by_link_email.html" type="html" module="Sapient_Worldpay" area="frontend"/>    
     <template id="wp_sales_email_paybylink_multishipping" label="Pay By link multishipping" file="wp_paybylink_multishipping_email.html" type="html" module="Sapient_Worldpay" area="frontend"/>
+    <template id="worldpay_subscriptions_skip_order_notification_email" label="Recurring Order Skip Notification" file="wp_skip_order_notification_email.html" type="html" module="Sapient_Worldpay" area="frontend"/>
+    <template id="worldpay_subscriptions_recurring_order_reminder_email" label="Recurring Order Notification" file="wp_recurring_order_notificaion_email.html" type="html" module="Sapient_Worldpay" area="frontend"/>
 </config>

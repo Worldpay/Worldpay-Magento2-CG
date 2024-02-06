@@ -310,6 +310,7 @@ EOD;
             $this->_addStatementNarrativeElement($order);
         }
         $this->_addFraudSightData($order);
+        
         return $order;
     }
 
@@ -592,6 +593,10 @@ EOD;
     {
         $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
         $storedCredentials['usage'] = "FIRST";
+        $isSubscriptionOrder = isset($this->paymentDetails['subscription_order'])? true : false;
+        if ($isSubscriptionOrder) {
+            $storedCredentials['customerInitiatedReason'] = "RECURRING";
+        }
         return $storedCredentials;
     }
      /**

@@ -1195,6 +1195,30 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
+     * Check Multishipping ApplePay Enable
+     *
+     * @return string
+     */
+    public function isMsApplePayEnable()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_wallets_config/ms_apple_pay_wallets_config/enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get Multishipping apple MerchantId
+     *
+     * @return string
+     */
+    public function msAppleMerchantId()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_wallets_config/ms_apple_pay_wallets_config/ms_merchant_name',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
      * Get is Samsung Pay Enable
      *
      * @return string
@@ -1206,6 +1230,20 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+
+    /**
+     * Get Samsung Pay Button Type
+     *
+     * @return string
+     */
+    public function getSamsungPayButtonType()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/wallet/samsungpay_ssl/samsungpay_button_type',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
     /**
      * Get is Dynamic 3DS2 Enabled
      *
@@ -2489,9 +2527,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * ApplePay button color
+     * ApplePay button color for PDP
      */
-    public function getApplePayButtonColor()
+    public function getApplePayButtonColorPdp()
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_button_color',
@@ -2499,9 +2537,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * ApplePay button type
+     * ApplePay button type for PDP
      */
-    public function getApplePayButtonType()
+    public function getApplePayButtonTypePdp()
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_button_type',
@@ -2509,9 +2547,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * ApplePay button locale
+     * ApplePay button locale for PDP
      */
-    public function getApplePayButtonLocale()
+    public function getApplePayButtonLocalePdp()
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_button_locale',
@@ -2519,9 +2557,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     *  Apple Pay on PopUp Order Place Button Text
+     *  Apple Pay on PopUp Order Place Button Text for PDP
      */
-    public function getApplePayPopupPlaceOrderText()
+    public function getApplePayPopupPlaceOrderTextPdp()
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_place_order_button_configuration',
@@ -2529,9 +2567,39 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * Get googlepay button color
+     * ApplePay button color for Checkout
      */
-    public function getGpayButtonColor()
+    public function getCheckoutApplePayBtnColor()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/wallet/applepay_ssl/applepay_button_color',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * ApplePay button type for Checkout
+     */
+    public function getCheckoutApplePayBtnType()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/wallet/applepay_ssl/applepay_button_type',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * ApplePay button locale for Checkout
+     */
+    public function getCheckoutApplePayBtnLocale()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/wallet/applepay_ssl/applepay_button_locale',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get googlepay button color for PDP
+     */
+    public function getGpayButtonColorPdp()
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_button_color',
@@ -2539,9 +2607,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * Get googlepay button type
+     * Get googlepay button type for PDP
      */
-    public function getGpayButtonType()
+    public function getGpayButtonTypePdp()
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_button_type',
@@ -2549,12 +2617,42 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
     /**
-     * Get googlepay button locale
+     * Get googlepay button locale for PDP
+     */
+    public function getGpayButtonLocalePdp()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_button_locale',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get googlepay button color for Checkout & Multishipping
+     */
+    public function getGpayButtonColor()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/wallet/paywithgoogle_ssl/gpay_button_color',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get googlepay button type for Checkout & Multishipping
+     */
+    public function getGpayButtonType()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/payment_method_logo_config/wallet/paywithgoogle_ssl/gpay_button_type',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get googlepay button locale for Checkout & Multishipping
      */
     public function getGpayButtonLocale()
     {
         return $this->_scopeConfig->getValue(
-            'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_button_locale',
+            'worldpay/payment_method_logo_config/wallet/paywithgoogle_ssl/gpay_button_locale',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
@@ -2699,9 +2797,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getCurrentMagentoVersionDetails()
     {
-        $magento['Edition'] = $this->productMetaData->getEdition();
-        $magento['Version'] = $this->productMetaData->getVersion();
-        return $magento;
+        $mageDetails = [];
+        $mageDetails['platform'] = __('Magento');
+        if ($this->productMetaData->getEdition()) {
+            $mageDetails['edition'] = __('Magento_').$this->productMetaData->getEdition();
+        }
+        if ($this->productMetaData->getVersion()) {
+            $mageDetails['version'] = $this->productMetaData->getVersion();
+        }
+        return $mageDetails;
     }
     /**
      * Get Plugin Tracker Details
@@ -2712,21 +2816,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getPluginTrackerdetails()
     {
         $details=[];
-        $magento = $this->getCurrentMagentoVersionDetails();
-        $details['partner_edition'] = $magento['Edition'];
-        $details['partner_version'] = $magento['Version'];
-        $details['php_version'] = $this->getPhpVersionUsed();
-        
+        $mageDetails = $this->getCurrentMagentoVersionDetails();
+        $details['ecommerce_platform'] = $mageDetails['platform'];
+        $details['ecommerce_platform_edition'] =  $mageDetails['edition'];
+        $details['ecommerce_platform_version'] = $mageDetails['version'];
+
         if (($this->getCurrentWopayPluginVersion()!=null) && !empty($this->getCurrentWopayPluginVersion())) {
-            $details['plugin_version'] = $this->getCurrentWopayPluginVersion();
+            $details['integration_version'] = $this->getCurrentWopayPluginVersion();
         }
-        if (($this->getWopayPluginVersionHistory()!=null) && !empty($this->getWopayPluginVersionHistory())) {
-            $details['worldpay_plugin_version_used_till_date'] = $this->getWopayPluginVersionHistory();
-        }
-        
+
         if (($this->getUpgradeDates()!=null) && !empty($this->getUpgradeDates())) {
-            $details['upgrade_dates'] = $this->getUpgradeDates();
+            $details['historic_integration_versions'] = $this->getUpgradeDates();
         }
+
+        $details['additional_details']['php_version'] = $this->getPhpVersionUsed();
+        
         return $details;
     }
 
@@ -3034,6 +3138,121 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
         return $multishippingIID;
     }
+    /**
+     * Get is Samsung Pay Enable for Multishipping
+     *
+     * @return string
+     */
+    public function isMsSamsungPayEnable()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_wallets_config/ms_samsung_pay_wallets_config/enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get Multishipping Google Pay Enable
+     *
+     * @return string
+     */
+    public function isMsGooglePayEnable()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    /**
+     * Get Multishipping google Payment Methods
+     *
+     * @return string
+     */
+    public function msGooglePaymentMethods()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/paymentmethods',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    /**
+     * Get MultiShipping google Auth Methods
+     *
+     * @return string
+     */
+    public function msGoogleAuthMethods()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/authmethods',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    /**
+     * Get google Gateway Merchantname
+     *
+     * @return string
+     */
+    public function msGoogleGatewayMerchantname()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/ms_gpay_gateway_merchantname',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    /**
+     * Get google Gateway Merchantid
+     *
+     * @return string
+     */
+    public function msGoogleGatewayMerchantid()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/ms_gpay_gateway_merchantid',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+  
+    /**
+     * Get MultiShipping google Merchantid
+     *
+     * @return string
+     */
+    public function msGoogleMerchantid()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/ms_gpay_merchantid',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+ 
+    /**
+     * Get MultiShipping google Merchant name
+     *
+     * @return string
+     */
+    public function msGoogleMerchantname()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/ms_gpay_merchantname',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get MultiShipping google test card holder name
+     *
+     * @return string
+     */
+    public function msGoogleTestCardname()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/ms_gpay_test_cardholdername',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
 
     /**
      * Get PaybyLink Installation Id
@@ -3129,7 +3348,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 array_key_exists("SEPA_DIRECT_DEBIT-SSL", $apmmethods)) {
             $data = $this->getSEPAMandateTypes();
             if (!empty($data)) {
-                return explode(",", $data);
+                return $data;
             }
         }
         return [];
@@ -3159,6 +3378,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+
     /**
      * Get SEPA Merchant Number
      *

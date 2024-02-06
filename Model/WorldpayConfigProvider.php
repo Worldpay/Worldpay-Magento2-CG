@@ -246,9 +246,23 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                         googleGatewayMerchantid();
                 $config['payment']['ccform']['googleMerchantname'] = $this->worldpayHelper->googleMerchantname();
                 $config['payment']['ccform']['googleMerchantid'] = $this->worldpayHelper->googleMerchantid();
+                $config['payment']['ccform']['gpayButtonColor'] = $this->worldpayHelper->getGpayButtonColor();
+                $config['payment']['ccform']['gpayButtonType'] = $this->worldpayHelper->getGpayButtonType();
+                $config['payment']['ccform']['gpayButtonLocale'] = $this->worldpayHelper->getGpayButtonLocale();
                 $config['payment']['ccform']['appleMerchantid'] = $this->worldpayHelper->appleMerchantId();
                 $config['payment']['ccform']['isApplePayEnable'] = $this->worldpayHelper->isApplePayEnable();
+                $config['payment']['ccform']['applePayButtonColor'] = $this->worldpayHelper
+                        ->getCheckoutApplePayBtnColor();
+                $config['payment']['ccform']['applePayButtonType'] = $this->worldpayHelper
+                        ->getCheckoutApplePayBtnType();
+                $config['payment']['ccform']['applePayButtonLocale'] = $this->worldpayHelper
+                        ->getCheckoutApplePayBtnLocale();
+                
+                // Multishipping Apple Pay configuration
+                $config['payment']['ccform']['msAppleMerchantid'] = $this->worldpayHelper->msAppleMerchantId();
+                $config['payment']['ccform']['isMsApplePayEnable'] = $this->worldpayHelper->isMsApplePayEnable();
                 $config['payment']['ccform']['isSamsungPayEnable'] = $this->worldpayHelper->isSamsungPayEnable();
+                $config['payment']['ccform']['samsungPayButton'] = $this->worldpayHelper->getSamsungPayButtonType();
                 
                 if ($this->worldpayHelper->getEnvironmentMode()=='Live Mode') {
                     $config['payment']['general']['environmentMode'] = "PRODUCTION";
@@ -306,7 +320,21 @@ class WorldpayConfigProvider implements ConfigProviderInterface
 
                 //Multishipping
                 $config['payment']['ccform']['isMultishipping'] = $this->worldpayHelper->isMultiShipping();
-                 //Pay By Link
+                // Multishipping Googlpay start
+                $config['payment']['ccform']['isMsGooglePayEnable'] = $this->worldpayHelper->isMsGooglePayEnable();
+                $config['payment']['ccform']['msGooglePaymentMethods'] = $this->worldpayHelper
+                ->msGooglePaymentMethods();
+                $config['payment']['ccform']['msGoogleAuthMethods'] = $this->worldpayHelper->msGoogleAuthMethods();
+                $config['payment']['ccform']['msGoogleGatewayMerchantname'] = $this->worldpayHelper->
+                msGoogleGatewayMerchantname();
+                $config['payment']['ccform']['msGoogleGatewayMerchantid'] = $this->worldpayHelper->
+                msGoogleGatewayMerchantid();
+                $config['payment']['ccform']['msGoogleMerchantname'] = $this->worldpayHelper->msGoogleMerchantname();
+                $config['payment']['ccform']['msGoogleMerchantid'] = $this->worldpayHelper->msGoogleMerchantid();
+
+                //End multishipping Google pay
+                $config['payment']['ccform']['isMsSamsungPayEnable'] = $this->worldpayHelper->isMsSamsungPayEnable();
+                //Pay By Link
                  $config['payment']['ccform']['isPayByLinkEnable'] = $this->worldpayHelper->isPayByLinkEnable();
                  $config['payment']['ccform']['payByLinkButtonName'] = $this->worldpayHelper->getPayByLinkButtonName();
             }
@@ -325,7 +353,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         if ($isSavedCardEnabled && ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn())) {
             $savedCardsList = $this->savedTokenFactory->create()->getCollection()
             ->addFieldToFilter('customer_id', $this->customerSession->getCustomerId())
-            ->addFieldToFilter('token_type', $tokenType)->getData();
+            ->addFieldToFilter('token_type', $tokenType)
+            ->addFieldToFilter('method', ['neq' => 'SEPA_DIRECT_DEBIT-SSL'])->getData();
         }
         return $savedCardsList;
     }

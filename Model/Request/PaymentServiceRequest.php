@@ -229,6 +229,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $this->customerSession,
             $requestConfiguration
         );
+        if ($this->worldpayhelper->getsubscriptionStatus()) {
+            $directOrderParams['paymentDetails']['subscription_order'] = 1;
+        }
               
         if (empty($directOrderParams['thirdPartyData']) && empty($directOrderParams['shippingfee'])) {
             $directOrderParams['thirdPartyData']='';
@@ -288,7 +291,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
             $xmlUsername,
-            $xmlPassword
+            $xmlPassword,
         );
     }
     
@@ -608,6 +611,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectPayByLinkOrder(
                 $requestConfiguration
             );
+        }
+
+        if ($this->worldpayhelper->getsubscriptionStatus()) {
+            $redirectOrderParams['paymentDetails']['subscription_order'] = 1;
         }
 
         if (empty($redirectOrderParams['thirdPartyData']) && empty($redirectOrderParams['shippingfee'])) {
@@ -1803,7 +1810,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     public function collectPluginTrackerDetails($paymentType)
     {
         $pluginTrackerDetails = $this->worldpayhelper->getPluginTrackerdetails();
-        $pluginTrackerDetails['additional_detail'] = $paymentType;
+        $pluginTrackerDetails['additional_details']['transaction_method'] = $paymentType;
         return json_encode($pluginTrackerDetails);
     }
 }

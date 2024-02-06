@@ -310,7 +310,7 @@ EOD;
         $locale = $this->orderlineitems['locale_code'];
         $include = $paymentMethodMask->addChild($this->paymentType);
         $include['shopperCountryCode'] = $this->billingAddress['countryCode'];
-        $include['locale'] = $locale;
+        $include['locale'] = str_replace('_', '-', $locale);
         
         $successUrl = $include->addChild('successURL', $urls['successURL']);
         $cancelURL = $include->addChild('cancelURL', $urls['cancelURL']);

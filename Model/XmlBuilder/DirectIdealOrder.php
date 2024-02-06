@@ -336,6 +336,7 @@ EOD;
             );
         }
     }
+
     /**
      * Add paymentDetails and its child tag to xml
      *

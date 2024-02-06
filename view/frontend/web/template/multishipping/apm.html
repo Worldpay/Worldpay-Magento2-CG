@@ -219,30 +219,6 @@
 
                 </div>
                 <div class="control field type required sepa-block" data-bind="visible: false">
-                    <label data-bind="attr: {for: getCode() + '_sepa_mandate_type'}" class="label">
-                        <span>
-                            <!--ko if: getCheckoutLabels('CO29') -->
-                               <!-- ko i18n: getCheckoutLabels('CO29')-->
-                                <!-- /ko -->
-                            <!--/ko-->
-
-                            <!--ko ifnot: getCheckoutLabels('CO29') -->
-                                <!-- ko i18n: 'Mandate Type'-->
-                                    <!-- /ko -->
-                            <!--/ko-->
-                        </span>
-                    </label>
-                    <div class="field type required sepa-mandate-type" style="margin-bottom:10px;">
-                        <select name="sepa_pay" class="select select-ccytpe" disabled data-bind="attr: {id: 'sepa_pay', 'data-validate': JSON.stringify({required:true})},
-                               options: getSEPAEMandateTypes(),
-                               optionsText: 'accountText',
-                               value: selectedSEPAMandateType,
-                               enable: isActive($parents),
-                               optionsValue: 'accountCode',
-                               optionsCaption: 'Select Mandate Type'">
-                        </select>
-                    </div>
-
                     <label data-bind="attr: {for: getCode() + '_sepa_iban'}" class="label">
                         <span>
                              <!--ko if: getCheckoutLabels('CO30') -->
@@ -336,7 +312,7 @@
                                     'id': 'sepa_e_mandate_condition',
                                     'name': 'sepa_e_mandate_condition',
                                     'value': 'sepa_e_mandate_condition_true'
-                                    }">
+                                    }" ></input>
                         <label class="label sepa_e-mandate-label" for="sepa_e_mandate_condition">
                             <span data-bind="html: getSepaEmandateTerms()"></span>            
                         </label>

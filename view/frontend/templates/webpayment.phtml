@@ -106,11 +106,6 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
     var guestMaskedQuoteId = window.checkoutConfig.quoteData.entity_id;
     var isDownlodable = <?= /* @noEscape */ $block->checkDownloadableProduct() ?>;
-    
-    var getShippingRate = '<?= /* @noEscape */ $block->getShippingRate() ?>';
-    if(isDownlodable == true){
-        getShippingRate = 0;
-    }
     const details = {
     displayItems: [
 
@@ -131,7 +126,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     {
     label: 'Shipping',
             amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
-                value:  getShippingRate},
+                value: '<?= /* @noEscape */ $block->getShippingRate() ?>'},
             pending: true,
     },
     {
@@ -360,14 +355,8 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         throw(error);
     }
 
-    var getDefaultBillingAddress = JSON.parse('<?= /* @noEscape */ $block->getDefaultBillingAddress(); ?>');
-    if (isDownlodable == true && getDefaultBillingAddress.status == false) {
-       alert(getDefaultBillingAddress.message);
-       throw(getDefaultBillingAddress.message);
-    }
-
     request.show().then(function(instrumentResponse) {
-        //Client-Side encryption 
+       //Client-Side encryption 
         if(isClientSideEncryptionEnabled()){
             require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.2.min.js"], function (worldpay) {
                 worldpay.setPublicKey(getCsePublicKey());
@@ -463,34 +452,25 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var apiUrl;
     var orderResponse;
     var dfReferenceId = "";
-    var regionId = 0;
-
+    
     if (isCustomerLoggedIn) { //Api for logged in customer
         apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/shipping-information';
     } else { // Api for guest customer
         apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + 
             guestMaskedQuoteId + '/shipping-information';
     }
-    
     if(typeof instrumentResponse.details.billingAddress == 'undefined' 
         || instrumentResponse.details.billingAddress == null){
         instrumentResponse.details.billingAddress = {};
-        var isDownlodable = <?= /* @noEscape */ $block->checkDownloadableProduct() ?>;
-        if (isDownlodable == true){
-            instrumentResponse.details.billingAddress = JSON.parse('<?= /* @noEscape */ $block->getDefaultBillingAddress(); ?>');
-            regionId = instrumentResponse.details.billingAddress.region_id;
-        } else {
-            instrumentResponse.details.billingAddress = instrumentResponse.shippingAddress;
-        }
-    } 
-    
+        instrumentResponse.details.billingAddress = instrumentResponse.shippingAddress;
+
+    }
+
     //country code 
-    if(regionId == 0){
-        regionId = getRegionById(
+    var regionId = getRegionById(
         instrumentResponse.details.billingAddress.country,
         instrumentResponse.details.billingAddress.region
-        ); 
-    }
+        );    
     var fullName = instrumentResponse.details.billingAddress.recipient;
     var strArray = fullName.split(" ");
     var firstName = strArray[0];
@@ -501,7 +481,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     } else {
     lastName = firstName;
     }
-    
+
     //Add shipping information to the cart
     // region id will be used as 0 as default (Magento validation)
     var customerDetails = {  "addressInformation": {
@@ -575,12 +555,26 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     let expiryMonth = instrumentResponse.details.expiryMonth;
     let expiryYear = instrumentResponse.details.expiryYear;
     let encyptedCseData = cseData.length>0 ? cseData : null;
-     
-    //Add payment information and place the order
-    var paymentDetails = {
-    "paymentMethod": {
-    "method": "worldpay_cc",
-            "additional_data": {
+    var additionalData = "";
+    if(encyptedCseData){
+        additionalData = {
+                    "cc_cid" : "",
+                    "cc_type" : "",
+                    "cc_exp_year" : "",
+                    "cc_exp_month" : "",
+                    "cc_number" : "",
+                    "cc_name" : "",
+                    "save_my_card" : false,
+                    "cse_enabled" : isClientSideEncryptionEnabled(),
+                    "encryptedData" : encyptedCseData,
+                    "tokenCode" : null,
+                    "isSavedCardPayment" : false,
+                    "isChromePay" : "1",
+                    "dfReferenceId": window.sessionId
+            }
+
+    }else{
+        additionalData = {
             "cc_cid" : cvc,
                     "cc_type" : cardType,
                     "cc_exp_year" : expiryYear,
@@ -595,6 +589,16 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
                     "isChromePay" : "1",
                     "dfReferenceId": window.sessionId
             }
+
+    }
+
+
+
+    //Add payment information and place the order
+    var paymentDetails = {
+    "paymentMethod": {
+    "method": "worldpay_cc",
+            "additional_data": additionalData
     },
             "billing_address": {
             "email": instrumentResponse.payerEmail,

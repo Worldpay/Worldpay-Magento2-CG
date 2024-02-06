@@ -104,13 +104,23 @@
                     <label>Payment Methods</label>
                     <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethodsCC</source_model>
                 </field>
+                <field id="cse_custom_popup" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Sapient\Worldpay\Block\Adminhtml\System\Config\CsePopup</frontend_model>
+                </field>
                 <field id="cse_enabled" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Client Side Encryption Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[Highly Recommended: Client Side Encryption must be enabled to secure shoppers card details]]> 
+                    </comment>
                 </field>
                 <field id="cse_public_key" translate="label" type="textarea" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Public Key</label>
                     <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="cse_enabled">1</field>
+                    </depends>
                 </field>
                 <field id="require_cvc" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Require CVC</label>
@@ -726,6 +736,19 @@
                 <field id="end_date_label" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>End Date Label</label>
                 </field>
+                <field id="recurring_order_buffer_time" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recurring Order Buffer Time (in days)</label>
+                    <validate>validate-number validate-zero-or-greater validate-not-negative-number</validate>
+                </field>
+                <field id="recurring_order_reminder_email" translate="label" type="select" sortOrder="18" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Recurring Order Reminder Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <comment>Will be  send 10 days before buffer time</comment>
+                </field>
+                <field id="skip_order_notification_email" translate="label" type="select" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Skip Order Notification Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
             </group>
             <!-- Miscellaneous -->
             <group id="miscellaneous" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -1174,60 +1197,40 @@
                     <label>Wallets Logo Config </label>
                     <group id="applepay_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Apple Pay </label>
-                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Use Custom Logo</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        </field> 
-                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                                <label>Logo</label>
-                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
-                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
-                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
-                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
-                                <ul style="margin-left: 2em;">
-                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
-                                </ul>
-                                ]]></comment>
-                                <depends><field id="enabled">1</field></depends>
-                        </field>            
+                        <field id="applepay_button_color" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Button Color</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\ApplePay\ButtonColor</source_model>
+                        </field>
+                        <field id="applepay_button_type" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Button Type</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\ApplePay\ButtonTypes</source_model>
+                        </field>
+                        <field id="applepay_button_locale" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Button Locale</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\ApplePay\ButtonLocale</source_model>
+                        </field>          
                     </group>
                     <group id="paywithgoogle_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Google Pay </label>
-                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Use Custom Logo</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        </field> 
-                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                                <label>Logo</label>
-                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
-                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
-                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
-                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
-                                <ul style="margin-left: 2em;">
-                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
-                                </ul>
-                                ]]></comment>
-                                <depends><field id="enabled">1</field></depends>
-                        </field>            
+                        <field id="gpay_button_color" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>GooglePay button color</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\GooglePay\ButtonColor</source_model>
+                        </field>
+                        <field id="gpay_button_type" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>GooglePay button type</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\GooglePay\ButtonTypes</source_model>
+                        </field>
+                        <field id="gpay_button_locale" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>GooglePay button locale</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\GooglePay\ButtonLocale</source_model>
+                        </field>      
                     </group>
                     <group id="samsungpay_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Samsung Pay </label>
-                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Use Custom Logo</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        </field> 
-                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                                <label>Logo</label>
-                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
-                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
-                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
-                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
-                                <ul style="margin-left: 2em;">
-                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
-                                </ul>
-                                ]]></comment>
-                                <depends><field id="enabled">1</field></depends>
-                        </field>            
+                        <label>Samsung Pay </label>       
+                        <field id="samsungpay_button_type" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Button Type</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\SamsungPayButtonTypes</source_model>
+                        </field>  
                     </group>                    
                     <depends>
                         <field id="worldpay/payment_method_logo_config/payment_method_logo_config_enabled">1</field>
@@ -1286,6 +1289,100 @@
                     <depends><field id="enabled">1</field></depends>
                     <comment>Enter the merchant Installation Id for Multishipping orders. If it is blank, global merchant Installation Id entered under HPP configuration will be applicable.</comment>
                 </field>
+                 <!-- Multishipping Mobile Wallet -->
+                <group id="ms_wallets_config" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Mobile Wallets</label>
+                    <!-- Multishipping Apple Pay -->
+                    <group id="ms_apple_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="1" showInStore="1">
+                        <label>Apple Pay</label>
+                        <!--Apple Pay  enabled-->
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                        <field id="ms_certification_key" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Apple Pay Certification Key</label>
+                            <comment>Location of the ApplePay.key.pem. eg. /var/www/html/cert/.  Files should be have read access by the webserver</comment>
+                        </field>
+                        <field id="ms_certification_crt" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Apple Pay Certification Path</label>
+                            <comment>Location of the ApplePay.crt.pem. eg. /var/www/html/cert/.  Files should be have read access by the webserver</comment>
+                        </field>
+                        <field id="ms_certification_password" translate="label" type="password" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Apple Pay Certification Password</label>
+                            <comment>Password set during the export of p12 file.</comment>
+                        </field>
+                        <field id="ms_merchant_name" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Merchant Name</label>
+                            <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                        </field>
+                        <field id="ms_domain_name" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Domain Name</label>
+                            <comment>eg. mydomain.com</comment>
+                        </field>
+                    </group>
+                    <!-- Multishipping Google Pay -->
+                    <group id="ms_gpay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="2" showInStore="1">
+                        <label>Google Pay</label>
+                        <!--Google Pay  enabled-->
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                        <field id="paymentmethods" translate="label" type="multiselect" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                            <label>Payment Methods</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\PaymentMethods</source_model>
+                        </field>
+                        <field id="authmethods" translate="label" type="multiselect" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                            <label>Authentication Methods Supported By Google</label>
+                            <source_model>Sapient\Worldpay\Model\Config\Source\AuthMethods</source_model>
+                        </field>
+                        <field id="ms_gpay_gateway_merchantname" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Gateway Name</label>
+                            <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                        </field> 
+                        <field id="ms_gpay_gateway_merchantid" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Gateway MerchantId</label>
+                            <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                        </field> 
+                        <field id="ms_gpay_merchantid" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Google MerchantId</label>
+                            <comment>This field only required for production mode. This can be generated from merchant's Google account</comment>
+                        </field> 
+                        <field id="ms_gpay_merchantname" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Google MerchantName</label>
+                        </field> 
+                        <field id="ms_gpay_test_cardholdername" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Test 3DS CardHolderName</label>
+                        </field>
+                    </group>
+                    <!-- Multishipping Samsung Pay -->
+                    <group id="ms_samsung_pay_wallets_config" translate="label" showInDefault="1" showInWebsite="1" sortOrder="3" showInStore="1">
+                        <label>Samsung Pay</label>
+                        <!--Samsung Pay  enabled-->
+                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                    
+                        <field id="ms_service_id" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Service Id</label>
+                        </field> 
+                        
+                        <field id="ms_samsung_merchant_shop_name" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Samsung Merchant Shop Name</label>
+                        </field> 
+                        
+                        <field id="ms_samsung_order_description" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Samsung Order Description</label>
+                        </field> 
+                        
+                        <field id="ms_samsung_merchant_shop_url" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Samsung Merchant Shop URL</label>
+                        </field> 
+                    </group>
+                    
+                </group>
             </group>
              <!-- Worldpay Pay By Link -->
             <group id="paybylink_config" translate="label"  sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">

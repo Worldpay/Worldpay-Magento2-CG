@@ -95,11 +95,6 @@ class Webpayment extends Template
     protected $httpRequest;
     
     /**
-     * @var \Magento\Customer\Helper\Session\CurrentCustomerAddress
-     */
-    protected $currentCustomerAddress;
-    
-    /**
      * Webpayment constructor
      *
      * @param Template\Context $context
@@ -115,7 +110,6 @@ class Webpayment extends Template
      * @param SerializerInterface $serializer
      * @param Magento\Framework\View\Asset\Repository $assetRepo
      * @param Magento\Framework\App\Request\Http $httpRequest
-     * @param Magento\Customer\Helper\Session\CurrentCustomerAddress $currentCustomerAddress
      * @param array $data
      */
     public function __construct(
@@ -132,13 +126,11 @@ class Webpayment extends Template
         SerializerInterface $serializer,
         \Magento\Framework\View\Asset\Repository $assetRepo,
         \Magento\Framework\App\Request\Http $httpRequest,
-        \Magento\Customer\Helper\Session\CurrentCustomerAddress $currentCustomerAddress,
         array $data = []
     ) {
 
         $this->_helper = $helper;
         $this->_cart = $cart;
-        $this->currentCustomerAddress = $currentCustomerAddress;
         parent::__construct(
             $context,
             $data
@@ -209,6 +201,7 @@ class Webpayment extends Template
     {
         $quote = $this->_cart->getTotalsCache();
         $getShippingRate = $quote['shipping']->getData('value');
+
         return $getShippingRate;
     }
     /**
@@ -588,35 +581,5 @@ class Webpayment extends Template
             return true;
         }
         return false;
-    }
-    /**
-     * Array for Billing Address
-     *
-     * @param AddressInterface $address
-     * @return string
-     */
-    public function getDefaultBillingAddress()
-    {
-        $response = [];
-        $response['status'] = false;
-        if (!$this->_customerSession->isLoggedIn()) {
-            $response['message'] = __('Please log in to continue.');
-            return json_encode($response);
-        }
-        $address = $this->currentCustomerAddress->getDefaultBillingAddress();
-        if ($address) {
-            $response['status'] = true;
-            $response['addressLine'] = $address->getStreet();
-            $response['city']  = $address->getCity();
-            $response['country'] = $address->getCountryId();
-            $response['phone'] = $address->getTelephone();
-            $response['postalCode'] = $address->getPostcode();
-            $response['recipient'] = $address->getFirstname().' '.$address->getLastname();
-            $response['region'] = $address->getRegion()->getRegion();
-            $response['region_id'] = $address->getRegionId();
-        } else {
-            $response['message'] = __('You have not set a default billing address.');
-        }
-        return json_encode($response);
     }
 }

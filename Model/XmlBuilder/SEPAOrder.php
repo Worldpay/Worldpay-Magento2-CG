@@ -180,11 +180,10 @@ EOD;
 
         return $order;
     }
-
     /**
      * Add description  tag to xml
      *
-     * @param \SimpleXMLElement $order
+     * @param SimpleXMLElement $order
      */
     private function _addDescriptionElement($order)
     {

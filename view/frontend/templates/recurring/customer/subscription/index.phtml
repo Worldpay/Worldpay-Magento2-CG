@@ -11,59 +11,59 @@
 <?php if ($subscriptions && count($subscriptions)): ?>
     <div class="table-wrapper subscriptions-list">
         <table class="data table table-subscriptions-items" id="my-subscriptions-table">
-            <caption class="table-caption"><?= /* @noEscape */  $block->escapeHtml(__('Subscriptions')) ?></caption>
+            <caption class="table-caption"><?= /* @noEscape */  $escaper->escapeHtml(__('Subscriptions')) ?></caption>
             <thead>
             <tr>
                 <th scope="col" class="col original-order-id">
-                    <?= /* @noEscape */  $block->escapeHtml($block->getMyAccountLabels('AC13')) ?>
+                    <?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC13')) ?>
                 </th>
                 <th scope="col" class="col original-order-date">
-                    <?= /* @noEscape */  $block->escapeHtml($block->getMyAccountLabels('AC14')) ?>
+                    <?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC14')) ?>
                 </th>
                 <th scope="col" class="col product">
-                    <?= /* @noEscape */  $block->escapeHtml($block->getMyAccountLabels('AC15')) ?>
+                    <?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC15')) ?>
                 </th>
                 <th scope="col" class="col interval-amount">
-                    <?= /* @noEscape */  $block->escapeHtml($block->getMyAccountLabels('AC16')) ?>
+                    <?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC16')) ?>
                 </th>
                 <th scope="col" class="col interval">
-                    <?= /* @noEscape */  $block->escapeHtml($block->getMyAccountLabels('AC17'))?>
+                    <?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC17'))?>
                 </th>
                 <th scope="col" class="col start-date">
-                    <?= /* @noEscape */  $block->escapeHtml($block->getMyAccountLabels('AC18')) ?>
+                    <?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC18')) ?>
                 </th>
                 <?php if ($block->isEndDateEnabled()): ?>
                 <th scope="col" class="col start-date">
-                    <?= /* @noEscape */  $block->escapeHtml($block->getMyAccountLabels('AC19')) ?>
+                    <?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC19')) ?>
                 </th>
                 <?php endif; ?>
                 <th scope="col" class="col status">
-                <?= /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC20')) ?>
+                <?= /* @noEscape */ $escaper->escapeHtml($block->getMyAccountLabels('AC20')) ?>
                 </th>
                 <th scope="col" class="col actions">
-                    <?= /* @noEscape */  $block->escapeHtml($block->getMyAccountLabels('AC21')) ?>
+                    <?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC21')) ?>
                 </th>
             </tr>
             </thead>
             <tbody>
             <?php foreach ($subscriptions as $subscription): ?>
                 <tr>
-                    <td data-th="<?= /* @noEscape */  $block->escapeHtml(__('Original Order #')) ?>"
+                    <td data-th="<?= /* @noEscape */  $escaper->escapeHtml(__('Original Order #')) ?>"
                         class="col original-order-id"><?= /* @noEscape */ $block->getOrderIdLabel($subscription) ?></td>
-                    <td data-th="<?= /* @noEscape */  $block->escapeHtml(__('Original Order Date')) ?>"
+                    <td data-th="<?= /* @noEscape */  $escaper->escapeHtml(__('Original Order Date')) ?>"
                         class="col original-order-date">
                 <?=/* @noEscape */$block->formatDate($subscription->getCreatedAt())?>
                     </td>
-                    <td data-th="<?= /* @noEscape */  $block->escapeHtml(__('Product')) ?>"
-                        class="col product"><?= /* @noEscape */ $block->escapeHtml($subscription->getProductName()) ?>
+                    <td data-th="<?= /* @noEscape */  $escaper->escapeHtml(__('Product')) ?>"
+                        class="col product"><?= /* @noEscape */ $escaper->escapeHtml($subscription->getProductName()) ?>
                     </td>
-                    <td data-th="<?= /* @noEscape */  $block->escapeHtml(__('Amount')) ?>"
+                    <td data-th="<?= /* @noEscape */  $escaper->escapeHtml(__('Amount')) ?>"
                         class="col interval-amount"><?= /* @noEscape */ $subscription->getFormattedIntervalAmount() ?>
                     </td>
-                    <td data-th="<?= /* @noEscape */ $block->escapeHtml(__('Interval')) ?>" class="col interval">
-                        <?= /* @noEscape */ $block->escapeHtml($block->getSubscriptionIntervalLabel($subscription)) ?>
+                    <td data-th="<?= /* @noEscape */ $escaper->escapeHtml(__('Interval')) ?>" class="col interval">
+                        <?= /* @noEscape */ $escaper->escapeHtml($block->getSubscriptionIntervalLabel($subscription)) ?>
                     </td>
-                    <td data-th="<?= /* @noEscape */ $block->escapeHtml(__('Start Date')) ?>" class="col start-date">
+                    <td data-th="<?= /* @noEscape */ $escaper->escapeHtml(__('Start Date')) ?>" class="col start-date">
                         <?= /* @noEscape */ $block->formatDate(
                             $subscription->getStartDate(),
                             \IntlDateFormatter::SHORT,
@@ -72,7 +72,7 @@
                         ) ?>
                     </td>
                     <?php if ($block->isEndDateEnabled()): ?>
-                    <td data-th="<?= /* @noEscape */  $block->escapeHtml(__('End Date')) ?>" class="col end-date">
+                    <td data-th="<?= /* @noEscape */  $escaper->escapeHtml(__('End Date')) ?>" class="col end-date">
                         <?= /* @noEscape */  $block->formatDate(
                             $subscription->getEndDate()?$subscription->getEndDate():$subscription->getStartDate(),
                             \IntlDateFormatter::SHORT,
@@ -81,11 +81,11 @@
                         ) ?>
                     </td>
                     <?php endif; ?>
-                    <td data-th="<?= /* @noEscape */ $block->escapeHtml(__('Status')) ?>"
+                    <td data-th="<?= /* @noEscape */ $escaper->escapeHtml(__('Status')) ?>"
                         class="col status">
-                            <?= /* @noEscape */ $block->escapeHtml($subscription->getStatusLabel()) ?>
+                            <?= /* @noEscape */ $escaper->escapeHtml($subscription->getStatusLabel()) ?>    
                     </td>
-                    <td data-th="<?= /* @noEscape */  $block->escapeHtml(__('Actions')) ?>" class="col actions">
+                    <td data-th="<?= /* @noEscape */  $escaper->escapeHtml(__('Actions')) ?>" class="col actions">
                         <?php if ($subscription->getStatus() == 'active'): ?>
                             <a href="<?= /* @noEscape */  $block->getEditUrl($subscription); ?>"
                                class="action edit"><span><?= /* @noEscape */  $block->getMyAccountLabels('AC22') ?>
@@ -95,6 +95,15 @@
                                class="action delete"><span><?= /* @noEscape */  $block->getMyAccountLabels('AC23') ?>
                                 </span></a>
                         <?php endif; ?>
+                        <?php 
+                            $subscriptionId = $subscription->getSubscriptionId();
+                            $nextOrder = $block->getNextRecurringOrder($subscriptionId);
+                            if (!empty($nextOrder)) { ?>
+                                <div class="upcoming-delivery">
+                                    <?= /* @noEscape */ __('Upcoming Delivery') ?>
+                                    <?= /* @noEscape */  $nextOrder->getRecurringDate() ?>
+                                </div>
+                        <?php } ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -141,5 +150,5 @@
     <div class="message info empty">
         <span><?php
         $msg = $block->getMyAccountSpecificException('MCAM13');
-        echo $block->escapeHtml(__($msg)); ?></span></div>
+        echo $escaper->escapeHtml(__($msg)); ?></span></div>
 <?php endif ?>

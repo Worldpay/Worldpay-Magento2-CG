@@ -5,39 +5,41 @@
  */
 ?>
 <?php /** @var $block \Sapient\Worldpay\Block\Paybylink */ ?>
-<h1><?= $block->escapeHtml(__('Thank you for your purchase!.')) ?></h1>
+<h1><?= $escaper->escapeHtml(__('Thank you for your purchase!.')) ?></h1>
 <div class="checkout-success">
     <?php if ($block->getOrderId()):?>
         <?php if ($block->getCanViewOrder()):?>
-            <p><?= $block->escapeHtml(__(
+            <p><?= $escaper->escapeHtml(__(
                 'Your order number is: %1.',
                 sprintf(
                     '<a href="%s" class="order-number"><strong>%s</strong></a>',
-                    $block->escapeUrl($block->getViewOrderUrl()),
+                    $escaper->escapeUrl($block->getViewOrderUrl()),
                     $block->getOrderId()
                 )
             ), ['a', 'strong']) ?>
             </p>
         <?php  else:?>
-            <p><?= $block->escapeHtml(__('Your payment has been successfully 
+            <p><?= $escaper->escapeHtml(__('Your payment has been successfully 
             regarding the order #:<span>%1</span>.', $block->getOrderId()), ['span']) ?></p>            
             <?php endif;?>
             <?php if ($block->checkCustomerLogin()):?>
-            <p><?= $block->escapeHtml(__('You can check your order details after loggedin: ')) ?>
-            <a class="action" href="<?= $block->escapeUrl($block->getCustomerLoginUrl()) ?>">
-            <span><strong><?= $block->escapeHtml(__(' Click here')) ?></strong></span></a>
+            <p><?= $escaper->escapeHtml(__('You can check your order details after loggedin: ')) ?>
+            <a class="action" href="<?= $escaper->escapeUrl($block->getCustomerLoginUrl()) ?>">
+            <span><strong><?= $escaper->escapeHtml(__(' Click here')) ?></strong></span></a>
             <?php endif;?>
             <p>
-                <?= $block->escapeHtml(__('We\'ll email you an order confirmation with details and tracking info.')) ?>
+                <?= $escaper->escapeHtml(__(
+                    'We\'ll email you an order confirmation with details and tracking info.'
+                )) ?>
             </p>
     <?php endif;?>
     <?= $block->getAdditionalInfoHtml() ?>
     <div class="actions-toolbar">
         <div class="primary">
-            <a class="action primary continue" href="<?= $block->escapeUrl(
+            <a class="action primary continue" href="<?= $escaper->escapeUrl(
                 $block->getContinueUrl()
             ) ?>"><span>
-            <?= $block->escapeHtml(__('Continue Shopping')) ?></span></a>
+            <?= $escaper->escapeHtml(__('Continue Shopping')) ?></span></a>
         </div>
     </div>
 </div>

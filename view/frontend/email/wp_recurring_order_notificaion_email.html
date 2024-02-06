@@ -1,0 +1,92 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@vars {
+"var mail_subject|raw":"Mail Subject",
+"var billing_name":"Customer Name",
+"var recurring_date":"Recurring Date",
+"var product_name":"Product Name",
+"var view_order_url":"View Order Url",
+"var order_data.formattedBillingAddress|raw":"Billing Address",
+"var order_data.formattedShippingAddress|raw":"Shipping Address",
+"var order_data.payment_html|raw":"Payment Details",
+"var order_data.order.shipping_description":"Shipping Description",
+"var shipping_msg":"Shipping message",
+"var expired_msg":"Card Expired message",
+"var order_data.order":"Order",
+"var order_data.order_id": "Order DB Id",
+"var order_data.is_not_virtual":"Order Type"
+} @-->
+<!--@subject {{var mail_subject|raw }} @-->
+{{template config_path="design/email/header_template"}}
+<p>Hi {{var billing_name}},</p>
+<br>
+<p>{{trans "We hope this email finds you well."}}</p>
+
+<p>Your next subscription order is scheduled for <b style="color: red;">{{var recurring_date}}</b>, and we want to ensure a seamless experience for you.</p> 
+{{depend expired_msg}}
+    <p style="color: red;"><b>{{var expired_msg}}</b></p>
+{{/depend}}    
+<p>{{trans "Please review the order details below"}}:</p>
+<h2>{{trans "Order Information"}}:</h2>
+<table class="order-details">
+    <tr>
+        <td class="address-details">
+            <h3>{{trans "Billing Info"}}</h3>
+            <p>{{var order_data.formattedBillingAddress|raw}}</p>
+        </td>
+        {{depend order_data.is_not_virtual}}
+        <td class="address-details">
+            <h3>{{trans "Shipping Info"}}</h3>
+            <p>{{var order_data.formattedShippingAddress|raw}}</p>
+        </td>
+        {{/depend}}
+    </tr>
+    <tr>
+        <td class="method-info">
+            <h3>{{trans "Payment Method"}}</h3>
+            {{var order_data.payment_html|raw}}
+        </td>
+        {{depend order_data.is_not_virtual}}
+        <td class="method-info">
+            <h3>{{trans "Shipping Method"}}</h3>
+            <p>{{var order_data.order.shipping_description}}</p>
+            {{if shipping_msg}}
+            <p>{{var shipping_msg}}</p>
+            {{/if}}
+        </td>
+        {{/depend}}
+    </tr>
+</table>
+{{layout handle="sales_email_order_items" order_id=$order_data.order_id area="frontend"}}
+<br>
+<h2>{{trans "Actions You Can Take"}}:</h2>
+<table style="text-align:center;border:none;margin: 30pt 10pt">
+    <tr>
+        {{depend order_data.is_not_virtual}}
+        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 0px; text-align: center;" valign="top" bgcolor="#3498db" align="center"> 
+            <a href="{{var view_order_url}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 0px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;">
+                {{trans "Change Shipment"}}</a> 
+        </td><td>&nbsp;&nbsp;</td>
+        {{/depend}}
+        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 0px; text-align: center;" valign="top" bgcolor="#3498db" align="center"> 
+            <a href="{{var view_order_url}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 0px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;">
+                {{trans "Change Payment Method"}}</a> 
+        </td><td>&nbsp;&nbsp;</td>
+        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 0px; text-align: center;" valign="top" bgcolor="#3498db" align="center"> 
+            <a href="{{var view_order_url}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 0px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;">
+                {{trans "Skip This Order"}}</a> 
+        </td>
+    </tr>
+</table>
+<p><br></p>
+<p>{{trans "Please ensure that any changes are made before the scheduled date to avoid any inconvenience. If you have any questions or encounter any issues, feel free to reach out to our customer support."}}</p>
+<br>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><small>{{trans "Note: You are receiving this email because you have recurring order in your account."}}</small></p>
+{{template config_path="design/email/footer_template"}}

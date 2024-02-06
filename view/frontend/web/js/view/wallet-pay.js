@@ -115,9 +115,7 @@ define([
             }
             mageTemplate(totalsegmentsTemplate);
             mageTemplate(pdpCartTemplate);
-
             this.isBillingAddressSameAsShipping(true);
-
             this.isRequiredShipping.subscribe(function(isrequired){
                 if(isrequired == false){
                     // do not need shipping and billing address checkbox
@@ -133,9 +131,6 @@ define([
                     $("#wp-wallet-pay").show();
                 }
             })
-
-
-
         },
         countriesHtml : function(){
             var self = this;
@@ -241,10 +236,10 @@ define([
                 storecode : window.walletpayObj.store_code,
                 quoteId : window.walletpayObj.currentQuoteid
             }
+
             if(!window.walletpayObj.isUserLoggedIn()){
                 quoteObj.quoteId = window.walletpayObj.currentQuoteMaskedId;
             }
-
             $("body").trigger('processStart');
             return checkoutUtils.cancelCoupon(
                 quoteObj
@@ -775,7 +770,6 @@ define([
                     text: applepayButtontext,
                     class: 'place-order-applepay',
                     click: function () {
-                        $("body").trigger('processStart');
                         self.preparePayment(true);
                     }
                 });
@@ -1069,7 +1063,6 @@ define([
                 merchantCapabilities: [ 'supports3DS'] //production changes
             };
             ApplePayModel.initApplePaySession(paymentRequest);
-            $("body").trigger('processStop');
         },
         // Send Payment token
         applePaySendPaymentToken : function(paymentToken){

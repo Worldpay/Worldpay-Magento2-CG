@@ -13,7 +13,7 @@
                 <enabled>1</enabled>
                 <title>Credit Cards</title>
                 <paymentmethods>AMEX-SSL,VISA-SSL,ECMC-SSL</paymentmethods>
-                <cse_enabled>0</cse_enabled>
+                <cse_enabled>1</cse_enabled>
                 <require_cvc>1</require_cvc>
                 <integration_mode>direct</integration_mode>
             </cc_config>
@@ -117,6 +117,23 @@
                 <capture_delay>default</capture_delay>
                 <capture_delay_custom_value>1</capture_delay_custom_value>
             </dynamic_capture_delay>
+            <subscriptions>
+                <recurring_order_buffer_time>5</recurring_order_buffer_time>
+            </subscriptions>
+            <payment_method_logo_config>
+                <wallet>
+                    <applepay_ssl>
+                        <applepay_button_color>black</applepay_button_color>
+                        <applepay_button_type>buy</applepay_button_type>
+                        <applepay_button_locale>en-GB</applepay_button_locale>
+                    </applepay_ssl>
+                    <paywithgoogle_ssl>
+                        <gpay_button_color>default</gpay_button_color>
+                        <gpay_button_type>buy</gpay_button_type>
+                        <gpay_button_locale>en</gpay_button_locale>
+                    </paywithgoogle_ssl>
+                </wallet>
+            </payment_method_logo_config>
         </worldpay>
         <payment>
             <worldpay_cc>
@@ -182,5 +199,12 @@
                 <can_use_for_worldpay_subscription>0</can_use_for_worldpay_subscription>
             </worldpay_paybylink>
         </payment>
+        <dev>
+            <js>
+               <minify_exclude>
+                  <exclude_name>../chromepay/sw.js</exclude_name>
+                </minify_exclude>
+             </js>
+        </dev>
     </default>
 </config>

@@ -10,23 +10,23 @@
                     <th scope="col" class="col id">
                         <?= /* @noEscape */ $block->getMyAccountLabels('AC2') ?
                                 $block->getMyAccountLabels('AC2') :
-                                $block->escapeHtml(__('Card Brand #'))?></th>
+                                $escaper->escapeHtml(__('Card Brand #'))?></th>
                     <th scope="col" class="col date">
                         <?= /* @noEscape */ $block->getMyAccountLabels('AC3') ?
                                 $block->getMyAccountLabels('AC3') :
-                                $block->escapeHtml(__('Card Number'))?></th>
+                                $escaper->escapeHtml(__('Card Number'))?></th>
                     <th scope="col" class="col shipping">
                         <?= /* @noEscape */ $block->getCheckoutLabels('CO4') ?
                                 $block->getCheckoutLabels('CO4') :
-                                $block->escapeHtml(__('Card Holder Name'))?></th>
+                                $escaper->escapeHtml(__('Card Holder Name'))?></th>
                     <th scope="col" class="col total">
                         <?=/* @noEscape */ $block->getMyAccountLabels('AC4') ?
                                 $block->getMyAccountLabels('AC4') :
-                                $block->escapeHtml(__('Card Expiry Month'))?></th>
+                                $escaper->escapeHtml(__('Card Expiry Month'))?></th>
                     <th scope="col" class="col status">
                         <?= /* @noEscape */ $block->getMyAccountLabels('AC5') ?
                                 $block->getMyAccountLabels('AC5') :
-                                $block->escapeHtml(__('Card Expiry Year'))?></th>
+                                $escaper->escapeHtml(__('Card Expiry Year'))?></th>
                     <th scope="col" class="col actions">&nbsp;</th>
                 </tr>
             </thead>
@@ -34,32 +34,32 @@
                 <?php foreach ($_savecards as $_savecard): ?>
                     <tr>
                         <td data-th="
-                            <?php print /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC2')?
+                            <?php print /* @noEscape */ $escaper->escapeHtml($block->getMyAccountLabels('AC2')?
                                 $block->getMyAccountLabels('AC2') : 'Card Brand #') ?>" class="col id">
                                 <?= /* @noEscape */ $_savecard->getCardBrand() ?>
                         </td>
                            <td data-th="
-                               <?php print /* @noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC3')?
+                               <?php print /* @noEscape */ $escaper->escapeHtml($block->getMyAccountLabels('AC3')?
                                    $block->getMyAccountLabels('AC3') : 'Card Number') ?>" class="col date">
                                    <?= /* @noEscape */ $_savecard->getCardNumber() ?>
                            </td>
                         <td data-th="
-                            <?php print /* @noEscape */ $block->escapeHtml($block->getCheckoutLabels('CO4')?
+                            <?php print /* @noEscape */ $escaper->escapeHtml($block->getCheckoutLabels('CO4')?
                                 $block->getCheckoutLabels('CO4') : 'Card Holder Name') ?>" class="col shipping">
                                 <?= /* @noEscape */ $_savecard->getCardholderName() ?>
                         </td>
                         <td data-th="
-                            <?php print /* @noEscape */$block->escapeHtml($block->getMyAccountLabels('AC4')?
+                            <?php print /* @noEscape */$escaper->escapeHtml($block->getMyAccountLabels('AC4')?
                                 $block->getMyAccountLabels('AC4') : 'Card Expiry Month') ?>" class="col total">
                                 <?= /* @noEscape */ $_savecard->getCardExpiryMonth() ?>
                         </td>
                         <td data-th="
-                            <?php print /* @noEscape */$block->escapeHtml($block->getMyAccountLabels('AC5')?
+                            <?php print /* @noEscape */$escaper->escapeHtml($block->getMyAccountLabels('AC5')?
                                 $block->getMyAccountLabels('AC5') : 'Card Expiry Year') ?>" class="col status">
                                 <?= /* @noEscape */ $_savecard->getCardExpiryYear() ?>
                         </td>
                         <td data-th="
-                            <?php print /*@noEscape */ $block->escapeHtml($block->getMyAccountLabels('AC21')?
+                            <?php print /*@noEscape */ $escaper->escapeHtml($block->getMyAccountLabels('AC21')?
                                 $block->getMyAccountLabels('AC21') : 'Actions') ?>" class="col actions">
                               <?php
                                 if ($_savecard->getTokenCode() != '') {
@@ -68,7 +68,7 @@
                                 <span>
                                     <?=/* @noEscape */ $block->getMyAccountLabels('AC6')?
                                         $block->getMyAccountLabels('AC6') :
-                                        $block->escapeHtml(__('Update'))?>
+                                        $escaper->escapeHtml(__('Update'))?>
                                 </span>
                             </a>
                                     <?php
@@ -77,7 +77,7 @@
                             
                         </td>
                         <td data-th="<?= /* @noEscape */
-                        $block->escapeHtml($block->getMyAccountLabels('AC21')?
+                        $escaper->escapeHtml($block->getMyAccountLabels('AC21')?
                                 $block->getMyAccountLabels('AC21') : 'Actions') ?>" 
                             class="col actions">
                         <a href="javascript:void(0)" data-delete-url="
@@ -85,7 +85,7 @@
                             <span>
                                 <?= /* @noEscape */ $block->getMyAccountLabels('AC11')?
                                         $block->getMyAccountLabels('AC11') :
-                                        $block->escapeHtml(__('Delete'))?>
+                                        $escaper->escapeHtml(__('Delete'))?>
                             </span></a>
                         </td>
                     </tr>
@@ -101,7 +101,7 @@
                     confirm({
                         title: "<?= /* @noEscape */ $block->getMyAccountLabels('AC11')?
                                 $block->getMyAccountLabels('AC11') :
-                                $block->escapeHtml(__('Delete'))?>",
+                                $escaper->escapeHtml(__('Delete'))?>",
                         content: getMyAccountExceptions('IAVMA2') ?
                 getMyAccountExceptions('IAVMA2') : 'Are you sure you want to delete the card? \n\
 Once the card is deleted, subscriptions associated with it will be cancelled',
@@ -133,20 +133,20 @@ Once the card is deleted, subscriptions associated with it will be cancelled',
         <span>
             <?= /* @noEscape */ $block->getMyAccountLabels('AC30')?
                     $block->getMyAccountLabels('AC30') :
-                    $block->escapeHtml(__('You have no Saved Card.')); ?>
+                    $escaper->escapeHtml(__('You have no Saved Card.')); ?>
         </span>
     </div>
 <?php endif ?>
 <div class="actions-toolbar">
     <div class="primary">
         <button type="button" role="add-card"
-                title="<?php print $block->escapeHtmlAttr(
+                title="<?php print $escaper->escapeHtmlAttr(
                     $block->getMyAccountLabels('IAVAC1')?
                     $block->getMyAccountLabels('IAVAC1') : 'Add New Card'
                 ) ?>" 
                 class="action primary add">
             <span>
-                <?php print $block->escapeHtml($block->getMyAccountLabels('IAVAC1')?
+                <?php print $escaper->escapeHtml($block->getMyAccountLabels('IAVAC1')?
                         $block->getMyAccountLabels('IAVAC1') : 'Add New Card') ?>
             </span></button>
     </div>
@@ -156,8 +156,8 @@ Once the card is deleted, subscriptions associated with it will be cancelled',
         ".page-main": {
             "newcard": {
                 "addCard": "button[role='add-card']",
-                "addCardLocation": "<?= $block->escapeJs($block->escapeUrl($block->getAddNewCardLabel())) ?>",
-                "isBilling": "<?= $block->escapeJs($block->escapeUrl($block->ifBillingAddressPresent())) ?>"
+                "addCardLocation": "<?= $escaper->escapeJs($escaper->escapeUrl($block->getAddNewCardLabel())) ?>",
+                "isBilling": "<?= $escaper->escapeJs($escaper->escapeUrl($block->ifBillingAddressPresent())) ?>"
             }
         }
     }

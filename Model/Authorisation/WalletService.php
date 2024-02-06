@@ -225,6 +225,7 @@ class WalletService extends \Magento\Framework\DataObject
                 $paymentxml=$orderStatus->payment;
                 $paymentxml->paymentMethod[0] = 'APPLEPAY-SSL';
             }
+
             $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment);
             $this->_applyPaymentUpdate($directResponse, $payment);
         }

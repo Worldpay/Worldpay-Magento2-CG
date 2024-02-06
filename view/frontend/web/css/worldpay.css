@@ -331,6 +331,14 @@ span.cc-card-type {
 .gpay-card-info-container{
     min-width:140px;
 }
+button.gpay-button:hover,
+button.gpay-button:focus,
+button.gpay-button:active{
+    background-origin: content-box;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
 .payment-title-wrapper{
     margin-top: auto;
     width: 40%;

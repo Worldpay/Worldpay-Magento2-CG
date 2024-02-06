@@ -9,16 +9,16 @@
 <div class="checkout-success">
     <?php if ($block->getOrderId()):?>
         <p>
-            <?= $block->escapeHtml(
+            <?= $escaper->escapeHtml(
                 __('Your order number is: %1.', sprintf(
                     '<a href="%s" class="order-number"><strong>%s</strong></a> has been created but not confirmed.',
-                    $block->escapeUrl($block->getViewOrderUrl()),
+                    $escaper->escapeUrl($block->getViewOrderUrl()),
                     $block->getOrderId()
                 )),
                 ['a', 'strong']
             ) ?>
         </p>
-        <p><?= $block->escapeHtml(__('An email has been sent to your email id with the payment link. 
+        <p><?= $escaper->escapeHtml(__('An email has been sent to your email id with the payment link. 
         Please do the payment.')) ?></p>
     <?php endif;?>
 
@@ -26,10 +26,10 @@
 
     <div class="actions-toolbar">
         <div class="primary">
-            <a class="action primary continue" href="<?= $block->escapeUrl(
+            <a class="action primary continue" href="<?= $escaper->escapeUrl(
                 $block->getContinueUrl()
             ) ?>">
-                <span><?= $block->escapeHtml(__('Continue Shopping')) ?></span></a>
+                <span><?= $escaper->escapeHtml(__('Continue Shopping')) ?></span></a>
         </div>
     </div>
 </div>

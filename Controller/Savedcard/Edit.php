@@ -63,9 +63,13 @@ class Edit extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        $resultRedirect = $this->resultRedirectFactory->create();
         if (!$this->customerSession->isLoggedIn()) {
-            $resultRedirect = $this->resultRedirectFactory->create();
             $resultRedirect->setPath('customer/account/login');
+            return $resultRedirect;
+        }
+        if (!$this->worldpayHelper->isWorldPayEnable()) {
+            $resultRedirect->setPath('noroute');
             return $resultRedirect;
         }
         $resultPage = $this->_resultPageFactory->create();
@@ -74,14 +78,12 @@ class Edit extends \Magento\Framework\App\Action\Action
         if ($id) {
             $cardDetails = $this->savecard->create()->load($id);
             if ($cardDetails->getCustomerId() != $customerId) {
-                $resultRedirect = $this->resultRedirectFactory->create();
                 $resultRedirect->setPath('404notfound');
                 return $resultRedirect;
             }
             $resultPage->getConfig()->getTitle()->set($this->worldpayHelper->getAccountLabelbyCode('AC7'));
             return $resultPage;
         } else {
-            $resultRedirect = $this->resultRedirectFactory->create();
             $resultRedirect->setPath('404notfound');
             return $resultRedirect;
         }

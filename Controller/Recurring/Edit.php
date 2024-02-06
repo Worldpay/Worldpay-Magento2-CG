@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2020 Worldpay, LLC. All rights reserved.
+ * Copyright ©2020 Worldpay, LLC. All rights reserved.
  * See LICENSE.txt for license details.
  */
 
@@ -13,26 +13,27 @@ use Magento\Framework\View\Result\PageFactory;
 use Sapient\Worldpay\Model\Recurring\SubscriptionFactory;
 use Sapient\Worldpay\Model\Config\Source\SubscriptionStatus;
 use Sapient\Worldpay\Helper\GeneralException;
+use Magento\Framework\Registry;
 
 class Edit extends \Magento\Framework\App\Action\Action
 {
     /**
-     * @var Session
+     * @var $customerSession
      */
     private $customerSession;
 
     /**
-     * @var PageFactory
+     * @var $resultPageFactory
      */
     private $resultPageFactory;
 
     /**
-     * @var SubscriptionFactory
+     * @var $subscriptionFactory
      */
     private $subscriptionFactory;
 
     /**
-     * @var helper
+     * @var $helper
      */
     private $helper;
 
@@ -42,12 +43,18 @@ class Edit extends \Magento\Framework\App\Action\Action
     private $customerUrl;
 
     /**
+     * @var \Magento\Framework\Registry
+     */
+    private $registry;
+
+    /**
      * @param Context $context
      * @param Session $customerSession
      * @param PageFactory $resultPageFactory
      * @param SubscriptionFactory $subscriptionFactory
      * @param Sapient\Worldpay\Helper\GeneralException $helper
      * @param \Magento\Customer\Model\Url $customerUrl
+     * @param Registry $registry
      */
     public function __construct(
         Context $context,
@@ -55,7 +62,8 @@ class Edit extends \Magento\Framework\App\Action\Action
         PageFactory $resultPageFactory,
         SubscriptionFactory $subscriptionFactory,
         \Sapient\Worldpay\Helper\GeneralException $helper,
-        \Magento\Customer\Model\Url $customerUrl
+        \Magento\Customer\Model\Url $customerUrl,
+        Registry $registry
     ) {
         $this->customerSession = $customerSession;
         parent::__construct($context);
@@ -63,6 +71,7 @@ class Edit extends \Magento\Framework\App\Action\Action
         $this->subscriptionFactory = $subscriptionFactory;
         $this->helper = $helper;
         $this->customerUrl = $customerUrl;
+        $this->registry = $registry;
     }
 
     /**
@@ -112,6 +121,8 @@ class Edit extends \Magento\Framework\App\Action\Action
 
             return $this->resultRedirectFactory->create()->setPath('*/*');
         }
+
+        $this->registry->register('current_subscription_order', $subscription);
 
         /** @var \Magento\Framework\View\Element\Html\Links $navigationBlock */
         //$resultPage->getConfig()->getTitle()->set(__('Update Saved Card'));

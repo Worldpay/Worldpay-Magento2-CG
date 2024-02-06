@@ -10,6 +10,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Multishipping\Model\Checkout\Type\Multishipping;
 use Magento\Multishipping\Model\Checkout\Type\Multishipping\State;
+use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\HttpGetActionInterface as HttpGetActionInterface;
 
 /**
@@ -28,17 +29,25 @@ class Orderplaced extends Action implements HttpGetActionInterface
     private $multishipping;
 
     /**
+     * @var $resultPageFactory
+     */
+    protected $resultPageFactory;
+
+    /**
      * @param Context $context
      * @param State $state
      * @param Multishipping $multishipping
+     * @param PageFactory $resultPageFactory
      */
     public function __construct(
         Context $context,
         State $state,
-        Multishipping $multishipping
+        Multishipping $multishipping,
+        PageFactory $resultPageFactory
     ) {
         $this->state = $state;
         $this->multishipping = $multishipping;
+        $this->resultPageFactory = $resultPageFactory;
         parent::__construct($context);
     }
     /**
@@ -51,9 +60,10 @@ class Orderplaced extends Action implements HttpGetActionInterface
         if (!$this->state->getCompleteStep(State::STEP_OVERVIEW)) {
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         }
-        $this->_view->loadLayout();
+        $resultPage = $this->resultPageFactory->create();
         $ids = $this->multishipping->getOrderIds();
         $this->_eventManager->dispatch('multishipping_checkout_controller_success_action', ['order_ids' => $ids]);
-        $this->_view->renderLayout();
+        
+        return $resultPage;
     }
 }

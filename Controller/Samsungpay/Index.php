@@ -1,5 +1,5 @@
 <?php
-//error_reporting(0);
+
 /**
  * @copyright 2017 Sapient
  */
@@ -14,6 +14,7 @@ use Magento\Quote\Model\QuoteIdMaskFactory;
 
 class Index extends \Magento\Framework\App\Action\Action
 {
+    public const SAMSUMG_CONFIG_PATH = "worldpay/multishipping/ms_wallets_config/ms_samsung_pay_wallets_config/";
     /**
      * @var $quoteFactory
      */
@@ -114,6 +115,11 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
+        $resultRedirect = $this->resultRedirectFactory->create();
+        if (!$this->worldpayHelper->isWorldPayEnable()) {
+            $resultRedirect->setPath('noroute');
+             return $resultRedirect;
+        }
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         
         $serviceId = $this->scopeConfig->
@@ -128,6 +134,8 @@ class Index extends \Magento\Framework\App\Action\Action
         $environmentMode = $this->scopeConfig->
                 getValue('worldpay/general_config/environment_mode', $storeScope);
         
+        $quoteId = $this->request->getParam('quoteId');
+        
         if ($environmentMode == 'Test Mode') {
             $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions";
         } else {
@@ -136,18 +144,34 @@ class Index extends \Magento\Framework\App\Action\Action
         
         $baseUrl =  $this->_storeManager->getStore()->getBaseUrl();
         
-         $quoteId = $this->request->getParam('quoteId');
         if (!$this->customerSession->isLoggedIn()) {
             $quoteIdMask = $this->quoteIdMaskFactory->create();
             $quoteIdMask->load($quoteId, 'masked_id');
             $quoteId = $quoteIdMask->getQuoteId();
         }
+
          $quote = $this->quoteFactory->create()->load($quoteId);
          $quoteData = $quote->getData();
          $currency = $quote->getQuoteCurrencyCode();
          $grandTotal =  $quote->getGrandTotal();
          $postFields = [];
          
+        /** Multishipping Samsung Pay Configuration */
+        if ($quote->getIsMultiShipping()) {
+            $msServiceId = $this->scopeConfig->
+                getValue(self::SAMSUMG_CONFIG_PATH.'ms_service_id', $storeScope);
+        
+            $msShopName = $this->scopeConfig->
+                    getValue(self::SAMSUMG_CONFIG_PATH.'ms_samsung_merchant_shop_name', $storeScope);
+        
+            $msShopUrl = $this->scopeConfig->
+                    getValue(self::SAMSUMG_CONFIG_PATH.'ms_samsung_merchant_shop_url', $storeScope);
+            
+            $serviceId = !empty($msServiceId) ? $msServiceId : $serviceId;
+            $shopName = !empty($msShopName) ? $msShopName : $shopName;
+            $shopUrl = !empty($msShopUrl) ? $msShopUrl : $shopUrl;
+        }
+
          $callBack = $baseUrl . 'worldpay/samsungpay/CallBack';
          $exponent = $this->worldpayHelper->getCurrencyExponent($currency);
          $postFields['callback'] = $callBack;

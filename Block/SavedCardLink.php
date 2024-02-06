@@ -14,6 +14,10 @@ use Magento\Framework\View\Element\Template\Context;
 use Sapient\Worldpay\Model\WorldpayConfigProvider;
 use Sapient\Worldpay\Helper\Data;
 
+/**
+ * Description of SavedCardLink
+ *
+ */
 class SavedCardLink extends \Magento\Framework\View\Element\Html\Link\Current
 {
 

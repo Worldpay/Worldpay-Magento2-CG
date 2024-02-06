@@ -9,7 +9,7 @@ namespace Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactio
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
     /**
-     * @var string
+     * @var string $_idFieldName
      */
     protected $_idFieldName = 'entity_id';
 
@@ -43,6 +43,20 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     {
         if ($subscription->getId()) {
             $this->addFieldToFilter('subscription_id', $subscription->getId());
+        }
+        return $this;
+    }
+
+    /**
+     * Set Status Filter
+     *
+     * @param Subscription $subscription
+     * @return $this
+     */
+    public function setStatusFilter(\Sapient\Worldpay\Model\Recurring\Subscription $subscription)
+    {
+        if ($subscription->getId()) {
+            $this->addFieldToFilter('status', 'active');
         }
         return $this;
     }

@@ -14,6 +14,7 @@ use Magento\Framework\Controller\ResultFactory;
 
 class Index extends \Magento\Framework\App\Action\Action
 {
+    public const APPLEPAY_MS_CONFIG_PATH = "worldpay/multishipping/ms_wallets_config/ms_samsung_pay_wallets_config/";
     /**
      * @var fileDriver
      */
@@ -111,7 +112,35 @@ class Index extends \Magento\Framework\App\Action\Action
                 getValue('worldpay/wallets_config/apple_pay_wallets_config/merchant_name', $storeScope);
         $domainName = $this->scopeConfig->
                 getValue('worldpay/wallets_config/apple_pay_wallets_config/domain_name', $storeScope);
- 
+        /** Multishipping Apple Pay Configuration */
+        if ($this->cart->getQuote()->getIsMultiShipping()) {
+            $msCertificateKey = $this->scopeConfig->getValue(
+                'worldpay/multishipping/ms_wallets_config/ms_apple_pay_wallets_config/ms_certification_key',
+                $storeScope
+            );
+            $msCertificateCrt = $this->scopeConfig->getValue(
+                'worldpay/multishipping/ms_wallets_config/ms_apple_pay_wallets_config/ms_certification_crt',
+                $storeScope
+            );
+            $msCertificationPassword = $this->scopeConfig->getValue(
+                'worldpay/multishipping/ms_wallets_config/ms_apple_pay_wallets_config/ms_certification_password',
+                $storeScope
+            );
+            $msMerchantName = $this->scopeConfig->getValue(
+                'worldpay/multishipping/ms_wallets_config/ms_apple_pay_wallets_config/ms_merchant_name',
+                $storeScope
+            );
+            $msDomainName = $this->scopeConfig->getValue(
+                'worldpay/multishipping/ms_wallets_config/ms_apple_pay_wallets_config/ms_domain_name',
+                $storeScope
+            );
+            $certificateKey = !empty($msCertificateKey) ? $msCertificateKey : $certificateKey;
+            $certificateCrt = !empty($msCertificateCrt) ? $msCertificateCrt : $certificateCrt;
+            $certificationPassword =
+            !empty($msCertificationPassword) ? $msCertificationPassword : $certificationPassword;
+            $merchantName = !empty($msMerchantName) ? $msMerchantName : $merchantName;
+            $domainName = !empty($msDomainName) ? $msDomainName : $domainName;
+        }
           $validation_url = $this->request->getParam('u');
          
         if ($validation_url == 'getTotal') {

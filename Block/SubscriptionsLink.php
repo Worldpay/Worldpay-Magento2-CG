@@ -15,11 +15,15 @@ use Sapient\Worldpay\Block\Recurring\Customer\Subscriptions;
 use Sapient\Worldpay\Helper\Recurring;
 use Sapient\Worldpay\Helper\Data;
 
+/**
+ * Description of SubscriptionsLink
+ *
+ */
 class SubscriptionsLink extends \Magento\Framework\View\Element\Html\Link\Current
 {
 
     /**
-     * @var _scopeConfig
+     * @var $_scopeConfig
      */
     protected $_scopeConfig = null;
     /**

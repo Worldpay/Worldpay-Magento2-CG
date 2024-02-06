@@ -1,0 +1,30 @@
+<?php /* @var $block \Sapient\Worldpay\Block\Adminhtml\System\Config\CsePopup */ ?>
+<script>
+    require([
+        'jquery',
+        'Magento_Ui/js/modal/confirm',
+        'prototype'
+    ], function($, confirmation){
+
+        $(document).ready(function() {
+            $('#worldpay_cc_config_cse_enabled').on('change', function () {
+                var value = $('#worldpay_cc_config_cse_enabled').val();
+                if(value == 0){ 
+                    confirmation({
+                        title: $.mage.__('Highly Recommended'),
+                        content: $.mage.__('Client Side Encryption must be enabled to secure shoppers card details'),
+                        buttons: [ {
+                            text: $.mage.__('Close'),
+                            class: 'action-secondary',
+                            click: function (event) {
+                                this.closeModal(event);
+                            }
+                        }],
+                    });
+
+                }
+            });
+        });
+
+    });
+</script>

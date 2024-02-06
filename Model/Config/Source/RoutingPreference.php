@@ -1,7 +1,6 @@
 <?php
-/**
- * @copyright 2017 Sapient
- */
+
+
 namespace Sapient\Worldpay\Model\Config\Source;
 
 /**

@@ -258,17 +258,14 @@ class PayByLinkService extends \Magento\Framework\DataObject
     }
 
     /**
-     * Get PBL expiry time
+     * Get PBL expiry time     *
      */
     public function getPayByLinkExpiryTime()
     {
         $currentDate = date('Y-m-d H:i:s');
         $pblExpiryConfiguration = $this->worldpayhelper->getPayByLinkExpiryTime();
-        $interval = date("Y-m-d H:i:s", $this->worldpayhelper
-            ->findPblOrderExpiryTime(
-                $currentDate,
-                $pblExpiryConfiguration
-            ));
+        $pblExpTime = $this->worldpayhelper->findPblOrderExpiryTime($currentDate, $pblExpiryConfiguration);
+        $interval = date("Y-m-d H:i:s", $pblExpTime);
         return $interval;
     }
 
@@ -354,8 +351,7 @@ class PayByLinkService extends \Magento\Framework\DataObject
             $responseInquiry = $this->_sendRequest(
                 dom_import_simplexml($inquirySimpleXml)->ownerDocument,
                 $merchantUsername,
-                $merchantPassword,
-                \Sapient\Worldpay\Model\Request\PaymentServiceRequest::SEND_ADDITIONAL_HEADER
+                $merchantPassword
             );
 
             $paymentService = new \SimpleXmlElement($responseInquiry);
@@ -545,12 +541,11 @@ class PayByLinkService extends \Magento\Framework\DataObject
      * @param SimpleXmlElement $xml
      * @param string $username
      * @param string $password
-     * @param bool $additionalHeader
      * @return SimpleXmlElement $response
      */
-    protected function _sendRequest($xml, $username, $password, $additionalHeader)
+    protected function _sendRequest($xml, $username, $password)
     {
-        $response = $this->_request->sendRequest($xml, $username, $password, $additionalHeader);
+        $response = $this->_request->sendRequest($xml, $username, $password);
         return $response;
     }
     /**

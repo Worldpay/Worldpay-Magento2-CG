@@ -117,6 +117,14 @@ EOD;
      * @var array
      */
     protected $billingAddress;
+    /**
+     * @var string
+     */
+    protected $echoData;
+    /**
+     * @var string
+     */
+    protected $shopperId;
      /**
       * Constructor
       *

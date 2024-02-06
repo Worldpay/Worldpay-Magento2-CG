@@ -7,6 +7,7 @@
 /**
  * Worldpay Multishipping PayByLink Shipment address
  *
+ * @author     Magento Core Team <core@magentocommerce.com>
  */
 namespace Sapient\Worldpay\Block\Multishipping\Paybylink\Email;
 
@@ -33,11 +34,11 @@ class Addresses extends \Magento\Framework\View\Element\Template
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
     protected $quoteRepository;
+
      /**
-      * constructor
-      *
+      * constructor      *
       * @param \Magento\Backend\Block\Template\Context $context
-      * @param  \Magento\Customer\Model\Address\Config $addressConfig
+      * @param \Magento\Customer\Model\Address\Config $addressConfig
       * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
       * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
       * @param array $data
