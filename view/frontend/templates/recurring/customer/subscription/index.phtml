@@ -95,10 +95,10 @@
                                class="action delete"><span><?= /* @noEscape */  $block->getMyAccountLabels('AC23') ?>
                                 </span></a>
                         <?php endif; ?>
-                        <?php 
+                        <?php
                             $subscriptionId = $subscription->getSubscriptionId();
                             $nextOrder = $block->getNextRecurringOrder($subscriptionId);
-                            if (!empty($nextOrder)) { ?>
+                        if (!empty($nextOrder)) { ?>
                                 <div class="upcoming-delivery">
                                     <?= /* @noEscape */ __('Upcoming Delivery') ?>
                                     <?= /* @noEscape */  $nextOrder->getRecurringDate() ?>

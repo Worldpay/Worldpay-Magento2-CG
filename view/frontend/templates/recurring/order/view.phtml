@@ -49,13 +49,13 @@
         <div>
             <select name="status" title="Order Status" onchange="location= this.value;" >
                 <option value="<?= $block->escapeUrl($block->getOrderFilterURL('m-6')) ?>"
-                    <?php if($block->checkSelectedFilter('m-6')): ?> 
+                    <?php if ($block->checkSelectedFilter('m-6')): ?> 
                         <?= /* @noEscape */  $escaper->escapeHtml('selected') ?>
                     <?php endif ?> >
                     <?= /* @noEscape */  $escaper->escapeHtml('6 Month') ?>
                 </option>
                 <option value="<?= $block->escapeUrl($block->getOrderFilterURL('y-'.date("Y"))) ?>"
-                <?php if($block->checkSelectedFilter('y-'.date("Y"))): ?> 
+                <?php if ($block->checkSelectedFilter('y-'.date("Y"))): ?> 
                         <?= /* @noEscape */  $escaper->escapeHtml('selected') ?> 
                     <?php endif ?> >
                     <?= /* @noEscape */  $escaper->escapeHtml(date("Y")) ?>

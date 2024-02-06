@@ -380,7 +380,7 @@ class Edit extends Template
     {
         $subscriptionId = $this->getSubscription()->getId();
         $customerId = $this->customerSession->getCustomerId();
-        return $this->recurringHelper->getNextRecurringOrder($subscriptionId,$customerId);
+        return $this->recurringHelper->getNextRecurringOrder($subscriptionId, $customerId);
     }
 
     /**
@@ -398,7 +398,7 @@ class Edit extends Template
     }
 
     /**
-     * Get recurring count 
+     * Get recurring count
      *
      * @return int
      */
@@ -410,5 +410,5 @@ class Edit extends Template
                 ->addFieldToFilter('status', ['eq' =>'completed']);
         
         return $subscriptionCount->getSize();
-    } 
+    }
 }

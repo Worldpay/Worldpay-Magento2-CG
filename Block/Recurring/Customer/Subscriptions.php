@@ -204,6 +204,6 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
     public function getNextRecurringOrder($subscriptionId)
     {
         $customerId = $this->customerSession->getCustomerId();
-        return $this->recurringHelper->getNextRecurringOrder($subscriptionId,$customerId);
+        return $this->recurringHelper->getNextRecurringOrder($subscriptionId, $customerId);
     }
 }

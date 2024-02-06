@@ -27,4 +27,3 @@ class CsePopup extends Field
         return $this->_toHtml();
     }
 }
-?>

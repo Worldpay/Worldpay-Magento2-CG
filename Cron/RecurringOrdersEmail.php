@@ -164,17 +164,17 @@ class RecurringOrdersEmail
      * @param Int $customerId
      */
 
-     public function getTokenInfo($tokenId, $customerId)
-     {
-         $curdate = date("Y-m-d");
-         if ($tokenId) {
-             $result = $this->worldpaytoken->getCollection()
-                 ->addFieldToFilter('id', ['eq' => trim($tokenId)])
-                 ->addFieldToFilter('customer_id', ['eq' => trim($customerId)])
-                 ->addFieldToFilter('token_expiry_date', ['gteq' => $curdate])->getData();
-             return $result;
-         }
-     }
+    public function getTokenInfo($tokenId, $customerId)
+    {
+        $curdate = date("Y-m-d");
+        if ($tokenId) {
+            $result = $this->worldpaytoken->getCollection()
+                ->addFieldToFilter('id', ['eq' => trim($tokenId)])
+                ->addFieldToFilter('customer_id', ['eq' => trim($customerId)])
+                ->addFieldToFilter('token_expiry_date', ['gteq' => $curdate])->getData();
+            return $result;
+        }
+    }
     /**
      * Get SubscriptionsInfo
      *
@@ -219,13 +219,13 @@ class RecurringOrdersEmail
             $currentMonth = date("m") + 1;
             $currentYear = date("Y");
 
-            $expiryMonth = sprintf("%02d",$totalInfo['tokenData'][0]['card_expiry_month']);
+            $expiryMonth = sprintf("%02d", $totalInfo['tokenData'][0]['card_expiry_month']);
             $expiryYear = $totalInfo['tokenData'][0]['card_expiry_year'];
             $expiry = date($expiryYear.'-'.$expiryMonth.'-01');
 
             if ($expiry < $currentDate) {
                 $expiredMsg = 'Your card is expired. Plese add/update card details.';
-            } else if ($expiryYear === $currentYear && $expiryMonth == $currentMonth) {
+            } elseif ($expiryYear === $currentYear && $expiryMonth == $currentMonth) {
                 $expiredMsg = 'Your card is going to expire, please check the card or update the card details';
             }
         }
