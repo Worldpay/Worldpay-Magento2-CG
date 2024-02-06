@@ -39,11 +39,11 @@ class Collection extends AbstractCollection
     }
     
    /**
-     * Filter collection by customer id
-     *
-     * @param int $customerId
-     * @return $this
-     */
+    * Filter collection by customer id
+    *
+    * @param int $customerId
+    * @return $this
+    */
     public function addCustomerIdFilter($customerId)
     {
         if ($customerId) {
@@ -68,7 +68,8 @@ class Collection extends AbstractCollection
         $this->getSelect()->joinLeft(
             ['plans' => 'worldpay_recurring_plans'],
             'plans.plan_id = main_table.plan_id',
-            $cols );
+            $cols
+        );
         $this->plansJoined = true;
 
         return $this;
@@ -88,10 +89,10 @@ class Collection extends AbstractCollection
         $this->getSelect()->joinLeft(
             ['subscriptions' => 'worldpay_subscriptions'],
             'subscriptions.subscription_id = main_table.subscription_id',
-            $cols );
+            $cols
+        );
         $this->subscriptionsJoined = true;
 
         return $this;
     }
- 
 }

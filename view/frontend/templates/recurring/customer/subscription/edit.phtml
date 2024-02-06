@@ -35,7 +35,7 @@
                     <?= /* @noEscape */ __('Upcoming Delivery') ?>
                 </span>
             <?php endif; ?>
-            <?php if($block->getRecurringOrderCollection() > 0 ): ?>
+            <?php if ($block->getRecurringOrderCollection() > 0): ?>
                 <a href="<?= /* @noEscape */  $block->getViewAllRecurringOrder() ?>"
                     class="action" rel="noopener">
                     <span><?= /* @noEscape */ __('View All Recurring Order') ?></span>
@@ -48,7 +48,7 @@
         <div class="">
             <legend class="legend">
                 <span><?= /* @noEscape */  $block->getMyAccountLabels('AC25') ?></span>
-                <?php if($block->getRecurringOrderCollection() > 0 ): ?>
+                <?php if ($block->getRecurringOrderCollection() > 0): ?>
                     <a href="<?= /* @noEscape */  $block->getViewAllRecurringOrder() ?>"
                         class="action all-recurring-order-desktop"
                         rel="noopener">

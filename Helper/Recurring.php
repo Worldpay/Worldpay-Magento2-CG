@@ -1155,7 +1155,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * @param int $orderId
      */
     public function getOrderDetails($orderId)
-    {   
+    {
         $order = $this->orderRepository->get($orderId);
         $billingAddress = $order->getBillingAddress()->getData();
         $formattedShippingAddress = '';
@@ -1195,9 +1195,9 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * @param int $customerId
      * @return array
      */
-    public function getNextRecurringOrder($subscriptionId,$customerId)
+    public function getNextRecurringOrder($subscriptionId, $customerId)
     {
-        $nextOrder = $this->getNextRecurringOrderCollection($subscriptionId,$customerId);
+        $nextOrder = $this->getNextRecurringOrderCollection($subscriptionId, $customerId);
         if (!empty($nextOrder)) {
             $curdate = date("Y-m-d");
             $skipDays = self::RECURRING_ORDER_SKIP_DAYS_UPTO;
@@ -1219,7 +1219,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * @param int $customerId
      * @return array
      */
-    public function getNextRecurringOrderCollection($subscriptionId,$customerId)
+    public function getNextRecurringOrderCollection($subscriptionId, $customerId)
     {
         $curdate = date("Y-m-d");
         $collection = $this->transactionCollectionFactory->getCollection()

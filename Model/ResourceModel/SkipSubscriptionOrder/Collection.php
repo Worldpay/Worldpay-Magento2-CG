@@ -66,7 +66,8 @@ class Collection extends AbstractCollection
         $this->getSelect()->joinLeft(
             ['plans' => 'worldpay_recurring_plans'],
             'plans.plan_id = subscriptions.plan_id',
-            $cols );
+            $cols
+        );
         $this->plansJoined = true;
 
         return $this;
@@ -86,7 +87,8 @@ class Collection extends AbstractCollection
         $this->getSelect()->joinLeft(
             ['subscriptions' => 'worldpay_subscriptions'],
             'subscriptions.subscription_id = main_table.subscription_id',
-            $cols );
+            $cols
+        );
         $this->subscriptionsJoined = true;
 
         return $this;
