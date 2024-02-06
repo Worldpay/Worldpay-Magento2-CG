@@ -943,35 +943,71 @@ define(
                     selectedCardType = this.selectedPayType();
                 }
 
-                return {
-                    'method': "worldpay_cc",
-                    'additional_data': {
-                        'cc_cid': this.creditCardVerificationNumber(),
-                        'cc_type': selectedCardType,
-                        'cc_exp_year': this.creditCardExpYear(),
-                        'cc_exp_month': this.creditCardExpMonth(),
-                        'cc_number': this.creditCardNumber(),
-                        'cc_name': $('#' + this.getCode() + '_cc_name').val(),
-                        'save_my_card': this.saveMyCard,
-                        'cse_enabled': this.isClientSideEncryptionEnabled(),
-                        'encryptedData': this.cseData,
-                        'tokenCode': this.paymentToken,
-                        'saved_cc_cid': $('.saved-cvv-number').val(),
-                        'isSavedCardPayment': this.isSavedCardPayment,
-                        'tokenization_enabled': this.isTokenizationEnabled(),
-                        'stored_credentials_enabled': this.isStoredCredentialsEnabled(),
-                        'dfReferenceId': window.sessionId,
-                        'disclaimerFlag': this.disclaimerFlag,
-                            'subscriptionStatus': this.isSubscribed(),
-                            'cpf_enabled': this.isCPFEnabled(),
-                            'instalment_enabled': this.isInstalmentEnabled(),
-                            'cpf': $('#' + this.getCode() + '_cpf').val(),
-                            'instalment': $('#' + this.getCode() + '_instalment').val(),
-                            'statement': this.statement,
-                            'shippingfee': this.getShippingFeeForBrazil(),
-                            'multishipping': this.multishipping
-                    }
-                };
+
+                if(this.isClientSideEncryptionEnabled()){
+                    return {
+                        'method': "worldpay_cc",
+                        'additional_data': {
+                            'cc_cid': this.creditCardVerificationNumber(),
+                            'cc_type': selectedCardType,
+                            'cc_exp_year': '',
+                            'cc_exp_month': '',
+                            'cc_number': '',
+                            'cc_name': $('#' + this.getCode() + '_cc_name').val(),
+                            'save_my_card': this.saveMyCard,
+                            'cse_enabled': this.isClientSideEncryptionEnabled(),
+                            'encryptedData': this.cseData,
+                            'tokenCode': this.paymentToken,
+                            'saved_cc_cid': $('.saved-cvv-number').val(),
+                            'isSavedCardPayment': this.isSavedCardPayment,
+                            'tokenization_enabled': this.isTokenizationEnabled(),
+                            'stored_credentials_enabled': this.isStoredCredentialsEnabled(),
+                            'dfReferenceId': window.sessionId,
+                            'disclaimerFlag': this.disclaimerFlag,
+                                'subscriptionStatus': this.isSubscribed(),
+                                'cpf_enabled': this.isCPFEnabled(),
+                                'instalment_enabled': this.isInstalmentEnabled(),
+                                'cpf': $('#' + this.getCode() + '_cpf').val(),
+                                'instalment': $('#' + this.getCode() + '_instalment').val(),
+                                'statement': this.statement,
+                                'shippingfee': this.getShippingFeeForBrazil(),
+                                'multishipping': this.multishipping
+                        }
+                    };
+
+                }else{
+                    return {
+                        'method': "worldpay_cc",
+                        'additional_data': {
+                            'cc_cid': this.creditCardVerificationNumber(),
+                            'cc_type': selectedCardType,
+                            'cc_exp_year': this.creditCardExpYear(),
+                            'cc_exp_month': this.creditCardExpMonth(),
+                            'cc_number': this.creditCardNumber(),
+                            'cc_name': $('#' + this.getCode() + '_cc_name').val(),
+                            'save_my_card': this.saveMyCard,
+                            'cse_enabled': this.isClientSideEncryptionEnabled(),
+                            'encryptedData': this.cseData,
+                            'tokenCode': this.paymentToken,
+                            'saved_cc_cid': $('.saved-cvv-number').val(),
+                            'isSavedCardPayment': this.isSavedCardPayment,
+                            'tokenization_enabled': this.isTokenizationEnabled(),
+                            'stored_credentials_enabled': this.isStoredCredentialsEnabled(),
+                            'dfReferenceId': window.sessionId,
+                            'disclaimerFlag': this.disclaimerFlag,
+                                'subscriptionStatus': this.isSubscribed(),
+                                'cpf_enabled': this.isCPFEnabled(),
+                                'instalment_enabled': this.isInstalmentEnabled(),
+                                'cpf': $('#' + this.getCode() + '_cpf').val(),
+                                'instalment': $('#' + this.getCode() + '_instalment').val(),
+                                'statement': this.statement,
+                                'shippingfee': this.getShippingFeeForBrazil(),
+                                'multishipping': this.multishipping
+                        }
+                    };
+                }
+
+                
             },
             isClientSideEncryptionEnabled:function(){
                 if (this.getCsePublicKey()) {

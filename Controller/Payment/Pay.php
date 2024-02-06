@@ -166,7 +166,7 @@ class Pay extends \Magento\Framework\App\Action\Action
 
         $this->jsonGenerator($paymentManifestJson, self::PAYMENT_MANIFEST_JSON);
         $this->jsonGenerator($paymentAppManifestjson, self::MANIFEST_JSON);
-        $result->setContents('');
+        $result->setContents('Pay with Chromepay');
         $result->setHeader('link', '<'.$mediPathPaymentManifest.'>; rel="payment-method-manifest"');
         return $result;
     }

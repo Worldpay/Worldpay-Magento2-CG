@@ -1,0 +1,185 @@
+<?php
+/**
+ * Copyright © 2020 Worldpay, LLC. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+/*
+* Sapient\Worldpay\Block\SubscriptionOrders
+*/
+?>
+<?php $orderData = $block->getsubscriptionOrderCollection(); ?>
+<?php if ($orderData && count($orderData)): ?>
+    <div class="show-order-sort-by" style="flex-direction: row-reverse;
+            flex-wrap: nowrap;justify-content: flex-start;
+            align-items: center;">
+        <div class="field  required" style="display: flex;float: left;
+            flex-direction: row;justify-content: center;
+                align-items: center;">
+            <label class="label" for="Sort By" style="display: block;margin: 5px 10px;" >
+                <span>
+                    <strong class="limiter-label">
+                    <strong>
+                        <?= /* @noEscape */  $escaper->escapeHtml('View:') ?>
+                    </strong>
+                </span>
+            </label>
+            <div>      
+                <span class="limiter-options">
+                <strong>
+                    <?= /* @noEscape */  $escaper->escapeHtml('Completed') ?>
+                </strong>
+                </span>
+                <span class="limiter-options">
+                <a href="<?= $block->escapeUrl($block->getSkipOrderlUrl()) ?>">
+                    <?= /* @noEscape */  $escaper->escapeHtml('Skipped') ?></strong>
+                </a>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="show-order-sort-by" 
+    style="display:flex;flex-direction:row-reverse;flex-wrap:nowrap;justify-content:flex-start;align-items:center;">
+    <div class="field  required" 
+    style="display:flex;float:right;flex-direction:row;justify-content:center;align-items:center;">
+        <label class="label" for="Sort By" style="display: block;margin: 0 10px;" >
+            <span>
+                <?= /* @noEscape */  $escaper->escapeHtml(count($orderData) .' Order placed in') ?>
+            </span>
+        </label>
+        <div>
+            <select name="status" title="Order Status" onchange="location= this.value;" >
+                <option value="<?= $block->escapeUrl($block->getOrderFilterURL('m-6')) ?>"
+                    <?php if ($block->checkSelectedFilter('m-6')): ?> 
+                        <?= /* @noEscape */  $escaper->escapeHtml('selected') ?>
+                    <?php endif ?> >
+                    <?= /* @noEscape */  $escaper->escapeHtml('6 Month') ?>
+                </option>
+                <option value="<?= $block->escapeUrl($block->getOrderFilterURL('y-'.date("Y"))) ?>"
+                <?php if ($block->checkSelectedFilter('y-'.date("Y"))): ?> 
+                        <?= /* @noEscape */  $escaper->escapeHtml('selected') ?> 
+                    <?php endif ?> >
+                    <?= /* @noEscape */  $escaper->escapeHtml(date("Y")) ?>
+                </option>
+            </select>
+        </div>
+    </div>
+</div>
+    <div class="table-wrapper subscriptions-list">
+        <table class="data table table-subscriptions-items" id="my-subscriptions-table">
+            <caption class="table-caption"><?= /* @noEscape */  $escaper->escapeHtml(__('Subscriptions')) ?></caption>
+            <thead>
+            <tr>
+                <th scope="col" class="col original-order-id">
+                    <?= /* @noEscape */  $escaper->escapeHtml(__('Order Id#')) ?>
+                </th>
+                <th scope="col" class="col Product">
+                    <?= /* @noEscape */  $escaper->escapeHtml(__('Subscription Item')) ?>
+                </th>
+                <th scope="col" class="col interval">
+                    <?= /* @noEscape */  $escaper->escapeHtml(__('Plan')) ?>
+                </th>
+                <th scope="col" class="col status">
+                <?= /* @noEscape */ $escaper->escapeHtml($block->getMyAccountLabels('AC20')) ?>
+                </th>
+                <th scope="col" class="col created_at">
+                    <?= /* @noEscape */  $escaper->escapeHtml(__('Sheduled At')) ?>
+                </th>
+                <th scope="col" class="col actions">
+                    <?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC21')) ?>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($orderData as $subscription): ?>
+                <tr>
+                    <td data-th="<?= /* @noEscape */  $escaper->escapeHtml(__('Original Order #')) ?>"
+                        class="col original-order-id">
+                        <?= /* @noEscape */ $block->getOrderIdLabel($subscription) ?></td>
+                    </td>
+                    <td data-th="<?= /* @noEscape */  $escaper->escapeHtml(__('Product')) ?>"
+                        class="col product"><?= /* @noEscape */ $escaper->escapeHtml($subscription->getProductName()) ?>
+                    </td>
+                    <td data-th="<?= /* @noEscape */ $escaper->escapeHtml(__('Interval')) ?>" class="col interval">
+                        <?= /* @noEscape */ $escaper->escapeHtml(
+                            $block->getSubscriptionIntervalLabel($subscription->getInterval())
+                        ) ?>
+                        <?= /* @noEscape */ $subscription->getFormattedIntervalAmount() ?>
+                    </td>
+                    <td data-th="<?= /* @noEscape */ $escaper->escapeHtml(__('Status')) ?>"
+                        class="col status">
+                        <?php if ($block->getNotAlreadyCanceled($subscription)): ?>
+                            <?= /* @noEscape */ $escaper->escapeHtml(__('Cancelled')) ?>
+                            <?php else: ?>   
+                                <?= /* @noEscape */ $escaper->escapeHtml($subscription->getStatus()) ?>
+                        <?php endif; ?>
+                    </td>
+                    <td data-th="<?= /* @noEscape */ $escaper->escapeHtml(__('created_at')) ?>" class="col created_at">
+                    <?= /* @noEscape */ $block->formatDate(
+                        $subscription->getCreatedAt(),
+                        \IntlDateFormatter::SHORT,
+                        false,
+                        date_default_timezone_get()
+                    ); ?>
+                    </td>
+                    <td data-th="<?= /* @noEscape */  $escaper->escapeHtml(__('Actions')) ?>" class="col actions">
+                        <?php if ($block->getNotAlreadyCanceled($subscription)): ?>
+                            <a href="<?= /* @noEscape */  $block->getViewlUrl($subscription); ?>">
+                                <span><?= /* @noEscape */ $escaper->escapeHtml(__('View')) ?>
+                            </span></a>
+                        <?php elseif (!$block->checkOrderShipment($subscription) &&
+                                 $block->checkOrderBufferTime($subscription)): ?>
+                            <a href="javascript:void(0)" 
+                               data-cancel-url="<?= /* @noEscape */  $block->getCancelUrl($subscription); ?>"
+                               class="action cancel delete">
+                            <span><?= /* @noEscape */  $block->getMyAccountLabels('AC23') ?>
+                            </span></a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach;  ?>
+            </tbody>
+        </table>
+        <script>
+            require([
+                'jquery',
+                'Magento_Ui/js/modal/confirm'
+            ], function($, confirm) {
+
+                $('.action.cancel').on("click", function(event) {
+                    confirm({
+                        title: 'Cancel Subscription Order',
+                        content: getMyAccountExceptions('MCAM12'),
+                        actions: {
+                            confirm: function() {
+                                window.location.href = $(event.currentTarget).data('cancel-url');
+                            }
+                        }
+                    });
+                });
+            });
+            function getMyAccountExceptions (exceptioncode){
+                var data=window.MyAccountExceptions;
+                var gendata=JSON.parse(data);
+                for (var key in gendata) {
+                    if (gendata.hasOwnProperty(key)) {  
+                        var cxData=gendata[key];
+                    if(cxData['exception_code'].includes(exceptioncode)){
+                        return cxData['exception_module_messages']?cxData['exception_module_messages']
+                        :cxData['exception_messages'];
+                    }
+                    }
+                }
+            }
+        </script>
+    </div>
+    <?php if ($paginationHtml = $block->getPaginationHtml()): ?>
+        <div class="susbcriptions-toolbar toolbar bottom">
+        <?= /* @noEscape */  $paginationHtml; ?></div>
+    <?php endif ?>
+<?php else: ?>
+    <div class="message info empty">
+        <span>
+            <?= $escaper->escapeHtml(__('You have not any reccurring order yet.')); ?>
+        </span>
+    </div>
+<?php endif ?>

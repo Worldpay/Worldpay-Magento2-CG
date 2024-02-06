@@ -251,14 +251,18 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['gpayButtonLocale'] = $this->worldpayHelper->getGpayButtonLocale();
                 $config['payment']['ccform']['appleMerchantid'] = $this->worldpayHelper->appleMerchantId();
                 $config['payment']['ccform']['isApplePayEnable'] = $this->worldpayHelper->isApplePayEnable();
-                $config['payment']['ccform']['applePayButtonColor'] = $this->worldpayHelper->getCheckoutApplePayBtnColor();
-                $config['payment']['ccform']['applePayButtonType'] = $this->worldpayHelper->getCheckoutApplePayBtnType();
-                $config['payment']['ccform']['applePayButtonLocale'] = $this->worldpayHelper->getCheckoutApplePayBtnLocale();
+                $config['payment']['ccform']['applePayButtonColor'] = $this->worldpayHelper
+                        ->getCheckoutApplePayBtnColor();
+                $config['payment']['ccform']['applePayButtonType'] = $this->worldpayHelper
+                        ->getCheckoutApplePayBtnType();
+                $config['payment']['ccform']['applePayButtonLocale'] = $this->worldpayHelper
+                        ->getCheckoutApplePayBtnLocale();
                 
                 // Multishipping Apple Pay configuration
                 $config['payment']['ccform']['msAppleMerchantid'] = $this->worldpayHelper->msAppleMerchantId();
                 $config['payment']['ccform']['isMsApplePayEnable'] = $this->worldpayHelper->isMsApplePayEnable();
                 $config['payment']['ccform']['isSamsungPayEnable'] = $this->worldpayHelper->isSamsungPayEnable();
+                $config['payment']['ccform']['samsungPayButton'] = $this->worldpayHelper->getSamsungPayButtonType();
                 
                 if ($this->worldpayHelper->getEnvironmentMode()=='Live Mode') {
                     $config['payment']['general']['environmentMode'] = "PRODUCTION";

@@ -172,6 +172,11 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     private $recurringHelper;
 
     /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\SavedToken
+     */
+    private $savedToken;
+
+    /**
      * Subscription model constructor.
      *
      * @param \Magento\Framework\Model\Context $context
@@ -186,6 +191,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
      * @param \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
+     * @param \Sapient\Worldpay\Model\SavedToken $savedToken
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource||null $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb||null $resourceCollection
      * @param array $data
@@ -204,6 +210,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
+        \Sapient\Worldpay\Model\SavedToken $savedToken,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
@@ -220,6 +227,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $this->priceCurrency = $priceCurrency;
         $this->transactionsFactory = $transactionsFactory;
         $this->registryObj = $registry;
+        $this->savedToken = $savedToken;
     }
 
     /**
@@ -232,7 +240,9 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $this->_init(\Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription::class);
     }
     /**
-     * @inheritdoc
+     * After save
+     *
+     * @return mixed
      */
     public function afterSave()
     {
@@ -431,7 +441,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     /**
      * Retrieve order shipping address
      *
-     * @return \Magento\Sales\Model\Order\Address|null
+     * @return \Sapient\Worldpay\Model\Recurring\Subscription\Address|null
      */
     public function getShippingAddress()
     {
@@ -840,5 +850,24 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         }
         $id = $this->getResource()->loadByOriginalOrderIncrementId($order_id);
             return $this->load($id);
+    }
+    /**
+     * Function to get is virtual column data
+     */
+    public function getIsVirtual()
+    {
+        return $this->getData('is_virtual');
+    }
+
+    /**
+     * Function to get subscription transaction data
+     */
+    public function getTransactionData()
+    {
+        $transactions = $this->transactionsFactory->create()
+        ->loadBySubscriptionIdActive($this->getSubscriptionId());
+        $tokenDetails = $this->savedToken->load($transactions->getData('worldpay_token_id'));
+        
+        return $tokenDetails;
     }
 }

@@ -83,7 +83,7 @@
                     <?php endif; ?>
                     <td data-th="<?= /* @noEscape */ $escaper->escapeHtml(__('Status')) ?>"
                         class="col status">
-                            <?= /* @noEscape */ $escaper->escapeHtml($subscription->getStatusLabel()) ?>
+                            <?= /* @noEscape */ $escaper->escapeHtml($subscription->getStatusLabel()) ?>    
                     </td>
                     <td data-th="<?= /* @noEscape */  $escaper->escapeHtml(__('Actions')) ?>" class="col actions">
                         <?php if ($subscription->getStatus() == 'active'): ?>
@@ -95,6 +95,15 @@
                                class="action delete"><span><?= /* @noEscape */  $block->getMyAccountLabels('AC23') ?>
                                 </span></a>
                         <?php endif; ?>
+                        <?php
+                            $subscriptionId = $subscription->getSubscriptionId();
+                            $nextOrder = $block->getNextRecurringOrder($subscriptionId);
+                        if (!empty($nextOrder)) { ?>
+                                <div class="upcoming-delivery">
+                                    <?= /* @noEscape */ __('Upcoming Delivery') ?>
+                                    <?= /* @noEscape */  $nextOrder->getRecurringDate() ?>
+                                </div>
+                        <?php } ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

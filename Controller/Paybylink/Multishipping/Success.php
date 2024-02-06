@@ -10,6 +10,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Multishipping\Model\Checkout\Type\Multishipping;
 use Magento\Multishipping\Model\Checkout\Type\Multishipping\State;
+use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\HttpGetActionInterface as HttpGetActionInterface;
 
 /**
@@ -38,6 +39,11 @@ class Success extends Action implements HttpGetActionInterface
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
     private $quoteRepository;
+    
+    /**
+     * @var $resultPageFactory
+     */
+    protected $resultPageFactory;
 
     /**
      * @param Context $context
@@ -46,6 +52,7 @@ class Success extends Action implements HttpGetActionInterface
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $wpMultishippingCollection
      * @param \Magento\Sales\Model\Order $order
+     * @param PageFactory $resultPageFactory
      */
     public function __construct(
         Context $context,
@@ -53,13 +60,15 @@ class Success extends Action implements HttpGetActionInterface
         Multishipping $multishipping,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $wpMultishippingCollection,
-        \Magento\Sales\Model\Order $order
+        \Magento\Sales\Model\Order $order,
+        PageFactory $resultPageFactory
     ) {
         $this->state = $state;
         $this->multishipping = $multishipping;
         $this->order = $order;
         $this->wpMultishippingCollection = $wpMultishippingCollection;
         $this->quoteRepository = $quoteRepository;
+        $this->resultPageFactory = $resultPageFactory;
         parent::__construct($context);
     }
     /**
@@ -84,11 +93,10 @@ class Success extends Action implements HttpGetActionInterface
                 $this->messageManager->addNotice("Multishipping orders not found");
                 return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
             }
-            $this->_view->loadLayout();
+            $resultPage = $this->resultPageFactory->create();
             $ids = $multiShippingOrders;
             $this->_eventManager->dispatch('multishipping_checkout_controller_success_action', ['order_ids' => $ids]);
-            $this->_view->renderLayout();
-            return;
+            return $resultPage;
         }
         $this->messageManager->addNotice("Order not found");
         return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);

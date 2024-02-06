@@ -44,6 +44,18 @@
     <preference for="Magento\Vault\Model\Method\Vault" type="Sapient\Worldpay\Model\PaymentMethods\CcVault" />
     <preference for="Magento\Sales\Model\Order\Email\Sender\OrderSender" type="Sapient\Worldpay\Model\Order\Email\Sender\OrderSender"/>
     <preference for="Sapient\Worldpay\Api\MultishippingInterface" type="Sapient\Worldpay\Model\Multishipping\Multishipping" />
+    <preference for="Sapient\Worldpay\Api\RecurringShippingMethodInterface" type="Sapient\Worldpay\Model\Recurring\Order\ShippingMethods" />
+    <preference for="Sapient\Worldpay\Api\UpdateRecurringShipmentInterface" type="Sapient\Worldpay\Model\Recurring\Order\UpdateRecurringShipment" />
+    <preference for="Sapient\Worldpay\Api\CustomerPaymentTokenInterface" type="Sapient\Worldpay\Model\Recurring\Order\CustomerPaymentTokens" />
+    <preference for="Sapient\Worldpay\Api\UpdateRecurringTokenInterface" type="Sapient\Worldpay\Model\Recurring\Order\UpdateRecurringToken" />
+    <preference for="Sapient\Worldpay\Api\Data\EditSubscriptionHistoryInterface" type="Sapient\Worldpay\Model\EditSubscriptionHistory" />
+    <preference for="Sapient\Worldpay\Api\EditSubscriptionHistoryRepositoryInterface" type="Sapient\Worldpay\Model\EditSubscriptionHistory" />
+   
+    <preference for="Sapient\Worldpay\Api\Data\SkipSubscriptionOrderInterface"
+                type="Sapient\Worldpay\Model\SkipSubscriptionOrder"/>
+    <preference for="Sapient\Worldpay\Api\SkipSubscriptionOrderRepositoryInterface"
+                type="Sapient\Worldpay\Model\SkipSubscriptionOrderRepository"/>
+
     <type name="Sapient\Worldpay\Model\PaymentMethods\CcVault">
         <arguments>
             <argument name="logger" xsi:type="object">Sapient\Worldpay\Logger\WorldpayLogger</argument>

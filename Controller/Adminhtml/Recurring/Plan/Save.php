@@ -34,6 +34,11 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
     private $uri;
 
     /**
+     * @var RedirectInterface
+     */
+    protected $redirect;
+
+    /**
      * Constructor
      *
      * @param \Magento\Backend\App\Action\Context $context
@@ -43,6 +48,7 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Sapient\Worldpay\Helper\GeneralException $helper
      * @param \Laminas\Uri\Uri $uri
+     * @param \Magento\Framework\App\Response\RedirectInterface $redirect
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -51,7 +57,8 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
         \Magento\Framework\Locale\FormatInterface $localeFormat,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Sapient\Worldpay\Helper\GeneralException $helper,
-        \Laminas\Uri\Uri $uri
+        \Laminas\Uri\Uri $uri,
+        \Magento\Framework\App\Response\RedirectInterface $redirect
     ) {
         parent::__construct($context, $planFactory);
         $this->planGridDataProvider = $planGridDataProvider;
@@ -59,6 +66,7 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
         $this->helper = $helper;
         $this->storeManager = $storeManager;
         $this->uri = $uri;
+        $this->redirect = $redirect;
     }
 
     /**
@@ -71,8 +79,8 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
         $data = $this->getRequest()->getPostValue();
         //$productId = $this->getRequest()->getParam('product_id');
 
-        //$url = parse_url($this->_redirect->getRefererUrl());
-        $parsedUrl = $this->uri->parse($this->_redirect->getRefererUrl());
+        //$url = parse_url($this->redirect->getRefererUrl());
+        $parsedUrl = $this->uri->parse($this->redirect->getRefererUrl());
         $path_parts=explode('/', $parsedUrl->getPath());
         if (in_array('id', $path_parts)) {
             $key = array_search('id', $path_parts);

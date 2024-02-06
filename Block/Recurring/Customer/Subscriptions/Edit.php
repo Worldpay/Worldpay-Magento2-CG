@@ -16,12 +16,14 @@ use Sapient\Worldpay\Helper\Recurring;
 use Sapient\Worldpay\Model\Recurring\Plan;
 use Sapient\Worldpay\Model\Recurring\Subscription;
 use Sapient\Worldpay\Model\Recurring\SubscriptionFactory;
+use Sapient\Worldpay\Model\Recurring\Subscription\Transactions;
 use Magento\Directory\Helper\Data;
 
 //use Sapient\Worldpay\Model\Ui\CcConfigProvider;
 
 class Edit extends Template
 {
+    public const RECURRING_ORDER_SKIP_DAYS_UPTO = 9;
     /**
      * @var \Sapient\Worldpay\Model\Recurring\Subscription|null
      */
@@ -34,6 +36,10 @@ class Edit extends Template
      * @var SubscriptionFactory
      */
     private $subscriptionFactory;
+    /**
+     * @var CollectionFactory
+     */
+    private $transactionCollectionFactory;
     /**
      * @var Recurring
      */
@@ -62,6 +68,7 @@ class Edit extends Template
     /**
      * @param Template\Context $context
      * @param SubscriptionFactory $subscriptionFactory
+     * @param Transactions $recurringTransactions
      * @param Recurring $recurringHelper
      * @param ProductFactory $productFactory
      * @param IconsProvider $iconsProvider
@@ -73,6 +80,7 @@ class Edit extends Template
     public function __construct(
         Template\Context $context,
         SubscriptionFactory $subscriptionFactory,
+        Transactions $recurringTransactions,
         Recurring $recurringHelper,
         ProductFactory $productFactory,
         IconsProvider $iconsProvider,
@@ -83,6 +91,7 @@ class Edit extends Template
     ) {
         parent::__construct($context, $data);
         $this->subscriptionFactory = $subscriptionFactory;
+        $this->transactionCollectionFactory = $recurringTransactions;
         $this->recurringHelper = $recurringHelper;
         $this->productFactory = $productFactory;
         $this->tokenManager = $tokenManager;
@@ -145,6 +154,19 @@ class Edit extends Template
     {
         return $this->_urlBuilder->getUrl(
             'worldpay/recurring/formPost',
+            ['_secure' => true, 'subscription_id' => $this->getSubscription()->getId()]
+        );
+    }
+
+    /**
+     * View All Recurring Order
+     *
+     * @return string
+     */
+    public function getViewAllRecurringOrder()
+    {
+        return $this->_urlBuilder->getUrl(
+            'worldpay/recurring_order/view/',
             ['_secure' => true, 'subscription_id' => $this->getSubscription()->getId()]
         );
     }
@@ -347,5 +369,46 @@ class Edit extends Template
     public function getCountriesWithOptionalZip($asJson)
     {
         return $this->helper->getCountriesWithOptionalZip($asJson);
+    }
+
+    /**
+     * Get next recurring order
+     *
+     * @return array
+     */
+    public function getNextRecurringOrder()
+    {
+        $subscriptionId = $this->getSubscription()->getId();
+        $customerId = $this->customerSession->getCustomerId();
+        return $this->recurringHelper->getNextRecurringOrder($subscriptionId, $customerId);
+    }
+
+    /**
+     * Get Next recurring order date
+     *
+     * @return string
+     */
+    public function getNextOrderDate()
+    {
+        $nextOrder = $this->getNextRecurringOrder();
+        if (!empty($nextOrder)) {
+            return $nextOrder->getRecurringDate();
+        }
+        return false;
+    }
+
+    /**
+     * Get recurring count
+     *
+     * @return int
+     */
+    public function getRecurringOrderCollection()
+    {
+        $subscriptionId = $this->getRequest()->getParam('subscription_id');
+        $subscriptionCount = $this->transactionCollectionFactory->getCollection()
+                ->addFieldToFilter('subscription_id', ['eq' => $subscriptionId])
+                ->addFieldToFilter('status', ['eq' =>'completed']);
+        
+        return $subscriptionCount->getSize();
     }
 }

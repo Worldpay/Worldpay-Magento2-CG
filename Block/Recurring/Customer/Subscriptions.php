@@ -194,4 +194,16 @@ class Subscriptions extends \Magento\Framework\View\Element\Template
     {
         return $this->recurringHelper->getMyAccountExceptions($exceptioncode);
     }
+
+    /**
+     * Get next recurring order
+     *
+     * @param int $subscriptionId
+     * @return array
+     */
+    public function getNextRecurringOrder($subscriptionId)
+    {
+        $customerId = $this->customerSession->getCustomerId();
+        return $this->recurringHelper->getNextRecurringOrder($subscriptionId, $customerId);
+    }
 }
