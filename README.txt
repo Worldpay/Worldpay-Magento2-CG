@@ -1,13 +1,17 @@
 Latest releases for all supported version:
 For Magento 2.4.7
 
-Worldpay Plugin version: 2.4.7-rc0124
+Worldpay Plugin version: 2.4.7-rc0224
 1. Magento 2.4.7-beta2 compatible
 2. PHP 8.2 & 8.1 ompatibility
 3. Scurity enhancement for Client side encryption
 4. Enhanced feature Subscription & Recurring
 
 For Magento 2.4.6
+
+Worldpay Plugin version: 2.4.6-p30124
+1. Magento 2.4.6-p3 compatible
+2. PHP 8.2 compatibility
 
 Worldpay Plugin version: 2.4.6-p21023
 1. Magento 2.4.6-p2 compatible
@@ -24,6 +28,14 @@ Worldpay Plugin version: 2.4.6-rc0523
 3. PHP 8.2 compatibility
 
 For Magento 2.4.5 
+
+Worldpay Plugin version: 2.4.5-p50124
+1. Magento 2.4.5-p5 compatible
+2. SEPA Direct
+
+Worldpay Plugin version: 2.4.5-p30923
+1. Magento 2.4.5-p3 compatible
+2. SEPA Direct
 
 Worldpay Plugin version: 2.4.5-p20823
 1. Magento 2.4.5-p2 compatible
