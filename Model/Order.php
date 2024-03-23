@@ -111,7 +111,7 @@ class Order
      */
     public function getStoreId()
     {
-        return $this->getOrder()->getPayment()->getStoreId();
+        return $this->getOrder()->getStoreId();
     }
 
     /**
