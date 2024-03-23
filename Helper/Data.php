@@ -277,44 +277,48 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
+
     /**
      * Get Xml Username
      *
      * @param string $paymentType
+     * @param int|null $storeId
      * @return string
      */
-    public function getXmlUsername($paymentType)
+    public function getXmlUsername($paymentType, $storeId = null)
     {
         if ($paymentType) {
-            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_username']:'';
-            if (!empty($merchantCodeValue)) {
-                return $merchantCodeValue;
+            $merchantDetail = $this->merchantprofile->getConfigValue($paymentType);
+            if (!empty($merchantDetail['merchant_username'])) {
+                return $merchantDetail['merchant_username'];
             }
         }
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/xml_username',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
         );
     }
+
     /**
      * Get Xml Password
      *
      * @param string $paymentType
+     * @param int|null $storeId
      * @return string
      */
-    public function getXmlPassword($paymentType)
+    public function getXmlPassword($paymentType, $storeId = null)
     {
         if ($paymentType) {
-            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_password']:'';
-            if (!empty($merchantCodeValue)) {
-                return $merchantCodeValue;
+            $merchantDetail = $this->merchantprofile->getConfigValue($paymentType);
+            if (!empty($merchantDetail['merchant_password'])) {
+                return $merchantDetail['merchant_password'];
             }
         }
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/xml_password',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
         );
     }
     /**

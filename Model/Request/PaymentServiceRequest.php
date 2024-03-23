@@ -1136,8 +1136,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     {
         $this->_wplogger->info('########## Submitting order inquiry. OrderCode: (' . $orderCode . ') ##########');
         $this->_wplogger->info('## Interaction Type'.$interactionType);
-        $xmlUsername = $this->worldpayhelper->getXmlUsername($paymenttype);
-        $xmlPassword = $this->worldpayhelper->getXmlPassword($paymenttype);
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($paymenttype, $storeId);
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($paymenttype, $storeId);
         $merchantcode = $merchantCode;
         
         if ($interactionType === 'MOTO') {
