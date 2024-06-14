@@ -82,6 +82,7 @@
                 <paymentmethods>PAYPAL-EXPRESS</paymentmethods>
                 <sepa_mandate_types>ONE-OFF</sepa_mandate_types>
                 <sepa_e_mandate>By signing this mandate form, you authorise (A) Worldpay to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with the instructions from Worldpay. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank.</sepa_e_mandate>
+                <statement_narrative>1</statement_narrative>
             </apm_config>            
             <miscellaneous>
                 <country_code_spoof>JE-GB,IM-GB</country_code_spoof>
@@ -89,20 +90,24 @@
             </miscellaneous>
             <klarna_config>
                 <klarna_countries_config>
-                    <klarna_contries>SE,NO,FI,DE,AT,GB,DK,US,NL,CH</klarna_contries>
+                    <klarna_contries>SE,NO,FI,DE,AT,GB,DK,UK,NL,CH</klarna_contries>
                 </klarna_countries_config>
                 <sliceit_config>
                     <klarna_sliceit>KLARNA_SLICEIT</klarna_sliceit>
-                    <sliceit_contries>SE,NO,FI,DE,AT,GB,DK,US</sliceit_contries>
+                    <sliceit_contries>SE,NO,FI,DE,AT,GB,DK,UK</sliceit_contries>
                 </sliceit_config>
                 <paylater_config>
                     <klarna_paylater>KLARNA_PAYLATER</klarna_paylater>
-                    <paylater_contries>SE,NO,FI,DE,NL,AT,CH,GB,DK,US</paylater_contries>
+                    <paylater_contries>SE,NO,FI,DE,NL,AT,CH,GB,DK,UK</paylater_contries>
                 </paylater_config>
                 <paynow_config>
                     <klarna_paynow>KLARNA_PAYNOW</klarna_paynow>
                     <paynow_contries>SE,DE,NL,AT</paynow_contries>
                 </paynow_config>
+                <store_pickup>
+                    <shipping_type>normal</shipping_type>
+                    <shipping_method>store pick-up</shipping_method>
+                </store_pickup>
             </klarna_config>
             <wp_error_alerts>
                 <enable_error_alerts>0</enable_error_alerts>
@@ -134,6 +139,9 @@
                     </paywithgoogle_ssl>
                 </wallet>
             </payment_method_logo_config>
+            <order_cleanup_cron>
+                <order_cleanup_option>1</order_cleanup_option>
+            </order_cleanup_cron>
         </worldpay>
         <payment>
             <worldpay_cc>
@@ -198,6 +206,9 @@
                 <sort_order>13</sort_order>
                 <can_use_for_worldpay_subscription>0</can_use_for_worldpay_subscription>
             </worldpay_paybylink>
+            <worldpay_pending_order_cleanup>
+                <order_cleanup_option>24</order_cleanup_option>
+            </worldpay_pending_order_cleanup>
         </payment>
         <dev>
             <js>

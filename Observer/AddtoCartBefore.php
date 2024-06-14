@@ -98,7 +98,8 @@ class AddtoCartBefore implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        if ($this->wpHelper->isGooglePayEnableonPdp() && $this->wpHelper->isGooglePayEnable()) {
+        if (($this->wpHelper->isGooglePayEnableonPdp() && $this->wpHelper->isGooglePayEnable())
+            || ($this->wpHelper->isApplePayEnableonPdp() && $this->wpHelper->isApplePayEnable() )) {
             $product = $observer->getEvent()->getProduct();
             $productRequestInfo = $observer->getEvent()->getInfo();
             if (!empty($productRequestInfo['existing_quote_id']) && $productRequestInfo['existing_quote_id'] !=0) {
@@ -106,19 +107,19 @@ class AddtoCartBefore implements ObserverInterface
                 try {
                     // get current Quote Id  and make inactive
                     // add current quote Id in session
-                    $currentQuoteId = $productRequestInfo['existing_quote_id'];
+                    //$currentQuoteId = $productRequestInfo['existing_quote_id'];
+                    $currentQuoteId = $this->checkoutSession->getQuote()->getId();
                     $this->customerSession->setActiveQuoteId($currentQuoteId);
                     $activeQuote = $this->quoteRepository->get($currentQuoteId);
                     $activeQuote->setIsActive(0);
                     $this->quoteRepository->save($activeQuote);
-
                     if ($this->customerSession->getCustomerId()) {
                         $newQuoteID = $this->quoteManagement->createEmptyCartForCustomer(
                             $this->customerSession->getCustomerId()
                         );
                         $newQuote = $this->quoteRepository->get($newQuoteID);
                         $this->customerCart->setQuote($newQuote);
-                        $this->wplogger->info("Set Quote successfully");
+                        $this->wplogger->info("Set New Quote successfully");
                     } else {
                         
                         $newQuoteID = $this->quoteManagement->createEmptyCart();

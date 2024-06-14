@@ -150,6 +150,17 @@ EOD;
      * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
+
+    /**
+     * @var array $browserFields
+     */
+    protected $browserFields;
+
+    /**
+     * @var string $telephoneNumber
+     */
+    protected $telephoneNumber;
+
     /**
      * Constructor
      * @param \Magento\Customer\Model\Session $customerSession
@@ -197,6 +208,8 @@ EOD;
      * @param mixed $primeRoutingData
      * @param array $orderLineItems
      * @param string $captureDelay
+     * @param array $browserFields
+     * @param string $telephoneNumber
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -224,7 +237,9 @@ EOD;
         $exponent,
         $primeRoutingData,
         $orderLineItems,
-        $captureDelay
+        $captureDelay,
+        $browserFields,
+        $telephoneNumber
     ) {
         
         $this->merchantCode = $merchantCode;
@@ -252,7 +267,8 @@ EOD;
         $this->primeRoutingData =$primeRoutingData;
         $this->orderLineItems = $orderLineItems;
         $this->captureDelay = $captureDelay;
-
+        $this->telephoneNumber = $telephoneNumber;
+        $this->browserFields = $browserFields;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -461,13 +477,19 @@ EOD;
     {
         $isRecurringOrder =  isset($this->paymentDetails['isRecurringOrder'])? true : false;
         if ($this->paymentDetails['dynamicInteractionType'] == 'MOTO') {
+
+            if ($this->paymentDetails['isEnabledEFTPOS']) {
+                return;
+            }
             $threeDSElement = $order->addChild('dynamic3DS');
             $threeDSElement['overrideAdvice'] = self::DYNAMIC3DS_NO3DS;
         }
         if (! $this->threeDSecureConfig->isDynamic3DEnabled()) {
             return;
         }
-
+        if ($this->paymentDetails['isEnabledEFTPOS']) {
+            return;
+        }
         $threeDSElement = $order->addChild('dynamic3DS');
         if ($this->threeDSecureConfig->is3DSecureCheckEnabled()
             && $this->paymentDetails['dynamicInteractionType'] !== 'MOTO'
@@ -556,7 +578,9 @@ EOD;
             $this->cardAddress['street'],
             $this->cardAddress['postalCode'],
             $this->cardAddress['city'],
-            $this->cardAddress['countryCode']
+            $this->cardAddress['countryCode'],
+            true,
+            $this->telephoneNumber
         );
     }
 
@@ -586,10 +610,19 @@ EOD;
         if ($this->saveCardEnabled && $this->storedCredentialsEnabled) {
             $this->_addStoredCredentials($paymentDetailsElement);
         }
-        $session = $paymentDetailsElement->addChild('session');
-        $session['id'] = $this->paymentDetails['sessionId'];
-        $session['shopperIPAddress'] = $this->paymentDetails['shopperIpAddress'];
-
+        $isSendIpAddress = true;
+        if (isset($this->paymentDetails['sendShopperIpAddress'])) {
+            $isSendIpAddress = $this->paymentDetails['sendShopperIpAddress'];
+        }
+        if ($isSendIpAddress) {
+            $session = $paymentDetailsElement->addChild('session');
+            $session['id'] = $this->paymentDetails['sessionId'];
+            $session['shopperIPAddress'] = $this->paymentDetails['shopperIpAddress'];
+        }
+        if (!empty($this->paymentDetails['routingMID'])) {
+            $paymentDetailsElement
+                ->addChild('routingMID', $this->paymentDetails['routingMID']);
+        }
         if ($this->paResponse) {
             $info3DSecure = $paymentDetailsElement->addChild('info3DSecure');
             $info3DSecure->addChild('paResponse', $this->paResponse);
@@ -623,7 +656,8 @@ EOD;
 
         $expiryDate = $paymentTypeElement->addChild('expiryDate');
         $date = $expiryDate->addChild('date');
-        $date['month'] = $this->paymentDetails['expiryMonth'];
+        $expiryMonth = $this->formatExpiryMonth($this->paymentDetails['expiryMonth']);
+        $date['month'] = $expiryMonth;
         $date['year'] = $this->paymentDetails['expiryYear'];
 
         $paymentTypeElement->addChild('cardHolderName', $this->paymentDetails['cardHolderName']);
@@ -633,6 +667,18 @@ EOD;
         }
 
         return $paymentTypeElement;
+    }
+    /**
+     * Format Expiry Month
+     *
+     * @param string $inputMonth
+     * @return string
+     */
+    protected function formatExpiryMonth($inputMonth)
+    {
+        $month = (int) $inputMonth;
+        $formattedMonth = sprintf('%02d', $month);
+        return $formattedMonth;
     }
 
     /**
@@ -661,6 +707,11 @@ EOD;
         $userAgentHeader = $browser->addChild('userAgentHeader');
         $this->_addCDATA($userAgentHeader, $this->userAgentHeader);
 
+        $browserFields = $this->browserFields;
+        $browser->addChild('browserColourDepth', $browserFields['browser_colorDepth']);
+        $browser->addChild('browserScreenHeight', $browserFields['browser_screenHeight']);
+        $browser->addChild('browserScreenWidth', $browserFields['browser_screenWidth']);
+
         return $shopper;
     }
 
@@ -679,7 +730,9 @@ EOD;
             $this->shippingAddress['street'],
             $this->shippingAddress['postalCode'],
             $this->shippingAddress['city'],
-            $this->shippingAddress['countryCode']
+            $this->shippingAddress['countryCode'],
+            false,
+            $this->telephoneNumber
         );
     }
 
@@ -698,7 +751,9 @@ EOD;
             $this->billingAddress['street'],
             $this->billingAddress['postalCode'],
             $this->billingAddress['city'],
-            $this->billingAddress['countryCode']
+            $this->billingAddress['countryCode'],
+            false,
+            $this->telephoneNumber
         );
     }
 
@@ -712,6 +767,8 @@ EOD;
      * @param string $postalCode
      * @param string $city
      * @param string $countryCode
+     * @param string $cardflag
+     * @param string $telephoneNumber
      */
     private function _addAddressElement(
         $parentElement,
@@ -720,7 +777,9 @@ EOD;
         $street,
         $postalCode,
         $city,
-        $countryCode
+        $countryCode,
+        $cardflag,
+        $telephoneNumber = ""
     ) {
         $address = $parentElement->addChild('address');
 
@@ -730,8 +789,13 @@ EOD;
         $lastNameElement = $address->addChild('lastName');
         $this->_addCDATA($lastNameElement, $lastName);
 
-        $streetElement = $address->addChild('street');
-        $this->_addCDATA($streetElement, $street);
+        if ($cardflag) {
+            $address1Element = $address->addChild('address1');
+            $this->_addCDATA($address1Element, substr($street, 0, 50));
+        } else {
+            $streetElement = $address->addChild('street');
+            $this->_addCDATA($streetElement, $street);
+        }
 
         $postalCodeElement = $address->addChild('postalCode');
         //Zip code mandatory for worldpay, if not provided by customer we will pass manually
@@ -747,6 +811,9 @@ EOD;
 
         $countryCodeElement = $address->addChild('countryCode');
         $this->_addCDATA($countryCodeElement, $countryCode);
+        if (!empty($telephoneNumber)) {
+            $address->addChild('telephoneNumber', $telephoneNumber);
+        }
     }
     
     /**
@@ -881,6 +948,9 @@ EOD;
      */
     protected function _addAdditional3DsElement($order)
     {
+        if ($this->paymentDetails['isEnabledEFTPOS']) {
+            return;
+        }
         $dfReferenceId = isset($this->paymentDetails['dfReferenceId']) ? $this->paymentDetails['dfReferenceId'] : '';
         if ($dfReferenceId) {
             $addisional3DsElement = $order->addChild('additional3DSData');
@@ -1041,7 +1111,9 @@ EOD;
             $this->billingAddress['street'],
             $this->billingAddress['postalCode'],
             $this->billingAddress['city'],
-            $this->billingAddress['countryCode']
+            $this->billingAddress['countryCode'],
+            false,
+            $this->telephoneNumber
         );
     }
     

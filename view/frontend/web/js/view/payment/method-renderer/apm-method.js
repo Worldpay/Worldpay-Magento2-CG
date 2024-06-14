@@ -273,9 +273,14 @@ define(
             getTitle: function() {
                return window.checkoutConfig.payment.ccform.apmtitle ;
             },
-
+            isStatementNarrativeEnabled: function() {
+                return window.checkoutConfig.payment.ccform.isStatementNarrativeEnabled;
+            },
             isActive: function() {
                 return true;
+            },
+            isEnabledEFTPOS: function() {
+                return window.checkoutConfig.payment.ccform.isEnabledEFTPOS;
             },
             getACHAccounttypes: function(code) {
                 var accounttypes = window.checkoutConfig.payment.ccform.achdetails;
@@ -428,7 +433,7 @@ define(
                         $(".klarna-block").hide();
                         $(".ach-block").hide();
                     }else if(isKlarna && data.ccValue=='KLARNA-SSL'){
-                        $(".klarna-block").show();
+                        $(".klarna-block").hide();
                         $("#klarna_pay").prop('disabled',false);
                         $(".ideal-block").hide();
                         $(".ach-block").hide();
@@ -463,7 +468,7 @@ define(
                         $(".klarna-block").hide();
                         $(".ach-block").hide();
                     }else if (isKlarna && data.selectedCCType() && data.selectedCCType() == 'KLARNA-SSL') {
-                        $(".klarna-block").show();
+                        $(".klarna-block").hide();
                         $("#klarna_pay").prop('disabled',false);
                         $(".ideal-block").hide();
                         $(".ach-block").hide();

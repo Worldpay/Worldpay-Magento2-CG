@@ -300,7 +300,10 @@ define([
                             'additional_data': {
                                 'cc_type': 'PAYWITHGOOGLE-SSL',
                                 'walletResponse' : JSON.stringify(paymentData),
-                                'dfReferenceId':  window.walletpayObj.sessionId
+                                'dfReferenceId':  window.walletpayObj.sessionId,
+                                'browser_screenheight': window.screen.height,
+                                'browser_screenwidth': window.screen.width,
+                                'browser_colordepth': window.screen.colorDepth
                             }
                         },
                         storecode :window.walletpayObj.store_code,
@@ -309,8 +312,6 @@ define([
                         isCustomerLoggedIn : window.walletpayObj.isUserLoggedIn(),
                         isRequiredShipping : window.walletpayObj.isRequiredShipping()
                     }
-
-
 
                     if(window.walletpayObj.isUserLoggedIn()){
                         window.walletpayObj.selectedBillingAddress().email = window.walletpayObj.customerDetails.email;

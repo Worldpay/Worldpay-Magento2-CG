@@ -142,6 +142,9 @@ class PlaceOrder extends Action
         $billingAddressId = (int)$request->getParam('instant_purchase_billing_address');
         $carrierCode = (string)$request->getParam('instant_purchase_carrier');
         $shippingMethodCode = (string)$request->getParam('instant_purchase_shipping');
+        $browserScreenHeight = (string)$request->getParam('browserScreenHeight');
+        $browserScreenWidth = (string)$request->getParam('browserScreenWidth');
+        $browserColorDepth = (string)$request->getParam('browserColorDepth');
         $productId = (int)$request->getParam('product');
         $productRequest = $this->getRequestUnknownParams($request);
         if (!($request->getParam('instant_purchase_dfreference') === null)) {
@@ -149,6 +152,9 @@ class PlaceOrder extends Action
             if ($dfReferenceId) {
                 $this->checkoutSession->setDfReferenceId($dfReferenceId);
                 $this->checkoutSession->setInstantPurchaseOrder(true);
+                $this->checkoutSession->setBrowserScreenHeight($browserScreenHeight);
+                $this->checkoutSession->setBrowserScreenWidth($browserScreenWidth);
+                $this->checkoutSession->setBrowserColorDepth($browserColorDepth);
                 $this->checkoutSession->setInstantPurchaseRedirectUrl($this->redirect->getRefererUrl());
             }
         }

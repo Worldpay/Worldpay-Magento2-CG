@@ -144,6 +144,11 @@ class View extends \Magento\Backend\Block\Template
             $xmlUsername = !empty($pblMerchantUn) ? $pblMerchantUn : $xmlUsername;
         }
 
+        if ($paymentType == 'EFTPOS_AU-SSL') {
+            $eftposMerchantUn = $this->helper->getEFTPosXmlUsername();
+            $xmlUsername = !empty($eftposMerchantUn) ? $eftposMerchantUn : $xmlUsername;
+        }
+
         return $xmlUsername;
     }
 }

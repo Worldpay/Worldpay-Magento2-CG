@@ -122,9 +122,14 @@ EOD;
      */
     protected $echoData;
     /**
-     * @var string
+     * @var string $shopperId
      */
     protected $shopperId;
+    /**
+     * @var array $browserFields
+     */
+    protected $browserFields;
+
      /**
       * Constructor
       *
@@ -161,6 +166,8 @@ EOD;
      * @param array $paymentDetails
      * @param float $exponent
      * @param string $captureDelay
+     * @param array $browserFields
+     *
      * @return \SimpleXMLElement $xml
      */
     public function build(
@@ -183,7 +190,8 @@ EOD;
         $shopperIpAddress,
         $paymentDetails,
         $exponent,
-        $captureDelay
+        $captureDelay,
+        $browserFields
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -205,6 +213,7 @@ EOD;
         $this->paymentDetails = $paymentDetails;
         $this->exponent = $exponent;
         $this->captureDelay = $captureDelay;
+        $this->browserFields = $browserFields;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -520,6 +529,11 @@ EOD;
 
         $userAgentHeader = $browser->addChild('userAgentHeader');
         $this->_addCDATA($userAgentHeader, $this->userAgentHeader);
+
+        $browser->addChild('browserColourDepth', $this->browserFields['browserColourDepth']);
+        $browser->addChild('browserScreenHeight', $this->browserFields['browserScreenHeight']);
+        $browser->addChild('browserScreenWidth', $this->browserFields['browserScreenWidth']);
+ 
         return $shopper;
     }
 

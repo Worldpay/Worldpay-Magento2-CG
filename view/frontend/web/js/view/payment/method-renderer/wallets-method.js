@@ -304,20 +304,39 @@ define(
                                     if (event.origin === envUrl) {
                                         var data = JSON.parse(event.data);
                                         //console.warn('Merchant received a message:', data);
-                                        if (data !== undefined && data.Status) {
-                                            //window.sessionId = data.SessionId;
-                                            var sessionId = data.SessionId;
-                                            if(sessionId){
-                                                this.dfReferenceId = sessionId;
-                                            }
-                                            window.sessionId = this.dfReferenceId;
-                                            //place order with direct CSE method
-                                            if(window.checkoutConfig.payment.ccform.isMultishipping){                                                        
-                                                placeMultishippingOrder(self.getData());
-                                            }
-                                            else{
-                                                fullScreenLoader.stopLoader();
-                                                self.placeOrder();
+                                        if (data !== undefined) {
+                                            if(data.Payload){
+                                                if(data.Payload.ActionCode =="SUCCESS"){ 
+                                                    var sessionId = data.Payload.SessionId;
+                                                    if(sessionId){
+                                                        this.dfReferenceId = sessionId;
+                                                    }
+                                                    window.sessionId = this.dfReferenceId;
+                                                    //place order with direct CSE method
+                                                    if(window.checkoutConfig.payment.ccform.isMultishipping){                                                        
+                                                        placeMultishippingOrder(self.getData());
+                                                    }
+                                                    else{
+                                                        fullScreenLoader.stopLoader();
+                                                        self.placeOrder();
+                                                    } 
+                                                }
+
+                                            }else if(data.Status){
+                                                //window.sessionId = data.SessionId;
+                                                var sessionId = data.SessionId;
+                                                if(sessionId){
+                                                    this.dfReferenceId = sessionId;
+                                                }
+                                                window.sessionId = this.dfReferenceId;
+                                                //place order with direct CSE method
+                                                if(window.checkoutConfig.payment.ccform.isMultishipping){                                                        
+                                                    placeMultishippingOrder(self.getData());
+                                                }
+                                                else{
+                                                    fullScreenLoader.stopLoader();
+                                                    self.placeOrder();
+                                                }
                                             }
                                         }
                                     }

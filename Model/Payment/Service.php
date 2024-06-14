@@ -158,11 +158,11 @@ class Service
         if ($worldPayPayment->getIsMultishippingOrder()) {
             $interactionType = self::INTERACTION_TYPE_MS;
         }
-
+        $worldPayOrder = $order->getOrder();
         $rawXml = $this->paymentservicerequest->inquiry(
             $worldPayPayment->getMerchantId(),
             $worldPayPayment->getWorldpayOrderId(),
-            $worldPayPayment->getStoreId(),
+            $worldPayOrder->getStoreId(),
             $order->getPaymentMethodCode(),
             $worldPayPayment->getPaymentType(),
             $interactionType

@@ -170,7 +170,7 @@ class PaymentMethods
     protected function _readXML()
     {
 
-        $validator = new \Zend\Validator\File\Exists();
+        $validator = new \Laminas\Validator\File\Exists();
         if (!self::$_xml && $validator->isValid($this->_xmlLocation)) {
              self::$_xml = simplexml_load_file($this->_xmlLocation);
         }

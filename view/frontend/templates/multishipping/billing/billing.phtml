@@ -121,7 +121,10 @@ class="form multicheckout billing">
                                         if ($code == 'worldpay_cc' ||
                                             $code == 'worldpay_apm' ||
                                             $code == 'worldpay_wallets') {
-                                            ?>
+                                            if ($block->getCcIntegrationMode() != 'redirect' ||
+                                                $code != 'worldpay_cc') {
+                                                ?>
+                                            
                                             <div class='accepted_cc'>
                                                 <span class='worldpay_cc_we_accept'>
                                                     <!-- ko i18n: getCheckoutLabels('CO2')-->
@@ -143,7 +146,8 @@ class="form multicheckout billing">
 
                                                 </div>
                                             </div>
-                                        <?php } ?>
+                                        <?php }
+                                        } ?>
 
                                         <!-- End Worldpay plugin customization -->
                                     </dt>
@@ -172,7 +176,7 @@ class="form multicheckout billing">
                             foreach ($methods as $_method):
                                 $code = $_method->getCode();
                                 $checked = $block->getSelectedMethodCode() === $code;
-                                if (in_array($code, $block->getWorldpayMethodsCode())) {
+                                if (in_array($code, $block->getWorldpayMethodsCode()) || $code =='worldpay_apm') {
                                     continue;
                                 }
                                 if (isset($methodsForms[$code])) {

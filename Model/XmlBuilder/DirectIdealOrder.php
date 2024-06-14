@@ -346,7 +346,7 @@ EOD;
     {
         $paymentdetails = $order->addChild('paymentDetails');
         $paymenttype = $paymentdetails->addChild($this->paymentType);
-        $paymenttype['shopperBankCode'] = $this->bankcode;
+    //    $paymenttype['shopperBankCode'] = $this->bankcode;
         $paymenttype->addChild('successURL', $this->callbackurl['successURL']);
         $paymenttype->addChild('failureURL', $this->callbackurl['failureURL']);
         $paymenttype->addChild('cancelURL', $this->callbackurl['cancelURL']);

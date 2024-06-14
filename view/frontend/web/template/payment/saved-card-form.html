@@ -52,7 +52,7 @@
 <!-- ko if: (hasVerification())-->
 <div class="field cvv required"
      data-bind="attr: {id: getCode() + '_cc_type_cvv_div'}">
-    <label class="label" data-bind="attr: {for: getCode() + '_cc_cid'}">
+    <label class="label" data-bind="attr: {for: getCode() + '_cc_cid_savedcard'}">
         <span><!-- ko i18n: getCheckoutLabels('CO24')--><!-- /ko --></span>
 <!--        <span> ko i18n: 'Card Verification Number' /ko </span>-->
     </label>
@@ -62,7 +62,7 @@
                class="input-text cvv saved-cvv-number"
                name="payment[cc_cid]"
                value=""
-               data-bind="attr: {id: getCode() + '_cc_cid',
+               data-bind="attr: {id: getCode() + '_cc_cid_savedcard',
                           title: $t('Card Verification Number'),
                           'data-container': getCode() + '-cc-cvv'},
                           enable: isActive($parents),
@@ -85,14 +85,14 @@
 <!--/ko-->
 <div class="field cpfNum required"
      data-bind="visible: (showCPFSection())">
-    <label data-bind="attr: {for: getCode() + '_cpf'},visible: (showCPFSection())" class="label">
+    <label data-bind="attr: {for: getCode() + '_cpf_savedcard'},visible: (showCPFSection())" class="label">
         <span><!-- ko i18n: getCheckoutLabels('CO10')--><!-- /ko --></span>
         <!--            <span> ko i18n: 'CPF/CNPJ' /ko </span>-->
     </label>
     <div class="control">
         <input type="number" style="width: 225px;" name="payment[cpf]" class="input-text" value=""
                data-bind="attr: {autocomplete: off,
-                                 id: getCode() + '_cpf',
+                                 id: getCode() + '_cpf_savedcard',
                                  title: $t('CPF/CNPJ'),
                                  'data-container': getCode() + '-cpf-number',
                                  'data-validate': JSON.stringify({'required-number':true,
@@ -106,7 +106,7 @@
 <div class="field instalment required"
      style="width: 225px;"
      data-bind="visible: (showInstalmentSection())">
-    <label data-bind="attr: {for: getCode() + '_instalment'},visible: (showInstalmentSection())" class="label">
+    <label data-bind="attr: {for: getCode() + '_instalment_savedcard'},visible: (showInstalmentSection())" class="label">
         <span><!-- ko i18n: getCheckoutLabels('CO11')--><!-- /ko --></span>
         <!--           <span> ko i18n: 'Instalment' /ko </span>-->
     </label>  
@@ -114,7 +114,7 @@
         <select name="payment[instalment]"
                 class="select select-instalment"
                 data-bind="visible: (showInstalmentSection()),
-                           attr: {id: getCode() + '_instalment', 
+                           attr: {id: getCode() + '_instalment_savedcard', 
                                   'data-container': getCode() + '-instalment', 
                                   'data-validate': JSON.stringify({required:true})},
                            enable: isActive($parents),
@@ -130,7 +130,7 @@
 <div class="field statementnarative required"
      style=" width:225px;"
      data-bind="visible: (showCPFSection() || showInstalmentSection())">
-    <label data-bind="attr: {for: getCode() + '_statement'},visible: (showCPFSection() || showInstalmentSection())" class="label">
+    <label data-bind="attr: {for: getCode() + '_statement_savedcard'},visible: (showCPFSection() || showInstalmentSection())" class="label">
         <span><!-- ko i18n: getCheckoutLabels('CO12')--><!-- /ko --></span>
             <!--            <span> ko i18n: 'Purpose of transaction' /ko </span>-->
     </label>  
@@ -138,7 +138,7 @@
            value=""   
            data-bind="visible: (showCPFSection() || showInstalmentSection()),
                       attr: {autocomplete: off,
-                             id: getCode() + '_statement',
+                             id: getCode() + '_statement_savedcard',
                              title: $t('Purpose of transaction'),
                              'data-container': getCode() + '-statement',
                              'data-validate': JSON.stringify({required:true,

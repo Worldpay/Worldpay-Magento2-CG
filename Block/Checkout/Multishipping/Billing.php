@@ -390,11 +390,18 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
      */
     public function getWorldpayMethodsCode()
     {
-        return [
-            'worldpay_cc',
-            'worldpay_apm',
-            'worldpay_wallets'
-        ];
+        if ($this->enabledEFTPOS()) {
+            return [
+                'worldpay_cc',
+                'worldpay_wallets'
+            ];
+        } else {
+            return [
+                'worldpay_cc',
+                'worldpay_apm',
+                'worldpay_wallets'
+            ];
+        }
     }
     /**
      * Get Worldpay Methods
@@ -425,5 +432,25 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
             }
         }
         return $otherPaymentMethods;
+    }
+    
+    /**
+     * Get EFTPos Enable
+     *
+     * @return bool
+     */
+    public function enabledEFTPOS()
+    {
+        return $this->wpHelper->isEnabledEFTPOS();
+    }
+
+    /**
+     * Retrieve list of cc integration mode details
+     *
+     * @return string
+     */
+    public function getCcIntegrationMode()
+    {
+        return $this->wpHelper->getCcIntegrationMode();
     }
 }

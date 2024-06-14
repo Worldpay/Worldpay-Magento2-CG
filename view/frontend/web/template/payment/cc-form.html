@@ -131,7 +131,7 @@
                    value=""
                    data-bind="attr: {
                         placeholder: getCheckoutLabels('CO5'),
-                        id: getCode() + '_cc_cid',
+                        id: getCode() + '_cc_cid_cvv',
                         title: $t('Card Verification Number'),
                         'data-container': getCode() + '-cc-cvv',
                         'data-validate': JSON.stringify({'required-number':true, 'validate-card-cvv':'#' + getCode() + '_cc_type'})},
@@ -240,7 +240,7 @@
 
 <form class="form" data-bind="attr: {'id': getCode() + '-savedcard-form'}">
     <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
-    <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
+    <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_savedcard_' + getCode()}">
         <!-- ko if: (getSavedCardsCount() > 0)-->
 <!--        <h4> ko i18n: 'Saved cards' /ko </h4>-->
             <h4><!-- ko i18n: getCheckoutLabels('CO25')--><!-- /ko --></h4>

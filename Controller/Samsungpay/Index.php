@@ -35,7 +35,10 @@ class Index extends \Magento\Framework\App\Action\Action
       * @var $customerSession
       */
     public $customerSession;
-
+    /**
+     * @var $_checkoutSession
+     */
+    protected $_checkoutSession;
     /**
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
@@ -79,6 +82,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
      * @param QuoteIdMaskFactory $quoteIdMaskFactory
      * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      */
     public function __construct(
@@ -93,6 +97,7 @@ class Index extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Helper\CurlHelper $curlHelper,
         QuoteIdMaskFactory $quoteIdMaskFactory,
         \Magento\Customer\Model\Session $customerSession,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Sapient\Worldpay\Helper\Data $worldpayHelper
     ) {
         parent::__construct($context);
@@ -105,7 +110,8 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->_storeManager = $storeManager;
         $this->curlHelper = $curlHelper;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
-        $this->customerSession=$customerSession;
+        $this->customerSession = $customerSession;
+        $this->_checkoutSession = $checkoutSession;
         $this->worldpayHelper = $worldpayHelper;
     }
     /**
@@ -135,7 +141,13 @@ class Index extends \Magento\Framework\App\Action\Action
                 getValue('worldpay/general_config/environment_mode', $storeScope);
         
         $quoteId = $this->request->getParam('quoteId');
-        
+        $browser = [
+            'browser_screenheight' => $this->request->getParam('browserHeight'),
+            'browser_screenwidth' => $this->request->getParam('browserWidth'),
+            'browser_colordepth' => $this->request->getParam('browserColor')
+        ];
+        $this->_checkoutSession->setBrowserFields($browser);
+
         if ($environmentMode == 'Test Mode') {
             $serviceUrl = "https://api-ops.stg.mpay.samsung.com/ops/v1/transactions";
         } else {

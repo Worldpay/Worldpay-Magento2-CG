@@ -115,7 +115,12 @@ class WorldpayConfigProvider implements ConfigProviderInterface
       * @var \Magento\Framework\Locale\ResolverInterface
       */
     protected $localeResolver;
-    
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    private $storeManager;
+
     /**
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Helper\Data $helper
@@ -133,6 +138,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
      * @param SerializerInterface $serializer
      * @param \Magento\Framework\Session\SessionManagerInterface $session
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\Filesystem\Driver\File $fileDriver
      */
     public function __construct(
@@ -152,6 +158,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
         SerializerInterface $serializer,
         \Magento\Framework\Session\SessionManagerInterface $session,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Filesystem\Driver\File $fileDriver
     ) {
 
@@ -173,6 +180,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
             $this->localeResolver = $localeResolver;
             $this->serializer = $serializer;
             $this->session = $session;
+            $this->storeManager = $storeManager;
             $this->fileDriver = $fileDriver;
     }
 
@@ -226,6 +234,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['isDisclaimerMessageMandatory'] = $this->worldpayHelper
                         ->isDisclaimerMessageMandatory();
                 $config['payment']['ccform']['apmtitle'] = $this->getApmtitle();
+                $config['payment']['ccform']['isStatementNarrativeEnabled'] = $this->worldpayHelper
+                        ->isStatementNarrativeEnabled();
                 $config['payment']['ccform']['walletstitle'] = $this->getWalletstitle();
                 $config['payment']['ccform']['samsungServiceId'] = $this->getSamsungServiceId();
                 $config['payment']['ccform']['paymentMethodSelection'] = $this->getPaymentMethodSelection();
@@ -337,6 +347,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 //Pay By Link
                  $config['payment']['ccform']['isPayByLinkEnable'] = $this->worldpayHelper->isPayByLinkEnable();
                  $config['payment']['ccform']['payByLinkButtonName'] = $this->worldpayHelper->getPayByLinkButtonName();
+                // EFTPOS
+                $config['payment']['ccform']['isEnabledEFTPOS'] = $this->worldpayHelper->isEnabledEFTPOS();
             }
         }
         return $config;
@@ -353,6 +365,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         if ($isSavedCardEnabled && ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn())) {
             $savedCardsList = $this->savedTokenFactory->create()->getCollection()
             ->addFieldToFilter('customer_id', $this->customerSession->getCustomerId())
+            ->addFieldToFilter('store_id', $this->storeManager->getStore()->getId())
             ->addFieldToFilter('token_type', $tokenType)
             ->addFieldToFilter('method', ['neq' => 'SEPA_DIRECT_DEBIT-SSL'])->getData();
         }
@@ -544,9 +557,10 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         if ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn()) {
             $savedCardsList = $this->savedTokenFactory->create()->getCollection()
             ->addFieldToFilter('customer_id', $customer)
+            ->addFieldToFilter('store_id', $this->storeManager->getStore()->getId())
             ->addFieldToFilter('token_type', $tokenType)->getData();
         }
-        return $savedCardsList;
+            return $savedCardsList;
     }
    
     /**
@@ -812,6 +826,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         if ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn()) {
             $savedCardsList = $this->savedTokenFactory->create()->getCollection()
             ->addFieldToFilter('customer_id', $this->customerSession->getCustomerId())
+            ->addFieldToFilter('store_id', $this->storeManager->getStore()->getId())
             ->addFieldToFilter('token_type', $tokenType)->getData();
         }
         return $savedCardsList;

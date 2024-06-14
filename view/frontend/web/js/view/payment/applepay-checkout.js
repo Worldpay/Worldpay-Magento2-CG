@@ -167,7 +167,10 @@ return Component.extend({
                         'additional_data': {
                             'cc_type': 'APPLEPAY-SSL',
                             'appleResponse' : appleResponse,
-                            'dfReferenceId':   window.checkoutConfig.payment.ccform.sessionId
+                            'dfReferenceId':   window.checkoutConfig.payment.ccform.sessionId,
+                            'browser_screenheight': window.screen.height,
+                            'browser_screenwidth': window.screen.width,
+                            'browser_colordepth': window.screen.colorDepth
                         }  
                     }
                     var checkoutData = {

@@ -69,7 +69,8 @@ class WorldPayPayment
             $wpp->setData('payment_type', $paymentState->getPaymentMethod());
         }
         if (!empty($wpp->getData('payment_type')) && !empty($paymentState->getPaymentMethod())) {
-            if (strtolower($wpp->getData('payment_type')) == "all") {
+            if (strtolower($wpp->getData('payment_type')) == "all" ||
+                $wpp->getData('payment_type') == 'ONLINE') {
                 if (!in_array(
                     strtoupper($paymentState->getPaymentMethod()),
                     $this->apmMethods
