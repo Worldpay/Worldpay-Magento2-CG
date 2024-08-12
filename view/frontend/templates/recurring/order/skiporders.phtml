@@ -25,7 +25,7 @@
             </label>
             <div>      
                 <span class="limiter-options">
-                <a href="<?= $block->escapeUrl($block->getCompleteOrderlUrl()) ?>">
+                <a href="<?= $escaper->escapeUrl($block->getCompleteOrderlUrl()) ?>">
                     <?= /* @noEscape */  $escaper->escapeHtml('Completed') ?>
                 </a>
                 </span>
@@ -47,13 +47,13 @@
         </label>
         <div>
             <select name="status" title="Order Status" onchange="location= this.value;" >
-                <option value="<?= $block->escapeUrl($block->getOrderFilterURL('m-6')) ?>"
+                <option value="<?= $escaper->escapeUrl($block->getOrderFilterURL('m-6')) ?>"
                     <?php if ($block->checkSelectedFilter('m-6')): ?> 
                         <?= /* @noEscape */  $escaper->escapeHtml('selected') ?>
                     <?php endif ?> >
                     <?= /* @noEscape */  $escaper->escapeHtml('6 Month') ?>
                 </option>
-                <option value="<?= $block->escapeUrl($block->getOrderFilterURL('y-'.date("Y"))) ?>"
+                <option value="<?= $escaper->escapeUrl($block->getOrderFilterURL('y-'.date("Y"))) ?>"
                 <?php if ($block->checkSelectedFilter('y-'.date("Y"))): ?> 
                         <?= /* @noEscape */  $escaper->escapeHtml('selected') ?> 
                     <?php endif ?> >
@@ -129,7 +129,7 @@
 <?php else: ?>
     <div class="message info empty">
         <span>
-            <?= $escaper->escapeHtml(__('You have not any reccurring order yet.')); ?>
+            <?= $escaper->escapeHtml(__('You have not any skipped reccurring order.')); ?>
         </span>
     </div>
 <?php endif ?>

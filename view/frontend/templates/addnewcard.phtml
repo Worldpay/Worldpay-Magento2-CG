@@ -393,14 +393,27 @@
                     }
                     if (event.origin === envUrl) {
                         var data = JSON.parse(event.data);
-                        if (data !== undefined && data.Status) {
-                            var sessionId = data.SessionId;
-                            if (sessionId) {
-                                dfReferenceId = sessionId;
+                        if (data !== undefined) {
+                            // for cardinal 
+                            if(data.Payload){
+                                if(data.Payload.ActionCode =="SUCCESS"){ 
+                                    var sessionId = data.Payload.SessionId;
+                                    if (sessionId) {
+                                        dfReferenceId = sessionId;
+                                    }
+                                    window.sessionId = dfReferenceId;
+                                    jQuery('[name=dfReferenceId]').val(dfReferenceId);
+                                    createPayment3DS();  
+                                }
+                            } else if(data.Status) {
+                                var sessionId = data.SessionId;
+                                if (sessionId) {
+                                    dfReferenceId = sessionId;
+                                }
+                                window.sessionId = dfReferenceId;
+                                jQuery('[name=dfReferenceId]').val(dfReferenceId);
+                                createPayment3DS();
                             }
-                            window.sessionId = dfReferenceId;
-                            jQuery('[name=dfReferenceId]').val(dfReferenceId);
-                            createPayment3DS();
                         }
                     }
                 }, false);
@@ -415,8 +428,10 @@
                         "expiryYear": jQuery('[name=expiryYear]').val(),
                         "cvc": jQuery('[name=cvc]').val(),
                         "cseEnabled": jQuery('[name=cseEnabled]').val(),
-                        "disclaimerFlag": disclaimerFlag
-                        
+                        "disclaimerFlag": disclaimerFlag,
+                        'browser_screenheight': window.screen.height,
+                        'browser_screenwidth': window.screen.width,
+                        'browser_colordepth': window.screen.colorDepth
                     }
                 };
                 var jsonPaymentDetails = JSON.stringify(paymentDetails);
@@ -465,7 +480,10 @@
                         "cvc": jQuery('[name=cvc]').val(),
                         "cseEnabled": jQuery('[name=cseEnabled]').val(),
                         "dfReferenceId": window.sessionId,
-                        "disclaimerFlag": disclaimerFlag
+                        "disclaimerFlag": disclaimerFlag,
+                        'browser_screenheight': window.screen.height,
+                        'browser_screenwidth': window.screen.width,
+                        'browser_colordepth': window.screen.colorDepth
                     }
                 };
                 var jsonPaymentDetails = JSON.stringify(paymentDetails);

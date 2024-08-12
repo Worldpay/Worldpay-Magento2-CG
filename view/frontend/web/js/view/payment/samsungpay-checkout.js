@@ -41,8 +41,11 @@ return Component.extend({
         return this;
     },
     performPlaceOrder:  function () {
-        var quoteId = window.checkoutConfig.quoteData.entity_id;                    
-        var linkUrl = url.build('worldpay/samsungpay/index?quoteId=' + quoteId);                         
+        var quoteId = window.checkoutConfig.quoteData.entity_id; 
+        var height = window.screen.height;
+        var width = window.screen.width;
+        var color = window.screen.colorDepth;
+        var linkUrl = url.build('worldpay/samsungpay/index?quoteId=' + quoteId+'&browserHeight='+height+'&browserWidth='+width+'&browserColor='+color);                         
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET", linkUrl, false);
         xhttp.send();   

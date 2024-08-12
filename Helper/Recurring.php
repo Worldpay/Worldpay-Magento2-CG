@@ -784,7 +784,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
                 ],
             ]
         );
-        return json_decode($response, true);
+        return json_decode($response ?? '', true);
     }
     
     /**
@@ -844,7 +844,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
                 ],
             ]
         );
-        return json_decode($response, true);
+        return json_decode($response ?? '', true);
     }
     
     /**
@@ -879,7 +879,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
                 ],
               ]
         );
-        return json_decode($response, true);
+        return json_decode($response ?? '', true);
     }
     
     /**
@@ -914,7 +914,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
                 ],
             ]
         );
-        return json_decode($response, true);
+        return json_decode($response ?? '', true);
     }
     
     /**

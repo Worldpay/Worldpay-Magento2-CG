@@ -1,13 +1,20 @@
 Latest releases for all supported version:
 For Magento 2.4.7
+Worldpay Plugin version: 2.4.7-rc0724
+1. Magento 2.4.7 compatible
+2. PHP 8.3 & 8.2 compatibility
+3. EFTPOS Payment
 
 Worldpay Plugin version: 2.4.7-rc0224
 1. Magento 2.4.7-beta2 compatible
-2. PHP 8.2 & 8.1 ompatibility
+2. PHP 8.2 & 8.1 compatibility
 3. Scurity enhancement for Client side encryption
 4. Enhanced feature Subscription & Recurring
 
 For Magento 2.4.6
+Worldpay Plugin version: 2.4.6-p50624
+1. Magento 2.4.6-p5 compatible
+2. PHP 8.2 compatibility
 
 Worldpay Plugin version: 2.4.6-p30124
 1. Magento 2.4.6-p3 compatible

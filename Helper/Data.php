@@ -260,9 +260,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Get MerchantCode
      *
      * @param string $paymentType
+     * @param string $storeId
      * @return string
      */
-    public function getMerchantCode($paymentType)
+    public function getMerchantCode($paymentType, $storeId = null)
     {
         if ($paymentType) {
             $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
@@ -271,19 +272,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 return $merchantCodeValue;
             }
         }
-        
-        return $this->_scopeConfig->getValue(
-            'worldpay/general_config/merchant_code',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        if ($storeId) {
+            return $this->_scopeConfig->getValue(
+                'worldpay/general_config/merchant_code',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        } else {
+            return $this->_scopeConfig->getValue(
+                'worldpay/general_config/merchant_code',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
     }
     /**
      * Get Xml Username
      *
      * @param string $paymentType
+     * @param string $storeId
      * @return string
      */
-    public function getXmlUsername($paymentType)
+    public function getXmlUsername($paymentType, $storeId = null)
     {
         if ($paymentType) {
             $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
@@ -292,18 +301,27 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 return $merchantCodeValue;
             }
         }
-        return $this->_scopeConfig->getValue(
-            'worldpay/general_config/xml_username',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        if ($storeId) {
+            return $this->_scopeConfig->getValue(
+                'worldpay/general_config/xml_username',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        } else {
+            return $this->_scopeConfig->getValue(
+                'worldpay/general_config/xml_username',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
     }
     /**
      * Get Xml Password
      *
      * @param string $paymentType
+     * @param string $storeId
      * @return string
      */
-    public function getXmlPassword($paymentType)
+    public function getXmlPassword($paymentType, $storeId = null)
     {
         if ($paymentType) {
             $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
@@ -312,10 +330,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 return $merchantCodeValue;
             }
         }
-        return $this->_scopeConfig->getValue(
-            'worldpay/general_config/xml_password',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        if ($storeId) {
+            return $this->_scopeConfig->getValue(
+                'worldpay/general_config/xml_password',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        } else {
+            return $this->_scopeConfig->getValue(
+                'worldpay/general_config/xml_password',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
     }
     /**
      * Check isMacEnabled
@@ -637,6 +663,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/apm_config/paymentmethods',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Check Statement Narrative
+     *
+     * @return string
+     */
+    public function isStatementNarrativeEnabled()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/apm_config/statement_narrative',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
@@ -1901,7 +1939,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 'worldpay/prime_routing/debit_networks',
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
-            if (strlen($debitNetworks)>0) {
+            if (!empty($debitNetworks)) {
                 return explode(",", $debitNetworks);
             }
         }
@@ -2025,7 +2063,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 'worldpay/klarna_config/sliceit_config/sliceit_contries',
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
-            if (strlen($sliceitContries) > 0) {
+            if (!empty($sliceitContries)) {
                 return $sliceitContries;
             }
         }
@@ -2058,7 +2096,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 'worldpay/klarna_config/paylater_config/paylater_contries',
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
-            if (strlen($payLaterContries) > 0) {
+            if (!empty($payLaterContries)) {
                 return $payLaterContries;
             }
         }
@@ -2092,7 +2130,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
 
-            if (strlen($paynowContries) > 0) {
+            if (!empty($paynowContries)) {
                 return $paynowContries;
             }
         }
@@ -2810,8 +2848,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get Plugin Tracker Details
      *
-     * @param string $username
-     * @param string $merchantCode
+     * @return array
      */
     public function getPluginTrackerdetails()
     {
@@ -2830,6 +2867,33 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $details['additional_details']['php_version'] = $this->getPhpVersionUsed();
+        
+        return $details;
+    }
+
+    /**
+     * Get Plugin Tracker Details for Header Request
+     *
+     * @return array
+     */
+    public function getPluginTrackerHeaderdetails()
+    {
+        $details=[];
+        $integrationVersion = $historicVersions= '';
+        $mageDetails = $this->getCurrentMagentoVersionDetails();
+        $details['ecommerce_platform'] = $mageDetails['platform'];
+        $details['ecommerce_platform_version'] = $mageDetails['version'];
+        if (($this->getCurrentWopayPluginVersion()!=null) && !empty($this->getCurrentWopayPluginVersion())) {
+            $integrationVersion = $this->getCurrentWopayPluginVersion();
+        }
+        if (($this->getUpgradeDates()!=null) && !empty($this->getUpgradeDates())) {
+            $historicVersions = $this->getUpgradeDates();
+        }
+        $details['ecommerce_plugin_data'] =
+            ['ecommerce_platform_edition'=>$mageDetails['edition'],
+            'integration_version'=>$integrationVersion,
+            'historic_integration_versions'=>$historicVersions
+            ];
         
         return $details;
     }
@@ -3058,84 +3122,155 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      *  Check if Pay By Link merchant code
+     *
+     * @param string $storeId
      */
-    public function getPayByLinkMerchantCode()
+    public function getPayByLinkMerchantCode($storeId = null)
     {
-        $paybyLinkMC = $this->_scopeConfig->getValue(
-            'worldpay/paybylink_config/pbl_merchant_code',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        if ($storeId) {
+            $paybyLinkMC = $this->_scopeConfig->getValue(
+                'worldpay/paybylink_config/pbl_merchant_code',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        } else {
+            $paybyLinkMC = $this->_scopeConfig->getValue(
+                'worldpay/paybylink_config/pbl_merchant_code',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
         return $paybyLinkMC;
     }
 
     /**
      * Get Pay by Link Merchant username
+     *
+     * @param string $storeId
      */
-    public function getPayByLinkMerchantUsername()
+    public function getPayByLinkMerchantUsername($storeId = null)
     {
-        $paybyLinkUn = $this->_scopeConfig->getValue(
-            'worldpay/paybylink_config/pbl_xml_username',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        if ($storeId) {
+            $paybyLinkUn = $this->_scopeConfig->getValue(
+                'worldpay/paybylink_config/pbl_xml_username',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        } else {
+            $paybyLinkUn = $this->_scopeConfig->getValue(
+                'worldpay/paybylink_config/pbl_xml_username',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
         return $paybyLinkUn;
     }
 
     /**
      * Get Pay by Link merchant password
+     *
+     * @param string $storeId
      */
-    public function getPayByLinkMerchantPassword()
+    public function getPayByLinkMerchantPassword($storeId = null)
     {
-        $paybyLinkPw = $this->_scopeConfig->getValue(
-            'worldpay/paybylink_config/pbl_xml_password',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        if ($storeId) {
+            $paybyLinkPw = $this->_scopeConfig->getValue(
+                'worldpay/paybylink_config/pbl_xml_password',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        } else {
+            $paybyLinkPw = $this->_scopeConfig->getValue(
+                'worldpay/paybylink_config/pbl_xml_password',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
         return $paybyLinkPw;
     }
 
     /**
      *  Get multishipping merchant code
+     *
+     * @param string $storeId
      */
-    public function getMultishippingMerchantCode()
+    public function getMultishippingMerchantCode($storeId = null)
     {
-        $multishippingMC = $this->_scopeConfig->getValue(
-            'worldpay/multishipping/ms_merchant_code',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        if ($storeId) {
+            $multishippingMC = $this->_scopeConfig->getValue(
+                'worldpay/multishipping/ms_merchant_code',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        } else {
+            $multishippingMC = $this->_scopeConfig->getValue(
+                'worldpay/multishipping/ms_merchant_code',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
+        
         return $multishippingMC;
     }
 
     /**
      * Get multishipping Merchant username
+     *
+     * @param string $storeId
      */
-    public function getMultishippingMerchantUsername()
+    public function getMultishippingMerchantUsername($storeId = null)
     {
-        $multishippingUn = $this->_scopeConfig->getValue(
-            'worldpay/multishipping/ms_xml_username',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        if ($storeId) {
+            $multishippingUn = $this->_scopeConfig->getValue(
+                'worldpay/multishipping/ms_xml_username',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        } else {
+            $multishippingUn = $this->_scopeConfig->getValue(
+                'worldpay/multishipping/ms_xml_username',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
         return $multishippingUn;
     }
 
     /**
      * Get multishipping merchant password
+     *
+     * @param string $storeId
      */
-    public function getMultishippingMerchantPassword()
+    public function getMultishippingMerchantPassword($storeId = null)
     {
-        $multishippingPw = $this->_scopeConfig->getValue(
-            'worldpay/multishipping/ms_xml_password',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        if ($storeId) {
+            $multishippingPw = $this->_scopeConfig->getValue(
+                'worldpay/multishipping/ms_xml_password',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        } else {
+            $multishippingPw = $this->_scopeConfig->getValue(
+                'worldpay/multishipping/ms_xml_password',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
         return $multishippingPw;
     }
     /**
      * Get multishipping Installation Id
+     *
+     * @param string $storeId
      */
-    public function getMultishippingInstallationId()
+    public function getMultishippingInstallationId($storeId = null)
     {
-        $multishippingIID = $this->_scopeConfig->getValue(
-            'worldpay/multishipping/ms_xml_installationId',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        if ($storeId) {
+            $multishippingIID = $this->_scopeConfig->getValue(
+                'worldpay/multishipping/ms_xml_installationId',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+        } else {
+            $multishippingIID = $this->_scopeConfig->getValue(
+                'worldpay/multishipping/ms_xml_installationId',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+        }
         return $multishippingIID;
     }
     /**
@@ -3256,12 +3391,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Get PaybyLink Installation Id
+     *
+     * @param string $storeId
      */
-    public function getPayByLinkInstallationId()
+    public function getPayByLinkInstallationId($storeId = null)
     {
         $pblIId = $this->_scopeConfig->getValue(
             'worldpay/paybylink_config/pbl_xml_installationId',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
         );
         return $pblIId;
     }
@@ -3414,5 +3552,160 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'general/country/default',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
+    }
+
+    /**
+     * Get Pending order cron enable
+     *
+     * @param int $storeId
+     * @return bool
+     */
+    public function getOrderCleanupEnable($storeId = null)
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/order_cleanup_cron/order_cleanup_enable',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+    
+    /**
+     * Get Default country code of Magento store
+     *
+     * @param int $storeId
+     * @return string
+     */
+    public function getOrderCleanupOption($storeId = null)
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/order_cleanup_cron/order_cleanup_option',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+   /**
+    * Get EFTPOS Enabled or not
+    *
+    * @return bool
+    */
+    public function isEnabledEFTPOS()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/eftpos_payments/enable_eftpos',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get EFTPOS Merchant Code
+     *
+     * @return string
+     */
+    public function getEFTPOSMerchantCode()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/eftpos_payments/eftpos_merchant_code',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get EFTPOS Routing Mid
+     *
+     * @return string
+     */
+    public function getEFTPOSRoutingMid()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/eftpos_payments/eftpos_routing_mid',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get EFTPOS Debugging Enable
+     *
+     * @return bool
+     */
+    public function getEFTPOSDebugging()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/eftpos_payments/eftpos_debugging',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Check If Storepickup is enabled from admin or not.
+     */
+    public function isStorePickUpEnabled()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/klarna_config/store_pickup/enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Get StorePickUp Method for Klarna StorePickUp Config
+     */
+    public function getStorePickUpMethod()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/klarna_config/store_pickup/shipping_method',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get Xml Username
+     *
+     * @param string $paymentType
+     * @return string
+     */
+    public function getEFTPosXmlUsername()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/eftpos_payments/eftpos_xml_username',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get Xml Password
+     *
+     * @param string $paymentType
+     * @return string
+     */
+    public function getEFTPOSXmlPassword()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/eftpos_payments/eftpos_xml_password',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+    /**
+     * Get StorePickUp Type for Klarna Config
+     */
+    public function getStorePickUpType()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/klarna_config/store_pickup/shipping_type',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+    }
+
+     /**
+      *  Check if isStorePickup selected by user on shipping page
+      *
+      * @return bool
+      */
+    public function isStorePickup()
+    {
+        $isStorePickup = false;
+        $quote = $this->_checkoutSession->getQuote();
+        $shippingAddress = $quote->getShippingAddress();
+        $shippingMethod = $shippingAddress->getShippingMethod();
+        if (strpos($shippingMethod, 'instore_pickup') !== false) {
+            $isStorePickup = true;
+        }
+        return $isStorePickup;
     }
 }

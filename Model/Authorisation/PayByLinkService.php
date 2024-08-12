@@ -333,10 +333,10 @@ class PayByLinkService extends \Magento\Framework\DataObject
             $merchantPassword = $this->worldpayhelper->getXmlPassword($redirectOrderParams['paymentType']);
             $installationId = $this->worldpayhelper->getInstallationId($redirectOrderParams['paymentType']);
             // pbl merchant configurations
-            $pblMerchantUn = $this->worldpayhelper->getPayByLinkMerchantUsername();
-            $pblMerchantPw = $this->worldpayhelper->getPayByLinkMerchantPassword();
-            $pblMerchantCode = $this->worldpayhelper->getPayByLinkMerchantCode();
-            $pblInstallationId = $this->worldpayhelper->getPayByLinkInstallationId();
+            $pblMerchantUn = $this->worldpayhelper->getPayByLinkMerchantUsername($orderStoreId);
+            $pblMerchantPw = $this->worldpayhelper->getPayByLinkMerchantPassword($orderStoreId);
+            $pblMerchantCode = $this->worldpayhelper->getPayByLinkMerchantCode($orderStoreId);
+            $pblInstallationId = $this->worldpayhelper->getPayByLinkInstallationId($orderStoreId);
 
             $merchantUsername = !empty($pblMerchantUn) ? $pblMerchantUn : $merchantUsername ;
             $merchantPassword = !empty($pblMerchantPw) ? $pblMerchantPw : $merchantPassword ;

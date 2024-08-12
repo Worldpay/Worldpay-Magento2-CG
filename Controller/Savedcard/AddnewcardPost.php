@@ -371,9 +371,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
                 $billingadd = $this->getAddress($billingaddress);
                 $fullRequest = json_decode($this->getRequest()->getContent());
-
                 $merchantCode = $this->worldpayHelper->getMerchantCode($fullRequest->payment->paymentType);
-                
                 $payment = [
                     'cardNumber' => $fullRequest->payment->cardNumber,
                     'paymentType' => $fullRequest->payment->paymentType,
@@ -381,6 +379,11 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                     'expiryMonth' => $fullRequest->payment->expiryMonth,
                     'expiryYear' => $fullRequest->payment->expiryYear,
                     'cseEnabled' => $fullRequest->payment->cseEnabled
+                ];
+                $browserFields = [
+                    'browser_colorDepth' => $fullRequest->payment->browser_colordepth,
+                    'browser_screenWidth' => $fullRequest->payment->browser_screenwidth,
+                    'browser_screenHeight' => $fullRequest->payment->browser_screenheight
                 ];
                 if (isset($fullRequest->payment->cvc) &&
                         !$fullRequest->payment->cvc == '' && !empty($fullRequest->payment->cvc)) {
@@ -437,6 +440,8 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 $orderParams['shippingfee'] = 0;
                 $orderParams['exponent'] = $exponent;
                 $orderParams['primeRoutingData'] = $this->getPrimeRoutingDetails($billingadd['countryCode']);
+                $orderParams['browserFields'] = $browserFields;
+                $orderParams['telephoneNumber'] = $billingaddress->getTelephone();
                 $payment['additional_data'] = [
                             'save_my_card' => 1,
                             'isRecurringOrder' => 0,

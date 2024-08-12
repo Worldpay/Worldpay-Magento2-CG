@@ -92,6 +92,16 @@ EOD;
      * @var string $captureDelay
      */
     protected $captureDelay;
+    
+    /**
+     * @var array $browserFields
+     */
+    protected $browserFields;
+
+    /**
+     * @var string $telephoneNumber
+     */
+    protected $telephoneNumber;
 
     /**
      * Build xml for processing Request
@@ -109,6 +119,9 @@ EOD;
      * @param string $shopperEmail
      * @param array|string $exponent
      * @param string $captureDelay
+     * @param array $browserFields
+     * @param string $telephoneNumber
+     *
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -128,7 +141,9 @@ EOD;
         //$shopperId,
         $shopperEmail,
         $exponent,
-        $captureDelay
+        $captureDelay,
+        $browserFields,
+        $telephoneNumber
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -146,6 +161,9 @@ EOD;
         $this->captureDelay = $captureDelay;
         //$this->acceptHeader = $acceptHeader;
         //$this->userAgentHeader = $userAgentHeader;
+
+        $this->telephoneNumber = $telephoneNumber;
+        $this->browserFields = $browserFields;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
@@ -348,18 +366,13 @@ EOD;
     protected function _addShopperElement($order)
     {
         $shopper = $order->addChild(self::TOKEN_SCOPE);
-
         $shopper->addChild('shopperEmailAddress', $this->shopperEmail);
-
         //$shopper->addChild('authenticatedShopperID', $this->paymentDetails['customerId']);
-
         $browser = $shopper->addChild('browser');
-
-//        $acceptHeader = $browser->addChild('acceptHeader');
-//        $this->_addCDATA($acceptHeader, $this->acceptHeader);
-//
-//        $userAgentHeader = $browser->addChild('userAgentHeader');
-//        $this->_addCDATA($userAgentHeader, $this->userAgentHeader);
+        // $acceptHeader = $browser->addChild('acceptHeader');
+        // $this->_addCDATA($acceptHeader, $this->acceptHeader);
+        // $userAgentHeader = $browser->addChild('userAgentHeader');
+        // $this->_addCDATA($userAgentHeader, $this->userAgentHeader);
 
         return $shopper;
     }

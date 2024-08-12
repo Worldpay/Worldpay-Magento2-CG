@@ -126,12 +126,12 @@ class SkipSubscriptionOrderRepository implements SkipSubscriptionOrderRepository
      */
     public function getById($id)
     {
-        $editHistory = $this->skipOrderFactory->create();
-        $this->editHistoryResource->load($editHistory, $id);
-        if (!$editHistory->getId()) {
+        $skipOrderHistory = $this->skipOrderFactory->create();
+        $this->skipOrderResource->load($skipOrderHistory, $id);
+        if (!$skipOrderHistory->getId()) {
             throw new NoSuchEntityException(__('Unable to find History with ID "%1"', $id));
         }
-        return $editHistory;
+        return $skipOrderHistory;
     }
 
     /**

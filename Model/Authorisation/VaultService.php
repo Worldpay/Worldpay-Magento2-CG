@@ -115,7 +115,6 @@ class VaultService extends \Magento\Framework\DataObject
             $orderStoreId,
             $paymentDetails
         );
-
         $response = $this->paymentservicerequest->order($directOrderParams);
         $directResponse = $this->directResponse->setResponse($response);
         if (!empty($directOrderParams['primeRoutingData'])) {

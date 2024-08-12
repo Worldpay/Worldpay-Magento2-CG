@@ -17,8 +17,6 @@ define(
         'Magento_Checkout/js/model/url-builder',
         'mage/storage',
         'Magento_Checkout/js/model/full-screen-loader',
-        'hmacSha256',
-        'encBase64',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Checkout/js/action/set-billing-address',
         'Magento_Ui/js/model/messageList',
@@ -27,7 +25,7 @@ define(
         'jquery/ui'        
     ],
     
-    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, hmacSha256, encBase64,additionalValidators,setBillingAddressAction,globalMessageList,disclaimerConfirm) {
+    function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, additionalValidators,setBillingAddressAction,globalMessageList,disclaimerConfirm) {
         'use strict';
         //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
@@ -413,6 +411,12 @@ define(
                 $("#worldpay_cc_save_card").removeAttr('disabled');
                 return true;                
             },
+            onSelectNewCard:function(obj) { 
+                $('#saved-Card-Visibility-Enabled').hide();  
+                obj.isSaveThisCardVisible(true);
+                $("#worldpay_cc_save-card_div").show();
+                return true;            
+            },
             onSelectSavedCards:function(obj,ccData){
                 obj.selectedPayType('savedcard');
                 obj.paymentToken = ccData.token_code;
@@ -481,6 +485,12 @@ define(
                 var self= this;
                 this.redirectAfterPlaceOrder = false;
                 var paymentDetails = this.getData();
+                if (this.getselectedCCType('payment[cc_type]') == undefined || 
+                    this.getselectedCCType('payment[cc_type]') == '') {
+                    $('#cc_type-error').css('display', 'block');
+                    $('#cc_type-error').html("<div>" + getCreditCardExceptions('CCAM6') + "</div>");
+                    return false;
+                }
                if(!this.validateForms(paymentDetails)){
                    console.log("Validation error");
                    return false;
@@ -653,6 +663,10 @@ define(
             },
 
             loadEventAction: function(data, event){
+                var type = $("input[name='payment[cc_type]']:checked").data('type');
+                if ((type !== undefined) && (type == 'redirect')) {
+                    data.ccValue = $("input[name='payment[cc_type]']:checked").val();
+                }
                 if ((data.ccValue)) {
                     if (data.ccValue=="savedcard") {
                         $("#saved-Card-Visibility-Enabled").show();
@@ -971,7 +985,10 @@ define(
                                 'instalment': $('#' + this.getCode() + '_instalment').val(),
                                 'statement': this.statement,
                                 'shippingfee': this.getShippingFeeForBrazil(),
-                                'multishipping': this.multishipping
+                                'multishipping': this.multishipping,
+                                'browser_screenheight': window.screen.height,
+                                'browser_screenwidth': window.screen.width,
+                                'browser_colordepth': window.screen.colorDepth
                         }
                     };
 
@@ -1002,7 +1019,10 @@ define(
                                 'instalment': $('#' + this.getCode() + '_instalment').val(),
                                 'statement': this.statement,
                                 'shippingfee': this.getShippingFeeForBrazil(),
-                                'multishipping': this.multishipping
+                                'multishipping': this.multishipping,
+                                'browser_screenheight': window.screen.height,
+                                'browser_screenwidth': window.screen.width,
+                                'browser_colordepth': window.screen.colorDepth
                         }
                     };
                 }
@@ -1040,6 +1060,14 @@ define(
                 if(!additionalValidators.validate()){
                     console.log("Validation Failed");
                     return false;
+                }
+                if(this.intigrationmode == 'redirect'){
+                    if (this.getselectedCCType('payment[cc_type]') == undefined || 
+                        this.getselectedCCType('payment[cc_type]') == '') {
+                        $('#cc_type-error').css('display', 'block');
+                        $('#cc_type-error').html("<div>" + getCreditCardExceptions('CCAM6') + "</div>");
+                        return false;
+                    }
                 }
                 // 3DS2 JWT create function 
                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
@@ -1088,9 +1116,7 @@ define(
                             this.redirectAfterPlaceOrder = false;
                             if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled && this.intigrationmode == 'direct'){
                                 window.addEventListener("message", function(event) {
-                                    
                                     var data = JSON.parse(event.data);
-
                                     var envUrl;
                                     if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
                                         envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
@@ -1098,21 +1124,42 @@ define(
                                     if (event.origin === envUrl) {
                                         var data = JSON.parse(event.data);
                                         //console.warn('Merchant received a message:', data);
-                                        if (data !== undefined && data.Status) {
-                                            //window.sessionId = data.SessionId;
-                                            var sessionId = data.SessionId;
-                                            if(sessionId){
-                                                this.dfReferenceId = sessionId;
+                                        if(data !== undefined){
+                                            if(data.Payload){
+                                                // for cardinal 
+                                                if(data.Payload.ActionCode =="SUCCESS"){
+                                                    var sessionId = data.Payload.SessionId;
+                                                    //place order with direct CSE method
+                                                    if(sessionId){
+                                                        this.dfReferenceId = sessionId;
+                                                    }
+                                                    window.sessionId = this.dfReferenceId;
+                                                    if(window.checkoutConfig.payment.ccform.isMultishipping){
+                                                        placeMultishippingOrder(self.getData());
+                                                    }
+                                                    else{
+                                                        fullScreenLoader.stopLoader();
+                                                        self.placeOrder();
+                                                    }
+                                                }
+
+                                            }else if(data.Status){
+                                                //window.sessionId = data.SessionId;
+                                                var sessionId = data.SessionId;
+                                                if(sessionId){
+                                                    this.dfReferenceId = sessionId;
+                                                }
+                                                window.sessionId = this.dfReferenceId;
+                                                //place order with direct CSE method
+                                                if(window.checkoutConfig.payment.ccform.isMultishipping){
+                                                    placeMultishippingOrder(self.getData());
+                                                }
+                                                else{
+                                                    fullScreenLoader.stopLoader();
+                                                    self.placeOrder();
+                                                }
                                             }
-                                            window.sessionId = this.dfReferenceId;
-                                            //place order with direct CSE method
-                                            if(window.checkoutConfig.payment.ccform.isMultishipping){  
-												placeMultishippingOrder(self.getData());
-											}
-											else{
-												fullScreenLoader.stopLoader();
-												self.placeOrder();
-											}
+
                                         }
                                     }
                                 }, { once: true });
@@ -1148,7 +1195,7 @@ define(
                     } else if(this.saveMyCard && this.isDisclaimerMessageMandatory() && this.isDisclaimerMessageEnabled() && window.disclaimerDialogue === null){
                         $('#disclaimer-error').css('display', 'block');
                             $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));
-			return false;
+			            return false;
                     } else if(this.saveMyCard && this.isStoredCredentialsEnabled() && this.isDisclaimerMessageEnabled() && (window.disclaimerDialogue === null || window.disclaimerDialogue === false)){
                         if(this.isSubscribed()){
                             $('#disclaimer-error').css('display', 'block');
@@ -1186,9 +1233,7 @@ define(
                                     that.dfReferenceId = null;
                                     if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                                         window.addEventListener("message", function(event) {
-                                             
                                             var data = JSON.parse(event.data);
-
                                             var envUrl;
                                             if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
                                                 envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
@@ -1196,17 +1241,32 @@ define(
                                             if (event.origin === envUrl) {
                                                 var data = JSON.parse(event.data);
                                                 //console.warn('Merchant received a message:', data);
-                                                if (data !== undefined && data.Status) {
-                                                   // window.sessionId = data.SessionId;
-                                                    window.sessionId = data.SessionId;
-                                                    
-                                                    if(window.checkoutConfig.payment.ccform.isMultishipping){                  
-														placeMultishippingOrder(self.getData());
-													}
-													else{                  
-														fullScreenLoader.stopLoader();
-														self.placeOrder();
-													}
+                                                if(data !== undefined){
+                                                    if(data.Payload){
+                                                        // for cardinal 
+                                                        if(data.Payload.ActionCode =="SUCCESS"){
+                                                            window.sessionId = data.Payload.SessionId;
+                                                            //place order with direct CSE method
+                                                            if(window.checkoutConfig.payment.ccform.isMultishipping){
+                                                                placeMultishippingOrder(self.getData());
+                                                            }
+                                                            else{
+                                                                fullScreenLoader.stopLoader();
+                                                                self.placeOrder();
+                                                            }
+                                                        }
+                                                    }else if(data.Status){
+                                                        //window.sessionId = data.SessionId;
+                                                        window.sessionId = data.SessionId;
+                                                        //place order with direct CSE method
+                                                        if(window.checkoutConfig.payment.ccform.isMultishipping){
+                                                            placeMultishippingOrder(self.getData());
+                                                        }
+                                                        else{
+                                                            fullScreenLoader.stopLoader();
+                                                            self.placeOrder();
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }, { once: true });
@@ -1224,7 +1284,6 @@ define(
                                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){  
                                     window.addEventListener("message", function(event) {
                                         var data = JSON.parse(event.data);
-                                        
                                         var envUrl;
                                         if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
                                             envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
@@ -1232,18 +1291,34 @@ define(
                                         if (event.origin === envUrl) {
                                             var data = JSON.parse(event.data);
                                             console.warn('Merchant received a message:', data);
-                                            if (data !== undefined && data.Status) {
-                                                //window.sessionId = data.SessionId;
-                                                window.sessionId = data.SessionId;
-                                                //place order with direct CSE method
-                                                if(window.checkoutConfig.payment.ccform.isMultishipping){
-                                                    placeMultishippingOrder(self.getData());
+
+                                            if(data !== undefined){
+                                                if(data.Payload){
+                                                    // for cardinal 
+                                                    if(data.Payload.ActionCode =="SUCCESS"){
+                                                        window.sessionId = data.Payload.SessionId;
+                                                        //place order with direct CSE method
+                                                        if(window.checkoutConfig.payment.ccform.isMultishipping){
+                                                            placeMultishippingOrder(self.getData());
+                                                        }
+                                                        else{
+                                                            fullScreenLoader.stopLoader();
+                                                            self.placeOrder();
+                                                        }
+                                                    }
+                                                }else if(data.Status){
+                                                    //window.sessionId = data.SessionId;
+                                                    window.sessionId = data.SessionId;
+                                                    //place order with direct CSE method
+                                                    if(window.checkoutConfig.payment.ccform.isMultishipping){
+                                                        placeMultishippingOrder(self.getData());
+                                                    }
+                                                    else{
+                                                        fullScreenLoader.stopLoader();
+                                                        self.placeOrder();
+                                                    }
                                                 }
-                                                else{
-                                                    fullScreenLoader.stopLoader();
-                                                    self.placeOrder();
-                                                }
-                                            } 
+                                            }
                                         } 
                                     }, { once: true });
                                 } else {

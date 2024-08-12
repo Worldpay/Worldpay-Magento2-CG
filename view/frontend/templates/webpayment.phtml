@@ -361,21 +361,19 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.2.min.js"], function (worldpay) {
                 worldpay.setPublicKey(getCsePublicKey());
                 cseData = {
-                            cardNumber : instrumentResponse.details.cardNumber,
-                            cvc : instrumentResponse.details.cardSecurityCode,
-                            cardHolderName : instrumentResponse.details.cardholderName,
-                            expiryMonth : instrumentResponse.details.expiryMonth,
-                            expiryYear : instrumentResponse.details.expiryYear
-                            };
+                        cardNumber : instrumentResponse.details.cardNumber,
+                        cvc : instrumentResponse.details.cardSecurityCode,
+                        cardHolderName : instrumentResponse.details.cardholderName,
+                        expiryMonth : instrumentResponse.details.expiryMonth,
+                        expiryYear : instrumentResponse.details.expiryYear
+                    };
                 var encryptedData = worldpay.encrypt(cseData);
                 cseData = encryptedData;
                 if (window.isDynamic3DS2Enabled) {
                     var bin = instrumentResponse.details.cardNumber;;
                     var binNew = bin.substring(0,6);
                     createJwt(binNew);
-                   
-                   window.sessionId ='';
-        
+                    window.sessionId ='';
                     window.addEventListener("message", function(event) {
                     var data = JSON.parse(event.data);
 
@@ -387,22 +385,35 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
                                         
                         var data = JSON.parse(event.data);
                             //console.warn('Merchant received a message:', data);
-                            if (data !== undefined && data.Status) {
+
+                        if (data !== undefined) {
+                            if(data.Payload){
+                                if(data.Payload.ActionCode =="SUCCESS"){
+                                    var sessionId = data.Payload.SessionId;
+                                    if(sessionId) {
+                                        dfReferenceId = sessionId;
+                                    }
+                                    window.sessionId = dfReferenceId;
+                                    //place order with direct CSE method
+                                    placeOrder(instrumentResponse);
+                                }
+                            }else if(data.Status) {
                                 //window.sessionId = data.SessionId;
                                 var sessionId = data.SessionId;
                                 if(sessionId) {
                                     dfReferenceId = sessionId;
-                                    }
-                                window.sessionId = dfReferenceId;
-                                placeOrder(instrumentResponse);
-                                            
-                                    }
                                 }
-                            }, false);          
-                        } else {
+                                window.sessionId = dfReferenceId;
+                                //place order with direct CSE method
                                 placeOrder(instrumentResponse);
-                            }
-                    } );
+                            }                                                    
+                        }
+                    }
+                }, false);          
+            } else {
+                    placeOrder(instrumentResponse);
+                }
+        } );
        } else if (window.isDynamic3DS2Enabled) {
         var bin = instrumentResponse.details.cardNumber;;
         var binNew = bin.substring(0,6);
@@ -416,23 +427,33 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             if(window.jwtEventUrl !== '') {
                 envUrl = window.jwtEventUrl;
             }
-            if (event.origin === envUrl) {
-                                        
+            if (event.origin === envUrl) {                            
                 var data = JSON.parse(event.data);
-                    //console.warn('Merchant received a message:', data);
-                if (data !== undefined && data.Status) {
-                    //window.sessionId = data.SessionId;
-                    var sessionId = data.SessionId;
-                    if(sessionId) {
-                        dfReferenceId = sessionId;
-                    }
-                    window.sessionId = dfReferenceId;
-                    //place order with direct CSE method
-                    placeOrder(instrumentResponse);
-                                            
-                    }
+                 //console.warn('Merchant received a message:', data);
+                if (data !== undefined) {
+                    if(data.Payload){
+                        if(data.Payload.ActionCode =="SUCCESS"){
+                            var sessionId = data.Payload.SessionId;
+                            if(sessionId) {
+                                dfReferenceId = sessionId;
+                            }
+                            window.sessionId = dfReferenceId;
+                            //place order with direct CSE method
+                            placeOrder(instrumentResponse);
+                        }
+                    }else if(data.Status) {
+                        //window.sessionId = data.SessionId;
+                        var sessionId = data.SessionId;
+                        if(sessionId) {
+                            dfReferenceId = sessionId;
+                        }
+                        window.sessionId = dfReferenceId;
+                        //place order with direct CSE method
+                        placeOrder(instrumentResponse);
+                    }                                                    
                 }
-            }, false);
+            }
+        }, false);
     }else {
          placeOrder(instrumentResponse);
     }
@@ -570,7 +591,10 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
                     "tokenCode" : null,
                     "isSavedCardPayment" : false,
                     "isChromePay" : "1",
-                    "dfReferenceId": window.sessionId
+                    "dfReferenceId": window.sessionId,
+                    'browser_screenheight': window.screen.height,
+                    'browser_screenwidth': window.screen.width,
+                    'browser_colordepth': window.screen.colorDepth
             }
 
     }else{
@@ -587,7 +611,10 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
                     "tokenCode" : null,
                     "isSavedCardPayment" : false,
                     "isChromePay" : "1",
-                    "dfReferenceId": window.sessionId
+                    "dfReferenceId": window.sessionId,
+                    "browser_screenheight": window.screen.height,
+                    "browser_screenwidth": window.screen.width,
+                    "browser_colordepth": window.screen.colorDepth
             }
 
     }

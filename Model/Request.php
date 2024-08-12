@@ -67,6 +67,11 @@ class Request
         $request = $this->_getRequest();
         $logger = $this->_wplogger;
         $url = $this->_getUrl();
+        
+        $pluginTrackerDetails = $this->collectHeaderPluginTrackerdetails($quote);
+        $_xml  = clone($quote);
+        $paymentDetails = $_xml->getElementsByTagName('paymentDetails');
+
         $logger->info('Setting destination URL: ' . $url);
         $logger->info('Initialising request');
         $request->setOption(CURLOPT_POST, self::CURL_POST);
@@ -88,10 +93,21 @@ class Request
         }
         //$request->addCookie(CURLOPT_COOKIE, $cookie);
         $request->setTimeout(self::CURL_TIMEOUT);
-        $headersArray = [
-            'Content-Type'=> 'text/xml',
-            'Expect'=>''
-        ];
+        if (isset($paymentDetails[0]->nodeValue)) {
+            $headersArray = [
+                'Content-Type'=> 'text/xml',
+                'Expect'=>'',
+                'ecommerce_platform' => $pluginTrackerDetails['ecommerce_platform'],
+                'ecommerce_platform_version' => $pluginTrackerDetails['ecommerce_platform_version'],
+                'ecommerce_plugin_data'=>json_encode($pluginTrackerDetails['ecommerce_plugin_data'])
+            ];
+        } else {
+            $headersArray = [
+                'Content-Type'=> 'text/xml',
+                'Expect'=>''
+            ];
+        }
+
         $logger->info('Sending XML as: ' . $this->_getObfuscatedXmlLog($quote));
         $request->setOption(CURLOPT_HEADER, 1);
         $request->setHeaders($headersArray);
@@ -145,7 +161,7 @@ class Request
      */
     protected function _getObfuscatedXmlLog($quote)
     {
-        $elems = ['cardNumber', 'cvc', 'iban', 'telephoneNumber'];
+        $elems = ['cardNumber', 'cvc', 'iban'];
         $_xml  = clone($quote);
 
         foreach ($elems as $_e) {
@@ -201,5 +217,31 @@ class Request
 
         }
         return $errorMsg;
+    }
+
+    /**
+     * Collect Plugin Trackerdetails for Header Request
+     *
+     * @param array $quote
+     * @return array
+     */
+    private function collectHeaderPluginTrackerdetails($quote)
+    {
+        $paymentMethod='';
+        $_xml  = clone($quote);
+        $paymentDetails = $_xml->getElementsByTagName('paymentDetails');
+        if (isset($paymentDetails[0]->nodeValue)) {
+            $orderContent = $_xml->getElementsByTagName('orderContent');
+            if (isset($orderContent[0]->nodeValue)) {
+                $orderContentdata = $orderContent[0]->nodeValue;
+                $result = json_decode($orderContentdata);
+                $paymentMethod = $result->additional_details->transaction_method;
+            }
+        }
+        $pluginTrackerDetails = $this->helper->getPluginTrackerHeaderdetails();
+        $pluginTrackerDetails['ecommerce_plugin_data']['additional_details'] =
+        ['payment_method'=>$paymentMethod];
+
+        return $pluginTrackerDetails;
     }
 }

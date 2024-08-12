@@ -56,6 +56,8 @@ class Service
       */
     public const NO_CHANGE = 'noChange';
 
+    public const KLARNA_V2_METHOD = 'KLARNA_V2-SSL';
+
     /**
      * @var \Sapient\Worldpay\Helper\Data
      */
@@ -154,6 +156,15 @@ class Service
             $isMultiShippingOrder = 1;
         }
         
+        $browserFields = [
+            'browser_screenHeight' => isset($paymentDetails['browser_screenheight']) ?
+            $paymentDetails['browser_screenheight'] : "",
+            'browser_screenWidth' => isset($paymentDetails['browser_screenwidth']) ?
+            $paymentDetails['browser_screenwidth'] : "",
+            'browser_colorDepth' => isset($paymentDetails['browser_colordepth']) ?
+            $paymentDetails['browser_colordepth'] : ""
+        ];
+        $telephoneNumber = $quote->getBillingAddress()->getTelephone();
         return [
             'orderCode' => $orderCode,
             'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['cc_type']),
@@ -182,7 +193,9 @@ class Service
             'exponent' => $exponent,
             'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote),
             'orderLineItems' => $orderLineItems,
-            'isMultishippingOrder' => $isMultiShippingOrder
+            'isMultishippingOrder' => $isMultiShippingOrder,
+            'browserFields'=> $browserFields,
+            'telephoneNumber' => $telephoneNumber
         ];
     }
     /**
@@ -237,7 +250,16 @@ class Service
         if ((bool)$quote->getIsMultiShipping()) {
             $isMultiShippingOrder = 1;
         }
+        $browserFields = [
+            'browser_colorDepth' => isset($paymentDetails['additional_data']['browser_colordepth']) ?
+                $paymentDetails['additional_data']['browser_colordepth'] : "",
+            'browser_screenWidth' => isset($paymentDetails['additional_data']['browser_screenwidth']) ?
+                $paymentDetails['additional_data']['browser_screenwidth'] : "",
+            'browser_screenHeight' => isset($paymentDetails['additional_data']['browser_screenheight']) ?
+                $paymentDetails['additional_data']['browser_screenheight'] : ""
+        ];
 
+        $telephoneNumber = $quote->getBillingAddress()->getTelephone();
         return [
                 'orderCode' => $orderCode,
                 'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -271,7 +293,9 @@ class Service
                 'exponent' => $exponent,
                 'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote),
                 'orderLineItems' => $orderLineItems,
-                'isMultishippingOrder' => $isMultiShippingOrder
+                'isMultishippingOrder' => $isMultiShippingOrder,
+                'browserFields'=> $browserFields,
+                'telephoneNumber' => $telephoneNumber
             ];
     }
     /**
@@ -558,6 +582,16 @@ class Service
                 ? $paymentDetails['additional_data']['stored_credentials_enabled'] : '';
         $thirdPartyData = '';
         $shippingFee = '';
+        $browserFields = [
+            'browser_colorDepth' => isset($paymentDetails['additional_data']['browser_colordepth']) ?
+                $paymentDetails['additional_data']['browser_colordepth'] : "",
+            'browser_screenWidth' => isset($paymentDetails['additional_data']['browser_screenwidth']) ?
+                $paymentDetails['additional_data']['browser_screenwidth'] : "",
+            'browser_screenHeight' => isset($paymentDetails['additional_data']['browser_screenheight']) ?
+                $paymentDetails['additional_data']['browser_screenheight'] : ""
+        ];
+        $telephoneNumber = $quote->getBillingAddress()->getTelephone();
+
         if ((isset($paymentDetails['additional_data']['cpf'])
                 && $paymentDetails['additional_data']['cpf'] == true)
                 || (isset($paymentDetails['additional_data']['instalment'])
@@ -621,7 +655,9 @@ class Service
                 'exponent' => $exponent,
                 'primeRoutingData' => $this->getPrimeRoutingDetails($paymentDetails, $quote),
                 'orderLineItems' => $orderLineItems,
-                'isMultishippingOrder' => $isMultiShippingOrder
+                'isMultishippingOrder' => $isMultiShippingOrder,
+                'browserFields'=> $browserFields,
+                'telephoneNumber' => $telephoneNumber
             ];
     }
     /**
@@ -758,6 +794,12 @@ class Service
             $msMC = $this->worldpayHelper->getMultishippingMerchantCode();
             $merchantCode = !empty($msMC) ? $msMC : $merchantCode;
         }
+        $isEnabledEftPos = $this->worldpayHelper->isEnabledEFTPOS();
+        if ($isEnabledEftPos) {
+            $eftPosMC = $this->worldpayHelper->getEFTPOSMerchantCode();
+            $merchantCode = !empty($eftPosMC) ? $eftPosMC : $merchantCode;
+        }
+
         return [
             'merchantCode' => $merchantCode,
             'countryCode' => $countryId,
@@ -894,7 +936,11 @@ class Service
                 $lineitem['productType'] = $_item->getProductType();
                 $lineitem['quantity'] = (int) $_item->getQty();
                 $lineitem['quantityUnit'] = $this->worldpayHelper->getQuantityUnit($_item->getProduct());
-                $lineitem['unitPrice'] = $rowtotal / $_item->getQty();
+                if ($paymentType == 'KLARNA-SSL' && $isMultiShipping) {
+                        $lineitem['unitPrice'] = $_item->getProduct()->getPrice();
+                } else {
+                        $lineitem['unitPrice'] = $rowtotal / $_item->getQty();
+                }
                 $lineitem['taxRate'] = $totaltax;
                 $lineitem['totalAmount'] = $totalamount + $totaltax;
                 $lineitem['totalTaxAmount'] = $totaltax;
@@ -1161,9 +1207,8 @@ class Service
         if ('CARTEBLEUE-SSL' == $paymentDetails['additional_data']['cc_type']) {
             return 'ECMC-SSL';
         }
-        if ($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL' &&
-            isset($paymentDetails['additional_data']['klarna_type'])) {
-            return $paymentDetails['additional_data']['klarna_type'];
+        if ($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL') {
+            return self::KLARNA_V2_METHOD;
         }
         return $paymentDetails['additional_data']['cc_type'];
     }
@@ -1308,6 +1353,14 @@ class Service
                 $sessionId = $this->session->getSessionId();
                 $paymentDetails['sessionId'] = $sessionId;
                 $dfReferenceId = '';
+                $browserfields = [
+                    'browserScreenHeight' => $paymentDetails['additional_data']
+                        ['browser_screenheight'],
+                    'browserScreenWidth' => $paymentDetails['additional_data']
+                        ['browser_screenwidth'],
+                    'browserColourDepth' => $paymentDetails['additional_data']
+                        ['browser_colordepth']
+                ];
                 $orderDescription = $this->_getOrderDescription($reservedOrderId);
                 if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
                     $paymentDetails['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
@@ -1353,7 +1406,8 @@ class Service
                     'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
                     'shopperIpAddress' => $this->_getClientIPAddress(),
                     'exponent' => $exponent,
-                    'isMultishippingOrder' => $isMultiShippingOrder
+                    'isMultishippingOrder' => $isMultiShippingOrder,
+                    'browserFields'=>$browserfields
                 ];
             }
         }
@@ -1374,7 +1428,14 @@ class Service
                 $ephemeralPublicKey = $headerObject->ephemeralPublicKey;
                 $publicKeyHash = $headerObject->publicKeyHash;
                 $transactionId = $headerObject->transactionId;
-
+                $browserfields = [
+                    'browserScreenHeight' => $paymentDetails['additional_data']
+                        ['browser_screenheight'],
+                    'browserScreenWidth' => $paymentDetails['additional_data']
+                        ['browser_screenwidth'],
+                    'browserColourDepth' => $paymentDetails['additional_data']
+                        ['browser_colordepth'],
+                ];
                 return [
                     'orderCode' => $orderCode,
                     'merchantCode' => $this->worldpayHelper->
@@ -1393,7 +1454,8 @@ class Service
                     'publicKeyHash' => $publicKeyHash,
                     'transactionId' => $transactionId,
                     'exponent' => $exponent,
-                    'isMultishippingOrder' => $isMultiShippingOrder
+                    'isMultishippingOrder' => $isMultiShippingOrder,
+                    'browserFields'=> $browserfields
                 ];
             }
         }
@@ -1670,8 +1732,7 @@ class Service
     private function _getSessionDetails($paymentDetails, $countryCode)
     {
         $sessionDetails = [];
-        if ($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL' &&
-            isset($paymentDetails['additional_data']['klarna_type'])) {
+        if ($paymentDetails['additional_data']['cc_type'] == 'KLARNA-SSL') {
             $sessionDetails['sessionId'] = $this->session->getSessionId();
             $sessionDetails['shopperIpAddress'] = $this->_getClientIPAddress();
             $sessionDetails['subscriptionDays'] = $this->worldpayHelper->getKlarnaSubscriptionDays($countryCode);

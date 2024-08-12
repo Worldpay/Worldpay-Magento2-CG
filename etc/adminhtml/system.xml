@@ -507,11 +507,15 @@
 					<comment>For this detail, You must connect with your Worldpay contact.</comment>
                 </field>
 
-                <field id="sepa_e_mandate" translate="label" type="textarea" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="sepa_e_mandate" translate="label" type="textarea" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>SEPA E-Mandate</label>
 					<comment>You must ensure you display the official wording to your shoppers so they can agree to be debited. This is official wording which is to be used to constitute a SEPA-compliant mandate. Without this official wording, shoppers can easily reverse the direct debit with their bank..</comment>
                 </field>
-               
+                <field id="statement_narrative" translate="label" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Statement Narrative</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>According to the Worldpay guide, we recommend enabling this configuration. This feature enables statement narratives for all supported APMs. This text is included in the authorization request as part of the payload.</comment>
+                </field>
             </group>
             <!-- KLARNA -->
             <group id="klarna_config" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -525,7 +529,7 @@
                     <label>Klarna Allowed Countries</label>
                     <field id="klarna_contries" translate="label" type="multiselect" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Klarna General Country list</label>
-                        <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                        <source_model>Sapient\Worldpay\Model\System\Config\Backend\KlarnaAllowedCountries</source_model>
                     </field>
                     <depends>
                         <field id="worldpay/klarna_config/enabled">1</field>
@@ -580,7 +584,27 @@
                     <depends>
                         <field id="worldpay/klarna_config/enabled">1</field>
                     </depends>
-                </group>     
+                </group>
+                <group id="store_pickup" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Configure Klarna Store PickUp</label>
+                    <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>You will need to enable and configure Magento's store pickup before using this feature</comment>
+                    </field>
+                    <field id="shipping_type" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Shipping Type</label>
+                        <source_model>Sapient\Worldpay\Model\Config\Source\KlarnaShippingType</source_model>
+                    </field>
+                    <field id="shipping_method" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Shipping Method</label>
+                        <comment>Used in Klarna storepickup. It is different than Magento Shipping method</comment>
+                        <source_model>Sapient\Worldpay\Model\Config\Source\KlarnaShippingMethod</source_model>
+                    </field>
+                    <depends>
+                        <field id="worldpay/klarna_config/enabled">1</field>
+                    </depends>
+                </group> 
             </group>
             <!--Level 2/3 Data-->
             <group id="level23_config" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -1465,7 +1489,64 @@
                     <comment>Sets the number of days to delay capture by</comment>
                 </field>             
             </group>
-             <!-- End Dynamic Capture Delay -->
+            <!-- End Dynamic Capture Delay -->
+            <!-- Order Cleanup Cron -->
+            <group id="order_cleanup_cron" translate="label" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Pending Order Cleanup Cron</label>
+                <field id="order_cleanup_enable" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If set to "Yes", Unpaid order will automatically cancel by the cron.</comment>                  
+                </field> 
+                <field id="order_cleanup_option" translate="label" type="select" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Time Duration </label>
+                    <comment>In Hours.</comment>
+                    <depends>
+                        <field id="order_cleanup_enable">1</field>
+                    </depends>
+                    <source_model>Sapient\Worldpay\Model\Config\Source\PendingOrderCleanupOption</source_model>
+                    <backend_model>Sapient\Worldpay\Model\Config\CronConfig</backend_model>
+                </field>         
+            </group> 
+            <!-- Order Cleanup Cron -->
+             <!-- EFTPOS PAYMENTS AUSTRALIA-->
+             <group id="eftpos_payments" translate="label" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>EFTPOS Payments AUSTRALIA</label>
+             <field id="enable_eftpos" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable EFTPOS PAYMENTS</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If set to "Yes", EFTPOS will be the default network for transactions</comment>
+                </field>
+                <field id="eftpos_merchant_code" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Code</label>
+                    <validate>required-entry</validate>
+                    <depends><field id="enable_eftpos">1</field></depends>
+                    <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                </field>
+                <field id="eftpos_xml_username" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>EFTPOS XML Username</label>
+                    <validate>required-entry</validate>
+                    <depends><field id="enable_eftpos">1</field></depends>
+                    <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                </field>
+                <field id="eftpos_xml_password" translate="label" type="password" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>EFTPOS XML Password</label>
+                    <validate>required-entry</validate>
+                    <depends><field id="enable_eftpos">1</field></depends>
+                    <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                </field>
+                <field id="eftpos_routing_mid" translate="label" type="password" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Routing MID</label>
+                    <depends><field id="enable_eftpos">1</field></depends>
+                    <comment>For this detail, You must connect with your Worldpay contact.</comment>
+                </field>
+                <field id="eftpos_debugging" translate="label" type="select" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled Debugging</label>
+                    <depends><field id="enable_eftpos">1</field></depends>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                </group>
+             <!-- END EFTPOS PAYMENTS AUSTRAILIA-->
         </section>
         <!-- New Tab for Worldpay exceptions -->
         <section id="worldpay_exceptions" translate="label" type="text" sortOrder="402" showInDefault="1" showInWebsite="1" showInStore="1">

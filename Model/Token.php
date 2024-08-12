@@ -78,7 +78,7 @@ class Token
             'userAgentHeader'   => php_sapi_name() !== "cli" ? filter_input(
                 INPUT_SERVER,
                 'HTTP_USER_AGENT',
-                FILTER_SANITIZE_STRING,
+                FILTER_SANITIZE_SPECIAL_CHARS,
                 FILTER_FLAG_STRIP_LOW
             ) : '',
             'method'            => $paymentData['method'],

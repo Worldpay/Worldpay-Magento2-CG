@@ -49,7 +49,7 @@
                     <!--/ko-->
 
                 </div>
-                <div class="field type required ideal-block" data-bind="visible: false">
+                <!-- <div class="field type required ideal-block" data-bind="visible: false">
                     <select name="ideal_bank" class="select select-ccytpe" disabled data-bind="attr: {id: 'ideal_bank', 'data-validate': JSON.stringify({required:true})},
                                options: getIdealBankList(),
                                optionsText: 'bankText',
@@ -57,7 +57,7 @@
                                optionsValue: 'bankCode',
                                optionsCaption: 'Select Your Bank'">
                     </select>
-                </div>
+                </div> -->
 
                 <div class="field type required klarna-block" data-bind="visible: false">
                     <select name="klarna_types" class="select select-ccytpe" id="klarna_types" data-bind="
@@ -275,6 +275,7 @@
 
                     </div>
                 </div>
+                <!--ko if: isStatementNarrativeEnabled() -->
                 <div class="field type statment-narrative"
                     data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative_div'},visible: false">
                     <label data-bind="attr: {for: getCode() + '_statement'}" class="label">
@@ -304,7 +305,7 @@
                             <strong>Statement Narrative</strong> guidelines of the selected payment method
                             before entering the <strong>Purpose of transaction.</strong></small></div>
                 </div>
-
+                <!--/ko -->
                  <!-- ko if: (paymentMethodSelectedType() == 'SEPA_DIRECT_DEBIT-SSL')-->
                     <div class="field type sepa_e-mandate">
                         <input type="checkbox" class="required-entry"

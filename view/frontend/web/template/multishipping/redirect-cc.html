@@ -1,40 +1,35 @@
 <div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
-    <div class="payment-method-content">
+    <div class="payment-method-content" data-bind="css: { 'redirect-form': (getSavedCardsCount() <= 0) }">
         <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
             <fieldset
                 data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
                 <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
-                    <!-- ko foreach: {data: availableCCTypes(), as: 'item'} -->
+                    <!-- ko if: (getSavedCardsCount() > 0)-->
                     <div class="paymentmethods-radio-wrapper">
-                        <input type="radio" data-bind="click:$parent.onSelectCcard.bind(this,$parent), event:{ change: $parent.loadEventAction }, attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
-                                        'validate-one-required-by-name':false
-                                                }),id: 'redirect_cc_' + item.ccValue}" name="payment[cc_type]"></input>
-                        <!--ko if: $parent.getIcons(item.ccValue) -->
-                        <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}"><img data-bind="attr: {
-                                    'src': $parent.getIcons(item.ccValue).url,
-                                    'alt': item.ccLabel,
-                                    'width': $parent.getIcons(item.ccValue).width,
-                                    'height': $parent.getIcons(item.ccValue).height
-                                    }"></label>
-                        <!--/ko-->
-                        <!--ko if: (item.ccValue=='savedcard') -->
-                        <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}">
+                        <input type="radio" data-bind="click:onSelectCcard.bind(this),event:{ change: loadEventAction }, 
+                            attr: {'value': 'ONLINE',id: 'redirect_cc_online','data-type':'redirect'}"
+                            name="payment[cc_type]"></input>
+                        <label data-bind="attr: {for: 'redirect_cc_online'}">
+                            <!-- ko i18n: 'New Card'-->
+                            <!-- /ko -->
+                        </label>
+                    </div>
+                    <div class="paymentmethods-radio-wrapper">                       
+                        <input type="radio" data-bind="click:onSelectCcard.bind(this),event:{ change: loadEventAction }, 
+                            attr: {'value': 'savedcard',id: 'redirect_cc_savedcard','data-type':'redirect'}" 
+                            name="payment[cc_type]"></input>
+                        <label data-bind="attr: {for: 'redirect_cc_savedcard'}">
                             <!-- ko i18n: 'Saved Cards'-->
                             <!-- /ko -->
                         </label>
-                        <!--/ko-->
                     </div>
-                    <!--/ko-->
-                    <!-- ko if: (getSavedCardsCount() > 0)-->
-                    <!-- ko if: (getHppIntegrationType()  == 'iframe')-->
-                    <div class="paymentmethods-radio-wrapper">
-                        <label class="action label-saved-card"
-                            data-bind="click: loadSavedCards,text: $t('Use Saved Card')"></label>
-
-                    </div>
-                    <!-- /ko -->
                     <!-- /ko -->
                     <div id="cc_type-error" class="mage-error" style="display:none"></div>
+                     <!-- ko if: (getSavedCardsCount()<= 0)-->
+                        <div class="paymentmethods-radio-wrapper">
+                            <input type="radio" checked data-bind="attr: {'value': 'ONLINE',  id:'redirect_cc_gust','data-type':'redirect'}" name="payment[cc_type]">
+                        </div>
+                     <!-- /ko --> 
                 </div>
                 <div class="mage-error message message-error error" id="multishipping-error" style="display:none"></div>
 				<div class="mage-error message message-error error" id="worldpay_cc_multishipping_error" style="display:none"></div>
@@ -51,7 +46,7 @@
                     </fieldset>
                     <!-- /ko -->
                 </div>
-                <!-- ko if: (getSaveCardAllowed() && (isTokenizationEnabled() || isStoredCredentialsEnabled()))-->
+                <!-- ko if: (getSaveCardAllowed() && (isTokenizationEnabled() || isStoredCredentialsEnabled()) )-->
                 <div class="field savecc"
                     data-bind="attr: {id: getCode() + '_save-card_div'},visible: isSaveThisCardVisible">
                     <div class="control">
@@ -81,7 +76,7 @@
                 <div class="field cpf required" data-bind="visible: (showCPFSection())">
                     <label data-bind="attr: {for: getCode() + '_cpf'},visible: (showCPFSection())" class="label">
                         <span> CPF/CNPJ </span>
-                        <!--            <span> ko i18n: 'CPF/CNPJ' /ko </span>-->
+                        <!-- <span> ko i18n: 'CPF/CNPJ' /ko </span>-->
                     </label>
                     <div class="control">
                         <input type="number" style="width: 225px;" name="payment[cpf]" class="input-text" value=""
