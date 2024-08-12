@@ -33,6 +33,18 @@ class Redirect extends \Magento\Framework\App\Action\Action
      * @var \Sapient\Worldpay\Helper\Data
      */
     protected $worldpayHelper;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+     */
+    protected $emailsender;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+    
+      protected $orderservice;
+
     /**
      * Constructor
      *
@@ -41,18 +53,24 @@ class Redirect extends \Magento\Framework\App\Action\Action
      * @param \Magento\Checkout\Model\Session $checkoutsession
      * @param \Magento\Sales\Model\Order $mageOrder
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender
+     * @param \Sapient\Worldpay\Model\Order\Service $orderservice
      */
     public function __construct(
         Context $context,
         PageFactory $pageFactory,
         \Magento\Checkout\Model\Session $checkoutsession,
         \Magento\Sales\Model\Order $mageOrder,
-        \Sapient\Worldpay\Helper\Data $worldpayHelper
+        \Sapient\Worldpay\Helper\Data $worldpayHelper,
+        \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender,
+        \Sapient\Worldpay\Model\Order\Service $orderservice
     ) {
         $this->pageFactory = $pageFactory;
         $this->checkoutsession = $checkoutsession;
         $this->mageOrder = $mageOrder;
         $this->worldpayHelper = $worldpayHelper;
+        $this->emailsender = $emailsender;
+        $this->orderservice = $orderservice;
         return parent::__construct($context);
     }
    /**
@@ -67,10 +85,30 @@ class Redirect extends \Magento\Framework\App\Action\Action
             $resultRedirect->setPath('noroute');
             return $resultRedirect;
         }
+        if ($this->worldpayHelper->getRedirectIntegrationMode() == 'full_page') {
+            $order = $this->getAuthorisedOrder();
+            $magentoorder = $order->getOrder();
+            $order = $this->getAuthorisedOrder();
+            $magentoorder = $order->getOrder();
+            $this->emailsender->fullPageRedirectOrderEmail($magentoorder);
+        }
         $redirecturl = $this->checkoutsession->getWpRedirecturl();
         $this->checkoutsession->unsWpRedirecturl();
         $this->checkoutsession->unsIframePay();
         $this->checkoutsession->unsHppOrderCode();
         return $resultRedirect->setUrl($redirecturl);
+    }
+
+    /**
+     * Get Authorised Order
+     *
+     * @return Increament Id
+     */
+    public function getAuthorisedOrder()
+    {
+        if ($this->checkoutsession->getauthenticatedOrderId()) {
+            return $this->orderservice->getByIncrementId($this->checkoutsession->getauthenticatedOrderId());
+        }
+        return false;
     }
 }

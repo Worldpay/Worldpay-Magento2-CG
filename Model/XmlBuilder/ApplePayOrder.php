@@ -83,6 +83,10 @@ EOD;
      * @var string
      */
     private $transactionId;
+    /**
+     * @var array
+     */
+    protected $browserFields;
 
     /**
      * Build xml for processing Request
@@ -103,6 +107,8 @@ EOD;
      * @param string $transactionId
      * @param string|array|float $exponent
      * @param string $captureDelay
+     * @param array $browserFields
+     *
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -121,7 +127,8 @@ EOD;
         $publicKeyHash,
         $transactionId,
         $exponent,
-        $captureDelay
+        $captureDelay,
+        $browserFields
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -139,6 +146,7 @@ EOD;
         $this->transactionId = $transactionId;
         $this->exponent = $exponent;
         $this->captureDelay = $captureDelay;
+        $this->browserFields = $browserFields;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -249,6 +257,12 @@ EOD;
         $shopper = $order->addChild('shopper');
 
         $shopper->addChild('shopperEmailAddress', $this->shopperEmail);
+
+        $browser = $shopper->addChild('browser');
+        $browserFields = $this->browserFields;
+        $browser->addChild('browserColourDepth', $browserFields['browserColourDepth']);
+        $browser->addChild('browserScreenHeight', $browserFields['browserScreenHeight']);
+        $browser->addChild('browserScreenWidth', $browserFields['browserScreenWidth']);
     }
 
     /**

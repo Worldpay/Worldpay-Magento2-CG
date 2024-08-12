@@ -70,7 +70,7 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
         $responsexml = simplexml_load_string($response);
         $paymentoptions =  $this->getPaymentOptions($responsexml);
         
-        if ($this->worldpayhelper->isGlobalApmEnable()) {
+        if ($this->worldpayhelper->isGlobalApmEnable() && !$this->worldpayhelper->isEnabledEFTPOS()) {
             $additionalMerchanPaymentoptions =  $this->getAdditionalMerchantPaymentOptions($countryId, $paymentoptions);
             $paymentoptions = array_merge($paymentoptions, $additionalMerchanPaymentoptions);
         }

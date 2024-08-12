@@ -98,6 +98,12 @@ class UpdateWorldpayment
      * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
      */
     public $transactionFactory;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    private $storeManager;
+
     /**
      * Constructor
      *
@@ -114,6 +120,7 @@ class UpdateWorldpayment
      * @param EncryptorInterface $encryptor
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
      * @param \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param Json $serializer
      */
     public function __construct(
@@ -130,6 +137,7 @@ class UpdateWorldpayment
         EncryptorInterface $encryptor,
         \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
         \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         Json $serializer
     ) {
         $this->wplogger = $wplogger;
@@ -145,6 +153,7 @@ class UpdateWorldpayment
         $this->encryptor = $encryptor;
         $this->transactionFactory = $transactionsFactory;
         $this->worldpaypaymentmodel = $worldpaypaymentmodel;
+        $this->storeManager = $storeManager;
         $this->serializer = $serializer;
     }
 
@@ -344,6 +353,7 @@ class UpdateWorldpayment
         $wpp->setData('aav_telephone_result_code', $payment->AAVTelephoneResultCode['description']);
         $wpp->setData('aav_email_result_code', $payment->AAVEmailResultCode['description']);
         $wpp->setData('latam_instalments', $lataminstalments);
+        $wpp->setData('store_id', $this->storeManager->getStore()->getId());
         $wpp->save();
         if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
                 $this->customerSession->unsIsSavedCardRequested();
@@ -429,6 +439,7 @@ class UpdateWorldpayment
                 $savedTokenFactory->setDisclaimerFlag($disclaimerFlag);
             }
             $savedTokenFactory->setTokenType($tokenScope);
+            $savedTokenFactory->setStoreId($this->storeManager->getStore()->getId());
             $savedTokenFactory->save();
             $tokenId = $savedTokenFactory->getId();
             $this->saveTokenDataToTransactions($tokenId, $orderCode);

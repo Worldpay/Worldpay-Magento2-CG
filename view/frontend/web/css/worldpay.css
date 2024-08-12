@@ -742,7 +742,7 @@ li#payment.checkout-payment-method {
     }
     .checkout-payment-method .payment-method .payment-method-content {
         margin: 0;
-        padding: 25px;
+        padding: 10px 25px;
     }
     .paymentmethods-radio-wrapper input {
         display: inline-block;
@@ -1153,4 +1153,13 @@ div.scroll {
  #sepa_e_mandate_condition-error{
     width:100%;
     float:left;
+ }
+ .checkout-payment-method .payment-method._active .redirect-form {
+    margin-top: 0px;
+ }
+ .redirect-form .fieldset .field {
+    margin: 0;
+ }
+ .payment-method-content.redirect-form .cpf {
+    margin: 20px 0;
  }

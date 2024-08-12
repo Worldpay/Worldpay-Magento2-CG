@@ -30,7 +30,7 @@
                 </strong>
                 </span>
                 <span class="limiter-options">
-                <a href="<?= $block->escapeUrl($block->getSkipOrderlUrl()) ?>">
+                <a href="<?= $escaper->escapeUrl($block->getSkipOrderlUrl()) ?>">
                     <?= /* @noEscape */  $escaper->escapeHtml('Skipped') ?></strong>
                 </a>
                 </span>
@@ -48,13 +48,13 @@
         </label>
         <div>
             <select name="status" title="Order Status" onchange="location= this.value;" >
-                <option value="<?= $block->escapeUrl($block->getOrderFilterURL('m-6')) ?>"
+                <option value="<?= $escaper->escapeUrl($block->getOrderFilterURL('m-6')) ?>"
                     <?php if ($block->checkSelectedFilter('m-6')): ?> 
                         <?= /* @noEscape */  $escaper->escapeHtml('selected') ?>
                     <?php endif ?> >
                     <?= /* @noEscape */  $escaper->escapeHtml('6 Month') ?>
                 </option>
-                <option value="<?= $block->escapeUrl($block->getOrderFilterURL('y-'.date("Y"))) ?>"
+                <option value="<?= $escaper->escapeUrl($block->getOrderFilterURL('y-'.date("Y"))) ?>"
                 <?php if ($block->checkSelectedFilter('y-'.date("Y"))): ?> 
                         <?= /* @noEscape */  $escaper->escapeHtml('selected') ?> 
                     <?php endif ?> >

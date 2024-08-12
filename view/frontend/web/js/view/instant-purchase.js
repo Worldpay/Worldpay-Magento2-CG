@@ -27,7 +27,6 @@ define([
                     }
                     }
                 }
-               
             }
 
     return Component.extend({
@@ -44,6 +43,9 @@ define([
             billingAddress: null,
             shippingMethod: null,
             dfreference: null,
+            browserScreenHeight: window.screen.height,
+            browserScreenWidth: window.screen.width,
+            browserColorDepth: window.screen.colorDepth,
             productFormSelector: '#product_addtocart_form',
             confirmationTitle: $t('Instant Purchase Confirmation'),
             confirmationData: {
@@ -66,7 +68,8 @@ define([
         /** @inheritdoc */
         initObservable: function () {
             this._super()
-                .observe('showButton paymentToken shippingAddress billingAddress shippingMethod dfreference');
+                .observe(
+                    'showButton paymentToken shippingAddress billingAddress shippingMethod dfreference browserScreenHeight browserScreenWidth browserColorDepth');
 
             return this;
         },
@@ -82,31 +85,49 @@ define([
             if(window.isDynamic3DS2Enabled && (typeof fulltoken !== 'undefined')){
                 var paymentTok = fulltoken['summary'].split(", bin:")[0];
                 this.bin = fulltoken['summary'].split(", bin:")[1];
-                fulltoken['summary'] = paymentTok;                
+                fulltoken['summary'] = paymentTok;
                 if(this.bin !== null) {
                 var encryptedBin = btoa(this.bin);
                 window.sessionId = this.sessionId;
                 $('body').append('<iframe src="'+this.jwtUrl+'?instrument='+encryptedBin+'" name="jwt_frm" id="jwt_frm" style="display: none"></iframe>');
+
                 window.addEventListener("message", function(event) {
-                                    var data = JSON.parse(event.data);
-                                    var envUrl;
-                                    if(window.jwtEventUrl !== '') {
-                                        envUrl = window.jwtEventUrl;
-                                    }
-                                    if (event.origin === envUrl) {
-                                        var data = JSON.parse(event.data);
-                                        if (data !== undefined && data.Status) {
-                                            var sessionId1 = data.SessionId;
-                                            if(sessionId1){
-                                                this.dfreference = sessionId1;
-                                            } else {
-                                               this.dfreference = this.sessionId; 
-                                            }
-                                            window.sessionId = this.dfreference;
-                                            jQuery('[name=instant_purchase_dfreference]').val(this.dfreference);
-                                         }
-                                    }
-                                }, false);
+
+                var data = JSON.parse(event.data);
+
+                var envUrl;
+
+                if(window.jwtEventUrl !== '') {
+                    envUrl = window.jwtEventUrl;
+                }
+                if (event.origin === envUrl) {
+                    var data = JSON.parse(event.data);
+                    if (data !== undefined) {
+                        console.warn('Merchant received a message:', data);
+                        if(data.Payload){
+                            if(data.Payload.ActionCode =="SUCCESS"){
+                                var sessionId1 =  data.Payload.SessionId;
+                                if(sessionId1){
+                                    this.dfreference = sessionId1;
+                                } else {
+                                    this.dfreference = this.sessionId;
+                                }
+                                window.sessionId = this.dfreference;
+                                jQuery('[name=instant_purchase_dfreference]').val(this.dfreference);
+                            }
+                        }else if(data.Status){
+                            var sessionId1 = data.SessionId;
+                            if(sessionId1){
+                                this.dfreference = sessionId1;
+                            } else {
+                               this.dfreference = this.sessionId;
+                            }
+                            window.sessionId = this.dfreference;
+                            jQuery('[name=instant_purchase_dfreference]').val(this.dfreference);
+                        }
+                    }
+                }
+            }, false);
                 this.paymentToken(fulltoken);
                 this.dfreference(window.sessionId);
             } else {
@@ -120,8 +141,10 @@ define([
             this.shippingAddress(data.shippingAddress);
             this.billingAddress(data.billingAddress);
             this.shippingMethod(data.shippingMethod);
+            this.browserScreenHeight();
+            this.browserScreenWidth();
+            this.browserColorDepth();
         },
-
         /**
          * Confirmation method
          */
@@ -146,15 +169,16 @@ define([
                 actions: {
                     /** @inheritdoc */
                     confirm: function () {
-                                 $.ajax({
+                        $.ajax({
                             url: this.purchaseUrl,
                             data: form.serialize(),
                             type: 'post',
                             dataType: 'json',
                             success: function (data) {
-				if(window.isDynamic3DS2Enabled || window.is3DsEnabled) {
+                            if(window.isDynamic3DS2Enabled ||
+                                window.is3DsEnabled) {
                                 window.location.replace(urlBuilder.build('worldpay/savedcard/instantredirect'));
-								}
+                                }
                             },
                             /** Show loader before send */
                             beforeSend: function () {
@@ -168,4 +192,5 @@ define([
             });
         }
     });
+
 });

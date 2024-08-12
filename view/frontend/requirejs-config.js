@@ -45,8 +45,6 @@ var config = {
             googlePay: 'https://pay.google.com/gp/p/js/pay.js',
             applePay: 'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js',
             samsungPay: sdkJs,
-            hmacSha256: 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js',
-            encBase64: 'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/enc-base64-min.js',
             worldpayPriceSubscription: 'Sapient_Worldpay/js/price-subscription',
             "Magento_Checkout/template/minicart/content.html": "Sapient_Worldpay/template/minicart/content.html",
             "Magento_Checkout/template/payment.html": "Sapient_Worldpay/template/payment.html",

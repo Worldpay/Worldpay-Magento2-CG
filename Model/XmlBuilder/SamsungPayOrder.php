@@ -61,6 +61,19 @@ EOD;
      * @var array
      */
     private $data;
+    /**
+     * @var array
+     */
+    protected $browserFields;
+    /**
+     * @var string
+     */
+    private $shopperIpAddress;
+    
+    /**
+     * @var string
+     */
+    private $sessionId;
 
     /**
      * Build xml for processing Request
@@ -76,6 +89,9 @@ EOD;
      * @param array $data
      * @param mixed $exponent
      * @param string $captureDelay
+     * @param array $browserFields
+     * @param string $shopperIpAddress
+     * @param string $sessionId
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -89,7 +105,10 @@ EOD;
         $shopperEmail,
         $data,
         $exponent,
-        $captureDelay
+        $captureDelay,
+        $browserFields,
+        $shopperIpAddress,
+        $sessionId
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -102,6 +121,10 @@ EOD;
         $this->data = $data;
         $this->exponent = $exponent;
         $this->captureDelay = $captureDelay;
+        $this->browserFields = $browserFields;
+        $this->shopperIpAddress = $shopperIpAddress;
+        $this->sessionId = $sessionId;
+        
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -192,6 +215,10 @@ EOD;
         $paymentThreeDS = $paymentType->addChild('ThreeDS');
         $paymentThreeDS->addChild('data', $this->data);
         $paymentThreeDS->addChild('version', 100);
+
+        $session = $paymentDetails->addChild('session');
+        $session['id'] = $this->sessionId;
+        $session['shopperIPAddress'] = $this->shopperIpAddress;
     }
 
     /**
@@ -204,6 +231,13 @@ EOD;
         $shopper = $order->addChild('shopper');
 
         $shopper->addChild('shopperEmailAddress', $this->shopperEmail);
+
+        $browser = $shopper->addChild('browser');
+        $browserFields = $this->browserFields;
+
+        $browser->addChild('browserColourDepth', $browserFields['browser_colorDepth']);
+        $browser->addChild('browserScreenHeight', $browserFields['browser_screenWidth']);
+        $browser->addChild('browserScreenWidth', $browserFields['browser_screenHeight']);
     }
 
     /**

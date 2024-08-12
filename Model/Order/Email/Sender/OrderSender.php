@@ -239,4 +239,28 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
         }
         return true;
     }
+    
+    /**
+     * Place Order confirm email for redirect mode full page
+     *
+     * @param array $order
+     * @return
+     */
+    public function fullPageRedirectOrderEmail(order $order)
+    {
+        $this->identityContainer->setStore($order->getStore());
+        if (!$this->identityContainer->isEnabled()) {
+            return false;
+        }
+        $this->prepareTemplate($order);
+        /** @var SenderBuilder $sender */
+        $sender = $this->getSender();
+        try {
+            $sender->send();
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+            return false;
+        }
+        return true;
+    }
 }

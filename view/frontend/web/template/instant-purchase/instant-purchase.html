@@ -5,36 +5,52 @@
  */
 -->
 <if args="showButton()">
-    <button type="button"
-            class="action primary instant-purchase"
-            click="instantPurchase"
-            attr="title: $t(buttonText)">
-        <span translate="buttonText"></span>
-    </button>
-    <input if="paymentToken()"
-           type="hidden"
-           name="instant_purchase_payment_token"
-           ko-value="paymentToken().publicHash"></input>
-    <if args="dfreference()">
-    <input if="dfreference()"
-           type="hidden"
-           name="instant_purchase_dfreference"
-           ko-value="dfreference()"></input>
-    </if>
-    <input if="shippingAddress()"
-           type="hidden"
-           name="instant_purchase_shipping_address"
-           ko-value="shippingAddress().id"></input>
-    <input if="billingAddress()"
-           type="hidden"
-           name="instant_purchase_billing_address"
-           ko-value="billingAddress().id"></input>
-    <if args="shippingMethod()">
-        <input type="hidden"
-               name="instant_purchase_carrier"
-               ko-value="shippingMethod().carrier"></input>
-        <input type="hidden"
-               name="instant_purchase_shipping"
-               ko-value="shippingMethod().method"></input>
-    </if>
-</if>
+       <button type="button"
+               class="action primary instant-purchase"
+               click="instantPurchase"
+               attr="title: $t(buttonText)">
+           <span translate="buttonText"></span>
+       </button>
+       <input if="paymentToken()"
+              type="hidden"
+              name="instant_purchase_payment_token"
+              ko-value="paymentToken().publicHash"></input>
+       <if args="dfreference()">
+       <input if="dfreference()"
+              type="hidden"
+              name="instant_purchase_dfreference"
+              ko-value="dfreference()"></input>
+       </if>
+       <input if="shippingAddress()"
+              type="hidden"
+              name="instant_purchase_shipping_address"
+              ko-value="shippingAddress().id"></input>
+       <input if="billingAddress()"
+              type="hidden"
+              name="instant_purchase_billing_address"
+              ko-value="billingAddress().id"></input>
+       <if args="shippingMethod()">
+           <input type="hidden"
+                  name="instant_purchase_carrier"
+                  ko-value="shippingMethod().carrier"></input>
+           <input type="hidden"
+                  name="instant_purchase_shipping"
+                  ko-value="shippingMethod().method"></input>
+       </if>
+       <if args="browserScreenHeight()">
+          <input type="hidden"
+                 name="browserScreenHeight"
+                 ko-value="browserScreenHeight()"></input>
+      </if>
+       <if args="browserScreenWidth()">
+          <input type="hidden"
+                 name="browserScreenWidth"
+                 ko-value="browserScreenWidth()"></input>
+      </if>
+       <if args="browserColorDepth()">
+          <input type="hidden"
+                 name="browserColorDepth"
+                 ko-value="browserColorDepth()"></input>
+      </if>
+   </if>
+   

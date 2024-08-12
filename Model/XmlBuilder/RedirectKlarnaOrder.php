@@ -103,6 +103,22 @@ EOD;
      * @var array
      */
     private $orderlineitems;
+    /**
+     * @var bool $isEnabledStorePickup
+     */
+    private $isEnabledStorePickup;
+    /**
+     * @var bool $isStorePickup
+     */
+    private $isStorePickup;
+    /**
+     * @var string $storePickUpMethod
+     */
+    private $storePickUpMethod;
+    /**
+     * @var string $storepickUpType
+     */
+    private $storepickUpType;
 
     /**
      * RedirectKlarnaOrder constructor
@@ -137,6 +153,10 @@ EOD;
      * @param string $sessionData
      * @param array|string $orderContent
      * @param string $captureDelay
+     * @param bool $isStorePickup
+     * @param string $isEnabledStorePickup
+     * @param string $storePickUpMethod
+     * @param string $storepickUpType
      * @return SimpleXMLElement $xml
      */
     public function build(
@@ -159,7 +179,11 @@ EOD;
         $exponent,
         $sessionData,
         $orderContent,
-        $captureDelay
+        $captureDelay,
+        $isStorePickup,
+        $isEnabledStorePickup,
+        $storePickUpMethod,
+        $storepickUpType
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -181,6 +205,10 @@ EOD;
         $this->sessionData = $sessionData;
         $this->orderContent = $orderContent;
         $this->captureDelay = $captureDelay;
+        $this->isStorePickup = $isStorePickup;
+        $this->isEnabledStorePickup = $isEnabledStorePickup;
+        $this->storePickUpMethod = $storePickUpMethod;
+        $this->storepickUpType = $storepickUpType;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -233,8 +261,14 @@ EOD;
         $this->_addOrderContentElement($order);
         $this->_addPaymentMethodMaskElement($order);
         $this->_addShopperElement($order);
-        $this->_addShippingElement($order);
+        if (!$this->isStorePickup) {
+            $this->_addShippingElement($order);
+        }
         $this->_addBillingElement($order);
+        if ($this->isEnabledStorePickup && $this->isStorePickup) {
+            $this->_addExtendedOrderDetails($order);
+        }
+
         if (!empty($this->statementNarrative)) {
             $this->_addStatementNarrativeElement($order);
         }
@@ -690,5 +724,25 @@ EOD;
         $date['hour'] = $today->format('H');
         $date['minute'] = $today->format('i');
         $date['second'] = $today->format('s');
+    }
+
+    /**
+     * Add Extended Order Details
+     *
+     * @param string $parentElement
+     */
+    private function _addExtendedOrderDetails($parentElement)
+    {
+        $extendedOrderDetail = $parentElement->addChild('extendedOrderDetail');
+        $alternateAddress = $extendedOrderDetail->addChild('alternativeShippingAddress');
+        $shippingSummary = $alternateAddress->addChild('shippingSummary');
+        $shippingSummary['shippingMethod'] = $this->storePickUpMethod;
+        ;
+        $shippingSummary['shippingType'] = $this->storepickUpType;
+        $address = $alternateAddress->addChild('address');
+        $address->addChild('address1', $this->shippingAddress['address1']);
+        $address->addChild('postalCode', $this->shippingAddress['postalCode']);
+        $address->addChild('city', $this->shippingAddress['city']);
+        $address->addChild('countryCode', $this->shippingAddress['countryCode']);
     }
 }

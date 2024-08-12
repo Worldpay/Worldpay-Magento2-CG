@@ -331,8 +331,6 @@ select {
 
       function payWithCreditCard() {
         if(!paymentRequestClient) return;
-       
-
         var paymentAppResponse = {
           methodName: "basic-card",
           details: {
@@ -348,9 +346,6 @@ select {
         paymentRequestClient.postMessage(paymentAppResponse);
         window.close();
       }
-      
-      
-      
       
       navigator.serviceWorker.addEventListener('message', e => {
         paymentRequestClient = e.source;

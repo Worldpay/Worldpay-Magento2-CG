@@ -66,6 +66,14 @@ class Chromepay extends \Magento\Framework\App\Action\Action
             $paymentDetails = $reqData->details;
             $shippingAddress = $reqData->shippingAddress;
             $billingAddress = $paymentDetails->billingAddress;
+            $browserfields = [
+                'browserScreenHeight' => $paymentDetails['additional_data']
+                    ['browser_screenheight'],
+                'browserScreenWidth' => $paymentDetails['additional_data']
+                    ['browser_screenwidth'],
+                'browserColourDepth' => $paymentDetails['additional_data']
+                    ['browser_colordepth']
+            ];
             $chromeOrderParams = [];
             $chromeOrderParams['orderCode'] = $orderCode;
             $chromeOrderParams['merchantCode'] = $this->worldpayHelper->getMerchantCode();
@@ -78,6 +86,7 @@ class Chromepay extends \Magento\Framework\App\Action\Action
             $chromeOrderParams['shippingAddress'] = $shippingAddress;
             $chromeOrderParams['billingAddress'] = $billingAddress;
             $chromeOrderParams['exponent'] = $exponent;
+            $chromeOrderParams['browserFields'] = $browserfields;
             if ($chromeOrderParams) {
                 $response = $this->_paymentservicerequest->chromepayOrder($chromeOrderParams);
             }

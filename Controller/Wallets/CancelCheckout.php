@@ -71,15 +71,13 @@ class CancelCheckout extends \Magento\Framework\App\Action\Action implements Htt
                 // setting g-pay/apple-pay quote id to inactive
                 $currentQuoteID = $this->getQuote()->getId();
             if ($currentQuoteID) {
-                $this->wplogger->info("Current Active Cart ID:".$currentQuoteID);
                 $activeQuote = $this->quoteRepository->get($currentQuoteID);
                 $activeQuote->setIsActive(0);
                 $this->quoteRepository->save($activeQuote);
             }
-
-                // bring previous user cart to active state
+            // bring previous user cart to active state
             if ($this->customerSession->getActiveQuoteId()) {
-                $this->wplogger->info("Previous  Active Cart ID:".$this->customerSession->getActiveQuoteId());
+                $this->wplogger->info("Restore previous Cart");
                 $inActiveQuoteId = $this->customerSession->getActiveQuoteId();
                 $inActiveQuote = $this->quoteRepository->get($inActiveQuoteId);
                 $inActiveQuote->setIsActive(1)->setReservedOrderId(null);
@@ -89,17 +87,18 @@ class CancelCheckout extends \Magento\Framework\App\Action\Action implements Htt
                 // unsetting session variable
                 $this->customerSession->unsActiveQuoteId();
             }
-                    $resultData = [
-                        'success' => true,
-                        'time' => time(),
-                    ];
+                $resultData = [
+                    'success' => true,
+                    'time' => time(),
+                ];
         } catch (\Exception $e) {
             $resultData = [
                 'success' => false,
                 'time' => time(),
                 'error_msg'=> $e->getMessage()
             ];
-            $this->wplogger->info("Cancel wp wallet checkout: Failed while unsetting quote Id ".$e->getMessage());
+            $this->wplogger
+            ->info("Cancel wp wallet checkout: Failed while unsetting quote Id ".$e->getMessage());
         }
         return $result->setData($resultData);
     }

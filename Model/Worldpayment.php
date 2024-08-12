@@ -4,11 +4,40 @@
  */
 namespace Sapient\Worldpay\Model;
 
+use Sapient\Worldpay\Model\ResourceModel\Worldpayment\CollectionFactory;
+
 /**
  * Resource Model
  */
 class Worldpayment extends \Magento\Framework\Model\AbstractModel
 {
+    /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\SubscriptionOrder
+     */
+    private $sentforAuthOrderCollection;
+
+    /**
+     * Constructor
+     *
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param CollectionFactory $sentforAuthOrderCollection
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
+     * @param array $data
+     */
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        CollectionFactory $sentforAuthOrderCollection,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+        $this->sentforAuthOrderCollection = $sentforAuthOrderCollection;
+    }
+
     /**
      * Initialize resource model
      *
@@ -48,5 +77,24 @@ class Worldpayment extends \Magento\Framework\Model\AbstractModel
         }
         $id = $this->getResource()->loadByWorldpayOrderId($order_id);
         return $this->load($id);
+    }
+
+    /**
+     * Load skip order
+     *
+     * @param string $subscriptionId
+     * @param string $timeFilterby
+     *
+     * @return \Sapient\Worldpay\Model\Worldpayment
+     */
+    public function getsentforAuthOrderCollection()
+    {
+            $this->sentforAuthOrderCollection = $this->sentforAuthOrderCollection->create();
+            $this->sentforAuthOrderCollection
+                ->addFieldToFilter('payment_status', ['eq'=> 'SENT_FOR_AUTHORISATION'])
+                //->addFieldToFilter('payment_model', ['eq'=> 'redirect'])
+                ->addOrder('id', \Magento\Framework\Data\Collection::SORT_ORDER_DESC);
+   
+        return $this->sentforAuthOrderCollection;
     }
 }

@@ -270,7 +270,7 @@
                             return false;
                         }
                         if (orderResponse){
-
+                            
                             if(typeof checkoutObj.paymentDetails.method !='undefined'){
 
                                 if(checkoutObj.paymentDetails.method == 'worldpay_paybylink'){

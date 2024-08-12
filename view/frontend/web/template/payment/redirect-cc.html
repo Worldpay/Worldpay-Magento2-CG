@@ -1,213 +1,185 @@
 <div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
-     <div class="payment-method-title field choice">
-        <input type="radio"
-               name="payment[method]"
-               class="radio"
-               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"></input>
-
-        <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
-        
-         <!-- ko if: ( getCode()=='worldpay_cc')-->
-        
-         <div data-bind="if: isPlaceOrderActionAllowed()" class='accepted_cc'>
-              
-             <span class='worldpay_cc_we_accept'>We Accept</span>
-             
-             <div class="paymentoptions-icon-wrapper">
-         <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
-         <!--ko if: $parent.getIcons(item.ccValue) -->
-                        <div data-bind="attr: {for: 'direct_cc_' + item.ccValue}"><img data-bind="attr: {
-                                    'src': $parent.getIcons(item.ccValue).url,
-                                    'alt': item.ccLabel,
-                                    'width': $parent.getIcons(item.ccValue).width,
-                                    'height': $parent.getIcons(item.ccValue).height
-                                    }"></div>
-                    <!--/ko-->
-         <!--/ko-->
-          </div>
-         </div>
-          <!--/ko-->
-          
-          
-    </div>
-    <div class="payment-method-content">
-        <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
-           <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
-            <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">          
-                <!-- ko foreach: {data: availableCCTypes(), as: 'item'} -->
-                       <div class="paymentmethods-radio-wrapper">
-                        <input type="radio"  data-bind="click:$parent.onSelectCcard.bind(this,$parent), event:{ change: $parent.loadEventAction }, attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
-                                        'validate-one-required-by-name':true
-                                                }),id: 'redirect_cc_' + item.ccValue}" name="payment[cc_type]"></input>
-                        <!--ko if: $parent.getIcons(item.ccValue) -->
-                            <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}"><img data-bind="attr: {
-                                    'src': $parent.getIcons(item.ccValue).url,
-                                    'alt': item.ccLabel,
-                                    'width': $parent.getIcons(item.ccValue).width,
-                                    'height': $parent.getIcons(item.ccValue).height
-                                    }"></label>
-                        <!--/ko-->     
-                         <!--ko if: (item.ccValue=='savedcard') -->
-                         <label data-bind="attr: {for: 'redirect_cc_' + item.ccValue}"><!-- ko i18n: 'Saved Cards'--><!-- /ko --></label>
-                         <!--/ko-->               
-                   </div>
-                <!--/ko-->
-                  <!-- ko if: (getSavedCardsCount() > 0)-->
-                    <!-- ko if: (getHppIntegrationType()  == 'iframe')-->
+    <div class="payment-method-title field choice">
+       <input type="radio"
+              name="payment[method]"
+              class="radio"
+              data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"></input>
+       <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>         
+   </div>
+   <div class="payment-method-content" data-bind="css: { 'redirect-form': (getSavedCardsCount() <= 0) }">
+       <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
+          <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
+           <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}"> 
+                <div id="cc_type-error" class="mage-error"></div>   
+                <!-- ko if: (getSavedCardsCount() > 0) -->     
                     <div class="paymentmethods-radio-wrapper">
-                        <label class="action label-saved-card" data-bind="click: loadSavedCards,text: $t('Use Saved Card')"></label>
-                        
-                        </div>
-                        <!-- /ko -->
-                   <!-- /ko -->              
-            </div>
-
-            <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
-                <!-- ko if: (getSavedCardsCount() > 0)-->
-                   <fieldset class="fieldset payment items ccard worldpay_cc" id="payment_form_worldpay_cc">
-                   <hr>
-                       <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
-                       <!-- ko template: 'Sapient_Worldpay/payment/saved-card-form' --><!-- /ko -->
-                   </fieldset>
-               <!-- /ko -->
-               </div>
-            <!-- ko if: (getSaveCardAllowed() && (isTokenizationEnabled() || isStoredCredentialsEnabled()))-->
-                <div  class="field savecc" data-bind="attr: {id: getCode() + '_save-card_div'},visible: isSaveThisCardVisible">
-                    <div class="control">
-                        <input type="checkbox" class="input-check savecard"  name="save-card"  data-bind="click: savethiscard,attr: {
-                            id: getCode() + '_save_card', title: $t('Save This Card'),
-                            'data-container': getCode() + '-save-card'}, value: saveMyCard">
-                            <label data-bind="attr: {for: getCode() + 'save-card'}" class="label">
-                            <span><!-- ko i18n: getCheckoutLabels('CO26')--><!-- /ko --></span>
-                            <!-- ko if: (isStoredCredentialsEnabled() && isDisclaimerMessageEnabled())-->
-                                <span>(<a class="checkout-disclaimer" data-bind="i18n: getCheckoutLabels('CO9'),click: disclaimerPopup"></a>)</span>
-                            <!-- /ko -->
-                        </label>
+                      <input type="radio" 
+                       data-bind="click:onSelectNewCard.bind(this), attr: {'value':'ONLINE', 'data-validate': JSON.stringify({ 'validate-one-required-by-name':true }), id: 'redirect_cc_new_card'}" 
+                       name="payment[cc_type]">  
+                       <label data-bind="attr: {for: 'redirect_cc_new_card'}">
+                            <!-- ko i18n: 'New Card'--><!-- /ko -->
+                       </label>     
+                    </div>                          
+                    <div class="paymentmethods-radio-wrapper">                       
+                       <input type="radio" data-bind="click:onSelectCcard.bind(this), event:{ change: loadEventAction }, attr: {'value': 'savedcard', 'data-validate': JSON.stringify({ 'validate-one-required-by-name':true }), id:'redirect_cc_savedcard','data-type':'redirect'}" name="payment[cc_type]">
+                       <label data-bind="attr: {for: 'redirect_cc_savedcard'}">
+                           <!-- ko i18n: 'Use Saved Card' --><!-- /ko -->
+                       </label>               
                     </div>
+                <!-- /ko --> 
+                <!-- ko if: (getSavedCardsCount()<= 0)-->
+                 <div class="paymentmethods-radio-wrapper">
+                    <input type="radio" checked data-bind="attr: {'value': 'ONLINE',  id:'redirect_cc_gust','data-type':'redirect'}" name="payment[cc_type]">
                 </div>
-             <!-- /ko -->
-                
-            <div id="dialog" style="display: none" align = "center" title="Disclaimer!">
-                <form id="disclaimer" name="disclaimer">
-                    <div data-bind="html: disclaimerMessage()"></div>
-                </form>
-            </div>
-            <div class="mage-error" generated="true"  id="disclaimer-error"></div>
-         <div class="field cpf required" data-bind="visible: (showCPFSection())">
-                        <label data-bind="attr: {for: getCode() + '_cpf'},visible: (showCPFSection())" class="label">
-						<span> CPF/CNPJ  </span>
-                            <!--            <span> ko i18n: 'CPF/CNPJ' /ko </span>-->
-                        </label> 
-                        <div class="control">
-                            <input type="number" style="width: 225px;" name="payment[cpf]" class="input-text" value=""   data-bind="attr: {
-                                    autocomplete: off,
-                                    id: getCode() + '_cpf',
-                                    title: $t('CPF/CNPJ'),
-                                    'data-container': getCode() + '-cpf-number',
-                                    'data-validate': JSON.stringify({'required-number':true,
-                                      'worldpay-validate-cpf-number': true})}, visible: (showCPFSection()) ,
-                                    enable: isActive($parents),
-                                    value: isCPF,
-                                    valueUpdate: 'keyup'"
-                                   ></input> 
-                        </div>
+                <!-- /ko -->                       
+           </div>
+
+           <div class="field sacedcard" id="saved-Card-Visibility-Enabled" data-bind="visible: false">
+               <!-- ko if: (getSavedCardsCount() > 0)-->
+                  <fieldset class="fieldset payment items ccard worldpay_cc" id="payment_form_worldpay_cc">
+                  <hr>
+                      <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
+                      <!-- ko template: 'Sapient_Worldpay/payment/saved-card-form' --><!-- /ko -->
+                  </fieldset>
+              <!-- /ko -->
+              </div>
+           <!-- ko if: (getSaveCardAllowed() && (isTokenizationEnabled() || isStoredCredentialsEnabled()))-->
+               <div  class="field savecc" data-bind="attr: {id: getCode() + '_save-card_div'},visible: isSaveThisCardVisible">
+                   <div class="control">
+                       <input type="checkbox" class="input-check savecard"  name="save-card"  data-bind="click: savethiscard,attr: {
+                           id: getCode() + '_save_card', title: $t('Save This Card'),
+                           'data-container': getCode() + '-save-card'}, value: saveMyCard">
+                           <label data-bind="attr: {for: getCode() + 'save-card'}" class="label">
+                           <span><!-- ko i18n: getCheckoutLabels('CO26')--><!-- /ko --></span>
+                           <!-- ko if: (isStoredCredentialsEnabled() && isDisclaimerMessageEnabled())-->
+                               <span>(<a class="checkout-disclaimer" data-bind="i18n: getCheckoutLabels('CO9'),click: disclaimerPopup"></a>)</span>
+                           <!-- /ko -->
+                       </label>
+                   </div>
+               </div>
+            <!-- /ko -->
+               
+           <div id="dialog" style="display: none" align = "center" title="Disclaimer!">
+               <form id="disclaimer" name="disclaimer">
+                   <div data-bind="html: disclaimerMessage()"></div>
+               </form>
+           </div>
+           <div class="mage-error" generated="true"  id="disclaimer-error"></div>
+        <div class="field cpf required" data-bind="visible: (showCPFSection())">
+                       <label data-bind="attr: {for: getCode() + '_cpf'},visible: (showCPFSection())" class="label">
+                       <span> CPF/CNPJ  </span>
+                           <!--            <span> ko i18n: 'CPF/CNPJ' /ko </span>-->
+                       </label> 
+                       <div class="control">
+                           <input type="number" style="width: 225px;" name="payment[cpf]" class="input-text" value=""   data-bind="attr: {
+                                   autocomplete: off,
+                                   id: getCode() + '_cpf',
+                                   title: $t('CPF/CNPJ'),
+                                   'data-container': getCode() + '-cpf-number',
+                                   'data-validate': JSON.stringify({'required-number':true,
+                                     'worldpay-validate-cpf-number': true})}, visible: (showCPFSection()) ,
+                                   enable: isActive($parents),
+                                   value: isCPF,
+                                   valueUpdate: 'keyup'"
+                                  ></input> 
                             </div>
-                    <div class="field instalment required"  data-bind="visible: (showInstalmentSection())">
-                                  <label data-bind="attr: {for: getCode() + '_instalment'},visible: (showInstalmentSection())" class="label">
-                            <span> Instalment </span>
-                            <!--           <span> ko i18n: 'Instalment' /ko </span>-->
-                        </label> 
+                        </div>
+                   <div class="field instalment required"  data-bind="visible: (showInstalmentSection())">
+                        <label data-bind="attr: {for: getCode() + '_instalment'},visible: (showInstalmentSection())" class="label">
+                        <span> Instalment </span>
+                        <!-- <span> ko i18n: 'Instalment' /ko </span>-->
+                       </label> 
                         <div class="control" style=" width:225px;align:'center'">
 
-                                   <select name="payment[instalment]"
-                                    class="select select-instalment"
-                                    data-bind="visible: (showInstalmentSection()),
-                                           attr: {id: getCode() + '_instalment', 
-                                           'data-container': getCode() + '-instalment', 
-                                           'data-validate': JSON.stringify({required:true})},
-                                           enable: isActive($parents),
-                                           options: availableInstalTypes(),
-                                           optionsValue: 'instalValue',
-                                           optionsText: 'instalccLabel',
-                                           optionsCaption: $t('Instalment'),
-                                           title: $t('Instalment'),
-                                           value: selectedInstalment">
+                            <select name="payment[instalment]"
+                                class="select select-instalment"
+                                data-bind="visible: (showInstalmentSection()),
+                                attr: {id: getCode() + '_instalment', 
+                                'data-container': getCode() + '-instalment', 
+                                'data-validate': JSON.stringify({required:true})},
+                                enable: isActive($parents),
+                                options: availableInstalTypes(),
+                                optionsValue: 'instalValue',
+                                optionsText: 'instalccLabel',
+                                optionsCaption: $t('Instalment'),
+                                title: $t('Instalment'),
+                                value: selectedInstalment">
                             </select>
-                                </div>
-                            </div>
-             </fieldset>
-        </form>
-        
-     
-        <!-- ko foreach: getRegion('messages') -->
-        <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
-        <div class="payment-method-billing-address">
-            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-            <!--/ko-->
-        </div>
-        <div class="checkout-agreements-block">
-            <!-- ko foreach: $parent.getRegion('before-place-order') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-            <!--/ko-->
-        </div>
-         <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='iframe')-->
-         <div class="actions-toolbar">
-            <div class="primary">
-                <button class="action primary checkout hpp-checkout"
-                        type="button"
-                        data-bind="
-                            click: loadHppIframe,
-                            css: {disabled: !isPlaceOrderActionAllowed()},
-                            attr: {title: getCheckoutLabels('CO27')}">
-                    <span data-bind="text: getCheckoutLabels('CO27')"></span>
-                </button>
-            </div>
-        </div>
-         <!-- HPP IFRAME -->
-         <style type="text/css">#checkout-payment-worldpay-container{padding-top:10px;} #wp-cl{ width: 93%;} .wp-cl-iframe{ height: 600px;  min-width: 93%; } #changePaymentMethod{display:none; } #wp-cl-checkout-payment-worldpay-container-iframe #changePaymentMethod{ display:none;}</style>
-         <div style="display:none" id="checkout-payment-worldpay-alert-message" data-bind="text: getCheckoutLabels('CO28')"></div>
-         <div id="checkout-payment-worldpay-container"></div>
-         <!-- HPP IFRAME -->
-
-         <!--/ko-->
-         <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='full_page')-->
-         <div class="actions-toolbar">
-            <div class="primary">
-                <button class="action primary checkout hpp-checkout"
-                        type="button"
-                        data-bind="
-                            click: preparePayment,
-                            css: {disabled: !isPlaceOrderActionAllowed()},
-                            attr: {title: getCheckoutLabels('CO27')}">
-                    <span data-bind="text: getCheckoutLabels('CO27')"></span>
-                </button>
-            </div>
-        </div>
-         <!-- HPP IFRAME -->
-         <style type="text/css">#checkout-payment-worldpay-container{padding-top:10px;} #wp-cl{ width: 93%;} .wp-cl-iframe{ height: 600px;  min-width: 93%; } #changePaymentMethod{display:none; } #wp-cl-checkout-payment-worldpay-container-iframe #changePaymentMethod{ display:none;}</style>
-         <div style="display:none" id="checkout-payment-worldpay-alert-message" data-bind="text: getCheckoutLabels('CO28')"></div>
-         <div id="checkout-payment-worldpay-container"></div>
-         <!-- HPP IFRAME -->
-
-         <!--/ko-->  
-         <!-- ko if: (getIntigrationMode() == 'direct')-->
+                        </div>
+                    </div>
+            </fieldset>
+       </form>
+       
+    
+       <!-- ko foreach: getRegion('messages') -->
+       <!-- ko template: getTemplate() --><!-- /ko -->
+       <!--/ko-->
+       <div class="payment-method-billing-address">
+           <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+           <!-- ko template: getTemplate() --><!-- /ko -->
+           <!--/ko-->
+       </div>
+       <div class="checkout-agreements-block">
+           <!-- ko foreach: $parent.getRegion('before-place-order') -->
+           <!-- ko template: getTemplate() --><!-- /ko -->
+           <!--/ko-->
+       </div>
+        <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='iframe')-->
         <div class="actions-toolbar">
-            <div class="primary">
-                <button class="action primary checkout"
-                        type="submit"
-                        data-bind="
-                            click: preparePayment,
-                            attr: {title: $t('Place Order')},
-                            css: {disabled: !isPlaceOrderActionAllowed()},
-                            enable: (getCode() == isChecked())
-                            "
-                        disabled>
-                    <span data-bind="text: $t('Place Order')"></span>
-                </button>
-            </div>
-        </div>
+           <div class="primary">
+               <button class="action primary checkout hpp-checkout"
+                       type="button"
+                       data-bind="
+                           click: loadHppIframe,
+                           css: {disabled: !isPlaceOrderActionAllowed()},
+                           attr: {title: getCheckoutLabels('CO27')}">
+                   <span data-bind="text: getCheckoutLabels('CO27')"></span>
+               </button>
+           </div>
+       </div>
+        <!-- HPP IFRAME -->
+        <style type="text/css">#checkout-payment-worldpay-container{padding-top:10px;} #wp-cl{ width: 93%;} .wp-cl-iframe{ height: 600px;  min-width: 93%; } #changePaymentMethod{display:none; } #wp-cl-checkout-payment-worldpay-container-iframe #changePaymentMethod{ display:none;}</style>
+        <div style="display:none" id="checkout-payment-worldpay-alert-message" data-bind="text: getCheckoutLabels('CO28')"></div>
+        <div id="checkout-payment-worldpay-container"></div>
+        <!-- HPP IFRAME -->
+
         <!--/ko-->
-    </div>
+        <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='full_page')-->
+        <div class="actions-toolbar">
+           <div class="primary">
+               <button class="action primary checkout hpp-checkout"
+                       type="button"
+                       data-bind="
+                           click: preparePayment,
+                           css: {disabled: !isPlaceOrderActionAllowed()},
+                           attr: {title: getCheckoutLabels('CO27')}">
+                   <span data-bind="text: getCheckoutLabels('CO27')"></span>
+               </button>
+           </div>
+       </div>
+        <!-- HPP IFRAME -->
+        <style type="text/css">#checkout-payment-worldpay-container{padding-top:10px;} #wp-cl{ width: 93%;} .wp-cl-iframe{ height: 600px;  min-width: 93%; } #changePaymentMethod{display:none; } #wp-cl-checkout-payment-worldpay-container-iframe #changePaymentMethod{ display:none;}</style>
+        <div style="display:none" id="checkout-payment-worldpay-alert-message" data-bind="text: getCheckoutLabels('CO28')"></div>
+        <div id="checkout-payment-worldpay-container"></div>
+        <!-- HPP IFRAME -->
+
+        <!--/ko-->  
+        <!-- ko if: (getIntigrationMode() == 'direct')-->
+       <div class="actions-toolbar">
+           <div class="primary">
+               <button class="action primary checkout"
+                       type="submit"
+                       data-bind="
+                           click: preparePayment,
+                           attr: {title: $t('Place Order')},
+                           css: {disabled: !isPlaceOrderActionAllowed()},
+                           enable: (getCode() == isChecked())
+                           "
+                       disabled>
+                   <span data-bind="text: $t('Place Order')"></span>
+               </button>
+           </div>
+       </div>
+       <!--/ko-->
+   </div>
 </div>

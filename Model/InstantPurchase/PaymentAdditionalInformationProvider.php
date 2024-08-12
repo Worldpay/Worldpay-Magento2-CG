@@ -49,12 +49,18 @@ class PaymentAdditionalInformationProvider implements PaymentAdditionalInformati
     {
         $vaultCardDetails = json_decode($paymentToken->getDetails());
         $dfId = $this->checkoutSession->getDfReferenceId();
+        $browserScreenheight = $this->checkoutSession->getBrowserScreenHeight();
+        $browserScreenwidth = $this->checkoutSession->getBrowserScreenWidth();
+        $browserColordepth = $this->checkoutSession->getBrowserColorDepth();
+
         if ($dfId === null) {
             return [
             'cc_type' => $vaultCardDetails->type,
             'card_brand' => str_replace('-SSL', '', $vaultCardDetails->type),
             'token' => $paymentToken->getGatewayToken(),
-            
+            'browser_screenheight'=>$browserScreenheight,
+            'browser_screenwidth'=>$browserScreenwidth,
+            'browser_colordepth'=>$browserColordepth
             ];
         } else {
             $this->checkoutSession->unsDfReferenceId();
@@ -63,7 +69,9 @@ class PaymentAdditionalInformationProvider implements PaymentAdditionalInformati
             'card_brand' => str_replace('-SSL', '', $vaultCardDetails->type),
             'token' => $paymentToken->getGatewayToken(),
             'dfReferenceId' => $dfId,
-            
+            'browser_screenheight'=>$browserScreenheight,
+            'browser_screenwidth'=>$browserScreenwidth,
+            'browser_colordepth'=>$browserColordepth
             ];
         }
     }

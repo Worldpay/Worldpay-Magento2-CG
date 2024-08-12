@@ -249,10 +249,17 @@ class CallBack extends \Magento\Framework\App\Action\Action
                     if ($isMultishipping) {
                         $grandTotal = $quote->getGrandTotal();
                     }
+                    
+                    $browserData = $this->_checkoutSession->getBrowserFields();
+                    $browserFields = [
+                        'browser_colorDepth' => $browserData['browser_colordepth'],
+                        'browser_screenWidth' => $browserData['browser_screenwidth'],
+                        'browser_screenHeight' => $browserData['browser_screenheight']
+                    ];
+                    
                     $samsungPayOrderParams = [];
 
                     $samsungPayOrderParams['orderCode'] = $worldpayOrderId;
-
                     $samsungPayOrderParams['merchantCode'] = $merchantCode;
                     $samsungPayOrderParams['orderDescription'] = $orderDescription;
                     $samsungPayOrderParams['currencyCode'] = $currencyCode;
@@ -261,6 +268,9 @@ class CallBack extends \Magento\Framework\App\Action\Action
                     $samsungPayOrderParams['shopperEmail'] = $orderDetails['customer_email'];
                     $samsungPayOrderParams['exponent'] = $exponent;
                     $samsungPayOrderParams['data'] = $response['3DS']['data'];
+                    $samsungPayOrderParams['browserFields'] = $browserFields;
+                    $samsungPayOrderParams['shopperIpAddress'] = $this->_getClientIPAddress();
+                    $samsungPayOrderParams['sessionId'] = $refId;
                     $response = $this->_paymentservicerequest->samsungPayOrder($samsungPayOrderParams);
                     $paymentService = new \SimpleXmlElement($response);
                     $lastEvent = $paymentService->xpath('//lastEvent');
@@ -312,5 +322,17 @@ class CallBack extends \Magento\Framework\App\Action\Action
                 $order = $this->orderFactory->create()->loadByIncrementId($orderIncrementId);
             return $order;
         }
+    }
+    /**
+     * Get ClientIP Address
+     *
+     * @return string
+     */
+    
+    private function _getClientIPAddress()
+    {
+        $REMOTE_ADDR = filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_VALIDATE_IP);
+        $remoteAddresses = explode(',', $REMOTE_ADDR);
+        return trim($remoteAddresses[0]);
     }
 }

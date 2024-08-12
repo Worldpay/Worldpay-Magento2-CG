@@ -86,6 +86,7 @@
     <column xsi:type="varchar" name="bin_number" nullable="true" length="25" comment="Bin Number"/>
     <column xsi:type="boolean" name="disclaimer_flag" nullable="false" comment="Disclaimer Flag"/>
     <column xsi:type="text" name="token_type" nullable="true" comment="Token type"/>
+    <column xsi:type="int" name="store_id" padding="6" unsigned="true" nullable="false" identity="false" default="1" comment="Store Id"/>
     <constraint xsi:type="primary" referenceId="PRIMARY">
       <column name="id"/>
     </constraint>

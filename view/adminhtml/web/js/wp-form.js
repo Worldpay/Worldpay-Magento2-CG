@@ -1,7 +1,6 @@
 define([
-    "jquery",
-    "worldpay"
-], function($, worldpay){
+    "jquery"
+], function($){
     "use strict";
     $.widget('mage.worldpayForm', {
          options: {

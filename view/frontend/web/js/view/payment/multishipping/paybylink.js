@@ -75,6 +75,9 @@ define(
                 if(window.checkoutConfig.payment.ccform.isSubscribed){
                     return false;
                 }
+                if(window.checkoutConfig.payment.ccform.isEnabledEFTPOS){
+                    return false;
+                }
                 return true;
             }
         });
