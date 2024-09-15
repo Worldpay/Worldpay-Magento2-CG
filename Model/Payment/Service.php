@@ -162,7 +162,7 @@ class Service
         $rawXml = $this->paymentservicerequest->inquiry(
             $worldPayPayment->getMerchantId(),
             $worldPayPayment->getWorldpayOrderId(),
-            $worldPayOrder->getStoreId(),
+            $order->getStoreId(),
             $order->getPaymentMethodCode(),
             $worldPayPayment->getPaymentType(),
             $interactionType

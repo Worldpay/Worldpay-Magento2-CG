@@ -1369,12 +1369,14 @@ class Service
                             'worldpay/general_config/environment_mode',
                             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                         );
-//                    if ($environmentMode == 'Test Mode') {
-//                        $orderDescription =   $this->_scopeConfig->getValue(
-//                            'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
-//                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-//                        );
-//                    }
+                    // if ($environmentMode == 'Test Mode') {
+                    //     $orderDescription =   $this->_scopeConfig->getValue(
+                    //         'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
+                    //         \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    //     );
+                    // }
+                    $this->wplogger->info("Gpay 3Ds value". $orderDescription);
+
                 } else {
                     $orderDescription = $this->_getOrderDescription($reservedOrderId);
                 }

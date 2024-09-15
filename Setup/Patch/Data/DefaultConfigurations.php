@@ -183,7 +183,7 @@ class DefaultConfigurations implements DataPatchInterface
     {
         $resultArray = [];
         foreach ($exceptionValues as $row) {
-             $payment_type = $row['exception_code'];
+            $payment_type = $row['exception_code'];
             $rs['exception_messages'] = $row['exception_messages'];
             $rs['exception_module_messages'] = $row['exception_module_messages'];
             $resultArray[$payment_type] = $rs;
@@ -220,7 +220,9 @@ class DefaultConfigurations implements DataPatchInterface
      */
     public static function getDependencies()
     {
-        return [];
+        return [
+            Sapient\Worldpay\Setup\Patch\Data\UpgradeDefaultConfigurations::class
+        ];
     }
     /**
      * Save Extended Response Code
@@ -968,9 +970,9 @@ class DefaultConfigurations implements DataPatchInterface
                 "exception_messages" => "Only alphabet,number or space is allowed",
                 "exception_module_messages" => ""],
             $index . '_22' => ["exception_code" => "CCAM22",
-                "exception_messages" => "You already appear to have this card number "
-                . "stored, if your card details have changed, you can update these via"
-                . " the my cards section", "exception_module_messages" => ""],
+                "exception_messages" => "You already seem to have this card number "
+                . "stored, If your card details have changed, you can update them via"
+                . " My Account -> Saved Card", "exception_module_messages" => ""],
             $index . '_23' => ["exception_code" => "CCAM23",
                 "exception_messages" => "Parse error with PaRes: Error parsing pARes",
                 "exception_module_messages" => ""],

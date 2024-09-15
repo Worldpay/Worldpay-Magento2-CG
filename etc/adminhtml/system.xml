@@ -1042,25 +1042,6 @@
                                 <depends><field id="enabled">1</field></depends>
                         </field>            
                     </group>
-                    <group id="giropay_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>GiroPay </label>
-                        <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Use Custom Logo</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        </field> 
-                        <field id="logo_config" translate="label" type="Sapient\Worldpay\Block\Adminhtml\System\Config\Field\Image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                                <label>Logo</label>
-                                <backend_model>Sapient\Worldpay\Model\Config\Backend\Image</backend_model>
-                                <upload_dir config="sapient_worldpay/images" scope_info="1">sapient_worldpay/images</upload_dir>
-                                <base_url type="media" scope_info="1">sapient_worldpay/images</base_url>
-                                <comment><![CDATA[Allowed file types: jpg, jpeg, png, gif . <br />
-                                <ul style="margin-left: 2em;">
-                                <li>Recommended size: Logo size should be (50*30)px and Max upto 50KB.</li>
-                                </ul>
-                                ]]></comment>
-                                <depends><field id="enabled">1</field></depends>
-                        </field>            
-                    </group>
                     <group id="ideal_ssl" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>IDEAL Pay </label>
                         <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">

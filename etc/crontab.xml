@@ -18,10 +18,9 @@
             <schedule>* * * * *</schedule>
         </job>
     </group>
-    <group id="worldpay_pending_order_cleanup">
+    <group id="defalut">
         <job name="pending_order_cleanup" instance="Sapient\Worldpay\Cron\PendingOrderCleanup" method="execute">
-            <schedule>* * */1 * *</schedule>
-            <config_path>crontab/worldpay_pending_order_cleanup/jobs/pending_order_cleanup/schedule/cron_expr</config_path>
+            <schedule>0 0 * * *</schedule>
         </job>
     </group>
 </config>

@@ -14,8 +14,8 @@ class PendingOrderCleanupOption extends \Magento\Framework\App\Config\Value
     public function toOptionArray()
     {
         return [
-            ['value' => '1', 'label' => __('24 hours')],
-            ['value' => '2', 'label' => __('48 hours')],
+            ['value' => '24', 'label' => __('24 hours')],
+            ['value' => '48', 'label' => __('48 hours')],
         ];
     }
 }

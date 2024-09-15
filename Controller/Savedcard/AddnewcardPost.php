@@ -528,7 +528,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 $this->messageManager->getMessages(true);
                 if ($e->getMessage()=== 'Unique constraint violation found') {
                     $this->messageManager
-                        ->addError(__($this->worldpayHelper
+                        ->addErrorMessage(__($this->worldpayHelper
                                 ->getCreditCardSpecificException('CCAM22')));
                 } else {
                     $this->messageManager->addException($e, __('Error: ').$e->getMessage());

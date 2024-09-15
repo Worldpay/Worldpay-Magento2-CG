@@ -164,7 +164,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
                     $orderStatus = $responseXml->reply->orderStatus;
                     $payment=$orderStatus->payment;
                     if (empty($payment)) {
-                        $this->_messageManager->addError(
+                        $this->_messageManager->addErrorMessage(
                             $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
                                ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
                             : 'Your card could not be saved'
@@ -197,7 +197,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
                              ['_secure' => true]
                          ));
                     } else {
-                         $this->_messageManager->addError(
+                         $this->_messageManager->addErrorMessage(
                              $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
                                 ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
                              : 'Your card could not be saved'
@@ -224,7 +224,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
             } else {
                 $errormessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM15');
                 $this->wplogger->info($errormessage);
-                $this->_messageManager->addError(__($errormessage?$errormessage:$e->getMessage()));
+                $this->_messageManager->addErrorMessage(__($errormessage?$errormessage:$e->getMessage()));
                 if ($this->checkoutSession->getInstantPurchaseOrder()) {
                     $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
                     $this->checkoutSession->unsInstantPurchaseMessage();
@@ -250,10 +250,10 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
             }
             if ($e->getMessage()=== 'Unique constraint violation found') {
                 $this->_messageManager
-                        ->addError(__($this->paymentservicerequest
+                        ->addErrorMessage(__($this->paymentservicerequest
                                 ->getCreditCardSpecificException('CCAM22')));
             } else {
-                $this->_messageManager->addError(__($errormessage?$errormessage:$e->getMessage()));
+                $this->_messageManager->addErrorMessage(__($errormessage?$errormessage:$e->getMessage()));
             }
             if ($this->checkoutSession->getInstantPurchaseOrder()) {
                     $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
@@ -314,7 +314,7 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
             $message = $this->worldpayHelper->getExtendedResponse($wpayCode, $orderId);
             $responseMessage = !empty($message) ? $message :
             $this->paymentservicerequest->getCreditCardSpecificException('CCAM9');
-            $this->_messageManager->addError(__($responseMessage));
+            $this->_messageManager->addErrorMessage(__($responseMessage));
             if ($this->checkoutSession->getInstantPurchaseOrder()) {
                 $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
                 $this->checkoutSession->unsInstantPurchaseMessage();
@@ -331,7 +331,9 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
                 );
             }
         } elseif ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
-            $this->_messageManager->addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM9')));
+            $this->_messageManager->addErrorMessage(
+                __($this->paymentservicerequest->getCreditCardSpecificException('CCAM9'))
+            );
             if ($this->checkoutSession->getInstantPurchaseOrder()) {
                 $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
                 $this->checkoutSession->unsInstantPurchaseMessage();

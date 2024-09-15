@@ -168,7 +168,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
                          ['_secure' => true]
                      ));
                 } else {
-                     $this->_messageManager->addError(
+                     $this->_messageManager->addErrorMessage(
                          $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
                                 ? $this->worldpayHelper->getMyAccountSpecificexception('IAVMA4')
                          : 'Your card could not be saved'
@@ -213,14 +213,14 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
             $this->wplogger->info($e->getMessage());
             if ($e->getMessage() === 'Asymmetric transaction rollback.') {
                 $errorMessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM16');
-                $this->_messageManager->addError(__($errorMessage));
+                $this->_messageManager->addErrorMessage(__($errorMessage));
             } elseif ($e->getMessage()=== 'Unique constraint violation found') {
                 $errorMessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM22');
-                $this->_messageManager->addError(__($errorMessage));
+                $this->_messageManager->addErrorMessage(__($errorMessage));
             } else {
                 $this->_messageManager->getMessages(true);
                 $this->_messageManager->
-                        addError(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM10')));
+                addErrorMessage(__($this->paymentservicerequest->getCreditCardSpecificException('CCAM10')));
             }
             $this->checkoutSession->setWpResponseForwardUrl(
                 $this->urlBuilders->getUrl(self::CART_URL, ['_secure' => true])
@@ -276,7 +276,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
             $message = $this->worldpayHelper->getExtendedResponse($wpayCode, $orderId);
             $responseMessage = !empty($message) ? $message :
             $this->paymentservicerequest->getCreditCardSpecificException('CCAM9');
-            $this->_messageManager->addError(__($responseMessage));
+            $this->_messageManager->addErrorMessage(__($responseMessage));
             if ($this->checkoutSession->getInstantPurchaseOrder()) {
                 $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
                 $this->checkoutSession->unsInstantPurchaseMessage();
@@ -294,7 +294,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
             }
         } elseif ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
             $this->_messageManager
-                    ->addError(__($this->paymentservicerequest
+                    ->addErrorMessage(__($this->paymentservicerequest
                             ->getCreditCardSpecificException('CCAM9')));
             if ($this->checkoutSession->getInstantPurchaseOrder()) {
                 $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
