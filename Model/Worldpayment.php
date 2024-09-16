@@ -80,21 +80,30 @@ class Worldpayment extends \Magento\Framework\Model\AbstractModel
     }
 
     /**
-     * Load skip order
+     * Load pending order
      *
-     * @param string $subscriptionId
-     * @param string $timeFilterby
+     * @param string $filterByCreatedAt
      *
      * @return \Sapient\Worldpay\Model\Worldpayment
      */
-    public function getsentforAuthOrderCollection()
+    public function getsentforAuthOrderCollection($filterByCreatedAt)
     {
-            $this->sentforAuthOrderCollection = $this->sentforAuthOrderCollection->create();
-            $this->sentforAuthOrderCollection
-                ->addFieldToFilter('payment_status', ['eq'=> 'SENT_FOR_AUTHORISATION'])
-                //->addFieldToFilter('payment_model', ['eq'=> 'redirect'])
-                ->addOrder('id', \Magento\Framework\Data\Collection::SORT_ORDER_DESC);
-   
+        $thresholdOption = new \DateTime();
+        $thresholdOption->modify('-'.$filterByCreatedAt.' hour');
+        $createdAt = $thresholdOption->format('Y-m-d H:i:s');
+        $this->sentforAuthOrderCollection = $this->sentforAuthOrderCollection->create();
+        //Add join with the order table
+        $this->sentforAuthOrderCollection
+            ->getSelect()
+            ->joinLeft(
+                ['so' => $this->sentforAuthOrderCollection->getTable('sales_order')],
+                'main_table.order_id = so.increment_id',
+                ['created_at']
+            )
+            ->where('so.created_at < ?', $createdAt)
+            ->where('payment_status = ?', 'SENT_FOR_AUTHORISATION')
+            ->order('id DESC');
+
         return $this->sentforAuthOrderCollection;
-    }
+    } 
 }

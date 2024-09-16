@@ -500,7 +500,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             //'YANDEXMONEY-SSL' => 'Yandex.Money',
             'PAYPAL-EXPRESS' => 'PayPal',
             'SOFORT-SSL' => 'SoFort EU',
-            'GIROPAY-SSL' => 'GiroPay',
             //'BOLETO-SSL' => 'Boleto Bancairo',
             'ALIPAY-SSL' => 'AliPay',
             'SEPA_DIRECT_DEBIT-SSL' => 'SEPA (One off transactions)',

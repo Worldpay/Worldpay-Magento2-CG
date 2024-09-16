@@ -447,7 +447,9 @@ class UpdateWorldpayment
             $tokenId = $tokenDataExist['id'];
             $this->saveTokenDataToTransactions($tokenId, $orderCode);
             if (!$this->customerSession->getIavCall()) {
-                $this->_messageManager->addNotice(__($this->worldpayHelper->getCreditCardSpecificexception('CCAM22')));
+                $this->_messageManager->addNoticeMessage(
+                    __($this->worldpayHelper->getCreditCardSpecificexception('CCAM22'))
+                );
             }
             return;
         }

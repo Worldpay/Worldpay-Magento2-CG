@@ -46,8 +46,8 @@ define(
             if (value) {
                 return evaluateRegex(value, "^[0-9]{12,20}$");
             }
-	    }, $.mage.__(getCreditCardExceptions('CCAM1')));
-	    $.validator.addMethod('worldpay-validate-cpf-number', function (value) {
+        }, $.mage.__(getCreditCardExceptions('CCAM1')));
+        $.validator.addMethod('worldpay-validate-cpf-number', function (value) {
                 if (value) {
                     return (evaluateRegex(value, "^[0-9]{11,11}$") || evaluateRegex(value, "^[0-9]{14,14}$"));
                 }
@@ -77,11 +77,14 @@ define(
                 if (cc_type_selected !== 'savedcard') {
                     if (cc_type_selected === 'VISA-SSL' && typeclasslist.contains('is_visa')) {
                         return true;
-                    } else if (cc_type_selected === 'ECMC-SSL' && typeclasslist.contains('is_mastercard')
-                            || (cc_type_selected === 'CB-SSL' && typeclasslist.contains('is_mastercard'))
-                            || (cc_type_selected === 'CARTEBLEUE-SSL' && typeclasslist.contains('is_mastercard'))) {
+                    }else if((cc_type_selected === 'CB-SSL' && typeclasslist.contains('is_mastercard')) || 
+                        (cc_type_selected === 'CB-SSL' && typeclasslist.contains('is_visa')) ){
+                            return true;
+                    }else if(cc_type_selected === 'CARTEBLEUE-SSL' && typeclasslist.contains('is_mastercard') ){
                         return true;
-                    } else if (cc_type_selected === 'AMEX-SSL' && typeclasslist.contains('is_amex')) {
+                    }else if (cc_type_selected === 'ECMC-SSL' && typeclasslist.contains('is_mastercard')) {
+                        return true;
+                    }else if (cc_type_selected === 'AMEX-SSL' && typeclasslist.contains('is_amex')) {
                         return true;
                     } else if (cc_type_selected === 'DISCOVER-SSL' && typeclasslist.contains('is_discover')) {
                         return true;
@@ -269,13 +272,13 @@ define(
                 var CreditCardPreSelected = jQuery('.paymentmethods-radio-wrapper [name="payment[cc_type]"]:checked');
                 /* Multishipping Code */
                 if(this.multishipping){
-					var MultishippingCreditCardPreSelected = jQuery('#p_method_worldpay_cc:checked');
-					if(MultishippingCreditCardPreSelected.length){
+                    var MultishippingCreditCardPreSelected = jQuery('#p_method_worldpay_cc:checked');
+                    if(MultishippingCreditCardPreSelected.length){
                         jQuery('#payment-continue').html("<span>Place Order</span>");
                         document.getElementById("checkout-agreement-div").style.display = "block";
-						this.selectPaymentMethod();
-					}
-				}
+                        this.selectPaymentMethod();
+                    }
+                }
                 var APMPreSelected = jQuery('.paymentmethods-radio-wrapper [name="apm_type"]:checked');
                 var WalletPreSelected = jQuery('.paymentmethods-radio-wrapper [name="wallets_type"]:checked');
                 if(!statusCheck){
@@ -527,12 +530,12 @@ define(
                         iframeParams.customisation = {
                             "page": {
                                 "BackgroundColor":"#FFF",
-								"border":{
-    								"style": "solid",
-									"color":"#e4e3de",
-									"width": "6px",
-									"border-radius": "10px"
-								}
+                                "border":{
+                                    "style": "solid",
+                                    "color":"#e4e3de",
+                                    "width": "6px",
+                                    "border-radius": "10px"
+                                }
                               }
                         };                                         
                         iframeParams.resultCallback = function(responseData){
@@ -819,13 +822,13 @@ define(
             getTemplate: function(){
                 if (this.intigrationmode == 'direct') {
                     if(this.multishipping){
-						return this.multishippingDirectTemplate;
-					}
+                        return this.multishippingDirectTemplate;
+                    }
                     return this.direcTemplate;
                 } else{
                     if(this.multishipping){
-						return this.multishippingRedirectTemplate;
-					}
+                        return this.multishippingRedirectTemplate;
+                    }
                     return this.redirectTemplate;
                 }
             },
@@ -1165,15 +1168,15 @@ define(
                                 }, { once: true });
                             } else {
                                 if(window.checkoutConfig.payment.ccform.isMultishipping){  
-									placeMultishippingOrder(self.getData());
-								}
-								else{
-									fullScreenLoader.stopLoader();
-									self.placeOrder();
-								}
+                                    placeMultishippingOrder(self.getData());
+                                }
+                                else{
+                                    fullScreenLoader.stopLoader();
+                                    self.placeOrder();
+                                }
                             }
                         }
-                      }
+                    }
                  }else if($form.validation() && $form.validation('isValid')){                    
                     // Subscription check
                     if(this.isSubscribed()){
@@ -1276,7 +1279,7 @@ define(
                                         }
                                         else{
                                             fullScreenLoader.stopLoader();
-											self.placeOrder();
+                                            self.placeOrder();
                                         }
                                     }                                    
                                 });

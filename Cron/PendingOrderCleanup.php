@@ -111,19 +111,15 @@ class PendingOrderCleanup
         if (!$orderCleanupenable) {
             return;
         }
-
         $timeDuration = $this->worldpayhelper->getOrderCleanupOption();
-
         $this->_logger->info('Pending order clean up cron started');
-        $pendingOrderCollection = $this->getPendingOrders();
+        $pendingOrderCollection = $this->getPendingOrders($timeDuration);
         foreach ($pendingOrderCollection as $order) {
-            $this->_logger->info('worldpay order: '.$order->getOrderId());
-
             if (!empty($order->getOrderId())) {
                 $this->_getPaymentDetailsXmlForOrder(
                     $this->orderservice->getByIncrementId($order->getOrderId())
                 );
-                 $this->applyCancel($order->getOrderId());
+               $this->applyCancel($order->getOrderId());
             }
         }
         $this->_logger->info('Pending order clean up cron finished');
@@ -132,12 +128,13 @@ class PendingOrderCleanup
    /**
     * Filter the collection to fetch pending orders
     *
-    * @param string $createdAt
-    * @return orderCollection
+    * @param string $timeDuration
+    * @return Collection
     */
-    public function getPendingOrders()
+    public function getPendingOrders($timeDuration)
     {
-        $collection = $this->worldpaypayment->create()->getsentforAuthOrderCollection();
+        $collection = $this->worldpaypayment->create()
+            ->getsentforAuthOrderCollection($timeDuration);
         return $collection;
     }
     
@@ -166,9 +163,10 @@ class PendingOrderCleanup
         );
         $paymentService = new \SimpleXmlElement($response);
         $error = $paymentService->xpath('//error');
-
-        if ($error[0]['code'] == 5) {
-            $this->applyCancel($worldPayPayment->getWorldpayOrderId());
+        if(!empty($error)){
+            if ($error[0]['code'] == 5) {
+                $this->applyCancel($worldPayPayment->getWorldpayOrderId());
+            }
         }
     }
 

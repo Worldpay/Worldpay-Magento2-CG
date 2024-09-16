@@ -690,7 +690,6 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $itemData['cartItem'] = ['sku' => $orderData['product_sku'],
             'qty' => $orderData['qty'], 'quote_id' => $quoteId];
         $itemResponse = $this->addItemsToQuote($tokenKey, json_encode($itemData), $quoteId);
-        
         $cartId = $quoteId;
         $itemId = $itemResponse['item_id'];
         $price = $orderData['item_price'];
@@ -727,7 +726,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     public function createEmptyQuote($tokenKey)
     {
         $token = 'Bearer '.$tokenKey;
-        $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine');
+        $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine', ['_secure' => true]);
         return $this->curlHelper->sendCurlRequest(
             $apiUrl,
             [
@@ -763,7 +762,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $token = 'Bearer '.$tokenKey;
         $apiUrl = '';
-        $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
+        $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/', ['_secure' => true]);
         $response = $this->curlHelper->sendCurlRequest(
             $apiUrl,
             [
@@ -808,6 +807,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             $quoteItem->getProduct()->setIsSuperMode(true);
             $quoteItem->save();
             $quote->save();
+
         }
         return true;
     }
@@ -823,7 +823,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     public function getShippingMethods($tokenKey, $addressData)
     {
         $token = 'Bearer '.$tokenKey;
-        $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
+        $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/', ['_secure' => true]);
         $response = $this->curlHelper->sendCurlRequest(
             $apiUrl,
             [
@@ -858,7 +858,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     public function setShippingInformation($tokenKey, $shippingInformation)
     {
         $token = 'Bearer '.$tokenKey;
-        $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
+        $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/', ['_secure' => true]);
         $response = $this->curlHelper->sendCurlRequest(
             $apiUrl,
             [
@@ -893,7 +893,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     public function orderPayment($tokenKey, $paymentData)
     {
         $token = 'Bearer '.$tokenKey;
-        $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/');
+        $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/', ['_secure' => true]);
         $response = $this->curlHelper->sendCurlRequest(
             $apiUrl,
             [

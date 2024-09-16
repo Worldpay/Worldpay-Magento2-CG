@@ -129,13 +129,6 @@
                 </areas>
                 <capture_request>1</capture_request>
             </SOFORT-SSL>
-            <GIROPAY-SSL>
-                <title>GiroPay</title>
-                <areas>
-                    <area>DE</area>
-                </areas>
-                <capture_request>1</capture_request>
-            </GIROPAY-SSL>
 <!--            <BOLETO-SSL>
                 <title>Boleto Bancairo</title>
                 <areas>
@@ -760,13 +753,6 @@
                 </areas>
                 <capture_request>1</capture_request>
             </SOFORT-SSL>
-            <GIROPAY-SSL>
-                <title>GiroPay</title>
-                <areas>
-                    <area>DE</area>
-                </areas>
-                <capture_request>1</capture_request>
-            </GIROPAY-SSL>
 <ALIPAY-SSL>
                 <title>AliPay</title>
                 <areas>

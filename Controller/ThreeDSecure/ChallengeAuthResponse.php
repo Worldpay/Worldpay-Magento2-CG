@@ -118,10 +118,10 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
             $this->wplogger->error('3DS2 Failed');
             if ($e->getMessage()=== 'Unique constraint violation found') {
                 $this->messageManager
-                        ->addError(__($this->paymentservicerequest
+                        ->addErrorMessage(__($this->paymentservicerequest
                                 ->getCreditCardSpecificException('CCAM22')));
             } else {
-                $this->messageManager->addError(__($this->helper->getConfigValue('CCAM9')));
+                $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('CCAM9')));
             }
             if ($this->checkoutSession->getInstantPurchaseOrder()) {
                 $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
