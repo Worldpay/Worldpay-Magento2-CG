@@ -63,8 +63,10 @@ class UpgradeDefaultConfigurations implements DataPatchInterface
             'worldpay_exceptions/ccexceptions/cc_exception',
             ScopeConfigInterface::SCOPE_TYPE_DEFAULT
         );
-        $updatedValue = $this->modifyConfigValue($existingValue);
-        $this->configWriter->save('worldpay_exceptions/ccexceptions/cc_exception', $updatedValue);
+	if(!empty($existingValue)){
+        	$updatedValue = $this->modifyConfigValue($existingValue);
+	        $this->configWriter->save('worldpay_exceptions/ccexceptions/cc_exception', $updatedValue);
+	}
     }
     
     /**

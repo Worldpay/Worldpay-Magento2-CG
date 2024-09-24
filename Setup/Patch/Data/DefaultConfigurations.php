@@ -221,7 +221,7 @@ class DefaultConfigurations implements DataPatchInterface
     public static function getDependencies()
     {
         return [
-            Sapient\Worldpay\Setup\Patch\Data\UpgradeDefaultConfigurations::class
+            \Sapient\Worldpay\Setup\Patch\Data\UpgradeDefaultConfigurations::class
         ];
     }
     /**
