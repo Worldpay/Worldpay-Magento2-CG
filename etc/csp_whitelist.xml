@@ -52,7 +52,7 @@
         </policy>
         <policy id="connect-src">
             <values>
-                <value id="google-pay" type="host">https://google.com/pay</value>
+                <value id="google-pay" type="host">google.com/pay</value>
             </values>
         </policy>
         <policy id="font-src">
