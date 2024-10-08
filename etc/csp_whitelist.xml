@@ -42,10 +42,12 @@
                 <value id="wpg-iframe-live" type="host">https://payments-live.hpp.apps.eu-west-1-7z55k.dev.msp.worldpay.io/app/hpp-iframe/integration/wpg/corporate</value>
             	<value id="google-pay" type="host">https://pay.google.com</value>
                 <value id="worldpay-pay" type="host">https://secure-test.worldpay.com</value>
+                <value id="hpp-worldpay" type="host">https://hpp.worldpay.com/</value>
             </values>
         </policy>
         <policy id="form-action">
             <values>
+                <value id="hpp-worldpay" type="host">https://hpp.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
                 <value id="secure-test.worldpay.com" type="host">https://secure-test.worldpay.com/shopper/3ds/ddc.html</value>
                 <value id="secure.worldpay.com" type="host">https://secure.worldpay.com/shopper/3ds/ddc.html</value>
                 <value id="wpg-iframe-test" type="host">https://payments-test.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
