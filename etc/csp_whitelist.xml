@@ -60,6 +60,7 @@
                 <value id="google-pay-web-manifest" type="host">https://pay.google.com/gp/p/web_manifest.json</value>
                 <value id="google-pay-payment-manifest" type="host">https://pay.google.com/gp/p/payment_method_manifest.json</value>
                 <value id="pay-google" type="host">https://pay.google.com/</value>
+                <value id="google-pay-2" type="host">https://google.com/pay</value>
             </values>
         </policy>
         <policy id="font-src">
