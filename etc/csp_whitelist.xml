@@ -38,7 +38,8 @@
         <policy id="frame-src">
             <values>
                 <value id="wpg-iframe-test" type="host">https://payments-test.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
-                <value id="wpg-iframe" type="host">https://payments-live.hpp.apps.eu-west-1-7z55k.dev.msp.worldpay.io/app/hpp-iframe/integration/wpg/corporate</value>
+                <value id="wpg-iframe" type="host">https://payments.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
+                <value id="wpg-iframe-live" type="host">https://payments-live.hpp.apps.eu-west-1-7z55k.dev.msp.worldpay.io/app/hpp-iframe/integration/wpg/corporate</value>
             	<value id="google-pay" type="host">https://pay.google.com</value>
                 <value id="worldpay-pay" type="host">https://secure-test.worldpay.com</value>
             </values>
@@ -46,6 +47,7 @@
         <policy id="form-action">
             <values>
                 <value id="secure-test.worldpay.com" type="host">https://secure-test.worldpay.com/shopper/3ds/ddc.html</value>
+                <value id="secure.worldpay.com" type="host">https://secure.worldpay.com/shopper/3ds/ddc.html</value>
                 <value id="wpg-iframe-test" type="host">https://payments-test.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
                 <value id="wpg-iframe" type="host">https://payments-live.hpp.apps.eu-west-1-7z55k.dev.msp.worldpay.io/app/hpp-iframe/integration/wpg/corporate</value>
             </values>
@@ -55,12 +57,17 @@
                 <value id="google-pay" type="host">https://www.google.com/pay</value>
                 <value id="google-pay-web-manifest" type="host">https://pay.google.com/gp/p/web_manifest.json</value>
                 <value id="google-pay-payment-manifest" type="host">https://pay.google.com/gp/p/payment_method_manifest.json</value>
-                <value id="pay-google" type="host">https://pay.google.com/*</value>
+                <value id="pay-google" type="host">https://pay.google.com/</value>
             </values>
         </policy>
         <policy id="font-src">
             <values>
                 <value id="fonts_gstatic" type="host">fonts.gstatic.com</value>
+            </values>
+        </policy>
+        <policy id="frame-ancestors">
+            <values>
+                <value id="pay-google" type="host">https://pay.google.com/</value>
             </values>
         </policy>
     </policies>
