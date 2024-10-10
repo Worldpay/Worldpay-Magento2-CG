@@ -45,5 +45,10 @@
                 <value id="secure-test.worldpay.com" type="host">https://secure-test.worldpay.com/shopper/3ds/ddc.html</value>
             </values>
         </policy>
+	 <policy id="connect-src">
+            <values>
+                <value id="worldpay-connect" type="host">*.worldpay.com</value>
+            </values>
+        </policy>
     </policies>
 </csp_whitelist>
