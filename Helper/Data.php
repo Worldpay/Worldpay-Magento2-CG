@@ -1863,7 +1863,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (strtoupper($integrationmode) === 'DIRECT' &&
                 array_key_exists("ACH_DIRECT_DEBIT-SSL", $apmmethods)) {
             $data = $this->getACHBankAccountTypes();
-            return explode(",", $data);
+            if(!empty($data)) {
+                return explode(",", $data);
+            }
         }
         return [];
     }
