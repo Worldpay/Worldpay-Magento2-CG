@@ -3,6 +3,7 @@ For Magento 2.4.7
 Worldpay Plugin version: 2.4.7-p21024
 1. Magento 2.4.7-p2 compatible
 2. PHP 8.3 & 8.2 compatibility
+3. Remove dependency on CryptoJs
 
 Worldpay Plugin version: 2.4.7-p10924
 1. Magento 2.4.7-p1 compatible
