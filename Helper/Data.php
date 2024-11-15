@@ -44,7 +44,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var SessionManagerInterface
      */
     protected $session;
-    
+
     /**
      * @var worldpaypaymentmodel
      */
@@ -1724,7 +1724,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $responseMessage;
     }
-    
+
     /**
      * Get Order Details By Email Id
      *
@@ -1739,7 +1739,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         )->getFirstItem()->getData();
         return $itemData;
     }
-    
+
     /**
      * Get Orders CountBy Email Id
      *
@@ -1752,13 +1752,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $lastYearInterval = new  \DateTime('-12 months');
         $lastSixMonthsInterval = new  \DateTime('-6 months');
         $ordersCount = [];
-        
+
         $ordersCount['last_day_count'] = $this->getOrderIdsCount($customerEmailId, $lastDayInterval);
         $ordersCount['last_year_count'] = $this->getOrderIdsCount($customerEmailId, $lastYearInterval);
         $ordersCount['last_six_months_count'] = $this->getOrderIdsCount($customerEmailId, $lastSixMonthsInterval);
         return $ordersCount;
     }
-    
+
     /**
      * Get the list of orders of customer by email
      *
@@ -1778,7 +1778,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return count($orders);
     }
-    
+
     /**
      * Returns cards count that are saved within 24 hrs
      *
@@ -1797,7 +1797,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                        ;
         return count($savedCards->getData());
     }
-    
+
     /**
      * Get GlobalCurrencyExponent
      *
@@ -1848,7 +1848,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamicExponentEnabled() && $specificexponent!=null) {
             return $specificexponent ;
         }
-        
+
         return $globalexponent;
     }
     /**
@@ -1863,7 +1863,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (strtoupper($integrationmode) === 'DIRECT' &&
                 array_key_exists("ACH_DIRECT_DEBIT-SSL", $apmmethods)) {
             $data = $this->getACHBankAccountTypes();
-            return explode(",", $data);
+            if(!empty($data)) {
+                return explode(",", $data);
+            }
         }
         return [];
     }
@@ -1907,7 +1909,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 'worldpay/prime_routing/enable_advanced_prime_routing',
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
-           
+
         }
     }
     /**
@@ -2243,7 +2245,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
          return false;
     }
-   
+
     /**
      * Get Moto Merchant Code
      *
@@ -2759,16 +2761,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Create Second JWT token
      *
-     * @param String $redirectUrl
-     * @param Array $payload
+     * @param string $redirectUrl
+     * @param array $payload
      */
-    public function createSecondJWTtoken($redirectUrl, array $payload)
+    public function createSecondJWTtoken(string $redirectUrl, array $payload): string
     {
         $jwtApiKey = $this->isJwtApiKey();
         $jwtIssuer = $this->isJwtIssuer();
         $orgUnitId = $this->isOrganisationalUnitId();
         $iat = $this->getCurrentDate();
-        $jwtTokenId    = base64_encode(random_bytes(16));
+        $jwtTokenId = base64_encode(random_bytes(16));
         $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
         $payload = json_encode([
             'jti' => $jwtTokenId,
@@ -2788,8 +2790,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
         $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $jwtApiKey, true);
         $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
-        $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
-        return $jwt;
+
+        return $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
     }
 
     /**
@@ -2866,7 +2868,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $details['additional_details']['php_version'] = $this->getPhpVersionUsed();
-        
+
         return $details;
     }
 
@@ -2893,7 +2895,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'integration_version'=>$integrationVersion,
             'historic_integration_versions'=>$historicVersions
             ];
-        
+
         return $details;
     }
 
@@ -2959,7 +2961,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $multishippingEnabled;
     }
-    
+
     /**
      * Get Multishipping Enabled
      *
@@ -2972,7 +2974,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      *  Check if Quote is Multishipping
      *
@@ -3204,7 +3206,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
         }
-        
+
         return $multishippingMC;
     }
 
@@ -3296,7 +3298,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get Multishipping google Payment Methods
      *
@@ -3309,7 +3311,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get MultiShipping google Auth Methods
      *
@@ -3322,7 +3324,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get google Gateway Merchantname
      *
@@ -3335,7 +3337,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get google Gateway Merchantid
      *
@@ -3348,7 +3350,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-  
+
     /**
      * Get MultiShipping google Merchantid
      *
@@ -3361,7 +3363,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
- 
+
     /**
      * Get MultiShipping google Merchant name
      *
@@ -3402,7 +3404,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
         return $pblIId;
     }
-    
+
     /**
      * Calculate Pay By Link Resend expiry time
      *
@@ -3413,7 +3415,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $expiryTime * 2;
     }
-    
+
     /**
      * Find Pay By Link Interval time between order date and current date
      *
@@ -3425,7 +3427,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return round(abs(strtotime($currentDate) - strtotime($orderDate))/3600, 0);
     }
-    
+
     /**
      * Find Pay By Link expiry date and time
      *
@@ -3437,7 +3439,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return strtotime(date("Y-m-d H:i:s", strtotime($currentDate)) . " -$expiryTime hour");
     }
-    
+
     /**
      * Find Pay By Link expiry date and time
      *
@@ -3452,7 +3454,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $cronMaxDate = date('Y-m-d H:i:s', $maxDate);
         $dates['from'] = $cronMinDate;
         $dates['to'] = $cronMaxDate;
-        
+
         return $dates;
     }
     /**
@@ -3567,7 +3569,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $storeId
         );
     }
-    
+
     /**
      * Get Default country code of Magento store
      *

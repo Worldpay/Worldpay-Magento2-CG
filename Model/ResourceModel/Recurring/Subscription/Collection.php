@@ -111,7 +111,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
         }
 
         $this->getSelect()->joinLeft(
-            ['plans' => 'worldpay_recurring_plans'],
+            ['plans' => $this->_resource->getTable('worldpay_recurring_plans')],
             'plans.plan_id = main_table.plan_id',
             $cols
         )->columns(
