@@ -6,43 +6,72 @@
  */
 -->
 <csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp/etc/csp_whitelist.xsd">
-	<policies>
-		<policy id="script-src">
-	        <values>
+    <policies>
+        <policy id="script-src">
+            <values>
                 <value id="payment-shim" type="hash" algorithm="sha256">sha256-U2Pr6nr/58DuOrqmOIptLSxY0eHWqp8OVjb169SPqqU=</value>
-	            <value id="google-recaptcha" type="host">https://www.google.com/recaptcha/api.js</value>
+                <value id="google-recaptcha" type="host">https://www.google.com/recaptcha/api.js</value>
                 <value id="gstatic" type="host">*.gstatic.com</value>
                 <value id="cloudflare" type="host">*.cloudflare.com</value>
                 <value id="google-pay" type="host">https://pay.google.com/gp/p/js/pay.js</value>
                 <value id="apple-pay" type="host">https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js</value>
                 <value id="google-analytics" type="host">www.google-analytics.com</value>
-                <value id="wpay-cse" type="host">*.payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.2.min.js</value>
+                <value id="wpay-cse" type="host">https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.2.min.js</value>
+                <value id="wpay-hpp" type="host">https://payments.worldpay.com/resources/hpp/integrations/embedded/js/hpp-embedded-integration-library.js</value>
                 <value id="stg-ops" type="host">https://d35p4vvdul393k.cloudfront.net/sdk_library/us/stg/ops/pc_gsmpi_web_sdk.js</value>
                 <value id="prd-ops" type="host">https://d16i99j5zwwv51.cloudfront.net/sdk_library/us/prd/ops/pc_gsmpi_web_sdk.js</value>
-                <value id="hpp" type="host">https://payments.worldpay.com/resources/hpp/integrations/embedded/js/hpp-embedded-integration-library.js</value>
-	        </values>
-    	</policy>
-    	<policy id="style-src">
-    		<values>
-                <value id="cloudflare" type="host">*.cloudflare.com</value>
             </values>
-    	</policy>
-    	<policy id="img-src">
+        </policy>
+        <policy id="style-src">
             <values>
-            	<value id="cloudflare" type="host">*.cloudflare.com</value>
-            	<value id="gstatic" type="host">*.gstatic.com</value>
-            	<value id="google-analytics" type="host">www.google-analytics.com</value>
+                <value id="cloudflare" type="host">*.cloudflare.com</value>
+                <value id="google-fonts" type="host">https://fonts.googleapis.com/css</value>
+            </values>
+        </policy>
+        <policy id="img-src">
+            <values>
+                <value id="cloudflare" type="host">*.cloudflare.com</value>
+                <value id="gstatic" type="host">*.gstatic.com</value>
+                <value id="google-analytics" type="host">www.google-analytics.com</value>
             </values>
         </policy>
         <policy id="frame-src">
             <values>
-            	<value id="google-pay" type="host">https://pay.google.com</value>
+                <value id="wpg-iframe-test" type="host">https://payments-test.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
+                <value id="wpg-iframe" type="host">https://payments.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
+                <value id="wpg-iframe-live" type="host">https://payments-live.hpp.apps.eu-west-1-7z55k.dev.msp.worldpay.io/app/hpp-iframe/integration/wpg/corporate</value>
+                <value id="google-pay" type="host">https://pay.google.com</value>
                 <value id="worldpay-pay" type="host">https://secure-test.worldpay.com</value>
+                <value id="hpp-worldpay" type="host">https://hpp.worldpay.com/</value>
             </values>
         </policy>
         <policy id="form-action">
             <values>
+                <value id="hpp-worldpay" type="host">https://hpp.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
                 <value id="secure-test.worldpay.com" type="host">https://secure-test.worldpay.com/shopper/3ds/ddc.html</value>
+                <value id="secure.worldpay.com" type="host">https://secure.worldpay.com/shopper/3ds/ddc.html</value>
+                <value id="wpg-iframe-test" type="host">https://payments-test.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
+                <value id="wpg-iframe" type="host">https://payments-live.hpp.apps.eu-west-1-7z55k.dev.msp.worldpay.io/app/hpp-iframe/integration/wpg/corporate</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="google-pay" type="host">https://www.google.com/pay</value>
+                <value id="google-pay-web-manifest" type="host">https://pay.google.com/gp/p/web_manifest.json</value>
+                <value id="google-pay-payment-manifest" type="host">https://pay.google.com/gp/p/payment_method_manifest.json</value>
+                <value id="pay-google" type="host">https://pay.google.com/</value>
+                <value id="google-pay-2" type="host">https://google.com/pay</value>
+                <value id="worldpay-connect" type="host">*.worldpay.com</value>
+            </values>
+        </policy>
+        <policy id="font-src">
+            <values>
+                <value id="fonts_gstatic" type="host">fonts.gstatic.com</value>
+            </values>
+        </policy>
+        <policy id="frame-ancestors">
+            <values>
+                <value id="pay-google" type="host">https://pay.google.com/</value>
             </values>
         </policy>
     </policies>
