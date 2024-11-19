@@ -18,7 +18,8 @@
     Diners
     JCB
   
-    PayPal
+    PayPal Express
+    PayPal SSL
     Klarna
     Sofort
     Giropay
