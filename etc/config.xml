@@ -112,7 +112,7 @@
             <wp_error_alerts>
                 <enable_error_alerts>0</enable_error_alerts>
                 <send_email_to_worldpay>0</send_email_to_worldpay>
-                <wp_team_email>adobe@fisglobal.com</wp_team_email>
+                <wp_team_email>adobe-technical@worldpay.com</wp_team_email>
             </wp_error_alerts>
             <paybylink_config>
                 <paybylink_button_name>Pay By Link</paybylink_button_name>
