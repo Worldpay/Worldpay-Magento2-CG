@@ -67,7 +67,7 @@ class Request
         $request = $this->_getRequest();
         $logger = $this->_wplogger;
         $url = $this->_getUrl();
-        
+
         $pluginTrackerDetails = $this->collectHeaderPluginTrackerdetails($quote);
         $_xml  = clone($quote);
         $paymentDetails = $_xml->getElementsByTagName('paymentDetails');
@@ -99,7 +99,8 @@ class Request
                 'Expect'=>'',
                 'ecommerce_platform' => $pluginTrackerDetails['ecommerce_platform'],
                 'ecommerce_platform_version' => $pluginTrackerDetails['ecommerce_platform_version'],
-                'ecommerce_plugin_data'=>json_encode($pluginTrackerDetails['ecommerce_plugin_data'])
+                'ecommerce_plugin_data' => json_encode($pluginTrackerDetails['ecommerce_plugin_data']),
+                'merchant_id' => $pluginTrackerDetails['merchant_id'],
             ];
         } else {
             $headersArray = [
@@ -139,7 +140,7 @@ class Request
         $logger->info('Request successfully sent');
         $logger->info($result);
         // extract headers
-       
+
         // extract headers
         $bits = explode("\r\n\r\n", $result);
         $body = array_pop($bits);
@@ -238,7 +239,8 @@ class Request
                 $paymentMethod = $result->additional_details->transaction_method;
             }
         }
-        $pluginTrackerDetails = $this->helper->getPluginTrackerHeaderdetails();
+
+        $pluginTrackerDetails = $this->helper->getPluginTrackerHeaderDetails($paymentMethod);
         $pluginTrackerDetails['ecommerce_plugin_data']['additional_details'] =
         ['payment_method'=>$paymentMethod];
 

@@ -23,12 +23,12 @@ class Merchantprofile
      * @var \Magento\Framework\Math\Random
      */
     protected $mathRandom;
-    
+
     /**
      * @var SerializerInterface
      */
     private $serializer;
-    
+
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Math\Random $mathRandom
@@ -201,7 +201,6 @@ class Merchantprofile
      *
      * @param int $paymenttype
      * @param null|string|bool|int|Store $store
-     * @return float|null
      */
     public function getConfigValue($paymenttype, $store = null)
     {

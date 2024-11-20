@@ -266,8 +266,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getMerchantCode($paymentType, $storeId = null)
     {
         if ($paymentType) {
-            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_code']: '';
+            $merchantDetails = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue = $merchantDetails ? $merchantDetails['merchant_code'] : '';
             if (!empty($merchantCodeValue)) {
                 return $merchantCodeValue;
             }
@@ -498,8 +498,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'CHINAUNIONPAY-SSL' => 'Union Pay',
             'IDEAL-SSL' => 'IDEAL',
             //'YANDEXMONEY-SSL' => 'Yandex.Money',
-            'PAYPAL-EXPRESS' => 'PayPal Express',
-            'PAYPAL-SSL' => 'PayPal SSL',
+            'PAYPAL-EXPRESS' => 'PayPal',
             'SOFORT-SSL' => 'SoFort EU',
             //'BOLETO-SSL' => 'Boleto Bancairo',
             'ALIPAY-SSL' => 'AliPay',
@@ -521,6 +520,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 }
             }
         }
+
+        $paypalSSL = explode(',', $this->_scopeConfig->getValue(
+            'worldpay/paypal_config/enable_paypal_ssl',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        ));
+
+        if($paypalSSL[0] == '1') {
+            if(isset($activeMethods['PAYPAL-EXPRESS'])) {
+                $activeMethods['PAYPAL-SSL'] = "Paypal SSL";
+                unset($activeMethods['PAYPAL-EXPRESS']);
+            }
+        }
+
         return $activeMethods;
     }
    /**
@@ -2852,13 +2864,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    public function getPluginTrackerdetails()
+    public function getPluginTrackerDetails($paymentType)
     {
         $details=[];
         $mageDetails = $this->getCurrentMagentoVersionDetails();
         $details['ecommerce_platform'] = $mageDetails['platform'];
         $details['ecommerce_platform_edition'] =  $mageDetails['edition'];
         $details['ecommerce_platform_version'] = $mageDetails['version'];
+        $details['merchant_id'] = $this->getMerchantCode($paymentType);
 
         if (($this->getCurrentWopayPluginVersion()!=null) && !empty($this->getCurrentWopayPluginVersion())) {
             $details['integration_version'] = $this->getCurrentWopayPluginVersion();
@@ -2878,24 +2891,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    public function getPluginTrackerHeaderdetails()
+    public function getPluginTrackerHeaderDetails($paymentMethod)
     {
-        $details=[];
-        $integrationVersion = $historicVersions= '';
+        $details = [];
+        $integrationVersion = $historicVersions = '';
         $mageDetails = $this->getCurrentMagentoVersionDetails();
         $details['ecommerce_platform'] = $mageDetails['platform'];
         $details['ecommerce_platform_version'] = $mageDetails['version'];
-        if (($this->getCurrentWopayPluginVersion()!=null) && !empty($this->getCurrentWopayPluginVersion())) {
+        $details['merchant_id'] = $this->getMerchantCode($paymentMethod);
+
+        if (($this->getCurrentWopayPluginVersion() != null) && !empty($this->getCurrentWopayPluginVersion())) {
             $integrationVersion = $this->getCurrentWopayPluginVersion();
         }
-        if (($this->getUpgradeDates()!=null) && !empty($this->getUpgradeDates())) {
+        if (($this->getUpgradeDates() != null) && !empty($this->getUpgradeDates())) {
             $historicVersions = $this->getUpgradeDates();
         }
-        $details['ecommerce_plugin_data'] =
-            ['ecommerce_platform_edition'=>$mageDetails['edition'],
-            'integration_version'=>$integrationVersion,
-            'historic_integration_versions'=>$historicVersions
-            ];
+        $details['ecommerce_plugin_data'] = [
+            'ecommerce_platform_edition' => $mageDetails['edition'],
+            'integration_version' => $integrationVersion,
+            'historic_integration_versions' => $historicVersions
+        ];
 
         return $details;
     }

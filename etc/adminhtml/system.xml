@@ -517,6 +517,19 @@
                     <comment>According to the Worldpay guide, we recommend enabling this configuration. This feature enables statement narratives for all supported APMs. This text is included in the authorization request as part of the payload.</comment>
                 </field>
             </group>
+            <!--Paypal-->
+            <group id="paypal_config" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Paypal</label>
+                <field id="enable_paypal_ssl" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable new Paypal API</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Insert warning text here !!!</comment>
+                </field>
+                <field id="enable_smart_button" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Paypal SmartButton in HPP</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
             <!-- KLARNA -->
             <group id="klarna_config" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>KLARNA</label>
