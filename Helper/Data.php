@@ -2872,7 +2872,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $details['ecommerce_platform'] = $mageDetails['platform'];
         $details['ecommerce_platform_edition'] =  $mageDetails['edition'];
         $details['ecommerce_platform_version'] = $mageDetails['version'];
-        $details['merchant_id'] = $this->getMerchantCode($paymentType);
 
         if (($this->getCurrentWopayPluginVersion()!=null) && !empty($this->getCurrentWopayPluginVersion())) {
             $details['integration_version'] = $this->getCurrentWopayPluginVersion();
