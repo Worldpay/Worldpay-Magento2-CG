@@ -2909,7 +2909,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $details['ecommerce_plugin_data'] = [
             'ecommerce_platform_edition' => $mageDetails['edition'],
             'integration_version' => $integrationVersion,
-            'historic_integration_versions' => $historicVersions
+            'historic_integration_versions' => $historicVersions,
+            'additional_details' => [
+                'payment_method' => $paymentMethod,
+                'currency' => $this->_checkoutSession->getQuote()->getQuoteCurrencyCode(),
+                'amount' => $this->_checkoutSession->getQuote()->getGrandTotal(),
+            ]
         ];
 
         return $details;

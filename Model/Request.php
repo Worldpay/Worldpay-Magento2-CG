@@ -234,15 +234,13 @@ class Request
         if (isset($paymentDetails[0]->nodeValue)) {
             $orderContent = $_xml->getElementsByTagName('orderContent');
             if (isset($orderContent[0]->nodeValue)) {
-                $orderContentdata = $orderContent[0]->nodeValue;
-                $result = json_decode($orderContentdata);
+                $orderContentData = $orderContent[0]->nodeValue;
+                $result = json_decode($orderContentData);
                 $paymentMethod = $result->additional_details->transaction_method;
             }
         }
 
         $pluginTrackerDetails = $this->helper->getPluginTrackerHeaderDetails($paymentMethod);
-        $pluginTrackerDetails['ecommerce_plugin_data']['additional_details'] =
-        ['payment_method'=>$paymentMethod];
 
         return $pluginTrackerDetails;
     }
