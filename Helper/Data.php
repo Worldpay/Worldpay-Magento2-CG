@@ -2179,6 +2179,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             ScopeInterface::SCOPE_STORE
         );
     }
+
+    public function isPaypalSmartButtonEnabled()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/paypal_config/enable_smart_button',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
    /**
     * Get CardAcceptor Tax Id
     *

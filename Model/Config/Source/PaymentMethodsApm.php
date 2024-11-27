@@ -18,7 +18,6 @@ class PaymentMethodsApm extends \Magento\Framework\App\Config\Value
             ['value' => 'IDEAL-SSL', 'label' => __('IDEAL')],
             //['value' => 'YANDEXMONEY-SSL', 'label' => __('Yandex.Money')],
             ['value' => 'PAYPAL-EXPRESS', 'label' => __('PayPal Express')],
-            ['value' => 'PAYPAL-SSL', 'label' => __('PayPal SSL')],
             ['value' => 'SOFORT-SSL', 'label' => __('SoFort EU')],
             //['value' => 'BOLETO-SSL', 'label' => __('Boleto Bancairo')],
             ['value' => 'ALIPAY-SSL', 'label' => __('AliPay')],
