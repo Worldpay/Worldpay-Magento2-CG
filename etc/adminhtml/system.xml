@@ -518,7 +518,7 @@
                 </field>
             </group>
             <!--Paypal-->
-            <group id="paypal_config" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="paypal_config" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Paypal</label>
                 <field id="enable_paypal_ssl" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable new Paypal API</label>
@@ -532,7 +532,7 @@
                 </field>
             </group>
             <!-- KLARNA -->
-            <group id="klarna_config" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="klarna_config" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>KLARNA</label>
                 <!--Klarna enabled-->
                 <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -621,7 +621,7 @@
                 </group>
             </group>
             <!--Level 2/3 Data-->
-            <group id="level23_config" translate="label" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="level23_config" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Level 2/3 Data for US and Canada payments</label>
                 <field id="level23" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Level 2/3 Data</label>
@@ -642,7 +642,7 @@
                 </field>
             </group>
             <!-- Prime routing -->
-            <group id="prime_routing" translate="label" type="text" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="prime_routing" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Prime Routing</label>
                 <field id="enable_prime_routing" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Prime Routing</label>
@@ -666,7 +666,7 @@
                 </field>
             </group>
             <!-- Latin America Payments -->
-            <group id="lat_america_payments" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="lat_america_payments" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Latin America Payments</label>
                 <field id="enable_cpf" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable CPF/CPNJ </label>
@@ -696,7 +696,7 @@
                 </field>
             </group>
             <!-- Exemption Engine -->
-            <group id="exemption_config" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="exemption_config" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Exemption Engine</label>
                 <field id="exemption_engine" translate="label" type="select" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Exemption Engine</label>
@@ -717,7 +717,7 @@
                 </field>
             </group>
             <!-- Multiple partial capture options -->
-            <group id="partial_capture_config" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="partial_capture_config" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Multiple Partial Capture</label>
                 <field id="partial_capture" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Partial Capture</label>
@@ -726,7 +726,7 @@
                 </field>
             </group>
             <!-- Merchant profile -->
-            <group id="merchant_config" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="merchant_config" translate="label" type="text" sortOrder="18" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Merchant Profile Override Configuration</label>
                 <field id="merchant_profile" translate="label" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Merchant Profile Configuration</label>
@@ -735,7 +735,7 @@
                 </field>
             </group>
             <!-- Synchronize Order Status -->
-            <group id="order_sync_status" translate="label" type="text" sortOrder="18" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="order_sync_status" translate="label" type="text" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Synchronize Order Status</label>
                 <field id="order_status" translate="label" type="multiselect" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Sync Order With Status</label>
@@ -747,7 +747,7 @@
                 </field>
             </group>
             <!-- Subscription Settings -->
-            <group id="subscriptions" sortOrder="19" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="subscriptions" sortOrder="20" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Subscription Settings</label>
                 <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Subscriptions Enabled</label>
@@ -789,7 +789,7 @@
                 </field>
             </group>
             <!-- Miscellaneous -->
-            <group id="miscellaneous" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="miscellaneous" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Miscellaneous</label>
                 <field id="country_code_spoof" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Country Codes</label>
@@ -813,7 +813,7 @@
                 </field>
             </group>
             <!-- Payment Method Logo Group -->
-            <group id="payment_method_logo_config" translate="label" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="payment_method_logo_config" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Logo Personalisation of Payment Methods</label>
                 <!-- Payment Method Logo enabled-->
                 <field id="payment_method_logo_config_enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -1276,7 +1276,7 @@
                 </group>
             </group>
              <!-- Worldpay API security alerts -->
-            <group id="wp_error_alerts" translate="label"  sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="wp_error_alerts" translate="label"  sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Worldpay API security alerts</label>
                 <field id="enable_error_alerts" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Worldpay Security Alerts </label>
@@ -1423,7 +1423,7 @@
                 </group>
             </group>
              <!-- Worldpay Pay By Link -->
-            <group id="paybylink_config" translate="label"  sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="paybylink_config" translate="label"  sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Worldpay Pay By Link</label>
                 <field id="enable" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Pay By Link </label>
