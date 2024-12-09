@@ -523,7 +523,7 @@
                 <field id="enable_paypal_ssl" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable new Paypal API</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Insert warning text here !!!</comment>
+                    <comment>Before enabling new Paypal API you must be onboarded. You must connect with your Worldpay contact.</comment>
                 </field>
                 <field id="enable_smart_button" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Paypal SmartButton in HPP</label>
