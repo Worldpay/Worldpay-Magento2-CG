@@ -2184,7 +2184,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/paypal_config/enable_smart_button',
-            ScopeInterface::SCOPE_STORE
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
 
