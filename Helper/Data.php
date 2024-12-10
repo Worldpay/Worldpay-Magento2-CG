@@ -44,7 +44,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var SessionManagerInterface
      */
     protected $session;
-    
+
     /**
      * @var worldpaypaymentmodel
      */
@@ -521,6 +521,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 }
             }
         }
+
+        $paypalSSL = $this->_scopeConfig->getValue(
+            'worldpay/paypal_config/enable_paypal_ssl',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+
+        if($paypalSSL == '1') {
+            if(isset($activeMethods['PAYPAL-EXPRESS'])) {
+                $activeMethods['PAYPAL-SSL'] = "Paypal SSL";
+                unset($activeMethods['PAYPAL-EXPRESS']);
+            }
+        }
+
         return $activeMethods;
     }
    /**
@@ -1725,7 +1738,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $responseMessage;
     }
-    
+
     /**
      * Get Order Details By Email Id
      *
@@ -1740,7 +1753,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         )->getFirstItem()->getData();
         return $itemData;
     }
-    
+
     /**
      * Get Orders CountBy Email Id
      *
@@ -1753,13 +1766,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $lastYearInterval = new  \DateTime('-12 months');
         $lastSixMonthsInterval = new  \DateTime('-6 months');
         $ordersCount = [];
-        
+
         $ordersCount['last_day_count'] = $this->getOrderIdsCount($customerEmailId, $lastDayInterval);
         $ordersCount['last_year_count'] = $this->getOrderIdsCount($customerEmailId, $lastYearInterval);
         $ordersCount['last_six_months_count'] = $this->getOrderIdsCount($customerEmailId, $lastSixMonthsInterval);
         return $ordersCount;
     }
-    
+
     /**
      * Get the list of orders of customer by email
      *
@@ -1779,7 +1792,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return count($orders);
     }
-    
+
     /**
      * Returns cards count that are saved within 24 hrs
      *
@@ -1798,7 +1811,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                        ;
         return count($savedCards->getData());
     }
-    
+
     /**
      * Get GlobalCurrencyExponent
      *
@@ -1849,7 +1862,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamicExponentEnabled() && $specificexponent!=null) {
             return $specificexponent ;
         }
-        
+
         return $globalexponent;
     }
     /**
@@ -1910,7 +1923,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 'worldpay/prime_routing/enable_advanced_prime_routing',
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
-           
+
         }
     }
     /**
@@ -2246,7 +2259,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
          return false;
     }
-   
+
     /**
      * Get Moto Merchant Code
      *
@@ -2869,7 +2882,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $details['additional_details']['php_version'] = $this->getPhpVersionUsed();
-        
+
         return $details;
     }
 
@@ -2896,7 +2909,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'integration_version'=>$integrationVersion,
             'historic_integration_versions'=>$historicVersions
             ];
-        
+
         return $details;
     }
 
@@ -2962,7 +2975,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $multishippingEnabled;
     }
-    
+
     /**
      * Get Multishipping Enabled
      *
@@ -2975,7 +2988,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      *  Check if Quote is Multishipping
      *
@@ -3207,7 +3220,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
         }
-        
+
         return $multishippingMC;
     }
 
@@ -3299,7 +3312,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get Multishipping google Payment Methods
      *
@@ -3312,7 +3325,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get MultiShipping google Auth Methods
      *
@@ -3325,7 +3338,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get google Gateway Merchantname
      *
@@ -3338,7 +3351,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get google Gateway Merchantid
      *
@@ -3351,7 +3364,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
-  
+
     /**
      * Get MultiShipping google Merchantid
      *
@@ -3364,7 +3377,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
     }
- 
+
     /**
      * Get MultiShipping google Merchant name
      *
@@ -3405,7 +3418,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
         return $pblIId;
     }
-    
+
     /**
      * Calculate Pay By Link Resend expiry time
      *
@@ -3416,7 +3429,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $expiryTime * 2;
     }
-    
+
     /**
      * Find Pay By Link Interval time between order date and current date
      *
@@ -3428,7 +3441,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return round(abs(strtotime($currentDate) - strtotime($orderDate))/3600, 0);
     }
-    
+
     /**
      * Find Pay By Link expiry date and time
      *
@@ -3440,7 +3453,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return strtotime(date("Y-m-d H:i:s", strtotime($currentDate)) . " -$expiryTime hour");
     }
-    
+
     /**
      * Find Pay By Link expiry date and time
      *
@@ -3455,7 +3468,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $cronMaxDate = date('Y-m-d H:i:s', $maxDate);
         $dates['from'] = $cronMinDate;
         $dates['to'] = $cronMaxDate;
-        
+
         return $dates;
     }
     /**
@@ -3570,7 +3583,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $storeId
         );
     }
-    
+
     /**
      * Get Default country code of Magento store
      *

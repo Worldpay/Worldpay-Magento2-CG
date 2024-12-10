@@ -32,9 +32,9 @@ class Request
 
     public const CURL_POST = true;
     public const CURL_RETURNTRANSFER = true;
-    public const CURL_NOPROGRESS = false;
+    public const CURL_NOPROGRESS = true;
     public const CURL_TIMEOUT = 300;
-    public const CURL_VERBOSE = true;
+    public const CURL_VERBOSE = false;
     public const SUCCESS = 200;
 
     /**
@@ -67,7 +67,7 @@ class Request
         $request = $this->_getRequest();
         $logger = $this->_wplogger;
         $url = $this->_getUrl();
-        
+
         $pluginTrackerDetails = $this->collectHeaderPluginTrackerdetails($quote);
         $_xml  = clone($quote);
         $paymentDetails = $_xml->getElementsByTagName('paymentDetails');
@@ -79,8 +79,8 @@ class Request
         $request->setOption(CURLOPT_NOPROGRESS, self::CURL_NOPROGRESS);
         $request->setOption(CURLOPT_VERBOSE, self::CURL_VERBOSE);
         /*SSL verification false*/
-        $request->setOption(CURLOPT_SSL_VERIFYHOST, false);
-        $request->setOption(CURLOPT_SSL_VERIFYPEER, false);
+        $request->setOption(CURLOPT_SSL_VERIFYHOST, 2);
+        $request->setOption(CURLOPT_SSL_VERIFYPEER, true);
         $request->setOption(CURLOPT_USERPWD, $username.':'.$password);
         // Cookie Set to 2nd 3DS request only.
         $cookie = $this->helper->getWorldpayAuthCookie();
@@ -139,7 +139,7 @@ class Request
         $logger->info('Request successfully sent');
         $logger->info($result);
         // extract headers
-       
+
         // extract headers
         $bits = explode("\r\n\r\n", $result);
         $body = array_pop($bits);

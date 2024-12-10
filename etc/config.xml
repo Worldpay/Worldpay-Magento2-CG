@@ -39,7 +39,7 @@
                     </stored_credentials_disclaimer_message>
                     <stored_credentials_message_enable>0</stored_credentials_message_enable>
                     <stored_credentials_flag>0</stored_credentials_flag>
-                </configure_disclaimer>                
+                </configure_disclaimer>
             </tokenization>
             <hpp_config>
                 <hpp_integration>iframe</hpp_integration>
@@ -83,7 +83,7 @@
                 <sepa_mandate_types>ONE-OFF</sepa_mandate_types>
                 <sepa_e_mandate>By signing this mandate form, you authorise (A) Worldpay to send instructions to your bank to debit your account and (B) your bank to debit your account in accordance with the instructions from Worldpay. As part of your rights, you are entitled to a refund from your bank under the terms and conditions of your agreement with your bank. A refund must be claimed within 8 weeks starting from the date on which your account was debited. Your rights are explained in a statement that you can obtain from your bank.</sepa_e_mandate>
                 <statement_narrative>1</statement_narrative>
-            </apm_config>            
+            </apm_config>
             <miscellaneous>
                 <country_code_spoof>JE-GB,IM-GB</country_code_spoof>
                 <global_currency_exponent>2</global_currency_exponent>
@@ -112,7 +112,7 @@
             <wp_error_alerts>
                 <enable_error_alerts>0</enable_error_alerts>
                 <send_email_to_worldpay>0</send_email_to_worldpay>
-                <wp_team_email>adobe@fisglobal.com</wp_team_email>
+                <wp_team_email>adobe-technical@worldpay.com</wp_team_email>
             </wp_error_alerts>
             <paybylink_config>
                 <paybylink_button_name>Pay By Link</paybylink_button_name>

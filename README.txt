@@ -1,6 +1,10 @@
 Latest releases for all supported version:
 
 For Magento 2.4.6
+Worldpay Plugin version: 2.4.6-p80125
+1. Magento 2.4.6-p8 compatible
+2. PHP 8.2 compatibility
+3. New PayPal API and SmartButton
 
 Worldpay Plugin version: 2.4.6-p61024
 1. Magento 2.4.6-p6 compatible
@@ -9,7 +13,7 @@ Worldpay Plugin version: 2.4.6-p61024
 
 Worldpay Plugin version: 2.4.6-p50624
 1. Magento 2.4.6-p5 compatible
-2. EFTPOS payment 
+2. EFTPOS payment
 3. PHP 8.2 compatibility
 
 Worldpay Plugin version: 2.4.6-p30124
@@ -30,7 +34,7 @@ Worldpay Plugin version: 2.4.6-rc0523
 2. Pay by link for multishipping orders
 3. PHP 8.2 compatibility
 
-For Magento 2.4.5 
+For Magento 2.4.5
 
 Worldpay Plugin version: 2.4.5-p20823
 1. Magento 2.4.5-p2 compatible
@@ -102,12 +106,12 @@ This release (2.4.3-p0322) is compatible with Magento 2.4.3-p1 with following ke
 1. Credit card payment
 2. Hosted payment page solution
 3. Alternative payment methods like Paypal, AliPay, Klarna, ACH Pay etc.
-4. Mobile wallets like Google Pay, Apple pay and Samsung Pay (Samsung Pay with only Visa and MasterCard) 
+4. Mobile wallets like Google Pay, Apple pay and Samsung Pay (Samsung Pay with only Visa and MasterCard)
 5. Client side encryption for direct integration
 6. 3DS Flex Authentication
 7. Exemption Engine
 8. FraudSight
-9. Latin America Specific Payment 
+9. Latin America Specific Payment
 10. Mobile order and Telephone Order support for customer support executive
 11. Shopper tokens and Merchant tokens
 12. Intelligent Account Verification

@@ -9,7 +9,7 @@ use \Magento\Store\Model\StoreManagerInterface;
 
 class SendErrorReport extends \Magento\Framework\App\Helper\AbstractHelper
 {
-    public const WORLDPAY_SUPPORT_EMAIL = "adobe@fisglobal.com";
+    public const WORLDPAY_SUPPORT_EMAIL = "adobe-technical@worldpay.com";
     public const WORLDPAY_ERROR_ALERT_EMAIL_TEMPLATE = "worldpay_error_alert_email";
     public const EMAIL_ATTACHMENT_WP_REQUEST_FILE_NAME = 'request.txt';
     public const EMAIL_ATTACHMENT_WP_RESPONSE_FILE_NAME = 'response.txt';
@@ -31,12 +31,12 @@ class SendErrorReport extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Framework\Translate\Inline\StateInterface
      */
     protected $inlineTranslation;
-    
+
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
     protected $storeManager;
-    
+
     /**
      * SendErrorReport constructor
      *
@@ -117,7 +117,7 @@ class SendErrorReport extends \Magento\Framework\App\Helper\AbstractHelper
             $storeId = $this->storeManager->getStore()->getId();
             $from = ['email' => $senderDetails['email'], 'name' => $senderDetails['name']];
             $this->inlineTranslation->suspend();
-  
+
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $templateOptions = [
                 'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
@@ -164,7 +164,7 @@ class SendErrorReport extends \Magento\Framework\App\Helper\AbstractHelper
         try {
             if ($this->isEnableSendEmail()) {
                 $recipientEmails = $this->getRecipientEmails();
-                
+
                 if (!empty($recipientEmails)) {
                     foreach ($recipientEmails as $recipientEmail) {
                         $this->sendEmail($params, $recipientEmail);

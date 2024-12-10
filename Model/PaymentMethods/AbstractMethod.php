@@ -359,7 +359,11 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $paymentAdditionalData = $payment->getData('additional_data');
         $orderCode = $this->_generateOrderCode($quote, $increment_id);
 
-        if (!empty($this->worlpayhelper->getOrderCodeFromCheckoutSession())) {
+        if (
+            !empty($this->worlpayhelper->getOrderCodeFromCheckoutSession())
+            && self::$paymentDetails['method'] === self::WORLDPAY_CC_TYPE
+            && $this->worlpayhelper->isIframeIntegration()
+        ) {
             $orderCode = $this->worlpayhelper->getOrderCodeFromCheckoutSession();
         }
 
@@ -372,7 +376,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             }
             $this->_checkShippingApplicable($quote);
             $this->_createWorldPayPayment($payment, $orderCode, $quote->getStoreId(), $orderId);
-            
+
             $authorisationService = $this->getAuthorisationService($quote->getStoreId());
             $authorisationService->authorizePayment(
                 $mageOrder,
@@ -543,7 +547,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         //      $integrationType = 'redirect'; uncomment to support moto redirect
         }
         $wpp = $this->worldpaypayment->create();
-        
+
         $cardType = $paymentdetails['additional_data']['cc_type'];
         if ($cardType == 'savedcard') {
             $cardType = $this->_getpaymentType();
@@ -600,12 +604,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 __('Worldpay Plugin is not available')
             );
         }
-        
+
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
         $autoInvoice = $this->_scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
         $partialCapture = $this->_scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
-          
+
         $mageOrder = $payment->getOrder();
         $orderId = $mageOrder->getIncrementId();
         /*$quote = $this->quoteRepository->get($mageOrder->getQuoteId());
@@ -675,7 +679,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 __('Worldpay Plugin is not available')
             );
         }
-        
+
         $this->_wplogger->info('refund payment model function executed');
         if ($order = $payment->getOrder()) {
             $mageOrder = $payment->getOrder();
@@ -834,7 +838,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $message = $payment->prependMessage($message);
         $payment->addTransactionCommentsToOrder($transaction, $message);
     }
-    
+
     /**
      * Void the order abstract method
      *
@@ -870,7 +874,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                     . 'Please check Payment Status below for confirmation.'));
         }
     }
-    
+
     /**
      * Update status for void order abstract method
      *
@@ -883,14 +887,14 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $mageOrder = $order->getOrder();
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
         $paymentStatus = $worldPayPayment->getPaymentStatus();
-       
+
         if ($paymentStatus === 'VOIDED') {
             $mageOrder->setState(\Magento\Sales\Model\Order::STATE_CLOSED, true);
             $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_CLOSED);
             $mageOrder->save();
         }
     }
-    
+
     /**
      * Cancel the order abstract method
      *
@@ -918,7 +922,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 $worldPayPayment,
                 $payment->getMethod()
             );
-         
+
             $payment->setTransactionId(time());
             $this->_response = $this->adminhtmlresponse->parseCancelOrderRespone($xml);
             if ($this->_response->reply->ok) {
@@ -930,7 +934,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                    . 'Please check Payment Status or Order Status below for confirmation.'));
         }
     }
-    
+
     /**
      * Update status for cancel order abstract method
      *
@@ -943,14 +947,14 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $mageOrder = $order->getOrder();
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
         $paymentStatus = $worldPayPayment->getPaymentStatus();
-       
+
         if ($paymentStatus === 'CANCELLED') {
             $mageOrder->setState(\Magento\Sales\Model\Order::STATE_CANCELED, true);
             $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
             $mageOrder->save();
         }
     }
-    
+
     /**
      * Get card type from credit card number
      *
@@ -986,7 +990,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             return 'DANKORT-SSL';
         }
     }
-    
+
     /**
      * Check apm partial capture
      *
