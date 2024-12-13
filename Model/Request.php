@@ -99,7 +99,8 @@ class Request
                 'Expect'=>'',
                 'ecommerce_platform' => $pluginTrackerDetails['ecommerce_platform'],
                 'ecommerce_platform_version' => $pluginTrackerDetails['ecommerce_platform_version'],
-                'ecommerce_plugin_data'=>json_encode($pluginTrackerDetails['ecommerce_plugin_data'])
+                'ecommerce_plugin_data'=>json_encode($pluginTrackerDetails['ecommerce_plugin_data']),
+                'merchant_id' => $pluginTrackerDetails['merchant_id'],
             ];
         } else {
             $headersArray = [
@@ -238,9 +239,8 @@ class Request
                 $paymentMethod = $result->additional_details->transaction_method;
             }
         }
-        $pluginTrackerDetails = $this->helper->getPluginTrackerHeaderdetails();
-        $pluginTrackerDetails['ecommerce_plugin_data']['additional_details'] =
-        ['payment_method'=>$paymentMethod];
+
+        $pluginTrackerDetails = $this->helper->getPluginTrackerHeaderDetails($paymentMethod);
 
         return $pluginTrackerDetails;
     }

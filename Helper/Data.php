@@ -2900,24 +2900,31 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    public function getPluginTrackerHeaderdetails()
+    public function getPluginTrackerHeaderdetails($paymentMethod)
     {
         $details=[];
         $integrationVersion = $historicVersions= '';
         $mageDetails = $this->getCurrentMagentoVersionDetails();
         $details['ecommerce_platform'] = $mageDetails['platform'];
         $details['ecommerce_platform_version'] = $mageDetails['version'];
+        $details['merchant_id'] = $this->getMerchantCode($paymentMethod);
+
         if (($this->getCurrentWopayPluginVersion()!=null) && !empty($this->getCurrentWopayPluginVersion())) {
             $integrationVersion = $this->getCurrentWopayPluginVersion();
         }
         if (($this->getUpgradeDates()!=null) && !empty($this->getUpgradeDates())) {
             $historicVersions = $this->getUpgradeDates();
         }
-        $details['ecommerce_plugin_data'] =
-            ['ecommerce_platform_edition'=>$mageDetails['edition'],
-            'integration_version'=>$integrationVersion,
-            'historic_integration_versions'=>$historicVersions
-            ];
+        $details['ecommerce_plugin_data'] = [
+            'ecommerce_platform_edition' => $mageDetails['edition'],
+            'integration_version' => $integrationVersion,
+            'historic_integration_versions' => $historicVersions,
+            'additional_details' => [
+                'payment_method' => $paymentMethod,
+                'currency' => $this->_checkoutSession->getQuote()->getQuoteCurrencyCode(),
+                'amount' => $this->_checkoutSession->getQuote()->getGrandTotal(),
+            ]
+        ];
 
         return $details;
     }
