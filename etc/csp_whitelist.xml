@@ -63,7 +63,7 @@
                 <value id="google-pay-2" type="host">https://google.com/pay</value>
 		        <value id="worldpay-connect" type="host">*.worldpay.com</value>
                 <value id="telemetry" type="host">https://hpp.worldpay.com/app/hpp/135-0/telemetry</value>
-                <value id="telemetry" type="paypalsmartbutton">https://hpp.worldpay.com/app/hpp/135-0/payment/paypalsmartbutton/continue</value>
+                <value id="paypal-smart-button" type="host">https://hpp.worldpay.com/app/hpp/135-0/payment/paypalsmartbutton/continue</value>
             </values>
         </policy>
         <policy id="font-src">
