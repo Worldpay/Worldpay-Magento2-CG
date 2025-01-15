@@ -52,6 +52,7 @@
                 <value id="secure.worldpay.com" type="host">https://secure.worldpay.com/shopper/3ds/ddc.html</value>
                 <value id="wpg-iframe-test" type="host">https://payments-test.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
                 <value id="wpg-iframe" type="host">https://payments-live.hpp.apps.eu-west-1-7z55k.dev.msp.worldpay.io/app/hpp-iframe/integration/wpg/corporate</value>
+                <value id="payments-wpg-iframe" type="host">https://payments.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
             </values>
         </policy>
         <policy id="connect-src">
