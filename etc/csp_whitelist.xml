@@ -65,6 +65,7 @@
 		        <value id="worldpay-connect" type="host">*.worldpay.com</value>
                 <value id="telemetry" type="host">https://hpp.worldpay.com/app/hpp/135-0/telemetry</value>
                 <value id="paypal-smart-button" type="host">https://hpp.worldpay.com/app/hpp/135-0/payment/paypalsmartbutton/continue</value>
+                <value id="telemetry-iframe" type="host">https://payments.worldpay.com/app/hpp/135-0/telemetry/iframe</value>
             </values>
         </policy>
         <policy id="font-src">
