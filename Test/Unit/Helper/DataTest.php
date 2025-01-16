@@ -91,7 +91,7 @@ class DataTest extends TestCase
     /**
      * @var string
      */
-    protected $APM_TYPES = 'CHINAUNIONPAY-SSL,IDEAL-SSL,PAYPAL-EXPRESS,'
+    protected $APM_TYPES = 'CHINAUNIONPAY-SSL,IDEAL-SSL,PAYPAL-EXPRESS,PAYPAL-SSL,'
             . 'SOFORT-SSL,GIROPAY-SSL,ALIPAY-SSL,SEPA_DIRECT_DEBIT-SSL,'
             . 'KLARNA-SSL,PRZELEWY-SSL,MISTERCASH-SSL,ACH_DIRECT_DEBIT-SSL';
     /**
@@ -115,7 +115,8 @@ class DataTest extends TestCase
             'CHINAUNIONPAY-SSL' => 'Union Pay',
             'IDEAL-SSL' => 'IDEAL',
             //'YANDEXMONEY-SSL' => 'Yandex.Money',
-            'PAYPAL-EXPRESS' => 'PayPal',
+            'PAYPAL-EXPRESS' => 'PayPal Express',
+            'PAYPAL-SSL' => 'PayPal SSL',
             'SOFORT-SSL' => 'SoFort EU',
             'GIROPAY-SSL' => 'GiroPay',
             //'BOLETO-SSL' => 'Boleto Bancairo',
@@ -237,7 +238,7 @@ class DataTest extends TestCase
             $this->klarnaCountries
         );
     }
-    
+
     public function testIsWorldPayEnable()
     {
         $this->scopeConfigMock->expects($this->once())
@@ -249,7 +250,7 @@ class DataTest extends TestCase
                 ->willReturn(true);
         $this->assertEquals(true, $this->dataObj->isWorldPayEnable());
     }
-    
+
     public function testIsApmEnabled()
     {
         $this->scopeConfigMock->expects($this->once())
@@ -375,7 +376,7 @@ class DataTest extends TestCase
             ->will($this->onConsecutiveCalls(true, true, $this->KLARNA_PAYNOW_TYPE, $this->KLARNA_PAYNOW_COUNTRIES));
         $this->assertEquals($this->KLARNA_PAYNOW_COUNTRIES, $this->dataObj->getKlarnaPayNowContries());
     }
-    
+
     public function testGetKlarnaSubscriptionDays()
     {
         $array = ['subscription_days' => 30];
@@ -385,7 +386,7 @@ class DataTest extends TestCase
                 ->willReturn($array);
         $this->assertEquals($array['subscription_days'], $this->dataObj->getKlarnaSubscriptionDays('US'));
     }
-     
+
     public function testGetApmTypes()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -398,6 +399,7 @@ class DataTest extends TestCase
                     ['worldpay_apm','CHINAUNIONPAY-SSL'],
                     ['worldpay_apm','IDEAL-SSL'],
                     ['worldpay_apm','PAYPAL-EXPRESS'],
+                    ['worldpay_apm','PAYPAL-SSL'],
                     ['worldpay_apm','SOFORT-SSL'],
                     ['worldpay_apm','GIROPAY-SSL'],
                     ['worldpay_apm','ALIPAY-SSL'],
@@ -421,13 +423,14 @@ class DataTest extends TestCase
                     ['worldpay/apm_config/achaccounttypes',\Magento\Store\Model\ScopeInterface::SCOPE_STORE]
                 )
                 ->will($this->onConsecutiveCalls('Direct', $this->APM_TYPES, $this->ACH_BANK_ACC_TYPES));
-         
+
         $this->paymentlist->expects($this->any())
                 ->method('checkCurrency')
                 ->withConsecutive(
                     ['worldpay_apm','CHINAUNIONPAY-SSL'],
                     ['worldpay_apm','IDEAL-SSL'],
                     ['worldpay_apm','PAYPAL-EXPRESS'],
+                    ['worldpay_apm','PAYPAL-SSL'],
                     ['worldpay_apm','SOFORT-SSL'],
                     ['worldpay_apm','GIROPAY-SSL'],
                     ['worldpay_apm','ALIPAY-SSL'],
@@ -440,7 +443,7 @@ class DataTest extends TestCase
                 ->willReturn(true);
         $this->assertEquals(explode(",", $this->ACH_BANK_ACC_TYPES), $this->dataObj->getACHDetails());
     }
-       
+
     public function testGetACHBankAccountTypes()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -449,7 +452,7 @@ class DataTest extends TestCase
                 ->willReturn($this->ACH_BANK_ACC_TYPES);
         $this->assertEquals($this->ACH_BANK_ACC_TYPES, $this->dataObj->getACHBankAccountTypes());
     }
-    
+
     public function testGetSEPADetails()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -460,13 +463,14 @@ class DataTest extends TestCase
                     ['worldpay/apm_config/sepa_mandate_types',\Magento\Store\Model\ScopeInterface::SCOPE_STORE]
                 )
                 ->will($this->onConsecutiveCalls('Direct', $this->APM_TYPES, $this->SEPA_MANDATE_TYPES));
-         
+
         $this->paymentlist->expects($this->any())
                 ->method('checkCurrency')
                 ->withConsecutive(
                     ['worldpay_apm','CHINAUNIONPAY-SSL'],
                     ['worldpay_apm','IDEAL-SSL'],
                     ['worldpay_apm','PAYPAL-EXPRESS'],
+                    ['worldpay_apm','PAYPAL-SSL'],
                     ['worldpay_apm','SOFORT-SSL'],
                     ['worldpay_apm','GIROPAY-SSL'],
                     ['worldpay_apm','ALIPAY-SSL'],
@@ -479,7 +483,7 @@ class DataTest extends TestCase
                 ->willReturn(true);
         $this->assertEquals(explode(",", $this->SEPA_MANDATE_TYPES), $this->dataObj->getSEPADetails());
     }
-    
+
     public function testGetSEPAMandateTypes()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -488,7 +492,7 @@ class DataTest extends TestCase
                 ->willReturn($this->SEPA_MANDATE_TYPES);
         $this->assertEquals($this->SEPA_MANDATE_TYPES, $this->dataObj->getSEPAMandateTypes());
     }
-    
+
     public function testIsIframeIntegration()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -497,7 +501,7 @@ class DataTest extends TestCase
                 ->willReturn('iframe');
         $this->assertEquals(true, $this->dataObj->isIframeIntegration());
     }
-     
+
     public function testGetRedirectIntegrationMode()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -506,7 +510,7 @@ class DataTest extends TestCase
                 ->willReturn('Redirect');
         $this->assertEquals('Redirect', $this->dataObj->getRedirectIntegrationMode());
     }
-     
+
     public function testGetCustomPaymentEnabled()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -515,7 +519,7 @@ class DataTest extends TestCase
                 ->willReturn(true);
         $this->assertEquals(true, $this->dataObj->getCustomPaymentEnabled());
     }
-     
+
     public function testGetInstallationId()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -524,7 +528,7 @@ class DataTest extends TestCase
                 ->willReturn(1074624);
         $this->assertEquals(1074624, $this->dataObj->getInstallationId());
     }
-     
+
     public function testGetHideAddress()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -533,7 +537,7 @@ class DataTest extends TestCase
                 ->willReturn(true);
         $this->assertEquals(true, $this->dataObj->getHideAddress());
     }
-    
+
     public function testIsMotoEnabled()
     {
         $this->scopeConfigMock->expects($this->once())
@@ -542,7 +546,7 @@ class DataTest extends TestCase
                 ->willReturn(true);
         $this->assertEquals(true, $this->dataObj->isMotoEnabled());
     }
-    
+
     public function testGetMotoTypes()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -566,7 +570,7 @@ class DataTest extends TestCase
                  ->willReturn(true);
          $this->assertEquals($this->ALL_MOTO_METHODS, $this->dataObj->getCcTypes('moto_config'));
     }
-    
+
     public function testGetMotoTitle()
     {
         $this->scopeConfigMock->expects($this->once())
@@ -575,7 +579,7 @@ class DataTest extends TestCase
                 ->willReturn('Mail Order Telephone Order');
         $this->assertEquals('Mail Order Telephone Order', $this->dataObj->getMotoTitle());
     }
-     
+
     public function testIsGooglePayEnable()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -587,7 +591,7 @@ class DataTest extends TestCase
                ->willReturn(true);
         $this->assertEquals(true, $this->dataObj->isGooglePayEnable());
     }
-     
+
     public function testGooglePaymentMethods()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -599,7 +603,7 @@ class DataTest extends TestCase
                 ->willReturn($this->GOOGLE_PAYMENT_METHODS);
         $this->assertEquals($this->GOOGLE_PAYMENT_METHODS, $this->dataObj->googlePaymentMethods());
     }
-     
+
     public function testGoogleAuthMethods()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -611,7 +615,7 @@ class DataTest extends TestCase
                 ->willReturn($this->GOOGLE_AUTH_METHODS);
         $this->assertEquals($this->GOOGLE_AUTH_METHODS, $this->dataObj->googleAuthMethods());
     }
-     
+
     public function testGoogleGatewayMerchantname()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -623,7 +627,7 @@ class DataTest extends TestCase
                 ->willReturn('worldpay');
         $this->assertEquals('worldpay', $this->dataObj->googleGatewayMerchantname());
     }
-     
+
     public function testGoogleMerchantname()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -635,7 +639,7 @@ class DataTest extends TestCase
                 ->willReturn('worldpay');
         $this->assertEquals('worldpay', $this->dataObj->googleMerchantname());
     }
-     
+
     public function testGoogleMerchantid()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -647,7 +651,7 @@ class DataTest extends TestCase
                 ->willReturn('');
         $this->assertEquals('', $this->dataObj->googleMerchantname());
     }
-     
+
     public function testGetWalletsTypesGooglePay()
     {
         $activeMethods = ['PAYWITHGOOGLE-SSL' => 'Google Pay',
@@ -666,7 +670,7 @@ class DataTest extends TestCase
                ->willReturn(true);
         $this->assertEquals($activeMethods, $this->dataObj->getWalletsTypes(''));
     }
-    
+
     public function testIsWalletsEnabled()
     {
          $this->scopeConfigMock->expects($this->any())
@@ -675,7 +679,7 @@ class DataTest extends TestCase
                  ->willReturn(true);
          $this->assertEquals(true, $this->dataObj->isWalletsEnabled());
     }
-     
+
     public function testGetWalletsTitle()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -684,7 +688,7 @@ class DataTest extends TestCase
                 ->willReturn('wallet');
         $this->assertEquals('wallet', $this->dataObj->getWalletsTitle());
     }
-     
+
     public function testIsApplePayEnable()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -696,7 +700,7 @@ class DataTest extends TestCase
                 ->willReturn(true);
         $this->assertEquals(true, $this->dataObj->isApplePayEnable());
     }
-     
+
     public function testAppleMerchantId()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -717,7 +721,7 @@ class DataTest extends TestCase
                ->willReturn(true);
         $this->assertEquals(true, $this->dataObj->isCreditCardEnabled());
     }
-    
+
     public function testGetCcTitle()
     {
         $this->scopeConfigMock->expects($this->once())
@@ -726,7 +730,7 @@ class DataTest extends TestCase
                ->willReturn('Alternative Payment Methods');
         $this->assertEquals('Alternative Payment Methods', $this->dataObj->getCcTitle());
     }
-    
+
     public function testGetCcTypes()
     {
         $this->scopeConfigMock->expects($this->any())
@@ -750,7 +754,7 @@ class DataTest extends TestCase
                  ->willReturn(true);
          $this->assertEquals($this->ALL_CC_METHODS, $this->dataObj->getCcTypes('cc_config'));
     }
-    
+
     public function testGetsubscriptionStatus()
     {
         $this->quote = $this->getMockBuilder(Quote::class)
