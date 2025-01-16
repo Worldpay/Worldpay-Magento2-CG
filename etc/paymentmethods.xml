@@ -56,7 +56,7 @@
                 <capture_request>1</capture_request>
             </IDEAL-SSL>
             <PAYPAL-EXPRESS>
-                <title>PayPal</title>
+                <title>PayPal Express</title>
                 <areas>
                     <area>AU</area>
                     <area>AT</area>
@@ -100,6 +100,51 @@
                 </areas>
                 <capture_request>1</capture_request>
             </PAYPAL-EXPRESS>
+            <PAYPAL-SSL>
+                <title>PayPal SSL</title>
+                <areas>
+                    <area>AU</area>
+                    <area>AT</area>
+                    <area>BE</area>
+                    <area>BR</area>
+                    <area>CA</area>
+                    <area>CN</area>
+                    <area>DK</area>
+                    <area>EG</area>
+                    <area>FI</area>
+                    <area>FR</area>
+                    <area>DE</area>
+                    <area>GH</area>
+                    <area>GR</area>
+                    <area>HK</area>
+                    <area>IN</area>
+                    <area>ID</area>
+                    <area>IE</area>
+                    <area>IT</area>
+                    <area>JP</area>
+                    <area>MY</area>
+                    <area>MX</area>
+                    <area>NL</area>
+                    <area>NZ</area>
+                    <area>NG</area>
+                    <area>NO</area>
+                    <area>PH</area>
+                    <area>PL</area>
+                    <area>PT</area>
+                    <area>RU</area>
+                    <area>SG</area>
+                    <area>ZA</area>
+                    <area>KR</area>
+                    <area>ES</area>
+                    <area>SE</area>
+                    <area>CH</area>
+                    <area>TH</area>
+                    <area>GB</area>
+                    <area>US</area>
+                    <area>VN</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </PAYPAL-SSL>
 <!--            <YANDEXMONEY-SSL>
                 <title>Yandex.Money</title>
                 <areas>
@@ -435,7 +480,7 @@
     </worldpay_moto>
     <worldpay_wallets>
         <title>Wallets</title>
-        <types>    
+        <types>
             <APPLEPAY-SSL>
                 <title>Apple Pay</title>
                 <areas>
@@ -742,6 +787,51 @@
                 </areas>
                 <capture_request>1</capture_request>
             </PAYPAL-EXPRESS>
+            <PAYPAL-SSL>
+                <title>PayPal SSL</title>
+                <areas>
+                    <area>AU</area>
+                    <area>AT</area>
+                    <area>BE</area>
+                    <area>BR</area>
+                    <area>CA</area>
+                    <area>CN</area>
+                    <area>DK</area>
+                    <area>EG</area>
+                    <area>FI</area>
+                    <area>FR</area>
+                    <area>DE</area>
+                    <area>GH</area>
+                    <area>GR</area>
+                    <area>HK</area>
+                    <area>IN</area>
+                    <area>ID</area>
+                    <area>IE</area>
+                    <area>IT</area>
+                    <area>JP</area>
+                    <area>MY</area>
+                    <area>MX</area>
+                    <area>NL</area>
+                    <area>NZ</area>
+                    <area>NG</area>
+                    <area>NO</area>
+                    <area>PH</area>
+                    <area>PL</area>
+                    <area>PT</area>
+                    <area>RU</area>
+                    <area>SG</area>
+                    <area>ZA</area>
+                    <area>KR</area>
+                    <area>ES</area>
+                    <area>SE</area>
+                    <area>CH</area>
+                    <area>TH</area>
+                    <area>GB</area>
+                    <area>US</area>
+                    <area>VN</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </PAYPAL-SSL>
             <SOFORT-SSL>
                 <title>SoFort EU</title>
                 <areas>
