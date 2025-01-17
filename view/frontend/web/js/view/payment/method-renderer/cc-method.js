@@ -77,13 +77,12 @@ define(
             if (cc_type_selected !== 'savedcard') {
                 if (cc_type_selected === 'VISA-SSL' && typeclasslist.contains('is_visa')) {
                     return true;
-                } else if (cc_type_selected === 'ECMC-SSL' && typeclasslist.contains('is_mastercard')
-                    || (cc_type_selected === 'CB-SSL' && (
-                            typeclasslist.contains('is_mastercard')
-                            || typeclasslist.contains('is_maestro')
-                            || typeclasslist.contains('is_visa')
-                        ))
-                    || (cc_type_selected === 'CARTEBLEUE-SSL' && typeclasslist.contains('is_mastercard'))) {
+                } else if (cc_type_selected === 'ECMC-SSL' && typeclasslist.contains('is_mastercard')) {
+                    return true;
+                } else if (cc_type_selected === 'CB-SSL' &&
+                    (typeclasslist.contains('is_mastercard') || typeclasslist.contains('is_maestro') || typeclasslist.contains('is_visa'))) {
+                    return true;
+                } else if (cc_type_selected === 'CARTEBLEUE-SSL' && typeclasslist.contains('is_mastercard')){
                     return true;
                 } else if (cc_type_selected === 'AMEX-SSL' && typeclasslist.contains('is_amex')) {
                     return true;
