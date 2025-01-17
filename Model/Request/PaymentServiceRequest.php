@@ -121,6 +121,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
             $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder(
                 $this->customerSession,
+                $this->worldpayhelper,
                 $requestConfiguration
             );
             $paymentType = isset($directOrderParams['paymentDetails']['brand']) ?
@@ -258,6 +259,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
         $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder(
             $this->customerSession,
+            $this->worldpayhelper,
             $requestConfiguration
         );
         if ($this->worldpayhelper->getsubscriptionStatus()) {
@@ -503,6 +505,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         $this->xmltokenorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder(
             $this->customerSession,
+            $this->worldpayhelper,
             $requestConfiguration
         );
         if (empty($tokenOrderParams['thirdPartyData']) && empty($tokenOrderParams['shippingfee'])) {
@@ -660,7 +663,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $redirectOrderParams['paymentDetails']['cardType']
         );
 
-        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectOrder($requestConfiguration);
+        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectOrder($this->worldpayhelper, $requestConfiguration);
 
         if (!empty($redirectOrderParams['is_paybylink_order'])) {
             $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectPayByLinkOrder(
@@ -1684,6 +1687,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             ];
             $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder(
                 $this->customerSession,
+                $this->worldpayhelper,
                 $requestConfiguration
             );
             $paymentType = isset($directOrderParams['paymentDetails']['brand']) ?

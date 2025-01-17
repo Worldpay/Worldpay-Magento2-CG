@@ -536,6 +536,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $activeMethods;
     }
+
+    public function getShopperSelection($paymentType)
+    {
+        $schemes = [
+            'EFTPOS_AU-SSL' => 'EFTPOS_AU',
+            'CHINAUNIONPAY-SSL' => 'CHINAUNIONPAY',
+            'AMEX-SSL' => 'AMEX',
+            'VISA-SSL' => 'VISA',
+            'ECMC-SSL' => 'ECMC',
+            'DISCOVER-SSL' => 'DISCOVER',
+            'DINERS-SSL' => 'DINERS',
+            'MAESTRO-SSL' => 'MAESTRO',
+            'CB-SSL' => 'CB',
+            'DANKORT-SSL' => 'DANKORT',
+            'JCB-SSL' => 'JCB',
+        ];
+
+        return $schemes[$paymentType] ?? null;
+    }
+
    /**
     * Get Wallets Types
     *

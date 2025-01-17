@@ -77,27 +77,26 @@ define(
                 if (cc_type_selected !== 'savedcard') {
                     if (cc_type_selected === 'VISA-SSL' && typeclasslist.contains('is_visa')) {
                         return true;
-                    }else if((cc_type_selected === 'CB-SSL' && typeclasslist.contains('is_mastercard')) || 
-                        (cc_type_selected === 'CB-SSL' && typeclasslist.contains('is_visa')) ){
-                            return true;
-                    }else if(cc_type_selected === 'CARTEBLEUE-SSL' && typeclasslist.contains('is_mastercard') ){
+                    } else if (cc_type_selected === 'ECMC-SSL' && typeclasslist.contains('is_mastercard')) {
                         return true;
-                    }else if (cc_type_selected === 'ECMC-SSL' && typeclasslist.contains('is_mastercard')) {
+                    } else if (cc_type_selected === 'CB-SSL' &&
+                        (typeclasslist.contains('is_mastercard') || typeclasslist.contains('is_maestro') || typeclasslist.contains('is_visa'))) {
                         return true;
-                    }else if (cc_type_selected === 'AMEX-SSL' && typeclasslist.contains('is_amex')) {
+                    } else if (cc_type_selected === 'CARTEBLEUE-SSL' && typeclasslist.contains('is_mastercard')){
+                        return true;
+                    } else if (cc_type_selected === 'AMEX-SSL' && typeclasslist.contains('is_amex')) {
                         return true;
                     } else if (cc_type_selected === 'DISCOVER-SSL' && typeclasslist.contains('is_discover')) {
                         return true;
-                    }else if (cc_type_selected === 'DINERS-SSL' && typeclasslist.contains('is_diners')) {
+                    } else if (cc_type_selected === 'DINERS-SSL' && typeclasslist.contains('is_diners')) {
                         return true;
-                    }else if (cc_type_selected === 'MAESTRO-SSL' && typeclasslist.contains('is_maestro')) {
+                    } else if (cc_type_selected === 'MAESTRO-SSL' && typeclasslist.contains('is_maestro')) {
                         return true;
-                    }else if (cc_type_selected === 'JCB-SSL' && typeclasslist.contains('is_jcb')) {
+                    } else if (cc_type_selected === 'JCB-SSL' && typeclasslist.contains('is_jcb')) {
                         return true;
-                    }else if (cc_type_selected === 'DANKORT-SSL' && typeclasslist.contains('is_dankort')) {
+                    } else if (cc_type_selected === 'DANKORT-SSL' && typeclasslist.contains('is_dankort')) {
                         return true;
-                    }
-                    else {
+                    } else {
                         return false;
                     }
                 }
