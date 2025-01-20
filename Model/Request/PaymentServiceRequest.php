@@ -663,7 +663,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $redirectOrderParams['paymentDetails']['cardType']
         );
 
-        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectOrder($this->worldpayhelper, $requestConfiguration);
+        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectOrder($requestConfiguration);
 
         if (!empty($redirectOrderParams['is_paybylink_order'])) {
             $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectPayByLinkOrder(
