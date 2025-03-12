@@ -84,7 +84,7 @@ class AfterPlaceOrder implements ObserverInterface
             $this->checkoutSession->unsPayByLinkRedirecturl();
         }
         $this->wplogger->info("#########################################");
-        $this->wplogger->info($this->customerSession->getActiveQuoteId());
+        $this->wplogger->info($this->customerSession->getActiveQuoteId() ?? '');
         $this->wplogger->info("#########################################");
         if (!empty($this->customerSession->getActiveQuoteId())) {
             if ($order->getId()) {
