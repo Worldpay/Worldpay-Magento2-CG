@@ -42,21 +42,24 @@
             <?= $block->getChildHtml('minicart.addons') ?>
         </div>
     <?php endif ?>
-    <script>
+    <?php $scriptString = <<<script
         window.checkout = <?= /* @noEscape */ $block->getSerializedConfig() ?>;
-         
-    </script>
-    <script type="text/x-magento-init">
+    script;
+    ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+    <?php $scriptString = <<<script
     {
         "[data-block='minicart']": {
             "Magento_Ui/js/core/app": <?= /* @escapeNotVerified */ $block->getJsLayout() ?>
         },
         "*": {
-            "Magento_Ui/js/block-loader": 
+            "Magento_Ui/js/block-loader":
             "<?= /* @noEscape */ $block->getViewFileUrl('images/loader-1.gif') ?>"
         }
     }
-    </script>
+    script;
+    ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/x-magento-init'], $scriptString, false) ?>
 </div>
 
 

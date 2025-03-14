@@ -362,6 +362,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         if (
             !empty($this->worlpayhelper->getOrderCodeFromCheckoutSession())
             && self::$paymentDetails['method'] === self::WORLDPAY_CC_TYPE
+            && $this->worlpayhelper->getCcIntegrationMode() === self::REDIRECT_MODEL
             && $this->worlpayhelper->isIframeIntegration()
         ) {
             $orderCode = $this->worlpayhelper->getOrderCodeFromCheckoutSession();

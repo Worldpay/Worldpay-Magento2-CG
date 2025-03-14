@@ -74,11 +74,11 @@
                                     <?php
                                 }
                                 ?>
-                            
+
                         </td>
                         <td data-th="<?= /* @noEscape */
                         $escaper->escapeHtml($block->getMyAccountLabels('AC21')?
-                                $block->getMyAccountLabels('AC21') : 'Actions') ?>" 
+                                $block->getMyAccountLabels('AC21') : 'Actions') ?>"
                             class="col actions">
                         <a href="javascript:void(0)" data-delete-url="
                         <?= /* @noEscape */ $block->getDeleteUrl($_savecard); ?>" class="action delete">
@@ -92,12 +92,12 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
-        <script>
+        <?php $scriptString = <<<script
             require([
                 'jquery',
                 'Magento_Ui/js/modal/confirm'
             ], function($, confirm) {
-                $(".action.delete").on("click", function(event) {   
+                $(".action.delete").on("click", function(event) {
                     confirm({
                         title: "<?= /* @noEscape */ $block->getMyAccountLabels('AC11')?
                                 $block->getMyAccountLabels('AC11') :
@@ -117,7 +117,7 @@ Once the card is deleted, subscriptions associated with it will be cancelled',
                 var data=window.MyAccountExceptions;
                 var gendata=JSON.parse(data);
                 for (var key in gendata) {
-                    if (gendata.hasOwnProperty(key)) {  
+                    if (gendata.hasOwnProperty(key)) {
                         var cxData=gendata[key];
                     if(cxData['exception_code'].includes(exceptioncode)){
                         return cxData['exception_module_messages']?
@@ -126,7 +126,9 @@ Once the card is deleted, subscriptions associated with it will be cancelled',
                     }
                 }
             }
-        </script>
+        script;
+        ?>
+        <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
     </div>
 <?php else: ?>
     <div class="message info empty">
@@ -143,7 +145,7 @@ Once the card is deleted, subscriptions associated with it will be cancelled',
                 title="<?php print $escaper->escapeHtmlAttr(
                     $block->getMyAccountLabels('IAVAC1')?
                     $block->getMyAccountLabels('IAVAC1') : 'Add New Card'
-                ) ?>" 
+                ) ?>"
                 class="action primary add">
             <span>
                 <?php print $escaper->escapeHtml($block->getMyAccountLabels('IAVAC1')?
@@ -151,7 +153,7 @@ Once the card is deleted, subscriptions associated with it will be cancelled',
             </span></button>
     </div>
 </div>
-<script type="text/x-magento-init">
+<?php $scriptString = <<<script
     {
         ".page-main": {
             "newcard": {
@@ -161,5 +163,7 @@ Once the card is deleted, subscriptions associated with it will be cancelled',
             }
         }
     }
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/x-magento-init'], $scriptString, false) ?>
 

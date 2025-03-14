@@ -7,8 +7,8 @@
 /** @var \Sapient\Worldpay\Block\Wallets $block */
 ?>
 
-<?php if ($block->isWalletsEnabled()): ?>    
-<div id="wp-wallet-pay" data-bind="scope:'wp-wallet-pay'"> 
+<?php if ($block->isWalletsEnabled()): ?>
+<div id="wp-wallet-pay" data-bind="scope:'wp-wallet-pay'">
     <?= $block->getChildHtml(); ?>
 </div>
 <style>
@@ -40,7 +40,7 @@
         font-style: normal;
     }
     .checkout-information .customer-shipping-address-radio-wrapper ,
-    .checkout-information .shippingmethods-radio-wrapper , 
+    .checkout-information .shippingmethods-radio-wrapper ,
     .checkout-information .customer-billing-address-radio-wrapper {
         padding-bottom: 17px;
         line-height: 25px;
@@ -115,19 +115,21 @@
     @media only screen and (min-width: 769px) and (max-width: 820px) {
         #instant-purchase .instant-purchase{
             width:78%;
-        }        
+        }
         #product-addtocart-button{
             width:78%;
         }
     }
-    
+
 </style>
-<script type="text/x-magento-init">
+    <?php $scriptString = <<<script
     {
         "#wp-wallet-pay": {
             "Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout();?>
         }
     }
-</script>
+script;
+    ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/x-magento-init'], $scriptString, false) ?>
     <?php //endif; ?>
 <?php endif; ?>

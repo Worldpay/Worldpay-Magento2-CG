@@ -21,10 +21,10 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
 
 /** @var $block \Sapient\Worldpay\Block\Webpayment */
 ?>
-<script>
+<?php $scriptString = <<<script
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
-          navigator.serviceWorker.register("<?= /* @noEscape */ $block->getServiceWorkerUrl(); ?>", 
+          navigator.serviceWorker.register("<?= /* @noEscape */ $block->getServiceWorkerUrl(); ?>",
             { scope: "<?= /* @noEscape */ $block->getServiceWorkerScope().'/'; ?>" })
             .then(function (registration)
             {
@@ -35,8 +35,10 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             });
         });
     }
-</script>
-<script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<?php $scriptString = <<<script
     window.ChromepayButtonName = '<?= /* @noEscape */ $block->getChromepayButtonName() ?>';
     window.ChromepayEnabled = '<?= /* @noEscape */ $block->getChromepayEnabled() ?>';
     window.ChromePaymentMode = '<?= /* @noEscape */ $block->getPaymentMode() ?>';
@@ -49,13 +51,13 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     window.jwtEventUrl = '<?= /* @noEscape */ $block->getJwtEventUrl() ?>';
     window.isCheckoutCartPage = '<?= /* @noEscape */ $block->isCheckoutCartPage(); ?>';
     var envMode = '<?= /* @noEscape */ $block->getEnvMode() ?>';
-    
+
     if(envMode == 'Test Mode') {
         document.cookie = "envMode=Test Mode; path=/";
     }else{
         document.cookie = "envMode=Live Mode; path=/";
     }
-    
+
     var browserType = window.navigator.userAgent.match(/chrome/i);
     var browserEdge = window.navigator.userAgent.match(/edg/i);
 
@@ -70,9 +72,11 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         return raw ? parseInt(raw[2], 10) : false;
     }
 
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
 
-<script>
+<?php $scriptString = <<<script
     //Global variables
     var carrierCode;
     var token = '<?= /* @noEscape */ $cusToken ?>';
@@ -120,40 +124,40 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
 
     {
     label: 'Subtotal',
-            amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+            amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
                 value: '<?= /* @noEscape */ $block->getSubTotal() ?>' }
     },
     {
     label: 'Shipping',
-            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
                 value: '<?= /* @noEscape */ $block->getShippingRate() ?>'},
             pending: true,
     },
     {
     label: 'Tax',
-            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
                 value: '<?= /* @noEscape */ $block->getTaxRate() ?>'},
             pending: true,
     },
     {
     label: 'Discount',
-            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
                 value: '<?= /* @noEscape */ $block->getDiscountRate() ?>'},
             pending: true,
     },
     ],
             total: {
             label: 'Total',
-                    amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+                    amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
                     value: '<?= /* @noEscape */ $block->getTotal() ?>' }
             },
-    };  
+    };
     var options = {
     requestShipping: reqShipping,
             requestPayerEmail: true,
             requestPayerPhone: true,
             requestPayerName: true
-    }; 
+    };
     /**
      * Updates the shipping price and the total based on the shipping address.
      *
@@ -189,7 +193,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         details.displayItems[shippingPosition].amount.value = newShippingAmount;
         selectedShippingOption.selected = true;
         var totals = updateTotals(carrierCode, shippingAddress,shippingOption);
-        if(totals){            
+        if(totals){
             var taxPosition = Number(productCount + 2);
             details.displayItems[taxPosition].amount.value = totals.base_tax_amount;
             // Update total after tax
@@ -197,7 +201,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         }
         resolve(details);
     }  // end of updateDetails fn
-    
+
     function updateTotals(carrierCode, shippingAddress,shippingOption){
         var countryCode = shippingAddress.country;
         var req = {
@@ -216,7 +220,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         if (isCustomerLoggedIn) { //Api for logged inb customer
             totalsUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/totals-information';
         } else { // Api for guest customer
-            totalsUrl = baseUrl + 'rest/<?= /* @noEscape */  $storeCode; ?>/V1/guest-carts/' + 
+            totalsUrl = baseUrl + 'rest/<?= /* @noEscape */  $storeCode; ?>/V1/guest-carts/' +
                     guestMaskedQuoteId + '/totals-information';
         }
         var xhttp = new XMLHttpRequest();
@@ -229,9 +233,9 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         var totals = JSON.parse(xhttp.responseText);
         return totals;
     } //--------------end of updateTotals fn -----------
-    
 
-    function updateDetailsAddress(details, request, resolve, reject) {       
+
+    function updateDetailsAddress(details, request, resolve, reject) {
         var countryCode = request.country;
         var req = {
         'address' : {
@@ -244,7 +248,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         if (isCustomerLoggedIn) { //Api for logged inb customer
             apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/estimate-shipping-methods';
         } else { // Api for guest customer
-            apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + 
+            apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' +
                     guestMaskedQuoteId + '/estimate-shipping-methods';
         }
         var xhttp = new XMLHttpRequest();
@@ -261,7 +265,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         id: shippindMethods[i].method_code,
                 label: shippindMethods[i].carrier_title,
                 carrier: shippindMethods[i].carrier_code,
-                amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>', 
+                amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
                     value: shippindMethods[i].amount},
                 selected: false,
         });
@@ -285,11 +289,11 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         }));
     });
     onBuyClicked(request);
-    
+
     } // ------------- End of initPaymentRequest fn ---------------
 
     var jwtUrl = baseUrl +'worldpay/hostedpaymentpage/jwt';
-        
+
         function createJwt(cardNumber){
             var bin = cardNumber;
             var encryptedBin = btoa(bin);
@@ -300,18 +304,18 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             iframe.style.display = "none";
             document.body.appendChild(iframe);
         }
-        
+
         function isClientSideEncryptionEnabled() {
                 if (getCsePublicKey()) {
                     return window.checkoutConfig.payment.ccform.cseEnabled;
                 }
                 return false;
             }
-    
+
         function getCsePublicKey (){
                 return window.checkoutConfig.payment.ccform.csePublicKey;
             }
-        
+
         function placeOrder(instrumentResponse) {
             orderCode = createOrder(instrumentResponse);
             if (instrumentResponse && orderCode){
@@ -321,11 +325,11 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         }
 
 
-    function getRegionById(countryId,regionCode){        
-        var apiUrl =  baseUrl + 'rest/V1/directory/countries/'+countryId; 
+    function getRegionById(countryId,regionCode){
+        var apiUrl =  baseUrl + 'rest/V1/directory/countries/'+countryId;
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET", apiUrl, false);
-        xhttp.setRequestHeader("Content-type", "application/json");        
+        xhttp.setRequestHeader("Content-type", "application/json");
         xhttp.send();
         var regions = JSON.parse(xhttp.responseText);
         if(typeof regions.available_regions !='undefined' ){
@@ -356,7 +360,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     }
 
     request.show().then(function(instrumentResponse) {
-       //Client-Side encryption 
+       //Client-Side encryption
         if(isClientSideEncryptionEnabled()){
             require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.2.min.js"], function (worldpay) {
                 worldpay.setPublicKey(getCsePublicKey());
@@ -382,7 +386,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
                         envUrl = window.jwtEventUrl;
                         }
                     if (event.origin === envUrl) {
-                                        
+
                         var data = JSON.parse(event.data);
                             //console.warn('Merchant received a message:', data);
 
@@ -406,10 +410,10 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
                                 window.sessionId = dfReferenceId;
                                 //place order with direct CSE method
                                 placeOrder(instrumentResponse);
-                            }                                                    
+                            }
                         }
                     }
-                }, false);          
+                }, false);
             } else {
                     placeOrder(instrumentResponse);
                 }
@@ -419,7 +423,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         var binNew = bin.substring(0,6);
         createJwt(binNew);
         window.sessionId ='<?= /* @noEscape */ $block->getSessionId(); ?>';
-        
+
         window.addEventListener("message", function(event) {
             var data = JSON.parse(event.data);
 
@@ -427,7 +431,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             if(window.jwtEventUrl !== '') {
                 envUrl = window.jwtEventUrl;
             }
-            if (event.origin === envUrl) {                            
+            if (event.origin === envUrl) {
                 var data = JSON.parse(event.data);
                  //console.warn('Merchant received a message:', data);
                 if (data !== undefined) {
@@ -450,7 +454,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
                         window.sessionId = dfReferenceId;
                         //place order with direct CSE method
                         placeOrder(instrumentResponse);
-                    }                                                    
+                    }
                 }
             }
         }, false);
@@ -473,25 +477,25 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var apiUrl;
     var orderResponse;
     var dfReferenceId = "";
-    
+
     if (isCustomerLoggedIn) { //Api for logged in customer
         apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/shipping-information';
     } else { // Api for guest customer
-        apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + 
+        apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' +
             guestMaskedQuoteId + '/shipping-information';
     }
-    if(typeof instrumentResponse.details.billingAddress == 'undefined' 
+    if(typeof instrumentResponse.details.billingAddress == 'undefined'
         || instrumentResponse.details.billingAddress == null){
         instrumentResponse.details.billingAddress = {};
         instrumentResponse.details.billingAddress = instrumentResponse.shippingAddress;
 
     }
 
-    //country code 
+    //country code
     var regionId = getRegionById(
         instrumentResponse.details.billingAddress.country,
         instrumentResponse.details.billingAddress.region
-        );    
+        );
     var fullName = instrumentResponse.details.billingAddress.recipient;
     var strArray = fullName.split(" ");
     var firstName = strArray[0];
@@ -556,7 +560,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     //Shipping information
     customerDetails.addressInformation.shipping_carrier_code = carrierCode;
     customerDetails.addressInformation.shipping_method_code = instrumentResponse.shippingOption;
-    
+
     var jsonCustomerDetails = JSON.stringify(customerDetails);
     let cardNo = instrumentResponse.details.cardNumber;
     //Get the card type
@@ -568,7 +572,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     xhttp.setRequestHeader("Authorization", token);
     xhttp.send(jsonCustomerDetails);
     }
- 
+
     //card details
     let cardNumber = instrumentResponse.details.cardNumber;
     let cvc = instrumentResponse.details.cardSecurityCode;
@@ -630,7 +634,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             "billing_address": {
             "email": instrumentResponse.payerEmail,
                     "region": instrumentResponse.details.billingAddress.city,
-                    "region_id":regionId,    
+                    "region_id":regionId,
                     "region_code": instrumentResponse.details.billingAddress.region,
                     "country_id": instrumentResponse.details.billingAddress.country,
                     "street": instrumentResponse.details.billingAddress.addressLine,
@@ -642,7 +646,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             }
     };
     var jsonPaymentDetails = JSON.stringify(paymentDetails);
-    
+
     var orderApiUrl;
     if (isCustomerLoggedIn) { //Api for logged in customer
     orderApiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/payment-information';
@@ -661,7 +665,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     xhttp.send(jsonPaymentDetails);
     var orderResponse = JSON.parse(xhttp.responseText);
     //console.log("Response-->"+orderResponse['message']);
-   
+
    if(isNaN(orderResponse)){
        if(orderResponse.hasOwnProperty("message") && orderResponse['message'].indexOf('3DS2')!==-1) {
          window.location.href = baseUrl + 'checkout/cart?error=true&message=error';
@@ -670,7 +674,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
         window.location.href = baseUrl + 'checkout/cart?error=true';
         exit;
     }
-   
+
     return orderResponse;
     }// --------------------- end of createOrder ----------------
 
@@ -679,7 +683,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     var re = new RegExp("^4");
     if (cardNumber.match(re) != null)
             return "VISA-SSL";
-    // Mastercard 
+    // Mastercard
     // Updated for Mastercard 2017 BINs expansion
     var binExps = /^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$/;
     if (binExps.test(cardNumber))
@@ -713,4 +717,6 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
             return "CHINAUNIONPAY-SSL";
     return "";
     } //end of getCardType
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>

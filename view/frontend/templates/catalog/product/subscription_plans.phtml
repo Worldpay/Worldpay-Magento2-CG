@@ -30,7 +30,7 @@
                        value="<?= /* @noEscape */  $escaper->escapeHtml($plan->getId()) ?>"
                         <?php if ($block->isPlanSelected($plan)): ?>checked
                         <?php endif; ?>/>
-                <label class="label" 
+                <label class="label"
                        for="worldpay_subscription_plan_<?= /* @noEscape */  $block->buildPlanOptionId($plan) ?>">
                     <span><?= /* @noEscape */  $block->getPlanTitle($plan); ?></span>
                 </label>
@@ -60,7 +60,7 @@
         </legend>
         <div class="field-control ">
             <input class="control-text" style="width: 44%;"
-                   name="subscription_end_date" id="subscription_end_date" type="text" readonly="true" 
+                   name="subscription_end_date" id="subscription_end_date" type="text" readonly="true"
                    value="<?= /* @noEscape */  $block->getEndDate();?>">
             <input type="hidden" id="show_endDate" value="1">
             <?php //echo $block->getDateHtml() ?>
@@ -74,7 +74,7 @@
     }
 </style>
 
-<script>
+<?php $scriptString = <<<script
     function valueChanged()
     {
         if(jQuery('#worldpay-add-plan').is(":checked")){
@@ -128,7 +128,7 @@
          .on( "change", function() {
          from.datepicker( "option", "maxDate", getDate(this));
          });
-         
+
          function getDate(element) {
          var date;
          try {
@@ -155,9 +155,11 @@
 
          return date;
          }
-         
+
          $("#subscription_date")
          .datepicker().change();
       });
 
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>

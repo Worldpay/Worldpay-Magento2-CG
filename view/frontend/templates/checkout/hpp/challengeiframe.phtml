@@ -1,6 +1,8 @@
 <?php
     $redirectUrl = $block->getRedirectUrl();
 ?>
-<script>
+<?php $scriptString = <<<script
     window.parent.document.location.href="<?= /* @noEscape */ $redirectUrl?>";
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
