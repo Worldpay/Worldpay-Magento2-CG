@@ -50,11 +50,11 @@
             </span>
             </label>
             <div class="control">
-                <input type="number" name="cardNumber" required='true' id="card_number" 
+                <input type="number" name="cardNumber" required='true' id="card_number"
                     title="<?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4')
                         ? $block->getCheckoutLabelbyCode('CO4') :
                         $escaper->escapeHtml(__('Card Holder Name'))?>"
-                    class="input-text required cardholder_name validate-cc-number 
+                    class="input-text required cardholder_name validate-cc-number
                        worldpay-cardholdername-length worldpay-cardnumber-valid cardNumber">
             </div>
             <div id="card_number_msg" class="wp-error"></div>
@@ -69,7 +69,7 @@
             </span>
             </label>
             <div class="control">
-                <input type="text" name="cardHolderName" required='true' id="card-holder-name" 
+                <input type="text" name="cardHolderName" required='true' id="card-holder-name"
                        title="<?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
                         $block->getCheckoutLabelbyCode('CO4') :
                         $escaper->escapeHtml(__('Card Holder Name'))?>"
@@ -89,7 +89,7 @@
                 <div class="field no-label month">
                     <div class="control">
                         <select id="expiry_month" name="expiryMonth"
-                                class="month required validate-cc-exp required-entry worldpay-month-included 
+                                class="month required validate-cc-exp required-entry worldpay-month-included
                                 worldpay-month-length worldpay-month-range expiryMonth">
                             <?php foreach ($block->getMonths() as $k => $v): ?>
                                 <option value="<?= /* @noEscape */ $escaper->escapeHtml($k) ?>">
@@ -124,17 +124,17 @@
                 </label>
                 <div class="control">
                     <input type="password" autocomplete="off" maxlength="4" length="4" id="cvv"
-                           class="input-text required cvv saved-cvv-number required-entry 
+                           class="input-text required cvv saved-cvv-number required-entry
                            validate-card-cvv validate-length maximum-length-4 cvc"
                            name="cvc"
                            value=""/>
                 </div>
                 <div id="cvv_msg" class="wp-error"></div>
-            </div> 
+            </div>
     <?php endif; ?>
         <!-- Disclaimer -->
         <label for="save-card" class="label">
-            <?php if ($block->getStoredCredentialsEnabledValue() && $block->getDisclaimerMessageEnable()): ?> 
+            <?php if ($block->getStoredCredentialsEnabledValue() && $block->getDisclaimerMessageEnable()): ?>
                 <span>(<a href="javascript:void(0)" role="important-disclaimer">
                 <?php
                     print /* @noEscape */ $escaper->escapeHtml(
@@ -151,7 +151,7 @@
             </form>
         </div>
         <div class="mage-error" generated="true" id="disclaimer-error"></div>
-        
+
         <div class="field billing-address">
             <label class="label" for="billing-address">
                 <span><?php
@@ -178,7 +178,7 @@
                        name="dfReferenceId"
                        id="dfReferenceId"
                        value=""/>
-                <button type="submit" class="action save primary" 
+                <button type="submit" class="action save primary"
                         onclick="javascript:onConfirmBtn(); return false;"
                         id ="save_newcard"
                         title="
@@ -193,7 +193,7 @@
         </div>
     </fieldset>
 </form>
-<script>
+<?php $scriptString = <<<script
     require(['jquery',
         'mage/url',
         'prototype'
@@ -201,7 +201,7 @@
         var baseUrl = '<?= /* @noEscape */ $block->getBaseUrl() ?>';
         var typeCamMsg = '<?= /* @noEscape */ $block->getCreditCardSpecificexception('CTYP01') ?>';
         var jwtUrl = baseUrl + 'worldpay/hostedpaymentpage/jwt';
-        
+
         function createJwt(cardNumber) {
             var bin = cardNumber;
             var encryptedBin = btoa(bin);
@@ -246,11 +246,11 @@
                 return false;
             }
         }
-        
+
         function getCardType() {
             var cardType = document.addnewcardform.paymentType.value;
             var cardnumber= document.getElementById('card_number').value
-           
+
             var visaRegex = new RegExp('^4[0-9]{0,20}$'),
                 mastercardRegex = new RegExp(
                 '^(?:5[1-5][0-9]{0,2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{0,2}|27[01][0-9]|2720)[0-9]{0,12}$'
@@ -262,7 +262,7 @@
                 maestroRegex = new RegExp('^(5018|5020|5038|6304|679|6759|676[1-3])'),
                 unionpayRegex = new RegExp('^62[0-9]{0,14}$|^645[0-9]{0,13}$|^65[0-9]{0,14}$'),
                 dankortRegex = new RegExp('^(5019|4571)');
-          
+
                 curVal = cardnumber.replace(/ /g, '').replace(/-/g, '');
 
                 if (cardType === 'CB-SSL' && curVal.match(mastercardRegex) ||
@@ -292,7 +292,7 @@
         }
         function checkCardTypeValidity()
         {
-            
+
             document.getElementById("card_number_msg")
                             .innerHTML = '';
             var cardType = document.addnewcardform.paymentType.value;
@@ -314,26 +314,26 @@
         function checkEmptyValidation (){
             var valid = false;
             var paymentType = document.addnewcardform.paymentType.value;
-            var cardNumber = document.addnewcardform.cardNumber.value;        
+            var cardNumber = document.addnewcardform.cardNumber.value;
             var cardHolderName = document.addnewcardform.cardHolderName.value;
             var expiryMonth = document.addnewcardform.expiryMonth.value;
             var expiryYear = document.addnewcardform.expiryYear.value;
             var cvc = document.addnewcardform.cvc.value;
-            const errorHtml = [paymentType,cardNumber,cardHolderName,expiryMonth,expiryYear,cvc];           
-           
-            jQuery.each(errorHtml, function(index, value){  
+            const errorHtml = [paymentType,cardNumber,cardHolderName,expiryMonth,expiryYear,cvc];
+
+            jQuery.each(errorHtml, function(index, value){
                 if(!value){
                     valid = false;
                     displayError(index);
                     return false;
                 }else{
                     valid = true;
-                    jQuery(".errmsg").remove();                     
+                    jQuery(".errmsg").remove();
                 }
             });
-            return valid;   
+            return valid;
         }
-      
+
         function displayError(index){
             const errorHtml = [
                             'paymentType',
@@ -345,9 +345,9 @@
                         ];
             var value = errorHtml[index];
             jQuery('.'+value).after('<span class="errmsg wp-error">This field is required</span>');
-            jQuery('.'+value).focus();                       
+            jQuery('.'+value).focus();
         }
-                
+
         function onConfirmBtn() {
             let valid = checkEmptyValidation();
             if(!valid){
@@ -358,7 +358,7 @@
                 ?$block->requireCvcEnabled(): 0); ?>;
             var isCvvValid = isCvcRequired == true ? validateCVV() : true;
             var cvvValid = isCvvValid && checkCardTypeValidity();
-            
+
             mandatoryMessage= parseInt("<?= /* @noEscape */
                 $escaper->escapeHtml(!empty($block->getDisclaimerMessageMandatory())
                 ?$block->getDisclaimerMessageMandatory():0); ?>");
@@ -374,7 +374,7 @@
                         $('#disclaimer-error').css('display', 'block');
                             $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
                         return false;
-                    } 
+                    }
                 /*if((window.is3DsEnabled)) {
                 createPayment3DS();
                 }else {*/
@@ -387,7 +387,7 @@
                     $('#disclaimer-error').css('display', 'block');
                     $('#disclaimer-error').html("Please, Verify the disclaimer! before saving");
                     return false;
-                } 
+                }
 
                 var bin = jQuery('[name=cardNumber]').val();
                 var binNew = bin.substring(0, 6);
@@ -403,16 +403,16 @@
                     if (event.origin === envUrl) {
                         var data = JSON.parse(event.data);
                         if (data !== undefined) {
-                            // for cardinal 
+                            // for cardinal
                             if(data.Payload){
-                                if(data.Payload.ActionCode =="SUCCESS"){ 
+                                if(data.Payload.ActionCode =="SUCCESS"){
                                     var sessionId = data.Payload.SessionId;
                                     if (sessionId) {
                                         dfReferenceId = sessionId;
                                     }
                                     window.sessionId = dfReferenceId;
                                     jQuery('[name=dfReferenceId]').val(dfReferenceId);
-                                    createPayment3DS();  
+                                    createPayment3DS();
                                 }
                             } else if(data.Status) {
                                 var sessionId = data.SessionId;
@@ -518,21 +518,23 @@
                     beforeSend: function () {
                         $('body').trigger('processStart');
                     }
-                    
+
                 }).always(function () {
                     $('body').trigger('processStop');
                 });
             }
-                
+
         }
         window.onConfirmBtn = onConfirmBtn;
         $(document).ready(function (){
-          window.disclaimerDialogue=null; 
+          window.disclaimerDialogue=null;
           disclaimerFlag=null;
         });
     });
-</script>
-<script type="text/x-magento-init">
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<?php $scriptString = <<<script
     {
         ".page-main": {
             "disclaimerPopup": {
@@ -549,4 +551,6 @@
             }
         }
     }
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/x-magento-init'], $scriptString, false) ?>

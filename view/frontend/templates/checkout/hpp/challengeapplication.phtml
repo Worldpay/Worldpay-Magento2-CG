@@ -19,8 +19,7 @@
         back to the return URL after challenge complete
         -->
     </form>
-    <script language="Javascript">
-
+    <?php $scriptString = <<<script
     document.getElementById("challenge_jwt").value = "<?= /* @noEscape */ $encodedJWT?>";
 
     window.onload = function()
@@ -28,5 +27,7 @@
       // Auto submit form on page load
       document.getElementById("challengeForm").submit();
     }
-    </script>
+    script;
+    ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', ['language' => 'Javascript'], $scriptString, false) ?>
 

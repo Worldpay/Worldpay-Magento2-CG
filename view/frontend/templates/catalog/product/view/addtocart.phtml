@@ -35,15 +35,17 @@
                     id="product-addtocart-button" disabled>
                 <span><?= $escaper->escapeHtml($buttonTitle) ?></span>
             </button>
-           
+
         </div>
     </div>
 </div>
 <?php endif; ?>
-<script type="text/x-magento-init">
+<?php $scriptString = <<<script
     {
         "#product_addtocart_form": {
             "Magento_Catalog/js/validate-product": {}
         }
     }
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/x-magento-init'], $scriptString, false) ?>
