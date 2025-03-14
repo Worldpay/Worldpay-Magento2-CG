@@ -47,10 +47,13 @@
     script;
     ?>
     <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
-    <?php $scriptString = <<<script
+
+    <?php
+    $jsLayout = $block->getJsLayout();
+    $scriptString = <<<script
     {
         "[data-block='minicart']": {
-            "Magento_Ui/js/core/app": <?= /* @escapeNotVerified */ $block->getJsLayout() ?>
+            "Magento_Ui/js/core/app": $jsLayout
         },
         "*": {
             "Magento_Ui/js/block-loader":

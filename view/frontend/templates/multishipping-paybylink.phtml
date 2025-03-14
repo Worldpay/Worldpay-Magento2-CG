@@ -1,9 +1,11 @@
 <div id="paybylink-component" data-bind="scope:'paybylink-js-field'">
     <!-- ko template: getTemplate() --><!-- /ko -->
-    <?php $scriptString = <<<script
+    <?php
+    $jsLayout = $block->getJsLayout();
+    $scriptString = <<<script
     {
         "#paybylink-component": {
-            "Magento_Ui/js/core/app":  <?= /* @escapeNotVerified */ $block->getJsLayout() ?>
+            "Magento_Ui/js/core/app":  $jsLayout
         }
     }
     script;
