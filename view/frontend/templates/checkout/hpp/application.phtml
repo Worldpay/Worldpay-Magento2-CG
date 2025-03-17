@@ -1,8 +1,10 @@
-<?php $scriptString = <<<script
+<?php
+$hppConfiguration = $block->getChildHtml('worldpay.checkout.hpp.configuration');
+$scriptString = <<<script
 //<![CDATA[
 var checkoutWorldPayLibraryObject = new WPCL.Library();
 (function(checkoutWorldPayLibraryObject) {
-    checkoutWorldPayLibraryObject.setup(<?= $block->getChildHtml('worldpay.checkout.hpp.configuration') ?>);
+    checkoutWorldPayLibraryObject.setup($hppConfiguration);
 })(checkoutWorldPayLibraryObject);
 //]]>
 script;

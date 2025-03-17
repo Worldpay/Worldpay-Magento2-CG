@@ -1,7 +1,7 @@
 <?php
     $data = $block->challengeConfigs();
     $challengeurl = $data['challengeurl'] ;
-    $encodedJWT = $data['encodedJWT'];
+    $encodedJWT = /* @noEscape */ $data['encodedJWT'];
 ?>
     <!-- An example 3DS2 challenge window size. -->
     <form name= "iframe_challengeForm"
@@ -20,7 +20,7 @@
         -->
     </form>
     <?php $scriptString = <<<script
-    document.getElementById("challenge_jwt").value = "<?= /* @noEscape */ $encodedJWT?>";
+    document.getElementById("challenge_jwt").value = $encodedJWT;
 
     window.onload = function()
     {

@@ -98,29 +98,37 @@
         <?php endif; ?>
     </fieldset>
 </form>
-<?php $scriptString = <<<script
+<?php
+$optionalRegionAllowed = /* @noEscape */($block->getConfig('general/region/display_all')
+    ? 'true' : 'false');
+$regionJson = /* @noEscape */ $block->getRegionJson();
+$defaultRegion = /* @noEscape */ $block->getSubscription()->getBillingAddress()->getRegionId();
+$countriesWithOptionalZip = /* @noEscape */ $block->getCountriesWithOptionalZip(true);
+$scriptString = <<<script
     {
         "#worldpay-subscription-edit": {
             "validation": {}
         },
         "#country": {
             "regionUpdater": {
-                "optionalRegionAllowed": <?= /* @noEscape */($block->getConfig('general/region/display_all')
-                        ? 'true' : 'false'); ?>,
+                "optionalRegionAllowed": $optionalRegionAllowed,
                 "regionListId": "#region_id",
                 "regionInputId": "#region",
                 "postcodeId": "#zip",
                 "form": "#worldpay-subscription-edit",
-                "regionJson": <?= /* @noEscape */ $block->getRegionJson() ?>,
-                "defaultRegion": "<?= /* @noEscape */ $block->getSubscription()->getBillingAddress()->getRegionId() ?>",
-                "countriesWithOptionalZip": <?= /* @noEscape */ $block->getCountriesWithOptionalZip(true) ?>
+                "regionJson": $regionJson,
+                "defaultRegion": $defaultRegion,
+                "countriesWithOptionalZip": $countriesWithOptionalZip,
             }
         }
     }
 script;
 ?>
 <?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/x-magento-init'], $scriptString, false) ?>
-<?php $scriptString = <<<script
+<?php
+$subscriptionId = $escaper->escapeHtml(__($block->getSubscription()->getSubscriptionId()));
+$nextOrder = $escaper->escapeHtml(__($block->getNextOrderDate()));
+$scriptString = <<<script
     require(['jquery',
         'mage/url',
         'prototype'
@@ -131,8 +139,8 @@ script;
                 type: 'POST',
                 dataType: 'json',
                 data: {
-                    subscriptionId: <?= $escaper->escapeHtml(__($block->getSubscription()->getSubscriptionId())) ?>,
-                    nextOrder: '<?= $escaper->escapeHtml(__($block->getNextOrderDate())) ?>',
+                    subscriptionId: $subscriptionId,
+                    nextOrder: $nextOrder,
                 },
                 /** Show loader before send */
                     beforeSend: function() {
