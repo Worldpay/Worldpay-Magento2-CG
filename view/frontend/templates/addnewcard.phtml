@@ -366,7 +366,7 @@ $scriptString = <<<script
                 return false;
             }
             var isCvcRequired =  $isCVCRequired;
-            var isCvvValid = $isCVCRequired == true ? validateCVV() : true;
+            var isCvvValid = isCvcRequired == true ? validateCVV() : true;
             var cvvValid = isCvvValid && checkCardTypeValidity();
 
             mandatoryMessage= parseInt("$mandatoryMessage");
