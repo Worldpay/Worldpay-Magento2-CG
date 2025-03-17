@@ -20,7 +20,7 @@
         -->
     </form>
     <?php $scriptString = <<<script
-    document.getElementById("challenge_jwt").value = $encodedJWT;
+    document.getElementById("challenge_jwt").value = "$encodedJWT";
 
     window.onload = function()
     {

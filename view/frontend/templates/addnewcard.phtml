@@ -210,8 +210,8 @@ $scriptString = <<<script
         'mage/url',
         'prototype'
     ], function ($, urlBuilder) {
-        var baseUrl = $baseurl;
-        var typeCamMsg = $exception;
+        var baseUrl = '$baseurl';
+        var typeCamMsg = '$exception';
         var jwtUrl = baseUrl + 'worldpay/hostedpaymentpage/jwt';
 
         function createJwt(cardNumber) {
@@ -369,9 +369,9 @@ $scriptString = <<<script
             var isCvvValid = $isCVCRequired == true ? validateCVV() : true;
             var cvvValid = isCvvValid && checkCardTypeValidity();
 
-            mandatoryMessage= parseInt($mandatoryMessage);
-            disclaimerMessageEnabled = parseInt($disclaimerMessageEnabled);
-            storedCredentials = parseInt($storedCredentials);
+            mandatoryMessage= parseInt("$mandatoryMessage");
+            disclaimerMessageEnabled = parseInt("$disclaimerMessageEnabled");
+            storedCredentials = parseInt("$storedCredentials");
             if (cvvValid && jQuery('#form_add_card').valid() && !(window.isDynamic3DS2Enabled)) {
                 document.getElementById('save_newcard').disabled=true;
                 if(mandatoryMessage && disclaimerMessageEnabled && window.disclaimerDialogue === null){
@@ -543,9 +543,9 @@ script;
         ".page-main": {
             "disclaimerPopup": {
                 "disclaimer": "a[role='important-disclaimer']",
-                "mandatoryMessage": $mandatoryMessage,
-                "disclaimerMessageEnabled": $disclaimerMessageEnabled,
-                "storedCredentials": $storedCredentials
+                "mandatoryMessage": "$mandatoryMessage",
+                "disclaimerMessageEnabled": "$disclaimerMessageEnabled",
+                "storedCredentials": "$storedCredentials"
             }
         }
     }

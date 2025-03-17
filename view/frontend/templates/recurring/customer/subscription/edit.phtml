@@ -117,7 +117,7 @@ $scriptString = <<<script
                 "postcodeId": "#zip",
                 "form": "#worldpay-subscription-edit",
                 "regionJson": $regionJson,
-                "defaultRegion": $defaultRegion,
+                "defaultRegion": "$defaultRegion",
                 "countriesWithOptionalZip": $countriesWithOptionalZip,
             }
         }
@@ -140,7 +140,7 @@ $scriptString = <<<script
                 dataType: 'json',
                 data: {
                     subscriptionId: $subscriptionId,
-                    nextOrder: $nextOrder,
+                    nextOrder: '$nextOrder',
                 },
                 /** Show loader before send */
                     beforeSend: function() {

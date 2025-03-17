@@ -102,7 +102,7 @@
             ], function($, confirm) {
                 $(".action.delete").on("click", function(event) {
                     confirm({
-                        title: $title,
+                        title: "$title",
                         content: getMyAccountExceptions('IAVMA2') ?
                 getMyAccountExceptions('IAVMA2') : 'Are you sure you want to delete the card? \n\
 Once the card is deleted, subscriptions associated with it will be cancelled',
@@ -162,8 +162,8 @@ $scriptString = <<<script
         ".page-main": {
             "newcard": {
                 "addCard": "button[role='add-card']",
-                "addCardLocation": $cartLocation,
-                "isBilling": $isBilling
+                "addCardLocation": "$cartLocation",
+                "isBilling": "$isBilling"
             }
         }
     }
