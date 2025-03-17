@@ -193,13 +193,25 @@
         </div>
     </fieldset>
 </form>
-<?php $scriptString = <<<script
+<?php
+$baseurl = /* @noEscape */ $block->getBaseUrl();
+$exception = /* @noEscape */ $block->getCreditCardSpecificexception('CTYP01');
+$isCVCRequired = /* @noEscape */ $escaper->escapeHtml(!empty($block->requireCvcEnabled())
+    ?$block->requireCvcEnabled(): 0);
+$mandatoryMessage = /* @noEscape */ $escaper->escapeHtml(!empty($block->getDisclaimerMessageMandatory())
+    ?$block->getDisclaimerMessageMandatory():0);
+$disclaimerMessageEnabled = /* @noEscape */ $escaper->escapeHtml(!empty($block->getDisclaimerMessageEnable())
+    ?$block->getDisclaimerMessageEnable():0);
+$storedCredentials = /* @noEscape */ $escaper->escapeHtml(!empty($block->getStoredCredentialsEnabledValue())
+    ?$block->getStoredCredentialsEnabledValue():0);
+
+$scriptString = <<<script
     require(['jquery',
         'mage/url',
         'prototype'
     ], function ($, urlBuilder) {
-        var baseUrl = '<?= /* @noEscape */ $block->getBaseUrl() ?>';
-        var typeCamMsg = '<?= /* @noEscape */ $block->getCreditCardSpecificexception('CTYP01') ?>';
+        var baseUrl = $baseurl;
+        var typeCamMsg = $exception;
         var jwtUrl = baseUrl + 'worldpay/hostedpaymentpage/jwt';
 
         function createJwt(cardNumber) {
@@ -353,21 +365,13 @@
             if(!valid){
                 return false;
             }
-            var isCvcRequired =  <?= /* @noEscape */
-                $escaper->escapeHtml(!empty($block->requireCvcEnabled())
-                ?$block->requireCvcEnabled(): 0); ?>;
-            var isCvvValid = isCvcRequired == true ? validateCVV() : true;
+            var isCvcRequired =  $isCVCRequired;
+            var isCvvValid = $isCVCRequired == true ? validateCVV() : true;
             var cvvValid = isCvvValid && checkCardTypeValidity();
 
-            mandatoryMessage= parseInt("<?= /* @noEscape */
-                $escaper->escapeHtml(!empty($block->getDisclaimerMessageMandatory())
-                ?$block->getDisclaimerMessageMandatory():0); ?>");
-            disclaimerMessageEnabled = parseInt("<?= /* @noEscape */
-                $escaper->escapeHtml(!empty($block->getDisclaimerMessageEnable())
-                ?$block->getDisclaimerMessageEnable():0); ?>");
-            storedCredentials = parseInt("<?= /* @noEscape */
-                $escaper->escapeHtml(!empty($block->getStoredCredentialsEnabledValue())
-                ?$block->getStoredCredentialsEnabledValue():0); ?>");
+            mandatoryMessage= parseInt($mandatoryMessage);
+            disclaimerMessageEnabled = parseInt($disclaimerMessageEnabled);
+            storedCredentials = parseInt($storedCredentials);
             if (cvvValid && jQuery('#form_add_card').valid() && !(window.isDynamic3DS2Enabled)) {
                 document.getElementById('save_newcard').disabled=true;
                 if(mandatoryMessage && disclaimerMessageEnabled && window.disclaimerDialogue === null){
@@ -539,15 +543,9 @@ script;
         ".page-main": {
             "disclaimerPopup": {
                 "disclaimer": "a[role='important-disclaimer']",
-                "mandatoryMessage": "<?= /* @noEscape */
-                $escaper->escapeHtml(!empty($block->getDisclaimerMessageMandatory())
-                ?$block->getDisclaimerMessageMandatory():0); ?>",
-                "disclaimerMessageEnabled": "<?= /* @noEscape */
-                $escaper->escapeHtml(!empty($block->getDisclaimerMessageEnable())
-                ?$block->getDisclaimerMessageEnable():0); ?>",
-                "storedCredentials": "<?= /* @noEscape */
-                $escaper->escapeHtml(!empty($block->getStoredCredentialsEnabledValue())
-                ?$block->getStoredCredentialsEnabledValue():0); ?>"
+                "mandatoryMessage": $mandatoryMessage,
+                "disclaimerMessageEnabled": $disclaimerMessageEnabled,
+                "storedCredentials": $storedCredentials
             }
         }
     }

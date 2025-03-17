@@ -92,16 +92,17 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
-        <?php $scriptString = <<<script
+        <?php
+        $title = /* @noEscape */ $block->getMyAccountLabels('AC11')?
+        $block->getMyAccountLabels('AC11') : $escaper->escapeHtml(__('Delete'));
+        $scriptString = <<<script
             require([
                 'jquery',
                 'Magento_Ui/js/modal/confirm'
             ], function($, confirm) {
                 $(".action.delete").on("click", function(event) {
                     confirm({
-                        title: "<?= /* @noEscape */ $block->getMyAccountLabels('AC11')?
-                                $block->getMyAccountLabels('AC11') :
-                                $escaper->escapeHtml(__('Delete'))?>",
+                        title: $title,
                         content: getMyAccountExceptions('IAVMA2') ?
                 getMyAccountExceptions('IAVMA2') : 'Are you sure you want to delete the card? \n\
 Once the card is deleted, subscriptions associated with it will be cancelled',
@@ -153,13 +154,16 @@ Once the card is deleted, subscriptions associated with it will be cancelled',
             </span></button>
     </div>
 </div>
-<?php $scriptString = <<<script
+<?php
+$cartLocation = $escaper->escapeJs($escaper->escapeUrl($block->getAddNewCardLabel()));
+$isBilling = $escaper->escapeJs($escaper->escapeUrl($block->ifBillingAddressPresent()));
+$scriptString = <<<script
     {
         ".page-main": {
             "newcard": {
                 "addCard": "button[role='add-card']",
-                "addCardLocation": "<?= $escaper->escapeJs($escaper->escapeUrl($block->getAddNewCardLabel())) ?>",
-                "isBilling": "<?= $escaper->escapeJs($escaper->escapeUrl($block->ifBillingAddressPresent())) ?>"
+                "addCardLocation": $cartLocation,
+                "isBilling": $isBilling
             }
         }
     }
