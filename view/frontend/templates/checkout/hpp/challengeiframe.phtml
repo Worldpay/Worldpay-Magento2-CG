@@ -2,7 +2,7 @@
     $redirectUrl = /* @noEscape */ $block->getRedirectUrl();
 ?>
 <?php $scriptString = <<<script
-    window.parent.document.location.href= $redirectUrl;
+    window.parent.document.location.href= "$redirectUrl";
 script;
 ?>
 <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>

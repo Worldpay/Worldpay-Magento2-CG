@@ -1,6 +1,6 @@
 <?php
 $param= $block->getRequest()->getParams();
-$storeCode= $block->getStoreCode();
+$storeCode= /* @noEscape */ $block->getStoreCode();
 
 if (array_key_exists('chromepay', $param)) {
     ?>
@@ -17,15 +17,16 @@ if (array_key_exists('error', $param)) {
     }
 }
 
-$cusToken = 'Bearer ' . $block->getCustomerToken();
-
 /** @var $block \Sapient\Worldpay\Block\Webpayment */
 ?>
-<?php $scriptString = <<<script
+<?php
+$serviceWorkerUrl = /* @noEscape */ $block->getServiceWorkerUrl();
+$serviceWorkerScope = /* @noEscape */ $block->getServiceWorkerScope().'/';
+$scriptString = <<<script
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
-          navigator.serviceWorker.register("<?= /* @noEscape */ $block->getServiceWorkerUrl(); ?>",
-            { scope: "<?= /* @noEscape */ $block->getServiceWorkerScope().'/'; ?>" })
+          navigator.serviceWorker.register('$serviceWorkerUrl',
+            { scope: '$serviceWorkerScope' })
             .then(function (registration)
             {
             console.log('Service worker registered successfully');
@@ -38,19 +39,33 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
 script;
 ?>
 <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
-<?php $scriptString = <<<script
-    window.ChromepayButtonName = '<?= /* @noEscape */ $block->getChromepayButtonName() ?>';
-    window.ChromepayEnabled = '<?= /* @noEscape */ $block->getChromepayEnabled() ?>';
-    window.ChromePaymentMode = '<?= /* @noEscape */ $block->getPaymentMode() ?>';
-    window.SubscriptionStatus = '<?= /* @noEscape */ $block->checkSubscriptionItems() ?>'
-    window.GeneralExceptions = '<?= /* @noEscape */ $block->getGeneralException() ?>'
-    window.MyAccountExceptions = '<?= /* @noEscape */ $block->MyAccountExceptions() ?>';
-    window.CreditCardException = '<?= /* @noEscape */ $block->getCreditCardException() ?>';
-    window.isDynamic3DS2Enabled = '<?= /* @noEscape */ $block->isDynamic3DS2Enabled() ?>';
-    window.is3DsEnabled = '<?= /* @noEscape */ $block->is3DsEnabled() ?>';
-    window.jwtEventUrl = '<?= /* @noEscape */ $block->getJwtEventUrl() ?>';
-    window.isCheckoutCartPage = '<?= /* @noEscape */ $block->isCheckoutCartPage(); ?>';
-    var envMode = '<?= /* @noEscape */ $block->getEnvMode() ?>';
+<?php
+$chromepayButtonName = /* @noEscape */ $block->getChromepayButtonName();
+$chromepayEnabled = /* @noEscape */ $block->getChromepayEnabled();
+$chromePaymentMode = /* @noEscape */ $block->getPaymentMode();
+$subscriptionStatus = /* @noEscape */ $block->checkSubscriptionItems();
+$generalExceptions = /* @noEscape */ $block->getGeneralException();
+$myAccountExceptions = /* @noEscape */ $block->MyAccountExceptions();
+$creditCardException = /* @noEscape */ $block->getCreditCardException();
+$isDynamic3DS2Enabled = /* @noEscape */ $block->isDynamic3DS2Enabled();
+$is3DsEnabled = /* @noEscape */ $block->is3DsEnabled();
+$jwtEventUrl = /* @noEscape */ $block->getJwtEventUrl();
+$isCheckoutCartPage = /* @noEscape */ $block->isCheckoutCartPage();;
+$envMode = /* @noEscape */ $block->getEnvMode();
+
+$scriptString = <<<script
+    window.ChromepayButtonName = '$chromepayButtonName';
+    window.ChromepayEnabled = '$chromepayEnabled';
+    window.ChromePaymentMode = '$chromePaymentMode';
+    window.SubscriptionStatus = '$subscriptionStatus';
+    window.GeneralExceptions = '$generalExceptions';
+    window.MyAccountExceptions = '$myAccountExceptions';
+    window.CreditCardException = '$creditCardException';
+    window.isDynamic3DS2Enabled = '$isDynamic3DS2Enabled';
+    window.is3DsEnabled = '$is3DsEnabled';
+    window.jwtEventUrl = '$jwtEventUrl';
+    window.isCheckoutCartPage = '$isCheckoutCartPage';
+    var envMode = '$envMode';
 
     if(envMode == 'Test Mode') {
         document.cookie = "envMode=Test Mode; path=/";
@@ -76,16 +91,40 @@ script;
 ?>
 <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
 
-<?php $scriptString = <<<script
+<?php
+$cusToken = /* @noEscape */ 'Bearer ' . $block->getCustomerToken();
+$baseUrl = /* @noEscape */ $block->getBaseUrl();
+$currency = /* @noEscape */ $block->getCurrency();
+$reqShipping = /* @noEscape */ $block->getshippingRequired();
+$isDownloadable = /* @noEscape */ $block->checkDownloadableProduct();
+$subtotal = /* @noEscape */ $block->getSubTotal();
+$shippingRate = /* @noEscape */ $block->getShippingRate();
+$taxRate = /* @noEscape */ $block->getTaxRate();
+$discountRate = /* @noEscape */ $block->getDiscountRate();
+$total = /* @noEscape */ $block->getTotal();
+$productCount = /* @noEscape */ $block->getProductCount();
+$sessionId = /* @noEscape */ $block->getSessionId();
+
+$blockAllItems = '';
+foreach ($block->getAllItems() as $item) {
+    $blockAllItems .= '{';
+    $blockAllItems .= 'label:"' . /* @noEscape */ $item->getData('name') . '",';
+    $blockAllItems .= 'amount: { currency: "' . /* @noEscape */ $block->getCurrency() . '",';
+    $blockAllItems .= 'value: "' . /* @noEscape */ $item->getData('price') .'"';
+    $blockAllItems .= '}},';
+}
+
+
+$scriptString = <<<script
     //Global variables
     var carrierCode;
-    var token = '<?= /* @noEscape */ $cusToken ?>';
+    var token = '$cusToken';
     var cardType;
     var totalAmount;
-    var baseUrl = '<?= /* @noEscape */ $block->getBaseUrl() ?>';
-    var baseCurrency = '<?= /* @noEscape */ $block->getCurrency() ?>';
+    var baseUrl = '$baseUrl';
+    var baseCurrency = '$currency';
     var orderCode;
-    var reqShipping = '<?= /* @noEscape */ $block->getshippingRequired() ?>';
+    var reqShipping = '$reqShipping';
     var session ='';
     var cseData = {};
     function initPaymentRequest() {
@@ -109,47 +148,40 @@ script;
     }];
     var isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
     var guestMaskedQuoteId = window.checkoutConfig.quoteData.entity_id;
-    var isDownlodable = <?= /* @noEscape */ $block->checkDownloadableProduct() ?>;
+    var isDownlodable = $isDownloadable;
     const details = {
     displayItems: [
 
-<?php foreach ($block->getAllItems() as $item) { ?>
-        {
-            label: "<?= /* @noEscape */ $item->getData('name') ?>",
-            amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
-            value: '<?= /* @noEscape */ $item->getData('price') ?>'
-         }
-        },
-<?php } ?>
+$blockAllItems
 
     {
     label: 'Subtotal',
-            amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
-                value: '<?= /* @noEscape */ $block->getSubTotal() ?>' }
+            amount: { currency: '$currency',
+                value: '$subtotal' }
     },
     {
     label: 'Shipping',
-            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
-                value: '<?= /* @noEscape */ $block->getShippingRate() ?>'},
+            amount: {currency: '$currency',
+                value: '$shippingRate'},
             pending: true,
     },
     {
     label: 'Tax',
-            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
-                value: '<?= /* @noEscape */ $block->getTaxRate() ?>'},
+            amount: {currency: '$currency',
+                value: '$taxRate'},
             pending: true,
     },
     {
     label: 'Discount',
-            amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
-                value: '<?= /* @noEscape */ $block->getDiscountRate() ?>'},
+            amount: {currency: '$currency',
+                value: '$discountRate'},
             pending: true,
     },
     ],
             total: {
             label: 'Total',
-                    amount: { currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
-                    value: '<?= /* @noEscape */ $block->getTotal() ?>' }
+                    amount: { currency: '$currency',
+                    value: '$total' }
             },
     };
     var options = {
@@ -184,9 +216,9 @@ script;
 
         carrierCode = details.shippingOptions[selectedOptIndex].carrier;
         var newShippingAmount = Number(details.shippingOptions[selectedOptIndex].amount.value);
-        var newTotal = Number(<?= /* @noEscape */ $block->getSubTotal() ?>) + newShippingAmount;
+        var newTotal = Number($subtotal) + newShippingAmount;
         selectedShippingOption = details.shippingOptions[selectedOptIndex];
-        var productCount = Number(<?= /* @noEscape */ $block->getProductCount() ?>);
+        var productCount = Number($productCount);
         var shippingPosition = Number(productCount + 1);
         details.total.amount.value = newTotal;
         totalAmount = newTotal;
@@ -218,9 +250,9 @@ script;
         var jsonReq = JSON.stringify(req);
         var totalsUrl;
         if (isCustomerLoggedIn) { //Api for logged inb customer
-            totalsUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/totals-information';
+            totalsUrl = baseUrl + 'rest/$storeCode/V1/carts/mine/totals-information';
         } else { // Api for guest customer
-            totalsUrl = baseUrl + 'rest/<?= /* @noEscape */  $storeCode; ?>/V1/guest-carts/' +
+            totalsUrl = baseUrl + 'rest/$storeCode/V1/guest-carts/' +
                     guestMaskedQuoteId + '/totals-information';
         }
         var xhttp = new XMLHttpRequest();
@@ -246,9 +278,9 @@ script;
         var jsonReq = JSON.stringify(req);
         var apiUrl;
         if (isCustomerLoggedIn) { //Api for logged inb customer
-            apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/estimate-shipping-methods';
+            apiUrl = baseUrl + 'rest/$storeCode/V1/carts/mine/estimate-shipping-methods';
         } else { // Api for guest customer
-            apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' +
+            apiUrl = baseUrl + 'rest/$storeCode/V1/guest-carts/' +
                     guestMaskedQuoteId + '/estimate-shipping-methods';
         }
         var xhttp = new XMLHttpRequest();
@@ -265,7 +297,7 @@ script;
         id: shippindMethods[i].method_code,
                 label: shippindMethods[i].carrier_title,
                 carrier: shippindMethods[i].carrier_code,
-                amount: {currency: '<?= /* @noEscape */ $block->getCurrency() ?>',
+                amount: {currency: '$currency',
                     value: shippindMethods[i].amount},
                 selected: false,
         });
@@ -352,7 +384,7 @@ script;
     function onBuyClicked(request) {
 
     var isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
-    var isDownlodable = <?= /* @noEscape */ $block->checkDownloadableProduct() ?>;
+    var isDownlodable = $isDownloadable;
     if (isCustomerLoggedIn == false && isDownlodable == true) {
         var error = 'Please log in to continue';
         alert(error);
@@ -422,7 +454,7 @@ script;
         var bin = instrumentResponse.details.cardNumber;;
         var binNew = bin.substring(0,6);
         createJwt(binNew);
-        window.sessionId ='<?= /* @noEscape */ $block->getSessionId(); ?>';
+        window.sessionId = '$sessionId';
 
         window.addEventListener("message", function(event) {
             var data = JSON.parse(event.data);
@@ -479,9 +511,9 @@ script;
     var dfReferenceId = "";
 
     if (isCustomerLoggedIn) { //Api for logged in customer
-        apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/shipping-information';
+        apiUrl = baseUrl + 'rest/$storeCode/V1/carts/mine/shipping-information';
     } else { // Api for guest customer
-        apiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' +
+        apiUrl = baseUrl + 'rest/$storeCode/V1/guest-carts/' +
             guestMaskedQuoteId + '/shipping-information';
     }
     if(typeof instrumentResponse.details.billingAddress == 'undefined'
@@ -649,9 +681,9 @@ script;
 
     var orderApiUrl;
     if (isCustomerLoggedIn) { //Api for logged in customer
-    orderApiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/carts/mine/payment-information';
+    orderApiUrl = baseUrl + 'rest/$storeCode/V1/carts/mine/payment-information';
     } else { // Api for guest customer
-    orderApiUrl = baseUrl + 'rest/<?= /* @noEscape */ $storeCode; ?>/V1/guest-carts/' + guestMaskedQuoteId + '/order';
+    orderApiUrl = baseUrl + 'rest/$storeCode/V1/guest-carts/' + guestMaskedQuoteId + '/order';
     }
 
     var xhttp = new XMLHttpRequest();
