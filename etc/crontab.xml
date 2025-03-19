@@ -18,7 +18,7 @@
             <schedule>* * * * *</schedule>
         </job>
     </group>
-    <group id="defalut">
+    <group id="default">
         <job name="pending_order_cleanup" instance="Sapient\Worldpay\Cron\PendingOrderCleanup" method="execute">
             <schedule>0 0 * * *</schedule>
         </job>
