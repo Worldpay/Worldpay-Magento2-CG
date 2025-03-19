@@ -51,7 +51,7 @@ function (
             if (this.isAddressSameAsShipping()) {
                 selectBillingAddress(quote.shippingAddress());
 
-                this.updateAddresses();
+                this.updateAddresses(true);
                 this.isAddressDetailsVisible(true);
             } else {
                 lastSelectedBillingAddress = quote.billingAddress();
@@ -69,7 +69,7 @@ function (
                            var wallets_APPLEPAY = document.getElementById("wallets_APPLEPAY-SSL");
                            var wallets_image_APPLEPAY = document.getElementById("wallets_image_APPLEPAY-SSL");
                            var wallets_label_APPLEPAY = document.getElementById("wallets_label_APPLEPAY-SSL");
-                           
+
                            if(wallets_APPLEPAY) {
                                //document.getElementById("wallets_APPLEPAY-SSL").style.display = "block";
                                document.getElementById("wallets_APPLEPAY-SSL").style.display = "table-cell";
@@ -80,18 +80,16 @@ function (
                            if(wallets_label_APPLEPAY) {
                                document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "table-cell";
                            }
-                          
-                             
-                       } 
-                     }); 
-             } 
+                       }
+                });
+            }
             // Worldpay - Applepay modification end
             return true;
         },
         /**
          * Update address action
          */
-            updateAddress: function () {
+        updateAddress: function () {
             var addressData, newBillingAddress;
 
             addressUpadated = true;
@@ -129,26 +127,24 @@ function (
                 var merchantIdentifier = window.checkoutConfig.payment.ccform.appleMerchantid;
                 var promise = ApplePaySession.canMakePaymentsWithActiveCard(merchantIdentifier);
                 promise.then(function (canMakePayments) {
-                        if (canMakePayments) {
-                            var wallets_APPLEPAY = document.getElementById("wallets_APPLEPAY-SSL");
-                            var wallets_image_APPLEPAY = document.getElementById("wallets_image_APPLEPAY-SSL");
-                            var wallets_label_APPLEPAY = document.getElementById("wallets_label_APPLEPAY-SSL");
-                            
-                            if(wallets_APPLEPAY) {
-                                //document.getElementById("wallets_APPLEPAY-SSL").style.display = "block";
-                                document.getElementById("wallets_APPLEPAY-SSL").style.display = "inline";
-                            }
-                            if(wallets_image_APPLEPAY) {
-                                document.getElementById("wallets_image_APPLEPAY-SSL").style.display = "inline";
-                            }
-                            if(wallets_label_APPLEPAY) {
-                                document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "inline";
-                            }
-                            
-                                
-                        } 
-                        }); 
-                }                    
+                    if (canMakePayments) {
+                        var wallets_APPLEPAY = document.getElementById("wallets_APPLEPAY-SSL");
+                        var wallets_image_APPLEPAY = document.getElementById("wallets_image_APPLEPAY-SSL");
+                        var wallets_label_APPLEPAY = document.getElementById("wallets_label_APPLEPAY-SSL");
+
+                        if(wallets_APPLEPAY) {
+                            //document.getElementById("wallets_APPLEPAY-SSL").style.display = "block";
+                            document.getElementById("wallets_APPLEPAY-SSL").style.display = "inline";
+                        }
+                        if(wallets_image_APPLEPAY) {
+                            document.getElementById("wallets_image_APPLEPAY-SSL").style.display = "inline";
+                        }
+                        if(wallets_label_APPLEPAY) {
+                            document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "inline";
+                        }
+                    }
+                });
+            }
             // Worldpay - Applepay modification end
         },
     };

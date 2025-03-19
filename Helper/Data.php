@@ -2942,7 +2942,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'additional_details' => [
                 'payment_method' => $paymentMethod,
                 'currency' => $this->_checkoutSession->getQuote()->getQuoteCurrencyCode(),
-                'amount' => $this->_checkoutSession->getQuote()->getGrandTotal(),
             ]
         ];
 
