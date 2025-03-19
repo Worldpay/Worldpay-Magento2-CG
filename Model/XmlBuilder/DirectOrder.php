@@ -624,8 +624,11 @@ EOD;
             $session['id'] = $this->paymentDetails['sessionId'];
             $session['shopperIPAddress'] = $this->paymentDetails['shopperIpAddress'];
         }
-//        dd($this->paymentDetails);die;
-        if($this->dataHelper->getShopperSelection($this->paymentDetails["cardType"])) {
+
+        if(
+            !$this->paymentDetails['isEnabledEFTPOS']
+            && $this->dataHelper->getShopperSelection($this->paymentDetails["cardType"])
+        ) {
             $selectedScheme = $paymentDetailsElement->addChild('selectedScheme');
             $selectedScheme['shopperSelection'] = $this->dataHelper->getShopperSelection($this->paymentDetails["cardType"]);
         }
