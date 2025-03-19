@@ -2,8 +2,8 @@ Latest releases for all supported version:
 
 For Magento 2.4.6
 Worldpay Plugin version: 2.4.6-p90225
-1. Magento 2.4.6-p8 compatible
-2. PHP 8.2 compatibility
+1. Magento 2.4.6-p9 compatible
+2. Co-badged functionality for HPP and Direct
 
 Worldpay Plugin version: 2.4.6-p80125
 1. Magento 2.4.6-p8 compatible
