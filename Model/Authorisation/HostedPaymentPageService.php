@@ -8,7 +8,7 @@ use Exception;
 
 class HostedPaymentPageService extends \Magento\Framework\DataObject
 {
-   
+
     /** @var  \Sapient\Worldpay\Model\Checkout\Hpp\State */
     protected $_status;
     /** @var  \Sapient\Worldpay\Model\Response\RedirectResponse */
@@ -50,7 +50,7 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
      * @var \Sapient\Worldpay\Model\Response\RedirectResponse
      */
     protected $redirectresponse;
-    
+
     /**
      * @var \Sapient\Worldpay\Helper\Multishipping
      */
@@ -142,6 +142,7 @@ class HostedPaymentPageService extends \Magento\Framework\DataObject
             $this->registryhelper->setworldpayRedirectUrl(
                 $this->_urlInterface->getUrl('worldpay/hostedpaymentpage/pay')
             );
+
             $this->checkoutsession->setWpRedirecturl($this->_urlInterface->getUrl('worldpay/hostedpaymentpage/pay'));
         }
     }

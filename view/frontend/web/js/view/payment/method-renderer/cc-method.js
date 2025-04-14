@@ -22,9 +22,9 @@ define(
         'Magento_Ui/js/model/messageList',
         'Sapient_Worldpay/js/model/disclaimer-confirm',
         'Magento_Checkout/js/view/summary/abstract-total',
-        'jquery/ui'        
+        'jquery/ui'
     ],
-    
+
     function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, additionalValidators,setBillingAddressAction,globalMessageList,disclaimerConfirm) {
         'use strict';
         //Valid card number or not.
@@ -61,7 +61,7 @@ define(
         $.validator.addMethod('worldpay-cardnumber-valid', function (value) {
             return doLuhnCheck(value);
         }, $.mage.__(getCreditCardExceptions('CCAM0')));
-        
+
         var typeErrorMsg = 'Card number entered does not match with card type selected';
         var cardTypeErrorDisplay = getCreditCardExceptions('CTYP01') ? getCreditCardExceptions('CTYP01') : typeErrorMsg;
         $.validator.addMethod('worldpay-validate-card-type', function (value) {
@@ -131,27 +131,27 @@ define(
         function getCreditCardExceptions (exceptioncode){
                 var ccData=window.checkoutConfig.payment.ccform.creditcardexceptions;
                   for (var key in ccData) {
-                    if (ccData.hasOwnProperty(key)) {  
+                    if (ccData.hasOwnProperty(key)) {
                         var cxData=ccData[key];
                     if(cxData['exception_code'].includes(exceptioncode)){
                         return cxData['exception_module_messages']?cxData['exception_module_messages']:cxData['exception_messages'];
                     }
                     }
                 }
-            }           
-           
+            }
+
         // 3DS2 part Start
-        
+
         var jwtUrl = url.build('worldpay/hostedpaymentpage/jwt');
-        
+
         function createJwt(cardNumber){
             var bin = cardNumber;
             var encryptedBin = btoa(bin);
             $('body').append('<iframe src="'+jwtUrl+'?instrument='+encryptedBin+'" name="jwt_frm" id="jwt_frm" style="display: none"></iframe>');
         }
-        
+
         // 3DS2 part End
-        
+
         return Component.extend({
             defaults: {
                 intigrationmode: window.checkoutConfig.payment.ccform.intigrationmode,
@@ -257,7 +257,7 @@ define(
                                 });
                                 fullScreenLoader.stopLoader();
                                 isInstalment(ccTypesArr1);
-                                
+
                             }
                     ).fail(
                             function (response) {
@@ -358,10 +358,10 @@ define(
                                 'ccValue': key,
                                 'ccLabel': value
                             };
-                          
+
                          });
                          fullScreenLoader.stopLoader();
-                        
+
                          ccTypesArr(ccTypesArr1);
                          filtersavedcardLists(filtercards);
 
@@ -384,19 +384,19 @@ define(
             },
             getCcAvailableTypesValues : function(){
                    return ccTypesArr;
-            },           
-            showCardTypes : function(){   
+            },
+            showCardTypes : function(){
                 this.showCardTypeDropDown(true);
             },
             savethiscard : function(obj,event){
                 if($(event.target).is(":checked")){
                     if(this.isDisclaimerMessageMandatory() && this.isDisclaimerMessageEnabled() && (window.disclaimerDialogue === null || window.disclaimerDialogue === false) ){
                             $('#disclaimer-error').css('display', 'block');
-                            $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));                            
+                            $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));
                         return false;
-                    } else{                        
+                    } else{
                             $('#disclaimer-error').css('display', 'none');
-                            
+
                     }
                     $(event.target).attr( 'checked', true );
                 }else{
@@ -411,20 +411,20 @@ define(
                 $('.hpp-checkout').show();
                 obj.isSaveThisCardVisible(true);
                 $("#worldpay_cc_save_card").removeAttr('disabled');
-                return true;                
+                return true;
             },
-            onSelectNewCard:function(obj) { 
-                $('#saved-Card-Visibility-Enabled').hide();  
+            onSelectNewCard:function(obj) {
+                $('#saved-Card-Visibility-Enabled').hide();
                 obj.isSaveThisCardVisible(true);
                 $("#worldpay_cc_save-card_div").show();
-                return true;            
+                return true;
             },
             onSelectSavedCards:function(obj,ccData){
                 obj.selectedPayType('savedcard');
                 obj.paymentToken = ccData.token_code;
                 obj.isSavedCardPayment=true;
                 return true;
-            },     
+            },
             loadSavedCards : function(){
                 this.selectedPayType('savedcard');
                 this.unselectPreviousSelectedCard('payment[cc_type]');
@@ -435,7 +435,7 @@ define(
             validateForms : function(selectedData){
                 var self= this;
                 var $form = $('#' + this.getCode() + '-form');
-                var $savedCardForm = $('#' + this.getCode() + '-savedcard-form');               
+                var $savedCardForm = $('#' + this.getCode() + '-savedcard-form');
                 if(selectedData.additional_data.cc_type == 'savedcard'){
                     if($savedCardForm.validation() && $savedCardForm.validation('isValid')) {
                         selectedData.additional_data.save_my_card = false;
@@ -487,7 +487,7 @@ define(
                 var self= this;
                 this.redirectAfterPlaceOrder = false;
                 var paymentDetails = this.getData();
-                if (this.getselectedCCType('payment[cc_type]') == undefined || 
+                if (this.getselectedCCType('payment[cc_type]') == undefined ||
                     this.getselectedCCType('payment[cc_type]') == '') {
                     $('#cc_type-error').css('display', 'block');
                     $('#cc_type-error').html("<div>" + getCreditCardExceptions('CCAM6') + "</div>");
@@ -515,8 +515,8 @@ define(
                 function (apiresponse) {
                     window.checkoutConfig.CCMethodClass.redirectAfterPlaceOrder = false;
                     window.checkoutConfig.CCMethodClass.isIframecardPage = true;
-                    
-                    if(window.checkoutConfig.CCMethodClass.multishipping){                                                        
+
+                    if(window.checkoutConfig.CCMethodClass.multishipping){
                         placeMultishippingOrder(window.checkoutConfig.CCMethodClass.getData());
                     }
                     else{
@@ -525,7 +525,7 @@ define(
                     $("#checkout-payment-worldpay-container").show();
                     require(["https://payments.worldpay.com/resources/hpp/integrations/embedded/js/hpp-embedded-integration-library.js"], function (worldpay) {
                         var checkoutWorldPayLibraryObject = new WPCL.Library();
-                        var iframeParams = JSON.parse(apiresponse);  
+                        var iframeParams = JSON.parse(apiresponse);
                         iframeParams.customisation = {
                             "page": {
                                 "BackgroundColor":"#FFF",
@@ -536,62 +536,62 @@ define(
                                     "border-radius": "10px"
                                 }
                               }
-                        };                                         
+                        };
                         iframeParams.resultCallback = function(responseData){
-                            var redirectUrl,isredirect=false;                            
+                            var redirectUrl,isredirect=false;
                             var status = responseData.order.status;
                             /*var urlParams  = Object.keys(responseData.gateway).map(function(k) {
                                 return encodeURIComponent(k) + '=' + encodeURIComponent(responseData.gateway[k])
-                            }).join('&');*/   
+                            }).join('&');*/
                             switch (status) {
                               case "success":
-                                redirectUrl=url.build('worldpay/redirectresult/iframe/status/success/');   
+                                redirectUrl=url.build('worldpay/redirectresult/iframe/status/success/');
                                 break;
                               case "failure":
-                                redirectUrl=url.build('worldpay/redirectresult/iframe/status/failure/');                       
+                                redirectUrl=url.build('worldpay/redirectresult/iframe/status/failure/');
                                 break;
                               case "error":
-                                redirectUrl=url.build('worldpay/redirectresult/iframe/status/error/');                           
+                                redirectUrl=url.build('worldpay/redirectresult/iframe/status/error/');
                                 break;
                                case "cancel":
-                                redirectUrl=url.build('worldpay/redirectresult/iframe/status/cancel');                    
+                                redirectUrl=url.build('worldpay/redirectresult/iframe/status/cancel');
                                 break;
                              case "cancelled_by_shopper":
-                                redirectUrl=url.build('worldpay/redirectresult/iframe/status/cancel');                    
+                                redirectUrl=url.build('worldpay/redirectresult/iframe/status/cancel');
                                 break
                               default:
                                 redirectUrl=url.build('worldpay/redirectresult/iframe/status/pending');
-                                
+
                             }
                              window.location = redirectUrl;
-                                                       
+
                         }
                         checkoutWorldPayLibraryObject.setup(iframeParams);
-                        window.addEventListener("message", function(event,s) {                            
+                        window.addEventListener("message", function(event,s) {
                             var data = JSON.parse(event.data);
-                            if(data.action == 'resize'){      
+                            if(data.action == 'resize'){
                                 $('.hpp-checkout').hide();
-                                if(paymentDetails.additional_data.save_my_card){                                    
+                                if(paymentDetails.additional_data.save_my_card){
                                     self.isSaveThisCardVisible(true);
                                     $("#worldpay_cc_save_card").attr('disabled',"disabled");
-                                }else{                                    
+                                }else{
                                     self.isSaveThisCardVisible(false);
                                     $("#worldpay_cc_save_card").removeAttr('disabled');
                                 }
                                 $("#wp-cl-checkout-payment-worldpay-container-iframe").attr('scrolling','yes');
                                 self.afterIframeLoadActions();
                                 fullScreenLoader.stopLoader();
-                            }                           
+                            }
                         }, { once: true });
                         /******* If addeventlister not working */
                         setTimeout(function () {
                             if($('.loading-mask:visible').length)
                                 {
                                       $('.hpp-checkout').hide();
-                                if(paymentDetails.additional_data.save_my_card){                                    
+                                if(paymentDetails.additional_data.save_my_card){
                                     self.isSaveThisCardVisible(true);
                                     $("#worldpay_cc_save_card").attr('disabled',"disabled");
-                                }else{                                    
+                                }else{
                                     self.isSaveThisCardVisible(false);
                                     $("#worldpay_cc_save_card").removeAttr('disabled');
                                 }
@@ -601,10 +601,10 @@ define(
                                     self.afterIframeLoadActions();
                                     fullScreenLoader.stopLoader();
                                 }
-                                
+
                          },1000);
                         /******** end  */
-                    });                    
+                    });
                 }
                ).fail(
                     function (response) {
@@ -618,7 +618,7 @@ define(
                 if(this.getIntigrationMode() == 'redirect' && this.getHppIntegrationType() == 'iframe'){
                     return ccTypesArr.filter(function(el) { return el.ccValue != "savedcard"; });
                 }
-                
+
                return ccTypesArr;
             },
             getCheckoutLabels: function (labelcode) {
@@ -661,7 +661,7 @@ define(
                 $("input:radio[name='"+radioName+"']").each(function(i) {
                     this.checked = false;
                 });
-                
+
             },
 
             loadEventAction: function(data, event){
@@ -694,7 +694,7 @@ define(
                         $("#worldpay_cc_save-card_div").hide();
                         $("#checkout-payment-worldpay-container").hide();
                         window.checkoutConfig.CCMethodClass.unselectPreviousSelectedCard('payment[token_to_use]');
-                       
+
                     }else{
                         $("#worldpay_cc_save-card_div").show();
                         $(".cc-Visibility-Enabled").children().prop('disabled',false);
@@ -742,7 +742,7 @@ define(
                 } else {
                     $ccNumberContain.removeClass('is_dankort');
                 }
-                
+
                 if (curVal.match(visaRegex)) {
                     piCardType = 'visa';
                     $ccNumberContain.addClass('is_visa');
@@ -945,16 +945,16 @@ define(
                 },
 //            getInstalmentValues : function(billingAddressCountryId){
 //                return window.checkoutConfig.payment.ccform.instalmentvalues.billingAddressCountryId;
-//                
+//
 //            },
                 isCPF: ko.observable(),
             /**
              * @override
              */
             getData: function () {
-                
+
                 var selectedCardType =    this.getselectedCCType('payment[cc_type]');
-              
+
                 if(typeof selectedCardType == 'undefined'){
                     selectedCardType = this.selectedPayType();
                 }
@@ -1029,7 +1029,7 @@ define(
                     };
                 }
 
-                
+
             },
             isClientSideEncryptionEnabled:function(){
                 if (this.getCsePublicKey()) {
@@ -1056,28 +1056,28 @@ define(
                 var $savedCardForm = $('#' + this.getCode() + '-savedcard-form');
                 var selectedSavedCardToken = $("input[name='payment[token_to_use]']:checked").val();
                     var $cpfForm = $('#' + this.getCode() + '-cpf-form');
-                var cc_type_selected = this.getselectedCCType('payment[cc_type]');                
+                var cc_type_selected = this.getselectedCCType('payment[cc_type]');
                     this.statement = $('#' + this.getCode() + '_statement').val();
-                
+
                 if(!additionalValidators.validate()){
                     console.log("Validation Failed");
                     return false;
                 }
                 if(this.intigrationmode == 'redirect'){
-                    if (this.getselectedCCType('payment[cc_type]') == undefined || 
+                    if (this.getselectedCCType('payment[cc_type]') == undefined ||
                         this.getselectedCCType('payment[cc_type]') == '') {
                         $('#cc_type-error').css('display', 'block');
                         $('#cc_type-error').html("<div>" + getCreditCardExceptions('CCAM6') + "</div>");
                         return false;
                     }
                 }
-                // 3DS2 JWT create function 
+                // 3DS2 JWT create function
                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                     var bin = this.creditCardNumber();
                     if(cc_type_selected == 'savedcard'){
-                        bin = $("input[name='payment[token_to_use]']:checked").next().next().next().val(); 
-                    } 
-                    
+                        bin = $("input[name='payment[token_to_use]']:checked").next().next().next().val();
+                    }
+
                     if(this.intigrationmode == 'direct') {
                         if(cc_type_selected == 'savedcard'){
                             if($savedCardForm.validation() && $savedCardForm.validation('isValid')) {
@@ -1085,14 +1085,14 @@ define(
                                 createJwt(bin);
                                 }else{
                                     alert(getCreditCardExceptions('CCAM2'));
-                                    return; 
+                                    return;
                                 }
                             }
                         }else {
                             if($form.validation() && $form.validation('isValid')) {
                                 var binNew = bin.substring(0,6);
 
-                               createJwt(binNew); 
+                               createJwt(binNew);
                             }
                         }
                     }
@@ -1100,7 +1100,7 @@ define(
                 this.dfReferenceId = null;
 
                 if(cc_type_selected == 'savedcard'){
-                    
+
                     //Saved card handle
                     if((this.intigrationmode == 'direct' && $savedCardForm.validation() && $savedCardForm.validation('isValid') && selectedSavedCardToken) ||
                         (this.intigrationmode == 'redirect' && $form.validation() && $form.validation('isValid') && selectedSavedCardToken)){
@@ -1128,7 +1128,7 @@ define(
                                         //console.warn('Merchant received a message:', data);
                                         if(data !== undefined){
                                             if(data.Payload){
-                                                // for cardinal 
+                                                // for cardinal
                                                 if(data.Payload.ActionCode =="SUCCESS"){
                                                     var sessionId = data.Payload.SessionId;
                                                     //place order with direct CSE method
@@ -1166,7 +1166,7 @@ define(
                                     }
                                 }, { once: true });
                             } else {
-                                if(window.checkoutConfig.payment.ccform.isMultishipping){  
+                                if(window.checkoutConfig.payment.ccform.isMultishipping){
                                     placeMultishippingOrder(self.getData());
                                 }
                                 else{
@@ -1176,7 +1176,7 @@ define(
                             }
                         }
                     }
-                 }else if($form.validation() && $form.validation('isValid')){                    
+                 }else if($form.validation() && $form.validation('isValid')){
                     // Subscription check
                     if(this.isSubscribed()){
                         if(cc_type_selected !== 'savedcard'){
@@ -1214,7 +1214,7 @@ define(
                             //jwtCreate(that.creditCardNumber());
                             var sessionId = window.sessionId;
                             that.dfReferenceId = sessionId;
-                            
+
                             if(this.isClientSideEncryptionEnabled()){
                                 require(["https://payments.worldpay.com/resources/cse/js/worldpay-cse-1.0.2.min.js"], function (worldpay) {
                                     worldpay.setPublicKey(that.getCsePublicKey());
@@ -1245,7 +1245,7 @@ define(
                                                 //console.warn('Merchant received a message:', data);
                                                 if(data !== undefined){
                                                     if(data.Payload){
-                                                        // for cardinal 
+                                                        // for cardinal
                                                         if(data.Payload.ActionCode =="SUCCESS"){
                                                             window.sessionId = data.Payload.SessionId;
                                                             //place order with direct CSE method
@@ -1273,17 +1273,17 @@ define(
                                             }
                                         }, { once: true });
                                     } else {
-                                        if(window.checkoutConfig.payment.ccform.isMultishipping){  
+                                        if(window.checkoutConfig.payment.ccform.isMultishipping){
                                             placeMultishippingOrder(self.getData());
                                         }
                                         else{
                                             fullScreenLoader.stopLoader();
                                             self.placeOrder();
                                         }
-                                    }                                    
+                                    }
                                 });
                             } else{
-                                if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){  
+                                if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                                     window.addEventListener("message", function(event) {
                                         var data = JSON.parse(event.data);
                                         var envUrl;
@@ -1296,7 +1296,7 @@ define(
 
                                             if(data !== undefined){
                                                 if(data.Payload){
-                                                    // for cardinal 
+                                                    // for cardinal
                                                     if(data.Payload.ActionCode =="SUCCESS"){
                                                         window.sessionId = data.Payload.SessionId;
                                                         //place order with direct CSE method
@@ -1321,7 +1321,7 @@ define(
                                                     }
                                                 }
                                             }
-                                        } 
+                                        }
                                     }, { once: true });
                                 } else {
                                     if(window.checkoutConfig.payment.ccform.isMultishipping){
@@ -1331,14 +1331,14 @@ define(
                                         fullScreenLoader.stopLoader();
                                         self.placeOrder();
                                     }
-                                }  
+                                }
                             }
                         }else if(this.intigrationmode == 'redirect'){
                         //place order with Redirect CSE Method
                         if(this.multishipping){
                             fullScreenLoader.startLoader();
                             placeMultishippingOrder(self.getData());
-                            
+
                         }
                         else{
                             self.placeOrder();
@@ -1346,13 +1346,13 @@ define(
                     }
                 }else {
                     jQuery('.paymentmethods-radio-wrapper .mage-error').css("margin-top", "45px");
-                    return $form.validation() && $form.validation('isValid');      
-                }               
+                    return $form.validation() && $form.validation('isValid');
+                }
             },
             afterPlaceOrder: function (data, event) {
                 if(window.checkoutConfig.CCMethodClass.isIframecardPage === true){
                     return false;
-                }                
+                }
                 if(this.intigrationmode === 'redirect'){
                     window.location.replace(url.build('worldpay/redirectresult/redirect'));
                 }else if (this.isSavedCardPayment) {

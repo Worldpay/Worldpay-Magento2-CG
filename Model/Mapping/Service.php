@@ -140,7 +140,7 @@ class Service
         $reservedOrderId = $quote->getReservedOrderId();
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
-        
+
         //Level23 data changes
         $billingAddr = $this->_getBillingAddress($quote);
         $orderLineItems = null;
@@ -155,7 +155,7 @@ class Service
         if ((bool)$quote->getIsMultiShipping()) {
             $isMultiShippingOrder = 1;
         }
-        
+
         $browserFields = [
             'browser_screenHeight' => isset($paymentDetails['browser_screenheight']) ?
             $paymentDetails['browser_screenheight'] : "",
@@ -213,7 +213,7 @@ class Service
         $orderStoreId,
         $paymentDetails
     ) {
-        
+
         $reservedOrderId = $quote->getReservedOrderId();
         $savemyCard = isset($paymentDetails['additional_data']['save_my_card'])
                 ? $paymentDetails['additional_data']['save_my_card'] : '';
@@ -235,7 +235,7 @@ class Service
             $paymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
 
         }
-        
+
         $thirdPartyData = '';
         $shippingFee = '';
         if ((isset($paymentDetails['additional_data']['cpf']) && $paymentDetails['additional_data']['cpf'] == true)
@@ -314,25 +314,25 @@ class Service
         $cusDetails['updated_at'] = !empty($this->customerSession->getCustomer()->getUpdatedAt())
                 ? $this->customerSession->getCustomer()->getUpdatedAt() : $now->format('Y-m-d H:i:s');
         $orderDetails = $this->worldpayHelper->getOrderDetailsByEmailId($quote->getCustomerEmail());
-        
+
         $cusDetails['shipping_amount'] = $quote->getShippingAddress()->getShippingAmount();
         $cusDetails['discount_amount'] = ($quote->getOrigData()['subtotal']) -
             ($quote->getOrigData()['subtotal_with_discount']);
-        
+
         $orderDetails['created_at'] = !empty($orderDetails['created_at'])
                 ? $orderDetails['created_at'] : $now->format('Y-m-d H:i:s');
         $orderDetails['updated_at'] = !empty($orderDetails['updated_at'])
                 ? $orderDetails['updated_at'] : $now->format('Y-m-d H:i:s');
         $orderDetails['previous_purchase'] = !empty($orderDetails['updated_at'])
                 ? 'true' : 'false';
-        
+
         $orderCount = $this->worldpayHelper->getOrdersCountByEmailId($quote->getCustomerEmail());
         if ($quote->getCustomerId()) {
             $savedCardCount = $this->worldpayHelper->getSavedCardsCount($quote->getCustomerId());
         } else {
             $savedCardCount = 0;
         }
-        
+
         $cusDetails['shopperAccountAgeIndicator'] = $this->
                 getshopperAccountAgeIndicator($cusDetails['created_at'], $now->format('Y-m-d H:i:s'));
         $cusDetails['shopperAccountChangeIndicator'] = $this->
@@ -343,17 +343,17 @@ class Service
            getShopperAccountShippingAddressUsageIndicator($orderDetails['created_at'], $now->format('Y-m-d H:i:s'));
         $cusDetails['shopperAccountPaymentAccountIndicator'] = $this->
            getShopperAccountPaymentAccountIndicator($orderDetails['created_at'], $now->format('Y-m-d H:i:s'));
-        
+
         $cusDetails['order_details'] = $orderDetails;
         $cusDetails['order_count'] = $orderCount;
         $cusDetails['card_count'] = $savedCardCount;
         $cusDetails['shipping_method'] = $quote->getShippingAddress()->getShippingMethod();
-        
+
         //Fraudsight
         $cusDetails['shopperName'] = $quote->getBillingAddress()->getFirstname();
         $cusDetails['shopperId'] = $quote->getCustomerId();
         $cusDetails['birthDate']= $this ->getCustomerDOB($quote->getCustomer());
-        
+
         return $cusDetails;
     }
     /**
@@ -422,11 +422,11 @@ class Service
         if (!empty($paymentDetails['is_paybylink_order'])) {
             $orderLineItems = $this->_getOrderLineItems($quote, 'null');
         }
-             
+
         if ($paymentDetails['additional_data']['cc_type'] !== 'savedcard') {
             $updatedPaymentDetails['cardType'] = $paymentType;
         }
-                    
+
         $thirdPartyData = '';
         $shippingFee = '';
         if ((isset($paymentDetails['additional_data']['cpf'])
@@ -485,7 +485,7 @@ class Service
                 'saveCardEnabled' => $savemyCard,
                 'storedCredentialsEnabled' => $storedCredentialsEnabled,
                 'isMultishippingOrder' => $isMultiShippingOrder
-                
+
             ];
     }
     /**
@@ -506,7 +506,7 @@ class Service
         $reservedOrderId = $quote->getReservedOrderId();
         $stmtNarrative = '';
         $orderContent = '';
-        
+
         $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
         if ($paymentDetails['additional_data']['cc_type'] === "KLARNA-SSL"
                 && (isset($paymentDetails['additional_data']['statementNarrative']))) {
@@ -569,7 +569,7 @@ class Service
     ) {
         $reservedOrderId = $quote->getReservedOrderId();
         $updatedPaymentDetails = $this->_getPaymentDetailsUsingToken($paymentDetails, $quote);
-        
+
         $id = '';
         if ($this->recurringHelper->quoteContainsSubscription($quote)) {
              $id = isset($updatedPaymentDetails['id'])? $updatedPaymentDetails['id'] : '';
@@ -684,14 +684,14 @@ class Service
             $stmtNarrative = $paymentDetails['additional_data']['statementNarrative'];
             $stmtNarrative = strlen($stmtNarrative)>15?substr($stmtNarrative, 0, 15):$stmtNarrative;
         }
-       
+
         if (array_key_exists($paymentDetails['additional_data']['cc_type'], $apmPaymentTypes)
                 && (isset($paymentDetails['additional_data']['ach_emailaddress']))) {
             $achEmailAddress = $paymentDetails['additional_data']['ach_emailaddress'];
         }
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
-        
+
         $isMultiShippingOrder = 0;
         if ((bool)$quote->getIsMultiShipping()) {
             $isMultiShippingOrder = 1;
@@ -746,7 +746,7 @@ class Service
         }
         $currencyCode = $quote->getQuoteCurrencyCode();
         $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
-        
+
         $isMultiShippingOrder = 0;
         if ((bool)$quote->getIsMultiShipping()) {
             $isMultiShippingOrder = 1;
@@ -1005,7 +1005,7 @@ class Service
                 $orderitems['lineItem'][] = $lineitem;
             }
         }
-        
+
         if ($quote->getBaseCustomerBalAmountUsed() > 0) {
             $storelineitem = [];
             $storelineitem['reference'] = 0;
@@ -1122,8 +1122,18 @@ class Service
             return $paymentDetails['additional_data']['cc_type'];
         }
 
+        if($paymentDetails['additional_data']['cc_type'] == "PAYPAL-SSL") {
+            $details = [
+                'paymentType' => $paymentDetails['additional_data']['cc_type'],
+                'sessionId' => $this->session->getSessionId(),
+                'shopperIpAddress' => $this->_getClientIPAddress()
+            ];
+
+            return $details;
+        }
+
         if ($paymentDetails['additional_data']['cc_type'] == "ACH_DIRECT_DEBIT-SSL") {
-            
+
             $details = [
                'paymentType' => $paymentDetails['additional_data']['cc_type'],
                'achaccount' => $paymentDetails['additional_data']['ach_account'],
@@ -1151,7 +1161,7 @@ class Service
             $details['sepaMerchantNumber'] = $this->worldpayHelper->getSEPAMerchantNo();
             return $details;
         }
-        
+
         if ($paymentDetails['additional_data']['cse_enabled']) {
             $details = [
                 'cseEnabled' => $paymentDetails['additional_data']['cse_enabled'],
@@ -1181,7 +1191,7 @@ class Service
         $details['shopperIpAddress'] = $this->_getClientIPAddress();
         $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($method);
         $details['salesTax'] = '';
-        
+
         if (isset($paymentDetails['salesTax'])) {
             $details['salesTax'] = $paymentDetails['salesTax'];
         }
@@ -1700,16 +1710,16 @@ class Service
                 $details['advanced_primerouting'] = $this->worldpayHelper->isAdvancedPrimeRoutingEnabled();
                 $details['routing_preference'] = $this->worldpayHelper->getRoutingPreference();
                 $details['debit_networks'] = $this->worldpayHelper->getDebitNetworks();
-            
+
                 return $details;
             } elseif ($this->worldpayHelper->isPrimeRoutingEnabled()) {
                 $details['primerouting'] = $this->worldpayHelper->isPrimeRoutingEnabled();
-            
+
                 return $details;
             }
         }
     }
-    
+
     /**
      * Get Return Urls to return from the payment page
      *
@@ -1770,11 +1780,11 @@ class Service
         $lineitem = [];
         $orderItems = $quote->getAllItems();
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        
+
         foreach ($orderItems as $_item) {
             $lineitem = [];
             $_product ='';
-            
+
             if ($_item->getParentItem()) {
                 continue;
             }
@@ -1786,7 +1796,7 @@ class Service
                 $totaltax = $_item->getTaxAmount() + $_item->getHiddenTaxAmount()
                         + $_item->getWeeeTaxAppliedRowAmount();
                 $discountamount = $_item->getDiscountAmount();
-                
+
                 $unitOfMeasure = $_product->getData('unit_of_measure');
             if ($unitOfMeasure == '') {
                 $unitOfMeasure = $this->worldpayHelper->getUnitOfMeasure();
@@ -1807,9 +1817,9 @@ class Service
                 $lineitem['itemDiscountAmount'] = $discountamount;
                 $lineitem['taxAmount'] = $totaltax;
                 $orderitems['lineItem'][] = $lineitem;
-                
+
         }
-        
+
         return $orderitems;
     }
 }

@@ -11,17 +11,21 @@ use \Sapient\Worldpay\Logger\WorldpayLogger;
 /**
  * Build xml for Direct Order request
  */
-class DirectOrder
+class PaypalOrder
 {
 
     public const ALLOW_INTERACTION_TYPE = 'MOTO';
-    public const DYNAMIC3DS_DO3DS = 'do3DS';
     public const DYNAMIC3DS_NO3DS = 'no3DS';
     public const TOKEN_SCOPE = 'shopper';
     public const ROOT_ELEMENT = <<<EOD
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
+
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    public $_urlBuilder;
 
     /**
      * @var string
@@ -76,10 +80,6 @@ EOD;
      */
     private $billingAddress;
     /**
-     * @var mixed|null
-     */
-    protected $paResponse = null;
-    /**
      * @var bool|null
      */
     private $echoData = null;
@@ -100,21 +100,9 @@ EOD;
      */
     private $storedCredentialsEnabled;
     /**
-     * @var string|null
-     */
-    protected $dfReferenceId = null;
-    /**
      * @var string
      */
     private $cusDetails;
-    /**
-     * @var mixed
-     */
-    private $exemptionEngine;
-    /**
-     * @var string
-     */
-    private $thirdparty;
     /**
      * @var mixed
      */
@@ -170,18 +158,13 @@ EOD;
      * @param array $args
      */
     public function __construct(
+        \Magento\Framework\UrlInterface $urlBuilder,
         \Magento\Customer\Model\Session $customerSession,
         Data $dataHelper,
         array $args = []
     ) {
+        $this->_urlBuilder = $urlBuilder;
         $this->customerSession = $customerSession;
-        $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure(
-            $args['threeDSecureConfig']['isDynamic3D'],
-            $args['threeDSecureConfig']['is3DSecure']
-        );
-        $this->tokenRequestConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration(
-            $args['tokenRequestConfig']
-        );
         $this->dataHelper = $dataHelper;
     }
 
@@ -207,7 +190,6 @@ EOD;
      * @param string $storedCredentialsEnabled
      * @param string $cusDetails
      * @param mixed $exemptionEngine
-     * @param string $thirdparty
      * @param mixed $shippingfee
      * @param array|string $exponent
      * @param mixed $primeRoutingData
@@ -236,8 +218,6 @@ EOD;
         $tokenizationEnabled,
         $storedCredentialsEnabled,
         $cusDetails,
-        $exemptionEngine,
-        $thirdparty,
         $shippingfee,
         $exponent,
         $primeRoutingData,
@@ -246,7 +226,6 @@ EOD;
         $browserFields,
         $telephoneNumber
     ) {
-
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
         $this->orderDescription = $orderDescription;
@@ -265,8 +244,6 @@ EOD;
         $this->tokenizationEnabled = $tokenizationEnabled;
         $this->storedCredentialsEnabled = $storedCredentialsEnabled;
         $this->cusDetails = $cusDetails;
-        $this->exemptionEngine = $exemptionEngine;
-        $this->thirdparty = $thirdparty;
         $this->shippingfee = $shippingfee;
         $this->exponent = $exponent;
         $this->primeRoutingData =$primeRoutingData;
@@ -281,63 +258,6 @@ EOD;
         $submit = $this->_addSubmitElement($xml);
         $this->_addOrderElement($submit);
 
-        return $xml;
-    }
-
-    /**
-     * Build xml for 3dsecure processing Request
-     *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param array $paymentDetails
-     * @param mixed $paResponse
-     * @param bool $echoData
-     * @return SimpleXMLElement $xml
-     */
-    public function build3DSecure(
-        $merchantCode,
-        $orderCode,
-        $paymentDetails,
-        $paResponse,
-        $echoData
-    ) {
-        $this->merchantCode = $merchantCode;
-        $this->paResponse = $paResponse;
-        $this->echoData = $echoData;
-        $this->orderCode = $orderCode;
-        $this->paymentDetails = $paymentDetails;
-        $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
-        $xml['merchantCode'] = $this->merchantCode;
-        $xml['version'] = '1.4';
-        $submit = $this->_addSubmitElement($xml);
-        $this->_addOrderElement($submit);
-        return $xml;
-    }
-
-    /**
-     * Build xml for 3ds2 processing Request
-     *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param array $paymentDetails
-     * @param string $dfReferenceId
-     * @return SimpleXMLElement $xml
-     */
-    public function build3Ds2Secure(
-        $merchantCode,
-        $orderCode,
-        $paymentDetails,
-        $dfReferenceId
-    ) {
-        $this->merchantCode = $merchantCode;
-        $this->dfReferenceId = $dfReferenceId;
-        $this->orderCode = $orderCode;
-        $this->paymentDetails = $paymentDetails;
-        $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
-        $xml['merchantCode'] = $this->merchantCode;
-        $xml['version'] = '1.4';
-        $submit = $this->_addSubmitElement($xml);
-        $this->_addOrderElement($submit);
         return $xml;
     }
 
@@ -362,20 +282,6 @@ EOD;
     {
         $order = $submit->addChild('order');
         $order['orderCode'] = $this->orderCode;
-        if ($this->paResponse) {
-            $info3DSecure = $order->addChild('info3DSecure');
-            $info3DSecure->addChild('paResponse', $this->paResponse);
-            $session = $order->addChild('session');
-            $session['id'] = $this->paymentDetails['sessionId'];
-            return $order;
-        }
-        if ($this->dfReferenceId) {
-            $info3DSecure = $order->addChild('info3DSecure');
-            $info3DSecure->addChild('completedAuthentication');
-            $session = $order->addChild('session');
-            $session['id'] = $this->paymentDetails['sessionId'];
-            return $order;
-        }
 
         if ($this->captureDelay!="") {
             $order['captureDelay'] = $this->captureDelay;
@@ -394,28 +300,21 @@ EOD;
         //Level 23 data request body
         if (!empty($this->paymentDetails['isLevel23Enabled']) && $this->paymentDetails['isLevel23Enabled']
             && (($this->paymentDetails['paymentType'] === 'ECMC-SSL'
-                || $this->paymentDetails['paymentType'] === 'VISA-SSL')
+                    || $this->paymentDetails['paymentType'] === 'VISA-SSL')
                 || (($this->paymentDetails['cardType'] === 'ECMC-SSL'
                     || $this->paymentDetails['cardType'] === 'VISA-SSL')))
             && ($this->paymentDetails['countryCode'] === 'US' || $this->paymentDetails['countryCode'] === 'CA')) {
             $this->_addBranchSpecificExtension($order);
         }
 
-        if (!empty($this->thirdparty)) {
-            $this->_addThirdPartyData($order);
-        }
         if ($this->echoData) {
             $order->addChild('echoData', $this->echoData);
         }
-        $this->_addDynamic3DSElement($order);
-        $this->_addCreateTokenElement($order);
-        $this->_addDynamicInteractionTypeElement($order);
+
         if (isset($this->primeRoutingData['advanced_primerouting'])) {
             $this->_addPrimeRoutingElement($order);
         }
         $this->_addCustomerRiskData($order);
-        $this->_addAdditional3DsElement($order);
-        $this->_addExemptionEngineElement($order);
         $this->_addFraudSightData($order);
 
         return $order;
@@ -429,11 +328,7 @@ EOD;
     private function _addDescriptionElement($order)
     {
         $description = $order->addChild('description');
-        if (!empty($this->thirdparty['statement'])) {
-            $this->_addCDATA($description, $this->thirdparty['statement']);
-        } else {
-            $this->_addCDATA($description, $this->orderDescription);
-        }
+        $this->_addCDATA($description, $this->orderDescription);
     }
 
     /**
@@ -461,135 +356,6 @@ EOD;
     }
 
     /**
-     * Add dynamicInteractionType and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addDynamicInteractionTypeElement($order)
-    {
-        if (self::ALLOW_INTERACTION_TYPE == $this->paymentDetails['dynamicInteractionType']) {
-            $interactionElement = $order->addChild('dynamicInteractionType');
-            $interactionElement['type'] = $this->paymentDetails['dynamicInteractionType'];
-        }
-    }
-
-    /**
-     * Add dynamicInteractionType and its attribute tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addDynamic3DSElement($order)
-    {
-        $isRecurringOrder =  isset($this->paymentDetails['isRecurringOrder'])? true : false;
-        if ($this->paymentDetails['dynamicInteractionType'] == 'MOTO') {
-
-            if ($this->paymentDetails['isEnabledEFTPOS']) {
-                return;
-            }
-            $threeDSElement = $order->addChild('dynamic3DS');
-            $threeDSElement['overrideAdvice'] = self::DYNAMIC3DS_NO3DS;
-        }
-        if (! $this->threeDSecureConfig->isDynamic3DEnabled()) {
-            return;
-        }
-        if ($this->paymentDetails['isEnabledEFTPOS']) {
-            return;
-        }
-        $threeDSElement = $order->addChild('dynamic3DS');
-        if ($this->threeDSecureConfig->is3DSecureCheckEnabled()
-            && $this->paymentDetails['dynamicInteractionType'] !== 'MOTO'
-            && !$isRecurringOrder) {
-            $threeDSElement['overrideAdvice'] = self::DYNAMIC3DS_DO3DS;
-        } else {
-            $threeDSElement['overrideAdvice'] = self::DYNAMIC3DS_NO3DS;
-        }
-    }
-
-    /**
-     * Add createToken and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addCreateTokenElement($order)
-    {
-        if (! $this->tokenRequestConfig->istokenizationIsEnabled()) {
-            return;
-        }
-        if (!$this->tokenizationEnabled && !$this->storedCredentialsEnabled) {
-            return;
-        }
-
-        $createTokenElement = $order->addChild('createToken');
-        $createTokenElement['tokenScope'] = self::TOKEN_SCOPE;
-        if ($this->paymentDetails['token_type']) {
-            $createTokenElement['tokenScope'] = 'merchant';
-            $createTokenElement->addChild(
-                'tokenEventReference',
-                time().'_'.random_int(0, 99999)
-            );
-        }
-        if ($this->tokenRequestConfig->getTokenReason($this->orderCode)) {
-            $createTokenElement->addChild(
-                'tokenReason',
-                $this->tokenRequestConfig->getTokenReason($this->orderCode)
-            );
-        }
-    }
-
-    /**
-     * Add encryptedData and its child tag to xml
-     *
-     * @param SimpleXMLElement $paymentDetailsElement
-     */
-    protected function _addPaymentDetailsForTokenOrder($paymentDetailsElement)
-    {
-        if (isset($this->paymentDetails['encryptedData'])) {
-            $cseElement = $this->_addCseElement($paymentDetailsElement);
-        }
-        $tokenNode = $paymentDetailsElement->addChild($this->paymentDetails['paymentType']);
-        $tokenNode['tokenScope'] = self::TOKEN_SCOPE;
-        if ($this->paymentDetails['token_type']) {
-            $tokenNode['tokenScope'] = 'merchant';
-        }
-        $tokenNode->addChild('paymentTokenID', $this->paymentDetails['tokenCode']);
-
-        if (isset($this->paymentDetails['cvc'])) {
-            $tokenNode
-                ->addChild('paymentInstrument')
-                ->addChild('cardDetails')
-                ->addChild('cvc', $this->paymentDetails['cvc']);
-        }
-    }
-
-    /**
-     * Add paymentDetailsElement and its child tag to xml
-     *
-     * @param SimpleXMLElement $paymentDetailsElement
-     */
-    protected function _addPaymentDetailsForCreditCardOrder($paymentDetailsElement)
-    {
-        if (isset($this->paymentDetails['cseEnabled']) && $this->paymentDetails['cseEnabled']) {
-            $cseElement = $this->_addCseElement($paymentDetailsElement);
-            $cardAddress = $cseElement->addChild('cardAddress');
-        } else {
-            $paymentTypeElement = $this->_addPaymentTypeElement($paymentDetailsElement);
-            $cardAddress = $paymentTypeElement->addChild('cardAddress');
-        }
-
-        $this->_addAddressElement(
-            $cardAddress,
-            $this->cardAddress['firstName'],
-            $this->cardAddress['lastName'],
-            $this->cardAddress['street'],
-            $this->cardAddress['postalCode'],
-            $this->cardAddress['city'],
-            $this->cardAddress['countryCode'],
-            true,
-            $this->telephoneNumber
-        );
-    }
-
-    /**
      * Add paymentDetails and its child tag to xml
      *
      * @param SimpleXMLElement $order
@@ -597,25 +363,9 @@ EOD;
     protected function _addPaymentDetailsElement($order)
     {
         $paymentDetailsElement = $order->addChild('paymentDetails');
-        if (isset($this->paymentDetails['isIAVEnabled'])) {
-            $paymentDetailsElement['action'] = "ACCOUNTVERIFICATION";
-        }
-        if (isset($this->primeRoutingData['primerouting'])) {
-            $paymentDetailsElement['action'] = 'SALE';
-        }
-        if (isset($this->paymentDetails['tokenCode'])) {
-            $this->_addPaymentDetailsForTokenOrder($paymentDetailsElement);
-            if (isset($this->paymentDetails['transactionIdentifier']) &&
-            !empty($this->paymentDetails['transactionIdentifier'])) {
-                $this->_addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement);
-            }
-        } else {
-            $this->_addPaymentDetailsForCreditCardOrder($paymentDetailsElement);
-        }
 
-        if ($this->saveCardEnabled && $this->storedCredentialsEnabled) {
-            $this->_addStoredCredentials($paymentDetailsElement);
-        }
+        $this->addPaypalPaymentDetails($paymentDetailsElement);
+
         $isSendIpAddress = true;
         if (isset($this->paymentDetails['sendShopperIpAddress'])) {
             $isSendIpAddress = $this->paymentDetails['sendShopperIpAddress'];
@@ -625,37 +375,6 @@ EOD;
             $session['id'] = $this->paymentDetails['sessionId'];
             $session['shopperIPAddress'] = $this->paymentDetails['shopperIpAddress'];
         }
-
-        if(
-            !$this->paymentDetails['isEnabledEFTPOS']
-            && $this->dataHelper->getShopperSelection($this->paymentDetails["cardType"])
-        ) {
-            $selectedScheme = $paymentDetailsElement->addChild('selectedScheme');
-            $selectedScheme['shopperSelection'] = $this->dataHelper->getShopperSelection($this->paymentDetails["cardType"]);
-        }
-
-        if (!empty($this->paymentDetails['routingMID'])) {
-            $paymentDetailsElement
-                ->addChild('routingMID', $this->paymentDetails['routingMID']);
-        }
-        if ($this->paResponse) {
-            $info3DSecure = $paymentDetailsElement->addChild('info3DSecure');
-            $info3DSecure->addChild('paResponse', $this->paResponse);
-        }
-    }
-
-    /**
-     * Add CSE-DATA and its child tag to xml
-     *
-     * @param SimpleXMLElement $paymentDetailsElement
-     * @return SimpleXMLElement cseElement
-     */
-    protected function _addCseElement($paymentDetailsElement)
-    {
-        $cseElement = $paymentDetailsElement->addChild('CSE-DATA');
-        $cseElement->addChild('encryptedData', $this->paymentDetails['encryptedData']);
-
-        return $cseElement;
     }
 
     /**
@@ -664,25 +383,18 @@ EOD;
      * @param SimpleXMLElement $paymentDetailsElement
      * @return SimpleXMLElement $paymentTypeElement
      */
-    protected function _addPaymentTypeElement($paymentDetailsElement)
+    protected function addPaypalPaymentDetails($paymentDetailsElement)
     {
-        $paymentTypeElement = $paymentDetailsElement->addChild($this->paymentDetails['paymentType']);
-        $paymentTypeElement->addChild('cardNumber', $this->paymentDetails['cardNumber']);
-
-        $expiryDate = $paymentTypeElement->addChild('expiryDate');
-        $date = $expiryDate->addChild('date');
-        $expiryMonth = $this->formatExpiryMonth($this->paymentDetails['expiryMonth']);
-        $date['month'] = $expiryMonth;
-        $date['year'] = $this->paymentDetails['expiryYear'];
-
-        $paymentTypeElement->addChild('cardHolderName', $this->paymentDetails['cardHolderName']);
-
-        if (isset($this->paymentDetails['cvc'])) {
-            $paymentTypeElement->addChild('cvc', $this->paymentDetails['cvc']);
-        }
+        $paymentTypeElement = $paymentDetailsElement->addChild('PAYPAL-SSL');
+        $paymentTypeElement['intent'] = 'authorise';
+        $paymentTypeElement->addChild('successURL', $this->_urlBuilder->getUrl('worldpay/redirectresult/success'));
+        $paymentTypeElement->addChild('cancelURL', $this->_urlBuilder->getUrl('worldpay/redirectresult/cancel'));
+        $paymentTypeElement->addChild('pendingURL', $this->_urlBuilder->getUrl('worldpay/redirectresult/pending'));
+        $paymentTypeElement->addChild('failureURL', $this->_urlBuilder->getUrl('worldpay/redirectresult/failure'));
 
         return $paymentTypeElement;
     }
+
 
     /**
      * Format Expiry Month
@@ -707,13 +419,6 @@ EOD;
         $shopper = $order->addChild(self::TOKEN_SCOPE);
 
         $shopper->addChild('shopperEmailAddress', $this->shopperEmail);
-        if (!$this->paymentDetails['token_type']) {
-            if ($this->tokenRequestConfig->istokenizationIsEnabled()) {
-                $shopper->addChild('authenticatedShopperID', $this->shopperId);
-            } elseif (isset($this->paymentDetails['tokenCode'])) {
-                $shopper->addChild('authenticatedShopperID', $this->paymentDetails['customerId']);
-            }
-        }
 
         $browser = $shopper->addChild('browser');
 
@@ -847,7 +552,7 @@ EOD;
         $orderUpdateDate = strtotime($this->cusDetails['order_details']['updated_at']);
         if ($this->shippingAddress) {
             $shippingNameMatchesAccountName = ($this->billingAddress['firstName'] == $this->
-            shippingAddress['firstName']) ? 'true' : 'false';
+                shippingAddress['firstName']) ? 'true' : 'false';
         } else {
             $shippingNameMatchesAccountName = 'false';
         }
@@ -868,18 +573,18 @@ EOD;
         $shopperAccountRiskData['transactionsAttemptedLastDay'] = $this->cusDetails['order_count']['last_day_count'];
         $shopperAccountRiskData['transactionsAttemptedLastYear'] = $this->cusDetails['order_count']['last_year_count'];
         $shopperAccountRiskData['purchasesCompletedLastSixMonths'] = $this->
-            cusDetails['order_count']['last_six_months_count'];
+        cusDetails['order_count']['last_six_months_count'];
         $shopperAccountRiskData['addCardAttemptsLastDay'] = $this->cusDetails['card_count'];
         $shopperAccountRiskData['previousSuspiciousActivity'] = 'false';
         $shopperAccountRiskData['shippingNameMatchesAccountName'] = $shippingNameMatchesAccountName;
         $shopperAccountRiskData['shopperAccountAgeIndicator'] = $this->cusDetails['shopperAccountAgeIndicator'];
         $shopperAccountRiskData['shopperAccountChangeIndicator'] = $this->cusDetails['shopperAccountChangeIndicator'];
         $shopperAccountRiskData['shopperAccountPasswordChangeIndicator'] = $this->
-            cusDetails['shopperAccountPasswordChangeIndicator'];
+        cusDetails['shopperAccountPasswordChangeIndicator'];
         $shopperAccountRiskData['shopperAccountShippingAddressUsageIndicator'] = $this->
-            cusDetails['shopperAccountShippingAddressUsageIndicator'];
+        cusDetails['shopperAccountShippingAddressUsageIndicator'];
         $shopperAccountRiskData['shopperAccountPaymentAccountIndicator'] = $this->
-            cusDetails['shopperAccountPaymentAccountIndicator'];
+        cusDetails['shopperAccountPaymentAccountIndicator'];
 
         $shopperAccountRiskDataElement = $shopperAccountRiskData->addChild('shopperAccountCreationDate');
         $shopperAccountRiskDataElementChild = $shopperAccountRiskDataElement->addChild('date');
@@ -900,16 +605,16 @@ EOD;
         $shopperAccountPasswordChangeElement['year'] = date("Y", $accountUpdatedDate);
 
         $shopperAccountShippingAddressAttribute = $shopperAccountRiskData->
-            addChild('shopperAccountShippingAddressFirstUseDate');
+        addChild('shopperAccountShippingAddressFirstUseDate');
         $shopperAccountShippingAddressElement = $shopperAccountShippingAddressAttribute->addChild('date');
         $shopperAccountShippingAddressElement['dayOfMonth'] = date("d", $orderCreateDate);
         $shopperAccountShippingAddressElement['month'] = date("m", $orderCreateDate);
         $shopperAccountShippingAddressElement['year'] = date("Y", $orderCreateDate);
 
         $shopperAccountPaymentAccountFirstUseDateAttribute = $shopperAccountRiskData->
-            addChild('shopperAccountPaymentAccountFirstUseDate');
+        addChild('shopperAccountPaymentAccountFirstUseDate');
         $shopperAccountPaymentAccountFirstUseDateElement = $shopperAccountPaymentAccountFirstUseDateAttribute->
-            addChild('date');
+        addChild('date');
         $shopperAccountPaymentAccountFirstUseDateElement['dayOfMonth'] = date("d", $orderUpdateDate);
         $shopperAccountPaymentAccountFirstUseDateElement['month'] = date("m", $orderUpdateDate);
         $shopperAccountPaymentAccountFirstUseDateElement['year'] = date("Y", $orderUpdateDate);
@@ -923,74 +628,8 @@ EOD;
         $transactionRiskData['reorderingPreviousPurchases'] = $this->cusDetails['order_details']['previous_purchase'];
         $transactionRiskData['preOrderPurchase'] = 'false';
         $transactionRiskData['giftCardCount'] = 0;
-        /* Enable if giftcard data available  */
-//  $transactionRiskDataGiftCardAmountAttribute = $transactionRiskData->addChild('transactionRiskDataGiftCardAmount');
-//  $transactionRiskDataGiftCardAmountElement = $transactionRiskDataGiftCardAmountAttribute->addChild('amount');
-//  $transactionRiskDataGiftCardAmountElement['value'] = 0;
-//  $transactionRiskDataGiftCardAmountElement['currencyCode'] = $this->currencyCode;
-//  $transactionRiskDataGiftCardAmountElement['exponent'] = $this->exponent;
 
         return $riskData;
-    }
-
-    /**
-     * Add  Risk Data  and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    protected function _addRiskData($order)
-    {
-        $riskData = $order->addChild('riskData');
-
-        //Authentication risk data
-        $authenticationRiskData = $riskData->addChild('authenticationRiskData');
-        $authenticationRiskData['authenticationMethod'] = 'localAccount';
-        $authenticationTimestampElement = $authenticationRiskData->addChild('authenticationTimestamp');
-        $dateElement = $authenticationTimestampElement->addChild('date');
-        $dateElement['second'] = date("s");
-        $dateElement['minute'] = date("i");
-        $dateElement['hour'] = date("H");
-        $dateElement['dayOfMonth'] = date("d");
-        $dateElement['month'] = date("m");
-        $dateElement['year'] = date("Y");
-
-        return $riskData;
-    }
-
-    /**
-     * Add Additional3Ds data and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    protected function _addAdditional3DsElement($order)
-    {
-        if ($this->paymentDetails['isEnabledEFTPOS']) {
-            return;
-        }
-        $dfReferenceId = isset($this->paymentDetails['dfReferenceId']) ? $this->paymentDetails['dfReferenceId'] : '';
-        if ($dfReferenceId) {
-            $addisional3DsElement = $order->addChild('additional3DSData');
-            $addisional3DsElement['dfReferenceId'] = $this->paymentDetails['dfReferenceId'];
-            $addisional3DsElement['challengeWindowSize'] = "600x400";
-            $addisional3DsElement['challengePreference'] = "challengeMandated";
-            return $addisional3DsElement;
-        }
-    }
-
-    /**
-     * Add Exemption Engine data and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    protected function _addExemptionEngineElement($order)
-    {
-
-        if ($this->exemptionEngine['enabled']) {
-            $exemptionEngineElement = $order->addChild('exemption');
-            $exemptionEngineElement['placement'] = $this->exemptionEngine['placement'];
-            $exemptionEngineElement['type'] = $this->exemptionEngine['type'];
-            return $exemptionEngineElement;
-        }
     }
 
     /**
@@ -1015,65 +654,6 @@ EOD;
     private function _amountAsInt($amount)
     {
         return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
-    }
-
-    /**
-     * Add stored credentials data and its child tag to xml
-     *
-     * @param element $paymentDetailsElement
-     * @return string
-     */
-    private function _addStoredCredentials($paymentDetailsElement)
-    {
-        $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
-        $storedCredentials['usage'] = "FIRST";
-        $isSubscriptionOrder = isset($this->paymentDetails['subscription_order'])? true : false;
-        if ($isSubscriptionOrder) {
-            $storedCredentials['customerInitiatedReason'] = "RECURRING";
-        }
-        return $storedCredentials;
-    }
-
-    /**
-     * Add payment details for stored credentials data and its child tag to xml
-     *
-     * @param element $paymentDetailsElement
-     * @return string
-     */
-    private function _addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement)
-    {
-        $isRecurringOrder =  isset($this->paymentDetails['isRecurringOrder'])? true : false;
-        $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
-        $storedCredentials['usage'] = "USED";
-        if ($isRecurringOrder) {
-            $storedCredentials['merchantInitiatedReason'] = "RECURRING";
-        }
-        $storedCredentials->addChild('schemeTransactionIdentifier', $this->paymentDetails['transactionIdentifier']);
-        return $storedCredentials;
-    }
-
-    /**
-     * Add third party data and its child tag to xml
-     *
-     * @param element $order
-     * @return string
-     */
-    private function _addThirdPartyData($order)
-    {
-        $thirdparty = $order->addChild('thirdPartyData');
-        if (!empty($this->thirdparty['instalment'])) {
-            $thirdparty->addChild('instalments', $this->thirdparty['instalment']);
-        }
-        if ($this->billingAddress['countryCode']=='BR' && !empty($this->shippingfee['shippingfee'])) {
-            $firstinstalment = $thirdparty->addChild('firstInstalment');
-            $firstinstalment = $firstinstalment->addChild('amountNoCurrency');
-            $firstinstalment['value'] =$this->_amountAsInt($this->shippingfee['shippingfee']);
-        }
-        if (!empty($this->thirdparty['cpf'])) {
-            $thirdparty->addChild('cpf', $this->thirdparty['cpf']);
-        }
-
-        return $thirdparty;
     }
 
     /**
@@ -1133,15 +713,13 @@ EOD;
         );
     }
 
-     /**
-      * Add branchSpecificExtension and its child tag to xml
-      *
-      * @param SimpleXMLElement $order
-      */
+    /**
+     * Add branchSpecificExtension and its child tag to xml
+     *
+     * @param SimpleXMLElement $order
+     */
     private function _addBranchSpecificExtension($order)
     {
-        $order_details = $this->cusDetails['order_details'];
-
         $branchSpecificExtension = $order->addChild('branchSpecificExtension');
         $purchase = $branchSpecificExtension->addChild('purchase');
 
@@ -1160,44 +738,23 @@ EOD;
 
         $salesTax = $purchase->addChild('salesTax');
 
-        $this->_addAmountElementDirect(
-            $salesTax,
-            $this->currencyCode,
-            $this->exponent,
-            $this->paymentDetails['salesTax']
-        );
+        $this->_addAmountElementDirect($salesTax, $this->paymentDetails['salesTax']);
 
         if (isset($this->cusDetails['discount_amount'])) {
             $discountAmount = $purchase->addChild('discountAmount');
-            $this->_addAmountElementDirect(
-                $discountAmount,
-                $this->currencyCode,
-                $this->exponent,
-                $this->cusDetails['discount_amount']
-            );
+            $this->_addAmountElementDirect($discountAmount, $this->cusDetails['discount_amount']);
         }
 
         if (isset($this->cusDetails['shipping_amount'])) {
             $shippingAmount = $purchase->addChild('shippingAmount');
-            $this->_addAmountElementDirect(
-                $shippingAmount,
-                $this->currencyCode,
-                $this->exponent,
-                $this->cusDetails['shipping_amount']
-            );
+            $this->_addAmountElementDirect($shippingAmount, $this->cusDetails['shipping_amount']);
         }
 
         if (isset($this->paymentDetails['dutyAmount'])) {
             $dutyAmount = $purchase->addChild('dutyAmount');
-            $this->_addAmountElementDirect(
-                $dutyAmount,
-                $this->currencyCode,
-                $this->exponent,
-                $this->paymentDetails['dutyAmount']
-            );
+            $this->_addAmountElementDirect($dutyAmount, $this->paymentDetails['dutyAmount']);
         }
 
-        //$purchase->addChild('shipFromPostalCode', '');
         $purchase->addChild('destinationPostalCode', $this->shippingAddress['postalCode']);
         $purchase->addChild('destinationCountryCode', $this->shippingAddress['countryCode']);
 
@@ -1286,7 +843,7 @@ EOD;
         $this->_addCDATA($quantityElement, $quantity);
 
         $unitCostElement = $item->addChild('unitCost');
-        $this->_addAmountElementDirect($unitCostElement, $this->currencyCode, $this->exponent, $unitCost);
+        $this->_addAmountElementDirect($unitCostElement, $unitCost);
 
         if ($unitOfMeasure) {
             $unitOfMeasureElement = $item->addChild('unitOfMeasure');
@@ -1294,26 +851,16 @@ EOD;
         }
 
         $itemTotalElement = $item->addChild('itemTotal');
-        $this->_addAmountElementDirect($itemTotalElement, $this->currencyCode, $this->exponent, $itemTotal);
+        $this->_addAmountElementDirect($itemTotalElement, $itemTotal);
 
         $itemTotalWithTaxElement = $item->addChild('itemTotalWithTax');
-        $this->_addAmountElementDirect(
-            $itemTotalWithTaxElement,
-            $this->currencyCode,
-            $this->exponent,
-            $itemTotalWithTax
-        );
+        $this->_addAmountElementDirect($itemTotalWithTaxElement, $itemTotalWithTax);
 
         $itemDiscountAmountElement = $item->addChild('itemDiscountAmount');
-        $this->_addAmountElementDirect(
-            $itemDiscountAmountElement,
-            $this->currencyCode,
-            $this->exponent,
-            $itemDiscountAmount
-        );
+        $this->_addAmountElementDirect($itemDiscountAmountElement, $itemDiscountAmount);
 
         $taxAmountElement = $item->addChild('taxAmount');
-        $this->_addAmountElementDirect($taxAmountElement, $this->currencyCode, $this->exponent, $taxAmount);
+        $this->_addAmountElementDirect($taxAmountElement, $taxAmount);
     }
     /**
      * Add amount and its child tag to xml
@@ -1323,7 +870,7 @@ EOD;
      * @param bool $exponent
      * @param float $amount
      */
-    private function _addAmountElementDirect($orderXml, $currencyCode, $exponent, $amount)
+    private function _addAmountElementDirect($orderXml, $amount)
     {
         $amountElement = $orderXml->addChild('amount');
         $amountElement['currencyCode'] = $this->currencyCode;
