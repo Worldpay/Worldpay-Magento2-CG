@@ -132,12 +132,12 @@ class EmailTransportBuilder extends \Magento\Framework\Mail\Template\TransportBu
      * @param SenderResolverInterface $senderResolver
      * @param ObjectManagerInterface $objectManager
      * @param TransportInterfaceFactory $mailTransportFactory
+     * @param \Laminas\Mime\PartFactory $partFactory
      * @param MessageInterfaceFactory|null $messageFactory
      * @param EmailMessageInterfaceFactory|null $emailMessageInterfaceFactory
      * @param MimeMessageInterfaceFactory|null $mimeMessageInterfaceFactory
      * @param MimePartInterfaceFactory|null $mimePartInterfaceFactory
      * @param addressConverter|null $addressConverter
-     * @param \Laminas\Mime\PartFactory $partFactory
      */
     public function __construct(
         FactoryInterface $templateFactory,
@@ -145,12 +145,12 @@ class EmailTransportBuilder extends \Magento\Framework\Mail\Template\TransportBu
         SenderResolverInterface $senderResolver,
         ObjectManagerInterface $objectManager,
         TransportInterfaceFactory $mailTransportFactory,
-        MessageInterfaceFactory $messageFactory = null,
-        EmailMessageInterfaceFactory $emailMessageInterfaceFactory = null,
-        MimeMessageInterfaceFactory $mimeMessageInterfaceFactory = null,
-        MimePartInterfaceFactory $mimePartInterfaceFactory = null,
-        AddressConverter $addressConverter = null,
-        \Laminas\Mime\PartFactory $partFactory
+        \Laminas\Mime\PartFactory $partFactory,
+        ?MessageInterfaceFactory $messageFactory = null,
+        ?EmailMessageInterfaceFactory $emailMessageInterfaceFactory = null,
+        ?MimeMessageInterfaceFactory $mimeMessageInterfaceFactory = null,
+        ?MimePartInterfaceFactory $mimePartInterfaceFactory = null,
+        ?AddressConverter $addressConverter = null
     ) {
         $this->templateFactory = $templateFactory;
         $this->objectManager = $objectManager;

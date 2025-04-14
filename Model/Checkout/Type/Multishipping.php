@@ -116,11 +116,11 @@ class Multishipping extends \Magento\Multishipping\Model\Checkout\Type\Multiship
         \Magento\Framework\Api\FilterBuilder $filterBuilder,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         array $data = [],
-        \Magento\Quote\Api\Data\CartExtensionFactory $cartExtensionFactory = null,
-        AllowedCountries $allowedCountryReader = null,
-        \Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderFactory $placeOrderFactory = null,
-        LoggerInterface $logger = null,
-        \Magento\Framework\Api\DataObjectHelper $dataObjectHelper = null
+        ?\Magento\Quote\Api\Data\CartExtensionFactory $cartExtensionFactory = null,
+        ?AllowedCountries $allowedCountryReader = null,
+        ?\Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderFactory $placeOrderFactory = null,
+        ?LoggerInterface $logger = null,
+        ?\Magento\Framework\Api\DataObjectHelper $dataObjectHelper = null
     ) {
         $this->dataObjectHelper = $dataObjectHelper ?: ObjectManager::getInstance()
             ->get(\Magento\Framework\Api\DataObjectHelper::class);

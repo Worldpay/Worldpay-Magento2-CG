@@ -66,7 +66,7 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      * @param string|null $quote
      * @return bool
      */
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
         /* Start Multishipping code */
         if ($this->worlpayhelper->isMultiShipping()) {

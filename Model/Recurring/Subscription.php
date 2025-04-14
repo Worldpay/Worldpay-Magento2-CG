@@ -211,8 +211,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
         \Sapient\Worldpay\Model\SavedToken $savedToken,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);

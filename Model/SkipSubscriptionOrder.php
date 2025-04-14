@@ -62,8 +62,8 @@ class SkipSubscriptionOrder extends AbstractModel implements SkipSubscriptionOrd
         \Sapient\Worldpay\Model\ResourceModel\SkipSubscriptionOrder\CollectionFactory $skipSubcriptionCollectionFactory,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\Customer\Model\Session $customerSession,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);

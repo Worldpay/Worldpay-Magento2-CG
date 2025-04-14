@@ -42,8 +42,8 @@ class GeneralException extends \Magento\Framework\App\Config\Value
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
         \Sapient\Worldpay\Helper\GeneralException $generalexception,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->generalexception = $generalexception;

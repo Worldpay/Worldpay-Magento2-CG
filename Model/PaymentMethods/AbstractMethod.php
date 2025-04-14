@@ -255,8 +255,8 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         \Sapient\Worldpay\Helper\Multishipping $multishippingHelper,
         \Sapient\Worldpay\Model\Multishipping\OrderFactory $multishippingOrderFactory,
         \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct(
