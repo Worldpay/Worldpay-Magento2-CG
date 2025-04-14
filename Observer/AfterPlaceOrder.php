@@ -10,7 +10,7 @@ use Magento\Framework\Event\ObserverInterface;
 
 class AfterPlaceOrder implements ObserverInterface
 {
-   
+
     /**
      * @var \Sapient\Worldpay\Helper\Recurring
      */
@@ -30,7 +30,7 @@ class AfterPlaceOrder implements ObserverInterface
       * @var \Magento\Customer\Model\Session
       */
     private $customerSession;
-    
+
     /**
      * @var \Magento\Framework\Controller\ResultFactory
      */

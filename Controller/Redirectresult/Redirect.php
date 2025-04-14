@@ -6,7 +6,7 @@ namespace Sapient\Worldpay\Controller\Redirectresult;
 
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\Context;
- 
+
 /**
  * Redirect to the page return from worldpay
  */

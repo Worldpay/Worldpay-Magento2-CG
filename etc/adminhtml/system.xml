@@ -525,8 +525,21 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Before enabling new PayPal API you must be onboarded. You must connect with your Worldpay contact.</comment>
                 </field>
-                <field id="enable_smart_button" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Enable PayPal SmartButton in HPP</label>
+                <field id="enable_checkout_smart_button" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Paypal SmartButton in checkout page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Before enabling Paypal SmartButton you must be onboarded. You must connect with your Worldpay contact.</comment>
+                </field>
+                <field id="paypal_client_id" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Paypal client ID</label>
+                </field>
+                <field id="paypal_currency" translate="label" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Paypal currency</label>
+                    <source_model>Magento\Config\Model\Config\Source\Locale\Currency</source_model>
+                    <comment>Please ensure you are adding the supported currency, one that was on-boarded for you, to avoid errors in payments. Refer to your Implementation Manager for details.</comment>
+                </field>
+                <field id="enable_hpp_smart_button" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Paypal SmartButton in HPP</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Before enabling PayPal SmartButton you must be onboarded. You must connect with your Worldpay contact.</comment>
                 </field>

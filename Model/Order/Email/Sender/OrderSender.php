@@ -233,7 +233,7 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
         $sender = $this->getSender();
         try {
             $sender->send();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
             return false;
         }
