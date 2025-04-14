@@ -18,7 +18,7 @@ define(
         'ko',
         'Magento_Checkout/js/model/payment/additional-validators',
         'Magento_Checkout/js/action/set-billing-address',
-        'Magento_Ui/js/model/messageList'
+        'Magento_Ui/js/model/messageList',
     ],
     function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,errorProcessor, urlBuilder, storage, fullScreenLoader, ko,additionalValidators,setBillingAddressAction,globalMessageList) {
         'use strict';
@@ -30,7 +30,7 @@ define(
             billingAddressCountryId = quote.billingAddress._latestValue.countryId;
         }
         var klarnaPay = window.checkoutConfig.payment.ccform.klarnaTypesAndContries;
-        
+
         var achAccountCodeMessage = 'Maximum allowed length of 17 exceeded';
         var achAccountDisplayMessage = getCreditCardExceptions('CACH03')?getCreditCardExceptions('CACH03'):achAccountCodeMessage;
         var achRoutingCodeMessage = 'Required length should be 8 or 9';
@@ -68,7 +68,7 @@ define(
         function getCreditCardExceptions (exceptioncode){
                 var ccData=window.checkoutConfig.payment.ccform.creditcardexceptions;
                   for (var key in ccData) {
-                    if (ccData.hasOwnProperty(key)) {  
+                    if (ccData.hasOwnProperty(key)) {
                         var cxData=ccData[key];
                     if(cxData['exception_code'] === exceptioncode){
                         return cxData['exception_module_messages']?cxData['exception_module_messages']:cxData['exception_messages'];
@@ -91,7 +91,7 @@ define(
                 multishipping:false,
                 klarnaType:null
             },
-            
+
             billingCountryId: ko.observable(),
 
             initialize: function () {
@@ -112,7 +112,7 @@ define(
                         billingAddressCountryId = quote.billingAddress._latestValue.countryId;
                         that.filterajax(1);
                         that.billingCountryId(billingAddressCountryId);
-                        paymentService = true;                 
+                        paymentService = true;
                     }
                });
             return this;
@@ -144,9 +144,9 @@ define(
                 var integrationMode = window.checkoutConfig.payment.ccform.intigrationmode;
                  fullScreenLoader.startLoader();
                 isKlarnaAvailabel = !("" in klarnaPay);
-                isKlarna = isKlarnaAvailabel 
+                isKlarna = isKlarnaAvailabel
                                 && (klarnaPay.KLARNA_PAYLATER.includes(quote.billingAddress._latestValue.countryId)
-                                || klarnaPay.KLARNA_SLICEIT.includes(quote.billingAddress._latestValue.countryId) 
+                                || klarnaPay.KLARNA_SLICEIT.includes(quote.billingAddress._latestValue.countryId)
                                 || klarnaPay.KLARNA_PAYNOW.includes(quote.billingAddress._latestValue.countryId));
 
                  storage.post(
@@ -165,14 +165,14 @@ define(
                                     if(response[responsekey] == key.toUpperCase()){
                                         if((integrationMode === 'redirect' && key !== 'ACH_DIRECT_DEBIT-SSL' && key!='SEPA_DIRECT_DEBIT-SSL')
                                             || integrationMode === 'direct' ){
-                                        found = true;
-                                        cckey = key;
-                                        ccvalue = ccavailabletypes[key];
-                                        if (key === 'ACH_DIRECT_DEBIT-SSL'){
-                                            isACH = true;
+                                            found = true;
+                                            cckey = key;
+                                            ccvalue = ccavailabletypes[key];
+                                            if (key === 'ACH_DIRECT_DEBIT-SSL'){
+                                                isACH = true;
+                                            }
+                                            return false;
                                         }
-                                        return false;
-                                    }
                                     }
                                 });
                                 if(found){
@@ -212,7 +212,7 @@ define(
                              'klarnaCode': value
                             };
                         });
-			
+
                         fullScreenLoader.stopLoader();
                         ccTypesArr(ccTypesArr1.filter((set => f => !set.has(f.ccValue) && set.add(f.ccValue))(new Set)));
 			klarnaTypesArr(klarnaTypesArr1);
@@ -379,15 +379,15 @@ define(
                         this.ach_checknumber = this.achchecknumber();
                         this.ach_companyname = this.achcompanyname();
                         this.ach_emailaddress = this.achemailaddress();
-                        
+
                     }
                     else if(this.getselectedCCType() == 'SEPA_DIRECT_DEBIT-SSL'){
                         this.sepa_iban = this.sepaIban();
-                        this.sepa_accountHolderName = this.sepaAccountHolderName();                        
+                        this.sepa_accountHolderName = this.sepaAccountHolderName();
                     }
                     this.statementNarrative = this.stmtNarrative();
-                    if(window.checkoutConfig.payment.ccform.isMultishipping){  
-						fullScreenLoader.startLoader();					
+                    if(window.checkoutConfig.payment.ccform.isMultishipping){
+						fullScreenLoader.startLoader();
 						placeMultishippingOrder(self.getData());
 					}
 					else{

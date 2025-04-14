@@ -16,7 +16,7 @@ define(
         $,
         Component,
         rendererList,
-        layout, 
+        layout,
         registry
     ) {
         'use strict';
@@ -49,7 +49,7 @@ define(
             });
         });
 
-        
+
 
         return Component.extend({});
     }

@@ -48,7 +48,7 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         parent::authorize($payment, $amount);
         return $this;
     }
-    
+
     /**
      * Authorisation service abstract method
      *
@@ -91,6 +91,13 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
                    return true;
             }
         }
+
+        if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isCheckoutPaypalSmartButtonEnabled()
+            && !$this->worlpayhelper->getsubscriptionStatus())
+        {
+            return true;
+        }
+
         return false;
     }
 

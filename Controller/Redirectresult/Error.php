@@ -19,17 +19,17 @@ class Error extends \Magento\Framework\App\Action\Action
      * @var Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;
-    
+
     /**
      * @var SubscriptionFactory
      */
     private $subscriptionFactory;
-    
+
     /**
      * @var TransactionsFactory
      */
     private $transactionsFactory;
-    
+
     /**
      * @var CreditCardException
      */

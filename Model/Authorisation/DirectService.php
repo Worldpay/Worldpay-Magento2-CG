@@ -52,7 +52,7 @@ class DirectService extends \Magento\Framework\DataObject
        * @var \Sapient\Worldpay\Helper\Registry
        */
     protected $registryhelper;
-    
+
       /**
        * @var \Magento\Framework\UrlInterface
        */
@@ -62,7 +62,7 @@ class DirectService extends \Magento\Framework\DataObject
      * @var \Sapient\Worldpay\Helper\Multishipping
      */
     protected $multishippingHelper;
-    
+
     /**
      * @var \Magento\Framework\DataObject\Copy
      */
@@ -155,7 +155,17 @@ class DirectService extends \Magento\Framework\DataObject
             }
         }
         /** End Multishipping Code */
-        if ($paymentDetails['additional_data']['cc_type'] == 'ACH_DIRECT_DEBIT-SSL') {
+
+        if ($paymentDetails['additional_data']['cc_type'] == 'PAYPAL-SSL' && isset($paymentDetails['additional_data']['paypal_smart'])) {
+            $directOrderParams = $this->mappingservice->collectDirectOrderParameters(
+                $orderCode,
+                $quote,
+                $orderStoreId,
+                $paymentDetails
+            );
+
+            $response = $this->paymentservicerequest->paypalOrder($directOrderParams);
+        } elseif ($paymentDetails['additional_data']['cc_type'] == 'ACH_DIRECT_DEBIT-SSL') {
             $directOrderParams = $this->mappingservice->collectACHOrderParameters(
                 $orderCode,
                 $quote,
@@ -178,17 +188,23 @@ class DirectService extends \Magento\Framework\DataObject
                 $orderStoreId,
                 $paymentDetails
             );
-            
+
             $response = $this->paymentservicerequest->order($directOrderParams);
         }
-        
+
         $directResponse = $this->directResponse->setResponse($response);
+        if ($paymentDetails['additional_data']['cc_type'] == 'PAYPAL-SSL') {
+            $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
+            $paypalOrderId = $directResponse->getXml()->reply->orderStatus->reference['id']->__toString();
+            $payment->setAdditionalInformation('paypal_order_id', $paypalOrderId);
+        }
+
         $threeDSecureParams = $directResponse->get3dSecureParams();
         $threeDsEnabled = $this->worldpayHelper->is3DSecureEnabled();
         $threeDSecureChallengeParams = $directResponse->get3ds2Params();
         $threeDSecureConfig = [];
         $disclaimerFlag = '';
-        
+
         if (!empty($directOrderParams['primeRoutingData'])) {
             $additionalInformation = $payment->getAdditionalInformation();
             $additionalInformation["worldpay_primerouting_enabled"]=true;
@@ -196,11 +212,11 @@ class DirectService extends \Magento\Framework\DataObject
                     $additionalInformation
                 );
         }
-        
+
         if (isset($paymentDetails['additional_data']['disclaimerFlag'])) {
             $disclaimerFlag = $paymentDetails['additional_data']['disclaimerFlag'];
         }
-        
+
         if ($threeDSecureParams) {
             // Handles success response with 3DS & redirect for varification.
             $this->checkoutSession->setauthenticatedOrderId($mageOrder->getIncrementId());
@@ -232,7 +248,7 @@ class DirectService extends \Magento\Framework\DataObject
         $this->checkoutSession->setDirectOrderParams($directOrderParams);
         $this->checkoutSession->setAuthOrderId($mageOrderId);
     }
-    
+
     /**
      * Handles 3ds2 secure for direct
      *
@@ -292,7 +308,7 @@ class DirectService extends \Magento\Framework\DataObject
             throw new PaymentException($msg);
         }
     }
-    
+
     /**
      * Get 3ds2 params from the configuration and set to checkout session
      *
@@ -305,14 +321,14 @@ class DirectService extends \Magento\Framework\DataObject
         $data['jwtIssuer'] =  $this->worldpayHelper->isJwtIssuer();
         $data['organisationalUnitId'] = $this->worldpayHelper->isOrganisationalUnitId();
         $data['challengeWindowType'] = $this->worldpayHelper->getChallengeWindowSize();
-    
+
         $mode = $this->worldpayHelper->getEnvironmentMode();
         if ($mode == 'Test Mode') {
             $data['challengeurl'] =  $this->worldpayHelper->isTestChallengeUrl();
         } else {
             $data['challengeurl'] =  $this->worldpayHelper->isProductionChallengeUrl();
         }
-        
+
         return $data;
     }
 }

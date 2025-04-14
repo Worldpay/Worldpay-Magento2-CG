@@ -9,7 +9,6 @@
         display: none;
     }
 </style>
-<!--ko if: (walletCCTypes().length) -->
 
 <div class="payment-method2">
     <div class="payment-method-outer-content">
@@ -30,6 +29,11 @@
             <!-- ko template: getTemplate() -->
             <!-- /ko -->
             <!-- /ko -->
+            <!-- paypal-->
+            <!-- ko foreach: $parent.getRegion('paypalCheckout') -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
+            <!-- /ko -->
 
         </div>
         <!-- ko foreach: getRegion('messages') -->
@@ -46,4 +50,3 @@
         </div>
     </div>
 </div>
-<!--/ko-->

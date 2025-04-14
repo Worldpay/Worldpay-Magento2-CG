@@ -63,7 +63,8 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
     public function getAuthorisationService($storeId)
     {
         $apmmethods = $this->paymentdetailsdata['additional_data']['cc_type'];
-        if ($apmmethods === "ACH_DIRECT_DEBIT-SSL" || $apmmethods === "SEPA_DIRECT_DEBIT-SSL") {
+        $isPaypalSmartButton = $apmmethods === "PAYPAL-SSL" && isset($this->paymentdetailsdata['additional_data']['paypal_smart']);
+        if ($apmmethods === "ACH_DIRECT_DEBIT-SSL" || $apmmethods === "SEPA_DIRECT_DEBIT-SSL" || $isPaypalSmartButton) {
             return $this->directservice;
         }
         return $this->redirectservice;
