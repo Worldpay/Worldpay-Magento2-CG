@@ -405,7 +405,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
             }
 
         }
-        $gatewayError = 'No matching order found in WorldPay to refund';
+        $gatewayError = 'No matching order found in WorldPay to refund.';
         $errorMsg = 'Please visit your WorldPay merchant interface and refund the order manually.';
         throw new \Magento\Framework\Exception\LocalizedException(
             __($gatewayError.' '.$errorMsg)

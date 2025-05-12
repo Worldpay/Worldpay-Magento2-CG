@@ -82,6 +82,10 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
             return false;
         }
 
+        if (!parent::isAvailable($quote)) {
+            return false;
+        }
+
         /* Start Multishipping code */
         if ($this->worlpayhelper->isMultiShipping()) {
             if ($this->worlpayhelper->isMultiShippingEnabledInApm()) {

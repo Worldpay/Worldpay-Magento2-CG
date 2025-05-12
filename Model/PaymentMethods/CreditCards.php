@@ -101,6 +101,10 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      */
     public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
+        if (!parent::isAvailable($quote)) {
+            return false;
+        }
+
         /* Start Multishipping code */
         if ($this->worlpayhelper->isMultiShipping()) {
             if ($this->worlpayhelper->isMultiShippingEnabledInCc()) {

@@ -68,6 +68,10 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      */
     public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
+        if (!parent::isAvailable($quote)) {
+            return false;
+        }
+
         if ($this->productOnDemandHelper->isProductOnDemandQuote()) {
             return false;
         }
