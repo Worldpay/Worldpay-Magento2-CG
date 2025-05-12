@@ -2,13 +2,14 @@
 namespace Sapient\Worldpay\Model\PaymentMethods;
 
 use Exception;
+use Magento\Payment\Model\Method\AbstractMethod as BaseAbstractMethod;
 use Magento\Sales\Model\Order\Payment\Transaction;
 use Sapient\Worldpay\Helper\ProductOnDemand;
 
 /**
  * WorldPay Abstract class extended from Magento Abstract Payment class.
  */
-abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
+abstract class AbstractMethod extends BaseAbstractMethod
 {
 
     /**
