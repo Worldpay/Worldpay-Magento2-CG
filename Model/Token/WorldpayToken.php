@@ -184,7 +184,7 @@ class WorldpayToken
         }
         $this->wplogger->info('########## Received notification customerId ##########');
         $this->wplogger->info($authenticatedShopperId);
-        
+
         try {
             $binNumber = $tokenState->getBin();
             $transactionIdentifier = $tokenState->getTransactionIdentifier();
@@ -242,7 +242,6 @@ class WorldpayToken
         $tokenId = $tokenModel->getId();
         $orderId = explode('-', $worldpayOrderId);
         $order_increment_id = $orderId[0];
-        $transactions = $this->transactionFactory->create();
         $transactions = $this->transactionFactory->create()->load($order_increment_id, 'original_order_increment_id');
         $transactions->setData('worldpay_order_id', $worldpayOrderId);
         $transactions->setData('worldpay_token_id', $tokenId);

@@ -5,6 +5,7 @@ namespace Sapient\Worldpay\Model\Request;
  * @copyright 2017 Sapient
  */
 use Exception;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 use Sapient\Worldpay\Model\SavedToken;
 
 /**
@@ -83,7 +84,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Helper\SendErrorReport $emailErrorReportHelper,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        ProductOnDemand $productOnDemand,
     ) {
         $this->_urlBuilder = $urlBuilder;
         $this->_wplogger = $wplogger;
@@ -95,6 +97,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $this->customerSession = $customerSession;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
+        $this->productOnDemand = $productOnDemand;
     }
 
     /**
@@ -260,8 +263,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $directOrderParams['paymentDetails']['sendShopperIpAddress'] = $this->isSendShopperIpAddress();
         ##### Added orderContent node for plugin tracker ######
         $directOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
-            $directOrderParams['paymentDetails']
-            ['paymentType']
+            $directOrderParams['paymentDetails']['paymentType']
         );
         $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
         $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder(
@@ -271,6 +273,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
         if ($this->worldpayhelper->getsubscriptionStatus()) {
             $directOrderParams['paymentDetails']['subscription_order'] = 1;
+        }
+
+        if ($this->productOnDemand->isProductOnDemandQuote()) {
+            $directOrderParams['paymentDetails']['zero_auth_order'] = 1;
         }
 
         if (empty($directOrderParams['thirdPartyData']) && empty($directOrderParams['shippingfee'])) {
@@ -361,11 +367,11 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $xmlPassword = !empty($msMerchantPw) ? $msMerchantPw : $xmlPassword ;
             $merchantCode = !empty($msMerchantCode) ? $msMerchantCode : $merchantCode ;
         }
+
         ##### Added orderContent node for plugin tracker ######
-            $directOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
-                $directOrderParams['paymentDetails']
-                ['paymentType']
-            );
+        $directOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
+            $directOrderParams['paymentDetails']['paymentType']
+        );
 
         $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
         $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\ACHOrder();
@@ -422,8 +428,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         ##### Added orderContent node for plugin tracker ######
         $directOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
-            $directOrderParams['paymentDetails']
-            ['paymentType']
+            $directOrderParams['paymentDetails']['paymentType']
         );
 
         $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\SEPAOrder();
@@ -558,10 +563,11 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
         ##### Added orderContent node for plugin tracker ######
         $tokenOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
-            $tokenOrderParams['paymentDetails']
-            ['paymentType']
+            $tokenOrderParams['paymentDetails']['paymentType']
         );
-
+        if ($this->productOnDemand->isProductOnDemandQuote()) {
+            $tokenOrderParams['paymentDetails']['zero_auth_order'] = 1;
+        }
         $orderSimpleXml = $this->xmltokenorder->build(
             $merchantCode,
             $tokenOrderParams['orderCode'],
@@ -672,10 +678,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $installationId = !empty($pblInstallationId) ? $pblInstallationId : $installationId ;
         }
         ##### Added orderContent node for plugin tracker ######
-            $redirectOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
-                $redirectOrderParams['paymentDetails']
-                ['cardType']
-            );
+        $redirectOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
+            $redirectOrderParams['paymentDetails']['cardType']
+        );
 
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectOrder($requestConfiguration);
 
@@ -770,10 +775,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $merchantCode = !empty($msMerchantCode) ? $msMerchantCode : $merchantCode ;
                 $installationId = !empty($msinstallationId) ? $msinstallationId : $installationId ;
             }
+
             ##### Added orderContent node for plugin tracker ######
-                $redirectOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
-                    $redirectOrderParams['paymentType']
-                );
+            $redirectOrderParams['orderContent'] = $this->collectPluginTrackerDetails($redirectOrderParams['paymentType']);
 
             $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
 
@@ -868,9 +872,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         }
         $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
         ##### Added orderContent node for plugin tracker ######
-        $redirectOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
-            $redirectOrderParams['paymentType']
-        );
+        $redirectOrderParams['orderContent'] = $this->collectPluginTrackerDetails($redirectOrderParams['paymentType']);
 
         $this->xmldirectidealorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectIdealOrder($requestConfiguration);
         $redirectSimpleXml = $this->xmldirectidealorder->build(
@@ -1116,7 +1118,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param string $password
      * @return SimpleXmlElement $response
      */
-    protected function _sendRequest($xml, $username, $password)
+    public function _sendRequest($xml, $username, $password)
     {
         $response = $this->_request->sendRequest($xml, $username, $password);
         $this->_checkForError($response, $xml);
@@ -1428,6 +1430,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         if ($countryCodeSpoofs) {
             $spoofCountryId = $this->getCountryCodeSpoof($countryCodeSpoofs, $paymentOptionsParams['countryCode']);
         }
+
         $countryId = ($spoofCountryId)? $spoofCountryId : $paymentOptionsParams['countryCode'];
         $this->_wplogger->info('########## Submitting payment options request ##########');
         $this->xmlpaymentoptions = new \Sapient\Worldpay\Model\XmlBuilder\PaymentOptions();
@@ -1496,9 +1499,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
         ##### Added orderContent node for plugin tracker ######
-        $walletOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
-            $walletOrderParams['paymentType']
-        );
+        $walletOrderParams['orderContent'] = $this->collectPluginTrackerDetails($walletOrderParams['paymentType']);
 
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\WalletOrder($requestConfiguration);
             $walletSimpleXml = $this->xmlredirectorder->build(
@@ -1560,9 +1561,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         }
         $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
         ##### Added orderContent node for plugin tracker ######
-        $applePayOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
-            $applePayOrderParams['paymentType']
-        );
+        $applePayOrderParams['orderContent'] = $this->collectPluginTrackerDetails($applePayOrderParams['paymentType']);
 
         $appleSimpleXml = $this->xmlredirectorder->build(
             $merchantCode,
@@ -1618,9 +1617,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\SamsungPayOrder();
         ##### Added orderContent node for plugin tracker ######
-        $samsungPayOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
-            $samsungPayOrderParams['paymentType']
-        );
+        $samsungPayOrderParams['orderContent'] = $this->collectPluginTrackerDetails($samsungPayOrderParams['paymentType']);
 
         $samsungPaySimpleXml = $this->xmlredirectorder->build(
             $merchantCode,
@@ -1761,9 +1758,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\ChromePayOrder();
         ##### Added orderContent node for plugin tracker ######
-        $chromeOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
-            $paymentType
-        );
+        $chromeOrderParams['orderContent'] = $this->collectPluginTrackerDetails($paymentType);
 
         $chromepaySimpleXml = $this->xmlredirectorder->build(
             $chromeOrderParams['merchantCode'],
@@ -2168,8 +2163,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      */
     public function collectPluginTrackerDetails($paymentType)
     {
-        $pluginTrackerDetails = $this->worldpayhelper->getPluginTrackerdetails();
+        $pluginTrackerDetails = $this->worldpayhelper->getPluginTrackerDetails();
         $pluginTrackerDetails['additional_details']['transaction_method'] = $paymentType;
+
         return json_encode($pluginTrackerDetails);
     }
     /**

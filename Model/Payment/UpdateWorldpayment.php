@@ -4,6 +4,7 @@
  */
 namespace Sapient\Worldpay\Model\Payment;
 
+use Sapient\Worldpay\Helper\ProductOnDemand;
 use Sapient\Worldpay\Model\SavedTokenFactory;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Payment\Model\InfoInterface;
@@ -26,7 +27,7 @@ class UpdateWorldpayment
      * @var mixed
      */
     protected $paymentMethodType;
-    
+
     /**
      * @var array
      */
@@ -104,6 +105,8 @@ class UpdateWorldpayment
      */
     private $storeManager;
 
+    private ProductOnDemand $productOnDemandHelper;
+
     /**
      * Constructor
      *
@@ -138,7 +141,8 @@ class UpdateWorldpayment
         \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
         \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        Json $serializer
+        Json $serializer,
+        ProductOnDemand $productOnDemandHelper,
     ) {
         $this->wplogger = $wplogger;
         $this->savedTokenFactory = $savedTokenFactory;
@@ -155,6 +159,7 @@ class UpdateWorldpayment
         $this->worldpaypaymentmodel = $worldpaypaymentmodel;
         $this->storeManager = $storeManager;
         $this->serializer = $serializer;
+        $this->productOnDemandHelper = $productOnDemandHelper;
     }
 
     /**
@@ -200,7 +205,7 @@ class UpdateWorldpayment
         $fraudsightData = $this->getFraudsightData($payment);
         $wpp = $this->worldpaypayment->create();
         $wpp = $wpp->loadByWorldpayOrderId($orderCode);
-        
+
         $wpp->setData('card_number', $cardNumber);
         $wpp->setData('payment_status', $paymentStatus);
         if ($payment->paymentMethod[0]) {
@@ -254,7 +259,7 @@ class UpdateWorldpayment
             $wpp->setData('virtual_account_number', $issureInsightresponse['virtualAccountNumber']);
         }
         $wpp->setData('risk_provider', $riskProvider);
-        
+
         if ($fraudsightData) {
             $wpp->setData('fraudsight_message', $fraudsightData['message']);
             if (isset($fraudsightData['score'])) {
@@ -264,15 +269,15 @@ class UpdateWorldpayment
                 $wpp->setData('fraudsight_reasoncode', $fraudsightData['reasonCode']);
             }
         }
-        
+
         $wpp->save();
-        
+
         if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
                 $this->customerSession->unsIsSavedCardRequested();
                 $tokenNodeWithError = $orderStatus->token->xpath('//error');
             if (!$tokenNodeWithError) {
                 $tokenElement = $orderStatus->token;
-                $this->saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag, $orderCode);
+                $this->saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag, $orderCode, $wpp->getOrderId());
                 // vault and instant purchase configuration goes here
                 $paymentToken = $this->getVaultPaymentToken($tokenElement);
                 if (null !== $paymentToken) {
@@ -282,13 +287,17 @@ class UpdateWorldpayment
                 }
             }
         } else {
+            $this->wplogger->info('else');
              $tokenNodeWithError = $orderStatus->token->xpath('//error');
             if (!$tokenNodeWithError && $tokenId != null) {
                 $this->saveTokenDataToTransactions($tokenId, $orderCode);
+                if ($this->productOnDemandHelper->isProductOnDemandQuote()) {
+                    $this->productOnDemandHelper->_createWorldpayPayOnDemand($wpp->getOrderId(), $orderCode, $tokenId);
+                }
             }
         }
     }
-    
+
     /**
      * Updating Risk gardian
      *
@@ -330,7 +339,7 @@ class UpdateWorldpayment
         }
         $wpp = $this->worldpaypayment->create();
         $wpp = $wpp->loadByWorldpayOrderId($orderCode);
-        
+
         $wpp->setData('card_number', $cardNumber);
         $wpp->setData('payment_status', $paymentStatus);
         if ($payment->paymentMethod[0]) {
@@ -381,7 +390,7 @@ class UpdateWorldpayment
      * @param string|null $disclaimerFlag
      * @param string|null $orderCode
      */
-    public function saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag = null, $orderCode = null)
+    public function saveTokenData($tokenElement, $payment, $merchantCode, $disclaimerFlag = null, $orderCode = null, $orderId = null)
     {
         $savedTokenFactory = $this->savedTokenFactory->create();
         // checking tokenization exist or not
@@ -449,7 +458,10 @@ class UpdateWorldpayment
             if (!$this->customerSession->getIavCall()) {
                 $this->_messageManager->addNotice(__($this->worldpayHelper->getCreditCardSpecificexception('CCAM22')));
             }
-            return;
+        }
+
+        if ($this->productOnDemandHelper->isProductOnDemandQuote()) {
+            $this->productOnDemandHelper->_createWorldpayPayOnDemand($orderId, $orderCode, $tokenId);
         }
     }
 
@@ -484,7 +496,7 @@ class UpdateWorldpayment
         ]));
         return $paymentToken;
     }
-    
+
     /**
      * Set vault payment token
      *
@@ -520,7 +532,7 @@ class UpdateWorldpayment
         $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
         $this->paymentTokenRepository->save($paymentToken);
     }
-    
+
     /**
      * Generate public hash
      *
@@ -539,7 +551,7 @@ class UpdateWorldpayment
 
         return $this->encryptor->getHash($hashKey);
     }
-    
+
     /**
      * Get expiration month and year
      *
@@ -614,7 +626,7 @@ class UpdateWorldpayment
         }
         return $extensionAttributes;
     }
-    
+
     /**
      * Provides additional information part specific for payment method.
      *
@@ -629,7 +641,7 @@ class UpdateWorldpayment
         $additionalInformation[VaultConfigProvider::IS_ACTIVE_CODE] = true;
         $payment->setAdditionalInformation($additionalInformation);
     }
-    
+
     /**
      * Save token of the given transaction
      *
@@ -662,7 +674,7 @@ class UpdateWorldpayment
             return $wpPrimeRoutingEnabled;
         }
     }
-    
+
     /**
      * Get issue insight response data
      *
@@ -683,11 +695,11 @@ class UpdateWorldpayment
             $issuerInsightData['accountRangeId'] = $enhancedAuthResponse->accountRangeId;
             $issuerInsightData['issuerCountry'] = $enhancedAuthResponse->issuerCountry;
             $issuerInsightData['virtualAccountNumber'] = $enhancedAuthResponse->virtualAccountNumber;
-            
+
             return $issuerInsightData;
         }
     }
-    
+
     /**
      * Get fraud sight data
      *
@@ -713,7 +725,7 @@ class UpdateWorldpayment
             }
         }
     }
-    
+
     /**
      * Get reason codes
      *

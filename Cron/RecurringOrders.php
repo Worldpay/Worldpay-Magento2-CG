@@ -49,17 +49,17 @@ class RecurringOrders
      * @var _newEntityId
      */
     private $_newEntityId;
-    
+
     /**
      * @var CollectionFactory
      */
     private $subscriptionCollectionFactory;
-    
+
     /**
      * @var CollectionFactory
      */
     private $transactionCollectionFactory;
-    
+
     /**
      * @var CollectionFactory
      */
@@ -109,7 +109,7 @@ class RecurringOrders
      * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
      */
     protected $_orderCollectionFactory;
-     
+
     /**
      * Constructor
      *
@@ -219,7 +219,7 @@ class RecurringOrders
         }
         return $this;
     }
-    
+
     /**
      * Update recurring order Transactionsfor next order
      *
@@ -233,7 +233,7 @@ class RecurringOrders
                $transactionDetails->setOriginalOrderId($orderId)->save();
         }
     }
-    
+
     /**
      * Get the list of orders to be Sync
      *
@@ -314,7 +314,7 @@ class RecurringOrders
             return $result;
         }
     }
-    
+
     /**
      * Get the list of orders to be Sync
      *
@@ -343,7 +343,7 @@ class RecurringOrders
         }
         return $this->orderCollectionFactory;
     }
-    
+
     /**
      * Frame Shipping Address
      *
@@ -369,7 +369,7 @@ class RecurringOrders
                         ];
         return $shippingAddress;
     }
-    
+
     /**
      * Frame Billing Address
      *
@@ -393,7 +393,7 @@ class RecurringOrders
                         ];
         return $billingAddress;
     }
-    
+
     /**
      * Frame Payment Additional data
      *
@@ -420,7 +420,7 @@ class RecurringOrders
                         ];
         return $additionalData;
     }
-    
+
     /**
      * Update recurring order Transactionsfor next order
      *
@@ -448,12 +448,12 @@ class RecurringOrders
             $tmonthsdate = strtotime(date("Y-m-d", strtotime($date)) . " +3 month");
             $sixmonthsdate = strtotime(date("Y-m-d", strtotime($date)) . " +6 month");
             $yeardate = strtotime(date("Y-m-d", strtotime($date)) . " +12 month");
-            
+
             $plan = $this->planFactory->create()->loadById($transactionDetails->getPlanId());
             $planInterval = $plan->getInterval();
-            
+
             $recurringOrderId = $transactionDetails->getRecurringOrderId();
-            
+
             if ($planInterval == 'WEEKLY') {
                 $recurringDate = date('Y-m-d', $week);
             } elseif ($planInterval == 'MONTHLY') {
@@ -492,7 +492,7 @@ class RecurringOrders
                 $subscription->setStatus(SubscriptionStatus::EXPIRED)->save();
                 $transactionDetails->setStatus('expired')->save();
                 return 'expired';
-                
+
             }
         }
     }

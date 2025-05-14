@@ -870,7 +870,7 @@ class DefaultConfigurations implements DataPatchInterface
                         'fields' => [
                             'response_codes' => [
                                 'value' => $responseCodes
-                                    
+
                             ],
                         ],
                     ],
@@ -885,7 +885,7 @@ class DefaultConfigurations implements DataPatchInterface
          */
     public function saveCCLabels()
     {
-            
+
         $index = time();
         $exceptionValues = [$index . '_0' => ["exception_code" => "CCAM0",
                 "exception_messages" => "The card number entered is invalid.",
@@ -1164,7 +1164,7 @@ class DefaultConfigurations implements DataPatchInterface
         "exception_messages" => "This is multishipping order. You cannot able to cancelled the order",
         "exception_module_messages" => ""],
         ];
-            
+
         $exceptionCodes = $this->convertArrayToString($exceptionValues);
         $configData = [
             'section' => 'worldpay_exceptions',
@@ -1637,7 +1637,7 @@ class DefaultConfigurations implements DataPatchInterface
             $resultArray[$payment_type] = $rs;
         }
         $subscriptionConfigData= $this->serializer->serialize($resultArray);
-            
+
         $configData = [
             'section' => 'worldpay',
             'website' => null,
@@ -1649,7 +1649,7 @@ class DefaultConfigurations implements DataPatchInterface
                         'value' => [
                                 $index.'_0' => "AT,CH,NO,DE,DK,US,FI,GB,NL,SE",
                             ]
-                                
+
                         ],
                     ],
                     ]
@@ -1660,7 +1660,7 @@ class DefaultConfigurations implements DataPatchInterface
                             'value' => [
                                 $index.'_0' => "SE,NO,FI,DE,AT,GB,DK,US",
                             ]
-                                
+
                         ],
                     ],
                     ]
@@ -1671,7 +1671,7 @@ class DefaultConfigurations implements DataPatchInterface
                             'value' => [
                                 $index.'_0' => "SE,NO,FI,DE,NL,AT,CH,GB,DK,US",
                             ]
-                                
+
                         ],
                     ],
                     ]
@@ -1682,7 +1682,7 @@ class DefaultConfigurations implements DataPatchInterface
                             'value' => [
                                 $index.'_0' => "SE,DE,NL,AT",
                             ]
-                                
+
                         ],
                     ],
                     ]

@@ -24,18 +24,18 @@ class SavedToken extends AbstractModel
     /**
      * Load worldpay token Details
      *
-     * @param string $order_id
+     * @param string $tokenCode
      * @return \Sapient\Worldpay\Model\SavedToken
      */
-    public function loadByTokenCode($order_id)
+    public function loadByTokenCode($tokenCode)
     {
-        if (!$order_id) {
+        if (!$tokenCode) {
             return;
         }
-        $id = $this->getResource()->loadByTokenCode($order_id);
+        $id = $this->getResource()->loadByTokenCode($tokenCode);
         return $this->load($id);
     }
-    
+
     /**
      * Load worldpay Storedcredentials Details
      *

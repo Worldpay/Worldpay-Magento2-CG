@@ -455,6 +455,16 @@ define(
                                 $('#disclaimer-error').html('');
                             }
                         }
+                        if(this.isProductOnDemand()){
+                            var saveCardOption = $('#' + this.getCode() + '_save_card').is(":checked");
+                            if(!saveCardOption){
+                                $('#disclaimer-error').css('display', 'block');
+                                $('#disclaimer-error').html(getCreditCardExceptions('CCAM30'));
+                                return false;
+                            } else {
+                                $('#disclaimer-error').html('');
+                            }
+                        }
                         return true;
                     }
                 }
@@ -906,6 +916,9 @@ define(
             isSubscribed : function (){
                 return window.checkoutConfig.payment.ccform.isSubscribed;
             },
+            isProductOnDemand : function (){
+                return window.checkoutConfig.payment.ccform.isProductOnDemand;
+            },
             isCPFEnabled: function () {
                 if(billingAddressCountryId === 'BR') {
                     return window.checkoutConfig.payment.ccform.isCPFEnabled;
@@ -982,6 +995,7 @@ define(
                             'dfReferenceId': window.sessionId,
                             'disclaimerFlag': this.disclaimerFlag,
                             'subscriptionStatus': this.isSubscribed(),
+                            'productOnDemand': this.isProductOnDemand(),
                             'cpf_enabled': this.isCPFEnabled(),
                             'instalment_enabled': this.isInstalmentEnabled(),
                             'cpf': $('#' + this.getCode() + '_cpf').val(),
@@ -1016,6 +1030,7 @@ define(
                             'dfReferenceId': window.sessionId,
                             'disclaimerFlag': this.disclaimerFlag,
                             'subscriptionStatus': this.isSubscribed(),
+                            'productOnDemand': this.isProductOnDemand(),
                             'cpf_enabled': this.isCPFEnabled(),
                             'instalment_enabled': this.isInstalmentEnabled(),
                             'cpf': $('#' + this.getCode() + '_cpf').val(),
@@ -1191,6 +1206,18 @@ define(
                             }
                         }
                     }
+                    if(this.isProductOnDemand()){
+                        if(cc_type_selected !== 'savedcard'){
+                            var saveCardOption = $('#' + this.getCode() + '_save_card').is(":checked");
+                            if(!saveCardOption){
+                                $('#disclaimer-error').css('display', 'block');
+                                $('#disclaimer-error').html(getCreditCardExceptions('CCAM30'));
+                                return false;
+                            } else {
+                                $('#disclaimer-error').html('');
+                            }
+                        }
+                    }
                     //Direct form handle
                     this.saveMyCard = $('#' + this.getCode() + '_save_card').is(":checked");
                     if(this.saveMyCard && !this.isDisclaimerMessageMandatory()){
@@ -1201,6 +1228,11 @@ define(
                         return false;
                     } else if(this.saveMyCard && this.isStoredCredentialsEnabled() && this.isDisclaimerMessageEnabled() && (window.disclaimerDialogue === null || window.disclaimerDialogue === false)){
                         if(this.isSubscribed()){
+                            $('#disclaimer-error').css('display', 'block');
+                            $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));
+                            return false;
+                        }
+                        if(this.isProductOnDemand()){
                             $('#disclaimer-error').css('display', 'block');
                             $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));
                             return false;

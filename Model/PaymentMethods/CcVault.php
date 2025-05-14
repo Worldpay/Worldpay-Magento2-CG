@@ -8,8 +8,6 @@ namespace Sapient\Worldpay\Model\PaymentMethods;
 use Sapient\Worldpay\Logger\WorldpayLogger;
 use Exception;
 use Magento\Sales\Model\Order\Payment\Transaction;
-use Sapient\Worldpay\Model\PaymentMethods\CreditCards;
-
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Payment\Gateway\Command;
@@ -18,14 +16,9 @@ use Magento\Payment\Gateway\ConfigFactoryInterface;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\MethodInterface;
-use Magento\Payment\Observer\AbstractDataAssignObserver;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
-use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Model\Order\Payment;
-use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
-use Magento\Vault\Block\Form;
-use Magento\Vault\Model\VaultPaymentInterface;
 
 class CcVault extends \Magento\Vault\Model\Method\Vault
 {
@@ -144,7 +137,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
       * @var \Magento\Framework\Registry
       */
     protected $registry;
-    
+
     /**
      * @var object
      */
@@ -264,7 +257,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $message = $payment->prependMessage($message);
         $payment->addTransactionCommentsToOrder($transaction, $message);
     }
-    
+
     /**
      *  Generate order code for cc vault
      *

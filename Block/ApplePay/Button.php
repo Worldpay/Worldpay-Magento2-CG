@@ -5,8 +5,10 @@
  */
 namespace Sapient\Worldpay\Block\ApplePay;
 
+use Magento\Catalog\Block\Product\View as ProductView;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\View\Element\Template;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 use \Sapient\Worldpay\Logger\WorldpayLogger;
 use Magento\Customer\Model\Context as CustomerContext;
 
@@ -18,41 +20,29 @@ use Magento\Customer\Model\Context as CustomerContext;
  */
 class Button extends Template
 {
-    /**
-     * @var scopeConfig
-     */
-    protected $_scopeConfig;
-    /**
-     * @var SessionManagerInterface
-     */
-    protected $session;
+    protected \Sapient\Worldpay\Helper\Data $worldpayHelper;
 
-    /**
-     * @var \Sapient\Worldpay\Logger\WorldpayLogger
-     */
-    protected $wplogger;
+    protected ProductView $productView;
 
-    /**
-     * @var \Sapient\Worldpay\Helper\Data
-     */
-    protected $worldpayHelper;
+    protected ProductOnDemand $productOnDemandHelper;
 
     /**
      * Button constructor.
      * @param Context $context
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Helper\Data $helper
      * @param array $data
      */
     public function __construct(
         Context $context,
-        WorldpayLogger $wplogger,
         \Sapient\Worldpay\Helper\Data $helper,
+        ProductView $productView,
+        ProductOnDemand $productOnDemandHelper,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->worldpayHelper = $helper;
-        $this->wplogger = $wplogger;
+        $this->productView = $productView;
+        $this->productOnDemandHelper = $productOnDemandHelper;
     }
 
     /**
@@ -63,7 +53,7 @@ class Button extends Template
      */
     public function isEnabled(): bool
     {
-        return $this->worldpayHelper->isApplePayEnable();
+        return $this->worldpayHelper->isApplePayEnable() && !$this->isProductOnDemand();
     }
 
     /**
@@ -71,7 +61,7 @@ class Button extends Template
      */
     public function isApplePayEnableonPdp()
     {
-        return $this->worldpayHelper->isApplePayEnableonPdp();
+        return $this->worldpayHelper->isApplePayEnableonPdp() && !$this->isProductOnDemand();
     }
 
     /**
@@ -96,5 +86,16 @@ class Button extends Template
     public function isApplePayButtonLocalePdp()
     {
         return $this->worldpayHelper->getApplePayButtonLocalePdp();
+    }
+
+    private function isProductOnDemand(): bool
+    {
+        $product = $this->productView->getProduct();
+
+        if ($product) {
+            return $this->productOnDemandHelper->isProductOnDemand($product);
+        }
+
+        return false;
     }
 }

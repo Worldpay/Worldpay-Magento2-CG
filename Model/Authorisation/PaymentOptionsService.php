@@ -56,7 +56,6 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
         $countryId,
         $paymenttype
     ) {
-
         $isMultishipping = false;
         if ($this->worldpayhelper->isMultiShipping()) {
             $isMultishipping = true;

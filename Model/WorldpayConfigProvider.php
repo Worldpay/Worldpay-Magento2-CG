@@ -6,9 +6,9 @@ namespace Sapient\Worldpay\Model;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 use Sapient\Worldpay\Model\PaymentMethods\CreditCards as WorldPayCCPayment;
 use Magento\Checkout\Model\Cart;
-use Sapient\Worldpay\Model\SavedTokenFactory;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Asset\Source;
@@ -121,6 +121,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      */
     private $storeManager;
 
+    private ProductOnDemand $productOnDemandHelper;
+
     /**
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Helper\Data $helper
@@ -159,7 +161,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         SerializerInterface $serializer,
         \Magento\Framework\Session\SessionManagerInterface $session,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Filesystem\Driver\File $fileDriver
+        \Magento\Framework\Filesystem\Driver\File $fileDriver,
+        ProductOnDemand $productOnDemandHelper,
     ) {
 
             $this->wplogger = $wplogger;
@@ -182,6 +185,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
             $this->session = $session;
             $this->storeManager = $storeManager;
             $this->fileDriver = $fileDriver;
+            $this->productOnDemandHelper = $productOnDemandHelper;
     }
 
     /**
@@ -308,6 +312,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
 
                 // Subscription Status
                 $config['payment']['ccform']['isSubscribed'] = $this->worldpayHelper->getsubscriptionStatus();
+
+                // Product on Demand
+                $config['payment']['ccform']['isProductOnDemand'] = $this->productOnDemandHelper->isProductOnDemandQuote();
 
                 $config['payment']['ccform']['myaccountexceptions'] = $this->getMyAccountException();
 
