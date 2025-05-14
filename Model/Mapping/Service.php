@@ -2,6 +2,7 @@
 
 namespace Sapient\Worldpay\Model\Mapping;
 
+use Sapient\Worldpay\Helper\ProductOnDemand;
 use Sapient\Worldpay\Model\SavedTokenFactory;
 use Magento\Framework\Session\SessionManagerInterface;
 
@@ -87,6 +88,9 @@ class Service
      * @var \Sapient\Worldpay\Helper\Recurring
      */
     protected $recurringHelper;
+
+    protected ProductOnDemand $productOnDemandHelper;
+
     /**
      * Constructor
      *
@@ -110,7 +114,8 @@ class Service
         \Magento\Customer\Model\Session $customerSession,
         \Sapient\Worldpay\Helper\Recurring $recurringHelper,
         SessionManagerInterface $session,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        ProductOnDemand $productOnDemandHelper,
     ) {
         $this->wplogger = $wplogger;
         $this->savedTokenFactory = $savedTokenFactory;
@@ -121,6 +126,7 @@ class Service
         $this->_urlBuilder = $urlBuilder;
         $this->session = $session;
         $this->_scopeConfig = $scopeConfig;
+        $this->productOnDemandHelper = $productOnDemandHelper;
     }
     /**
      * Collect Vault Order Parameters
@@ -213,7 +219,6 @@ class Service
         $orderStoreId,
         $paymentDetails
     ) {
-
         $reservedOrderId = $quote->getReservedOrderId();
         $savemyCard = isset($paymentDetails['additional_data']['save_my_card'])
                 ? $paymentDetails['additional_data']['save_my_card'] : '';
@@ -429,10 +434,15 @@ class Service
 
         $thirdPartyData = '';
         $shippingFee = '';
-        if ((isset($paymentDetails['additional_data']['cpf'])
-                && $paymentDetails['additional_data']['cpf'] == true)
-                || (isset($paymentDetails['additional_data']['instalment'])
-                        && ($paymentDetails['additional_data']['instalment'] == true))) {
+        if (
+            (
+                isset($paymentDetails['additional_data']['cpf'])
+                && $paymentDetails['additional_data']['cpf']
+            ) || (
+                isset($paymentDetails['additional_data']['instalment'])
+                && $paymentDetails['additional_data']['instalment']
+            )
+        ) {
             $thirdPartyData = $this->getThirdPartyDetails($paymentDetails, $quote);
             $shippingFee = $this->getShippingFeeForBrazil($paymentDetails, $quote);
         }
@@ -454,7 +464,7 @@ class Service
                                    getMerchantCode($paymentType),
                 'orderDescription' => $this->_getOrderDescription($reservedOrderId),
                 'currencyCode' => $quote->getQuoteCurrencyCode(),
-                'amount' => $quote->getGrandTotal(),
+                'amount' => $this->productOnDemandHelper->isProductOnDemandQuote() ? 0 : $quote->getGrandTotal(),
                 'paymentType' => $paymentType,
                 'shopperEmail' => $quote->getCustomerEmail(),
                 'statementNarrative' => $stmtNarrative,
@@ -1379,14 +1389,12 @@ class Service
                             'worldpay/general_config/environment_mode',
                             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                         );
-                    // if ($environmentMode == 'Test Mode') {
-                    //     $orderDescription =   $this->_scopeConfig->getValue(
-                    //         'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
-                    //         \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                    //     );
-                    // }
-                    $this->wplogger->info("Gpay 3Ds value". $orderDescription);
-
+//                    if ($environmentMode == 'Test Mode') {
+//                        $orderDescription =   $this->_scopeConfig->getValue(
+//                            'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
+//                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+//                        );
+//                    }
                 } else {
                     $orderDescription = $this->_getOrderDescription($reservedOrderId);
                 }
@@ -1450,8 +1458,8 @@ class Service
                 ];
                 return [
                     'orderCode' => $orderCode,
-                    'merchantCode' => $this->worldpayHelper->
-                                        getMerchantCode($paymentDetails['additional_data']['cc_type']),
+                    'merchantCode' =>
+                        $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
                     'orderDescription' => $this->_getOrderDescription($reservedOrderId),
                     'currencyCode' => $quote->getQuoteCurrencyCode(),
                     'amount' => $quote->getGrandTotal(),

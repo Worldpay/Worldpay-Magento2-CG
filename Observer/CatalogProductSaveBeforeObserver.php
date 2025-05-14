@@ -7,6 +7,7 @@
 namespace Sapient\Worldpay\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 class CatalogProductSaveBeforeObserver implements ObserverInterface
 {
@@ -36,6 +37,15 @@ class CatalogProductSaveBeforeObserver implements ObserverInterface
             && $product->getWorldpayRecurringEnabled()
         ) {
             $product->setHasOptions(true);
+        }
+
+        $productOnDemand = $product->getData('product_on_demand');
+        $recurringEnabled = $product->getData('worldpay_recurring_enabled');
+
+        if ($productOnDemand && $recurringEnabled) {
+            throw new LocalizedException(
+                __('Both "Product on Demand" and "Worldpay Recurring Enabled" cannot be enabled on the same product.')
+            );
         }
 
         return $this;

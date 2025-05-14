@@ -48,15 +48,15 @@ define(
             }
         }, $.mage.__(getCreditCardExceptions('CCAM1')));
         $.validator.addMethod('worldpay-validate-cpf-number', function (value) {
-                if (value) {
-                    return (evaluateRegex(value, "^[0-9]{11,11}$") || evaluateRegex(value, "^[0-9]{14,14}$"));
-                }
-            }, $.mage.__(getCreditCardExceptions('CCAM20')));
-            $.validator.addMethod('worldpay-validate-latm-desc', function (value) {
-                if (value) {
-                    return evaluateRegex(value, "^[a-zA-Z0-9 ]+$");
-                }
-            }, $.mage.__(getCreditCardExceptions('CCAM21')));
+            if (value) {
+                return (evaluateRegex(value, "^[0-9]{11,11}$") || evaluateRegex(value, "^[0-9]{14,14}$"));
+            }
+        }, $.mage.__(getCreditCardExceptions('CCAM20')));
+        $.validator.addMethod('worldpay-validate-latm-desc', function (value) {
+            if (value) {
+                return evaluateRegex(value, "^[a-zA-Z0-9 ]+$");
+            }
+        }, $.mage.__(getCreditCardExceptions('CCAM21')));
         //Valid Card or not.
         $.validator.addMethod('worldpay-cardnumber-valid', function (value) {
             return doLuhnCheck(value);
@@ -65,10 +65,10 @@ define(
         var typeErrorMsg = 'Card number entered does not match with card type selected';
         var cardTypeErrorDisplay = getCreditCardExceptions('CTYP01') ? getCreditCardExceptions('CTYP01') : typeErrorMsg;
         $.validator.addMethod('worldpay-validate-card-type', function (value) {
-                if (value) {
-                    return (checkForCcTypeValidation());
-                }
-            }, $.mage.__(cardTypeErrorDisplay));
+            if (value) {
+                return (checkForCcTypeValidation());
+            }
+        }, $.mage.__(cardTypeErrorDisplay));
 
             function checkForCcTypeValidation() {
                 var inputName = 'payment[cc_type]';
@@ -453,6 +453,16 @@ define(
                                 } else {
                                     $('#disclaimer-error').html('');
                                 }
+                        }
+                        if(this.isProductOnDemand()){
+                            var saveCardOption = $('#' + this.getCode() + '_save_card').is(":checked");
+                            if(!saveCardOption){
+                                $('#disclaimer-error').css('display', 'block');
+                                $('#disclaimer-error').html(getCreditCardExceptions('CCAM30'));
+                                return false;
+                            } else {
+                                $('#disclaimer-error').html('');
+                            }
                         }
                         return true;
                     }
@@ -905,12 +915,15 @@ define(
             isSubscribed : function (){
                 return window.checkoutConfig.payment.ccform.isSubscribed;
             },
-                isCPFEnabled: function () {
-                    if(billingAddressCountryId === 'BR') {
-                        return window.checkoutConfig.payment.ccform.isCPFEnabled;
-                    }
-                    return false;
-                },
+            isProductOnDemand : function (){
+                return window.checkoutConfig.payment.ccform.isProductOnDemand;
+            },
+            isCPFEnabled: function () {
+                if(billingAddressCountryId === 'BR') {
+                    return window.checkoutConfig.payment.ccform.isCPFEnabled;
+                }
+                return false;
+            },
 
                 isInstalmentEnabled: function () {
                     return window.checkoutConfig.payment.ccform.isInstalmentEnabled;
@@ -980,17 +993,18 @@ define(
                             'stored_credentials_enabled': this.isStoredCredentialsEnabled(),
                             'dfReferenceId': window.sessionId,
                             'disclaimerFlag': this.disclaimerFlag,
-                                'subscriptionStatus': this.isSubscribed(),
-                                'cpf_enabled': this.isCPFEnabled(),
-                                'instalment_enabled': this.isInstalmentEnabled(),
-                                'cpf': $('#' + this.getCode() + '_cpf').val(),
-                                'instalment': $('#' + this.getCode() + '_instalment').val(),
-                                'statement': this.statement,
-                                'shippingfee': this.getShippingFeeForBrazil(),
-                                'multishipping': this.multishipping,
-                                'browser_screenheight': window.screen.height,
-                                'browser_screenwidth': window.screen.width,
-                                'browser_colordepth': window.screen.colorDepth
+                            'subscriptionStatus': this.isSubscribed(),
+                            'productOnDemand': this.isProductOnDemand(),
+                            'cpf_enabled': this.isCPFEnabled(),
+                            'instalment_enabled': this.isInstalmentEnabled(),
+                            'cpf': $('#' + this.getCode() + '_cpf').val(),
+                            'instalment': $('#' + this.getCode() + '_instalment').val(),
+                            'statement': this.statement,
+                            'shippingfee': this.getShippingFeeForBrazil(),
+                            'multishipping': this.multishipping,
+                            'browser_screenheight': window.screen.height,
+                            'browser_screenwidth': window.screen.width,
+                            'browser_colordepth': window.screen.colorDepth
                         }
                     };
 
@@ -1014,17 +1028,18 @@ define(
                             'stored_credentials_enabled': this.isStoredCredentialsEnabled(),
                             'dfReferenceId': window.sessionId,
                             'disclaimerFlag': this.disclaimerFlag,
-                                'subscriptionStatus': this.isSubscribed(),
-                                'cpf_enabled': this.isCPFEnabled(),
-                                'instalment_enabled': this.isInstalmentEnabled(),
-                                'cpf': $('#' + this.getCode() + '_cpf').val(),
-                                'instalment': $('#' + this.getCode() + '_instalment').val(),
-                                'statement': this.statement,
-                                'shippingfee': this.getShippingFeeForBrazil(),
-                                'multishipping': this.multishipping,
-                                'browser_screenheight': window.screen.height,
-                                'browser_screenwidth': window.screen.width,
-                                'browser_colordepth': window.screen.colorDepth
+                            'subscriptionStatus': this.isSubscribed(),
+                            'productOnDemand': this.isProductOnDemand(),
+                            'cpf_enabled': this.isCPFEnabled(),
+                            'instalment_enabled': this.isInstalmentEnabled(),
+                            'cpf': $('#' + this.getCode() + '_cpf').val(),
+                            'instalment': $('#' + this.getCode() + '_instalment').val(),
+                            'statement': this.statement,
+                            'shippingfee': this.getShippingFeeForBrazil(),
+                            'multishipping': this.multishipping,
+                            'browser_screenheight': window.screen.height,
+                            'browser_screenwidth': window.screen.width,
+                            'browser_colordepth': window.screen.colorDepth
                         }
                     };
                 }
@@ -1037,7 +1052,7 @@ define(
                 }
                 return false;
             },
-             getCsePublicKey:function(){
+            getCsePublicKey:function(){
                 return window.checkoutConfig.payment.ccform.csePublicKey;
             },
             getRegexCode:function(cardType){
@@ -1055,9 +1070,9 @@ define(
                 var $form = $('#' + this.getCode() + '-form');
                 var $savedCardForm = $('#' + this.getCode() + '-savedcard-form');
                 var selectedSavedCardToken = $("input[name='payment[token_to_use]']:checked").val();
-                    var $cpfForm = $('#' + this.getCode() + '-cpf-form');
+                var $cpfForm = $('#' + this.getCode() + '-cpf-form');
                 var cc_type_selected = this.getselectedCCType('payment[cc_type]');
-                    this.statement = $('#' + this.getCode() + '_statement').val();
+                this.statement = $('#' + this.getCode() + '_statement').val();
 
                 if(!additionalValidators.validate()){
                     console.log("Validation Failed");
@@ -1190,6 +1205,18 @@ define(
                             }
                         }
                     }
+                    if(this.isProductOnDemand()){
+                        if(cc_type_selected !== 'savedcard'){
+                            var saveCardOption = $('#' + this.getCode() + '_save_card').is(":checked");
+                            if(!saveCardOption){
+                                $('#disclaimer-error').css('display', 'block');
+                                $('#disclaimer-error').html(getCreditCardExceptions('CCAM30'));
+                                return false;
+                            } else {
+                                $('#disclaimer-error').html('');
+                            }
+                        }
+                    }
                     //Direct form handle
                     this.saveMyCard = $('#' + this.getCode() + '_save_card').is(":checked");
                     if(this.saveMyCard && !this.isDisclaimerMessageMandatory()){
@@ -1200,6 +1227,11 @@ define(
 			            return false;
                     } else if(this.saveMyCard && this.isStoredCredentialsEnabled() && this.isDisclaimerMessageEnabled() && (window.disclaimerDialogue === null || window.disclaimerDialogue === false)){
                         if(this.isSubscribed()){
+                            $('#disclaimer-error').css('display', 'block');
+                            $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));
+                            return false;
+                        }
+                        if(this.isProductOnDemand()){
                             $('#disclaimer-error').css('display', 'block');
                             $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));
                             return false;

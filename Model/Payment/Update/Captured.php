@@ -37,7 +37,9 @@ class Captured extends \Sapient\Worldpay\Model\Payment\Update\Base implements Up
 
         if (!empty($order)) {
             $this->_assertValidPaymentStatusTransition($order, $this->_getAllowedPaymentStatuses());
-            $order->capture();
+            if (!$this->_worldPayPayment->getIsOrderOnDemand($payment)) {
+                $order->capture();
+            }
             $this->_worldPayPayment->updateWorldPayPayment($this->_paymentState);
             $this->_worldPayPayment->updatePrimeroutingData($order->getPayment(), $this->_paymentState);
         }

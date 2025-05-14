@@ -58,7 +58,7 @@ class Order
      * @var \Magento\Sales\Model\Order\Creditmemo
      */
     private $ordercreditmemo;
-    
+
     /**
      * Constructor
      *
@@ -143,7 +143,7 @@ class Order
     {
         return $this->getOrder()->getId();
     }
-    
+
     /**
      * Retrieve payment Method
      *

@@ -129,7 +129,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
      * @var \Magento\Sales\Model\Order|bool
      */
     private $lastOrder;
-    
+
     /**
      * @var \Magento\Framework\Pricing\PriceCurrencyInterface
      */
@@ -155,7 +155,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
      * @var array
      */
     private $totalAmountToDate = [];
-    
+
     /**
      * @var \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory
      */
@@ -766,7 +766,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
 
         return $this;
     }
-    
+
      /**
       * Check is subscriptions functionality enabled globally and product is of supported type
       *
@@ -776,7 +776,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     {
         return $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/endDate');
     }
-    
+
     /**
      * Update recurring transactions data
      *
@@ -784,26 +784,16 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
      */
     public function updateTransactionsData()
     {
+
         $startDate = '';
         if ($this->getStartDate()) {
             $startDate = $this->getStartDate();
         }
-        $endDate = '';
         if ($this->getEndDate()) {
             $endDate = $this->getEndDate();
         } else {
              $endDate = $this->getStartDate();
         }
-        $transactionData = ['subscription_id'=>$this->getId(),
-                'customer_id'   =>  $this->getCustomerId(),
-                'original_order_id' =>  $this->getOriginalOrderId(),
-                'original_order_increment_id'   =>  $this->getOriginalOrderIncrementId(),
-                'plan_id'   =>  $this->getPlanId(),
-                'recurring_date'   =>  $startDate,
-                'recurring_end_date'   =>  $endDate,
-                'email'=>$this->getCustomerEmail(),
-                'status'=>'active',
-                'recurring_order_id' => $this->getOriginalOrderId()];
         $transactions = $this->transactionsFactory->create()
                 ->loadByOrderIncrementId($this->getOriginalOrderIncrementId());
         $transactions->setData('subscription_id', $this->getId());
@@ -824,7 +814,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $transactions->setData('recurring_order_id', $this->getOriginalOrderId());
         $transactions->save();
     }
-    
+
     /**
      * Getter for order state
      *
@@ -837,7 +827,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $state = $order->getState(); //Get Order State(Complete, Processing, ....)
         return $state;
     }
-    
+
     /**
      * Load subscription Details
      *
@@ -867,7 +857,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $transactions = $this->transactionsFactory->create()
         ->loadBySubscriptionIdActive($this->getSubscriptionId());
         $tokenDetails = $this->savedToken->load($transactions->getData('worldpay_token_id'));
-        
+
         return $tokenDetails;
     }
 }

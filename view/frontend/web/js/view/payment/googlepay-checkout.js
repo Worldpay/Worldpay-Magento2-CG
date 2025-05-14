@@ -20,7 +20,7 @@ define([
     $,
     _,
     Component,
-    ko,    
+    ko,
     $t,
     GooglePayModel,
     stepNavigator,
@@ -58,90 +58,100 @@ define([
             var self= this;
             if(self.isActive() && ($('.gpay-card-info-container').length == 0)){
                     self.addGooglePayButton();
-             }   
+             }
         },
-        initialize: function () { 
+        initialize: function () {
             this._super();
             var self=this;
             window.googleCheckout = this;
-            
-            $(document).on('ajaxComplete',function(event, xhr, settings) {                
+
+            $(document).on('ajaxComplete',function(event, xhr, settings) {
                 // load once payment types ajax completes
                 if(settings.url.indexOf("worldpay/latam/types") != -1)
                 {
                     if(self.isActive() && ($('.gpay-card-info-container').length == 0)){
                         //self.addGooglePayButton();
                     }
-                }                
+                }
             });
         },
-        isActive: function(){            
-            if(window.checkoutConfig.payment.ccform.isMultishipping){ 
-                return (window.checkoutConfig.payment.ccform.isMsGooglePayEnable && window.checkoutConfig.payment.ccform.isWalletsEnabled && !window.checkoutConfig.payment.ccform.isSubscribed);
-            }          
-            return (window.checkoutConfig.payment.ccform.isGooglePayEnable && window.checkoutConfig.payment.ccform.isWalletsEnabled && !window.checkoutConfig.payment.ccform.isSubscribed);
+        isActive: function(){
+            if(window.checkoutConfig.payment.ccform.isMultishipping){
+                return (
+                    window.checkoutConfig.payment.ccform.isMsGooglePayEnable
+                    && window.checkoutConfig.payment.ccform.isWalletsEnabled
+                    && !window.checkoutConfig.payment.ccform.isSubscribed
+                    && !window.checkoutConfig.payment.ccform.isProductOnDemand
+                );
+            }
+            return (
+                window.checkoutConfig.payment.ccform.isGooglePayEnable
+                && window.checkoutConfig.payment.ccform.isWalletsEnabled
+                && !window.checkoutConfig.payment.ccform.isSubscribed
+                && !window.checkoutConfig.payment.ccform.isProductOnDemand
+            );
         },
 
         gPayCardAuthMethods:function(){
-            if(window.checkoutConfig.payment.ccform.isMultishipping){ 
-              if(window.checkoutConfig.payment.ccform.msGoogleAuthMethods !='undefined' 
+            if(window.checkoutConfig.payment.ccform.isMultishipping){
+              if(window.checkoutConfig.payment.ccform.msGoogleAuthMethods !='undefined'
                 && window.checkoutConfig.payment.ccform.msGoogleAuthMethods !=null){
                     return window.checkoutConfig.payment.ccform.msGoogleAuthMethods.split(",");
               }
                 return window.checkoutConfig.payment.ccform.googleAuthMethods.split(",");
-            }  
+            }
             return window.checkoutConfig.payment.ccform.googleAuthMethods.split(",");
         },
 
         gPayPaymentMethods:function(){
-            if(window.checkoutConfig.payment.ccform.isMultishipping){ 
-              if(window.checkoutConfig.payment.ccform.msGooglePaymentMethods !='undefined' 
+            if(window.checkoutConfig.payment.ccform.isMultishipping){
+              if(window.checkoutConfig.payment.ccform.msGooglePaymentMethods !='undefined'
                 && window.checkoutConfig.payment.ccform.msGooglePaymentMethods !=null){
                     return window.checkoutConfig.payment.ccform.msGooglePaymentMethods.split(",");
               }
                 return window.checkoutConfig.payment.ccform.googlePaymentMethods.split(",");
-            }  
+            }
             return window.checkoutConfig.payment.ccform.googlePaymentMethods.split(",");
         },
         gatewayName:function(){
-            if(window.checkoutConfig.payment.ccform.isMultishipping){ 
-              if(window.checkoutConfig.payment.ccform.msGoogleGatewayMerchantname !='undefined' 
+            if(window.checkoutConfig.payment.ccform.isMultishipping){
+              if(window.checkoutConfig.payment.ccform.msGoogleGatewayMerchantname !='undefined'
                 && window.checkoutConfig.payment.ccform.msGoogleGatewayMerchantname !=null){
                     return window.checkoutConfig.payment.ccform.msGoogleGatewayMerchantname;
               }
                 return window.checkoutConfig.payment.ccform.googleGatewayMerchantname;
-            }  
+            }
             return window.checkoutConfig.payment.ccform.googleGatewayMerchantname;
         },
         gatewayMerchantId:function(){
-            if(window.checkoutConfig.payment.ccform.isMultishipping){ 
-              if(window.checkoutConfig.payment.ccform.msGoogleGatewayMerchantid !='undefined' 
+            if(window.checkoutConfig.payment.ccform.isMultishipping){
+              if(window.checkoutConfig.payment.ccform.msGoogleGatewayMerchantid !='undefined'
                 && window.checkoutConfig.payment.ccform.msGoogleGatewayMerchantid !=null){
                     return window.checkoutConfig.payment.ccform.msGoogleGatewayMerchantid;
               }
                 return window.checkoutConfig.payment.ccform.googleGatewayMerchantid;
-            }  
+            }
             return window.checkoutConfig.payment.ccform.googleGatewayMerchantid;
         },
         gpayMerchantName:function(){
-            if(window.checkoutConfig.payment.ccform.isMultishipping){ 
-              if(window.checkoutConfig.payment.ccform.msGoogleMerchantname !='undefined' 
+            if(window.checkoutConfig.payment.ccform.isMultishipping){
+              if(window.checkoutConfig.payment.ccform.msGoogleMerchantname !='undefined'
                 && window.checkoutConfig.payment.ccform.msGoogleMerchantname !=null){
                     return window.checkoutConfig.payment.ccform.msGoogleMerchantname;
               }
                 return window.checkoutConfig.payment.ccform.googleMerchantname;
-            }  
+            }
             return window.checkoutConfig.payment.ccform.googleMerchantname;
         },
         gpayMerchantId:function(){
-            if(window.checkoutConfig.payment.ccform.isMultishipping){ 
-              if(window.checkoutConfig.payment.ccform.msGoogleMerchantid !='undefined' 
+            if(window.checkoutConfig.payment.ccform.isMultishipping){
+              if(window.checkoutConfig.payment.ccform.msGoogleMerchantid !='undefined'
                 && window.checkoutConfig.payment.ccform.msGoogleMerchantid !=null){
                     return window.checkoutConfig.payment.ccform.msGoogleMerchantid;
               }
                 return window.checkoutConfig.payment.ccform.googleMerchantid;
-            }  
-            return window.checkoutConfig.payment.ccform.googleMerchantid;         
+            }
+            return window.checkoutConfig.payment.ccform.googleMerchantid;
         },
         gpayTokenizationSpecification:function(){
             var self = this;
@@ -150,8 +160,8 @@ define([
                 "parameters": {
                   "gateway": self.gatewayName(),
                   "gatewayMerchantId": self.gatewayMerchantId()
-                }  
-            }    
+                }
+            }
             return tokenizationSpecification;
         },
         addGooglePayButton: function(){
@@ -169,7 +179,7 @@ define([
                     "buttonLocale" : window.checkoutConfig.payment.ccform.gpayButtonLocale,
                     "buttonSizeMode" : 'fill'
                 }
-            }            
+            }
             GooglePayModel.addGooglePayButton(
                 self.googlepayOptions.container,
                 additionalData,
@@ -188,7 +198,7 @@ define([
                 "tokenizationSpecification": window.googleCheckout.gpayTokenizationSpecification(),
                 "totalPrice": window.googleCheckout.getGrandTotal()
             }
-            GooglePayModel.initGooglePay(ginitData).then(function(paymentData){   
+            GooglePayModel.initGooglePay(ginitData).then(function(paymentData){
                     var maskedQuoteId = "";
                     if(!customer.isLoggedIn()){
                         maskedQuoteId = quote.getQuoteId();
@@ -208,7 +218,7 @@ define([
                             'browser_screenwidth': window.screen.width,
                             'browser_colordepth': window.screen.colorDepth
                         }
-                    }   
+                    }
                 var checkoutData = {
                     billingAddress : quote.billingAddress(),
                     shippingAddress: quote.shippingAddress(),
@@ -220,8 +230,8 @@ define([
                     isCustomerLoggedIn : customer.isLoggedIn(),
                     isRequiredShipping : shippingrequired
                 }
-                if(window.checkoutConfig.payment.ccform.isMultishipping){                       
-                    fullScreenLoader.startLoader();                                                     
+                if(window.checkoutConfig.payment.ccform.isMultishipping){
+                    fullScreenLoader.startLoader();
                     placeMultishippingOrder(paymentData);
                 }
                 else{

@@ -4,6 +4,8 @@
  */
 namespace Sapient\Worldpay\Model\Payment\Update;
 
+use Sapient\Worldpay\Helper\ProductOnDemand;
+
 class Factory
 {
     /** @var \Sapient\Worldpay\Helper\Data */
@@ -19,6 +21,8 @@ class Factory
      */
     private $_multishippingHelper;
 
+    private ProductOnDemand $productOnDemandHelper;
+
     /**
      * Constructor
      *
@@ -29,11 +33,13 @@ class Factory
     public function __construct(
         \Sapient\Worldpay\Helper\Data $configHelper,
         \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldpaymentmodel,
-        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper,
+        ProductOnDemand $productOnDemand,
     ) {
-            $this->_configHelper = $configHelper;
-            $this->worldpaymentmodel = $worldpaymentmodel;
-            $this->_multishippingHelper = $multishippingHelper;
+        $this->_configHelper = $configHelper;
+        $this->worldpaymentmodel = $worldpaymentmodel;
+        $this->_multishippingHelper = $multishippingHelper;
+        $this->productOnDemandHelper = $productOnDemand;
     }
 
     /**
@@ -50,7 +56,8 @@ class Factory
                     $paymentState,
                     $this->worldpaymentmodel,
                     $this->_configHelper,
-                    $this->_multishippingHelper
+                    $this->_multishippingHelper,
+                    $this->productOnDemandHelper,
                 );
 
             case \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_CAPTURED:
@@ -80,7 +87,7 @@ class Factory
                     $this->worldpaymentmodel,
                     $this->_configHelper
                 );
-            
+
             case \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_REFUND_EXPIRED:
                 return new \Sapient\Worldpay\Model\Payment\Update\RefundFailed(
                     $paymentState,
