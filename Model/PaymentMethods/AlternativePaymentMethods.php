@@ -78,6 +78,10 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
      */
     public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
+        if ($this->productOnDemandHelper->isProductOnDemandQuote()) {
+            return false;
+        }
+
         /* Start Multishipping code */
         if ($this->worlpayhelper->isMultiShipping()) {
             if ($this->worlpayhelper->isMultiShippingEnabledInApm()) {
@@ -86,8 +90,11 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
             return false;
         }
         /* End Multishipping code */
-        if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isApmEnabled()
-                && !$this->worlpayhelper->getsubscriptionStatus()) {
+        if (
+            $this->worlpayhelper->isWorldPayEnable()
+            && $this->worlpayhelper->isApmEnabled()
+            && !$this->worlpayhelper->getsubscriptionStatus()
+        ) {
             return true;
         }
         return false;

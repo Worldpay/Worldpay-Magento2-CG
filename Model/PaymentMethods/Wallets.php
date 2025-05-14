@@ -68,6 +68,9 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      */
     public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
+        if ($this->productOnDemandHelper->isProductOnDemandQuote()) {
+            return false;
+        }
         /* Start Multishipping code */
         if ($this->worlpayhelper->isMultiShipping()) {
             if ($this->worlpayhelper->isMultiShippingEnabledInWallets()) {
@@ -82,8 +85,11 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         }
         /* End Multishipping code */
 
-        if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isWalletsEnabled()
-                && !$this->worlpayhelper->getsubscriptionStatus()) {
+        if (
+            $this->worlpayhelper->isWorldPayEnable()
+            && $this->worlpayhelper->isWalletsEnabled()
+            && !$this->worlpayhelper->getsubscriptionStatus()
+        ) {
             if ($this->worlpayhelper->isGooglePayEnable() ||
                 $this->worlpayhelper->isSamsungPayEnable() ||
                 $this->worlpayhelper->isApplePayEnable()

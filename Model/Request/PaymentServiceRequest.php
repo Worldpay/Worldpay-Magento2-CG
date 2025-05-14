@@ -5,6 +5,7 @@ namespace Sapient\Worldpay\Model\Request;
  * @copyright 2017 Sapient
  */
 use Exception;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 use Sapient\Worldpay\Model\SavedToken;
 
 /**
@@ -83,7 +84,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Helper\SendErrorReport $emailErrorReportHelper,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        ProductOnDemand $productOnDemand,
     ) {
         $this->_urlBuilder = $urlBuilder;
         $this->_wplogger = $wplogger;
@@ -95,6 +97,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $this->customerSession = $customerSession;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
+        $this->productOnDemand = $productOnDemand;
     }
 
     /**
@@ -270,6 +273,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
         if ($this->worldpayhelper->getsubscriptionStatus()) {
             $directOrderParams['paymentDetails']['subscription_order'] = 1;
+        }
+
+        if ($this->productOnDemand->isProductOnDemandQuote()) {
+            $directOrderParams['paymentDetails']['zero_auth_order'] = 1;
         }
 
         if (empty($directOrderParams['thirdPartyData']) && empty($directOrderParams['shippingfee'])) {
@@ -558,7 +565,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $tokenOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
             $tokenOrderParams['paymentDetails']['paymentType']
         );
-
+        if ($this->productOnDemand->isProductOnDemandQuote()) {
+            $tokenOrderParams['paymentDetails']['zero_auth_order'] = 1;
+        }
         $orderSimpleXml = $this->xmltokenorder->build(
             $merchantCode,
             $tokenOrderParams['orderCode'],
@@ -1109,7 +1118,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param string $password
      * @return SimpleXmlElement $response
      */
-    protected function _sendRequest($xml, $username, $password)
+    public function _sendRequest($xml, $username, $password)
     {
         $response = $this->_request->sendRequest($xml, $username, $password);
         $this->_checkForError($response, $xml);
@@ -1421,6 +1430,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         if ($countryCodeSpoofs) {
             $spoofCountryId = $this->getCountryCodeSpoof($countryCodeSpoofs, $paymentOptionsParams['countryCode']);
         }
+
         $countryId = ($spoofCountryId)? $spoofCountryId : $paymentOptionsParams['countryCode'];
         $this->_wplogger->info('########## Submitting payment options request ##########');
         $this->xmlpaymentoptions = new \Sapient\Worldpay\Model\XmlBuilder\PaymentOptions();
@@ -2153,7 +2163,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      */
     public function collectPluginTrackerDetails($paymentType)
     {
-        $pluginTrackerDetails = $this->worldpayhelper->getPluginTrackerDetails($paymentType);
+        $pluginTrackerDetails = $this->worldpayhelper->getPluginTrackerDetails();
         $pluginTrackerDetails['additional_details']['transaction_method'] = $paymentType;
 
         return json_encode($pluginTrackerDetails);

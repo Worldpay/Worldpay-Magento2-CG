@@ -32,5 +32,11 @@
     </event>
     <event name="checkout_onepage_controller_success_action">
         <observer name="worldpay_order_place_after" instance="Sapient\Worldpay\Observer\AfterPlaceOrder"/>
-    </event>	
+    </event>
+    <event name="sales_order_place_before">
+        <observer name="modify_order_amount" instance="Sapient\Worldpay\Observer\ModifyOrderAmount" />
+    </event>
+    <event name="sales_order_invoice_save_before">
+        <observer name="custom_invoice_generated_observer" instance="Sapient\Worldpay\Observer\InvoiceGenerated" />
+    </event>
 </config>

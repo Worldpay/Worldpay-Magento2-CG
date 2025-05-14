@@ -5,10 +5,12 @@
  */
 namespace Sapient\Worldpay\Block\InstantPurchase;
 
+use Magento\Catalog\Block\Product\View as ProductView;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\InstantPurchase\Model\Config;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\Session\SessionManagerInterface;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 
 /**
  * Configuration for JavaScript instant purchase button component.
@@ -23,35 +25,34 @@ class Button extends Template
      */
     private $instantPurchaseConfig;
     /**
-     * @var Config
-     */
-
-    protected $_scopeConfig;
-    /**
      * @var SessionManagerInterface
      */
     protected $session;
 
+    protected ProductView $productView;
+
+    protected ProductOnDemand $productOnDemand;
     /**
      * Constructor
      *
      * @param Context $context
      * @param InstantPurchaseConfig $instantPurchaseConfig
-     * @param ScopeConfig $scopeConfig
      * @param Session $session
      * @param array $data
      */
     public function __construct(
         Context $context,
         Config $instantPurchaseConfig,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Session\SessionManagerInterface $session,
+        ProductView $productView,
+        ProductOnDemand $productOnDemand,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->instantPurchaseConfig = $instantPurchaseConfig;
-        $this->_scopeConfig = $scopeConfig;
         $this->session = $session;
+        $this->productView = $productView;
+        $this->productOnDemand = $productOnDemand;
     }
 
     /**
@@ -62,7 +63,7 @@ class Button extends Template
      */
     public function isEnabled(): bool
     {
-        return $this->instantPurchaseConfig->isModuleEnabled($this->getCurrentStoreId());
+        return $this->instantPurchaseConfig->isModuleEnabled($this->getCurrentStoreId()) && !$this->isProductOnDemand();
     }
 
     /**
@@ -73,14 +74,6 @@ class Button extends Template
     {
         $buttonText = $this->instantPurchaseConfig->getButtonText($this->getCurrentStoreId());
         $purchaseUrl = $this->getUrl('worldpay/button/placeOrder', ['_secure' => true]);
-        $is3DSEnabled = (bool) $this->_scopeConfig->getValue(
-            'worldpay/3ds_config/do_3Dsecure',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-        $is3DS2Enabled = (bool) $this->_scopeConfig->getValue(
-            'worldpay/3ds_config/enable_dynamic3DS2',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
         // String data does not require escaping here and handled on transport level and on client side
         $this->jsLayout['components']['instant-purchase']['config']['buttonText'] = $buttonText;
         $this->jsLayout['components']['instant-purchase']['config']['purchaseUrl'] = $purchaseUrl;
@@ -106,5 +99,16 @@ class Button extends Template
     public function getSessionId()
     {
         return $this->session->getSessionId();
+    }
+
+    private function isProductOnDemand(): bool
+    {
+        $product = $this->productView->getProduct();
+
+        if ($product) {
+            return $this->productOnDemand->isProductOnDemand($product);
+        }
+
+        return false;
     }
 }

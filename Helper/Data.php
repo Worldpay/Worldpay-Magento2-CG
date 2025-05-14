@@ -184,7 +184,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Backend\Model\Session\Quote $adminsessionquote,
         \Magento\Framework\App\ProductMetadataInterface $productMetaData,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
-        \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
+        \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
@@ -1572,6 +1572,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return false;
     }
+
     /**
      * Get CPF Enabled
      *
@@ -2918,7 +2919,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    public function getPluginTrackerDetails($paymentType)
+    public function getPluginTrackerDetails(): array
     {
         $details=[];
         $mageDetails = $this->getCurrentMagentoVersionDetails();

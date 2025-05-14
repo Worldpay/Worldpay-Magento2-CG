@@ -6,7 +6,6 @@ namespace Sapient\Worldpay\Model\XmlBuilder;
 
 use Sapient\Worldpay\Helper\Data;
 use Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecureConfig;
-use \Sapient\Worldpay\Logger\WorldpayLogger;
 
 /**
  * Build xml for Direct Order request
@@ -172,7 +171,7 @@ EOD;
     public function __construct(
         \Magento\Customer\Model\Session $customerSession,
         Data $dataHelper,
-        array $args = []
+        array $args = [],
     ) {
         $this->customerSession = $customerSession;
         $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure(
@@ -199,8 +198,8 @@ EOD;
      * @param string $shopperEmail
      * @param string $acceptHeader
      * @param string $userAgentHeader
-     * @param string $shippingAddress
-     * @param float $billingAddress
+     * @param array $shippingAddress
+     * @param array $billingAddress
      * @param string $shopperId
      * @param string $saveCardEnabled
      * @param string $tokenizationEnabled
@@ -519,6 +518,10 @@ EOD;
             return;
         }
 
+        if (isset($this->paymentDetails['zero_auth_payment']) && !$this->paymentDetails['zero_auth_payment']) {
+            return;
+        }
+
         $createTokenElement = $order->addChild('createToken');
         $createTokenElement['tokenScope'] = self::TOKEN_SCOPE;
         if ($this->paymentDetails['token_type']) {
@@ -628,10 +631,18 @@ EOD;
 
         if(
             !$this->paymentDetails['isEnabledEFTPOS']
+            && isset($this->paymentDetails["cardType"])
             && $this->dataHelper->getShopperSelection($this->paymentDetails["cardType"])
         ) {
             $selectedScheme = $paymentDetailsElement->addChild('selectedScheme');
             $selectedScheme['shopperSelection'] = $this->dataHelper->getShopperSelection($this->paymentDetails["cardType"]);
+        } else if(
+            !$this->paymentDetails['isEnabledEFTPOS']
+            && isset($this->paymentDetails["paymentType"])
+            && $this->dataHelper->getShopperSelection($this->paymentDetails["paymentType"])
+        ) {
+            $selectedScheme = $paymentDetailsElement->addChild('selectedScheme');
+            $selectedScheme['shopperSelection'] = $this->dataHelper->getShopperSelection($this->paymentDetails["paymentType"]);
         }
 
         if (!empty($this->paymentDetails['routingMID'])) {
@@ -1014,6 +1025,10 @@ EOD;
      */
     private function _amountAsInt($amount)
     {
+        if (isset($this->paymentDetails['zero_auth_order']) && $this->paymentDetails['zero_auth_order']) {
+            return 0;
+        }
+
         return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
     }
 
@@ -1025,11 +1040,18 @@ EOD;
      */
     private function _addStoredCredentials($paymentDetailsElement)
     {
+        if (isset($this->paymentDetails['zero_auth_payment']) && !$this->paymentDetails['zero_auth_payment']) {
+            return;
+        }
+
         $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
         $storedCredentials['usage'] = "FIRST";
-        $isSubscriptionOrder = isset($this->paymentDetails['subscription_order'])? true : false;
+        $isSubscriptionOrder = isset($this->paymentDetails['subscription_order']);
+        $isProductOnDemandOrder = isset($this->paymentDetails['zero_auth_order']) && $this->paymentDetails['zero_auth_order'];
         if ($isSubscriptionOrder) {
             $storedCredentials['customerInitiatedReason'] = "RECURRING";
+        } else if ($isProductOnDemandOrder) {
+            $storedCredentials['customerInitiatedReason'] = "UNSCHEDULED";
         }
         return $storedCredentials;
     }
@@ -1042,11 +1064,18 @@ EOD;
      */
     private function _addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement)
     {
-        $isRecurringOrder =  isset($this->paymentDetails['isRecurringOrder'])? true : false;
+        $isRecurringOrder = isset($this->paymentDetails['isRecurringOrder']);
+        $isZeroAuthPayment =
+            isset($this->paymentDetails['zero_auth_payment'])
+            && !$this->paymentDetails['zero_auth_payment'];
+        $isProductOnDemandOrder = isset($this->paymentDetails['zero_auth_order']) && $this->paymentDetails['zero_auth_order'];
+
         $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
         $storedCredentials['usage'] = "USED";
         if ($isRecurringOrder) {
             $storedCredentials['merchantInitiatedReason'] = "RECURRING";
+        } else if($isZeroAuthPayment || $isProductOnDemandOrder) {
+            $storedCredentials['merchantInitiatedReason'] = "UNSCHEDULED";
         }
         $storedCredentials->addChild('schemeTransactionIdentifier', $this->paymentDetails['transactionIdentifier']);
         return $storedCredentials;
@@ -1328,6 +1357,11 @@ EOD;
         $amountElement = $orderXml->addChild('amount');
         $amountElement['currencyCode'] = $this->currencyCode;
         $amountElement['exponent'] = $this->exponent;
-        $amountElement['value'] = $this->_amountAsInt($amount);
+
+        if (isset($this->paymentDetails['zero_auth_order']) && $this->paymentDetails['zero_auth_order']) {
+            $amountElement['value'] = 0;
+        } else {
+            $amountElement['value'] = $this->_amountAsInt($amount);
+        }
     }
 }

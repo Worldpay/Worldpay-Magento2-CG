@@ -62,6 +62,9 @@ class PayByLink extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      */
     public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
+        if ($this->productOnDemandHelper->isProductOnDemandQuote()) {
+            return false;
+        }
 
         if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isPayByLinkEnable()) {
             return true;

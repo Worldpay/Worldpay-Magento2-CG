@@ -19,7 +19,7 @@ define(
         return Component.extend({
             defaults: {
                 template: 'Sapient_Worldpay/payment/paybylink'
-            },            
+            },
             isPlaceOrderActionAllowed: ko.observable(quote.billingAddress() != null),
             /**
              * @returns {*}
@@ -62,9 +62,9 @@ define(
                     guest_masked_quote_id: maskedQuoteId,
                     isCustomerLoggedIn: customer.isLoggedIn(),
                     isRequiredShipping: shippingrequired
-                }                
+                }
                 checkoutUtils.setPaymentInformationAndPlaceOrder(checkoutData);
-            },            
+            },
             getpaybylinkText: function(){
                 return window.checkoutConfig.payment.ccform.payByLinkButtonName;
             },
@@ -73,6 +73,9 @@ define(
                     return false;
                 }
                 if(window.checkoutConfig.payment.ccform.isSubscribed){
+                    return false;
+                }
+                if(window.checkoutConfig.payment.ccform.isProductOnDemand){
                     return false;
                 }
                 if(window.checkoutConfig.payment.ccform.isEnabledEFTPOS){
