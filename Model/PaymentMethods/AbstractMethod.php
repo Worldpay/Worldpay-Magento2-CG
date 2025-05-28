@@ -210,16 +210,19 @@ abstract class AbstractMethod extends BaseAbstractMethod
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Backend\Model\Session\Quote $adminsessionquote,
         \Sapient\Worldpay\Model\Authorisation\DirectService $directservice,
+        \Sapient\Worldpay\Model\Authorisation\RedirectService $redirectservice,
         \Sapient\Worldpay\Model\Authorisation\TokenService $tokenservice,
         \Sapient\Worldpay\Model\Authorisation\MotoRedirectService $motoredirectservice,
         \Sapient\Worldpay\Model\Authorisation\HostedPaymentPageService $hostedpaymentpageservice,
         \Sapient\Worldpay\Model\Authorisation\WalletService $walletService,
         \Sapient\Worldpay\Model\Authorisation\PayByLinkService $paybylinkservice,
         \Sapient\Worldpay\Helper\Registry $registryhelper,
+        \Magento\Framework\UrlInterface $urlBuilder,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
         \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment,
         \Sapient\Worldpay\Model\SavedTokenFactory $savecard,
         \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
+        \Magento\Framework\Pricing\Helper\Data $pricinghelper,
         \Sapient\Worldpay\Model\Response\AdminhtmlResponse $adminhtmlresponse,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
         \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentutils,
@@ -227,6 +230,8 @@ abstract class AbstractMethod extends BaseAbstractMethod
         \Magento\Framework\App\RequestInterface $request,
         \Magento\Backend\Model\Auth\Session $authSession,
         \Sapient\Worldpay\Helper\Multishipping $multishippingHelper,
+        \Sapient\Worldpay\Model\Multishipping\OrderFactory $multishippingOrderFactory,
+        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection,
         ProductOnDemand $productOnDemandHelper,
         ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
@@ -247,15 +252,18 @@ abstract class AbstractMethod extends BaseAbstractMethod
         $this->_wplogger = $wplogger;
         $this->directservice = $directservice;
         $this->paymentservicerequest = $paymentservicerequest;
+        $this->redirectservice = $redirectservice;
         $this->tokenservice = $tokenservice;
         $this->hostedpaymentpageservice = $hostedpaymentpageservice;
         $this->walletService = $walletService;
         $this->paybylinkservice = $paybylinkservice;
         $this->quoteRepository = $quoteRepository;
         $this->registryhelper = $registryhelper;
+        $this->urlbuilder = $urlBuilder;
         $this->worlpayhelper = $worldpayhelper;
         $this->worldpaypayment = $worldpaypayment;
         $this->worldpaypaymentmodel = $worldpaypaymentmodel;
+        $this->pricinghelper = $pricinghelper;
         $this->adminhtmlresponse = $adminhtmlresponse;
         $this->paymentutils = $paymentutils;
         $this->adminsessionquote = $adminsessionquote;
@@ -266,8 +274,11 @@ abstract class AbstractMethod extends BaseAbstractMethod
         $this->registry = $registry;
         $this->_request = $request;
         $this->multishippingHelper = $multishippingHelper;
+        $this->multishippingOrderFactory = $multishippingOrderFactory;
+        $this->multishippingOrderCollection = $multishippingOrderCollection;
         $this->productOnDemandHelper = $productOnDemandHelper;
     }
+
     /**
      * Initializer
      *
