@@ -355,20 +355,8 @@ class Webpayment extends Template
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $wpayEnabled = (bool)$this->_scopeConfig->getValue('worldpay/general_config/enable_worldpay', $storeScope);
         $chromePayEnabled = (bool)$this->scopeConfig->getValue('worldpay/chromepay_config/chromepay', $storeScope);
-        $isProductOnDemand = $this->isProductOnDemand();
 
-        return $wpayEnabled && $chromePayEnabled && $isProductOnDemand;
-    }
-
-    private function isProductOnDemand(): bool
-    {
-        $product = $this->productView->getProduct();
-
-        if ($product) {
-            return $this->productOnDemand->isProductOnDemand($product);
-        }
-
-        return false;
+        return $wpayEnabled && $chromePayEnabled && !$this->productOnDemand->isProductOnDemandQuote();
     }
 
     /**
