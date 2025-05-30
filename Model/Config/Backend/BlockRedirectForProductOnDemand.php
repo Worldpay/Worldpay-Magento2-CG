@@ -22,6 +22,13 @@ class BlockRedirectForProductOnDemand extends Value
             throw new LocalizedException(__('Product on Demand cannot be enabled when Integration Mode is set to Redirect.'));
         }
 
+        if (
+            $newIntegrationMode === 'redirect' && $currentIntegrationMode === 'redirect'
+            && $currentProductOnDemandEnabled == '1' && $newProductOnDemand === '1'
+        ) {
+            throw new LocalizedException(__('Product on Demand cannot be enabled when Integration Mode is set to Redirect. Please change configurations.'));
+        }
+
         parent::beforeSave();
     }
 }
