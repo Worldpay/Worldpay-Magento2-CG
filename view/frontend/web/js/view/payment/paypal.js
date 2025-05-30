@@ -32,6 +32,9 @@ define(
                     const script = document.createElement('script');
                     var currency = quote.totals().quote_currency_code;
                     var clientId = window.checkoutConfig.payment.ccform.paypalClientId;
+                    if(!clientId) {
+                        return;
+                    }
                     script.src = 'https://www.paypal.com/sdk/js?client-id=' + clientId + '&currency=' + currency + '&intent=authorize';
                     script.type = 'text/javascript';
                     script.async = true;
