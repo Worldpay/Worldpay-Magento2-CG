@@ -808,7 +808,7 @@
                     <label>Product on Demand Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <backend_model>Sapient\Worldpay\Model\Config\Backend\BlockRedirectForProductOnDemand</backend_model>
-                    <comment>Shopper pays when merchant issues the invoice</comment>
+                    <comment>Shopper pays when merchant issues the invoice. Credit Cards > Integration Mode must be set to Direct.</comment>
                 </field>
                 <field id="pdp_label" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Product Description Page Label</label>
