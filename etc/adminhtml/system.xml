@@ -98,6 +98,7 @@
                 <field id="integration_mode" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Integration Mode</label>
                     <source_model>Sapient\Worldpay\Model\Config\Source\IntegrationMode</source_model>
+                    <backend_model>Sapient\Worldpay\Model\Config\Backend\BlockRedirectForProductOnDemand</backend_model>
                     <comment>Set Hosted payment page by selecting Redirect</comment>
                 </field>
                 <field id="paymentmethods" translate="label" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -806,7 +807,8 @@
                 <field id="enabled" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Product on Demand Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Shopper pays when merchant issues the invoice</comment>
+                    <backend_model>Sapient\Worldpay\Model\Config\Backend\BlockRedirectForProductOnDemand</backend_model>
+                    <comment>Shopper pays when merchant issues the invoice. Credit Cards > Integration Mode must be set to Direct.</comment>
                 </field>
                 <field id="pdp_label" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Product Description Page Label</label>
