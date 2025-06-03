@@ -4,6 +4,7 @@
  */
 namespace Sapient\Worldpay\Helper;
 
+use Magento\Store\Model\ScopeInterface;
 use Sapient\Worldpay\Model\Config\Source\HppIntegration as HPPI;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -44,7 +45,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @var SessionManagerInterface
      */
     protected $session;
-    
+
     /**
      * @var worldpaypaymentmodel
      */
@@ -217,7 +218,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/general_config/enable_worldpay',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -229,7 +230,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/environment_mode',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -241,7 +242,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/test_url',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -253,7 +254,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/live_url',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -266,8 +267,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getMerchantCode($paymentType, $storeId = null)
     {
         if ($paymentType) {
-            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_code']: '';
+            $merchantDetails = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue = $merchantDetails ? $merchantDetails['merchant_code'] : '';
             if (!empty($merchantCodeValue)) {
                 return $merchantCodeValue;
             }
@@ -275,13 +276,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             return $this->_scopeConfig->getValue(
                 'worldpay/general_config/merchant_code',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         } else {
             return $this->_scopeConfig->getValue(
                 'worldpay/general_config/merchant_code',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
     }
@@ -304,13 +305,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             return $this->_scopeConfig->getValue(
                 'worldpay/general_config/xml_username',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         } else {
             return $this->_scopeConfig->getValue(
                 'worldpay/general_config/xml_username',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
     }
@@ -333,13 +334,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             return $this->_scopeConfig->getValue(
                 'worldpay/general_config/xml_password',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         } else {
             return $this->_scopeConfig->getValue(
                 'worldpay/general_config/xml_password',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
     }
@@ -352,7 +353,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/mac_enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -364,7 +365,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/mac_secret',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -376,7 +377,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/3ds_config/enable_dynamic3DS',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -388,7 +389,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/3ds_config/do_3Dsecure',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -410,7 +411,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/general_config/enable_logging',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -422,7 +423,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/moto_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -434,7 +435,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/cc_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -446,7 +447,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/cc_config/title',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -458,7 +459,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/cc_config/paymentmethods',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -479,7 +480,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'LASER-SSL' => 'Laser Card', 'UATP-SSL' => 'UATP',
         ];
         $configMethods = explode(',', $this->_scopeConfig->getValue('worldpay/' .
-                $paymentconfig . '/paymentmethods', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+                $paymentconfig . '/paymentmethods', ScopeInterface::SCOPE_STORE));
         $activeMethods = [];
         foreach ($configMethods as $method) {
             $activeMethods[$method] = $allCcMethods[$method];
@@ -510,7 +511,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         ];
         $configMethods = explode(',', $this->_scopeConfig->getValue(
             'worldpay/apm_config/paymentmethods',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         ));
         $activeMethods = [];
         foreach ($configMethods as $method) {
@@ -520,8 +521,41 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 }
             }
         }
+
+        $paypalSSL = $this->_scopeConfig->getValue(
+            'worldpay/paypal_config/enable_paypal_ssl',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+
+        if($paypalSSL == '1') {
+            if(isset($activeMethods['PAYPAL-EXPRESS'])) {
+                $activeMethods['PAYPAL-SSL'] = "Paypal SSL";
+                unset($activeMethods['PAYPAL-EXPRESS']);
+            }
+        }
+
         return $activeMethods;
     }
+
+    public function getShopperSelection($paymentType)
+    {
+        $schemes = [
+            'EFTPOS_AU-SSL' => 'EFTPOS_AU',
+            'CHINAUNIONPAY-SSL' => 'CHINAUNIONPAY',
+            'AMEX-SSL' => 'AMEX',
+            'VISA-SSL' => 'VISA',
+            'ECMC-SSL' => 'ECMC',
+            'DISCOVER-SSL' => 'DISCOVER',
+            'DINERS-SSL' => 'DINERS',
+            'MAESTRO-SSL' => 'MAESTRO',
+            'CB-SSL' => 'CB',
+            'DANKORT-SSL' => 'DANKORT',
+            'JCB-SSL' => 'JCB',
+        ];
+
+        return $schemes[$paymentType] ?? null;
+    }
+
    /**
     * Get Wallets Types
     *
@@ -551,7 +585,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return trim($this->_scopeConfig->getValue(
             'worldpay/cc_config/cse_public_key',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         ));
     }
    /**
@@ -563,7 +597,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/cc_config/cse_enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
    /**
@@ -575,7 +609,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/cc_config/require_cvc',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
    /**
@@ -587,7 +621,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             self::INTEGRATION_MODE,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
    /**
@@ -599,7 +633,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/tokenization/saved_card',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -612,7 +646,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/tokenization/save_tokenization',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -625,7 +659,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/tokenization/save_stored_credentials',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -637,7 +671,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/apm_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -650,7 +684,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/apm_config/title',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -662,7 +696,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/apm_config/paymentmethods',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -674,7 +708,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/apm_config/statement_narrative',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -687,7 +721,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/payment_method_selection',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -701,7 +735,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/capture_automatically',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -719,7 +753,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $paymentMethodCode == 'worldpay_wallets') {
             return $this->_scopeConfig->getValue(
                 self::INTEGRATION_MODE,
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         } else {
             return 'redirect';
@@ -736,7 +770,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/hpp_config/hpp_integration',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         ) == HPPI::OPTION_VALUE_IFRAME;
     }
     /**
@@ -749,7 +783,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/hpp_config/hpp_integration',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -763,7 +797,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/hpp_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -785,7 +819,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $this->_scopeConfig->getValue(
             'worldpay/hpp_config/installation_id',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -798,7 +832,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/hpp_config/hideaddress',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -811,7 +845,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/order_sync_status/order_sync_interval',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -824,7 +858,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/order_sync_status/order_status',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -892,7 +926,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'worldpay/order_cleanup/%s_payment_method',
             str_replace("-", "_", $paymentMethodCode)
         );
-        return $this->_scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return $this->_scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE);
     }
     /**
      * Get Time Limit Of Abandoned Orders
@@ -904,7 +938,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'shipping/origin/country_id',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -917,7 +951,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'general/locale/code',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -968,7 +1002,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $instantPurchaseEnabled = (bool) $this->_scopeConfig->
                 getValue(
                     'worldpay/quick_checkout_config/instant_purchase',
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ScopeInterface::SCOPE_STORE
                 );
         }
         return $instantPurchaseEnabled;
@@ -1010,7 +1044,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $description = $this->_scopeConfig->getValue(
             'worldpay/general_config/order_description',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
         if ($this->isMultiShipping()) {
             return $this->getMultiShippingOrderDescription();
@@ -1027,7 +1061,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $description = $this->_scopeConfig->getValue(
             'worldpay/general_config/order_description',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
         return __('Multishipping - ').$description;
     }
@@ -1040,7 +1074,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/moto_config/title',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -1096,7 +1130,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/wallets_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1108,7 +1142,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/title',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1120,7 +1154,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/samsung_pay_wallets_config/service_id',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1132,7 +1166,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1144,7 +1178,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_config/paymentmethods',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1156,7 +1190,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_config/authmethods',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1168,7 +1202,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_config/gateway_merchantname',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1180,7 +1214,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_config/gateway_merchantid',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1192,7 +1226,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_config/google_merchantname',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1204,7 +1238,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_config/google_merchantid',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1216,7 +1250,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/wallets_config/apple_pay_wallets_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1228,7 +1262,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/apple_pay_wallets_config/merchant_name',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1240,7 +1274,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/multishipping/ms_wallets_config/ms_apple_pay_wallets_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1252,7 +1286,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/multishipping/ms_wallets_config/ms_apple_pay_wallets_config/ms_merchant_name',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1264,7 +1298,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/wallets_config/samsung_pay_wallets_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -1277,7 +1311,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/wallet/samsungpay_ssl/samsungpay_button_type',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -1290,7 +1324,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/3ds_config/enable_dynamic3DS2',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1303,7 +1337,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/jwt_event_url',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1318,7 +1352,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/jwt_api_key',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1333,7 +1367,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/jwt_issuer',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1349,7 +1383,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/organisational_unit_id',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1364,7 +1398,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/test_ddc_url',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1379,7 +1413,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/production_ddc_url',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1394,7 +1428,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return (bool) $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/risk_data',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1409,7 +1443,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/authentication_method',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1424,7 +1458,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/test_challenge_url',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1439,7 +1473,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/production_challenge_url',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1455,7 +1489,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/challenge_preference',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1470,7 +1504,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamic3DS2Enabled()) {
             return $this->_scopeConfig->getValue(
                 'worldpay/3ds_config/3ds2_config/challenge_window_size',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return (bool) false;
@@ -1484,7 +1518,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         if ($this->getStoredCredentials()) {
             return $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer/'
-                    . 'stored_credentials_disclaimer_message', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+                    . 'stored_credentials_disclaimer_message', ScopeInterface::SCOPE_STORE);
         }
         return (bool) false;
     }
@@ -1497,7 +1531,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         if ($this->getStoredCredentials()) {
             return (bool) $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer'
-                    . '/stored_credentials_message_enable', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+                    . '/stored_credentials_message_enable', ScopeInterface::SCOPE_STORE);
         }
         return (bool) false;
     }
@@ -1510,7 +1544,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         if ($this->getStoredCredentials()) {
             return (bool) $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer/'
-                    . 'stored_credentials_flag', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+                    . 'stored_credentials_flag', ScopeInterface::SCOPE_STORE);
         }
         return (bool) false;
     }
@@ -1523,7 +1557,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/miscellaneous/country_code_spoof',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1547,7 +1581,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/lat_america_payments/enable_cpf',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1559,7 +1593,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/lat_america_payments/enable_instalment',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1618,7 +1652,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/tokenization/enable_merchant_tokens',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1630,7 +1664,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/cc_config/enable_iav',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1642,7 +1676,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
                 return $this->_scopeConfig->getValue(
                     'worldpay_exceptions/my_account_alert_codes/response_codes',
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ScopeInterface::SCOPE_STORE
                 );
     }
     /**
@@ -1654,7 +1688,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
                 return $this->_scopeConfig->getValue(
                     'worldpay_exceptions/ccexceptions/cc_exception',
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ScopeInterface::SCOPE_STORE
                 );
     }
      /**
@@ -1665,7 +1699,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getGeneralException()
     {
                return $this->_scopeConfig->getValue('worldpay_exceptions/adminexceptions/'
-                       . 'general_exception', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+                       . 'general_exception', ScopeInterface::SCOPE_STORE);
     }
     /**
      * Get Credit Card Specific exception
@@ -1724,7 +1758,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $responseMessage;
     }
-    
+
     /**
      * Get Order Details By Email Id
      *
@@ -1739,7 +1773,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         )->getFirstItem()->getData();
         return $itemData;
     }
-    
+
     /**
      * Get Orders CountBy Email Id
      *
@@ -1752,13 +1786,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $lastYearInterval = new  \DateTime('-12 months');
         $lastSixMonthsInterval = new  \DateTime('-6 months');
         $ordersCount = [];
-        
+
         $ordersCount['last_day_count'] = $this->getOrderIdsCount($customerEmailId, $lastDayInterval);
         $ordersCount['last_year_count'] = $this->getOrderIdsCount($customerEmailId, $lastYearInterval);
         $ordersCount['last_six_months_count'] = $this->getOrderIdsCount($customerEmailId, $lastSixMonthsInterval);
         return $ordersCount;
     }
-    
+
     /**
      * Get the list of orders of customer by email
      *
@@ -1778,7 +1812,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return count($orders);
     }
-    
+
     /**
      * Returns cards count that are saved within 24 hrs
      *
@@ -1797,7 +1831,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                        ;
         return count($savedCards->getData());
     }
-    
+
     /**
      * Get GlobalCurrencyExponent
      *
@@ -1808,7 +1842,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/miscellaneous/global_currency_exponent',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1820,7 +1854,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/miscellaneous/enable_dynamic_exponents',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1832,7 +1866,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
             return $this->_scopeConfig->getValue(
                 'worldpay/miscellaneous/currency_codes',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
     }
     /**
@@ -1848,7 +1882,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($this->isDynamicExponentEnabled() && $specificexponent!=null) {
             return $specificexponent ;
         }
-        
+
         return $globalexponent;
     }
     /**
@@ -1863,7 +1897,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (strtoupper($integrationmode) === 'DIRECT' &&
                 array_key_exists("ACH_DIRECT_DEBIT-SSL", $apmmethods)) {
             $data = $this->getACHBankAccountTypes();
-            return explode(",", $data);
+            if(!empty($data)) {
+                return explode(",", $data);
+            }
         }
         return [];
     }
@@ -1876,7 +1912,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/apm_config/achaccounttypes',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -1890,7 +1926,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if (strtoupper($integrationmode) === 'DIRECT') {
             return $this->_scopeConfig->getValue(
                 'worldpay/prime_routing/enable_prime_routing',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
     }
@@ -1905,9 +1941,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($isPrimeRoutingEnabled) {
             return $this->_scopeConfig->getValue(
                 'worldpay/prime_routing/enable_advanced_prime_routing',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
-           
+
         }
     }
     /**
@@ -1921,7 +1957,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($isAdvancedPrimeRoutingEnabled) {
             return $this->_scopeConfig->getValue(
                 'worldpay/prime_routing/routing_preference',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
     }
@@ -1936,7 +1972,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($isAdvancedPrimeRoutingEnabled) {
             $debitNetworks = $this->_scopeConfig->getValue(
                 'worldpay/prime_routing/debit_networks',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
             if (!empty($debitNetworks)) {
                 return explode(",", $debitNetworks);
@@ -1953,7 +1989,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
                 return $this->_scopeConfig->getValue(
                     'worldpay_custom_labels/my_account_labels/my_account_label',
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ScopeInterface::SCOPE_STORE
                 );
     }
     /**
@@ -1965,7 +2001,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
                 return $this->_scopeConfig->getValue(
                     'worldpay_custom_labels/checkout_labels/checkout_label',
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ScopeInterface::SCOPE_STORE
                 );
     }
     /**
@@ -1977,7 +2013,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
                return $this->_scopeConfig->getValue(
                    'worldpay_custom_labels/admin_labels/admin_label',
-                   \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                   ScopeInterface::SCOPE_STORE
                );
     }
     /**
@@ -1990,7 +2026,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $aLabels = $this->serializer->unserialize($this->_scopeConfig->getValue(
             'worldpay_custom_labels/my_account_labels/my_account_label',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         ));
         if (is_array($aLabels) || is_object($aLabels)) {
             foreach ($aLabels as $key => $valuepair) {
@@ -2011,7 +2047,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $aLabels = $this->serializer->unserialize($this->_scopeConfig->getValue(
             'worldpay_custom_labels/checkout_labels/checkout_label',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         ));
         if (is_array($aLabels) || is_object($aLabels)) {
             foreach ($aLabels as $key => $valuepair) {
@@ -2031,7 +2067,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/klarna_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
    /**
@@ -2045,7 +2081,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($isKlarnaEnabled) {
             return $this->_scopeConfig->getValue(
                 'worldpay/klarna_config/sliceit_config/klarna_sliceit',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
     }
@@ -2060,7 +2096,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($isKlarnaEnabled && $this->getKlarnaSliceitType() !== null) {
             $sliceitContries = $this->_scopeConfig->getValue(
                 'worldpay/klarna_config/sliceit_config/sliceit_contries',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
             if (!empty($sliceitContries)) {
                 return $sliceitContries;
@@ -2078,7 +2114,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($isKlarnaEnabled) {
             return $this->_scopeConfig->getValue(
                 'worldpay/klarna_config/paylater_config/klarna_paylater',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
     }
@@ -2093,7 +2129,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($isKlarnaEnabled && $this->getKlarnaPayLaterType() !== null) {
             $payLaterContries = $this->_scopeConfig->getValue(
                 'worldpay/klarna_config/paylater_config/paylater_contries',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
             if (!empty($payLaterContries)) {
                 return $payLaterContries;
@@ -2111,7 +2147,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($isKlarnaEnabled) {
             return $this->_scopeConfig->getValue(
                 'worldpay/klarna_config/paynow_config/klarna_paynow',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
     }
@@ -2126,7 +2162,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($isKlarnaEnabled && $this->getKlarnaPayNowType() !== null) {
             $paynowContries = $this->_scopeConfig->getValue(
                 'worldpay/klarna_config/paynow_config/paynow_contries',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
 
             if (!empty($paynowContries)) {
@@ -2160,9 +2196,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/level23_config/level23',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
+
+    public function isPaypalSmartButtonEnabled()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/paypal_config/enable_smart_button',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
    /**
     * Get CardAcceptor Tax Id
     *
@@ -2172,7 +2217,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
             return $this->_scopeConfig->getValue(
                 'worldpay/level23_config/CardAcceptorTaxId',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
     }
    /**
@@ -2184,7 +2229,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
            return $this->_scopeConfig->getValue(
                'worldpay/level23_config/duty_amount',
-               \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+               ScopeInterface::SCOPE_STORE
            );
     }
    /**
@@ -2196,7 +2241,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
            return $this->_scopeConfig->getValue(
                'worldpay/level23_config/unit_of_measure',
-               \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+               ScopeInterface::SCOPE_STORE
            );
     }
    /**
@@ -2243,7 +2288,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
          return false;
     }
-   
+
     /**
      * Get Moto Merchant Code
      *
@@ -2254,7 +2299,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/merchant_code',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            ScopeInterface::SCOPE_STORE,
             $storeId
         );
     }
@@ -2268,7 +2313,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/xml_username',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            ScopeInterface::SCOPE_STORE,
             $storeId
         );
     }
@@ -2282,7 +2327,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/xml_password',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            ScopeInterface::SCOPE_STORE,
             $storeId
         );
     }
@@ -2298,13 +2343,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             return $this->_scopeConfig->getValue(
                 'worldpay/moto_config/moto_merchant_code',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         }
         return $this->_scopeConfig->getValue(
             'worldpay/moto_config/moto_merchant_code',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2318,13 +2363,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             return $this->_scopeConfig->getValue(
                 'worldpay/moto_config/moto_username',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         }
         return $this->_scopeConfig->getValue(
             'worldpay/moto_config/moto_username',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2338,13 +2383,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             return $this->_scopeConfig->getValue(
                 'worldpay/moto_config/moto_password',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         }
         return $this->_scopeConfig->getValue(
             'worldpay/moto_config/moto_password',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2356,7 +2401,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/moto_config/moto_integration_mode',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2375,7 +2420,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/enable_global_apm_call',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -2393,7 +2438,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/payment_method_logo_config_enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -2407,7 +2452,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/cc/'.$methodCode.'/'.'logo_config',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -2421,7 +2466,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/apm/'.$methodCode.'/'.'logo_config',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -2435,7 +2480,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/wallet/'.$methodCode.'/'.'logo_config',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -2449,7 +2494,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/cc/'.$methodCode.'/'.'enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -2463,7 +2508,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/apm/'.$methodCode.'/'.'enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -2477,7 +2522,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/wallet/'.$methodCode.'/'.'enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -2528,7 +2573,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_pdp_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2538,7 +2583,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return trim($this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_btn_configuration',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         ));
     }
     /**
@@ -2548,7 +2593,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_place_order_button_configuration',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -2559,7 +2604,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/wallets_config/apple_pay_wallets_pdp_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -2570,7 +2615,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_button_color',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2580,7 +2625,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_button_type',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2590,7 +2635,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_button_locale',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2600,7 +2645,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/apple_pay_wallets_pdp_config/applepay_place_order_button_configuration',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2610,7 +2655,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/wallet/applepay_ssl/applepay_button_color',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2620,7 +2665,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/wallet/applepay_ssl/applepay_button_type',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2630,7 +2675,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/wallet/applepay_ssl/applepay_button_locale',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2640,7 +2685,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_button_color',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2650,7 +2695,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_button_type',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2660,7 +2705,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/wallets_config/google_pay_wallets_pdp_config/gpay_button_locale',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2670,7 +2715,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/wallet/paywithgoogle_ssl/gpay_button_color',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2680,7 +2725,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/wallet/paywithgoogle_ssl/gpay_button_type',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2690,7 +2735,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/payment_method_logo_config/wallet/paywithgoogle_ssl/gpay_button_locale',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -2759,16 +2804,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Create Second JWT token
      *
-     * @param String $redirectUrl
-     * @param Array $payload
+     * @param string $redirectUrl
+     * @param array $payload
      */
-    public function createSecondJWTtoken($redirectUrl, array $payload)
+    public function createSecondJWTtoken(string $redirectUrl, array $payload): string
     {
         $jwtApiKey = $this->isJwtApiKey();
         $jwtIssuer = $this->isJwtIssuer();
         $orgUnitId = $this->isOrganisationalUnitId();
         $iat = $this->getCurrentDate();
-        $jwtTokenId    = base64_encode(random_bytes(16));
+        $jwtTokenId = base64_encode(random_bytes(16));
         $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
         $payload = json_encode([
             'jti' => $jwtTokenId,
@@ -2788,8 +2833,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
         $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $jwtApiKey, true);
         $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
-        $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
-        return $jwt;
+
+        return $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
     }
 
     /**
@@ -2799,7 +2844,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/plugin_tracker/current_wopay_plugin_version',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2809,7 +2854,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/general_config/plugin_tracker/wopay_plugin_version_history',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -2819,7 +2864,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
          return $this->_scopeConfig->getValue(
              'worldpay/general_config/plugin_tracker/upgrade_dates',
-             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+             ScopeInterface::SCOPE_STORE
          );
     }
     /**
@@ -2849,7 +2894,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    public function getPluginTrackerdetails()
+    public function getPluginTrackerDetails($paymentType)
     {
         $details=[];
         $mageDetails = $this->getCurrentMagentoVersionDetails();
@@ -2866,7 +2911,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $details['additional_details']['php_version'] = $this->getPhpVersionUsed();
-        
+
         return $details;
     }
 
@@ -2875,25 +2920,31 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    public function getPluginTrackerHeaderdetails()
+    public function getPluginTrackerHeaderDetails($paymentMethod)
     {
-        $details=[];
-        $integrationVersion = $historicVersions= '';
+        $details = [];
+        $integrationVersion = $historicVersions = '';
         $mageDetails = $this->getCurrentMagentoVersionDetails();
         $details['ecommerce_platform'] = $mageDetails['platform'];
         $details['ecommerce_platform_version'] = $mageDetails['version'];
-        if (($this->getCurrentWopayPluginVersion()!=null) && !empty($this->getCurrentWopayPluginVersion())) {
+        $details['merchant_id'] = $this->getMerchantCode($paymentMethod);
+
+        if (($this->getCurrentWopayPluginVersion() != null) && !empty($this->getCurrentWopayPluginVersion())) {
             $integrationVersion = $this->getCurrentWopayPluginVersion();
         }
-        if (($this->getUpgradeDates()!=null) && !empty($this->getUpgradeDates())) {
+        if (($this->getUpgradeDates() != null) && !empty($this->getUpgradeDates())) {
             $historicVersions = $this->getUpgradeDates();
         }
-        $details['ecommerce_plugin_data'] =
-            ['ecommerce_platform_edition'=>$mageDetails['edition'],
-            'integration_version'=>$integrationVersion,
-            'historic_integration_versions'=>$historicVersions
-            ];
-        
+        $details['ecommerce_plugin_data'] = [
+            'ecommerce_platform_edition' => $mageDetails['edition'],
+            'integration_version' => $integrationVersion,
+            'historic_integration_versions' => $historicVersions,
+            'additional_details' => [
+                'payment_method' => $paymentMethod,
+                'currency' => $this->_checkoutSession->getQuote()->getQuoteCurrencyCode(),
+            ]
+        ];
+
         return $details;
     }
 
@@ -2959,7 +3010,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $multishippingEnabled;
     }
-    
+
     /**
      * Get Multishipping Enabled
      *
@@ -2969,10 +3020,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/multishipping/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      *  Check if Quote is Multishipping
      *
@@ -3039,7 +3090,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/paybylink_config/enable',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -3049,7 +3100,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/paybylink_config/paybylink_button_name',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -3059,7 +3110,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/paybylink_config/paybylink_expiry_time',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -3069,7 +3120,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/paybylink_config/paybylink_resend_link',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -3088,7 +3139,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $recurringMerchantCode = $this->_scopeConfig->getValue(
             'worldpay/recurring_merchant_config/recurring_merchant_code',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
         return $recurringMerchantCode;
     }
@@ -3101,7 +3152,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $recurringMerchantUn = $this->_scopeConfig->getValue(
             'worldpay/recurring_merchant_config/recurring_username',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
         return $recurringMerchantUn;
     }
@@ -3114,7 +3165,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $recurringMerchantPw = $this->_scopeConfig->getValue(
             'worldpay/recurring_merchant_config/recurring_password',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
         return $recurringMerchantPw;
     }
@@ -3129,13 +3180,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             $paybyLinkMC = $this->_scopeConfig->getValue(
                 'worldpay/paybylink_config/pbl_merchant_code',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         } else {
             $paybyLinkMC = $this->_scopeConfig->getValue(
                 'worldpay/paybylink_config/pbl_merchant_code',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return $paybyLinkMC;
@@ -3151,13 +3202,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             $paybyLinkUn = $this->_scopeConfig->getValue(
                 'worldpay/paybylink_config/pbl_xml_username',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         } else {
             $paybyLinkUn = $this->_scopeConfig->getValue(
                 'worldpay/paybylink_config/pbl_xml_username',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return $paybyLinkUn;
@@ -3173,13 +3224,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             $paybyLinkPw = $this->_scopeConfig->getValue(
                 'worldpay/paybylink_config/pbl_xml_password',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         } else {
             $paybyLinkPw = $this->_scopeConfig->getValue(
                 'worldpay/paybylink_config/pbl_xml_password',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return $paybyLinkPw;
@@ -3195,16 +3246,16 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             $multishippingMC = $this->_scopeConfig->getValue(
                 'worldpay/multishipping/ms_merchant_code',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         } else {
             $multishippingMC = $this->_scopeConfig->getValue(
                 'worldpay/multishipping/ms_merchant_code',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
-        
+
         return $multishippingMC;
     }
 
@@ -3218,13 +3269,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             $multishippingUn = $this->_scopeConfig->getValue(
                 'worldpay/multishipping/ms_xml_username',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         } else {
             $multishippingUn = $this->_scopeConfig->getValue(
                 'worldpay/multishipping/ms_xml_username',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return $multishippingUn;
@@ -3240,13 +3291,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             $multishippingPw = $this->_scopeConfig->getValue(
                 'worldpay/multishipping/ms_xml_password',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         } else {
             $multishippingPw = $this->_scopeConfig->getValue(
                 'worldpay/multishipping/ms_xml_password',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return $multishippingPw;
@@ -3261,13 +3312,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         if ($storeId) {
             $multishippingIID = $this->_scopeConfig->getValue(
                 'worldpay/multishipping/ms_xml_installationId',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         } else {
             $multishippingIID = $this->_scopeConfig->getValue(
                 'worldpay/multishipping/ms_xml_installationId',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return $multishippingIID;
@@ -3281,7 +3332,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/multishipping/ms_wallets_config/ms_samsung_pay_wallets_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -3293,10 +3344,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get Multishipping google Payment Methods
      *
@@ -3306,10 +3357,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/paymentmethods',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get MultiShipping google Auth Methods
      *
@@ -3319,10 +3370,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/authmethods',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get google Gateway Merchantname
      *
@@ -3332,10 +3383,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/ms_gpay_gateway_merchantname',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
-    
+
     /**
      * Get google Gateway Merchantid
      *
@@ -3345,10 +3396,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/ms_gpay_gateway_merchantid',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
-  
+
     /**
      * Get MultiShipping google Merchantid
      *
@@ -3358,10 +3409,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/ms_gpay_merchantid',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
- 
+
     /**
      * Get MultiShipping google Merchant name
      *
@@ -3371,7 +3422,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/ms_gpay_merchantname',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -3384,7 +3435,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/multishipping/ms_wallets_config/ms_gpay_wallets_config/ms_gpay_test_cardholdername',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -3397,12 +3448,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $pblIId = $this->_scopeConfig->getValue(
             'worldpay/paybylink_config/pbl_xml_installationId',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            ScopeInterface::SCOPE_STORE,
             $storeId
         );
         return $pblIId;
     }
-    
+
     /**
      * Calculate Pay By Link Resend expiry time
      *
@@ -3413,7 +3464,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $expiryTime * 2;
     }
-    
+
     /**
      * Find Pay By Link Interval time between order date and current date
      *
@@ -3425,7 +3476,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return round(abs(strtotime($currentDate) - strtotime($orderDate))/3600, 0);
     }
-    
+
     /**
      * Find Pay By Link expiry date and time
      *
@@ -3437,7 +3488,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return strtotime(date("Y-m-d H:i:s", strtotime($currentDate)) . " -$expiryTime hour");
     }
-    
+
     /**
      * Find Pay By Link expiry date and time
      *
@@ -3452,7 +3503,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $cronMaxDate = date('Y-m-d H:i:s', $maxDate);
         $dates['from'] = $cronMinDate;
         $dates['to'] = $cronMaxDate;
-        
+
         return $dates;
     }
     /**
@@ -3462,12 +3513,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $captureDelay = $this->_scopeConfig->getValue(
             'worldpay/dynamic_capture_delay/capture_delay',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
         if ($captureDelay == \Sapient\Worldpay\Model\Config\Source\CaptureDelay::CUSTOM_CAPTURE_DELAY_KEY) {
             $captureDelay = $this->_scopeConfig->getValue(
                 'worldpay/dynamic_capture_delay/capture_delay_custom_value',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                ScopeInterface::SCOPE_STORE
             );
         }
         return $captureDelay;
@@ -3499,7 +3550,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/apm_config/sepa_e_mandate',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -3512,7 +3563,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/apm_config/sepa_mandate_types',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -3526,7 +3577,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/apm_config/sepa_merchant_no',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -3549,7 +3600,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'general/country/default',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -3563,11 +3614,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/order_cleanup_cron/order_cleanup_enable',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            ScopeInterface::SCOPE_STORE,
             $storeId
         );
     }
-    
+
     /**
      * Get Default country code of Magento store
      *
@@ -3578,7 +3629,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/order_cleanup_cron/order_cleanup_option',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            ScopeInterface::SCOPE_STORE,
             $storeId
         );
     }
@@ -3591,7 +3642,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return (bool) $this->_scopeConfig->getValue(
             'worldpay/eftpos_payments/enable_eftpos',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -3604,7 +3655,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/eftpos_payments/eftpos_merchant_code',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -3617,7 +3668,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/eftpos_payments/eftpos_routing_mid',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -3630,7 +3681,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/eftpos_payments/eftpos_debugging',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -3640,7 +3691,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/klarna_config/store_pickup/enabled',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -3651,7 +3702,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/klarna_config/store_pickup/shipping_method',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -3664,7 +3715,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/eftpos_payments/eftpos_xml_username',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -3677,7 +3728,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/eftpos_payments/eftpos_xml_password',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
     /**
@@ -3687,7 +3738,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/klarna_config/store_pickup/shipping_type',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
     }
 

@@ -1,5 +1,19 @@
 Latest releases for all supported version:
 For Magento 2.4.7
+Worldpay Plugin version: 2.4.7-p40225
+1. Magento 2.4.7-p4 compatible
+2. Co-badged functionality for HPP and Direct
+
+Worldpay Plugin version: 2.4.7-p31224
+1. Magento 2.4.7-p3 compatible
+2. PHP 8.3 & 8.2 compatibility
+3. Add PAYPAL-SSL
+
+Worldpay Plugin version: 2.4.7-p21124
+1. Magento 2.4.7-p2 compatible
+2. PHP 8.3 & 8.2 compatibility
+3. Remove dependency on CryptoJs
+
 Worldpay Plugin version: 2.4.7-p10924
 1. Magento 2.4.7-p1 compatible
 2. PHP 8.3 & 8.2 compatibility

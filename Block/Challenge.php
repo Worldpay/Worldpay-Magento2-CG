@@ -8,14 +8,14 @@ class Challenge extends \Magento\Framework\View\Element\Template
     /**
      * @var \Sapient\Worldpay\Helper\Data;
      */
-    
+
     protected $_helper;
-    
+
     /**
      * @var \Magento\Checkout\Model\Session
      */
     protected $checkoutSession;
-       
+
     /**
      * Jwt constructor.
      *
@@ -75,17 +75,24 @@ class Challenge extends \Magento\Framework\View\Element\Template
     /**
      * Get Challenge Configs
      *
-     * @return string
+     * @return array
      */
 
     public function challengeConfigs()
     {
-        $data['threeDSecureChallengeConfig'] = $this->checkoutSession->get3DS2Config();
-        $data['threeDSecureChallengeParams'] =  $this->checkoutSession->get3Ds2Params();
-        $data['orderId'] = $this->checkoutSession->getAuthOrderId();
-        $data['redirectUrl'] = $this->getUrl('worldpay/threedsecure/challengeredirectresponse', ['_secure' => true]);
-        
-        //$data['redirectUrl'] = $this->getUrl('worldpay/threedsecure/challengeauthresponse', ['_secure' => true]);
-        return $data;
+        $threeDSecureChallengeParams = $this->checkoutSession->get3Ds2Params();
+
+        return [
+            'challengeurl' => $this->checkoutSession->get3DS2Config()['challengeurl'],
+            'orderId' => $this->checkoutSession->getAuthOrderId(),
+            'encodedJWT' => $this->_helper->createSecondJWTtoken(
+                $this->getUrl('worldpay/threedsecure/challengeredirectresponse', ['_secure' => true]),
+                [
+                    'ACSUrl' => $threeDSecureChallengeParams['acsURL'],
+                    'Payload' => $threeDSecureChallengeParams['payload'],
+                    'TransactionId' => $threeDSecureChallengeParams['transactionId3DS'],
+                ]
+            ),
+        ];
     }
 }
