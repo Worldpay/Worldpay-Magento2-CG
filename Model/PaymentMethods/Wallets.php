@@ -48,7 +48,7 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         parent::authorize($payment, $amount);
         return $this;
     }
-    
+
     /**
      * Authorisation service abstract method
      *
@@ -66,8 +66,15 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      * @param string|null $quote
      * @return bool
      */
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
+        if (!parent::isAvailable($quote)) {
+            return false;
+        }
+
+        if ($this->productOnDemandHelper->isProductOnDemandQuote()) {
+            return false;
+        }
         /* Start Multishipping code */
         if ($this->worlpayhelper->isMultiShipping()) {
             if ($this->worlpayhelper->isMultiShippingEnabledInWallets()) {
@@ -82,8 +89,11 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
         }
         /* End Multishipping code */
 
-        if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isWalletsEnabled()
-                && !$this->worlpayhelper->getsubscriptionStatus()) {
+        if (
+            $this->worlpayhelper->isWorldPayEnable()
+            && $this->worlpayhelper->isWalletsEnabled()
+            && !$this->worlpayhelper->getsubscriptionStatus()
+        ) {
             if ($this->worlpayhelper->isGooglePayEnable() ||
                 $this->worlpayhelper->isSamsungPayEnable() ||
                 $this->worlpayhelper->isApplePayEnable()
@@ -91,6 +101,13 @@ class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
                    return true;
             }
         }
+
+        if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isCheckoutPaypalSmartButtonEnabled()
+            && !$this->worlpayhelper->getsubscriptionStatus())
+        {
+            return true;
+        }
+
         return false;
     }
 

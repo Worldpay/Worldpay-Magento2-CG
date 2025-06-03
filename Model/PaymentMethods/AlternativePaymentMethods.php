@@ -63,7 +63,8 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
     public function getAuthorisationService($storeId)
     {
         $apmmethods = $this->paymentdetailsdata['additional_data']['cc_type'];
-        if ($apmmethods === "ACH_DIRECT_DEBIT-SSL" || $apmmethods === "SEPA_DIRECT_DEBIT-SSL") {
+        $isPaypalSmartButton = $apmmethods === "PAYPAL-SSL" && isset($this->paymentdetailsdata['additional_data']['paypal_smart']);
+        if ($apmmethods === "ACH_DIRECT_DEBIT-SSL" || $apmmethods === "SEPA_DIRECT_DEBIT-SSL" || $isPaypalSmartButton) {
             return $this->directservice;
         }
         return $this->redirectservice;
@@ -75,8 +76,16 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
      * @param \Magento\Quote\Api\Data\CartInterface $quote
      * @return bool
      */
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
+        if ($this->productOnDemandHelper->isProductOnDemandQuote()) {
+            return false;
+        }
+
+        if (!parent::isAvailable($quote)) {
+            return false;
+        }
+
         /* Start Multishipping code */
         if ($this->worlpayhelper->isMultiShipping()) {
             if ($this->worlpayhelper->isMultiShippingEnabledInApm()) {
@@ -85,8 +94,11 @@ class AlternativePaymentMethods extends \Sapient\Worldpay\Model\PaymentMethods\A
             return false;
         }
         /* End Multishipping code */
-        if ($this->worlpayhelper->isWorldPayEnable() && $this->worlpayhelper->isApmEnabled()
-                && !$this->worlpayhelper->getsubscriptionStatus()) {
+        if (
+            $this->worlpayhelper->isWorldPayEnable()
+            && $this->worlpayhelper->isApmEnabled()
+            && !$this->worlpayhelper->getsubscriptionStatus()
+        ) {
             return true;
         }
         return false;

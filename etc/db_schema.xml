@@ -297,6 +297,16 @@
       <column name="id"/>
     </constraint>
   </table>
+    <table name="worldpay_product_on_demand_order" resource="default" engine="innodb" comment="Product on Demand Orders Table">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="varchar" name="order_id"  nullable="false"  comment="Order Id" length="25"/>
+        <column xsi:type="varchar" name="worldpay_order_id" nullable="true" length="40" comment="WorldPay Order Id"/>
+        <column xsi:type="varchar" name="worldpay_token_id" nullable="true" length="40" comment="WorldPay Token Id"/>
+        <column xsi:type="boolean" name="is_zero_auth_order" nullable="true" comment="Is zero auth order"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
   <table name="worldpay_subscription_edit_history" resource="default" engine="innodb" comment="Worldpay Subscription Edit History">
     <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
     <column xsi:type="int" name="subscription_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Subscription Id"/>

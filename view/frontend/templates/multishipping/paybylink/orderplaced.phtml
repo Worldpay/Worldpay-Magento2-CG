@@ -6,18 +6,20 @@
 
 /** @var \Magento\Multishipping\Block\Checkout\Success $block */
 ?>
-<script>
+<?php $scriptString = <<<script
 require([
      'Magento_Customer/js/customer-data'
  ], function (customerData) {
      var sections = ['cart'];
      customerData.reload(sections, true);
  });
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
 <form action="<?= $escaper->escapeUrl($block->getContinueUrl()); ?>" method="post">
-    <div class="multicheckout success">   
-        <p><?= $escaper->escapeHtml(__('An email has been sent to your email id with the payment link. 
-        Please do the payment.')) ?></p>        
+    <div class="multicheckout success">
+        <p><?= $escaper->escapeHtml(__('An email has been sent to your email id with the payment link.
+        Please do the payment.')) ?></p>
         <?php if ($orderIds = $block->getOrderIds()): ?>
             <h3><?= $escaper->escapeHtml(__('Successfully ordered'))?></h3>
             <div class="orders-succeed">

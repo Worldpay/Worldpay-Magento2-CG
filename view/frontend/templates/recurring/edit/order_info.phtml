@@ -19,7 +19,7 @@
             <div class="box-content">
                 <address>
                     <?= /* @noEscape */ $block->getFormattedAddress($_order->getBillingAddress()) ?>
-                </address>     
+                </address>
             </div>
         </div>
         <?php if (!$_order->getIsVirtual()): ?>
@@ -51,7 +51,7 @@
     </div>
     <div class="block-content payment-method">
         <?php $transactionData = $block->getTransactionData($_order); ?>
-        <p><?= $escaper->escapeHtml(__($transactionData->getCardNumber())) ?> - 
+        <p><?= $escaper->escapeHtml(__($transactionData->getCardNumber())) ?> -
             <?= $escaper->escapeHtml(__($transactionData->getCardBrand())); ?> </p>
         <span><a  id="change-payment-method" data-bind="click: openPaymentPopup">
             <?= $escaper->escapeHtml(__('Change Payment Method')) ?></a>
@@ -60,7 +60,12 @@
 
 <?= $block->getChildHtml('recurring_additional_info') ?>
 </div>
-<script type="text/x-magento-init">
+<?php
+$orderIncrementId = $escaper->escapeHtml(__($block->getCurrentSubscriptionOrder()
+    ->getOriginalOrderIncrementId()));
+$currentSubscriptionId = $escaper->escapeHtml(__($block->getCurrentSubscriptionOrder()
+    ->getId()));
+$scriptString = <<<script
     {
         "*": {
             "Magento_Ui/js/core/app": {
@@ -71,13 +76,13 @@
                         "sp_elementId": "#change-shipping-address",
                         "sp_popelement": "#change_shipping_modal",
                         "pm_popelement": "#change_payment_modal",
-                        "order_incrementId": "<?= $escaper->escapeHtml(__($block->getCurrentSubscriptionOrder()
-                            ->getOriginalOrderIncrementId())); ?>",
-                        "current_subscription_id": "<?= $escaper->escapeHtml(__($block->getCurrentSubscriptionOrder()
-                            ->getId())); ?>"
+                        "order_incrementId": "$orderIncrementId",
+                        "current_subscription_id": "$currentSubscriptionId"
                     }
                 }
             }
         }
     }
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/x-magento-init'], $scriptString, false) ?>

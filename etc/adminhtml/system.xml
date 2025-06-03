@@ -98,6 +98,7 @@
                 <field id="integration_mode" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Integration Mode</label>
                     <source_model>Sapient\Worldpay\Model\Config\Source\IntegrationMode</source_model>
+                    <backend_model>Sapient\Worldpay\Model\Config\Backend\BlockRedirectForProductOnDemand</backend_model>
                     <comment>Set Hosted payment page by selecting Redirect</comment>
                 </field>
                 <field id="paymentmethods" translate="label" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -525,7 +526,20 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Before enabling new Paypal API you must be onboarded. You must connect with your Worldpay contact.</comment>
                 </field>
-                <field id="enable_smart_button" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="enable_checkout_smart_button" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Paypal SmartButton in checkout page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Before enabling Paypal SmartButton you must be onboarded. You must connect with your Worldpay contact.</comment>
+                </field>
+                <field id="paypal_client_id" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Paypal client ID</label>
+                </field>
+                <field id="paypal_currency" translate="label" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Paypal currency</label>
+                    <source_model>Magento\Config\Model\Config\Source\Locale\Currency</source_model>
+                    <comment>Please ensure you are adding the supported currency, one that was on-boarded for you, to avoid errors in payments. Refer to your Implementation Manager for details.</comment>
+                </field>
+                <field id="enable_hpp_smart_button" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Paypal SmartButton in HPP</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Before enabling Paypal SmartButton you must be onboarded. You must connect with your Worldpay contact.</comment>
@@ -786,6 +800,35 @@
                 <field id="skip_order_notification_email" translate="label" type="select" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Skip Order Notification Email</label>
                     <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+            </group>
+            <group id="product_on_demand" sortOrder="20" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Product on Demand</label>
+                <field id="enabled" translate="label" type="select" sortOrder="13" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Product on Demand Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Sapient\Worldpay\Model\Config\Backend\BlockRedirectForProductOnDemand</backend_model>
+                    <comment>Shopper pays when merchant issues the invoice. Credit Cards > Integration Mode must be set to Direct.</comment>
+                </field>
+                <field id="pdp_label" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Product Description Page Label</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="minicart_label" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Mini Cart Label</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="cart_label" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Cart Label</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="multi_shipping_disabled" translate="label" type="text" sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Checkout With Multiple Addresses Disabled Label</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <validate>required-entry</validate>
                 </field>
             </group>
             <!-- Miscellaneous -->

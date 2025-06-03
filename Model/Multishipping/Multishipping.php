@@ -71,7 +71,7 @@ class Multishipping extends \Magento\Framework\Model\AbstractModel
     public function placeMultishippingOrder(
         $cartId,
         \Magento\Quote\Api\Data\PaymentInterface $paymentMethod,
-        \Magento\Quote\Api\Data\AddressInterface $billingAddress = null
+        ?\Magento\Quote\Api\Data\AddressInterface $billingAddress = null
     ) {
         try {
             $quote = $this->helper->getQuote();

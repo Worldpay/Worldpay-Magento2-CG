@@ -4,6 +4,13 @@ Worldpay Plugin version: 2.4.7-p40225
 1. Magento 2.4.7-p4 compatible
 2. Co-badged functionality for HPP and Direct
 
+For Magento 2.4.8
+Worldpay Plugin version: 2.4.8-p10625
+1. Magento 2.4.8 compatible
+2. PHP 8.3 & 8.2 compatibility
+3. Added Product on Demand
+4. Added Paypal SmartButton on checkout page
+
 Worldpay Plugin version: 2.4.7-p31224
 1. Magento 2.4.7-p3 compatible
 2. PHP 8.3 & 8.2 compatibility

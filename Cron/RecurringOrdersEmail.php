@@ -18,12 +18,12 @@ class RecurringOrdersEmail
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
     protected $_logger;
-   
+
     /**
      * @var CollectionFactory
      */
     private $subscriptionCollectionFactory;
-    
+
     /**
      * @var CollectionFactory
      */
@@ -123,7 +123,7 @@ class RecurringOrdersEmail
         }
         return $this;
     }
-    
+
     /**
      * Get the list of orders for send Email Notificaion
      *
@@ -156,7 +156,7 @@ class RecurringOrdersEmail
         }
         return $data;
     }
-    
+
     /**
      * Get Total Details
      *

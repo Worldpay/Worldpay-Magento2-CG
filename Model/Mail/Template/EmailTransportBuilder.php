@@ -27,8 +27,6 @@ use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Phrase;
 use Magento\Framework\Mail\Template\FactoryInterface;
 use Magento\Framework\Mail\Template\SenderResolverInterface;
-use Laminas\Mime\Mime;
-use Laminas\Mime\PartFactory;
 
 /**
  * TransportBuilder for Mail Templates
@@ -119,10 +117,6 @@ class EmailTransportBuilder extends \Magento\Framework\Mail\Template\TransportBu
      * @var attachments
      */
     protected $attachments = [];
-    /**
-     * @var partFactory
-     */
-    protected $partFactory;
 
     /**
      * TransportBuilder constructor
@@ -137,7 +131,6 @@ class EmailTransportBuilder extends \Magento\Framework\Mail\Template\TransportBu
      * @param MimeMessageInterfaceFactory|null $mimeMessageInterfaceFactory
      * @param MimePartInterfaceFactory|null $mimePartInterfaceFactory
      * @param addressConverter|null $addressConverter
-     * @param \Laminas\Mime\PartFactory $partFactory
      */
     public function __construct(
         FactoryInterface $templateFactory,
@@ -145,12 +138,11 @@ class EmailTransportBuilder extends \Magento\Framework\Mail\Template\TransportBu
         SenderResolverInterface $senderResolver,
         ObjectManagerInterface $objectManager,
         TransportInterfaceFactory $mailTransportFactory,
-        MessageInterfaceFactory $messageFactory = null,
-        EmailMessageInterfaceFactory $emailMessageInterfaceFactory = null,
-        MimeMessageInterfaceFactory $mimeMessageInterfaceFactory = null,
-        MimePartInterfaceFactory $mimePartInterfaceFactory = null,
-        AddressConverter $addressConverter = null,
-        \Laminas\Mime\PartFactory $partFactory
+        ?MessageInterfaceFactory $messageFactory = null,
+        ?EmailMessageInterfaceFactory $emailMessageInterfaceFactory = null,
+        ?MimeMessageInterfaceFactory $mimeMessageInterfaceFactory = null,
+        ?MimePartInterfaceFactory $mimePartInterfaceFactory = null,
+        ?AddressConverter $addressConverter = null
     ) {
         $this->templateFactory = $templateFactory;
         $this->objectManager = $objectManager;
@@ -164,7 +156,6 @@ class EmailTransportBuilder extends \Magento\Framework\Mail\Template\TransportBu
             ->get(MimePartInterfaceFactory::class);
         $this->addressConverter = $addressConverter ?: $this->objectManager
             ->get(AddressConverter::class);
-        $this->partFactory = $partFactory;
         parent::__construct(
             $templateFactory,
             $message,
@@ -454,16 +445,17 @@ class EmailTransportBuilder extends \Magento\Framework\Mail\Template\TransportBu
       * @param string|null $content
       * @param string|null $fileName
       * @param string|null $fileType
-      * @return TransportBuilder
+      * @return EmailTransportBuilder
       */
     public function addAttachment(?string $content, ?string $fileName, ?string $fileType)
     {
-        $attachmentPart = $this->partFactory->create();
-        $attachmentPart->setContent($content)
-            ->setType($fileType)
-            ->setFileName($fileName)
-            ->setDisposition(Mime::DISPOSITION_ATTACHMENT)
-            ->setEncoding(Mime::ENCODING_BASE64);
+        $attachmentPart = $this->mimePartInterfaceFactory->create([
+            'content' => $content,
+            'type' => $fileType,
+            'fileName' => $fileName,
+            'disposition' => MimeInterface::DISPOSITION_ATTACHMENT,
+            'encoding' => MimeInterface::ENCODING_BASE64,
+        ]);
         $this->attachments[] = $attachmentPart;
 
         return $this;

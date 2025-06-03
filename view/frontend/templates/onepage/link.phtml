@@ -5,14 +5,14 @@
  */
 ?>
 <button type="button" id='checkout-now-bottom'
-    title="<?= /* @noEscape */ __('Checkout Now') ?>"    
+    title="<?= /* @noEscape */ __('Checkout Now') ?>"
     data-mage-init='{"Sapient_Worldpay/js/proceed-to-checkout":{"checkoutNowUrl":"<?= /* @noEscape */
     $block->getCheckoutUrl() ?>"}}'
     class="action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
     <?php if ($block->isDisabled()):?>disabled="disabled"<?php endif; ?>>
     <span><?= /* @noEscape */ __('Checkout Now') ?></span>
 </button>
-<script>
+<?php $scriptString = <<<script
 var browserType = window.navigator.userAgent.match(/chrome/i);
 var browserEdge = window.navigator.userAgent.match(/edg/i);
 
@@ -21,11 +21,11 @@ if((browserType && browserType[0] == 'Chrome') && !browserEdge) {
 }else{
     window.ChromepayAvailable = '0';
 }
- if(window.ChromepayEnabled == 1 && window.ChromePaymentMode == 'direct' 
+ if(window.ChromepayEnabled == 1 && window.ChromePaymentMode == 'direct'
          && window.SubscriptionStatus == "" && window.ChromepayAvailable == '1') {
     var buttonObj = document.getElementById("checkout-now-bottom");
     buttonObj.value = window.ChromepayButtonName;
-    buttonObj.innerHTML = window.ChromepayButtonName;    
+    buttonObj.innerHTML = window.ChromepayButtonName;
  }else{
     var buttonObj = document.getElementById("checkout-now-bottom");
     buttonObj.style.visibility='hidden';
@@ -33,4 +33,6 @@ if((browserType && browserType[0] == 'Chrome') && !browserEdge) {
     parentObj.style.height = '0';
     parentObj.style.margin = '0';
  }
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>

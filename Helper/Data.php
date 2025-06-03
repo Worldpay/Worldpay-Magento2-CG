@@ -184,7 +184,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Backend\Model\Session\Quote $adminsessionquote,
         \Magento\Framework\App\ProductMetadataInterface $productMetaData,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
-        \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
+        \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
@@ -1572,6 +1572,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return false;
     }
+
     /**
      * Get CPF Enabled
      *
@@ -2200,10 +2201,34 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
-    public function isPaypalSmartButtonEnabled()
+    public function isHppPaypalSmartButtonEnabled()
     {
         return (bool) $this->_scopeConfig->getValue(
-            'worldpay/paypal_config/enable_smart_button',
+            'worldpay/paypal_config/enable_hpp_smart_button',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    public function getPaypalClientId()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/paypal_config/paypal_client_id',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    public function getPaypalCurrency()
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/paypal_config/paypal_currency',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    public function isCheckoutPaypalSmartButtonEnabled()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/paypal_config/enable_checkout_smart_button',
             ScopeInterface::SCOPE_STORE
         );
     }
@@ -2894,7 +2919,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return array
      */
-    public function getPluginTrackerDetails($paymentType)
+    public function getPluginTrackerDetails(): array
     {
         $details=[];
         $mageDetails = $this->getCurrentMagentoVersionDetails();

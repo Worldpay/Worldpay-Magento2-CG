@@ -14,7 +14,7 @@ $taxHelper = $block->getData('taxHelper');
 ?>
 <div id="checkout-loader" data-role="checkout-loader" class="loading-mask" data-mage-init='{"billingLoader": {}}'>
     <div class="loader">
-        <img src="<?= $escaper->escapeUrl($block->getViewFileUrl('images/loader-1.gif')); ?>" 
+        <img src="<?= $escaper->escapeUrl($block->getViewFileUrl('images/loader-1.gif')); ?>"
         alt="<?= $escaper->escapeHtml(__('Loading...')); ?>">
     </div>
 </div>
@@ -30,7 +30,7 @@ script;
 <div id="checkout" data-bind="scope:'checkoutMessages'">
     <!-- ko template: getTemplate() -->
     <!-- /ko -->
-    <script type="text/x-magento-init">
+    <?php $scriptString = <<<script
         {
             "#checkout": {
                 "Magento_Ui/js/core/app": {
@@ -43,17 +43,19 @@ script;
                 }
             }
         }
-    </script>
+    script;
+    ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/x-magento-init'], $scriptString, false) ?>
 </div>
-<form action="<?= $escaper->escapeUrl($block->getPostActionUrl()); ?>" method="post" id="multishipping-billing-form" 
+<form action="<?= $escaper->escapeUrl($block->getPostActionUrl()); ?>" method="post" id="multishipping-billing-form"
 class="form multicheckout billing">
     <div class="block block-billing">
-        <div class="block-content">            
+        <div class="block-content">
             <div class="box box-billing-method" id = "payment">
                 <fieldset class="fieldset">
-                   
+
                     <div class="box-content">
-                        
+
                         <?php /* Payment methods forms list */ ?>
                         <?php
                              $methods = $block->getMethods();
@@ -73,10 +75,10 @@ class="form multicheckout billing">
                                 <span class="security-title">All transactions are secure and encrypted...</span>
                             </div>
                             <div class="payment-logo-wrapper">
-                                <img 
-                                data-bind="attr: { 
-                                    src: require.toUrl('Sapient_Worldpay/images/cc/worldpay-logo.png') 
-                                }" 
+                                <img
+                                data-bind="attr: {
+                                    src: require.toUrl('Sapient_Worldpay/images/cc/worldpay-logo.png')
+                                }"
                                 alt="worldpay logo" class="worldpay-logo-paymentscreen">
                                 <?= $block->getChildHtml('payment_method_paybylink') ?>
                             </div>
@@ -94,23 +96,23 @@ class="form multicheckout billing">
                                 <div data-bind="scope: 'payment_method_<?= $escaper->escapeHtml($code); ?>'">
                                     <dt class="item-title">
                                         <?php if ($methodsCount > 1): ?>
-                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>" 
-                                            value="<?= $escaper->escapeHtml($code); ?>" 
-                                            name="payment[method]" 
-                                            title="<?= $escaper->escapeHtml($_method->getTitle()) ?>" 
+                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>"
+                                            value="<?= $escaper->escapeHtml($code); ?>"
+                                            name="payment[method]"
+                                            title="<?= $escaper->escapeHtml($_method->getTitle()) ?>"
                                             data-bind="
                                                        value: getCode(),
                                                        checked: isChecked,
                                                        click: selectPaymentMethod,
-                                                       visible: isRadioButtonVisible()" 
-                                                       <?php if ($checked): ?> checked="checked" <?php endif; ?> 
+                                                       visible: isRadioButtonVisible()"
+                                                       <?php if ($checked): ?> checked="checked" <?php endif; ?>
                                                         class="radio payment-method" />
                                         <?php else: ?>
-                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>" 
-                                            value="<?= $escaper->escapeHtml($code); ?>" name="payment[method]" 
+                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>"
+                                            value="<?= $escaper->escapeHtml($code); ?>" name="payment[method]"
                                             data-bind="
                                                        value: getCode(),
-                                                       afterRender: selectPaymentMethod" checked="checked" 
+                                                       afterRender: selectPaymentMethod" checked="checked"
                                                        class="radio solo method" />
                                         <?php endif; ?>
                                         <label for="p_method_<?= $escaper->escapeHtml($code); ?>">
@@ -124,7 +126,7 @@ class="form multicheckout billing">
                                             if ($block->getCcIntegrationMode() != 'redirect' ||
                                                 $code != 'worldpay_cc') {
                                                 ?>
-                                            
+
                                             <div class='accepted_cc'>
                                                 <span class='worldpay_cc_we_accept'>
                                                     <!-- ko i18n: getCheckoutLabels('CO2')-->
@@ -134,7 +136,7 @@ class="form multicheckout billing">
                                                     <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
                                                     <!--ko if: $parent.getIcons(item.ccValue) -->
                                                     <div data-bind="attr: {for: 'direct_cc_' + item.ccValue}">
-                                                        <img 
+                                                        <img
                                                         data-bind="attr: {
                                                                    'src': $parent.getIcons(item.ccValue).url,
                                                                     'alt': item.ccLabel,
@@ -167,7 +169,7 @@ class="form multicheckout billing">
                             <div class="other-payment-methods-wrapper">
                                 <div class="payment-title-wrapper">
                                     <h2 class="step-title">Other Payment Methods</h2>
-                                </div>         
+                                </div>
                             </div>
                             <?= $block->getChildHtml('payment_methods_before') ?>
                         <!-- Default Payment Methods START -->
@@ -186,23 +188,23 @@ class="form multicheckout billing">
                                 <div data-bind="scope: 'payment_method_<?= $escaper->escapeHtml($code); ?>'">
                                     <dt class="item-title">
                                         <?php if ($methodsCount > 1): ?>
-                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>" 
-                                            value="<?= $escaper->escapeHtml($code); ?>" 
-                                            name="payment[method]" 
-                                            title="<?= $escaper->escapeHtml($_method->getTitle()) ?>" 
+                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>"
+                                            value="<?= $escaper->escapeHtml($code); ?>"
+                                            name="payment[method]"
+                                            title="<?= $escaper->escapeHtml($_method->getTitle()) ?>"
                                             data-bind="
                                                        value: getCode(),
                                                        checked: isChecked,
                                                        click: selectPaymentMethod,
-                                                       visible: isRadioButtonVisible()" 
-                                                       <?php if ($checked): ?> checked="checked" <?php endif; ?> 
+                                                       visible: isRadioButtonVisible()"
+                                                       <?php if ($checked): ?> checked="checked" <?php endif; ?>
                                                         class="radio payment-method" />
                                         <?php else: ?>
-                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>" 
-                                            value="<?= $escaper->escapeHtml($code); ?>" name="payment[method]" 
+                                            <input type="radio" id="p_method_<?= $escaper->escapeHtml($code); ?>"
+                                            value="<?= $escaper->escapeHtml($code); ?>" name="payment[method]"
                                             data-bind="
                                                        value: getCode(),
-                                                       afterRender: selectPaymentMethod" checked="checked" 
+                                                       afterRender: selectPaymentMethod" checked="checked"
                                                        class="radio solo method" />
                                         <?php endif; ?>
                                         <label for="p_method_<?= $escaper->escapeHtml($code); ?>">
@@ -223,7 +225,7 @@ class="form multicheckout billing">
                                                     <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
                                                     <!--ko if: $parent.getIcons(item.ccValue) -->
                                                     <div data-bind="attr: {for: 'direct_cc_' + item.ccValue}">
-                                                        <img 
+                                                        <img
                                                         data-bind="attr: {
                                                                    'src': $parent.getIcons(item.ccValue).url,
                                                                     'alt': item.ccLabel,
@@ -250,11 +252,11 @@ class="form multicheckout billing">
                         </dl>
                         <!-- END Default Payment Methods -->
                         <?php endif; ?>
-                        
+
                         <?= $block->getChildHtml('payment_methods_after') ?>
                         <?= $block->getChildHtml('checkout_billing_items') ?>
                     </div>
-                    
+
                 </fieldset>
                 <div class="actions-toolbar wp-actions-toolbar">
                 <div id="checkout-agreement-div" style="display:none">
@@ -305,7 +307,7 @@ class="form multicheckout billing">
                         <div class="block-content">
                             <a name="<?= $escaper->escapeHtml($block->getAddressAnchorName($address->getId())); ?>"></a>
                             <div class="title address-title-space">
-                                <strong><?= $escaper->escapeHtml(__('Address')); ?> 
+                                <strong><?= $escaper->escapeHtml(__('Address')); ?>
                         <?= $escaper->escapeHtml($index + 1); ?>
                                     <span>
                                         <?= $escaper->escapeHtml(__('of')); ?>
@@ -316,7 +318,7 @@ class="form multicheckout billing">
                             <div class="box box-shipping-address wp-address-block">
                                 <strong class="box-title">
                                     <span><?= $escaper->escapeHtml(__('Shipping To')); ?></span>
-                                    <a href="<?= $escaper->escapeUrl($block->getEditShippingAddressUrl($address)); ?>" 
+                                    <a href="<?= $escaper->escapeUrl($block->getEditShippingAddressUrl($address)); ?>"
                                     class="action edit"><span><?= $escaper->escapeHtml(__('Edit')); ?></span></a>
                                 </strong>
                                 <div class="box-content">
@@ -329,7 +331,7 @@ class="form multicheckout billing">
                             <div class="box box-items wp-price-block">
                                 <div class="box-content">
                                     <div class="order-review-wrapper table-wrapper">
-                                        <table class="items data table table-order-review" 
+                                        <table class="items data table table-order-review"
                                         id="overview-table-<?= $escaper->escapeHtml($address->getId()); ?>">
                                             <caption class="table-caption">
                                                 <?= $escaper->escapeHtml(__('Order Review')); ?>
@@ -396,7 +398,8 @@ class="form multicheckout billing">
     </div>
 
 </form>
-<script>
+<?php $scriptString = <<<script
+
     if (document.querySelector('input[name="payment[method]"]')) {
         document.querySelectorAll('input[name="payment[method]"]').forEach((elem) => {
             elem.addEventListener("change", function(event) {
@@ -405,19 +408,22 @@ class="form multicheckout billing">
                     document.getElementById("payment-continue").innerHTML = "<span>Place Order</span>";
                     document.querySelectorAll('.wp-method-contents').forEach((elem) => {
                         elem.classList.remove("no-display");
-                    });                    
+                    });
                     document.getElementById("checkout-agreement-div").style.display = "block";
                 } else {
                     document.querySelectorAll('.wp-method-contents').forEach((elem) => {
                         elem.classList.add("no-display");
-                    });                    
+                    });
                     document.getElementById("payment-continue").innerHTML = "<span>Go to Review Your Order</span>";
                     document.getElementById("checkout-agreement-div").style.display = "none";
-                }               
+                }
             });
         });
     }
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+
 <?php $quoteBaseGrandTotal = (float)$block->getQuoteBaseGrandTotal();
 $scriptString = <<<script
 

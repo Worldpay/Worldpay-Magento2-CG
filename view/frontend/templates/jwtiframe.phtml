@@ -12,16 +12,17 @@ $ddcUrl = $block->getDdcUrl();
 $decoder = $block->getDecoder();
 ?>
 
-<form method="post" action="<?= /* @noEscape */ $ddcUrl;?>" id="collectionForm" name="collectionForm"> 
+<form method="post" action="<?= /* @noEscape */ $ddcUrl;?>" id="collectionForm" name="collectionForm">
     <input type="hidden" name="Bin" id="first_bin" value="<?= /* @noEscape */ $decoder->decode($ccNumber); ?>" />
     <input type="hidden" name="JWT" id="first_jwt" value="<?= /* @noEscape */ $block->getJwtToken(); ?>" />
 </form>
-
-<script language="Javascript">    
+<?php $scriptString = <<<script
     window.onload = function()
     {
       // Auto submit form on page load
       document.getElementById("collectionForm").submit();
     }
 
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', ['language' => 'Javascript'], $scriptString, false) ?>

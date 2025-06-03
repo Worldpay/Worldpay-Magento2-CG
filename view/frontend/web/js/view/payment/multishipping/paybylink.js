@@ -17,7 +17,7 @@ define(
     ], function ($, ko, Component, _, $t, quote, placeMultishippingOrder, fullScreenLoader, customerData, checkoutUtils, urlBuilder, url, customer,additionalValidators) {
         'use strict';
 
-        return Component.extend({         
+        return Component.extend({
             isPlaceOrderActionAllowed: ko.observable(quote.billingAddress() != null),
             /**
              * @returns {*}
@@ -63,8 +63,7 @@ define(
                 }
                 fullScreenLoader.startLoader();
                 placeMultishippingOrder(checkoutData.paymentDetails);
-                
-            },            
+            },
             getpaybylinkText: function(){
                 return window.checkoutConfig.payment.ccform.payByLinkButtonName;
             },
@@ -73,6 +72,9 @@ define(
                     return false;
                 }
                 if(window.checkoutConfig.payment.ccform.isSubscribed){
+                    return false;
+                }
+                 if(window.checkoutConfig.payment.ccform.isProductOnDemand){
                     return false;
                 }
                 if(window.checkoutConfig.payment.ccform.isEnabledEFTPOS){

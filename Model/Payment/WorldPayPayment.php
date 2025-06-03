@@ -117,7 +117,7 @@ class WorldPayPayment
         $wpp->setData('fraudsight_reasoncode', $paymentState->getFraudsightReasonCode());
         $wpp->save();
     }
-    
+
     /**
      * Updating prime routing date
      *
@@ -134,7 +134,18 @@ class WorldPayPayment
         $wpp->setData('is_primerouting_enabled', $isPrimeRoutingRequest);
         $wpp->save();
     }
-    
+
+    public function updateOrderOnDemandData(
+        InfoInterface $payment,
+        \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
+    ) {
+        $wpp = $this->worldpaypayment->create();
+        $wpp = $wpp->loadByWorldpayOrderId($paymentState->getOrderCode());
+        $isOrderOnDemand = $this->getIsOrderOnDemand($payment);
+        $wpp->setData('is_order_on_demand_enabled', $isOrderOnDemand);
+        $wpp->save();
+    }
+
     /**
      * Get prime routing enabled
      *
@@ -149,5 +160,18 @@ class WorldPayPayment
             $wpPrimeRoutingEnabled=$paymentAditionalInformation['worldpay_primerouting_enabled'];
             return $wpPrimeRoutingEnabled;
         }
+    }
+
+    public function getIsOrderOnDemand(InfoInterface $paymentObject)
+    {
+        $paymentAdditionalInformation = $paymentObject->getAdditionalInformation();
+        if (
+            !empty($paymentAdditionalInformation)
+            && array_key_exists('zero_auth_order', $paymentAdditionalInformation)
+        ) {
+            return $paymentAdditionalInformation['zero_auth_order'];
+        }
+
+        return false;
     }
 }

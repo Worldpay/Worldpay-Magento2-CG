@@ -6,9 +6,9 @@ namespace Sapient\Worldpay\Model;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 use Sapient\Worldpay\Model\PaymentMethods\CreditCards as WorldPayCCPayment;
 use Magento\Checkout\Model\Cart;
-use Sapient\Worldpay\Model\SavedTokenFactory;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Asset\Source;
@@ -60,7 +60,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @var session
      */
     public $session;
-    
+
     /**
      * @var SerializerInterface
      */
@@ -121,6 +121,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      */
     private $storeManager;
 
+    private ProductOnDemand $productOnDemandHelper;
+
     /**
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Helper\Data $helper
@@ -159,7 +161,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         SerializerInterface $serializer,
         \Magento\Framework\Session\SessionManagerInterface $session,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Filesystem\Driver\File $fileDriver
+        \Magento\Framework\Filesystem\Driver\File $fileDriver,
+        ProductOnDemand $productOnDemandHelper,
     ) {
 
             $this->wplogger = $wplogger;
@@ -182,6 +185,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
             $this->session = $session;
             $this->storeManager = $storeManager;
             $this->fileDriver = $fileDriver;
+            $this->productOnDemandHelper = $productOnDemandHelper;
     }
 
     /**
@@ -246,7 +250,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['wpicons'] = $this->getIcons();
 
                 $config['payment']['ccform']['sessionId']   = $this->session->getSessionId();
-                $config['payment']['ccform']['isWalletsEnabled'] = $this->isWalletsEnabled();
+                $config['payment']['ccform']['isWalletsEnabled'] = $this->worldpayHelper->isWalletsEnabled();
                 $config['payment']['ccform']['isGooglePayEnable'] = $this->worldpayHelper->isGooglePayEnable();
                 $config['payment']['ccform']['googlePaymentMethods'] = $this->worldpayHelper->googlePaymentMethods();
                 $config['payment']['ccform']['googleAuthMethods'] = $this->worldpayHelper->googleAuthMethods();
@@ -267,19 +271,24 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                         ->getCheckoutApplePayBtnType();
                 $config['payment']['ccform']['applePayButtonLocale'] = $this->worldpayHelper
                         ->getCheckoutApplePayBtnLocale();
-                
+                $config['payment']['ccform']['paypalSmartButton'] =
+                    $this->worldpayHelper->isCheckoutPaypalSmartButtonEnabled() && $this->worldpayHelper->isApmEnabled();
+                $config['payment']['ccform']['paypalClientId'] = $this->worldpayHelper->getPaypalClientId();
+                $config['payment']['ccform']['paypalCurrency'] = $this->worldpayHelper->getPaypalCurrency();
+
+
                 // Multishipping Apple Pay configuration
                 $config['payment']['ccform']['msAppleMerchantid'] = $this->worldpayHelper->msAppleMerchantId();
                 $config['payment']['ccform']['isMsApplePayEnable'] = $this->worldpayHelper->isMsApplePayEnable();
                 $config['payment']['ccform']['isSamsungPayEnable'] = $this->worldpayHelper->isSamsungPayEnable();
                 $config['payment']['ccform']['samsungPayButton'] = $this->worldpayHelper->getSamsungPayButtonType();
-                
+
                 if ($this->worldpayHelper->getEnvironmentMode()=='Live Mode') {
                     $config['payment']['general']['environmentMode'] = "PRODUCTION";
                 } else {
                     $config['payment']['general']['environmentMode'] = "TEST";
                 }
-                
+
                 // 3DS2 Configurations
                 $config['payment']['ccform']['isDynamic3DS2Enabled'] = $this->worldpayHelper->
                         isDynamic3DS2Enabled();
@@ -300,10 +309,13 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                         isChallengePreference();
                 $config['payment']['ccform']['isChallengeWindowSize'] = $this->worldpayHelper->
                         getChallengeWindowSize();
-                
+
                 // Subscription Status
                 $config['payment']['ccform']['isSubscribed'] = $this->worldpayHelper->getsubscriptionStatus();
-                
+
+                // Product on Demand
+                $config['payment']['ccform']['isProductOnDemand'] = $this->productOnDemandHelper->isProductOnDemandQuote();
+
                 $config['payment']['ccform']['myaccountexceptions'] = $this->getMyAccountException();
 
                 $config['payment']['ccform']['creditcardexceptions'] = $this->getCreditCardException();
@@ -319,12 +331,12 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['sepa_e_mandate'] = $this->worldpayHelper->getSepaEmandate();
                 //Prime Routing
                 $config['payment']['ccform']['isPrimeRoutingEnabled'] = $this->worldpayHelper->isPrimeRoutingEnabled();
-                
+
                 // Custom label configuration
                 $config['payment']['ccform']['myaccountlabels'] = $this->getMyAccountLabels();
                 $config['payment']['ccform']['checkoutlabels'] = $this->getCheckoutLabels();
                 $config['payment']['ccform']['adminlabels'] = $this->getAdminLabels();
-                
+
                 //Klarna Pay
                 $config['payment']['ccform']['klarnaTypesAndContries'] = $this->getKlarnaTypesAndContries();
 
@@ -409,7 +421,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 getSaveCardListForAdminOrder($this->adminquotesession->getCustomerId())))) {
              $options['savedcard'] = $this->worldpayHelper->getCheckoutLabelbyCode('CO13');
         }
-        
+
         return $options;
     }
 
@@ -423,7 +435,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     {
         return $this->worldpayHelper->getApmTypes($code);
     }
-    
+
     /**
      * Retrieve list of wallets types
      *
@@ -503,7 +515,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     {
         return $this->worldpayHelper->getApmTitle();
     }
-    
+
     /**
      * Retrieve wallets title
      *
@@ -513,7 +525,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     {
         return $this->worldpayHelper->getWalletstitle();
     }
-    
+
     /**
      * Retrieve samsung service id
      *
@@ -562,7 +574,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
             return $savedCardsList;
     }
-   
+
     /**
      * Retrieve apm ideal bank list
      *
@@ -577,7 +589,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
         return [];
     }
-    
+
     /**
      * Get icons for available payment methods
      *
@@ -601,12 +613,12 @@ class WorldpayConfigProvider implements ConfigProviderInterface
 
         $allTypePayments = array_unique(array_merge($types, $apmTypes));
         $allTypePayments = array_unique(array_merge($allTypePayments, $walletsTypes));
-        
+
         foreach (array_keys($allTypePayments) as $code) {
             if (!array_key_exists($code, $this->icons)) {
                 $asset = $this->createAsset('Sapient_Worldpay::images/cc/' . strtolower($code) . '.png');
                 $placeholder = $this->assetSource->findSource($asset);
-                
+
                 if ($placeholder) {
                     //list($width, $height) = getimagesize($asset->getSourceFile());
                     list($width, $height) = getimagesizefromstring($asset->getUrl());
@@ -691,7 +703,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         $params = array_merge(['_secure' => $this->request->isSecure()], $params);
         return $this->assetRepo->createAsset($fileId, $params);
     }
-    
+
     /**
      * Retrieve cc exception
      *
@@ -709,12 +721,12 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $result['exception_messages'] = $value['exception_messages'];
                 $result['exception_module_messages'] = $value['exception_module_messages'];
                 array_push($data, $result);
-            
+
             }
         }
         return $data;
     }
-    
+
     /**
      * Retrieve general exception
      *
@@ -732,12 +744,12 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $result['exception_messages'] = $value['exception_messages'];
                 $result['exception_module_messages'] = $value['exception_module_messages'];
                 array_push($data, $result);
-            
+
             }
         }
         return $data;
     }
-    
+
      /**
       * Check if cpf is enabled?
       *
@@ -750,7 +762,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
         return false;
     }
-    
+
      /**
       * Check if the installment is enabled?
       *
@@ -763,7 +775,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
         return false;
     }
-    
+
     /**
      * Retrieve my account exception
      *
@@ -781,7 +793,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $result['exception_messages'] = $value['exception_messages'];
                 $result['exception_module_messages'] = $value['exception_module_messages'];
                 array_push($data, $result);
-            
+
             }
         }
         return $data;
@@ -797,7 +809,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     {
         return $this->worldpayHelper->getInstalmentValues($countryId);
     }
-    
+
     /**
      * Unserialize value
      *
@@ -813,7 +825,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
             return [];
         }
     }
-    
+
     /**
      * Retrieve save card list by customer
      *
@@ -831,7 +843,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         }
         return $savedCardsList;
     }
-    
+
     /**
      * Retrieve my account labels
      *
@@ -849,12 +861,12 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $result['wpay_label_desc'] = $value['wpay_label_desc'];
                 $result['wpay_custom_label'] = $value['wpay_custom_label'];
                 array_push($data, $result);
-            
+
             }
         }
         return $data;
     }
-    
+
     /**
      * Retrieve checkout labels
      *
@@ -872,7 +884,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $result['wpay_label_desc'] = $value['wpay_label_desc'];
                 $result['wpay_custom_label'] = $value['wpay_custom_label'];
                 array_push($data, $result);
-            
+
             }
         }
         return $data;
@@ -895,12 +907,12 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $result['wpay_label_desc'] = $value['wpay_label_desc'];
                 $result['wpay_custom_label'] = $value['wpay_custom_label'];
                 array_push($data, $result);
-            
+
             }
         }
         return $data;
     }
-    
+
     /**
      * Retrieve klarna types and countries
      *
@@ -917,14 +929,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         $klarnaValues[$klarnaSlicietType] = $this->worldpayHelper->getKlarnaSliceitContries();
         $klarnaValues[$klarnaPayLaterType] = $this->worldpayHelper->getKlarnaPayLaterContries();
         $klarnaValues[$klarnaPayNowType] = $this->worldpayHelper->getKlarnaPayNowContries();
-      
+
         return $klarnaValues;
-    }
-    /**
-     *  Check if wallets is enabled
-     */
-    public function isWalletsEnabled()
-    {
-        return $this->worldpayHelper->isWalletsEnabled();
     }
 }

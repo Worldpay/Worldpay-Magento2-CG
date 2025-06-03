@@ -1,7 +1,7 @@
 <?php
 // This template is loaded on the multi-shipping checkout page while selecting Wallets
 ?>
-<script>
+<?php $scriptString = <<<script
     require([
         'uiLayout',
         'jquery'
@@ -21,9 +21,11 @@
             $('body').trigger('contentUpdated');
         })
     })
-</script>
-<fieldset id="payment_form_worldpay_wallets" 
-class="worldpay_wallets worldpay_wallets_multishipping worldpay-ms standard-form fieldset items" 
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<fieldset id="payment_form_worldpay_wallets"
+class="worldpay_wallets worldpay_wallets_multishipping worldpay-ms standard-form fieldset items"
 style="display: none;">
 
   <div data-bind="scope: 'payment_method_worldpay_wallets'">

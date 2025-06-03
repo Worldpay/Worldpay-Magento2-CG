@@ -5,7 +5,7 @@
 namespace Sapient\Worldpay\Model\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
-use Exception;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 
 class Cart implements ObserverInterface
 {
@@ -28,6 +28,8 @@ class Cart implements ObserverInterface
      */
     private $checkoutsession;
 
+    private ProductOnDemand $productOnDemandHelper;
+
     /**
      * Constructor
      *
@@ -40,12 +42,14 @@ class Cart implements ObserverInterface
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Order\Service $orderservice,
         \Sapient\Worldpay\Model\Checkout\Service $checkoutservice,
-        \Magento\Checkout\Model\Session $checkoutsession
+        \Magento\Checkout\Model\Session $checkoutsession,
+        ProductOnDemand $productOnDemandHelper,
     ) {
         $this->orderservice = $orderservice;
         $this->wplogger = $wplogger;
         $this->checkoutservice = $checkoutservice;
         $this->checkoutsession = $checkoutsession;
+        $this->productOnDemandHelper = $productOnDemandHelper;
     }
 
    /**
@@ -59,6 +63,21 @@ class Cart implements ObserverInterface
             $order = $this->orderservice->getAuthorisedOrder();
             $this->checkoutservice->reactivateQuoteForOrder($order);
             $this->orderservice->removeAuthorisedOrder();
+        }
+
+        if ($this->productOnDemandHelper->isProductOnDemandGeneralConfigActive()) {
+            $quote = $this->checkoutsession->getQuote();
+            $items = $quote->getAllItems();
+            /** @var \Magento\Quote\Model\Quote\Item $item */
+            foreach ($items as $item) {
+                if ($item) {
+                    $product = $item->getProduct();
+                    $product->load($product->getId());
+                    if ($product->getProductOnDemand() || $product->getData('product_on_demand')) {
+                        $item->addMessage($this->productOnDemandHelper->getCartLabel());
+                    }
+                }
+            }
         }
     }
 }
