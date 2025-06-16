@@ -15,7 +15,7 @@ class SEPATokenOrder
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
         'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
 EOD;
- 
+
     /**
      * @var string
      */
@@ -119,7 +119,7 @@ EOD;
         $exponent,
         $captureDelay
     ) {
-        
+
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
         $this->orderDescription = $orderDescription;
@@ -225,7 +225,7 @@ EOD;
             $sepaElement['tokenScope'] = 'merchant';
         }
         $sepaElement = $sepaElement->addChild('paymentTokenID', $this->paymentDetails['sepa_token']);
-       
+
         return $paymentDetailsElement;
     }
 
@@ -258,7 +258,7 @@ EOD;
     {
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($content));
+        $node->appendChild($no->createCDATASection((string)$content));
     }
 
     /**

@@ -271,7 +271,7 @@ EOD;
             $this->_addCDATA($description, $this->orderDescription);
         }
     }
-    
+
     /**
      * Add OrderContent tag to xml
      *
@@ -446,7 +446,7 @@ EOD;
         $countryCodeElement = $address->addChild('countryCode');
         $this->_addCDATA($countryCodeElement, $countryCode);
     }
-  
+
     /**
      * Add cdata to xml
      *
@@ -457,7 +457,7 @@ EOD;
     {
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($content));
+        $node->appendChild($no->createCDATASection((string)$content));
     }
 
     /**
