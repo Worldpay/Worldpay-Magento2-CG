@@ -118,7 +118,7 @@ EOD;
         $exponent,
         $captureDelay
     ) {
-        
+
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
         $this->orderDescription = $orderDescription;
@@ -190,7 +190,7 @@ EOD;
         $description = $order->addChild('description');
         $this->_addCDATA($description, $this->orderDescription);
     }
-    
+
     /**
      * Add OrderContent tag to xml
      *
@@ -201,7 +201,7 @@ EOD;
         $orderContent = $order->addChild('orderContent');
         $this->_addCDATA($orderContent, $this->orderContent);
     }
-    
+
     /**
      * Add amount and its child tag to xml
      *
@@ -317,7 +317,7 @@ EOD;
     {
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($content));
+        $node->appendChild($no->createCDATASection((string)$content));
     }
 
     /**

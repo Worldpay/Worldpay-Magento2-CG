@@ -1014,7 +1014,7 @@ EOD;
     {
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($content));
+        $node->appendChild($no->createCDATASection((string)$content));
     }
 
     /**
