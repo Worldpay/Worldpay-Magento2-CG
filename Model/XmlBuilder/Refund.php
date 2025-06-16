@@ -54,7 +54,7 @@ EOD;
     ) {
         $this->scopeConfig = $scopeConfig;
     }
-    
+
     /**
      * Build xml for processing Request
      *
@@ -92,7 +92,7 @@ EOD;
         $modify = $this->_addModifyElement($xml);
         $orderModification = $this->_addOrderModificationElement($modify);
         $this->_addRefundElement($orderModification, $order, $paymentType);
-        
+
         return $xml;
     }
 
@@ -138,17 +138,17 @@ EOD;
         $amountElement['currencyCode'] = $this->currencyCode;
         $amountElement['exponent'] = $this->exponent;
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
-        
+
         $level23DataEnabled = $this->scopeConfig
                         ->getValue('worldpay/level23_config/level23', $storeScope);
-        
+
          //Level23 data changes
         $countryCode = $order->getBillingAddress()->getCountryId();
 
         if ($level23DataEnabled
            && ($paymentType === 'ECMC-SSL' || $paymentType === 'VISA-SSL')
            && ($countryCode === 'US' || $countryCode === 'CA')) {
-            
+
              $this->_addBranchSpecificExtension($order, $refund);
         }
     }
@@ -163,7 +163,7 @@ EOD;
     {
         return round((float)$amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
     }
-    
+
      /**
       * Add branchSpecificExtension and its child tag to xml
       *
@@ -179,30 +179,30 @@ EOD;
         } else {
             $purchase->addChild('customerReference', $order->getCustomerId());
         }
-         
+
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORES;
-        
+
         $cardAcceptorTaxId = $this->scopeConfig
                         ->getValue('worldpay/level23_config/CardAcceptorTaxId', $storeScope);
-        
+
         $dutyAmount = $this->scopeConfig
                         ->getValue('worldpay/level23_config/duty_amount', $storeScope);
-        
+
         $purchase->addChild('cardAcceptorTaxId', $cardAcceptorTaxId);
-        
+
         $salesTax = $purchase->addChild('salesTax');
-          
+
          $taxAmount = $order->getTaxAmount();
          $taxAmountNew = abs($taxAmount);
-         
+
          $taxApplied = 'false';
         if ($taxAmountNew != 0) {
             $taxApplied = 'true';
         }
          $this->_addAmountElementCapture($salesTax, $this->currencyCode, $this->exponent, $taxAmountNew);
-         
+
          $orderDiscountAmount = abs($order->getDiscountAmount());
-         
+
         if ($orderDiscountAmount) {
             $discountAmountXml = $purchase->addChild('discountAmount');
             $this->_addAmountElementCapture(
@@ -212,40 +212,40 @@ EOD;
                 $order->getDiscountAmount()
             );
         }
-        
+
         $shippingAmnt = (float)$order->getShippingAmount();
-        
+
         if ($shippingAmnt) {
             $shippingAmountXml = $purchase->addChild('shippingAmount');
             $this->_addAmountElementCapture($shippingAmountXml, $this->currencyCode, $this->exponent, $shippingAmnt);
         }
-        
+
         if ($dutyAmount) {
             $dutyAmountXml = $purchase->addChild('dutyAmount');
             $this->_addAmountElementCapture($dutyAmountXml, $this->currencyCode, $this->exponent, $dutyAmount);
         }
-        
+
         $billingaddress = $order->getBillingAddress();
         $billingpostcode = $billingaddress->getPostcode();
         //$purchase->addChild('shipFromPostalCode', '');
         $purchase->addChild('destinationPostalCode', $billingpostcode);
-        
+
         $countryCode = $order->getShippingAddress()->getCountryId();
-               
+
         $purchase->addChild('destinationCountryCode', $countryCode);
-        
+
         $orderDate = $purchase->addChild('orderDate');
         $dateElement = $orderDate->addChild('date');
         $today = new \DateTime();
         $dateElement['dayOfMonth'] = $today->format('d');
         $dateElement['month'] = $today->format('m');
         $dateElement['year'] = $today->format('Y');
-        
+
         $purchase->addChild('taxExempt', $taxApplied);
-    
+
         $this->_addL23OrderLineItemElement($order, $purchase, $refund);
     }
-    
+
     /**
      * Add all order line item element values to xml
      *
@@ -255,7 +255,7 @@ EOD;
      */
     private function _addL23OrderLineItemElement($order, $purchase, $capture)
     {
-        
+
         foreach ($order->getAllItems() as $lineitem) {
             $this->_addLineItemElement(
                 $purchase,
@@ -272,7 +272,7 @@ EOD;
             );
         }
     }
-    
+
     /**
      * Add order line item element values to xml
      *
@@ -301,38 +301,38 @@ EOD;
         $itemDiscountAmount,
         $taxAmount
     ) {
-        
+
         $item = $parentElement->addChild('item');
-        
+
         if ($description) {
             $descriptionElement = $item->addChild('description');
             $this->_addCDATA($descriptionElement, substr($description, 0, 12));
         }
-        
+
         if ($productCode) {
             $productCodeElement = $item->addChild('productCode');
             $this->_addCDATA($productCodeElement, substr($productCode, 0, 12));
         }
-        
+
         if ($commodityCode) {
             $commodityCodeElement = $item->addChild('commodityCode');
             $this->_addCDATA($commodityCodeElement, $commodityCode);
         }
-        
+
         $quantityElement = $item->addChild('quantity');
-        
+
         $quantityNew = abs($quantity);
-         
+
         $this->_addCDATA($quantityElement, $quantityNew);
 
         $unitCostElement = $item->addChild('unitCost');
         $this->_addAmountElement($unitCostElement, $this->currencyCode, $this->exponent, $unitCost);
-        
+
         if ($unitOfMeasure) {
             $unitOfMeasureElement = $item->addChild('unitOfMeasure');
             $this->_addCDATA($unitOfMeasureElement, $unitOfMeasure);
         }
-        
+
         $itemTotalElement = $item->addChild('itemTotal');
         $this->_addAmountElement($itemTotalElement, $this->currencyCode, $this->exponent, $itemTotal);
 
@@ -345,7 +345,7 @@ EOD;
         $taxAmountElement = $item->addChild('taxAmount');
         $this->_addAmountElement($taxAmountElement, $this->currencyCode, $this->exponent, $taxAmount);
     }
-    
+
     /**
      * Add amount and its child tag to xml
      *
@@ -361,7 +361,7 @@ EOD;
         $amountElement['exponent'] = $this->exponent;
         $amountElement['value'] = $this->_amountAsInt($amount);
     }
-    
+
      /**
       * Add amount and its child tag to xml
       *
@@ -377,7 +377,7 @@ EOD;
         $amountElement['exponent'] = $this->exponent;
         $amountElement['value'] = $this->_amountAsInt($discountAmount);
     }
-    
+
      /**
       * Add cdata to xml
       *
@@ -388,6 +388,6 @@ EOD;
     {
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($content));
+        $node->appendChild($no->createCDATASection((string)$content));
     }
 }
