@@ -4,8 +4,6 @@
  */
 namespace Sapient\Worldpay\Model\XmlBuilder;
 
-use \Sapient\Worldpay\Logger\WorldpayLogger;
-
 /**
  * Build xml for Direct Order request
  */
@@ -92,7 +90,7 @@ EOD;
      * @var string $captureDelay
      */
     protected $captureDelay;
-    
+
     /**
      * @var array $browserFields
      */
@@ -227,7 +225,7 @@ EOD;
         $description = $order->addChild('description');
         $this->_addCDATA($description, $this->orderDescription);
     }
-    
+
     /**
      * Add OrderContent tag to xml
      *
@@ -238,7 +236,7 @@ EOD;
         $orderContent = $order->addChild('orderContent');
         $this->_addCDATA($orderContent, $this->orderContent);
     }
-    
+
     /**
      * Add amount and its child tag to xml
      *
@@ -251,7 +249,7 @@ EOD;
         $amountElement['exponent'] = $this->exponent;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
     }
-    
+
     /**
      * Add paymentDetails and its child tag to xml
      *
@@ -260,13 +258,13 @@ EOD;
     protected function _addPaymentDetailsElement($order)
     {
         $paymentDetailsElement = $order->addChild('paymentDetails');
-        
+
         $this->_addPaymentDetailsForCreditCardOrder($paymentDetailsElement);
         //$session = $paymentDetailsElement->addChild('session');
         //$session['id'] = $this->paymentDetails['sessionId'];
         //$session['shopperIPAddress'] = $this->paymentDetails['shopperIpAddress'];
     }
-    
+
     /**
      * Add dynamicInteractionType and its child tag to xml
      *
@@ -462,7 +460,7 @@ EOD;
     {
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($content));
+        $node->appendChild($no->createCDATASection((string)$content));
     }
 
     /**
