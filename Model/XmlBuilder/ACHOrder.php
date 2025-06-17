@@ -5,7 +5,6 @@
 namespace Sapient\Worldpay\Model\XmlBuilder;
 
 use Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecureConfig;
-use \Sapient\Worldpay\Logger\WorldpayLogger;
 
 /**
  * Build xml for ACH Order request
@@ -133,7 +132,6 @@ EOD;
         $exponent,
         $captureDelay
     ) {
-        
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
         $this->orderDescription = $orderDescription;
@@ -352,7 +350,7 @@ EOD;
     {
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($content));
+        $node->appendChild($no->createCDATASection((string)$content));
     }
 
     /**

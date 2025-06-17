@@ -301,7 +301,7 @@ EOD;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
         //$amountElement['value'] = $this->_amountAsInt($this->_roundOfTotal($order));
     }
-    
+
     /**
      * Add orderContent and its child tag to xml
      *
@@ -345,7 +345,7 @@ EOD;
         $include = $paymentMethodMask->addChild($this->paymentType);
         $include['shopperCountryCode'] = $this->billingAddress['countryCode'];
         $include['locale'] = str_replace('_', '-', $locale);
-        
+
         $successUrl = $include->addChild('successURL', $urls['successURL']);
         $cancelURL = $include->addChild('cancelURL', $urls['cancelURL']);
         $pendingURL = $include->addChild('pendingURL', $urls['pendingURL']);
@@ -373,7 +373,7 @@ EOD;
 
         $shopper->addChild('shopperEmailAddress', $this->shopperEmail);
     }
-    
+
      /**
       * Add _addStatementNarrativeElement to xml
       *
@@ -460,7 +460,7 @@ EOD;
 
         $streetElement1 = $address->addChild('address1');
         $this->_addCDATA($streetElement1, $address1);
-        
+
         $postalCodeElement = $address->addChild('postalCode');
         //Zip code mandatory for worldpay, if not provided by customer we will pass manually
         $zipCode = '00000';
@@ -477,10 +477,10 @@ EOD;
             $stateElement = $address->addChild('state');
             $this->_addCDATA($stateElement, $state);
         }
-        
+
         $countryCodeElement = $address->addChild('countryCode');
         $this->_addCDATA($countryCodeElement, $countryCode);
-        
+
         $telephoneElement = $address->addChild('telephoneNumber');
         $this->_addCDATA($telephoneElement, $telephoneNumber);
     }
@@ -509,7 +509,7 @@ EOD;
         $this->_addCDATA($termsURLElement, $orderlineitems['termsURL']);
 
         foreach ($orderlineitems['lineItem'] as $lineitem) {
-            
+
             $totaldiscountamount = (isset($lineitem['totalDiscountAmount'])) ? $lineitem['totalDiscountAmount'] : 0;
             if ($lineitem['productType'] === 'bundle' && $diffAmt > 0) {
                 $totaldiscountamount = $diffAmt;
@@ -517,7 +517,7 @@ EOD;
             } else {
                 $totalAmount = 0;
             }
-            
+
             $this->_addLineItemElement(
                 $orderLinesElement,
                 $lineitem['reference'],
@@ -617,7 +617,7 @@ EOD;
     {
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($content));
+        $node->appendChild($no->createCDATASection((string)$content));
     }
 
     /**
@@ -630,7 +630,7 @@ EOD;
     {
         return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
     }
-    
+
     /**
      * Round price
      *
@@ -652,7 +652,7 @@ EOD;
         }
         return $accTotalAmt;
     }
-    
+
     /**
      * Add subsciption and its child tag to xml
      *
