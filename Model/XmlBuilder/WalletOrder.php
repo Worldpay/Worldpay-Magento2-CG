@@ -248,7 +248,7 @@ EOD;
         $this->_addOrderElement($submit);
         return $xml;
     }
-    
+
     /**
      * Add submit tag to xml
      *
@@ -337,7 +337,7 @@ EOD;
         $riskData = $order->addChild('riskData');
         $accountCreatedDate = strtotime($this->cusDetails['created_at']);
         $accountUpdatedDate = strtotime($this->cusDetails['updated_at']);
-        
+
         $orderCreateDate = strtotime($this->cusDetails['order_details']['created_at']);
         $orderUpdateDate = strtotime($this->cusDetails['order_details']['updated_at']);
         if ($this->shippingAddress) {
@@ -357,7 +357,7 @@ EOD;
         $dateElement['dayOfMonth'] = date("d");
         $dateElement['month'] = date("m");
         $dateElement['year'] = date("Y");
-        
+
         //shoppper account risk data
         $shopperAccountRiskData = $riskData->addChild('shopperAccountRiskData');
         $shopperAccountRiskData['transactionsAttemptedLastDay'] = $this->cusDetails['order_count']['last_day_count'];
@@ -375,32 +375,32 @@ EOD;
             cusDetails['shopperAccountShippingAddressUsageIndicator'];
         $shopperAccountRiskData['shopperAccountPaymentAccountIndicator'] = $this->
             cusDetails['shopperAccountPaymentAccountIndicator'];
-        
+
         $shopperAccountRiskDataElement = $shopperAccountRiskData->addChild('shopperAccountCreationDate');
         $shopperAccountRiskDataElementChild = $shopperAccountRiskDataElement->addChild('date');
         $shopperAccountRiskDataElementChild['dayOfMonth'] = date("d", $accountCreatedDate);
         $shopperAccountRiskDataElementChild['month'] = date("m", $accountCreatedDate);
         $shopperAccountRiskDataElementChild['year'] = date("Y", $accountCreatedDate);
-        
+
         $shopperAccountRiskDataElement1 = $shopperAccountRiskData->addChild('shopperAccountModificationDate');
         $shopperAccountRiskDataElementChild1 = $shopperAccountRiskDataElement1->addChild('date');
         $shopperAccountRiskDataElementChild1['dayOfMonth'] = date("d", $accountUpdatedDate);
         $shopperAccountRiskDataElementChild1['month'] = date("m", $accountUpdatedDate);
         $shopperAccountRiskDataElementChild1['year'] = date("Y", $accountUpdatedDate);
-        
+
         $shopperAccountPasswordChangeAttribute = $shopperAccountRiskData->addChild('shopperAccountPasswordChangeDate');
         $shopperAccountPasswordChangeElement = $shopperAccountPasswordChangeAttribute->addChild('date');
         $shopperAccountPasswordChangeElement['dayOfMonth'] = date("d", $accountUpdatedDate);
         $shopperAccountPasswordChangeElement['month'] = date("m", $accountUpdatedDate);
         $shopperAccountPasswordChangeElement['year'] = date("Y", $accountUpdatedDate);
-        
+
         $shopperAccountShippingAddressAttribute = $shopperAccountRiskData->
             addChild('shopperAccountShippingAddressFirstUseDate');
         $shopperAccountShippingAddressElement = $shopperAccountShippingAddressAttribute->addChild('date');
         $shopperAccountShippingAddressElement['dayOfMonth'] = date("d", $orderCreateDate);
         $shopperAccountShippingAddressElement['month'] = date("m", $orderCreateDate);
         $shopperAccountShippingAddressElement['year'] = date("Y", $orderCreateDate);
-        
+
         $shopperAccountPaymentAccountFirstUseDateAttribute = $shopperAccountRiskData->
             addChild('shopperAccountPaymentAccountFirstUseDate');
         $shopperAccountPaymentAccountFirstUseDateElement = $shopperAccountPaymentAccountFirstUseDateAttribute->
@@ -408,7 +408,7 @@ EOD;
         $shopperAccountPaymentAccountFirstUseDateElement['dayOfMonth'] = date("d", $orderUpdateDate);
         $shopperAccountPaymentAccountFirstUseDateElement['month'] = date("m", $orderUpdateDate);
         $shopperAccountPaymentAccountFirstUseDateElement['year'] = date("Y", $orderUpdateDate);
-        
+
         // Transaction Risk Data
         $transactionRiskData = $riskData->addChild('transactionRiskData');
         $transactionRiskData['shippingMethod'] = 'other';
@@ -464,7 +464,7 @@ EOD;
         $description = $order->addChild('description');
         $this->_addCDATA($description, $this->orderDescription);
     }
-    
+
     /**
      * Add OrderContent tag to xml
      *
@@ -533,7 +533,7 @@ EOD;
         $browser->addChild('browserColourDepth', $this->browserFields['browserColourDepth']);
         $browser->addChild('browserScreenHeight', $this->browserFields['browserScreenHeight']);
         $browser->addChild('browserScreenWidth', $this->browserFields['browserScreenWidth']);
- 
+
         return $shopper;
     }
 
@@ -547,7 +547,7 @@ EOD;
     {
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($content));
+        $node->appendChild($no->createCDATASection((string)$content));
     }
 
     /**
