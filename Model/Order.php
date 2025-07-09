@@ -308,9 +308,8 @@ class Order
      * @param string $reference
      * @param string $comment
      */
-    public function refund($reference, $comment)
+    public function refund($reference, $comment): void
     {
-
         if (!$reference) {
             return;
         }
@@ -325,7 +324,7 @@ class Order
         }
 
         if ($creditmemo->getState() == \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN) {
-            $this->_markRefunded($creditmemo, $comment);
+            $this->_markRefunded($creditmemo, $comment, $reference);
         }
     }
 
@@ -402,34 +401,29 @@ class Order
             $this->_markRefunded($creditmemo, $comment);
         }
     }
-    /**
-     * Create Credit Memos
-     *
-     * @param string $creditmemo
-     * @param string $comment
-     */
 
-    private function _markRefunded($creditmemo, $comment)
-    {
+    private function _markRefunded(
+        \Magento\Sales\Model\Order\Creditmemo $creditmemo,
+        string $comment,
+        string $reference = ''
+    ): void {
         $creditmemo->setState(\Magento\Sales\Model\Order\Creditmemo::STATE_REFUNDED);
         $order = $creditmemo->getOrder();
-        $order->addStatusHistoryComment($comment);
 
-         $transactionSave = $this->_transaction->addObject(
-             $creditmemo
-         )->addObject(
-             $creditmemo->getOrder()
-         );
+        if ($reference !== '') {
+            $comment .= " Refund ID: $reference";
+        }
+        $order->addCommentToStatusHistory(comment: $comment, isVisibleOnFront: true);
+        $creditmemo->addComment($comment, false, true);
+
+         $transactionSave = $this
+             ->_transaction
+             ->addObject($creditmemo)
+             ->addObject($creditmemo->getOrder());
         $transactionSave->save();
     }
-    /**
-     * Cancel Refund
-     *
-     * @param string $reference
-     * @param string $comment
-     */
 
-    public function cancelRefund($reference, $comment)
+    public function cancelRefund($reference, $comment): void
     {
         if (!$reference) {
             return;
@@ -444,35 +438,51 @@ class Order
             );
         }
 
-        if ($creditmemo->getState() == \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN) {
-            $this->_cancelCreditmemo($creditmemo, $comment);
+        if ($creditmemo->canCancel()) {
+            $this->_cancelCreditmemo($creditmemo, $comment, $reference);
         }
     }
-    /**
-     * Cancel Credit memo
-     *
-     * @param string $creditmemo
-     * @param string $comment
-     */
 
-    private function _cancelCreditmemo($creditmemo, $comment = null)
+    private function _cancelCreditmemo(
+        \Magento\Sales\Model\Order\Creditmemo $creditmemo,
+        $comment = null,
+        string $reference = ''
+    ): void {
+        $creditmemo->setState(\Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED);
+        $order = $creditmemo->getOrder();
+        if ($comment) {
+            $creditmemo->addComment($comment, false, true);
+            $order->addCommentToStatusHistory(comment: $comment . " Refund ID: $reference", isVisibleOnFront: true);
+        }
+        $this->_deductOrderTotals($order, $creditmemo);
+
+        $transactionSave = $this->_transaction->addObject(
+            $creditmemo
+        )->addObject(
+            $creditmemo->getOrder()
+        );
+        $transactionSave->save();
+    }
+
+    public function refundOffline($reference, string $comment): void
     {
-        if ($creditmemo && $creditmemo->canCancel()) {
-             $creditmemo->setState(\Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED);
-            $order = $creditmemo->getOrder();
-            if ($comment) {
-                $order->addStatusHistoryComment($comment);
-            }
-            $this->_deductOrderTotals($order, $creditmemo);
+        $creditmemo = $this->ordercreditmemo;
+        $creditmemo->load($reference, 'increment_id');
 
-            $transactionSave = $this->_transaction->addObject(
-                $creditmemo
-            )->addObject(
-                $creditmemo->getOrder()
-            );
-            $transactionSave->save();
+        $creditmemo->setState(\Magento\Sales\Model\Order\Creditmemo::STATE_OPEN);
+        $order = $creditmemo->getOrder();
+        if ($comment) {
+            $creditmemo->addComment($comment, false, true);
+            $order->addCommentToStatusHistory(comment: $comment . " Refund ID: $reference", isVisibleOnFront: true);
         }
+
+        $transactionSave = $this
+            ->_transaction
+            ->addObject($creditmemo)
+            ->addObject($creditmemo->getOrder());
+        $transactionSave->save();
     }
+
     /**
      * Cancel Magento Credit Memo
      *
@@ -498,13 +508,12 @@ class Order
    /**
     * Deduct Order Totals
     *
-    * @param array $order
-    * @param string $creditmemo
+    * @param \Magento\Sales\Model\Order $order
+    * @param \Magento\Sales\Model\Order\Creditmemo $creditmemo
     */
 
-    private function _deductOrderTotals($order, $creditmemo)
+    private function _deductOrderTotals($order, $creditmemo): void
     {
-
         if (!$order->dataHasChangedFor('total_refunded')) {
             $order->setTotalRefunded($order->getTotalRefunded() - $creditmemo->getGrandTotal());
             foreach ($creditmemo->getAllItems() as $item) {
