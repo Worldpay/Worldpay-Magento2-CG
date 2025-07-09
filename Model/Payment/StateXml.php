@@ -241,6 +241,40 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
         return false;
     }
 
+    public function getRefundAuthorisationJournalReference($state)
+    {
+        $statusNode = $this->_getStatusNode();
+        $journalNodes = $statusNode->journal;
+
+        foreach ($journalNodes as $journal) {
+            if ($journal['journalType'] == $state) {
+                foreach ($journal->journalReference as $journalReference) {
+                    if ($journalReference['type'] == 'refund_authorisation') {
+                        return $journalReference['reference']->__toString();
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function getJournalReferenceDescription($paymentStatus)
+    {
+        $statusNode = $this->_getStatusNode();
+        $journalNodes = $statusNode->journal;
+
+        foreach ($journalNodes as $journal) {
+            if ($journal['journalType'] == $paymentStatus) {
+                if (isset($journal['description'])) {
+                    return $journal['description']->__toString();
+                }
+            }
+        }
+
+        return '';
+    }
+
     /**
      * Retrive full Refund from xml
      *
@@ -351,7 +385,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
         $statusNode = $this->_getStatusNode();
         return (string) $statusNode->payment->amount['currencyCode'];
     }
-    
+
     /**
      * Retrieve network used from xml
      *
