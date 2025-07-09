@@ -188,6 +188,8 @@ interface StateInterface
      * Get getFullRefundAmount
      */
 
+    public function getRefundAuthorisationJournalReference($state);
+
     public function getFullRefundAmount();
     /**
      * Get isAsyncNotification
@@ -294,4 +296,6 @@ interface StateInterface
      */
 
     public function getFraudsightReasonCode();
+
+    public function getJournalReferenceDescription($paymentStatus);
 }
