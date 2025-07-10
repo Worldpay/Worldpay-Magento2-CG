@@ -116,14 +116,19 @@ class PluginBefore
                     -1
                 );
             //Cancel button function to send order-modification request to Cancel Order.
-                $cancelurl = $this->_urlBuilder->getUrl(
-                    "worldpay/cancel/index",
-                    ['order_id' => $orderId]
-                );
-                $buttonList->remove('order_cancel');
-                $buttonList->add('cancel', ['label' => __('Cancel'),
+            foreach ($buttonList->getItems() as $itemList) {
+                if (array_key_exists('order_cancel', $itemList)) {
+                    $cancelurl = $this->_urlBuilder->getUrl(
+                        "worldpay/cancel/index",
+                        ['order_id' => $orderId]
+                    );
+                    $buttonList->remove('order_cancel');
+                    $buttonList->add('cancel', ['label' => __('Cancel'),
                         'onclick' => 'setLocation("' . $cancelurl . '")',
                         'class' => 'cancel'], -1);
+                    break;
+                }
+            }
             //Void Sale changes
                 $data = $order->getData();
                 $paymenttype = $this->getPaymentType($data['increment_id']);
@@ -152,7 +157,7 @@ class PluginBefore
 
         return [$context, $buttonList];
     }
-    
+
     /**
      * Get the order date details
      *
@@ -165,11 +170,11 @@ class PluginBefore
         $currentdate = $this->objDate->Date();
         $formattedCurrentDate=$this->timeobj->formatDate($currentdate, \IntlDateFormatter::SHORT);
         $formattedOrderDate=$this->timeobj->formatDate($orderdate, \IntlDateFormatter::SHORT);
-             
+
         if ($formattedCurrentDate===$formattedOrderDate) {
             return true;
         }
-        
+
         return false;
     }
 
@@ -184,7 +189,7 @@ class PluginBefore
         $worldpaydata=$this->worldpaymodel->loadByPaymentId($orderid);
         return $worldpaydata->getPaymentType();
     }
-    
+
     /**
      * Check eligibility for void sale
      *
@@ -206,7 +211,7 @@ class PluginBefore
             }
         }
     }
-    
+
     /**
      * Is prime routing request?
      *
@@ -216,12 +221,12 @@ class PluginBefore
     public function isPrimeRoutingRequest($orderid)
     {
         $worldpaydata=$this->worldpaymodel->loadByPaymentId($orderid);
-      
+
         if ($worldpaydata->getIsPrimeroutingEnabled()) {
             return true;
         }
     }
-    
+
     /**
      * Remove shipment button
      *
