@@ -31,13 +31,22 @@ class SentForRefund extends \Sapient\Worldpay\Model\Payment\Update\Base implemen
      * Apply
      *
      * @param Payment $payment
-     * @param Order $order
+     * @param \Sapient\Worldpay\Model\Order $order
      */
     public function apply($payment, $order = null)
     {
         $reference = $this->_paymentState->getJournalReference($this->_paymentState->getPaymentStatus());
+
         if ($reference) {
-            $order->refund($reference, self::REFUND_COMMENT);
+            $refundAuth = $this->_paymentState->getRefundAuthorisationJournalReference($this->_paymentState->getPaymentStatus());
+            if (!$refundAuth) {
+                $order->refundOffline(
+                    $reference,
+                    __("The refund was processed offline; please contact the merchant for details.")
+                );
+            } else {
+                $order->refund($reference, __("The refund has been processed successfully."));
+            }
         } else {
             $amount = $this->_paymentState->getFullRefundAmount();
             $order->refundFull($amount, self::REFUND_COMMENT);
