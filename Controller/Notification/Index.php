@@ -267,23 +267,18 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     private function updateNotification($xml)
     {
-        $statusNode = $xml->notify->orderStatusEvent;
-        $orderCode = "";
-        $paymentStatus = "";
-        $reference = "";
+        $statusNode=$xml->notify->orderStatusEvent;
+        $orderCode="";
+        $paymentStatus="";
         if (isset($statusNode['orderCode'])) {
             list($orderCode, $ordercode_last) = explode("-", $statusNode['orderCode']);
         }
         if (isset($statusNode->payment->lastEvent)) {
-            $paymentStatus = $statusNode->payment->lastEvent;
-        }
-        if (isset($statusNode->payment->reference)) {
-            $reference = $statusNode->payment->reference;
+                $paymentStatus=$statusNode->payment->lastEvent;
         }
         $hn = $this->historyNotification->create();
         $hn->setData('status', $paymentStatus);
         $hn->setData('order_id', trim($orderCode));
-        $hn->setData('reference', trim($reference));
         $hn->save();
     }
     /**
