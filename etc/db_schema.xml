@@ -101,7 +101,6 @@
     <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
     <column xsi:type="varchar" name="order_id"  nullable="true"  comment="Worldpay order id" onCreate="migrateDataFrom(order_id)" length="255"/>
     <column xsi:type="varchar" name="status" nullable="true" length="255" comment="Status"/>
-    <column xsi:type="varchar" name="reference" nullable="true" length="255" comment="Reference"/>
     <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
     <constraint xsi:type="primary" referenceId="PRIMARY">
       <column name="id"/>
