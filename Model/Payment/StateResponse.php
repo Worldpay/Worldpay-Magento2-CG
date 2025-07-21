@@ -284,11 +284,6 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\StateInterface
         return null;
     }
 
-    public function getRefundAuthorisationJournalReference($state)
-    {
-        return null;
-    }
-
     /**
      * Get getFullRefundAmount
      *
@@ -358,7 +353,7 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\StateInterface
     {
         return null;
     }
-
+    
     /**
      * Get getAAVEmailResultCode
      *
@@ -493,11 +488,6 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\StateInterface
      * @return null
      */
     public function getFraudsightReasonCode()
-    {
-        return null;
-    }
-
-    public function getJournalReferenceDescription($getPaymentStatus)
     {
         return null;
     }
