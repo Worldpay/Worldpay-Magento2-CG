@@ -9,10 +9,13 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Container\OrderIdentity;
 use Magento\Sales\Model\Order\Email\Container\Template;
+use Magento\Sales\Model\Order\Email\SenderBuilderFactory;
 use Magento\Sales\Model\ResourceModel\Order as OrderResource;
 use Magento\Sales\Model\Order\Address\Renderer;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\DataObject;
+use Sapient\Worldpay\Model\AuthorisedOrderEmailFactory;
+use Sapient\Worldpay\Model\Worldpayment;
 
 class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
 {
@@ -22,7 +25,7 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
     public const XML_PATH_AUTHORISED_EMAIL_TEMPLATE = 'wp_auth_sales_email_order_template';
 
     /**
-     * @var  \Sapient\Worldpay\Model\Worldpayment
+     * @var  Worldpayment
      */
     public $worldpaypaymentmodel;
 
@@ -31,32 +34,20 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
       */
     public $scopeConfig;
 
-    /**
-     * Constructor
-     *
-     * @param Template $templateContainer
-     * @param OrderIdentity $identityContainer
-     * @param \Magento\Sales\Model\Order\Email\SenderBuilderFactory $senderBuilderFactory
-     * @param \Psr\Log\LoggerInterface $logger
-     * @param Renderer $addressRenderer
-     * @param PaymentHelper $paymentHelper
-     * @param \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
-     * @param OrderResource $orderResource
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $globalConfig
-     * @param ManagerInterface $eventManager
-     */
+    private AuthorisedOrderEmailFactory $authorisedOrderEmailFactory;
 
     public function __construct(
         Template $templateContainer,
         OrderIdentity $identityContainer,
-        \Magento\Sales\Model\Order\Email\SenderBuilderFactory $senderBuilderFactory,
+        SenderBuilderFactory $senderBuilderFactory,
         \Psr\Log\LoggerInterface $logger,
         Renderer $addressRenderer,
         PaymentHelper $paymentHelper,
-        \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
+        Worldpayment $worldpaypaymentmodel,
         OrderResource $orderResource,
         \Magento\Framework\App\Config\ScopeConfigInterface $globalConfig,
-        ManagerInterface $eventManager
+        ManagerInterface $eventManager,
+        AuthorisedOrderEmailFactory $authorisedOrderEmailFactory,
     ) {
         parent::__construct(
             $templateContainer,
@@ -71,6 +62,7 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
         );
         $this->worldpaypaymentmodel = $worldpaypaymentmodel;
         $this->scopeConfig = $globalConfig;
+        $this->authorisedOrderEmailFactory = $authorisedOrderEmailFactory;
     }
 
     /**
@@ -92,9 +84,7 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
                return false;
         } else {
             return parent::send($order, $forceSyncMode);
-             
         }
-        return false;
     }
 
      /**
@@ -159,14 +149,7 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
         }
     }
 
-    /**
-     * Prepare Template For Authorised Order
-     *
-     * @param  array $order
-     * @param  string $successFlag
-     * @return string
-     */
-    public function prepareTemplateForAuthorisedOrder($order, $successFlag)
+    public function prepareTemplateForAuthorisedOrder($order, $successFlag): void
     {
         $emailSub = "Your payment has been confirmed with the bank and order has been processed successfully";
         $authSuccessMsg = "Once your package ships we will send you a tracking number.";
@@ -215,14 +198,7 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
         $this->templateContainer->setTemplateId($templateId);
     }
 
-    /**
-     * Authorised Email Send
-     *
-     * @param array $order
-     * @param string $successFlag
-     * @return
-     */
-    public function authorisedEmailSend(order $order, $successFlag)
+    public function authorisedEmailSend(Order $order, bool $successFlag): bool
     {
         $this->identityContainer->setStore($order->getStore());
         if (!$this->identityContainer->isEnabled()) {
@@ -232,7 +208,15 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
         /** @var SenderBuilder $sender */
         $sender = $this->getSender();
         try {
-            $sender->send();
+            if (!$this->globalConfig->getValue('sales_email/general/async_sending')) {
+                $sender->send();
+            } else {
+                $authorisedOrderEmailModel = $this->authorisedOrderEmailFactory->create();
+                $authorisedOrderEmailModel->setOrderIncrementId($order->getIncrementId());
+                $authorisedOrderEmailModel->setSuccessFlag($successFlag);
+                $authorisedOrderEmailModel->setAttemptCount(0);
+                $authorisedOrderEmailModel->save();
+            }
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
             return false;
