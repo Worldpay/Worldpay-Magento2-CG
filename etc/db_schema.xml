@@ -331,5 +331,15 @@
       <column name="entity_id"/>
     </constraint>
   </table>
+  <table name="worldpay_authorised_order_email" resource="default" engine="innodb" comment="Worldpay Authorised Order Email">
+      <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
+      <column xsi:type="varchar" name="order_increment_id"  nullable="false"  comment="Order Increment Id" length="50"/>
+      <column xsi:type="boolean" name="success_flag" nullable="false" comment="Success Flag"/>
+      <column xsi:type="tinyint" name="attempt_count" padding="5" unsigned="true" nullable="false" default="0" identity="false" comment="Send attempt count"/>
+      <constraint xsi:type="primary" referenceId="PRIMARY">
+          <column name="entity_id"/>
+      </constraint>
+      <constraint xsi:type="foreign" referenceId="WORLDPAY_AUTHORISED_ORDER_EMAIL_SALE_ORDER_INCREMENT_ID" table="worldpay_custom_email" column="order_increment_id" referenceTable="sales_order" referenceColumn="increment_id" onDelete="CASCADE"/>
+  </table>
 
 </schema>
