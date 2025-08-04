@@ -2209,6 +2209,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
+    public function isPaypalOnPdpEnabled()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/paypal_config/enable_paypal_on_pdp',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
     public function getPaypalClientId()
     {
         return $this->_scopeConfig->getValue(

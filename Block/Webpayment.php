@@ -171,8 +171,7 @@ class Webpayment extends Template
 
     public function getCurrency()
     {
-        $currency = $this->_cart->getQuote()->getQuoteCurrencyCode();
-        return $currency;
+        return $this->_cart->getQuote()->getQuoteCurrencyCode() ?? $this->_storeManager->getStore()->getCurrentCurrencyCode();
     }
     /**
      * Get All Items

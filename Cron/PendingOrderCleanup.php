@@ -6,6 +6,7 @@ namespace Sapient\Worldpay\Cron;
 
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Magento\Sales\Model\OrderFactory;
+use Sapient\Worldpay\Model\Payment\StateInterface;
 use Sapient\Worldpay\Model\WorldpaymentFactory;
 use Sapient\Worldpay\Model\Payment\Service as PaymentService;
 use Sapient\Worldpay\Model\Request\PaymentServiceRequest;
@@ -40,7 +41,7 @@ class PendingOrderCleanup
      * @var \Sapient\Worldpay\Model\Payment\Service
      */
     protected $paymentservice;
-      
+
     /**
      * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
      */
@@ -140,7 +141,7 @@ class PendingOrderCleanup
         $collection = $this->worldpaypayment->create()->getsentforAuthOrderCollection();
         return $collection;
     }
-    
+
     /**
      * Get Payment Details Xml For Order
      *
@@ -183,11 +184,12 @@ class PendingOrderCleanup
             $paymentModel = $this->worldpaypayment->create()->loadByWorldpayOrderId($orderId);
             //$isRedirectOrder = $paymentModel->getPaymentModel();
             $wpPaymentStatus = $paymentModel->getPaymentStatus();
-            if ($wpPaymentStatus == \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION) {
+            if ($wpPaymentStatus == StateInterface::STATUS_SENT_FOR_AUTHORISATION ||
+                $wpPaymentStatus == StateInterface::STATUS_WAITING_FOR_SHOPPER) {
                 try {
                     $paymentModel->setData(
                         'payment_status',
-                        \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_CANCELLED
+                        StateInterface::STATUS_CANCELLED
                     );
                     if ($paymentModel->save()) {
                         $this->updateOrderCancel($paymentModel->getOrderId());

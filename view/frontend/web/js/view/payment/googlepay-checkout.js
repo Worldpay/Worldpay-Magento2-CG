@@ -238,7 +238,6 @@ define([
                     checkoutUtils.setPaymentInformationAndPlaceOrder(checkoutData);
                 }
             }).catch(function(err) {
-                // show error in developer console for debugging
                 console.error("Gpay Init Error:",err);
                 return false;
             });

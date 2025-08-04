@@ -49,6 +49,7 @@ $cusToken = 'Bearer ' . $block->getCustomerToken();
     window.jwtEventUrl = '<?= /* @noEscape */ $block->getJwtEventUrl() ?>';
     window.isCheckoutCartPage = '<?= /* @noEscape */ $block->isCheckoutCartPage(); ?>';
     var envMode = '<?= /* @noEscape */ $block->getEnvMode() ?>';
+    window.currency = '<?= /* @noEscape */ $block->getCurrency() ?>';
 
     if(envMode == 'Test Mode') {
         document.cookie = "envMode=Test Mode; path=/";

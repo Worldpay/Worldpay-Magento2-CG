@@ -6,6 +6,9 @@
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Sapient_Worldpay::css/product_view.css" />
+    </head>
     <body>
         <referenceContainer name="product.info.options.wrapper">
             <block class="Sapient\Worldpay\Block\Catalog\Product\SubscriptionPlans"
@@ -28,29 +31,32 @@
         </referenceContainer>
 
         <referenceBlock name="product.info.addtocart">
-              <action method="setTemplate">
-                    <argument name="template" xsi:type="string">Sapient_Worldpay::catalog/product/view/addtocart.phtml</argument>
-                </action>
-             <block name="product.info.addtocart.wallets" class="Sapient\Worldpay\Block\Wallets"
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Sapient_Worldpay::catalog/product/view/addtocart.phtml</argument>
+            </action>
+            <block name="product.info.addtocart.wallets" class="Sapient\Worldpay\Block\Wallets"
                    template="Sapient_Worldpay::wallets.phtml" before="-" ifconfig="worldpay/general_config/enable_worldpay">
                 <arguments>
                     <argument name="jsLayout" xsi:type="array">
                         <item name="components" xsi:type="array">
                             <item name="wp-wallet-pay" xsi:type="array">
                                 <item name="component" xsi:type="string">Sapient_Worldpay/js/view/wallet-pay</item>
-                                 <item name="config" xsi:type="array">
-                                     <item name="template" xsi:type="string">Sapient_Worldpay/wallets/checkout</item>
-                                 </item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">Sapient_Worldpay/wallets/checkout</item>
+                                </item>
                             </item>
                         </item>
                     </argument>
                 </arguments>
                 <block name="product.info.addtocart.googlepay" class="Sapient\Worldpay\Block\GooglePay\Button"
-                   template="Sapient_Worldpay::wallets/googlepay.phtml" before="-">
-                 </block>
-                 <block name="product.info.addtocart.applepay" class="Sapient\Worldpay\Block\ApplePay\Button"
-                   template="Sapient_Worldpay::wallets/applepay.phtml" before="-">
-                 </block>
+                       template="Sapient_Worldpay::wallets/googlepay.phtml" before="-">
+                </block>
+                <block name="product.info.addtocart.paypal" class="Sapient\Worldpay\Block\Paypal\Button"
+                       template="Sapient_Worldpay::wallets/paypal.phtml" before="-">
+                </block>
+                <block name="product.info.addtocart.applepay" class="Sapient\Worldpay\Block\ApplePay\Button"
+                       template="Sapient_Worldpay::wallets/applepay.phtml" before="-">
+                </block>
             </block>
             <block name="product.info.addtocart.instantPurchase" class="Sapient\Worldpay\Block\InstantPurchase\Button"
                    template="Magento_InstantPurchase::button.phtml" after="product.info.addtocart.wallets">
@@ -69,29 +75,32 @@
             </block>
         </referenceBlock>
         <referenceBlock name="product.info.addtocart.additional">
-                <action method="setTemplate">
-                    <argument name="template" xsi:type="string">Sapient_Worldpay::catalog/product/view/addtocart.phtml</argument>
-                </action>
-               <block name="product.info.addtocart.wallets.additional" class="Sapient\Worldpay\Block\Wallets"
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Sapient_Worldpay::catalog/product/view/addtocart.phtml</argument>
+            </action>
+            <block name="product.info.addtocart.wallets.additional" class="Sapient\Worldpay\Block\Wallets"
                    template="Sapient_Worldpay::wallets.phtml" before="-" ifconfig="worldpay/general_config/enable_worldpay">
                 <arguments>
                     <argument name="jsLayout" xsi:type="array">
                         <item name="components" xsi:type="array">
                             <item name="wp-wallet-pay" xsi:type="array">
                                 <item name="component" xsi:type="string">Sapient_Worldpay/js/view/wallet-pay</item>
-                                 <item name="config" xsi:type="array">
-                                     <item name="template" xsi:type="string">Sapient_Worldpay/wallets/checkout</item>
-                                 </item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">Sapient_Worldpay/wallets/checkout</item>
+                                </item>
                             </item>
                         </item>
                     </argument>
                 </arguments>
                 <block name="product.info.addtocart.googlepay.additional" class="Sapient\Worldpay\Block\GooglePay\Button"
-                   template="Sapient_Worldpay::wallets/googlepay.phtml" before="-">
-                 </block>
-                 <block name="product.info.addtocart.applepay.additional" class="Sapient\Worldpay\Block\ApplePay\Button"
-                   template="Sapient_Worldpay::wallets/applepay.phtml" before="-">
-                 </block>
+                       template="Sapient_Worldpay::wallets/googlepay.phtml" before="-">
+                </block>
+                <block name="product.info.addtocart.applepay.additional" class="Sapient\Worldpay\Block\ApplePay\Button"
+                       template="Sapient_Worldpay::wallets/applepay.phtml" before="-">
+                </block>
+                <block name="product.info.addtocart.paypal.additional" class="Sapient\Worldpay\Block\Paypal\Button"
+                       template="Sapient_Worldpay::wallets/paypal.phtml" before="-">
+                </block>
             </block>
             <block name="product.info.addtocart.instantPurchase.additional" class="Sapient\Worldpay\Block\InstantPurchase\Button"
                    template="Magento_InstantPurchase::button.phtml" after="product.info.addtocart.wallets.additional">

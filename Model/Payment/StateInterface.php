@@ -93,6 +93,7 @@ interface StateInterface
      * @var STATUS_VOIDED
      */
     public const STATUS_VOIDED = 'VOIDED';
+    public const STATUS_WAITING_FOR_SHOPPER = 'WAITING_FOR_SHOPPER';
 
     /**
      * Get getPaymentStatus
