@@ -12,6 +12,9 @@
         <job name="recurring_order_transactions" instance="Sapient\Worldpay\Cron\RecurringOrders" method="execute">
             <schedule>* * * * *</schedule>
         </job>
+        <job name="worldpay_authorised_order_emails" instance="Sapient\Worldpay\Cron\SendAuthorisedOrderEmails" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
     </group>
     <group id="worldpay_paybylink">
         <job name="paybylink_orders" instance="Sapient\Worldpay\Cron\PayByLinkOrders" method="execute">
