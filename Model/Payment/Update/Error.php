@@ -4,6 +4,7 @@
  */
 namespace Sapient\Worldpay\Model\Payment\Update;
 
+use Sapient\Worldpay\Model\Payment\StateInterface;
 use \Sapient\Worldpay\Model\Payment\UpdateInterface;
 
 class Error extends \Sapient\Worldpay\Model\Payment\Update\Base implements UpdateInterface
@@ -60,7 +61,8 @@ class Error extends \Sapient\Worldpay\Model\Payment\Update\Base implements Updat
     protected function _getAllowedPaymentStatuses()
     {
         return [
-            \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION
+            StateInterface::STATUS_SENT_FOR_AUTHORISATION,
+            StateInterface::STATUS_WAITING_FOR_SHOPPER
         ];
     }
 }

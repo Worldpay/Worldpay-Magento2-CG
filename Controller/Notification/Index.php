@@ -134,7 +134,6 @@ class Index extends \Magento\Framework\App\Action\Action
                 $this->_applyTokenUpdate($xmlRequest);
                 return $this->_returnOk();
             } else {
-
                 $this->wplogger->error('Not a valid xml');
             }
         } catch (Exception $e) {
