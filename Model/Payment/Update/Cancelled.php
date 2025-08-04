@@ -4,6 +4,7 @@
  */
 namespace Sapient\Worldpay\Model\Payment\Update;
 
+use Sapient\Worldpay\Model\Payment\StateInterface;
 use \Sapient\Worldpay\Model\Payment\UpdateInterface;
 
 class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements UpdateInterface
@@ -45,7 +46,7 @@ class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements U
                 $isRedirectOrder = $worldPayPayment->getData('payment_model');
                 $wpPaymentStatus = $worldPayPayment->getData('payment_status');
                 if ($isRedirectOrder &&
-                $wpPaymentStatus == \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION) {
+                $wpPaymentStatus == StateInterface::STATUS_SENT_FOR_AUTHORISATION) {
                     $order->cancel()->save();
                     $this->_worldPayPayment->updateWorldPayPayment($this->_paymentState);
                     return;
@@ -65,9 +66,10 @@ class Cancelled extends \Sapient\Worldpay\Model\Payment\Update\Base implements U
     protected function _getAllowedPaymentStatuses()
     {
         return [
-            \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION,
-            \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_AUTHORISED,
-            \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_CAPTURED
+            StateInterface::STATUS_SENT_FOR_AUTHORISATION,
+            StateInterface::STATUS_AUTHORISED,
+            StateInterface::STATUS_CAPTURED,
+            StateInterface::STATUS_WAITING_FOR_SHOPPER,
         ];
     }
 }

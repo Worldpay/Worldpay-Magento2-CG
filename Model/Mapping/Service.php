@@ -265,6 +265,7 @@ class Service
         ];
 
         $telephoneNumber = $quote->getBillingAddress()->getTelephone();
+
         return [
                 'orderCode' => $orderCode,
                 'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),

@@ -1,0 +1,11 @@
+.wp-paypal-modal-footer{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+#paypal-button-real{
+    margin-top: 5px;
+    width: 150px;
+}

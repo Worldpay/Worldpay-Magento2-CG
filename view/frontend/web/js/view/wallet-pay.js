@@ -25,26 +25,25 @@ define([
     'Sapient_Worldpay/js/model/checkout-utils',
     'Sapient_Worldpay/js/model/region-updator',
     'Sapient_Worldpay/js/model/apple-pay',
-    'mage/validation'
-], function (ko, $, _, Component, confirm, customerData, url, mageTemplate, $t,idsResolver, productInfoResolver,customer,storage,modal,addressList,priceUtils,totalsegmentsTemplate,pdpCartTemplate,GooglePayModel,checkoutUtils,RegionUpdater,ApplePayModel) {
+    'Sapient_Worldpay/js/model/paypal-pdp'
+], function (ko, $, _, Component, confirm, customerData, url, mageTemplate, $t,idsResolver, productInfoResolver,customer,storage,modal,addressList,priceUtils,totalsegmentsTemplate,pdpCartTemplate, GooglePayModel,checkoutUtils,RegionUpdater,ApplePayModel, PaypalModel) {
     'use strict';
 
     var appleResponse = "";
     var debug = true;
 
-     return Component.extend({
+    return Component.extend({
         defaults: {
             buttonText: $t('Google Pay'),
             googlepayOptions:{
                 container : 'wp-google-pay-btn',
                 baseRequest : {
-                     apiVersion: 2,
-                     apiVersionMinor: 0
-                 }
+                    apiVersion: 2,
+                    apiVersionMinor: 0
+                }
             },
 
             productFormSelector: '#product_addtocart_form'
-
         },
         priceFormat :{
             decimalSymbol: ".",
@@ -66,15 +65,16 @@ define([
         customerData : null,
         currentQuoteid : null,
         currentQuoteMaskedId : null,
-        selectedShippingAddress : ko.observableArray([]),
+        selectedShippingAddress : ko.observable(null),
+        dropdownSelectionShippingAddress : ko.observable(null),
         selectedBillingAddress : ko.observableArray([]),
-        selectedShippingMethod : ko.observableArray([]),
+        selectedShippingMethod : ko.observable(null),
         availableShippingMethods : ko.observableArray([]),
         customeraddresses : ko.observableArray([]),
         isLoadingShippingMethod : ko.observable(false),
         grandtotal : ko.observable(0),
         grandtotalFormatted : ko.observable(0),
-        currencyCode : ko.observable('USD'),
+        currencyCode : ko.observable(window.currency),
         isLoadingCheckoutActions: ko.observable(false),
         totalsegments : ko.observable(),
         getPDPcartInfo: ko.observable(),
@@ -88,57 +88,54 @@ define([
         showNewBillingAddress : ko.observable(false),
         isAppleDevice : ko.observable(false),
         isUserActiveSession: ko.observable(false),
+        paymentType: ko.observableArray(false),
+        showNoShippingAddressError: ko.observable(false),
+        showNoShippingMethodError: ko.observable(false),
+        noCustomerAddresses: ko.observable(false),
         /** @inheritdoc */
         initialize: function () {
             this._super();
             window.walletpayObj = this;
             var self = this;
 
-            customerData.getInitCustomerData().done(function(){
-                self.customerData = customerData.get('customer')();
-                if(self.customerData.firstname){
-                    self.addGooglePayPurchaseBtn();
-                    self.addApplePayButton();
-                    self.isApplePayPurchase(false);
-                    self.isUserActiveSession(true);
-                }else{
-                    self.addGooglePayPurchaseBtn();
-                    self.addApplePayButton();
-                    self.isApplePayPurchase(false);
-                    self.isUserActiveSession(false);
+            var customerObservable = customerData.get('customer');
+
+            function handleCustomerData(customer) {
+                self.customerData = customer;
+                self.isUserActiveSession(!!self.customerData.firstname);
+                if (self.isUserActiveSession()) {
+                    $('#paypal-button-fake').show();
+                } else {
+                    $('#paypal-button-fake').hide();
                 }
+            }
+
+            const initialCustomer = customerObservable();
+            if(initialCustomer && typeof initialCustomer === 'object') {
+                handleCustomerData(initialCustomer);
+            }
+
+            customerObservable.subscribe(function (updatedCustomer) {
+                handleCustomerData(updatedCustomer);
             });
 
-            if(this.isUserLoggedIn()){
-                var existingCustomerDetails = customerData.get('customer')();
-                this.customeraddresses(existingCustomerDetails.customer_address);
-            }
+            self.addGooglePayPurchaseBtn();
+            self.addApplePayButton();
+            self.isApplePayPurchase(false);
+            PaypalModel.loadPaypalSdk(self.addtoCartAndInitCheckout);
+
             mageTemplate(totalsegmentsTemplate);
             mageTemplate(pdpCartTemplate);
             this.isBillingAddressSameAsShipping(true);
             this.isRequiredShipping.subscribe(function(isrequired){
                 if(isrequired == false){
-                    // do not need shipping and billing address checkbox
                     self.isBillingAddressSameAsShipping(false);
                 }
             })
 
-
-            $("#worldpay-add-plan").on('click',function(){
-                if($('#worldpay-add-plan').is(":checked")){
-                    $("#wp-wallet-pay").hide();
-                }else{
-                    $("#wp-wallet-pay").show();
-                }
-            })
-        },
-        countriesHtml : function(){
-            var self = this;
-            return self.countriesHtml;
-        },
-        billingCountriesHtml : function(){
-            var self = this;
-            return self.billingCountryHtml;
+            $('#worldpay-add-plan').on('click', function() {
+                $('#wp-wallet-pay').toggle(!this.checked);
+            });
         },
         updateTotalSegments : function(segments){
             var self = this;
@@ -146,13 +143,16 @@ define([
             _.each(segments,function(val , key){
                 allsegments[key] = {
                     "title" : val.title,
-                    "value" : priceUtils.formatPrice(val.value, self.priceFormat),
+                    "value" : priceUtils.formatPrice(val.value, {
+                        ...self.priceFormat,
+                        pattern: "%s " + window.walletpayObj.currencyCode()
+                    }),
                 };
             });
             totalsTemplate = mageTemplate(totalsegmentsTemplate),
-            confirmData = {
-                segment :allsegments
-            }
+                confirmData = {
+                    segment :allsegments
+                }
             this.totalsegments(totalsTemplate({
                 data: confirmData
             }));
@@ -170,9 +170,9 @@ define([
             });
             pdpCart = mageTemplate(pdpCartTemplate),
 
-            confirmData = {
-                segment :allsegments
-            }
+                confirmData = {
+                    segment :allsegments
+                }
             self.getPDPcartInfo(pdpCart({
                 data: confirmData
             }));
@@ -254,33 +254,13 @@ define([
                 $("body").trigger('processStop');
             });
         },
-        showNewAddressForm : function(){
+        preparePayment : async function(){
             var self = this;
-                $("#new-address-form").toggle();
-        },
-        showNewBillingAddressForm : function (){
-            var self= this;
-            if(self.showNewBillingAddress() == false){
-                self.showNewBillingAddress(true);
-            }else if(self.showNewBillingAddress() == true){
-                self.showNewBillingAddress(false);
-            }
-        },
-        sameAsShippingAddress : function(){
-            var self = window.walletpayObj;
-            if(self.isBillingAddressSameAsShipping() == false){
-                self.isBillingAddressSameAsShipping(true);
-            }else{
-                self.isBillingAddressSameAsShipping(false);
-            }
-            return true;
-        },
-        preparePayment : function(isApplePay){
-            if(window.walletpayObj.isApplePayPurchase()){
+            if(window.walletpayObj.paymentType() === 'applepay') {
                 if (window.ApplePaySession) {
                     window.walletpayObj.initApplePaySession();
                 }
-            }else{
+            } else if(window.walletpayObj.paymentType() === 'googlepay') {
                 var ginitData = {
                     "env_mode": window.walletpayObj.env_mode,
                     "currencyCode": window.walletpayObj.currencyCode(),
@@ -290,42 +270,66 @@ define([
                     "tokenizationSpecification": window.walletpayObj.googlepayOptions.tokenizationSpecification,
                     "totalPrice": window.walletpayObj.grandtotal()
                 }
-                GooglePayModel.initGooglePay(ginitData).then(function(paymentData){
-                    var checkoutData = {
-                        billingAddress :window.walletpayObj.selectedBillingAddress(),
-                        shippingAddress: window.walletpayObj.selectedShippingAddress(),
-                        shippingMethod: window.walletpayObj.selectedShippingMethod(),
-                        paymentDetails:{
-                            'method': "worldpay_wallets",
-                            'additional_data': {
-                                'cc_type': 'PAYWITHGOOGLE-SSL',
-                                'walletResponse' : JSON.stringify(paymentData),
-                                'dfReferenceId':  window.walletpayObj.sessionId,
-                                'browser_screenheight': window.screen.height,
-                                'browser_screenwidth': window.screen.width,
-                                'browser_colordepth': window.screen.colorDepth
-                            }
-                        },
-                        storecode :window.walletpayObj.store_code,
-                        quote_id : window.walletpayObj.currentQuoteid,
-                        guest_masked_quote_id: window.walletpayObj.currentQuoteMaskedId,
-                        isCustomerLoggedIn : window.walletpayObj.isUserLoggedIn(),
-                        isRequiredShipping : window.walletpayObj.isRequiredShipping()
-                    }
 
-                    if(window.walletpayObj.isUserLoggedIn()){
-                        window.walletpayObj.selectedBillingAddress().email = window.walletpayObj.customerDetails.email;
-                    }else{
-                        window.walletpayObj.selectedBillingAddress().email = paymentData.email;
-                    }
+                GooglePayModel.initGooglePay(ginitData).then(function(paymentData){
+                    var checkoutData = self.getCheckoutData(paymentData);
+
+                    window.walletpayObj.selectedBillingAddress().email = window.walletpayObj.isUserLoggedIn()
+                        ? window.walletpayObj.customerDetails.email
+                        : paymentData.email;
+
                     checkoutUtils.placeorder(checkoutData);
                 }).catch(function(err) {
-                    // show error in developer console for debugging
                     console.error("Gpay Init Error:",err);
                     return false;
                 });
+            } else if(window.walletpayObj.paymentType() === 'paypal') {
+                var checkoutData = self.getCheckoutData('');
+
+                try {
+                    var data = await checkoutUtils.placeorder(checkoutData);
+                    return data;
+                } catch (error) {
+                    console.error('Error during PayPal payment preparation:', error);
+                }
             }
         },
+
+        getCheckoutData : function(paymentData){
+            let paymentDetails = {
+                'method': null,
+                'additional_data': {
+                    'cc_type': null,
+                    'walletResponse': JSON.stringify(paymentData),
+                    'dfReferenceId': window.walletpayObj.sessionId,
+                    'browser_screenheight': window.screen.height,
+                    'browser_screenwidth': window.screen.width,
+                    'browser_colordepth': window.screen.colorDepth
+                }
+            };
+
+            if (window.walletpayObj.paymentType() === 'paypal') {
+                paymentDetails.method = 'worldpay_apm';
+                paymentDetails.additional_data.cc_type = 'PAYPAL-SSL';
+                paymentDetails.additional_data.paypal_smart = true;
+            } else if (window.walletpayObj.paymentType() === 'googlepay') {
+                paymentDetails.method = 'worldpay_wallets';
+                paymentDetails.additional_data.cc_type = 'PAYWITHGOOGLE-SSL';
+            }
+
+            return {
+                billingAddress :window.walletpayObj.selectedBillingAddress(),
+                shippingAddress: window.walletpayObj.selectedShippingAddress(),
+                shippingMethod: window.walletpayObj.selectedShippingMethod(),
+                paymentDetails: paymentDetails,
+                storecode :window.walletpayObj.store_code,
+                quote_id : window.walletpayObj.currentQuoteid,
+                guest_masked_quote_id: window.walletpayObj.currentQuoteMaskedId,
+                isCustomerLoggedIn : window.walletpayObj.isUserLoggedIn(),
+                isRequiredShipping : window.walletpayObj.isRequiredShipping()
+            }
+        },
+
         getBillingAddress : function(){
             var self = this,selectedAddress = {},customerDataAddress;
             if(self.isUserLoggedIn()){
@@ -357,9 +361,15 @@ define([
         getShippingAddress : function(){
             var self = this,selectedAddress = {},customerDataAddress;
             if(self.isUserLoggedIn()){
-                customerDataAddress = customerData.get('customer')();
-                window.walletpayObj.customerData = customerDataAddress;
-                window.walletpayObj.customeraddresses(customerDataAddress.customer_address);
+                customerData.reload(['customer'], true).done(function () {
+                    customerDataAddress = customerData.get('customer')();
+                    window.walletpayObj.customerData = customerDataAddress;
+                    window.walletpayObj.customeraddresses(customerDataAddress.customer_address);
+                    if(window.walletpayObj.customeraddresses().length === 0){
+                        window.walletpayObj.noCustomerAddresses(true);
+                    }
+                });
+
                 if(typeof window.walletpayObj.customerData.customer_address !=='undefined'){
                     addressList = window.walletpayObj.customerData.customer_address;
                     _.each(addressList,function(address){
@@ -376,6 +386,7 @@ define([
                             if(typeof address.region.region!='undefined'){
                                 selectedAddress.region= address.region.region;
                             }
+                            window.walletpayObj.selectedShippingAddress(selectedAddress);
                         }
                     });
                 }
@@ -395,111 +406,7 @@ define([
             self.updateTotals(shippingMethod);
             self.fetchShippingByAddress(shippingAddress);
         },
-        setBillingAddressFromExistingAddress : function(address){
-            var self = this,selectedAddress={};
-            if(typeof address.firstname!='undefined'){
-                selectedAddress.firstname = address.firstname;
-            }
-            if(typeof address.lastname!='undefined'){
-                selectedAddress.lastname = address.lastname;
-            }
-            if(typeof address.street!='undefined'){
-                selectedAddress.street = address.street;
-            }
-            if(typeof address.city!='undefined'){
-                selectedAddress.city = address.city;
-            }
-            if(typeof address.region_id!='undefined'){
-                selectedAddress.region_id = address.region_id;
-            }
-            if(typeof address.country_id!='undefined'){
-                selectedAddress.country_id = address.country_id;
-            }
-            if(typeof address.postcode!='undefined'){
-                selectedAddress.postcode = address.postcode;
-            }
-            if(typeof address.telephone!='undefined'){
-                selectedAddress.telephone = address.telephone;
-            }
-            if(typeof address.save_in_address_book!='undefined'){
-                selectedAddress.save_in_address_book = address.save_in_address_book;
-            }
-            if(typeof address.region!=='undefined' && address.region!==null){
-                if(typeof address.region.region!='undefined'){
-                    selectedAddress.region= address.region.region;
-                }
-            }
-            window.walletpayObj.selectedBillingAddress(selectedAddress);
-            if(!window.walletpayObj.isRequiredShipping()){
-                window.walletpayObj.fetchTotals(selectedAddress,{});
-            }
-        },
-        fetchDefaultShippingRates: function(){
-            var selectedAddress = {
-                'firstname': '',
-                'lastname': '',
-                'street': [],
-                'city': '',
-                'region_id': 0,
-                'postcode': '',
-                'country_id': window.walletpayObj.default_country_code,
-            }
-            var payload = {
-                address : selectedAddress
-            };
-            if(!window.walletpayObj.currentQuoteid){
-                return false;
-            }
-            if(!window.walletpayObj.isUserActiveSession()){
-                if(!window.walletpayObj.currentQuoteMaskedId){
-                    return false;
-                }
-            }
-            var checkoutObj = {
-                isCustomerLoggedIn : window.walletpayObj.isUserLoggedIn(),
-                store_code : window.walletpayObj.storeCode,
-                guest_masked_quote_id : window.walletpayObj.currentQuoteMaskedId,
-                payload : payload
-            }
-            window.walletpayObj.isLoadingShippingMethod(true);
-            checkoutUtils.fetchShippingRates(
-                checkoutObj
-            ).done(
-                function (apiresponse) {
-                    var response = (apiresponse);
-                    var shippingMethodList = [];
-                    if(response.length){
-                        _.each(response,function(value){
-                            var titledesc = priceUtils.formatPrice(value.amount, window.walletpayObj.priceFormat)+' '+value.carrier_title+' - '+ value.method_title;
-                            shippingMethodList.push({
-                                "id": value.carrier_code+'_'+value.method_code,
-                                "description": titledesc,
-                                "amount": value.amount,
-                                "carrier_code": value.carrier_code,
-                                "carrier_title": value.carrier_title,
-                                "method_code": value.method_code,
-                                "method_title": value.method_title,
-                            });
-                        })
-                        if(typeof selectedAddress.region_id=='undefined'){
-                            selectedAddress.region_id = 0;
-                        }
-                        if(selectedAddress.region_id==''){
-                            selectedAddress.region_id = 0;
-                        }
 
-                        $.localStorage.set('wp-default-shipping-method', shippingMethodList);
-                        $.localStorage.set('wp-default-shipping-address', selectedAddress);
-
-                    }
-                }
-            ).fail(
-                function (response) {
-                    console.log("Error:", response);
-                    window.walletpayObj.isLoadingShippingMethod(false);
-                }
-            )
-        },
         fetchRatesByDynamicAddress : function(address,callback){
             var self = this,apiUrl=null,selectedAddress={};
             if(typeof address.firstname!='undefined'){
@@ -585,7 +492,7 @@ define([
             )
         },
         fetchShippingByAddress : function(address){
-            var self = this,apiUrl=null,selectedAddress={};
+            var selectedAddress={};
             if(typeof address.firstname!='undefined'){
                 selectedAddress.firstname = address.firstname;
             }
@@ -640,10 +547,9 @@ define([
                 checkoutObj
             ).done(
                 function (apiresponse) {
-                    var response = (apiresponse);
                     var shippingMethodList = [];
-                    if(response.length){
-                        _.each(response,function(value){
+                    if(apiresponse.length){
+                        _.each(apiresponse,function(value){
                             var titledesc = priceUtils.formatPrice(value.amount, window.walletpayObj.priceFormat)+' '+value.carrier_title+' - '+ value.method_title;
                             shippingMethodList.push({
                                 "id": value.carrier_code+'_'+value.method_code,
@@ -745,37 +651,26 @@ define([
         },
         initCheckout : function(){
             var self = this;
-            var gpayButtontext = self.googlepayOptions.gpay_button_popup_text;
-            var applepayButtontext = self.applepayOptions.applePayPopUpButtonText;
-            if(gpayButtontext == ''){
-                gpayButtontext = $.mage.__('Place Order with GooglePay');
-            }
-            if(applepayButtontext == ''){
-                applepayButtontext = $.mage.__('Place Order with ApplePay');
-            }
-
             var popupButtons = [];
-            // googlepay button if enabled
-            if(self.googlepayOptions.isgooglepayenabledonpdp && self.isApplePayPurchase() == false){
+
+            if(self.googlepayOptions.isgooglepayenabledonpdp && self.paymentType() == 'googlepay'){
                 popupButtons.push({
-                    text: gpayButtontext,
+                    text: self.googlepayOptions.gpay_button_popup_text || $.mage.__('Place Order with GooglePay'),
                     class: 'place-order-gpay',
                     click: function () {
-                        self.preparePayment(false);
+                        self.preparePayment();
                     }
                 });
             }
-            // applepay button if enabled
-            if(self.applepayOptions.isApplePayEnableonPdp && (self.isApplePayPurchase() == true)){
+            if(self.applepayOptions.isApplePayEnableonPdp && self.paymentType() == 'applepay'){
                 popupButtons.push({
-                    text: applepayButtontext,
+                    text: self.applepayOptions.applePayPopUpButtonText || $.mage.__('Place Order with ApplePay'),
                     class: 'place-order-applepay',
                     click: function () {
-                        self.preparePayment(true);
+                        self.preparePayment();
                     }
                 });
             }
-            // cancel button on popup
             popupButtons.push({
                 text: $.mage.__('Cancel'),
                 class: 'cancel-gpay',
@@ -808,36 +703,28 @@ define([
                     $(".action-close").hide();
                     if(self.isUserLoggedIn()){
                         var shippingAddress = self.getShippingAddress();
-                        //var BillingAddress = self.getShippingAddress();
                         if(shippingAddress){
-                            var shippingMethod = self.fetchShippingByAddress(shippingAddress);
+                            self.fetchShippingByAddress(shippingAddress);
                         }
                     }else{
                         var guestShippingAddress = {
                             country_id: window.walletpayObj.default_country_code,
                         }
-                        var shippingMethod = self.fetchShippingByAddress(guestShippingAddress);
+                        self.fetchShippingByAddress(guestShippingAddress);
                     }
                 }
             };
-                let gpayCheckoutPopup = $('.gpay-checkout-popup');
-                let gpayPopup = modal(options, gpayCheckoutPopup);
-                gpayCheckoutPopup.modal('openModal');
-                self.countriesDropDown(self.countriesHtml);
-                self.BillingCountriesDropDown(self.billingCountriesHtml);
+
+            modal(options, $('.gpay-checkout-popup'));
+            $('.gpay-checkout-popup').modal('openModal');
+
+            if(window.walletpayObj.paymentType() === 'paypal') {
+                $('.wp-wallets-pay-modal').find('.modal-footer').append('<div id="paypal-button-real"></div>').addClass('wp-paypal-modal-footer');
+                PaypalModel.triggerRealPaypal(() => self.preparePayment());
+            }
         },
         isUserLoggedIn : function(){
-
             return this.isUserActiveSession();
-           /* var self=this,customer = customerData.get('customer')();
-            if (customer.fullname && customer.firstname)
-            {
-                return true;
-            }
-            if(typeof self.customerDetails.email !='undefined'){
-                return true;
-            }
-            return false;*/
         },
         isValidJson : function(jsonString){
             var json = null;
@@ -871,22 +758,19 @@ define([
         },
         addtocartFormData : function(){
             var self = this,
-            form = $(window.walletpayObj.productFormSelector),
-            productIds = idsResolver(form),
-            productInfo = productInfoResolver(form);
+                form = $(window.walletpayObj.productFormSelector),
+                productIds = idsResolver(form),
+                productInfo = productInfoResolver(form);
             return{
                 'form' : form,
                 'productIds': productIds,
                 'productInfo': productInfo
             }
         },
-        isEnableRestoreCart : function(){
-            return false;
-        },
-        addtoCartAndInitCheckout : function(){
-            var self = this,
-                addTocartFormData = window.walletpayObj.addtocartFormData(),
-                triggerCheckout = false;
+        addtoCartAndInitCheckout : function(paymentType){
+            var addTocartFormData = window.walletpayObj.addtocartFormData();
+            var triggerCheckout = false;
+            window.walletpayObj.paymentType(paymentType);
 
             if (!(addTocartFormData.form.validation() && addTocartFormData.form.validation('isValid'))) {
                 return;
@@ -950,50 +834,48 @@ define([
 
                     var showMiniCheckout = false;
                     var currentItemId = formData.get('item');
-                        cart.subscribe(function (changedCart) {
-                            if(triggerCheckout == true){
-                                 $("body").trigger('processStop');
-                                count = changedCart.summary_count;
-                                if(count > 0){
-                                    window.walletpayObj.isCartContainVirtualProduct(changedCart.items,currentItemId);
-                                    window.walletpayObj.currentQuoteid =changedCart.quote_id;
-                                    window.walletpayObj.currentQuoteMaskedId =changedCart.quote_masked_id;
-                                    window.walletpayObj.initCheckout();
-                                    window.walletpayObj.grandtotal(changedCart.subtotalAmount);
-                                    window.walletpayObj.grandtotalFormatted(priceUtils.formatPrice(changedCart.subtotalAmount, window.walletpayObj.priceFormat));
-                                    window.walletpayObj.updateTotalSegments( {
+                    cart.subscribe(function (changedCart) {
+                        if(triggerCheckout == true){
+                            $("body").trigger('processStop');
+                            count = changedCart.summary_count;
+                            if(count > 0){
+                                window.walletpayObj.isCartContainVirtualProduct(changedCart.items,currentItemId);
+                                window.walletpayObj.currentQuoteid =changedCart.quote_id;
+                                window.walletpayObj.currentQuoteMaskedId =changedCart.quote_masked_id;
+                                window.walletpayObj.initCheckout();
+                                window.walletpayObj.grandtotal(changedCart.subtotalAmount);
+                                window.walletpayObj.grandtotalFormatted(priceUtils.formatPrice(changedCart.subtotalAmount, window.walletpayObj.priceFormat));
+                                window.walletpayObj.updateTotalSegments( {
 
-                                        subtotal : {
-                                            "title" : 'Subtotal',
-                                            "value" : changedCart.subtotalAmount
-                                        },
-                                        grandtotal:{
-                                            "title" : 'Grand Total',
-                                            "value" : changedCart.subtotalAmount
-                                        }
-                                    });
-                                    window.walletpayObj.fetchDefaultShippingRates();
+                                    subtotal : {
+                                        "title" : 'Subtotal',
+                                        "value" : changedCart.subtotalAmount
+                                    },
+                                    grandtotal:{
+                                        "title" : 'Grand Total',
+                                        "value" : changedCart.subtotalAmount
+                                    }
+                                });
 
-                                    var productInfo ={};
-                                    _.each(changedCart.items,function(value,key){
-                                        productInfo.name = value.product_name;
-                                        productInfo.options = value.options;
-                                        productInfo.image = value.product_image.src;
-                                        productInfo.subtotal = changedCart.subtotal;
+                                var productInfo ={};
+                                _.each(changedCart.items,function(value,key){
+                                    productInfo.name = value.product_name;
+                                    productInfo.options = value.options;
+                                    productInfo.image = value.product_image.src;
+                                    productInfo.subtotal = changedCart.subtotal;
 
-                                    });
+                                });
 
-
-                                     /** PDP segments **/
-                                     window.walletpayObj.updatePdpCartSegments(
-                                        {
-                                            productInfo : productInfo
-                                        }
-                                    )
-                                }
-                                triggerCheckout = false;
-                             }
-                        });
+                                /** PDP segments **/
+                                window.walletpayObj.updatePdpCartSegments(
+                                    {
+                                        productInfo : productInfo
+                                    }
+                                )
+                            }
+                            triggerCheckout = false;
+                        }
+                    });
 
                 },
                 /** @inheritdoc */
@@ -1037,11 +919,9 @@ define([
         addtoCartandInitApplePay : function(){
             var self = this;
             self.isApplePayPurchase(true);
-            self.addtoCartAndInitCheckout();
+            self.addtoCartAndInitCheckout('applepay');
         },
         initApplePaySession : function() {
-            var self= this;
-            var cartData = customerData.get('cart');
             //var baseGrandTotal   = cartData().subtotalAmount;
             var baseGrandTotal = window.walletpayObj.grandtotal();
             var runningAmount = (Math.round(baseGrandTotal * 100) / 100).toFixed(2);
@@ -1049,7 +929,7 @@ define([
             var currencyCode = window.walletpayObj.currencyCode();
             var countryCode = window.walletpayObj.selectedBillingAddress().country_id
             if(window.walletpayObj.isRequiredShipping()) {
-            var countryCode = window.walletpayObj.selectedShippingAddress().country_id;
+                var countryCode = window.walletpayObj.selectedShippingAddress().country_id;
             }
             var paymentRequest = {
                 currencyCode: currencyCode,
@@ -1070,10 +950,10 @@ define([
             return new Promise(function(resolve, reject) {
                 var appleResponse = paymentToken;
                 if ( debug == true )
-                resolve(true);
+                    resolve(true);
                 else
-                reject;
-                });
+                    reject;
+            });
         },
         // Perform Validation
         applePayPerformValidation:  function (valURL) {
@@ -1081,10 +961,9 @@ define([
                 var xhr = new XMLHttpRequest();
                 xhr.onload = function() {
                     var finaldata = this.responseText.slice(1, -1);
-                    var finaldata = finaldata.replace(/\\/g, '');
+                    finaldata = finaldata.replace(/\\/g, '');
 
-                    var data = JSON.parse(finaldata);
-                    resolve(data);
+                    resolve(JSON.parse(finaldata));
                 };
                 xhr.onerror = reject;
                 var linkUrl = url.build('worldpay/applepay/index?u=');
@@ -1104,9 +983,24 @@ define([
                     }
                 });
                 self.isAppleDevice(true);
-
-
             }
+        },
+
+        onAddressChange: function() {
+            var selectedAddress = this.dropdownSelectionShippingAddress();
+            if (!selectedAddress) {
+                window.walletpayObj.availableShippingMethods([]);
+                window.walletpayObj.selectedShippingAddress(null);
+                window.walletpayObj.selectedShippingMethod(null);
+            } else {
+                selectedAddress.region = selectedAddress.region?.region || selectedAddress.region;
+                this.fetchShippingByAddress(selectedAddress);
+            }
+        },
+
+        onShippingMethodChange: function(shippingMethod) {
+            this.updateTotals(shippingMethod);
         }
     });
 });
+

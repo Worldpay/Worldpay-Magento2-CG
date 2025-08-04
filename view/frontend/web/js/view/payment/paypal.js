@@ -26,8 +26,6 @@ define(
             },
 
             loadPaypalSdk: function() {
-                var self = this;
-
                 if(!window.paypal) {
                     const script = document.createElement('script');
                     var currency = quote.totals().quote_currency_code;

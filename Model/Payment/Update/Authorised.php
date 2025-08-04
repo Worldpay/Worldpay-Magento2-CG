@@ -5,6 +5,7 @@
 namespace Sapient\Worldpay\Model\Payment\Update;
 
 use Sapient\Worldpay\Helper\ProductOnDemand;
+use Sapient\Worldpay\Model\Payment\StateInterface;
 use \Sapient\Worldpay\Model\Payment\UpdateInterface;
 
 class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements UpdateInterface
@@ -88,7 +89,7 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
         $payment->setTransactionId(time());
         $payment->setIsTransactionClosed(0);
         if (!empty($order) &&
-        ($order->getPaymentStatus() == \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION)
+        ($order->getPaymentStatus() == StateInterface::STATUS_SENT_FOR_AUTHORISATION)
         ) {
             $currencycode = $this->_paymentState->getCurrency();
             $currencysymbol = $this->_configHelper->getCurrencySymbol($currencycode);
@@ -116,27 +117,20 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
      */
     private function _getAllowedPaymentStatuses(\Sapient\Worldpay\Model\Order $order)
     {
-        if ($this->_isDirectIntegrationMode($order)) {
-             return [
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION,
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_AUTHORISED
-             ];
-        }
-        if ($this->_isWalletIntegrationMode($order)) {
-             return [
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION,
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_AUTHORISED
-             ];
-        }
-        if ($this->_isACHIntegrationMode($order) || $this->_isSEPAIntegrationMode($order)) {
-              return [
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION,
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_AUTHORISED,
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_CAPTURED
-              ];
+        $allowedPaymentStatuses = [
+            StateInterface::STATUS_SENT_FOR_AUTHORISATION,
+            StateInterface::STATUS_WAITING_FOR_SHOPPER,
+        ];
+
+        if ($this->_isDirectIntegrationMode($order) || $this->_isWalletIntegrationMode($order)) {
+            array_push($allowedPaymentStatuses, StateInterface::STATUS_AUTHORISED);
         }
 
-        return [\Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION];
+        if ($this->_isACHIntegrationMode($order) || $this->_isSEPAIntegrationMode($order)) {
+            array_push($allowedPaymentStatuses, StateInterface::STATUS_AUTHORISED, StateInterface::STATUS_CAPTURED);
+        }
+
+        return $allowedPaymentStatuses;
     }
 
     /**
