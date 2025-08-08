@@ -52,6 +52,7 @@ $is3DsEnabled = /* @noEscape */ $block->is3DsEnabled();
 $jwtEventUrl = /* @noEscape */ $block->getJwtEventUrl();
 $isCheckoutCartPage = /* @noEscape */ $block->isCheckoutCartPage();;
 $envMode = /* @noEscape */ $block->getEnvMode();
+$currency = /* @noEscape */ $block->getCurrency();
 
 $scriptString = <<<script
     window.ChromepayButtonName = '$chromepayButtonName';
@@ -65,6 +66,7 @@ $scriptString = <<<script
     window.is3DsEnabled = '$is3DsEnabled';
     window.jwtEventUrl = '$jwtEventUrl';
     window.isCheckoutCartPage = '$isCheckoutCartPage';
+    window.currency = '$currency';
     var envMode = '$envMode';
 
     if(envMode == 'Test Mode') {

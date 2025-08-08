@@ -72,7 +72,6 @@ define([
                             defaultSelectedShipping.amount =  value.amount;
                         }
 
-
                     shippingMethodList.push({
                         "identifier": value.carrier_code+'_'+value.method_code,
                         "label": titledesc,
@@ -84,23 +83,19 @@ define([
                 shippingMethodListLS  =  shippingMethodList;
                  $.localStorage.set('wp-default-shipping-method',shippingMethodListLS); // set in localstorage
 
-
-
                  //var runningTotal = window.walletpayObj.grandtotal();
                 // var newTotal = { type: 'final', label: 'Order Total', amount: runningTotal };
                  //var newLineItems =[{type: 'final',label: subTotalDescr, amount: self.getCartSubtotal() }];
 
                  var explodedShippingMethod = defaultSelectedShipping.identifier.split("_");
-                
+
                  window.walletpayObj.selectedShippingMethod({
                     carrier_code : explodedShippingMethod[0],
                     method_code : explodedShippingMethod[1],
                 });
 
-
                 var newTotal = self.buildTotal(defaultSelectedShipping);
                 var newLineItems = self.buildLineItems(defaultSelectedShipping);
-
 
                 applepaySession.completeShippingContactSelection(
                     applepaySession.STATUS_SUCCESS,
@@ -136,11 +131,11 @@ define([
         },
         initApplePaySession: function(paymentRequest){
             var self = this;
-            customerData.reload(['customer'], false); // to reload Customer Data
+            customerData.reload(['customer'], false);
             if(typeof paymentRequest.countryCode == 'undefined'){
                 paymentRequest.countryCode = window.walletpayObj.default_country_code;
             }
-            
+
             if(window.walletpayObj.isRequiredShipping()){
                 paymentRequest.shippingMethods = self.getDefaultShippingMethods();
                 paymentRequest.requiredShippingContactFields = ["postalAddress","name","phone","email"];
@@ -150,7 +145,7 @@ define([
             paymentRequest.requiredBillingContactFields = ["postalAddress","name","phone","email"];
             paymentRequest.ApplePayContactField = ["name","email","phone","postalAddress"];
 
-            
+
             var session = new ApplePaySession(self.versionNumber, paymentRequest);
             var subTotalDescr      = "Cart Subtotal";
             // Merchant Validation
@@ -222,7 +217,7 @@ define([
                     billingContact.phoneNumber = event.payment.shippingContact.phoneNumber;
 
                     var selectedBillingaddress = self.formattedApplePayAddress(billingContact);
-                    window.walletpayObj.selectedBillingAddress(selectedBillingaddress); 
+                    window.walletpayObj.selectedBillingAddress(selectedBillingaddress);
 
                     if(window.walletpayObj.isUserLoggedIn()){
                         window.walletpayObj.selectedBillingAddress().email = window.walletpayObj.customerDetails.email;
@@ -230,7 +225,6 @@ define([
                         window.walletpayObj.selectedBillingAddress().email = event.payment.shippingContact.emailAddress;
                     }
                 }
-
 
                 var checkoutData = {
                     billingAddress :window.walletpayObj.selectedBillingAddress(),
@@ -303,7 +297,7 @@ define([
                                     "amount": value.amount
                                 });
                     }else{
-            
+
                         shippingMethodList.push({
                                     "identifier": value.identifier,
                                     "label": value.label,

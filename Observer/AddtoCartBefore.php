@@ -11,7 +11,7 @@ use Magento\Customer\Api\CustomerRepositoryInterface as CustomerRepository;
 
 class AddtoCartBefore implements ObserverInterface
 {
-   
+
     /**
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
      */
@@ -114,6 +114,7 @@ class AddtoCartBefore implements ObserverInterface
                     $activeQuote->setIsActive(0);
                     $this->quoteRepository->save($activeQuote);
                     if ($this->customerSession->getCustomerId()) {
+
                         $newQuoteID = $this->quoteManagement->createEmptyCartForCustomer(
                             $this->customerSession->getCustomerId()
                         );
@@ -121,13 +122,13 @@ class AddtoCartBefore implements ObserverInterface
                         $this->customerCart->setQuote($newQuote);
                         $this->wplogger->info("Set New Quote successfully");
                     } else {
-                        
+
                         $newQuoteID = $this->quoteManagement->createEmptyCart();
                         $newQuote = $this->quoteRepository->get($newQuoteID);
                         $this->customerCart->setQuote($newQuote);
                         $this->wplogger->info("Guest Quote : Set Quote successfully");
                     }
-                    
+
                 } catch (\Exception $e) {
                     $this->wplogger->info(__("Error while making cart Inactive"). $e->getMessage());
                 }

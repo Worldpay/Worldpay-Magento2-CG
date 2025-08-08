@@ -1,0 +1,8 @@
+<?php if ($block->isPaypalEnabledOnPdp()) { ?>
+    <div id="paypal-button-fake" style="width: 240px; display: none"></div>
+<?php } ?>
+
+<script type="text/javascript">
+    window.paypalClientId = '<?= $block->getPaypalClientId(); ?>';
+</script>
+
