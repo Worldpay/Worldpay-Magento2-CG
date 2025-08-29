@@ -9,3 +9,18 @@
     margin-top: 5px;
     width: 150px;
 }
+
+#paypal-button-fake{
+    width: 240px;
+    display: none;
+}
+
+@media only screen and (max-width: 768px) {
+    #wp-google-pay-btn{
+        width: 100% !important;
+    }
+
+    #paypal-button-fake{
+        width: 100%;
+    }
+}

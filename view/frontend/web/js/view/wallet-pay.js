@@ -988,10 +988,10 @@ define([
 
         onAddressChange: function() {
             var selectedAddress = this.dropdownSelectionShippingAddress();
+            window.walletpayObj.selectedShippingMethod(null);
             if (!selectedAddress) {
                 window.walletpayObj.availableShippingMethods([]);
                 window.walletpayObj.selectedShippingAddress(null);
-                window.walletpayObj.selectedShippingMethod(null);
             } else {
                 selectedAddress.region = selectedAddress.region?.region || selectedAddress.region;
                 this.fetchShippingByAddress(selectedAddress);
