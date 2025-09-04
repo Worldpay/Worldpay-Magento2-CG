@@ -1,3 +1,5 @@
+<?php /** @var \Magento\Framework\Escaper $escaper */ ?>
+<?php /** @var \Sapient\Worldpay\Block\Edit $block */ ?>
 
 <?php $carddeatils = $block->getTokenData() ?>
 <form class="form form-edit-account"
@@ -7,9 +9,8 @@
         <?= /* @noEscape */ $block->getBlockHtml('formkey')?>
         <legend class="legend">
             <span>
-                <?= /* @noEscape */ $block->getAccountLabelbyCode('AC8') ?
-                        $block->getAccountLabelbyCode('AC8') :
-                        $escaper->escapeHtml(__('Card Information')) ?>
+                <?= /* @noEscape */ $block->getAccountLabelbyCode('AC8')
+                    ?: $escaper->escapeHtml(__('Card Information')) ?>
             </span></legend><br>
 
         <input type="hidden" name="token[id]" value="<?= /* @noEscape */ $carddeatils->getTokenCode() ?>" />
@@ -18,9 +19,8 @@
         <div class="field card Number">
             <label class="label" for="card number">
                 <span>
-                    <?= /* @noEscape */ $block->getAccountLabelbyCode('AC3') ?
-                            $block->getAccountLabelbyCode('AC3') :
-                            $escaper->escapeHtml(__('Card Number')) ?>
+                    <?= /* @noEscape */ $block->getAccountLabelbyCode('AC3')
+                        ?: $escaper->escapeHtml(__('Card Number')) ?>
                 </span>
             </label>
             <div class="control">
@@ -31,17 +31,14 @@
         <div class="field card holder name">
             <label class="label" for="card holder name">
                 <span>
-                    <?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4') ?
-                            $block->getCheckoutLabelbyCode('CO4') :
-                            $escaper->escapeHtml(__('Card Holder Name')) ?>
+                    <?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4')
+                        ?: $escaper->escapeHtml(__('Card Holder Name')) ?>
                 </span>
             </label>
             <div class="control">
-                <input type="text" name="token[cardholder_name]" required='true' id="card-holder-name" 
+                <input type="text" name="token[cardholder_name]" required='true' id="card-holder-name"
                        title="<?= /* @noEscape */
-                        $block->getCheckoutLabelbyCode('CO4') ?
-                        $block->getCheckoutLabelbyCode('CO4') :
-                        $escaper->escapeHtml(__('Card Holder Name')) ?>"
+                    $block->getCheckoutLabelbyCode('CO4') ?: $escaper->escapeHtml(__('Card Holder Name')) ?>"
                 value="<?= /* @noEscape */ $escaper->escapeHtml($carddeatils->getCardholderName()) ?>"
                 class="input-text required cardholder_name worldpay-cardholdername-length">
             </div>
@@ -51,9 +48,7 @@
             <label class="label" for="card holder name">
                 <span>
                     <?= /* @noEscape */
-                    $block->getAccountLabelbyCode('AC10') ?
-                            $block->getAccountLabelbyCode('AC10') :
-                            $escaper->escapeHtml(__('Expiry Month/Year')) ?>
+                    $block->getAccountLabelbyCode('AC10') ?: $escaper->escapeHtml(__('Expiry Month/Year')) ?>
                 </span>
             </label>
             <div class="fields group group-2">
@@ -64,8 +59,8 @@
                         <?php foreach ($block->getMonths() as $k => $v): ?>
                             <option value="<?= /* @noEscape */ $escaper->escapeHtml($k) ?>"
                                 <?php if ($k == $carddeatils->getCardExpiryMonth()): ?>
-                            selected<?php endif ?>>
-                            <?= /* @noEscape */ $escaper->escapeHtml($v) ?></option>
+                                selected<?php endif ?>>
+                                <?= /* @noEscape */ $escaper->escapeHtml($v) ?></option>
                         <?php endforeach; ?>
                         </select>
                     </div>
@@ -80,8 +75,8 @@
                         <?php foreach ($block->getExpiryYears() as $k => $v): ?>
                             <option value="<?= /* @noEscape */$escaper->escapeHtml($k) ?>"
                                 <?php if ($k == $carddeatils->getCardExpiryYear()): ?>
-                            selected<?php endif ?>>
-                            <?= /* @noEscape */ $escaper->escapeHtml($v) ?></option>
+                                selected<?php endif ?>>
+                                <?= /* @noEscape */ $escaper->escapeHtml($v) ?></option>
                         <?php endforeach; ?>
                         </select>
                     </div>
@@ -92,12 +87,10 @@
             <div class="primary">
                 <button type="submit" class="action save primary"
                         title="<?= /* @noEscape */
-                        $block->getAccountLabelbyCode('AC39') ?
-                        $block->getAccountLabelbyCode('AC39') : $escaper->escapeHtml(__('Save')) ?>">
+                        $block->getAccountLabelbyCode('AC39') ?: $escaper->escapeHtml(__('Save')) ?>">
                     <span>
                         <?= /* @noEscape */
-                        $block->getAccountLabelbyCode('AC39') ?
-                        $block->getAccountLabelbyCode('AC39') : $escaper->escapeHtml(__('Save')) ?>
+                        $block->getAccountLabelbyCode('AC39') ?: $escaper->escapeHtml(__('Save')) ?>
                     </span>
                 </button>
             </div>

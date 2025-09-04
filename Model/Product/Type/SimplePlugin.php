@@ -29,21 +29,29 @@ class SimplePlugin
     private $localeDate;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate
+     * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
         \Sapient\Worldpay\Helper\Recurring $recurringHelper,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
+        \Psr\Log\LoggerInterface $logger
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->recurringHelper = $recurringHelper;
         $this->storeManager = $storeManager;
         $this->localeDate = $localeDate;
+        $this->logger = $logger;
     }
 
     /**
@@ -70,8 +78,8 @@ class SimplePlugin
         if (!(in_array($product->getTypeId(), $this->recurringHelper->getAllowedProductTypeIds())
             && $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/active')
             && $product->getWorldpayRecurringEnabled()
-            && ($planId = $buyRequest->getWorldpaySubscriptionPlan())))
-        {
+            && ($planId = $buyRequest->getWorldpaySubscriptionPlan()))
+        ) {
             return $proceed($buyRequest, $product, $processMode);
         }
 
@@ -138,6 +146,7 @@ class SimplePlugin
      *
      * @param \Magento\Catalog\Model\Product\Type\AbstractType $subject
      * @param Product $product
+     * @return \Magento\Catalog\Model\Product\Type\AbstractType
      * @throws \Magento\Framework\Exception\LocalizedException
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
@@ -165,7 +174,7 @@ class SimplePlugin
         }
 
         $quoteItem = $planOption->getItem();
-        $subcriptionCodeMessage = 'Please verify subscription data, before placing the order';
+        $subcriptionCodeMessage = __('Please verify subscription data, before placing the order');
         $subscriptionCamMessage = $this->recurringHelper->getCheckoutExceptions('CSUB01');
         $subscriptionDisplayMessage = $subscriptionCamMessage?$subscriptionCamMessage:$subcriptionCodeMessage;
         $quoteItem->setHasError(false)->setMessage(

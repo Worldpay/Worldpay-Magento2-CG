@@ -43,7 +43,7 @@
     style="display:flex;float:right;flex-direction:row;justify-content:center;align-items:center;">
         <label class="label" for="Sort By" style="display: block;margin: 0 10px;" >
             <span>
-                <?= /* @noEscape */  $escaper->escapeHtml(count($orderData) .' Order placed in') ?>
+                <?= /* @noEscape */  $escaper->escapeHtml(__('%1 Order placed in', count($orderData))) ?>
             </span>
         </label>
         <div>
@@ -139,7 +139,9 @@
             <?php endforeach;  ?>
             </tbody>
         </table>
-        <?php $scriptString = <<<script
+        <?php
+        $textCancelSubscriptionOrder = __('Cancel Subscription Order');
+        $scriptString = <<<script
             require([
                 'jquery',
                 'Magento_Ui/js/modal/confirm'
@@ -147,7 +149,7 @@
 
                 $('.action.cancel').on("click", function(event) {
                     confirm({
-                        title: 'Cancel Subscription Order',
+                        title: $textCancelSubscriptionOrder,
                         content: getMyAccountExceptions('MCAM12'),
                         actions: {
                             confirm: function() {

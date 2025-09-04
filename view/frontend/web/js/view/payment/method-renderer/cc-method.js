@@ -62,7 +62,7 @@ define(
             return doLuhnCheck(value);
         }, $.mage.__(getCreditCardExceptions('CCAM0')));
 
-        var typeErrorMsg = 'Card number entered does not match with card type selected';
+        var typeErrorMsg = $.mage.__('Card number entered does not match with card type selected');
         var cardTypeErrorDisplay = getCreditCardExceptions('CTYP01') ? getCreditCardExceptions('CTYP01') : typeErrorMsg;
         $.validator.addMethod('worldpay-validate-card-type', function (value) {
             if (value) {
@@ -88,16 +88,15 @@ define(
                     return true;
                 } else if (cc_type_selected === 'DISCOVER-SSL' && typeclasslist.contains('is_discover')) {
                     return true;
-                }else if (cc_type_selected === 'DINERS-SSL' && typeclasslist.contains('is_diners')) {
+                } else if (cc_type_selected === 'DINERS-SSL' && typeclasslist.contains('is_diners')) {
                     return true;
-                }else if (cc_type_selected === 'MAESTRO-SSL' && typeclasslist.contains('is_maestro')) {
+                } else if (cc_type_selected === 'MAESTRO-SSL' && typeclasslist.contains('is_maestro')) {
                     return true;
-                }else if (cc_type_selected === 'JCB-SSL' && typeclasslist.contains('is_jcb')) {
+                } else if (cc_type_selected === 'JCB-SSL' && typeclasslist.contains('is_jcb')) {
                     return true;
-                }else if (cc_type_selected === 'DANKORT-SSL' && typeclasslist.contains('is_dankort')) {
+                } else if (cc_type_selected === 'DANKORT-SSL' && typeclasslist.contains('is_dankort')) {
                     return true;
-                }
-                else {
+                } else {
                     return false;
                 }
             }
@@ -274,7 +273,7 @@ define(
                 if(this.multishipping){
                     var MultishippingCreditCardPreSelected = jQuery('#p_method_worldpay_cc:checked');
                     if(MultishippingCreditCardPreSelected.length){
-                        jQuery('#payment-continue').html("<span>Place Order</span>");
+                        jQuery('#payment-continue').html("<span>" + ("Place Order") + "</span>");
                         document.getElementById("checkout-agreement-div").style.display = "block";
                         this.selectPaymentMethod();
                     }
@@ -865,10 +864,10 @@ define(
             },
 
             getTitle: function() {
-                return window.checkoutConfig.payment.ccform.cctitle ;
+                return window.checkoutConfig.payment.ccform.cctitle;
             },
             hasVerification:function() {
-                return window.checkoutConfig.payment.ccform.isCvcRequired ;
+                return window.checkoutConfig.payment.ccform.isCvcRequired;
             },
             getSaveCardAllowed: function(){
                 if(customer.isLoggedIn()){

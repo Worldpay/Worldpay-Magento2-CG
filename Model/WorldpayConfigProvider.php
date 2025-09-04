@@ -429,9 +429,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * Retrieve list of apm types
      *
      * @param string $code
-     * @return Array
+     * @return array
      */
-    public function getApmTypes($code)
+    public function getApmTypes($code): array
     {
         return $this->worldpayHelper->getApmTypes($code);
     }
@@ -440,9 +440,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * Retrieve list of wallets types
      *
      * @param string $code
-     * @return Array
+     * @return array
      */
-    public function getWalletsTypes($code)
+    public function getWalletsTypes(string $code): array
     {
         return $this->worldpayHelper->getWalletsTypes($code);
     }
@@ -453,7 +453,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * @return array
      * @api
      */
-    public function getMonths()
+    public function getMonths(): array
     {
         $data = [];
         $months = (new DataBundle())->get(
@@ -471,26 +471,26 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      *
      * @return array
      */
-    public function getYears()
+    public function getYears(): array
     {
         $years = [];
         for ($i=0; $i<=10; $i++) {
-            $year = (string)($i+date('Y'));
+            $year = (string)($i + (int)date('Y'));
             $years[$year] = $year;
         }
         return $years;
     }
 
     /**
-     * Retrieve a list of the previos five years
+     * Retrieve a list of the previous five years
      *
-     * @return Array
+     * @return array
      */
-    public function getStartYears()
+    public function getStartYears(): array
     {
         $years = [];
         for ($i=5; $i>=0; $i--) {
-            $year = (string)(date('Y')-$i);
+            $year = (string)(date('Y') - $i);
             $years[$year] = $year;
         }
         return $years;
@@ -560,19 +560,21 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      * Retrieve save card list for admin orders
      *
      * @param \Magento\Customer\Model\Customer $customer
-     * @return string
+     * @return array
      */
-    public function getSaveCardListForAdminOrder($customer)
+    public function getSaveCardListForAdminOrder($customer): array
     {
         $savedCardsList = [];
-        $tokenType = $this->worldpayHelper->getMerchantTokenization() ? 'merchant' : 'shopper';
         if ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn()) {
+            $tokenType = $this->worldpayHelper->getMerchantTokenization() ? 'merchant' : 'shopper';
             $savedCardsList = $this->savedTokenFactory->create()->getCollection()
-            ->addFieldToFilter('customer_id', $customer)
-            ->addFieldToFilter('store_id', $this->storeManager->getStore()->getId())
-            ->addFieldToFilter('token_type', $tokenType)->getData();
+                ->addFieldToFilter('customer_id', $customer)
+                ->addFieldToFilter('store_id', $this->storeManager->getStore()->getId())
+                ->addFieldToFilter('token_type', $tokenType)
+                ->getData();
         }
-            return $savedCardsList;
+
+        return $savedCardsList;
     }
 
     /**
@@ -584,8 +586,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
     {
         $apmPaymentTypes = $this->getApmTypes('worldpay_apm');
         if (array_key_exists("IDEAL-SSL", $apmPaymentTypes)) {
-            $data = $this->paymentmethodutils->idealBanks();
-            return $data;
+            return $this->paymentmethodutils->idealBanks();
         }
         return [];
     }
@@ -709,22 +710,15 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      *
      * @return array
      */
-    public function getCreditCardException()
+    public function getCreditCardException(): array
     {
-        $ccdata= $this->unserializeValue($this->worldpayHelper->getCreditCardException());
-        $result=[];
-        $data=[];
-        if (is_array($ccdata) || is_object($ccdata)) {
-            foreach ($ccdata as $key => $value) {
+        $exceptions = $this->unserializeValue($this->worldpayHelper->getCreditCardException());
 
-                $result['exception_code']=$key;
-                $result['exception_messages'] = $value['exception_messages'];
-                $result['exception_module_messages'] = $value['exception_module_messages'];
-                array_push($data, $result);
+        array_walk($exceptions, function (&$exception, $key) {
+            $exception['exception_code'] = $key;
+        });
 
-            }
-        }
-        return $data;
+        return $exceptions;
     }
 
     /**
@@ -734,20 +728,13 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      */
     public function getGeneralException()
     {
-        $generaldata=$this->unserializeValue($this->worldpayHelper->getGeneralException());
-        $result=[];
-        $data=[];
-        if (is_array($generaldata) || is_object($generaldata)) {
-            foreach ($generaldata as $key => $value) {
+        $exceptions = $this->unserializeValue($this->worldpayHelper->getGeneralException());
 
-                $result['exception_code']=$key;
-                $result['exception_messages'] = $value['exception_messages'];
-                $result['exception_module_messages'] = $value['exception_module_messages'];
-                array_push($data, $result);
+        array_walk($exceptions, function (&$exception, $key) {
+            $exception['exception_code'] = $key;
+        });
 
-            }
-        }
-        return $data;
+        return $exceptions;
     }
 
      /**
@@ -757,10 +744,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
       */
     public function cpfEnabled()
     {
-        if ($this->worldpayHelper->isCPFEnabled()) {
-            return true;
-        }
-        return false;
+        return (bool) $this->worldpayHelper->isCPFEnabled();
     }
 
      /**
@@ -770,10 +754,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
       */
     public function instalmentEnabled()
     {
-        if ($this->worldpayHelper->isInstalmentEnabled()) {
-            return true;
-        }
-        return false;
+        return (bool) $this->worldpayHelper->isInstalmentEnabled();
     }
 
     /**
@@ -783,20 +764,13 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      */
     public function getMyAccountException()
     {
-        $generaldata=$this->unserializeValue($this->worldpayHelper->getMyAccountException());
-        $result=[];
-        $data=[];
-        if (is_array($generaldata) || is_object($generaldata)) {
-            foreach ($generaldata as $key => $value) {
+        $exceptions = $this->unserializeValue($this->worldpayHelper->getMyAccountException());
 
-                $result['exception_code']=$key;
-                $result['exception_messages'] = $value['exception_messages'];
-                $result['exception_module_messages'] = $value['exception_module_messages'];
-                array_push($data, $result);
+        array_walk($exceptions, function (&$exception, $key) {
+            $exception['exception_code'] = $key;
+        });
 
-            }
-        }
-        return $data;
+        return $exceptions;
     }
 
     /**
@@ -851,20 +825,13 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      */
     public function getMyAccountLabels()
     {
-        $generaldata=$this->unserializeValue($this->worldpayHelper->getMyAccountLabels());
-        $result=[];
-        $data=[];
-        if (is_array($generaldata) || is_object($generaldata)) {
-            foreach ($generaldata as $key => $value) {
+        $myAccountLabels = $this->unserializeValue($this->worldpayHelper->getMyAccountLabels());
 
-                $result['wpay_label_code']=$key;
-                $result['wpay_label_desc'] = $value['wpay_label_desc'];
-                $result['wpay_custom_label'] = $value['wpay_custom_label'];
-                array_push($data, $result);
+        array_walk($myAccountLabels, function (&$label, $key) {
+            $label['wpay_label_code'] = $key;
+        });
 
-            }
-        }
-        return $data;
+        return $myAccountLabels;
     }
 
     /**
@@ -874,20 +841,13 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      */
     public function getCheckoutLabels()
     {
-        $generaldata=$this->unserializeValue($this->worldpayHelper->getCheckoutLabels());
-        $result=[];
-        $data=[];
-        if (is_array($generaldata) || is_object($generaldata)) {
-            foreach ($generaldata as $key => $value) {
+        $checkoutLabels = $this->unserializeValue($this->worldpayHelper->getCheckoutLabels());
 
-                $result['wpay_label_code']=$key;
-                $result['wpay_label_desc'] = $value['wpay_label_desc'];
-                $result['wpay_custom_label'] = $value['wpay_custom_label'];
-                array_push($data, $result);
+        array_walk($checkoutLabels, function (&$label, $key) {
+            $label['wpay_label_code'] = $key;
+        });
 
-            }
-        }
-        return $data;
+        return $checkoutLabels;
     }
 
     /**
@@ -897,20 +857,13 @@ class WorldpayConfigProvider implements ConfigProviderInterface
      */
     public function getAdminLabels()
     {
-        $generaldata=$this->unserializeValue($this->worldpayHelper->getAdminLabels());
-        $result=[];
-        $data=[];
-        if (is_array($generaldata) || is_object($generaldata)) {
-            foreach ($generaldata as $key => $value) {
+        $adminLabels = $this->unserializeValue($this->worldpayHelper->getAdminLabels());
 
-                $result['wpay_label_code']=$key;
-                $result['wpay_label_desc'] = $value['wpay_label_desc'];
-                $result['wpay_custom_label'] = $value['wpay_custom_label'];
-                array_push($data, $result);
+        array_walk($adminLabels, function (&$label, $key) {
+            $label['wpay_label_code'] = $key;
+        });
 
-            }
-        }
-        return $data;
+        return $adminLabels;
     }
 
     /**

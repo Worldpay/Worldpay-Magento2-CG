@@ -109,7 +109,9 @@
             <?php endforeach; ?>
             </tbody>
         </table>
-        <?php $scriptString = <<<script
+        <?php
+        $textCancelSubscription = __('Cancel Subscription');
+        $scriptString = <<<script
             require([
                 'jquery',
                 'Magento_Ui/js/modal/confirm'
@@ -117,7 +119,7 @@
 
                 $('.action.delete').on("click", function(event) {
                     confirm({
-                        title: 'Cancel Subscription',
+                        title: '$textCancelSubscription',
                         content: getMyAccountExceptions('MCAM12'),
                         actions: {
                             confirm: function() {
