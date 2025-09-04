@@ -9,7 +9,7 @@
     <div class="shipping-modal-body-content mb-20">
         <p class="successmsg" data-bind="i18n: successmsg(), attr: {class: msgColor() }"></p>
         <label><?= $escaper->escapeHtml(__('Shipping Address')) ?>:</label>
-        <select name="current-shipping-addresses" id="ship-address-dropdown" 
+        <select name="current-shipping-addresses" id="ship-address-dropdown"
             data-bind="event:{ change: fetchShippingMethodByAddress }" >
         <?php foreach ($address_options as $key => $option): ?>
                 <option value="<?= $escaper->escapeHtml(__($option['value'])) ?>">
@@ -17,7 +17,7 @@
         <?php endforeach; ?>
         </select>
     </div>
-   
+
     <div class="ship-via" data-bind="blockLoader: isLoadingShippingMethod">
         <!-- ko if: (availableShippingMethods().length)-->
         <div class="shipping-information-title">
@@ -25,27 +25,27 @@
         </div>
          <!-- /ko -->
         <div class="shipping-information-content">
-                <p class="ship-method-error" style="display:none; color:red" 
+                <p class="ship-method-error" style="display:none; color:red"
                 data-bind="i18n: 'Please select shipping method'"></p>
                 <!-- ko if: (availableShippingMethods().length)-->
                     <!-- ko foreach: {data: availableShippingMethods(), as: 'item'} -->
                     <div class="shippingmethods-radio-wrapper">
-                            <input type="radio"  
+                            <input type="radio"
                                 data-bind="attr: {
                                     'value': item.identifier,
                                     id: 'recurring_ship_method' + item.identifier
-                                }" 
-                                name="shipping_method_recurring" >               
+                                }"
+                                name="shipping_method_recurring" >
                             <label data-bind="attr: {
                                     for: 'recurring_ship_method' + item.identifier},
                                     i18n: item.label">
-                            </label>                 
+                            </label>
                     </div>
                     <!-- /ko -->
             <!--/ko-->
             <!-- ko if: (availableShippingMethods().length == 0)-->
-                <div class="shippingmethods-radio-wrapper">             
-                    <label data-bind="text: 'Shipping method is not available'"></label>                 
+                <div class="shippingmethods-radio-wrapper">
+                    <label data-bind="ii18n: 'Shipping method is not available'"></label>
             </div>
             <!-- /ko-->
         </div>

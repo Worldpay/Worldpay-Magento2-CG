@@ -62,7 +62,7 @@ define(
             return doLuhnCheck(value);
         }, $.mage.__(getCreditCardExceptions('CCAM0')));
 
-        var typeErrorMsg = 'Card number entered does not match with card type selected';
+        var typeErrorMsg = $.mage.__('Card number entered does not match with card type selected');
         var cardTypeErrorDisplay = getCreditCardExceptions('CTYP01') ? getCreditCardExceptions('CTYP01') : typeErrorMsg;
         $.validator.addMethod('worldpay-validate-card-type', function (value) {
             if (value) {
@@ -88,16 +88,15 @@ define(
                     return true;
                 } else if (cc_type_selected === 'DISCOVER-SSL' && typeclasslist.contains('is_discover')) {
                     return true;
-                }else if (cc_type_selected === 'DINERS-SSL' && typeclasslist.contains('is_diners')) {
+                } else if (cc_type_selected === 'DINERS-SSL' && typeclasslist.contains('is_diners')) {
                     return true;
-                }else if (cc_type_selected === 'MAESTRO-SSL' && typeclasslist.contains('is_maestro')) {
+                } else if (cc_type_selected === 'MAESTRO-SSL' && typeclasslist.contains('is_maestro')) {
                     return true;
-                }else if (cc_type_selected === 'JCB-SSL' && typeclasslist.contains('is_jcb')) {
+                } else if (cc_type_selected === 'JCB-SSL' && typeclasslist.contains('is_jcb')) {
                     return true;
-                }else if (cc_type_selected === 'DANKORT-SSL' && typeclasslist.contains('is_dankort')) {
+                } else if (cc_type_selected === 'DANKORT-SSL' && typeclasslist.contains('is_dankort')) {
                     return true;
-                }
-                else {
+                } else {
                     return false;
                 }
             }
@@ -131,7 +130,7 @@ define(
         }
         function getCreditCardExceptions (exceptioncode){
             var ccData=window.checkoutConfig.payment.ccform.creditcardexceptions;
-            for (var key in ccData) {
+              for (var key in ccData) {
                 if (ccData.hasOwnProperty(key)) {
                     var cxData=ccData[key];
                     if(cxData['exception_code'].includes(exceptioncode)){
@@ -274,7 +273,7 @@ define(
                 if(this.multishipping){
                     var MultishippingCreditCardPreSelected = jQuery('#p_method_worldpay_cc:checked');
                     if(MultishippingCreditCardPreSelected.length){
-                        jQuery('#payment-continue').html("<span>Place Order</span>");
+                        jQuery('#payment-continue').html("<span>" + ("Place Order") + "</span>");
                         document.getElementById("checkout-agreement-div").style.display = "block";
                         this.selectPaymentMethod();
                     }
@@ -302,7 +301,7 @@ define(
                     serviceUrl, JSON.stringify(payload)
                 ).done(
                     function (apiresponse) {
-                        var response = JSON.parse(apiresponse);
+                       var response = JSON.parse(apiresponse);
                         if(response.length){
                             if(quote.isVirtual()){
                                 setBillingAddressAction(globalMessageList);
@@ -391,13 +390,12 @@ define(
             },
             savethiscard : function(obj,event){
                 if($(event.target).is(":checked")){
-                    if(this.isDisclaimerMessageMandatory() && this.isDisclaimerMessageEnabled() && (window.disclaimerDialogue === null || window.disclaimerDialogue === false) ){
+                    if (this.isDisclaimerMessageMandatory() && this.isDisclaimerMessageEnabled() && (window.disclaimerDialogue === null || window.disclaimerDialogue === false)) {
                         $('#disclaimer-error').css('display', 'block');
                         $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));
                         return false;
-                    } else{
+                    } else {
                         $('#disclaimer-error').css('display', 'none');
-
                     }
                     $(event.target).attr( 'checked', true );
                 }else{
@@ -504,14 +502,14 @@ define(
                     $('#cc_type-error').html("<div>" + getCreditCardExceptions('CCAM6') + "</div>");
                     return false;
                 }
-                if(!this.validateForms(paymentDetails)){
-                    console.log("Validation error");
-                    return false;
-                }
-                if(!additionalValidators.validate()){
+               if(!this.validateForms(paymentDetails)){
+                   console.log("Validation error");
+                   return false;
+               }
+               if(!additionalValidators.validate()){
                     console.log("Validation Failed");
                     return false;
-                }
+               }
                 var serviceUrl = urlBuilder.createUrl('/worldpay/payment/hostedurl', {});
                 var payload = {
                     quoteId: quote.getQuoteId(),
@@ -731,16 +729,16 @@ define(
                 var piCardType = '';
 
                 var visaRegex = new RegExp('^4[0-9]{0,20}$'),
-                    mastercardRegex = new RegExp(
-                        '^(?:5[1-5][0-9]{0,2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{0,2}|27[01][0-9]|2720)[0-9]{0,12}$'
-                    ),
-                    amexRegex = new RegExp('^3$|^3[47][0-9]{0,13}$'),
-                    discoverRegex = new RegExp('^6[05]$|^601[1]?$|^65[0-9][0-9]?$|^6(?:011|5[0-9]{2})[0-9]{0,12}$'),
-                    jcbRegex = new RegExp('^35(2[89]|[3-8][0-9])'),
-                    dinersRegex = new RegExp('^36'),
-                    maestroRegex = new RegExp('^(5018|5020|5038|6304|679|6759|676[1-3])'),
-                    unionpayRegex = new RegExp('^62[0-9]{0,14}$|^645[0-9]{0,13}$|^65[0-9]{0,14}$'),
-                    dankortRegex = new RegExp('^(5019)');
+                mastercardRegex = new RegExp(
+                '^(?:5[1-5][0-9]{0,2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{0,2}|27[01][0-9]|2720)[0-9]{0,12}$'
+                ),
+                amexRegex = new RegExp('^3$|^3[47][0-9]{0,13}$'),
+                discoverRegex = new RegExp('^6[05]$|^601[1]?$|^65[0-9][0-9]?$|^6(?:011|5[0-9]{2})[0-9]{0,12}$'),
+                jcbRegex = new RegExp('^35(2[89]|[3-8][0-9])'),
+                dinersRegex = new RegExp('^36'),
+                maestroRegex = new RegExp('^(5018|5020|5038|6304|679|6759|676[1-3])'),
+                unionpayRegex = new RegExp('^62[0-9]{0,14}$|^645[0-9]{0,13}$|^65[0-9]{0,14}$'),
+                dankortRegex = new RegExp('^(5019)');
 
                 // get rid of spaces and dashes before using the regular expression
                 curVal = curVal.replace(/ /g, '').replace(/-/g, '');
@@ -865,10 +863,10 @@ define(
             },
 
             getTitle: function() {
-                return window.checkoutConfig.payment.ccform.cctitle ;
+                return window.checkoutConfig.payment.ccform.cctitle;
             },
             hasVerification:function() {
-                return window.checkoutConfig.payment.ccform.isCvcRequired ;
+                return window.checkoutConfig.payment.ccform.isCvcRequired;
             },
             getSaveCardAllowed: function(){
                 if(customer.isLoggedIn()){
@@ -907,9 +905,9 @@ define(
                 return window.checkoutConfig.payment.ccform.paymentMethodSelection;
             },
             getselectedCCType : function(inputName){
-                if(this.paymentMethodSelection()=='radio'){
+                if (this.paymentMethodSelection()=='radio') {
                     return $("input[name='"+inputName+"']:checked").val();
-                } else{
+                } else {
                     return  this.selectedCCType();
                 }
             },
@@ -1192,7 +1190,7 @@ define(
                             }
                         }
                     }
-                }else if($form.validation() && $form.validation('isValid')){
+                } else if($form.validation() && $form.validation('isValid')) {
                     // Subscription check
                     if(this.isSubscribed()){
                         if(cc_type_selected !== 'savedcard'){

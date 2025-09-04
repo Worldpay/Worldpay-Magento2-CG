@@ -22,14 +22,14 @@
 } @-->
 <!--@subject {{var mail_subject|raw }} @-->
 {{template config_path="design/email/header_template"}}
-<p>Hi {{var billing_name}},</p>
+<p>{{trans "Hi" }} {{var billing_name}},</p>
 <br>
 <p>{{trans "We hope this email finds you well."}}</p>
 
-<p>Your next subscription order is scheduled for <b style="color: red;">{{var recurring_date}}</b>, and we want to ensure a seamless experience for you.</p> 
+<p>{{trans 'Your next subscription order is scheduled for <strong style="color: red;">%recurring_date</strong>, and we want to ensure a seamless experience for you.' recurring_date=$recurring_date }}</p>
 {{depend expired_msg}}
     <p style="color: red;"><b>{{var expired_msg}}</b></p>
-{{/depend}}    
+{{/depend}}
 <p>{{trans "Please review the order details below"}}:</p>
 <h2>{{trans "Order Information"}}:</h2>
 <table class="order-details">
@@ -67,18 +67,18 @@
 <table style="text-align:center;border:none;margin: 30pt 10pt">
     <tr>
         {{depend order_data.is_not_virtual}}
-        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 0px; text-align: center;" valign="top" bgcolor="#3498db" align="center"> 
+        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 0px; text-align: center;" valign="top" bgcolor="#3498db" align="center">
             <a href="{{var view_order_url}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 0px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;">
-                {{trans "Change Shipment"}}</a> 
+                {{trans "Change Shipment"}}</a>
         </td><td>&nbsp;&nbsp;</td>
         {{/depend}}
-        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 0px; text-align: center;" valign="top" bgcolor="#3498db" align="center"> 
+        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 0px; text-align: center;" valign="top" bgcolor="#3498db" align="center">
             <a href="{{var view_order_url}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 0px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;">
-                {{trans "Change Payment Method"}}</a> 
+                {{trans "Change Payment Method"}}</a>
         </td><td>&nbsp;&nbsp;</td>
-        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 0px; text-align: center;" valign="top" bgcolor="#3498db" align="center"> 
+        <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #3498db; border-radius: 0px; text-align: center;" valign="top" bgcolor="#3498db" align="center">
             <a href="{{var view_order_url}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #3498db; border: solid 1px #3498db; border-radius: 0px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize; border-color: #3498db;">
-                {{trans "Skip This Order"}}</a> 
+                {{trans "Skip This Order"}}</a>
         </td>
     </tr>
 </table>
@@ -88,5 +88,5 @@
 
 <p>&nbsp;</p>
 <p>&nbsp;</p>
-<p><small>{{trans "Note: You are receiving this email because you have recurring order in your account."}}</small></p>
+<p><small>{{trans "Note: You are receiving this email because you have a recurring order in your account."}}</small></p>
 {{template config_path="design/email/footer_template"}}

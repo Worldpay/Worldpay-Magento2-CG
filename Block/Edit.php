@@ -73,10 +73,7 @@ class Edit extends \Magento\Framework\View\Element\Template
     public function getMonths()
     {
         if (!self::$_months) {
-            self::$_months = ['' => __(
-                $this->getCheckoutLabelbyCode('CO6') ?
-                $this->getCheckoutLabelbyCode('CO6') : 'Month'
-            )];
+            self::$_months = ['' => $this->getCheckoutLabelbyCode('CO6') ?: __('Month')];
             for ($i = 1; $i < 13; $i++) {
                 $month = str_pad($i, 2, '0', STR_PAD_LEFT);
                 self::$_months[$month] = date("$i - F", mktime(0, 0, 0, $i, 1));
@@ -115,10 +112,7 @@ class Edit extends \Magento\Framework\View\Element\Template
     public function getExpiryYears()
     {
         if (!self::$_expiryYears) {
-            self::$_expiryYears = ['' => __(
-                $this->getCheckoutLabelbyCode('CO7') ?
-                $this->getCheckoutLabelbyCode('CO7') : 'Year'
-            )];
+            self::$_expiryYears = ['' => $this->getCheckoutLabelbyCode('CO7') ?: __('Year')];
             $year = date('Y');
             $endYear = ($year + 20);
             while ($year < $endYear) {

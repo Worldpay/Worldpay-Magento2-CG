@@ -4,45 +4,45 @@
  * See COPYING.txt for license details.
  */
  -->
- <div if="isPaymentMethodsAvailable()" class="items payment-methods" 
-     if="isWorldPayEnable()"> 
+ <div if="isPaymentMethodsAvailable()" class="items payment-methods"
+     if="isWorldPayEnable()">
      <div repeat="foreach: paymentGroupsList, item: '$group'"
           class="" data-bind="attr: { class: 'payment-group '+$group().displayArea }">
           <!-- ko if: ($group().displayArea == 'payment-methods-items-worldpay') -->
           <div class="payment-titlelogo-wrapper" if="isWorldPayEnable()">
-          <div class="payment-title-wrapper">
-               <h2 if="getRegion($group().displayArea)().length"
-                     translate="getGroupTitle($group)"
-                     class="step-title"
-                     data-role="title">
-               </h2>
-                <p>All transactions are secure and encrypted...</p>
-           </div>
-          <div class="payment-logo-wrapper">
-                    <img data-bind="attr: 
-                         { src: require.toUrl('Sapient_Worldpay/images/cc/worldpay-logo.png') }" 
+              <div class="payment-title-wrapper">
+                   <h2 if="getRegion($group().displayArea)().length"
+                         translate="getGroupTitle($group)"
+                         class="step-title"
+                         data-role="title">
+                   </h2>
+                   <p data-bind="i18n: 'All transactions are secure and encrypted...'"></p>
+              </div>
+              <div class="payment-logo-wrapper">
+                    <img data-bind="attr:
+                         { src: require.toUrl('Sapient_Worldpay/images/cc/worldpay-logo.png') }"
                          alt="worldpay logo"
                          class="worldpay-logo-paymentscreen" >
                     <!-- ko foreach: getRegion('paybylinkCheckout') -->
                     <!-- ko template: getTemplate() -->
                     <!-- /ko -->
                     <!-- /ko -->
-               </div>
+              </div>
           </div>
           <!-- /ko-->
           <!-- ko if: ($group().displayArea == 'payment-methods-items-default') -->
           <div class="other-payment-methods-wrapper" if="isWorldPayEnable()">
                <div class="payment-title-wrapper">
                     <h2 class="step-title" data-bind="text: $t('Other Payment Methods')"></h2>
-               </div>         
+               </div>
           </div>
           <!-- /ko -->
           <div class="payment-group" ifnot="isWorldPayEnable()">
-               <div class="step-title" data-role="title" 
+               <div class="step-title" data-role="title"
                     data-bind="text: $t('Payment Methods')">
-               </div>        
+               </div>
            </div>
-     <each args="data: getRegion($group().displayArea), as: 'method'" render="">
+         <each args="data: getRegion($group().displayArea), as: 'method'" render=""></each>
      </div>
 </div>
 <div ifnot="isPaymentMethodsAvailable()"

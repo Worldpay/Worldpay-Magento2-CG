@@ -151,10 +151,10 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
 
     public function prepareTemplateForAuthorisedOrder($order, $successFlag): void
     {
-        $emailSub = "Your payment has been confirmed with the bank and order has been processed successfully";
-        $authSuccessMsg = "Once your package ships we will send you a tracking number.";
+        $emailSub = __("Your payment has been confirmed with the bank and order has been processed successfully");
+        $authSuccessMsg = __("Once your package ships we will send you a tracking number.");
         if (!$successFlag) {
-            $emailSub = "Your payment has been declined by the bank and order has been cancelled";
+            $emailSub = __("Your payment has been declined by the bank and order has been cancelled");
             $authSuccessMsg = $emailSub;
         }
         $transport = [
@@ -217,6 +217,30 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
                 $authorisedOrderEmailModel->setAttemptCount(0);
                 $authorisedOrderEmailModel->save();
             }
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Place Order confirm email for redirect mode full page
+     *
+     * @param array $order
+     * @return
+     */
+    public function fullPageRedirectOrderEmail(order $order)
+    {
+        $this->identityContainer->setStore($order->getStore());
+        if (!$this->identityContainer->isEnabled()) {
+            return false;
+        }
+        $this->prepareTemplate($order);
+        /** @var SenderBuilder $sender */
+        $sender = $this->getSender();
+        try {
+            $sender->send();
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());
             return false;

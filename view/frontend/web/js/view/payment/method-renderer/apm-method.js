@@ -31,14 +31,14 @@ define(
         }
         var klarnaPay = window.checkoutConfig.payment.ccform.klarnaTypesAndContries;
 
-        var achAccountCodeMessage = 'Maximum allowed length of 17 exceeded';
-        var achAccountDisplayMessage = getCreditCardExceptions('CACH03')?getCreditCardExceptions('CACH03'):achAccountCodeMessage;
-        var achRoutingCodeMessage = 'Required length should be 8 or 9';
-        var achRoutingDisplayMessage = getCreditCardExceptions('CACH04')?getCreditCardExceptions('CACH04'):achRoutingCodeMessage;
-        var achCheckNumberCodeMessage = 'Maximum allowed length of 15 exceeded';
-        var achCheckNumberDisplayMsg = getCreditCardExceptions('CACH05')?getCreditCardExceptions('CACH05'):achCheckNumberCodeMessage;
-        var achCompanyCodeMessage = 'Maximum allowed length of 40 exceeded' ;
-        var achCompanyDisplayMsg = getCreditCardExceptions('CACH06')?getCreditCardExceptions('CACH06'):achCompanyCodeMessage;
+        var achAccountCodeMessage = $.mage.__('Maximum allowed length of 17 exceeded');
+        var achAccountDisplayMessage = getCreditCardExceptions('CACH03') || achAccountCodeMessage;
+        var achRoutingCodeMessage = $.mage.__('Required length should be 8 or 9');
+        var achRoutingDisplayMessage = getCreditCardExceptions('CACH04') || achRoutingCodeMessage;
+        var achCheckNumberCodeMessage = $.mage.__('Maximum allowed length of 15 exceeded');
+        var achCheckNumberDisplayMsg = getCreditCardExceptions('CACH05') || achCheckNumberCodeMessage;
+        var achCompanyCodeMessage = $.mage.__('Maximum allowed length of 40 exceeded');
+        var achCompanyDisplayMsg = getCreditCardExceptions('CACH06') || achCompanyCodeMessage;
         var klarnaTypesArr = ko.observableArray([]);
         var isKlarnaAvailabel,isKlarna;
         $.validator.addMethod('worldpay-validate-ach-accountnumber', function (value) {
@@ -129,7 +129,7 @@ define(
                 if(this.multishipping){
 					var MultishippingApmPreSelected = jQuery('#p_method_worldpay_apm:checked');
 					if(MultishippingApmPreSelected.length){
-                        jQuery('#payment-continue').html("<span>Place Order</span>");
+                        jQuery('#payment-continue').html("<span>" + ("Place Order") + "</span>");
                         document.getElementById("checkout-agreement-div").style.display = "block";
 						this.selectPaymentMethod();
 					}
