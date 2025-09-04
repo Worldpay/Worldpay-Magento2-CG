@@ -80,24 +80,24 @@ class Savedcard extends \Magento\Framework\View\Element\Template
         $this->storeManager = $storeManager;
            parent::__construct($context, $data);
     }
-    
+
     /**
      * Get order id column value
      *
      * @return string
      */
-   
+
     public function isIAVEnabled()
     {
         return $this->worlpayhelper->isIAVEnabled();
     }
-    
+
     /**
      * Get order id column value
      *
      * @return string
      */
-   
+
     public function getAddNewCardLabel()
     {
         return $this->getUrl('worldpay/savedcard/addnewcard', ['_secure' => true]);
@@ -117,7 +117,7 @@ class Savedcard extends \Magento\Framework\View\Element\Template
         }
         return false;
     }
-    
+
     /**
      * Render an address as HTML and return the result
      *
@@ -170,8 +170,7 @@ class Savedcard extends \Magento\Framework\View\Element\Template
         if (is_array($accdata) || is_object($accdata)) {
             foreach ($accdata as $key => $valuepair) {
                 if ($key == $labelCode) {
-                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
-                        $valuepair['wpay_label_desc'];
+                    return $valuepair['wpay_custom_label'] ?: __($valuepair['wpay_label_desc']);
                 }
             }
         }
@@ -189,8 +188,7 @@ class Savedcard extends \Magento\Framework\View\Element\Template
         if (is_array($accdata) || is_object($accdata)) {
             foreach ($accdata as $key => $valuepair) {
                 if ($key == $labelCode) {
-                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
-                        $valuepair['wpay_label_desc'];
+                    return $valuepair['wpay_custom_label'] ?: __($valuepair['wpay_label_desc']);
                 }
             }
         }

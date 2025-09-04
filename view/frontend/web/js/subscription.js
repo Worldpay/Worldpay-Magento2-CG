@@ -71,7 +71,7 @@ define([
                 text: $.mage.__('Add New Address'),
                 class: 'action-primary add-new-btn',
                 click: function (event) {
-                    window.location.href = '/customer/address/new/';                  
+                    window.location.href = '/customer/address/new/';
                 }
             },{
                 text: $.mage.__('Save'),
@@ -83,7 +83,7 @@ define([
                 text: $.mage.__('Close'),
                 class: 'action-secondary',
                 click: function (event) {
-                    self.closeModalPopup();                    
+                    self.closeModalPopup();
                 }
             }];
             self.sp_popelement.modal(popupdetails).modal('openModal').on('modalclosed',function(){
@@ -103,7 +103,7 @@ define([
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth() + 1; // January is 0, so we add 1
-          
+
             // Convert expiryDate and expiryYear to a Date object
             const expiry = new Date(`${item.card_expiry_year}-${item.card_expiry_month}-01`);
 
@@ -129,7 +129,7 @@ define([
             $("body").trigger('processStart');
             self.successmsg("");
             storage.post(
-                self.updatePaymentTokenApiUrl, 
+                self.updatePaymentTokenApiUrl,
                 JSON.stringify(obj)
             ).done(
                 function (response) {
@@ -146,7 +146,7 @@ define([
                     $("body").trigger('processStop');
                 }
             );
-        },        
+        },
         openPaymentPopup: function(){
             var self=this;
             var popupdetails = self.popupOptions;
@@ -156,7 +156,7 @@ define([
                 text: $.mage.__('Add New Card'),
                 class: 'action-primary add-new-btn',
                 click: function (event) {
-                    window.location.href = '/worldpay/savedcard/addnewcard/';                  
+                    window.location.href = '/worldpay/savedcard/addnewcard/';
                 }
             },{
                 text: $.mage.__('Save'),
@@ -168,7 +168,7 @@ define([
                 text: $.mage.__('Close'),
                 class: 'action-secondary',
                 click: function (event) {
-                    self.closePaymentModalPopup();                    
+                    self.closePaymentModalPopup();
                 }
             }];
             self.pm_popelement.modal(popupdetails).modal('openModal').on('modalclosed',function(){
@@ -178,7 +178,7 @@ define([
             }
             $("body").trigger('processStart');
              storage.post(
-                    self.paymentTokenApiUrl, 
+                    self.paymentTokenApiUrl,
                     JSON.stringify(obj)
                 ).done(
                     function (response) {
@@ -205,7 +205,7 @@ define([
                         $("body").trigger('processStop');
                     }
                 );
-            
+
         },
         getShippingMethodObj: function(selectedMethod){
             var self = this;
@@ -224,7 +224,7 @@ define([
             var orderIncrementId = self.order_incrementId;
             var selectedShippingMethod = $('input[name="shipping_method_recurring"]:checked').val();
             if(typeof selectedShippingMethod == 'undefined'){
-                self.successmsg('Please select shipping method');
+                self.successmsg($.mage.__('Please select shipping method'));
                 self.msgColor('error');
                 return false;
             }
@@ -239,7 +239,7 @@ define([
             }
             $(".ship-via").trigger('processStart');
             storage.post(
-                self.shipmentUpdateApiUrl, 
+                self.shipmentUpdateApiUrl,
                 JSON.stringify(obj)
             ).done(
                 function (response) {
@@ -268,7 +268,7 @@ define([
             $(".ship-via").trigger('processStart');
             $('.shipping-information-content').hide();
              storage.post(
-                    self.shipmentApiUrl, 
+                    self.shipmentApiUrl,
                     JSON.stringify(obj)
                 ).done(
                     function (response) {

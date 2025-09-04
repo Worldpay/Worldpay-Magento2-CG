@@ -68,13 +68,13 @@ class SendRecurringOrdersEmail extends \Magento\Framework\App\Helper\AbstractHel
             $templateVars = $params;
             $templateId = $params['mail_template'];
             $subject = __("WORLDPAY: ").
-            "Reminder - Recurring order";
+                __("Reminder - Recurring order");
 
             $templateVars['mail_subject'] = $subject;
             $storeId = $this->storeManager->getStore()->getId();
             $from = ['email' => $senderDetails['email'], 'name' => $senderDetails['name']];
             $this->inlineTranslation->suspend();
-  
+
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $templateOptions = [
                 'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
@@ -124,7 +124,7 @@ class SendRecurringOrdersEmail extends \Magento\Framework\App\Helper\AbstractHel
                     $this->sendEmail($params, $recipientEmail);
                 }
             }
-            
+
         } catch (\Exception $e) {
             $this->wplogger->info(__("Failed to send email:").$e->getMessage());
         }

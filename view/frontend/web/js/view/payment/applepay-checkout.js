@@ -44,8 +44,8 @@ return Component.extend({
         merchantIdentifier : appleMerchantId,
         countryCode : window.checkoutConfig.defaultCountryId,
         currencyCode : window.checkoutConfig.quoteData.quote_currency_code,
-        subTotalDescr : "Cart Subtotal",
-        lineItemLabel : "Order Total"
+        subTotalDescr : $t("Cart Subtotal"),
+        lineItemLabel : $t("Order Total")
         }
     },
     applepayConfig: ko.observableArray([]),
@@ -97,7 +97,7 @@ return Component.extend({
                 var runningAmount = (Math.round(baseGrandTotal * 100) / 100).toFixed(2);
                 var subTotal = window.checkoutConfig.quoteData.base_grand_total;
                 var runningTotal = (Math.round(subTotal * 100) / 100).toFixed(2);
-                var subTotalDescr      = "Cart Subtotal";
+                var subTotalDescr      = $t("Cart Subtotal");
                 var currencyCode = window.checkoutConfig.quoteData.quote_currency_code;
                 var countryCode = window.checkoutConfig.defaultCountryId;
                 var paymentRequest = {
@@ -105,7 +105,7 @@ return Component.extend({
                     countryCode: countryCode,
                     lineItems: [{label: subTotalDescr, amount: runningAmount }],
                     total: {
-                        label: 'Order Total',
+                        label: $t('Order Total'),
                         amount: runningAmount
                     },
                     supportedNetworks: ['amex', 'masterCard', 'visa' ],
@@ -132,7 +132,7 @@ return Component.extend({
                     var finalTotal = xhttp.responseText.slice(1, -1); // removing quotes
 
                     var runningTotal = (Math.round(finalTotal * 100) / 100).toFixed(2);
-                    var newTotal = { type: 'final', label: 'Order Total', amount: runningTotal };
+                    var newTotal = { type: 'final', label: $t('Order Total'), amount: runningTotal };
                     var newLineItems =[{type: 'final',label: subTotalDescr, amount: runningAmount }];
 
                     session.completePaymentMethodSelection( newTotal, newLineItems );

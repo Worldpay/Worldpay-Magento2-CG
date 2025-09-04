@@ -61,24 +61,24 @@
                         "
                         translate="'Proceed to Checkout'">
                 </button>
-                <!-- ko if:getSubscriptionStatus() == false -->	
+                <!-- ko if:getSubscriptionStatus() == false -->
                 <if args="window.isCheckoutCartPage == 1">
-                    <if args="chromepayEnabled == 1">	
-                        <if args="chromePaymentMode == 'direct'">	
-                            <if args="isChromium == '1'">	
-                            <br><br>	
-                            <a class="action viewcart" data-bind="attr: {href: checkoutNowUrl}">	
-                                <button 	
-                                    id="checkout-now"	
-                                    type="button"	
-                                    class="action primary checkout"	
-                                    data-action="close"	
-                                    data-bind="attr: {href: checkoutNowUrl, title: checkoutNowTitle}, text: checkoutNowTitle, click: initPaymentRequest"	
-                                ></button>	
-                            </a>	
-                        </if>	
-                    </if>	
-                    </if>	
+                    <if args="chromepayEnabled == 1">
+                        <if args="chromePaymentMode == 'direct'">
+                            <if args="isChromium == '1'">
+                            <br><br>
+                            <a class="action viewcart" data-bind="attr: {href: checkoutNowUrl}">
+                                <button
+                                    id="checkout-now"
+                                    type="button"
+                                    class="action primary checkout"
+                                    data-action="close"
+                                    data-bind="attr: {href: checkoutNowUrl, title: checkoutNowTitle}, text: checkoutNowTitle, click: initPaymentRequest"
+                                ></button>
+                            </a>
+                        </if>
+                    </if>
+                    </if>
                 </if>
                 <!-- /ko -->
                 <div data-bind="html: getCartParamUnsanitizedHtml('extra_actions')"></div>

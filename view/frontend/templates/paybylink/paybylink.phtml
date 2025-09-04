@@ -5,7 +5,7 @@
  */
 ?>
 <?php /** @var $block \Sapient\Worldpay\Block\Paybylink */ ?>
-<h1><?= $escaper->escapeHtml(__('Thank you for your purchase!.')) ?></h1>
+<h1><?= $escaper->escapeHtml(__('Thank you for your purchase!')) ?></h1>
 <div class="checkout-success">
     <?php if ($block->getOrderId()):?>
         <?php if ($block->getCanViewOrder()):?>
@@ -19,13 +19,13 @@
             ), ['a', 'strong']) ?>
             </p>
         <?php  else:?>
-            <p><?= $escaper->escapeHtml(__('Your payment has been successfully 
-            regarding the order #:<span>%1</span>.', $block->getOrderId()), ['span']) ?></p>            
+            <p><?= $escaper->escapeHtml(__('Your payment has been successfully
+            regarding the order #: <span>%1</span>.', $block->getOrderId()), ['span']) ?></p>
             <?php endif;?>
             <?php if ($block->checkCustomerLogin()):?>
             <p><?= $escaper->escapeHtml(__('You can check your order details after loggedin: ')) ?>
             <a class="action" href="<?= $escaper->escapeUrl($block->getCustomerLoginUrl()) ?>">
-            <span><strong><?= $escaper->escapeHtml(__(' Click here')) ?></strong></span></a>
+                <span> <strong><?= $escaper->escapeHtml(__('Click here')) ?></strong></span></a>
             <?php endif;?>
             <p>
                 <?= $escaper->escapeHtml(__(

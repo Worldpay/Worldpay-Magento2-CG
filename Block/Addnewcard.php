@@ -96,7 +96,7 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
         $this->_storeManager = $storeManager;
         parent::__construct($context, $data);
     }
-   
+
     /**
      * Get Cvc Enabled
      *
@@ -107,7 +107,7 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
     {
         return $this->worldpayHelper->isCcRequireCVC();
     }
-    
+
     /**
      * Get Store code
      *
@@ -123,7 +123,7 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
      *
      * @return string
      */
-    
+
     public function getSessionId()
     {
         return $this->_customerSession->getSessionId();
@@ -134,7 +134,7 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
      *
      * @return string
      */
-    
+
     public function getCustomerToken()
     {
         $customerId = $this->_customerSession->getCustomer()->getId();
@@ -178,8 +178,7 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
 
     public function getCheckoutSpecificLabel($labelcode)
     {
-        $data = $this->worldpayHelper->getCheckoutLabelbyCode($labelcode);
-        return $data;
+        return $this->worldpayHelper->getCheckoutLabelbyCode($labelcode);
     }
 
     /**
@@ -190,8 +189,7 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
     public function getMonths()
     {
         if (!self::$_months) {
-            self::$_months = ['' => __($this->getCheckoutLabelbyCode('CO6') ?
-                    $this->getCheckoutLabelbyCode('CO6') : 'Month')];
+            self::$_months = ['' => $this->getCheckoutLabelbyCode('CO6') ?: __('Month')];
             for ($i = 1; $i < 13; $i++) {
                 $month = str_pad($i, 2, '0', STR_PAD_LEFT);
                 self::$_months[$month] = date("$i - F", mktime(0, 0, 0, $i, 1));
@@ -230,9 +228,8 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
     public function getExpiryYears()
     {
         if (!self::$_expiryYears) {
-            self::$_expiryYears = ['' => __($this->getCheckoutLabelbyCode('CO7')
-                    ? $this->getCheckoutLabelbyCode('CO7') : 'Year')];
-            $year = date('Y');
+            self::$_expiryYears = ['' => $this->getCheckoutLabelbyCode('CO7') ?: __('Year')];
+            $year = (int)date('Y');
             $endYear = ($year + 20);
             while ($year < $endYear) {
                 self::$_expiryYears[$year] = $year;
@@ -249,8 +246,10 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
 
     public function getDisclaimerMessageEnable()
     {
-        return (bool) $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer'
-                  . '/stored_credentials_message_enable', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/tokenization/configure_disclaimer/stored_credentials_message_enable',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
     }
     /**
      * Get Disclaimer Text
@@ -260,8 +259,10 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
 
     public function getDisclaimerText()
     {
-        return $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer/'
-                    . 'stored_credentials_disclaimer_message', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return $this->_scopeConfig->getValue(
+            'worldpay/tokenization/configure_disclaimer/stored_credentials_disclaimer_message',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
     }
     /**
      * Get Disclaimer Message Mandatory
@@ -271,15 +272,17 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
 
     public function getDisclaimerMessageMandatory()
     {
-        return (bool) $this->_scopeConfig->getValue('worldpay/tokenization/configure_disclaimer/'
-                    . 'stored_credentials_flag', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/tokenization/configure_disclaimer/stored_credentials_flag',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
     }
     /**
      * Get Stored Credentials Enabled Value
      *
      * @return string
      */
-    
+
     public function getStoredCredentialsEnabledValue()
     {
         return (bool) $this->_scopeConfig->getValue(

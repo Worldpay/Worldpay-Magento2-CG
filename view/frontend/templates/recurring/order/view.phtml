@@ -23,7 +23,7 @@
                     </strong>
                 </span>
             </label>
-            <div>      
+            <div>
                 <span class="limiter-options">
                 <strong>
                     <?= /* @noEscape */  $escaper->escapeHtml('Completed') ?>
@@ -37,26 +37,26 @@
             </div>
         </div>
     </div>
-    <div class="show-order-sort-by" 
+    <div class="show-order-sort-by"
     style="display:flex;flex-direction:row-reverse;flex-wrap:nowrap;justify-content:flex-start;align-items:center;">
-    <div class="field  required" 
+    <div class="field  required"
     style="display:flex;float:right;flex-direction:row;justify-content:center;align-items:center;">
         <label class="label" for="Sort By" style="display: block;margin: 0 10px;" >
             <span>
-                <?= /* @noEscape */  $escaper->escapeHtml(count($orderData) .' Order placed in') ?>
+                <?= /* @noEscape */  $escaper->escapeHtml(__('%1 Order placed in', count($orderData))) ?>
             </span>
         </label>
         <div>
             <select name="status" title="Order Status" onchange="location= this.value;" >
                 <option value="<?= $escaper->escapeUrl($block->getOrderFilterURL('m-6')) ?>"
-                    <?php if ($block->checkSelectedFilter('m-6')): ?> 
+                    <?php if ($block->checkSelectedFilter('m-6')): ?>
                         <?= /* @noEscape */  $escaper->escapeHtml('selected') ?>
                     <?php endif ?> >
                     <?= /* @noEscape */  $escaper->escapeHtml('6 Month') ?>
                 </option>
                 <option value="<?= $escaper->escapeUrl($block->getOrderFilterURL('y-'.date("Y"))) ?>"
-                <?php if ($block->checkSelectedFilter('y-'.date("Y"))): ?> 
-                        <?= /* @noEscape */  $escaper->escapeHtml('selected') ?> 
+                <?php if ($block->checkSelectedFilter('y-'.date("Y"))): ?>
+                        <?= /* @noEscape */  $escaper->escapeHtml('selected') ?>
                     <?php endif ?> >
                     <?= /* @noEscape */  $escaper->escapeHtml(date("Y")) ?>
                 </option>
@@ -109,7 +109,7 @@
                         class="col status">
                         <?php if ($block->getNotAlreadyCanceled($subscription)): ?>
                             <?= /* @noEscape */ $escaper->escapeHtml(__('Cancelled')) ?>
-                            <?php else: ?>   
+                            <?php else: ?>
                                 <?= /* @noEscape */ $escaper->escapeHtml($subscription->getStatus()) ?>
                         <?php endif; ?>
                     </td>
@@ -128,7 +128,7 @@
                             </span></a>
                         <?php elseif (!$block->checkOrderShipment($subscription) &&
                                  $block->checkOrderBufferTime($subscription)): ?>
-                            <a href="javascript:void(0)" 
+                            <a href="javascript:void(0)"
                                data-cancel-url="<?= /* @noEscape */  $block->getCancelUrl($subscription); ?>"
                                class="action cancel delete">
                             <span><?= /* @noEscape */  $block->getMyAccountLabels('AC23') ?>
@@ -147,7 +147,7 @@
 
                 $('.action.cancel').on("click", function(event) {
                     confirm({
-                        title: 'Cancel Subscription Order',
+                        title: $t('Cancel Subscription Order'),
                         content: getMyAccountExceptions('MCAM12'),
                         actions: {
                             confirm: function() {
@@ -161,7 +161,7 @@
                 var data=window.MyAccountExceptions;
                 var gendata=JSON.parse(data);
                 for (var key in gendata) {
-                    if (gendata.hasOwnProperty(key)) {  
+                    if (gendata.hasOwnProperty(key)) {
                         var cxData=gendata[key];
                     if(cxData['exception_code'].includes(exceptioncode)){
                         return cxData['exception_module_messages']?cxData['exception_module_messages']

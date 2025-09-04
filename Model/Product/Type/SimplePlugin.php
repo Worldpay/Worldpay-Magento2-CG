@@ -165,7 +165,7 @@ class SimplePlugin
         }
 
         $quoteItem = $planOption->getItem();
-        $subcriptionCodeMessage = 'Please verify subscription data, before placing the order';
+        $subcriptionCodeMessage = __('Please verify subscription data, before placing the order');
         $subscriptionCamMessage = $this->recurringHelper->getCheckoutExceptions('CSUB01');
         $subscriptionDisplayMessage = $subscriptionCamMessage?$subscriptionCamMessage:$subcriptionCodeMessage;
         $quoteItem->setHasError(false)->setMessage(

@@ -83,14 +83,14 @@
                     <?php endif; ?>
                     <td data-th="<?= /* @noEscape */ $escaper->escapeHtml(__('Status')) ?>"
                         class="col status">
-                            <?= /* @noEscape */ $escaper->escapeHtml($subscription->getStatusLabel()) ?>    
+                            <?= /* @noEscape */ $escaper->escapeHtml($subscription->getStatusLabel()) ?>
                     </td>
                     <td data-th="<?= /* @noEscape */  $escaper->escapeHtml(__('Actions')) ?>" class="col actions">
                         <?php if ($subscription->getStatus() == 'active'): ?>
                             <a href="<?= /* @noEscape */  $block->getEditUrl($subscription); ?>"
                                class="action edit"><span><?= /* @noEscape */  $block->getMyAccountLabels('AC22') ?>
                                 </span></a>
-                            <a href="javascript:void(0)" 
+                            <a href="javascript:void(0)"
                                data-cancel-url="<?= /* @noEscape */  $block->getCancelUrl($subscription); ?>"
                                class="action delete"><span><?= /* @noEscape */  $block->getMyAccountLabels('AC23') ?>
                                 </span></a>
@@ -117,7 +117,7 @@
 
                 $('.action.delete').on("click", function(event) {
                     confirm({
-                        title: 'Cancel Subscription',
+                        title: $t('Cancel Subscription'),
                         content: getMyAccountExceptions('MCAM12'),
                         actions: {
                             confirm: function() {
@@ -131,7 +131,7 @@
                 var data=window.MyAccountExceptions;
                 var gendata=JSON.parse(data);
                 for (var key in gendata) {
-                    if (gendata.hasOwnProperty(key)) {  
+                    if (gendata.hasOwnProperty(key)) {
                         var cxData=gendata[key];
                     if(cxData['exception_code'].includes(exceptioncode)){
                         return cxData['exception_module_messages']?cxData['exception_module_messages']

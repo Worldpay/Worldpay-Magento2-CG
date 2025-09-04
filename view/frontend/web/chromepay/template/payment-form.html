@@ -168,7 +168,7 @@ select {
 }
 
 @media (min-width: 500px) {
-  
+
 
   button {
     font-size: 18px; /* fallback */
@@ -229,36 +229,36 @@ select {
   </head>
   <body>
     <main>
-    
+
       <form action="javascript:void(0);" onsubmit="payWithCreditCard()" method="post">
 
         <h1>Enter details</h1>
 
-        <section>        
+        <section>
           <label for="cc-number">Card number</label>
           <!-- Allow for spaces and for shorter and longer payment card numbers -->
           <input id="cc-number" onblur="validateCard()"  name="cc-number" autocomplete="cc-number" inputmode="numeric" maxlength="50" pattern="[\d ]{10,30}" required>
         </section>
 
-        <section>        
+        <section>
           <label for="cc-name">Name on card</label>
           <input id="cc-name" name="cc-name" autocomplete="cc-name" maxlength="50"  required>
         </section>
-        
-        <!-- section id="cc-exp-csc">      
+
+        <!-- section id="cc-exp-csc">
           <div>
             <label for="cc-exp">Expiry date</label>
             <input id="cc-exp" name="cc-exp" autocomplete="cc-exp" placeholder="MM/YY" maxlength="5" required>
-          </div> 
+          </div>
           <div>
             <label for="cc-csc">Security code</label>
             <input id="cc-csc" name="cc-csc" inputmode="numeric" maxlength="3" required>
             <div class="explanation">Back of card, last 3 digits</div>
           </div>
-        </section -->  
+        </section -->
 
         <!-- Alternative using select elements for expiry month and year  -->
-        
+
         <section id="cc-exp-csc">
           <div id="exp-month-year">
             <label for="cc-exp-month">Expiry date</label>
@@ -297,24 +297,24 @@ select {
             </select>
           </div>
           <div>
-            <label for="cc-csc">Security code</label>
+            <label for="cc-csc"><!-- ko i18n: 'Security code'--><!-- /ko --></label>
             <input id="cc-csc" name="cc-csc" autocomplete="cc-csc" inputmode="numeric" minlength="3" maxlength="3" required>
-            <div class="explanation">Back of card, last 3 digits</div>
+            <div class="explanation"><!-- ko i18n: 'Back of card, last 3 digits'--><!-- /ko --></div>
           </div>
         </section>
 
-        <button type="submit" id="complete-payment" onclick="javascript:void(0);">Complete payment</button>
-        <button id="cancel-payment" onclick="cancel();">Cancel</button>
+        <button type="submit" id="complete-payment" onclick="javascript:void(0);"><!-- ko i18n: 'Complete payment'--><!-- /ko --></button>
+        <button id="cancel-payment" onclick="cancel();"><!-- ko i18n: 'Cancel'--><!-- /ko --></button>
 
       </form>
-    
+
     </main>
     <script>
       let paymentRequestClient;
       let methodData;
-    
+
       function validateCard(){
-        var cardType = getCardType(document.getElementById('cc-number').value);        
+        var cardType = getCardType(document.getElementById('cc-number').value);
         if(cardType == 'AMEX-SSL'){
           document.getElementById('cc-csc').removeAttribute('maxlength')
           document.getElementById('cc-csc').removeAttribute('minlength')
@@ -342,26 +342,26 @@ select {
             billingAddress: null,
           }
         };
-      
+
         paymentRequestClient.postMessage(paymentAppResponse);
         window.close();
       }
-      
+
       navigator.serviceWorker.addEventListener('message', e => {
         paymentRequestClient = e.source;
-        
+
         methodData = e.data["methodData"];
         //document.getElementById('details').innerHTML = JSON.stringify(e.data, undefined, 2);
-      
+
         //populatePaymentInstrumentsList();
       });
-      
+
       navigator.serviceWorker.controller.postMessage('payment_app_window_ready');
-      
+
       function cancel() {
         if(!paymentRequestClient) return;
-      
-        paymentRequestClient.postMessage("The payment request is cancelled by user");
+
+        paymentRequestClient.postMessage($t("The payment request is cancelled by user"));
         window.close();
       }
 
@@ -370,7 +370,7 @@ select {
     var re = new RegExp("^4");
     if (cardNumber.match(re) != null)
             return "VISA-SSL";
-    // Mastercard 
+    // Mastercard
     // Updated for Mastercard 2017 BINs expansion
     var binExps = /^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$/;
     if (binExps.test(cardNumber))
@@ -404,7 +404,7 @@ select {
             return "CHINAUNIONPAY-SSL";
     return "";
     } //end of getCardType
-      
+
           </script>
   </body>
 </html>

@@ -62,7 +62,7 @@ define(
             return doLuhnCheck(value);
         }, $.mage.__(getCreditCardExceptions('CCAM0')));
 
-        var typeErrorMsg = 'Card number entered does not match with card type selected';
+        var typeErrorMsg = $.mage.__('Card number entered does not match with card type selected');
         var cardTypeErrorDisplay = getCreditCardExceptions('CTYP01') ? getCreditCardExceptions('CTYP01') : typeErrorMsg;
         $.validator.addMethod('worldpay-validate-card-type', function (value) {
             if (value) {
@@ -273,7 +273,7 @@ define(
                 if(this.multishipping){
                     var MultishippingCreditCardPreSelected = jQuery('#p_method_worldpay_cc:checked');
                     if(MultishippingCreditCardPreSelected.length){
-                        jQuery('#payment-continue').html("<span>Place Order</span>");
+                        jQuery('#payment-continue').html("<span>" + ("Place Order") + "</span>");
                         document.getElementById("checkout-agreement-div").style.display = "block";
                         this.selectPaymentMethod();
                     }

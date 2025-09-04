@@ -1,5 +1,5 @@
 <div class="new-address-form">
-    <form class="form form-shipping-address" id="new-address-form"  data-bind="visible: !isUserLoggedIn() || (customeraddresses().length == 0),attr: {'data-hasrequired': $t('* Required Fields')}" data-hasrequired="* Required Fields" >
+    <form class="form form-shipping-address" id="new-address-form"  data-bind="visible: !isUserLoggedIn() || (customeraddresses().length == 0),attr: {'data-hasrequired': $t('* Required Fields')}" data-hasrequired="$t('* Required Fields')" >
         <div id="shipping-new-address-form" class="fieldset address">
                 <div class="field _required"  name="address.firstname">
                     <label class="label"><span data-bind="i18n: 'First Name'"></span></label>
@@ -84,7 +84,7 @@
                         <label class="label"  ><span data-bind="i18n: 'State/Province'"></span></label>
                         <div class="control">
                             <select id="region_id" name="region_id"  class="validate-select">
-                                <option value="" data-bind="text: 'Please select a region, state or province.'"></option>
+                                <option value="" data-bind="i18n: 'Please select a region, state or province.'"></option>
                             </select>
                             <input type="text" id="region" name="region" value=""  title=""
                             class="input-text required-entry">

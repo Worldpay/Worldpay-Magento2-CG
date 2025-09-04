@@ -37,7 +37,7 @@ define([
         },
         fetchDynamicShippingRates: function(shippingAddress,applepaySession){
             var self=this;
-            var subTotalDescr =  "Cart Subtotal";
+            var subTotalDescr =  $t("Cart Subtotal");
             var formattedSHippingAdress = {
                 'firstname' : '',
                 'lastname' : '',
@@ -147,7 +147,7 @@ define([
 
 
             var session = new ApplePaySession(self.versionNumber, paymentRequest);
-            var subTotalDescr      = "Cart Subtotal";
+            var subTotalDescr      = $t("Cart Subtotal");
             // Merchant Validation
             session.onvalidatemerchant = function (event) {
                 var promise = self.applePayPerformValidation(event.validationURL);
@@ -259,7 +259,7 @@ define([
             var totalAmount = cart().subtotalAmount;
             var totalPayableAmount =  parseFloat(selectedShippingMethod.amount) + parseFloat(totalAmount);
             return {
-                label: 'Order Total',
+                label: $t('Order Total'),
                 amount: totalPayableAmount
               }
         },
