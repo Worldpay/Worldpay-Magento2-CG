@@ -9,7 +9,7 @@ Worldpay Plugin version: 2.4.7-p70925
 Worldpay Plugin version: 2.4.7-p60725
 1. Magento 2.4.7-p6 compatible
 2. PHP 8.3 & 8.2 compatibility
-4. Added Paypal SmartButton on product description page
+3. Added Paypal SmartButton on product description page
 
 Worldpay Plugin version: 2.4.7-p50625
 1. Magento 2.4.7-p5 compatible
