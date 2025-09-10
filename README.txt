@@ -1,10 +1,16 @@
 Latest releases for all supported version:
 
 For Magento 2.4.6
+
+Worldpay Plugin version: 2.4.6-p120925
+1. Magento 2.4.6-p11 compatible
+2. PHP 8.2 compatibility
+3. Added Spanish and Portuguese translations
+
 Worldpay Plugin version: 2.4.6-p110725
 1. Magento 2.4.6-p11 compatible
 2. PHP 8.2 compatibility
-4. Added Paypal SmartButton on product description page
+3. Added Paypal SmartButton on product description page
 
 Worldpay Plugin version: 2.4.6-p100625
 1. Magento 2.4.6-p10 compatible
