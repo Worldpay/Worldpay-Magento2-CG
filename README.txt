@@ -1,6 +1,12 @@
 Latest releases for all supported version:
 
 For Magento 2.4.8
+
+Worldpay Plugin version: 2.4.8-p20925
+1. Magento 2.4.8-p2 compatible
+2. PHP 8.4 & 8.3 compatibility
+4. Added Spanish and Portuguese translations
+
 Worldpay Plugin version: 2.4.8-p10725
 1. Magento 2.4.8-p1 compatible
 2. PHP 8.4 & 8.3 compatibility
