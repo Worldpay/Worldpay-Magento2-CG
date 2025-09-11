@@ -28,12 +28,12 @@
                     <td style="border-radius:4px;padding:9.0pt 13.5pt 9.0pt 13.5pt;background-color:#1979c3;"><a href = {{var paybylink_url}} style="color: #fff;">
                         {{trans "Pay Now"}}</a></td>
                 </tr>
-            </table>  
+            </table>
         </td>
     </tr>
     <tr>
         <td>
-            {{trans "Please note that the link will get expired "}}<b>{{var pblexpirytime }} </b>
+            {{trans "Please note that the link will get expired <strong>%pblexpirytime</strong>" }}
         </td>
     </tr>
     <tr><td>&nbsp;</td></tr>
@@ -61,5 +61,5 @@
         <td>{{trans "If you have queries about this payment, or would you like to chat, feel free to contact us."}}</td>
     </tr>
 </table>
-  
-{{template config_path="design/email/footer_template"}} 
+
+{{template config_path="design/email/footer_template"}}

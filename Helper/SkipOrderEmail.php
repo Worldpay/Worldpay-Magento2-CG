@@ -36,7 +36,7 @@ class SkipOrderEmail extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Customer\Model\Session
      */
       protected $_customerSession;
-    
+
     /**
      * @var CheckoutSession
      */
@@ -129,13 +129,13 @@ class SkipOrderEmail extends \Magento\Framework\App\Helper\AbstractHelper
             // template variables pass here
             $templateVars = $params;
             $subject = __("WORLDPAY: ").
-                "Skipped Order".' '.$params['orderId'];
+                __("Skipped Order").' '.$params['orderId'];
 
             $templateVars['mail_subject'] = $subject;
             $storeId = $this->storeManager->getStore()->getId();
             $from = ['email' => $senderDetails['email'], 'name' => $senderDetails['name']];
             $this->inlineTranslation->suspend();
-  
+
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $templateOptions = [
                 'area' => \Magento\Framework\App\Area::AREA_FRONTEND,

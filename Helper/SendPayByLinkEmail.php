@@ -12,7 +12,7 @@ class SendPayByLinkEmail extends \Magento\Framework\App\Helper\AbstractHelper
 {
     public const WORLDPAY_SALES_EMAIL_PAYBYLINK_TEMPLATE = "wp_sales_email_paybylink";
     public const WORLDPAY_SALES_EMAIL_PAYBYLINK_MULTISHIPPING_TEMPLATE = "wp_sales_email_paybylink_multishipping";
-    
+
     /**
      * @var ScopeConfigInterface
      */
@@ -39,7 +39,7 @@ class SendPayByLinkEmail extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Customer\Model\Session
      */
       protected $_customerSession;
-    
+
     /**
      * @var CheckoutSession
      */
@@ -134,22 +134,22 @@ class SendPayByLinkEmail extends \Magento\Framework\App\Helper\AbstractHelper
             // template variables pass here
             $templateVars = $params;
             $subject = __("WORLDPAY: ").
-            "Pay by Link for Order".' '.$this->checkoutSession->getAuthenticatedOrderId();
+                __("Pay by Link for Order").' '.$this->checkoutSession->getAuthenticatedOrderId();
 
             if ($params['is_multishipping']) {
                 $subject = __("WORLDPAY: ").
-                "Pay by Link for Multishipping Order".' '.$params['orderId'];
+                    __("Pay by Link for Multishipping Order").' '.$params['orderId'];
             }
 
             if ($params['is_resend']) {
                 $subject = __("WORLDPAY: ").
-                "Resend Pay by Link for Order".' '.$params['orderId'];
+                    __("Resend Pay by Link for Order").' '.$params['orderId'];
             }
             $templateVars['mail_subject'] = $subject;
             $storeId = $this->storeManager->getStore()->getId();
             $from = ['email' => $senderDetails['email'], 'name' => $senderDetails['name']];
             $this->inlineTranslation->suspend();
-  
+
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $templateOptions = [
                 'area' => \Magento\Framework\App\Area::AREA_FRONTEND,

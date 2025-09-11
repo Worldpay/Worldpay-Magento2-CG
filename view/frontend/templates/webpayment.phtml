@@ -1,6 +1,6 @@
 <?php
-$param= $block->getRequest()->getParams();
-$storeCode= /* @noEscape */ $block->getStoreCode();
+$param = $block->getRequest()->getParams();
+$storeCode = /* @noEscape */ $block->getStoreCode();
 
 if (array_key_exists('chromepay', $param)) {
     ?>
@@ -32,7 +32,7 @@ $scriptString = <<<script
             console.log('Service worker registered successfully');
             }).catch(function (e)
             {
-            console.error('Error during service worker registration:', e);
+            console.error('Error during service worker registration:', e.message);
             });
         });
     }
@@ -68,7 +68,6 @@ $scriptString = <<<script
     window.isCheckoutCartPage = '$isCheckoutCartPage';
     window.currency = '$currency';
     var envMode = '$envMode';
-
     if(envMode == 'Test Mode') {
         document.cookie = "envMode=Test Mode; path=/";
     }else{
@@ -109,11 +108,13 @@ $sessionId = /* @noEscape */ $block->getSessionId();
 
 $blockAllItems = '';
 foreach ($block->getAllItems() as $item) {
-    $blockAllItems .= '{';
-    $blockAllItems .= 'label:"' . /* @noEscape */ $item->getData('name') . '",';
-    $blockAllItems .= 'amount: { currency: "' . /* @noEscape */ $block->getCurrency() . '",';
-    $blockAllItems .= 'value: "' . /* @noEscape */ $item->getData('price') .'"';
-    $blockAllItems .= '}},';
+    $blockAllItems .= '{' .
+        'label:"' . /* @noEscape */ $item->getData('name') . '",' .
+        'amount: {' .
+            'currency: "' . /* @noEscape */ $block->getCurrency() . '",' .
+            'value: "' . /* @noEscape */ $item->getData('price') .'"' .
+        '}' .
+    '},';
 }
 
 
@@ -152,39 +153,49 @@ $scriptString = <<<script
     var guestMaskedQuoteId = window.checkoutConfig.quoteData.entity_id;
     var isDownlodable = $isDownloadable;
     const details = {
-    displayItems: [
+        displayItems: [
 
-$blockAllItems
+            $blockAllItems
 
-    {
-    label: 'Subtotal',
-            amount: { currency: '$currency',
-                value: '$subtotal' }
-    },
-    {
-    label: 'Shipping',
-            amount: {currency: '$currency',
-                value: '$shippingRate'},
-            pending: true,
-    },
-    {
-    label: 'Tax',
-            amount: {currency: '$currency',
-                value: '$taxRate'},
-            pending: true,
-    },
-    {
-    label: 'Discount',
-            amount: {currency: '$currency',
-                value: '$discountRate'},
-            pending: true,
-    },
-    ],
-            total: {
-            label: 'Total',
-                    amount: { currency: '$currency',
-                    value: '$total' }
+            {
+                label: 'Subtotal',
+                amount: {
+                    currency: '$currency',
+                    value: '$subtotal'
+                }
             },
+            {
+                label: 'Shipping',
+                amount: {
+                    currency: '$currency',
+                    value: '$shippingRate'
+                },
+                pending: true,
+            },
+            {
+                label: 'Tax',
+                amount: {
+                    currency: '$currency',
+                    value: '$taxRate'
+                },
+                pending: true,
+            },
+            {
+                label: 'Discount',
+                amount: {
+                    currency: '$currency',
+                    value: '$discountRate'
+                },
+                pending: true,
+            },
+        ],
+        total: {
+            label: 'Total',
+            amount: {
+                currency: '$currency',
+                value: '$total'
+            }
+        },
     };
     var options = {
     requestShipping: reqShipping,

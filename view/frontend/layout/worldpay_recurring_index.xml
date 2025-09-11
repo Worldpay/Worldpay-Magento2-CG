@@ -9,7 +9,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <update handle="customer_account"/>
     <head>
-        <css src="Sapient_Worldpay::css/wp-myaccount.css" />         
+        <css src="Sapient_Worldpay::css/wp-myaccount.css" />
     </head>
     <body>
         <referenceContainer name="content">

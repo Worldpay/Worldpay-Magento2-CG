@@ -20,7 +20,7 @@
                 <select name="payment[cc_type]" class="select select-ccytpe" data-bind="attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type', 'data-validate': JSON.stringify({required:true})},
                    options: availableCCTypes(), optionsText: 'ccLabel',
                    value: selectedCCType, optionsValue: 'ccValue',
-                   optionsCaption: 'Select Your Credit Card', event:{ change: loadEventAction }"></select>
+                   optionsCaption: $t('Select Your Credit Card'), event:{ change: loadEventAction }"></select>
                 <!-- /ko -->
                 <!-- ko if: (paymentMethodSelection()=='radio')-->
 
@@ -39,7 +39,7 @@
                     <!--/ko-->
                     <!--ko ifnot: $parent.getIcons(item.ccValue) -->
                     <label data-bind="attr: {for: 'direct_cc_' + item.ccValue}">
-                        <!-- ko text: item.ccLabel -->
+                        <!-- ko i18n: item.ccLabel -->
                         <!-- /ko -->
                     </label>
                     <!--/ko-->
@@ -101,7 +101,7 @@
                                                 options: getCcMonthsValues(),
                                                 optionsValue: 'value',
                                                 optionsText: 'month',
-                                                optionsCaption: $t(getCheckoutLabels('CO6')),
+                                                optionsCaption: getCheckoutLabels('CO6'),
                                                 value: creditCardExpMonth">
                             </select>
                         </div>
@@ -113,7 +113,7 @@
                                                options: getCcYearsValues(),
                                                optionsValue: 'value',
                                                optionsText: 'year',
-                                               optionsCaption: $t(getCheckoutLabels('CO7')),
+                                               optionsCaption: getCheckoutLabels('CO7'),
                                                value: creditCardExpYear">
                             </select>
                         </div>
@@ -212,14 +212,14 @@
                 style=" width:225px;align:'center'">
 
                 <select name="payment[instalment]" class="select select-instalment" data-bind="visible: (showInstalmentSection()),
-                                               attr: {id: getCode() + '_instalment', 
-                                               'data-container': getCode() + '-instalment', 
+                                               attr: {id: getCode() + '_instalment',
+                                               'data-container': getCode() + '-instalment',
                                                'data-validate': JSON.stringify({required:true})},
                                                enable: isActive($parents),
                                                options: availableInstalTypes(),
                                                optionsValue: 'instalValue',
                                                optionsText: 'instalccLabel',
-                                               optionsCaption: $t(getCheckoutLabels('CO11')),
+                                               optionsCaption: getCheckoutLabels('CO11'),
                                                title: $t('Instalment'),
                                                value: selectedInstalment">
                 </select>

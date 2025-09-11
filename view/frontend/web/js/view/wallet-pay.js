@@ -25,7 +25,8 @@ define([
     'Sapient_Worldpay/js/model/checkout-utils',
     'Sapient_Worldpay/js/model/region-updator',
     'Sapient_Worldpay/js/model/apple-pay',
-    'Sapient_Worldpay/js/model/paypal-pdp'
+    'Sapient_Worldpay/js/model/paypal-pdp',
+    'mage/validation'
 ], function (ko, $, _, Component, confirm, customerData, url, mageTemplate, $t,idsResolver, productInfoResolver,customer,storage,modal,addressList,priceUtils,totalsegmentsTemplate,pdpCartTemplate, GooglePayModel,checkoutUtils,RegionUpdater,ApplePayModel, PaypalModel) {
     'use strict';
 
@@ -848,11 +849,11 @@ define([
                                 window.walletpayObj.updateTotalSegments( {
 
                                     subtotal : {
-                                        "title" : 'Subtotal',
+                                        "title" : $t('Subtotal'),
                                         "value" : changedCart.subtotalAmount
                                     },
                                     grandtotal:{
-                                        "title" : 'Grand Total',
+                                        "title" : $t('Grand Total'),
                                         "value" : changedCart.subtotalAmount
                                     }
                                 });
@@ -925,7 +926,7 @@ define([
             //var baseGrandTotal   = cartData().subtotalAmount;
             var baseGrandTotal = window.walletpayObj.grandtotal();
             var runningAmount = (Math.round(baseGrandTotal * 100) / 100).toFixed(2);
-            var subTotalDescr      = "Cart Subtotal";
+            var subTotalDescr      = $t("Cart Subtotal");
             var currencyCode = window.walletpayObj.currencyCode();
             var countryCode = window.walletpayObj.selectedBillingAddress().country_id
             if(window.walletpayObj.isRequiredShipping()) {
@@ -936,7 +937,7 @@ define([
                 countryCode: countryCode,
                 lineItems: [{label: subTotalDescr, amount: runningAmount }],
                 total: {
-                    label: 'Order Total',
+                    label: $t('Order Total'),
                     amount: runningAmount
                 },
                 supportedNetworks: ['amex', 'masterCard', 'visa' ],
@@ -988,10 +989,10 @@ define([
 
         onAddressChange: function() {
             var selectedAddress = this.dropdownSelectionShippingAddress();
+            window.walletpayObj.selectedShippingMethod(null);
             if (!selectedAddress) {
                 window.walletpayObj.availableShippingMethods([]);
                 window.walletpayObj.selectedShippingAddress(null);
-                window.walletpayObj.selectedShippingMethod(null);
             } else {
                 selectedAddress.region = selectedAddress.region?.region || selectedAddress.region;
                 this.fetchShippingByAddress(selectedAddress);
@@ -1003,4 +1004,3 @@ define([
         }
     });
 });
-

@@ -91,9 +91,9 @@ class Request
         if ($this->helper->isDynamic3DS2Enabled() && $cookie != "") { // Check is 3DS2 request
             $request->setOption(CURLOPT_COOKIE, $cookie);
         }
-        //$request->addCookie(CURLOPT_COOKIE, $cookie);
         $request->setTimeout(self::CURL_TIMEOUT);
-        if (isset($paymentDetails[0]->nodeValue)) {
+        $orderContent = $_xml->getElementsByTagName('orderContent');
+        if (isset($orderContent[0]->nodeValue)) {
             $headersArray = [
                 'Content-Type'=> 'text/xml',
                 'Expect'=>'',
@@ -118,7 +118,6 @@ class Request
 
         // logging Headder for 3DS request to check Cookie.
         if ($this->helper->isThreeDSRequest()) {
-            //$information = $request->getInfo(CURLINFO_HEADER_OUT);
             $information = $request->getHeaders();
             $logger->info("**REQUEST HEADER START**");
             $logger->info(json_encode($information));
@@ -230,14 +229,11 @@ class Request
     {
         $paymentMethod='';
         $_xml  = clone($quote);
-        $paymentDetails = $_xml->getElementsByTagName('paymentDetails');
-        if (isset($paymentDetails[0]->nodeValue)) {
-            $orderContent = $_xml->getElementsByTagName('orderContent');
-            if (isset($orderContent[0]->nodeValue)) {
-                $orderContentData = $orderContent[0]->nodeValue;
-                $result = json_decode($orderContentData);
-                $paymentMethod = $result->additional_details->transaction_method;
-            }
+        $orderContent = $_xml->getElementsByTagName('orderContent');
+        if (isset($orderContent[0]->nodeValue)) {
+            $orderContentData = $orderContent[0]->nodeValue;
+            $result = json_decode($orderContentData);
+            $paymentMethod = $result->additional_details->transaction_method;
         }
 
         $pluginTrackerDetails = $this->helper->getPluginTrackerHeaderDetails($paymentMethod);

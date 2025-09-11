@@ -72,7 +72,7 @@ class="form multicheckout billing">
                             <div class="payment-title-wrapper">
                                 <span><?= $escaper->escapeHtml(__('Payment Method')); ?></span>
                                 <br>
-                                <span class="security-title">All transactions are secure and encrypted...</span>
+                                <span class="security-title"><?= $escaper->escapeHtml(__('All transactions are secure and encrypted...')); ?></span>
                             </div>
                             <div class="payment-logo-wrapper">
                                 <img
@@ -168,7 +168,7 @@ class="form multicheckout billing">
                         <?php if (count($otherPaymentMethods) > 0): ?>
                             <div class="other-payment-methods-wrapper">
                                 <div class="payment-title-wrapper">
-                                    <h2 class="step-title">Other Payment Methods</h2>
+                                    <h2 class="step-title"><?= $escaper->escapeHtml(__('Other Payment Methods')); ?></h2>
                                 </div>
                             </div>
                             <?= $block->getChildHtml('payment_methods_before') ?>
@@ -398,6 +398,9 @@ class="form multicheckout billing">
     </div>
 
 </form>
+<?php $textPlaceOrder = $escaper->escapeHtml(__('Place Order')); ?>
+<?php $textGoToReviewYourOrder = $escaper->escapeHtml(__('Go to Review Your Order')); ?>
+
 <?php $scriptString = <<<script
 
     if (document.querySelector('input[name="payment[method]"]')) {
@@ -405,7 +408,9 @@ class="form multicheckout billing">
             elem.addEventListener("change", function(event) {
                 var item = event.target.value;
                 if (item == 'worldpay_cc' || item == 'worldpay_wallets' || item == 'worldpay_apm') {
-                    document.getElementById("payment-continue").innerHTML = "<span>Place Order</span>";
+                    let spanElem = document.createElement('span');
+                    spanElem.innerHTML = "$textPlaceOrder";
+                    document.getElementById("payment-continue").appendChild(spanElem);
                     document.querySelectorAll('.wp-method-contents').forEach((elem) => {
                         elem.classList.remove("no-display");
                     });
@@ -414,7 +419,9 @@ class="form multicheckout billing">
                     document.querySelectorAll('.wp-method-contents').forEach((elem) => {
                         elem.classList.add("no-display");
                     });
-                    document.getElementById("payment-continue").innerHTML = "<span>Go to Review Your Order</span>";
+                    let spanElem = document.createElement('span');
+                    spanElem.innerHTML = "$textGoToReviewYourOrder";
+                    document.getElementById("payment-continue").appendChild(spanElem);
                     document.getElementById("checkout-agreement-div").style.display = "none";
                 }
             });
