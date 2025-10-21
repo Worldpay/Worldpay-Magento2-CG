@@ -4,12 +4,15 @@
         <input type="radio"
                name="payment[method]"
                class="radio"
-               data-bind="attr: {'id': getCode()},
+               data-bind="attr: {
+                       'id': getCode(),
+                       'aria-label': getTitle()
+                   },
                    value: getCode(),
                    checked: isChecked,
                    click: selectPaymentMethod,
                    visible: isRadioButtonVisible()"
-        />
+        >
 
         <label data-bind="attr: {'for': getCode()}" class="label">
             <span data-bind="text: getTitle()"></span>
@@ -43,6 +46,8 @@
 
         <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
             <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode(), id: 'payment_form_' + getCode()}">
+                <legend data-bind="visible: false"></legend>
+
                 <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
                     <div class="control">
 
@@ -58,7 +63,7 @@
                                     'data-validate': JSON.stringify({'validate-one-required-by-name':true}),
                                     id: 'apm_' + item.ccValue
                                 }"
-                               name="apm_type" />
+                               name="apm_type" >
 
                             <!-- ko if: $parent.getIcons(item.ccValue) -->
                             <label data-bind="attr: {for: 'apm_' + item.ccValue}">
@@ -125,38 +130,41 @@
                     <div id="klarna-msg" data-bind="visible: isKlarnaPayLater()">
                         <div>
                             <small>
-                                <strong><!-- ko i18n: 'US/UK - '--><!-- /ko --></strong>
-                                <!-- ko i18n: 'You need to make the payment within 30 days for the selected billing country.' --><!-- /ko -->
+                                <strong data-bind="i18n: 'US/UK - '"></strong>
+                                <span data-bind="html: $t('You need to make the payment within 30 days for the selected billing country.')"></span>
                             </small>
                         </div>
                         <div>
                             <small>
-                                CCC 111
+                                <strong data-bind="i18n: 'ALL Other Europe - '"></strong>
+                                <span data-bind="html: $t('You need to make the payment within 14 days for the selected billing country.')"></span>
                             </small>
                         </div>
                     </div>
                 </div>
 
                 <div class="control field type required ach-block" data-bind="visible: false">
-                    <label data-bind="attr: {for: getCode() + '_ach_account_type'}" class="label">
+                    <label data-bind="attr: {for: 'ach_pay'}" class="label">
                         <span><!-- ko i18n: getCheckoutLabels('CO15') --><!-- /ko --></span>
-                        <!-- <span> ko i18n: 'Bank Account Types' /ko </span> -->
                     </label>
                     <div class="field type required ach-account-type" style="margin-bottom:10px;">
-                        <select name="ach_pay" class="select select-ccytpe" disabled
-                                data-bind="attr: {id: 'ach_pay', 'data-validate': JSON.stringify({required:true})},
-                              options: getACHBankAccountTypes(),
-                              optionsText: 'accountText',
-                              value: selectedACHAccountType,
-                              enable: isActive($parents),
-                              optionsValue: 'accountCode',
-                              optionsCaption: $t('Select Account Type')">
+                        <select name="ach_pay" class="select select-ccytpe" disabled="disabled"
+                            data-bind="
+                                attr: {
+                                    id: 'ach_pay',
+                                    'data-validate': JSON.stringify({required:true})
+                                },
+                                options: getACHBankAccountTypes(),
+                                optionsText: 'accountText',
+                                value: selectedACHAccountType,
+                                enable: isActive($parents),
+                                optionsValue: 'accountCode',
+                                optionsCaption: getCheckoutLabels('CO15')">
                         </select>
                     </div>
 
                     <label data-bind="attr: {for: getCode() + '_ach_account_number'}" class="label">
                         <span><!-- ko i18n: getCheckoutLabels('CO16')--><!-- /ko --></span>
-                        <!-- <span> ko i18n: 'Account Number' /ko </span> -->
                     </label>
                     <div class="field type required ach-account-number" style="margin-bottom:10px;">
 
@@ -164,22 +172,21 @@
                             onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189 && event.keyCode !== 190"
                             style="width: 225px;" name="ach-account-number" class="input-text" value=""
                             data-bind="attr: {
+                                    title: getCheckoutLabels('CO16'),
+                                    'aria-label': getCheckoutLabels('CO16'),
                                     autocomplete: off,
                                     id: getCode() + '_ach_account_number',
-                                    title: $t('Account Number'),
                                     'data-container': getCode() + '-ach-account-number',
                                     'data-validate': JSON.stringify({'required':true,'worldpay-validate-ach-accountnumber': true})
                                 },
                                 enable: isActive($parents),
                                 value: achaccountnumber,
-                                valueUpdate: 'keyup'"
-                            />
+                                valueUpdate: 'keyup'">
 
                     </div>
 
                     <label data-bind="attr: {for: getCode() + '_ach_routing_number'}" class="label">
                         <span><!-- ko i18n: getCheckoutLabels('CO17') --><!-- /ko --></span>
-                        <!-- <span> ko i18n: 'Routing Number' /ko </span> -->
                     </label>
                     <div class="field type required ach-routing-number" style="margin-bottom:10px;">
 
@@ -187,38 +194,37 @@
                             onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189 && event.keyCode !== 190"
                             style="width: 225px;" name="ach-routing-number" class="input-text" value=""
                             data-bind="attr: {
+                                   title: getCheckoutLabels('CO17'),
+                                   'aria-label': getCheckoutLabels('CO17'),
                                    autocomplete: off,
                                    id: getCode() + '_ach_routing_number',
-                                   title: $t('Routing Number'),
                                    'data-container': getCode() + '-ach-routing-number',
                                    'data-validate': JSON.stringify({'required':true, 'worldpay-validate-ach-routingnumber': true})
                                    },
                                enable: isActive($parents),
                                value: achroutingnumber,
-                               valueUpdate: 'keyup'"
-                        />
+                               valueUpdate: 'keyup'">
 
                     </div>
 
                     <div class="field type ach-check-number" style="margin-bottom:10px;">
                         <label data-bind="attr: {for: getCode() + '_ach_check_number'}" class="label">
                             <span><!-- ko i18n: getCheckoutLabels('CO18') --><!-- /ko --></span>
-                            <!-- <span> ko i18n: 'Check Number' /ko </span> -->
                         </label>
                         <div class="checknumber">
                             <input type="number"
                                    onkeydown="return event.keyCode !== 69 && event.keyCode !== 187 && event.keyCode !== 189 && event.keyCode !== 190"
                                    style="width: 225px;" name="ach-check-number" class="input-text" value="" data-bind="attr: {
-                                   autocomplete: off,
-                                   id: getCode() + '_ach_check_number',
-                                   title: $t('Check Number'),
-                                   'data-container': getCode() + '-ach-check-number',
-                                   'data-validate': JSON.stringify({'required':false,
-                                     'worldpay-validate-ach-checknumber': true})},
+                                       title: getCheckoutLabels('CO18'),
+                                       'aria-label': getCheckoutLabels('CO18'),
+                                       autocomplete: off,
+                                       id: getCode() + '_ach_check_number',
+                                       'data-container': getCode() + '-ach-check-number',
+                                       'data-validate': JSON.stringify({'required':false,'worldpay-validate-ach-checknumber': true})
+                                   },
                                    enable: isActive($parents),
                                    value: achchecknumber,
-                                   valueUpdate: 'keyup'"
-                            />
+                                   valueUpdate: 'keyup'">
                         </div>
 
                     </div>
@@ -226,46 +232,43 @@
                     <div class="field type ach-company-name" style="margin-bottom:10px;">
                         <label data-bind="attr: {for: getCode() + '_ach_company_name'}" class="label">
                             <span><!-- ko i18n: getCheckoutLabels('CO19') --><!-- /ko --></span>
-                            <!-- <span> ko i18n: 'Company Name' /ko </span> -->
                         </label>
                         <div class="companame">
                             <input type="text" style="width: 225px;" name="ach-company-name" class="input-text" value=""
                                    data-bind="attr: {
-                                   autocomplete: off,
-                                   id: getCode() + '_ach_company_name',
-                                   title: $t('Company Name'),
-                                   'data-container': getCode() + '-ach-company-name',
-                                   'data-validate': JSON.stringify({'required':false,
-                                     'worldpay-validate-ach-companyname': true})},
+                                       title: getCheckoutLabels('CO19'),
+                                       'aria-label': getCheckoutLabels('CO19'),
+                                       autocomplete: off,
+                                       id: getCode() + '_ach_company_name',
+                                       'data-container': getCode() + '-ach-company-name',
+                                       'data-validate': JSON.stringify({'required':false,'worldpay-validate-ach-companyname': true})
+                                   },
                                    enable: isActive($parents),
                                    value: achcompanyname,
-                                   valueUpdate: 'keyup'"
-                            />
+                                   valueUpdate: 'keyup'">
                         </div>
 
                     </div>
 
                     <div class="field type ach-email-address"
-                         data-bind="attr: {id: getCode() + '_ach_email_address'}"
                          style="margin-bottom:10px;">
                         <label data-bind="attr: {for: getCode() + '_ach_email_address'}" class="label">
                             <span><!-- ko i18n: getCheckoutLabels('CO20') --><!-- /ko --></span>
-                            <!-- <span> ko i18n: 'Email Address' /ko </span> -->
                         </label>
                         <div class="achemail">
                             <input type="email" style="width: 225px;" name="ach-email-address" class="input-text"
                                 value=""
                                 data-bind="attr: {
+                                       title: getCheckoutLabels('CO20'),
+                                       'aria-label': getCheckoutLabels('CO20'),
                                        autocomplete: off,
                                        id: getCode() + '_ach_email_address',
-                                       title: $t('Email Address'),
                                        'data-container': getCode() + '-ach-email-address',
                                        'data-validate': JSON.stringify({'validate-email':true})
                                     },
                                     enable: isActive($parents),
                                     value: achemailaddress,
-                                    valueUpdate: 'keyup'"
-                            />
+                                    valueUpdate: 'keyup'">
                         </div>
                     </div>
                 </div>
@@ -286,15 +289,16 @@
 
                         <input type="text"
                                style="width: 225px;" name="sepa-iban" class="input-text" value="" data-bind="attr: {
-                               autocomplete: off,
-                               id: getCode() + '_sepa_iban',
-                               title: $t('IBAN'),
-                               'data-container': getCode() + '-sepa-iban',
-                               'data-validate': JSON.stringify({'required':true})},
+                                   title: getCheckoutLabels('CO30'),
+                                   'aria-label': getCheckoutLabels('CO30'),
+                                   autocomplete: off,
+                                   id: getCode() + '_sepa_iban',
+                                   'data-container': getCode() + '-sepa-iban',
+                                   'data-validate': JSON.stringify({'required':true})
+                               },
                                enable: isActive($parents),
                                value: sepaIban,
-                               valueUpdate: 'keyup'"
-                        />
+                               valueUpdate: 'keyup'">
 
                     </div>
 
@@ -314,29 +318,31 @@
                         <input type="text"
                                style="width: 225px;" name="sepa-account-holder-name" class="input-text" value=""
                                data-bind="attr: {
+                                       title: getCheckoutLabels('CO31'),
+                                       'aria-label': getCheckoutLabels('CO31'),
                                        autocomplete: off,
                                        id: getCode() + '_sepa_account_holder_name',
-                                       title: $t('Account Holder Name'),
                                        'data-container': getCode() + '-sepa-account-holder-name',
                                        'data-validate': JSON.stringify({'required':true})
                                    },
                                    enable: isActive($parents),
                                    value: sepaAccountHolderName,
-                                   valueUpdate: 'keyup'" />
+                                   valueUpdate: 'keyup'">
                     </div>
                 </div>
 
                 <!--ko if: isStatementNarrativeEnabled() -->
                 <div class="field type statment-narrative"
                      data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative_div'},visible: false">
-                    <label data-bind="attr: {for: getCode() + '_statement'}" class="label">
+                    <label data-bind="attr: {for: getCode() + '_cc_type_stmt_narrative'}" class="label">
                         <span><!-- ko i18n: getCheckoutLabels('CO12') --><!-- /ko --></span>
-                        <!-- <span> ko i18n: 'Purpose of transaction' /ko </span> -->
                     </label>
                     <div>
                         <textarea name="stmt_narrative" maxlength="255" cols="20" rows="3"
                             style="width:225px;text-align:left;resize: none;"
                             data-bind="attr: {
+                                    title: getCheckoutLabels('CO12'),
+                                    'aria-label': getCheckoutLabels('CO12'),
                                     id: getCode() + '_cc_type_stmt_narrative',
                                     'data-container': getCode() + '-cc-type-narrative',
                                     'data-validate': JSON.stringify({'validate-no-html-tags': true})
@@ -368,11 +374,10 @@
                 <div class="field type sepa_e-mandate">
                     <input type="checkbox" class="required-entry"
                            data-bind="attr: {
-                               'id': 'sepa_e_mandate_condition',
-                               'name': 'sepa_e_mandate_condition',
-                               'value': 'sepa_e_mandate_condition_true'
-                               }"
-                    />
+                               id: 'sepa_e_mandate_condition',
+                               name: 'sepa_e_mandate_condition',
+                               value: 'sepa_e_mandate_condition_true'
+                               }">
                     <label class="label sepa_e-mandate-label" for="sepa_e_mandate_condition">
                         <span data-bind="html: getSepaEmandateTerms()"></span>
                     </label>
@@ -402,7 +407,7 @@
                         type="submit"
                         data-bind="
                            click: preparePayment,
-                           attr: {title: $t('Place Order')},
+                           attr: {title: getCheckoutLabels('CO14')},
                            css: {disabled: !isPlaceOrderActionAllowed()},
                            enable: (getCode() == isChecked())
                            "

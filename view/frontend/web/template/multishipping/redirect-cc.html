@@ -37,10 +37,7 @@
                     <!-- ko if: (getSavedCardsCount() > 0)-->
                     <fieldset class="fieldset payment items ccard worldpay_cc" id="payment_form_worldpay_cc">
                         <hr>
-                        <h4>
-                            <!-- ko i18n: 'Saved cards'-->
-                            <!-- /ko -->
-                        </h4>
+                        <h4><!-- ko i18n: 'Saved cards'--><!-- /ko --></h4>
                         <!-- ko template: 'Sapient_Worldpay/payment/saved-card-form' -->
                         <!-- /ko -->
                     </fieldset>
@@ -59,14 +56,14 @@
                                 <!-- /ko -->
                             </span>
                             <!-- ko if: (isStoredCredentialsEnabled() && isDisclaimerMessageEnabled())-->
-                            <span>(<a class="checkout-disclaimer" data-bind="i18n: getCheckoutLabels('CO9'), click: disclaimerPopup"></a>)</span>
+                            <span>(<a href="#" class="checkout-disclaimer" data-bind="i18n: getCheckoutLabels('CO9'), click: disclaimerPopup"></a>)</span>
                             <!-- /ko -->
                         </label>
                     </div>
                 </div>
                 <!-- /ko -->
 
-                <div id="dialog" style="display: none" align="center" title="Disclaimer!">
+                <div id="dialog" style="display: none" align="center">
                     <form id="disclaimer" name="disclaimer">
                         <div data-bind="html: disclaimerMessage()"></div>
                     </form>
@@ -74,32 +71,32 @@
                 <div class="mage-error" generated="true" id="disclaimer-error"></div>
                 <div class="field cpf required" data-bind="visible: (showCPFSection())">
                     <label data-bind="attr: {for: getCode() + '_cpf'},visible: (showCPFSection())" class="label">
-                        <span> CPF/CNPJ </span>
-                        <!-- <span> ko i18n: 'CPF/CNPJ' /ko </span>-->
+                        <span><!-- ko i18n: getCheckoutLabels('CO10') --><!-- /ko --></span>
                     </label>
                     <div class="control">
                         <input type="number" style="width: 225px;" name="payment[cpf]" class="input-text" value=""
                             data-bind="attr: {
                                     autocomplete: off,
                                     id: getCode() + '_cpf',
-                                    title: $t('CPF/CNPJ'),
+                                    title: getCheckoutLabels('CO10'),
+                                    'aria-label': getCheckoutLabels('CO10'),
                                     'data-container': getCode() + '-cpf-number',
                                     'data-validate': JSON.stringify({'required-number':true,
                                       'worldpay-validate-cpf-number': true})}, visible: (showCPFSection()) ,
                                     enable: isActive($parents),
                                     value: isCPF,
-                                    valueUpdate: 'keyup'"></input>
+                                    valueUpdate: 'keyup'">
                     </div>
                 </div>
                 <div class="field instalment required" data-bind="visible: (showInstalmentSection())">
                     <label data-bind="attr: {for: getCode() + '_instalment'},visible: (showInstalmentSection())"
                         class="label">
-                        <span> Instalment </span>
-                        <!--           <span> ko i18n: 'Instalment' /ko </span>-->
+                        <span><!-- ko i18n: getCheckoutLabels('CO11') --><!-- /ko --></span>
                     </label>
                     <div class="control" style=" width:225px;align:'center'">
 
-                        <select name="payment[instalment]" class="select select-instalment" data-bind="visible: (showInstalmentSection()),
+                        <select name="payment[instalment]" class="select select-instalment"
+                                data-bind="visible: (showInstalmentSection()),
                                            attr: {id: getCode() + '_instalment',
                                            'data-container': getCode() + '-instalment',
                                            'data-validate': JSON.stringify({required:true})},

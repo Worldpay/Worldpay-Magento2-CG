@@ -8,7 +8,7 @@
                 value: getCode(),
                 checked: isChecked,
                 click: selectPaymentMethod,
-                visible: isRadioButtonVisible()" />
+                visible: isRadioButtonVisible()">
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
     </div>
     <div class="payment-method-content" data-bind="css: { 'redirect-form': (getSavedCardsCount() <= 0) }">
@@ -25,7 +25,7 @@
                                 'value':'ONLINE',
                                 'data-validate': JSON.stringify({ 'validate-one-required-by-name':true }),
                                 id: 'redirect_cc_new_card'
-                            }" />
+                            }">
                     <label data-bind="attr: {for: 'redirect_cc_new_card'}"><!-- ko i18n: 'New Card' --><!-- /ko --></label>
                 </div>
                 <div class="paymentmethods-radio-wrapper">
@@ -38,7 +38,7 @@
                                 'data-validate': JSON.stringify({ 'validate-one-required-by-name':true }),
                                 id: 'redirect_cc_savedcard',
                                 'data-type': 'redirect'
-                            }" />
+                            }">
                     <label data-bind="attr: {for: 'redirect_cc_savedcard'}"><!-- ko i18n: getCheckoutLabels('CO13') --><!-- /ko --></label>
                 </div>
                 <!-- /ko -->
@@ -50,7 +50,7 @@
                             'value': 'ONLINE',
                             id: 'redirect_cc_gust',
                             'data-type':'redirect'
-                        }" />
+                        }">
                 </div>
                 <!-- /ko -->
             </div>
@@ -76,11 +76,11 @@
                                 title: getCheckoutLabels('CO8'),
                                 'data-container': getCode() + '-save-card'
                             },
-                            value: saveMyCard" />
+                            value: saveMyCard">
                     <label data-bind="attr: {for: getCode() + 'save-card'}" class="label">
                         <span><!-- ko i18n: getCheckoutLabels('CO26') --><!-- /ko --></span>
                         <!-- ko if: (isStoredCredentialsEnabled() && isDisclaimerMessageEnabled()) -->
-                            <span>(<a class="checkout-disclaimer" data-bind="i18n: getCheckoutLabels('CO9'), click: disclaimerPopup"></a>)</span>
+                            <span>(<a href="#" class="checkout-disclaimer" data-bind="i18n: getCheckoutLabels('CO9'), click: disclaimerPopup"></a>)</span>
                         <!-- /ko -->
                     </label>
                 </div>
@@ -97,7 +97,7 @@
 
             <div class="field cpf required" data-bind="visible: (showCPFSection())">
                 <label data-bind="attr: {for: getCode() + '_cpf'}, visible: (showCPFSection())" class="label">
-                    <span><!-- ko i18n: 'CPF/CNPJ' --><!-- /ko --></span>
+                    <span><!-- ko i18n: getCheckoutLabels('CO10') --><!-- /ko --></span>
                 </label>
                 <div class="control">
                     <input type="number"
@@ -109,14 +109,14 @@
                                 autocomplete: off,
                                 id: getCode() + '_cpf',
                                 title: getCheckoutLabels('CO10'),
+                                'aria-label': getCheckoutLabels('CO10'),
                                 'data-container': getCode() + '-cpf-number',
                                 'data-validate': JSON.stringify({'required-number':true, 'worldpay-validate-cpf-number': true})
                             },
                             visible: (showCPFSection()) ,
                             enable: isActive($parents),
                             value: isCPF,
-                            valueUpdate: 'keyup'"
-                          />
+                            valueUpdate: 'keyup'">
                 </div>
             </div>
 

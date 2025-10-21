@@ -1,3 +1,6 @@
+<?php /** @var \Magento\Framework\Escaper $escaper */ ?>
+<?php /** @var \Sapient\Worldpay\Block\Form\Card $block */ ?>
+
 <?php
 $clientKey = $escaper->escapeHtml($block->getClientKey());
 
@@ -26,10 +29,9 @@ $serializedFormData = $block->getJsonData($wpData);
           id="payment_form_<?= $escaper->escapeHtml($block->getMethodCode()) ?>"
           style="display: none"
           data-mage-init='{"worldpayForm":<?= /* @noEscape */ $serializedFormData; ?>}'>
-   <div class="admin__field _required">
+    <div class="admin__field _required">
        <label for="worldpay_cc_type" class="admin__field-label">
            <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO1'); ?></span>
-<!--       <span>Credit Card Type</span>-->
        </label>
        <div class="admin__field-control">
             <?php $cctypes = $block->getCCtypes(); ?>
@@ -55,7 +57,6 @@ $serializedFormData = $block->getJsonData($wpData);
     <div class="admin__field _required directform">
        <label for="worldpay_cc_name" class="admin__field-label">
            <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO4'); ?></span>
-<!--       <span>Card Holder name</span>-->
        </label>
        <div class="admin__field-control">
           <input type="text" id="worldpay_cc_name"
@@ -67,7 +68,6 @@ $serializedFormData = $block->getJsonData($wpData);
     <div class="admin__field _required directform">
        <label for="worldpay_cc_number" class="admin__field-label">
            <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO3'); ?></span>
-<!--       <span>Credit Card Number</span>-->
        </label>
        <div class="admin__field-control">
           <input type="number" id="worldpay_cc_number"
@@ -77,9 +77,8 @@ $serializedFormData = $block->getJsonData($wpData);
        </div>
     </div>
     <div class="admin__field _required directform">
-       <label for="worldpay_card_expiration" class="admin__field-label">
+       <label for="worldpay_card_expiration_month" class="admin__field-label" id="worldpay_card_expiration_month_year">
            <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO22'); ?></span>
-<!--       <span>Expiration Date</span>-->
        </label>
        <div class="admin__field-control">
             <?php
@@ -87,10 +86,10 @@ $serializedFormData = $block->getJsonData($wpData);
             ?>
           <select id="worldpay_card_expiration_month"
                   name="payment[cc_exp_month]"
-                  class="validate-cc-exp required-entry admin__control-select admin__control-select-month">
+                  class="validate-cc-exp required-entry admin__control-select admin__control-select-month"
+                  aria-labelledby="worldpay_card_expiration_month_year">
              <option value="0" selected="selected">
                  <?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO6'); ?>
-<!--                Month-->
              </option>
              <?php foreach ($months as $k => $v) { ?>
              <option value="<?= /* @noEscape */ $k ?>">
@@ -103,10 +102,10 @@ $serializedFormData = $block->getJsonData($wpData);
             ?>
           <select id="worldpay_card_expiration_yr"
                   name="payment[cc_exp_year]"
-                  class="required-entry admin__control-select admin__control-select-year">
+                  class="required-entry admin__control-select admin__control-select-year"
+                  aria-labelledby="worldpay_card_expiration_month_year">
              <option value="" selected="selected">
                  <?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO7'); ?>
-<!--                Year                    -->
              </option>
               <?php foreach ($years as $k => $v) { ?>
                  <option value="<?= /** @noEscape */ $k ?>">
@@ -117,14 +116,13 @@ $serializedFormData = $block->getJsonData($wpData);
        </div>
     </div>
 
-            <?php if ($block->requireCvcEnabled()): ?>
+    <?php if ($block->requireCvcEnabled()): ?>
     <div class="admin__field field required _required directform" id="wp_cvv" >
         <label for="worldpay_card_expiration" class="admin__field-label">
             <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO5'); ?></span>
-<!--            <span>CVV</span>-->
-       </label>
+        </label>
         <div class="admin__field-control control" id="wp_cvc_container">
-         <input type="password" autocomplete="off"
+            <input type="password" autocomplete="off"
                    class="input-text cvv saved-cvv-number required-entry validate-cc-cvn validate-digits"
                    name="payment[cvv]"
                    value="" />
@@ -137,15 +135,14 @@ $serializedFormData = $block->getJsonData($wpData);
        id="worldpay_cse_enabled"
        value=""/>
     <?php } ?>
- 
+
     <?php if ($saveCardEnabled && ($tokenizationEnabled || $storedCredentialsEnabled)): ?>
     <div class="admin__field field directform">
-      <div class="admin__field-control field-tooltip-content">
+        <div class="admin__field-control field-tooltip-content">
           <input type="checkbox" id="worldpay_savecard" name="payment[save_my_card]" class="admin__control-checkbox">
           <label class="label" for="worldpay_savecard">
               <span class="admin__field-label" style="padding-left:10px;">
                   <?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO8'); ?>
-                   <!--Save card-->
               </span>
           </label>
           <input type="hidden" id="savecard_tokenization"
@@ -154,10 +151,10 @@ $serializedFormData = $block->getJsonData($wpData);
           <input type="hidden" id="savecard_stored_credentials"
                  name="payment[stored_credentials_enabled]"
                  value="<?= /** @noEscape */ $storedCredentialsEnabled;?>">
-      </div>
+        </div>
     </div>
     <?php endif; ?>
-  
+
   <div class="admin__field _required saved_card_form">
      <input type="hidden"
        name="payment[paymentToken]"
@@ -166,16 +163,15 @@ $serializedFormData = $block->getJsonData($wpData);
         <?php if (count($savedCards) && $saveCardEnabled): ?>
             <label class="label admin__field-label">
                 <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO25'); ?></span>
-<!--                    <span>Saved cards</span>-->
-                  </label>
+            </label>
         <?php endif; ?>
         <?php foreach ($savedCards as $savedCard):?>
         <div class="admin__field-control admin__field-option">
-            <input id="saved_card_<?= /** @noEscape */ $savedCard['id'];?>"
+            <input id="saved_card_<?= /** @noEscape */ $savedCard['id']; ?>"
                    value="<?= /** @noEscape */ $savedCard['token_code']; ?>"
                    type="radio" name="payment[tokenCode]"
                    class="admin__control-radio saved_tokens">
-            <label class="admin__field-label" for="saved_card_<?= /** @noEscape */ $savedCard['id'];?>">
+            <label class="admin__field-label" for="saved_card_<?= /** @noEscape */ $savedCard['id']; ?>">
                 <?= /** @noEscape */ $savedCard['method']; ?> <?= /** @noEscape */ $savedCard['card_number']; ?>
             </label>
             <input id="stored_credentials_<?= /** @noEscape */ $savedCard['id'];?>"
@@ -186,25 +182,25 @@ $serializedFormData = $block->getJsonData($wpData);
         <?php endforeach; ?>
         <?php if (count($savedCards) && $block->requireCvcEnabled() && ($block->isDirectIntegration())): ?>
             <p>&nbsp;</p>
-            
-                <label class="label admin__field-label">
-                    <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO24'); ?></span>
-<!--                    <span>CVN</span>-->
-                  </label>
-                <div class="admin__field-control control" id="wp_cvc_container">
-                 <input type="password" autocomplete="off"
-                           class="input-text cvv saved-cvv-number required-entry validate-digits"
-                           name="payment[saved_cc_cid]"
-                           value="" />
-                </div>
-          
+
+            <label class="label admin__field-label" for="worldpay_cvv">
+                <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO24'); ?></span>
+            </label>
+            <div class="admin__field-control control" id="wp_cvc_container">
+                <input type="password"
+                       autocomplete="off"
+                       id="worldpay_cvv"
+                       class="input-text cvv saved-cvv-number required-entry validate-digits"
+                       name="payment[saved_cc_cid]"
+                       value="" />
+            </div>
+
         <?php endif; ?>
   </div>
     <?php if ($cpfEnabled): ?>
     <div class="admin__field _required">
        <label for="worldpay_cpf" class="admin__field-label">
            <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO10'); ?></span>
-<!--       <span>CPF/CNPJ</span>-->
        </label>
        <div class="admin__field-control">
           <input type="text" id="worldpay_cpf"
@@ -216,9 +212,8 @@ $serializedFormData = $block->getJsonData($wpData);
     <?php endif; ?>
     <?php if (count($instalmentTypes) && $block->instalmentEnabled()): ?>
     <div class="admin__field _required">
-       <label for="worldpay_cc_type" class="admin__field-label">
+       <label for="worldpay_instalment" class="admin__field-label">
            <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO11'); ?></span>
-<!--       <span>Instalment</span>-->
        </label>
        <div class="admin__field-control">
             <?php $cctypes = $instalmentTypes; ?>
@@ -227,7 +222,6 @@ $serializedFormData = $block->getJsonData($wpData);
                   class="required-entry admin__control-select">
               <option value="" selected="selected">
                   <?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO11'); ?>
-<!--                Instalment-->
               </option>
               <option value="1">
                 One Payment
@@ -242,13 +236,12 @@ $serializedFormData = $block->getJsonData($wpData);
           </select>
        </div>
     </div>
-            <?php endif; ?>
+    <?php endif; ?>
     <?php if (!$block->isRedirectIntegration()
             && ($cpfEnabled || (count($instalmentTypes) && $block->instalmentEnabled()))): ?>
     <div class="admin__field _required">
        <label for="worldpay_statement" class="admin__field-label">
            <span><?= /* @noEscape */ $block->getCheckoutSpecificLabel('CO12'); ?></span>
-<!--       <span>Purpose of transaction</span>-->
        </label>
        <div class="admin__field-control">
           <input type="text" id="worldpay_statement"
