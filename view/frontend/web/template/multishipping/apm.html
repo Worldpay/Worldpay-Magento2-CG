@@ -15,8 +15,7 @@
                                 attr: {
                                     'value': item.ccValue,
                                     'data-validate': JSON.stringify({'validate-one-required-by-name':true}),
-                                    id: 'apm_' + item.ccValue}"
-                            />
+                                    id: 'apm_' + item.ccValue}">
 
                         <!-- ko if: $parent.getIcons(item.ccValue) -->
                         <label data-bind="attr: {for: 'apm_' + item.ccValue}">
@@ -57,7 +56,8 @@
                                 value: selectedCCType,
                                 optionsValue: 'ccValue',
                                 optionsCaption: $t('Select Your Payment Method'),
-                                event:{ change: checkPaymentTypes }"></select>
+                                event:{ change: checkPaymentTypes }">
+                    </select>
                     <!-- /ko -->
 
                 </div>
@@ -74,25 +74,26 @@
                     <div id="klarna-msg" data-bind="visible: isKlarnaPayLater()">
                         <div>
                             <small>
-                                <strong><!-- ko i18n: 'US/UK - ' --><!-- /ko --></strong>
-                                <!-- ko i18n: 'You need to make the payment within 30 days for the selected billing country. --><!-- /ko -->
+                                <strong data-bind="i18n: 'US/UK - '"></strong>
+                                <span data-bind="html: $t('You need to make the payment within 30 days for the selected billing country.')"></span>
                             </small>
                         </div>
                         <div>
                             <small>
-                                <strong><!-- ko i18n: 'ALL Other Europe - ' --><!-- /ko --></strong>
-                                <!-- ko i18n: 'You need to make the payment within 14 days for the selected billing country.' --><!-- /ko -->
+                                <strong data-bind="i18n: 'ALL Other Europe - '"></strong>
+                                <span data-bind="html: $t('You need to make the payment within 14 days for the selected billing country.')"></span>
                             </small>
                         </div>
                     </div>
                 </div>
 
                 <div class="control field type required ach-block" data-bind="visible: false">
-                    <label data-bind="attr: {for: getCode() + '_ach_account_type'}" class="label">
+                    <label data-bind="attr: {for: 'ach_pay'}" class="label">
                         <span><!-- ko i18n: getCheckoutLabels('CO15') --><!-- /ko --></span>
                     </label>
                     <div class="field type required ach-account-type" style="margin-bottom:10px;">
-                        <select name="ach_pay" class="select select-ccytpe" disabled data-bind="attr: {id: 'ach_pay', 'data-validate': JSON.stringify({required:true})},
+                        <select name="ach_pay" class="select select-ccytpe" disabled="disabled"
+                                data-bind="attr: {id: 'ach_pay', 'data-validate': JSON.stringify({required:true})},
                                options: getACHBankAccountTypes(),
                                optionsText: 'accountText',
                                value: selectedACHAccountType,
@@ -104,10 +105,8 @@
 
                     <label data-bind="attr: {for: getCode() + '_ach_account_number'}" class="label">
                         <span>
-                            <!-- ko i18n: getCheckoutLabels('CO16')-->
-                            <!-- /ko -->
+                            <!-- ko i18n: getCheckoutLabels('CO16') --><!-- /ko -->
                         </span>
-                        <!--            <span> ko i18n: 'Account Number' /ko </span>-->
                     </label>
                     <div class="field type required ach-account-number" style="margin-bottom:10px;">
 
@@ -122,16 +121,14 @@
                                       'worldpay-validate-ach-accountnumber': true})},
                                     enable: isActive($parents),
                                     value: achaccountnumber,
-                                    valueUpdate: 'keyup'"></input>
+                                    valueUpdate: 'keyup'">
 
                     </div>
 
                     <label data-bind="attr: {for: getCode() + '_ach_routing_number'}" class="label">
                         <span>
-                            <!-- ko i18n: getCheckoutLabels('CO17')-->
-                            <!-- /ko -->
+                            <!-- ko i18n: getCheckoutLabels('CO17') --><!-- /ko -->
                         </span>
-                        <!--            <span> ko i18n: 'Routing Number' /ko </span>-->
                     </label>
                     <div class="field type required ach-routing-number" style="margin-bottom:10px;">
 
@@ -146,17 +143,15 @@
                                       'worldpay-validate-ach-routingnumber': true})},
                                     enable: isActive($parents),
                                     value: achroutingnumber,
-                                    valueUpdate: 'keyup'"></input>
+                                    valueUpdate: 'keyup'">
 
                     </div>
 
                     <div class="field type ach-check-number" style="margin-bottom:10px;">
                         <label data-bind="attr: {for: getCode() + '_ach_check_number'}" class="label">
                             <span>
-                                <!-- ko i18n: getCheckoutLabels('CO18')-->
-                                <!-- /ko -->
+                                <!-- ko i18n: getCheckoutLabels('CO18') --><!-- /ko -->
                             </span>
-                            <!--            <span> ko i18n: 'Check Number' /ko </span>-->
                         </label>
                         <div class="checknumber">
                             <input type="number"
@@ -170,7 +165,7 @@
                                       'worldpay-validate-ach-checknumber': true})},
                                     enable: isActive($parents),
                                     value: achchecknumber,
-                                    valueUpdate: 'keyup'"></input>
+                                    valueUpdate: 'keyup'">
                         </div>
 
                     </div>
@@ -178,10 +173,8 @@
                     <div class="field type ach-company-name" style="margin-bottom:10px;">
                         <label data-bind="attr: {for: getCode() + '_ach_company_name'}" class="label">
                             <span>
-                                <!-- ko i18n: getCheckoutLabels('CO19')-->
-                                <!-- /ko -->
+                                <!-- ko i18n: getCheckoutLabels('CO19') --><!-- /ko -->
                             </span>
-                            <!--            <span> ko i18n: 'Company Name' /ko </span>-->
                         </label>
                         <div class="companame">
                             <input type="text" style="width: 225px;" name="ach-company-name" class="input-text" value=""
@@ -194,19 +187,17 @@
                                       'worldpay-validate-ach-companyname': true})},
                                     enable: isActive($parents),
                                     value: achcompanyname,
-                                    valueUpdate: 'keyup'"></input>
+                                    valueUpdate: 'keyup'">
                         </div>
 
                     </div>
 
-                    <div class="field type ach-email-address" data-bind="attr: {id: getCode() + '_ach_email_address'}"
+                    <div class="field type ach-email-address"
                         style="margin-bottom:10px;">
                         <label data-bind="attr: {for: getCode() + '_ach_email_address'}" class="label">
                             <span>
-                                <!-- ko i18n: getCheckoutLabels('CO20')-->
-                                <!-- /ko -->
+                                <!-- ko i18n: getCheckoutLabels('CO20') --><!-- /ko -->
                             </span>
-                            <!--            <span> ko i18n: 'Email Address' /ko </span>-->
                         </label>
                         <div class="achemail">
                             <input type="email" style="width: 225px;" name="ach-email-address" class="input-text"
@@ -219,7 +210,7 @@
                                       'validate-email':true})},
                                     enable: isActive($parents),
                                     value: achemailaddress,
-                                    valueUpdate: 'keyup'"></input>
+                                    valueUpdate: 'keyup'">
                         </div>
 
                     </div>
@@ -228,15 +219,13 @@
                 <div class="control field type required sepa-block" data-bind="visible: false">
                     <label data-bind="attr: {for: getCode() + '_sepa_iban'}" class="label">
                         <span>
-                             <!--ko if: getCheckoutLabels('CO30') -->
-                               <!-- ko i18n: getCheckoutLabels('CO30')-->
-                                <!-- /ko -->
-                            <!--/ko-->
+                            <!-- ko if: getCheckoutLabels('CO30') -->
+                               <!-- ko i18n: getCheckoutLabels('CO30') --><!-- /ko -->
+                            <!-- /ko -->
 
-                            <!--ko ifnot: getCheckoutLabels('CO30') -->
-                                <!-- ko i18n: 'IBAN'-->
-                                    <!-- /ko -->
-                            <!--/ko-->
+                            <!-- ko ifnot: getCheckoutLabels('CO30') -->
+                                <!-- ko i18n: 'IBAN' --><!-- /ko -->
+                            <!-- /ko -->
                         </span>
                     </label>
                     <div class="field type required sepa-iban" style="margin-bottom:10px;">
@@ -250,21 +239,19 @@
                                     'data-validate': JSON.stringify({'required':true})},
                                     enable: isActive($parents),
                                     value: sepaIban,
-                                    valueUpdate: 'keyup'"></input>
+                                    valueUpdate: 'keyup'">
 
                     </div>
 
                     <label data-bind="attr: {for: getCode() + '_sepa_account_holder_name'}" class="label">
                         <span>
-                           <!--ko if: getCheckoutLabels('CO31') -->
-                               <!-- ko i18n: getCheckoutLabels('CO31')-->
-                                <!-- /ko -->
-                            <!--/ko-->
+                            <!-- ko if: getCheckoutLabels('CO31') -->
+                                <!-- ko i18n: getCheckoutLabels('CO31') --><!-- /ko -->
+                            <!-- /ko -->
 
-                            <!--ko ifnot: getCheckoutLabels('CO31') -->
-                                <!-- ko i18n: 'Account Holder Name'-->
-                                    <!-- /ko -->
-                            <!--/ko-->
+                            <!-- ko ifnot: getCheckoutLabels('CO31') -->
+                                <!-- ko i18n: 'Account Holder Name' --><!-- /ko -->
+                            <!-- /ko -->
                         </span>
                     </label>
                     <div class="field type required sepa-account-holder-name" style="margin-bottom:10px;">
@@ -278,84 +265,80 @@
                                     'data-validate': JSON.stringify({'required':true})},
                                     enable: isActive($parents),
                                     value: sepaAccountHolderName,
-                                    valueUpdate: 'keyup'"></input>
+                                    valueUpdate: 'keyup'">
 
                     </div>
                 </div>
                 <!--ko if: isStatementNarrativeEnabled() -->
                 <div class="field type statment-narrative"
                     data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative_div'},visible: false">
-                    <label data-bind="attr: {for: getCode() + '_statement'}" class="label">
-                        <span>
-                            <!-- ko i18n: getCheckoutLabels('CO12')-->
-                            <!-- /ko -->
-                        </span>
-                        <!--  <span> ko i18n: 'Purpose of transaction' /ko </span>-->
+                    <label data-bind="attr: {for: getCode() + '_cc_type_stmt_narrative'}" class="label">
+                        <span><!-- ko i18n: getCheckoutLabels('CO12') --><!-- /ko --></span>
                     </label>
                     <div>
-                        <textarea name="stmt_narrative" maxlength="255" cols="20" rows="3" data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative',
-                       'data-container': getCode() + '-cc-type-narrative',
-                                    'data-validate': JSON.stringify({
-                                      'validate-no-html-tags': true
-                                    })},
-                                    enable: isActive($parents),
-                        value: stmtNarrative," style="width:225px;text-align:left;resize: none;">
-            </textarea>
+                        <textarea name="stmt_narrative" maxlength="255" cols="20" rows="3"
+                            data-bind="
+                                attr: {
+                                    title: getCheckoutLabels('CO12'),
+                                    'aria-label': getCheckoutLabels('CO12'),
+                                    id: getCode() + '_cc_type_stmt_narrative',
+                                    'data-container': getCode() + '-cc-type-narrative',
+                                    'data-validate': JSON.stringify({'validate-no-html-tags': true})
+                                },
+                                enable: isActive($parents),
+                        value: stmtNarrative," style="width:225px;text-align:left;resize: none;"></textarea>
                     </div>
                     <div>
                         <small>
-                            <!-- ko i18n: '<strong>Purpose of transaction</strong> will reflect on your statement,
-                            only if it is supported by the selected payment method.' --><!-- /ko -->
+                            <span data-bind="html: $t('<strong>Purpose of transaction</strong> will reflect on your statement, only if it is supported by the selected payment method.')"></span>
                         </small>
                     </div>
                     <div>
                         <small>
-                            <!-- ko i18n: '<strong>Purpose of transaction</strong> will be validated
-                            by the payment method before processing.' --><!-- /ko -->
+                            <span data-bind="html: $t('<strong>Purpose of transaction</strong> will be validated by the payment method before processing.')"></span>
                         </small>
                     </div>
                     <div>
                         <small>
-                            <!-- ko i18n: 'Please adhere to the <strong>Statement Narrative</strong> guidelines of the
-                            selected payment method before entering the <strong>Purpose of transaction.</strong>' --><!-- /ko -->
+                            <span data-bind="html: $t('Please adhere to the <strong>Statement Narrative</strong> guidelines of the selected payment method before entering the <strong>Purpose of transaction.</strong>')"></span>
                         </small>
                     </div>
-                <!--/ko -->
-                 <!-- ko if: (paymentMethodSelectedType() == 'SEPA_DIRECT_DEBIT-SSL')-->
-                    <div class="field type sepa_e-mandate">
-                        <input type="checkbox" class="required-entry"
-                        data-bind="attr: {
-                                    'id': 'sepa_e_mandate_condition',
-                                    'name': 'sepa_e_mandate_condition',
-                                    'value': 'sepa_e_mandate_condition_true'
-                                    }" ></input>
-                        <label class="label sepa_e-mandate-label" for="sepa_e_mandate_condition">
-                            <span data-bind="html: getSepaEmandateTerms()"></span>
-                        </label>
-                    </div>
-                 <!--/ko -->
+                </div>
+                <!-- /ko -->
+
+                <!-- ko if: (paymentMethodSelectedType() == 'SEPA_DIRECT_DEBIT-SSL')-->
+                <div class="field type sepa_e-mandate">
+                    <input type="checkbox" class="required-entry"
+                    data-bind="attr: {
+                                'id': 'sepa_e_mandate_condition',
+                                'name': 'sepa_e_mandate_condition',
+                                'value': 'sepa_e_mandate_condition_true'
+                                }">
+                    <label class="label sepa_e-mandate-label" for="sepa_e_mandate_condition">
+                        <span data-bind="html: getSepaEmandateTerms()"></span>
+                    </label>
+                </div>
+                <!-- /ko -->
+
                 <div class="field"></div>
             </fieldset>
         </form>
 
         <!-- ko foreach: getRegion('messages') -->
-        <!-- ko template: getTemplate() -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
         <!-- /ko -->
-        <!--/ko-->
         <div id="apm-type-error" class="mage-error" style="display:none"></div>
         <div class="mage-error message message-error error" id="worldpay_apm_multishipping_error"
             style="display:none"></div>
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
-            <!-- ko template: getTemplate() -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
             <!-- /ko -->
-            <!--/ko-->
         </div>
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
-            <!-- ko template: getTemplate() -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
             <!-- /ko -->
-            <!--/ko-->
         </div>
     </div>
 </div>

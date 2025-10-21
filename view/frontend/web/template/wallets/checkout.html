@@ -41,8 +41,7 @@
                        name="shipping_method_group"
                        data-bind="value: $data,
                        checked: $parent.selectedShippingMethod,
-                       event: { change: $parent.onShippingMethodChange.bind($parent, $data) }"
-                />
+                       event: { change: $parent.onShippingMethodChange.bind($parent, $data) }">
                 <span data-bind="text: carrier_title + ' - ' + method_title"></span>
                 (<span data-bind="text: amount + ' ' + $parent.currencyCode()"></span>)
             </label>

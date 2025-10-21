@@ -3,10 +3,12 @@
  * Sapient 2022
  *
  * @extends Magento_Multishipping::checkout/billing.phtml
- * @var \Magento\Multishipping\Block\Checkout\Billing $block
  */
 ?>
 <?php
+/** @var \Sapient\Worldpay\Block\Checkout\Multishipping\Billing $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 /** @var \Magento\Checkout\Helper\Data $checkoutHelper */
 $checkoutHelper = $block->getData('checkoutHelper');
 /** @var \Magento\Tax\Helper\Data $taxHelper */
@@ -67,19 +69,19 @@ class="form multicheckout billing">
                         <dl class="checkout-payment-method worldpay-methods" id="payment-methods">
                             <?php if ($block->isWorldpayEnable()): ?>
                         <legend class="legend box-title">
-                            <div class="payment-title-wrapper">
+                            <span class="payment-title-wrapper">
                                 <span><?= $escaper->escapeHtml(__('Payment Method')); ?></span>
                                 <br>
                                 <span class="security-title"><?= $escaper->escapeHtml(__('All transactions are secure and encrypted...')); ?></span>
-                            </div>
-                            <div class="payment-logo-wrapper">
+                            </span>
+                            <span class="payment-logo-wrapper">
                                 <img
                                 data-bind="attr: {
                                     src: require.toUrl('Sapient_Worldpay/images/cc/worldpay-logo.png')
                                 }"
-                                alt="worldpay logo" class="worldpay-logo-paymentscreen">
+                                alt="worldpay logo" class="worldpay-logo-paymentscreen" />
                                 <?= $block->getChildHtml('payment_method_paybylink') ?>
-                            </div>
+                            </span>
                         </legend><br>
                         <?php endif; ?>
                             <?php
@@ -140,7 +142,8 @@ class="form multicheckout billing">
                                                                     'alt': item.ccLabel,
                                                                     'width': $parent.getIcons(item.ccValue).width,
                                                                     'height': $parent.getIcons(item.ccValue).height
-                                                                    }"></div>
+                                                                    }" />
+                                                    </div>
                                                     <!--/ko-->
                                                     <!--/ko-->
 
@@ -229,7 +232,8 @@ class="form multicheckout billing">
                                                                     'alt': item.ccLabel,
                                                                     'width': $parent.getIcons(item.ccValue).width,
                                                                     'height': $parent.getIcons(item.ccValue).height
-                                                                    }"></div>
+                                                                    }" />
+                                                    </div>
                                                     <!--/ko-->
                                                     <!--/ko-->
 
@@ -401,23 +405,28 @@ class="form multicheckout billing">
         document.querySelectorAll('input[name="payment[method]"]').forEach((elem) => {
             elem.addEventListener("change", function(event) {
                 var item = event.target.value;
-                if (item == 'worldpay_cc' || item == 'worldpay_wallets' || item == 'worldpay_apm') {
-                    const spanElem = document.createElement('span');
-                    spanElem.innerHTML = "<?= $escaper->escapeHtml(__('Place Order')); ?>";
-                    document.getElementById("payment-continue").appendChild(spanElem);
+
+                let continueText = document.createElement('span');
+                let continueButton = document.getElementById("payment-continue");
+                continueButton.innerHTML = '';
+
+                if (['worldpay_cc', 'worldpay_wallets', 'worldpay_apm'].includes(item)) {
                     document.querySelectorAll('.wp-method-contents').forEach((elem) => {
                         elem.classList.remove("no-display");
                     });
                     document.getElementById("checkout-agreement-div").style.display = "block";
+                    continueText.textContent = "<?= $escaper->escapeHtml(__('Place Order')); ?>";
+                    console.log(continueText.outerHTML)
                 } else {
                     document.querySelectorAll('.wp-method-contents').forEach((elem) => {
                         elem.classList.add("no-display");
                     });
-                    let spanElem = document.createElement('span');
-                    spanElem.innerHTML = "<?= $escaper->escapeHtml(__('Go to Review Your Order')); ?>";
-                    document.getElementById("payment-continue").appendChild(spanElem);
                     document.getElementById("checkout-agreement-div").style.display = "none";
+                    continueText.textContent = "<?= $escaper->escapeHtml(__('Go to Review Your Order')); ?>";
+                    console.log(continueText.outerHTML)
                 }
+
+                continueButton.innerHTML = continueText.outerHTML;
             });
         });
     }

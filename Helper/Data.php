@@ -1101,7 +1101,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             //Klarna sliceit check
             if (strpos($item->getPaymentType(), "KLARNA_SLICEIT-SSL") !== false
                && strlen($item->getPaymentType()) > 18) {
-                return $apmTitle . "\n" . $item->getPaymentType() . "\r\n" . "Installments: "
+                return $this->getApmTitle() . "\n" . $item->getPaymentType() . "\r\n" . "Installments: "
                     . rtrim(rtrim(substr($item->getPaymentType(), 15, 5), '_'), 'MOS') . " months";
             } else {
                 return $this->getApmTitle() . "\n" . $item->getPaymentType();
@@ -3539,7 +3539,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Calculate Pay By Link Resend expiry time
      *
      * @param int $expiryTime
-     * @retrun int
+     * @return int
      */
     public function calculatePblResendExpiryTime($expiryTime)
     {
@@ -3551,11 +3551,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param string $currentDate
      * @param string $orderDate
-     * @retrun int
+     * @return int
      */
-    public function findPblOrderIntervalTime($currentDate, $orderDate)
+    public function findPblOrderIntervalTime(string $currentDate, string $orderDate): int
     {
-        return round(abs(strtotime($currentDate) - strtotime($orderDate))/3600, 0);
+        return round(abs((int)strtotime($currentDate) - (int)strtotime($orderDate))/3600, 0);
     }
 
     /**
@@ -3563,7 +3563,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param string $currentDate
      * @param string $expiryTime
-     * @retrun int
+     * @return int
      */
     public function findPblOrderExpiryTime($currentDate, $expiryTime)
     {
@@ -3574,7 +3574,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Find Pay By Link expiry date and time
      *
      * @param string $minDate
-     * @retrun array
+     * @return array
      */
     public function findFromToPblDateAndTime($minDate)
     {

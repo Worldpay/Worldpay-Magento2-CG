@@ -7,12 +7,12 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <title translate="true">Success Page</title>
+        <title>Success Page</title>
     </head>
     <body>
         <referenceBlock name="page.main.title">
             <action method="setPageTitle">
-                <argument translate="true" name="title" xsi:type="string">Payment link has been generated! Please check your email</argument>
+                <argument name="title" xsi:type="string" translate="true">Payment link has been generated! Please check your email</argument>
             </action>
         </referenceBlock>
         <referenceContainer name="content">
