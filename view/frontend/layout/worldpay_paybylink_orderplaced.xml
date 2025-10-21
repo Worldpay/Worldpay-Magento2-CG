@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <title translate="true">Paybylink order place</title>
+        <title>Paybylink order place</title>
     </head>
     <referenceBlock name="page.main.title">
         <action method="setPageTitle">
-            <argument translate="true" name="title" xsi:type="string">Payment link has been generated! Please check your email</argument>
+            <argument name="title" xsi:type="string" translate="true">Payment link has been generated! Please check your email</argument>
         </action>
     </referenceBlock>
     <referenceContainer name="content">
         <block class="Sapient\Worldpay\Block\Paybylink" name="worldpay_paybylink_orderplaced" template="Sapient_Worldpay::paybylink/orderplaced.phtml" cacheable="false"/>
     </referenceContainer>
-    <container name="order.success.additional.info" label="Order Success Additional Info" translate="label"/>
+    <container name="order.success.additional.info" label="Order Success Additional Info"/>
 </page>

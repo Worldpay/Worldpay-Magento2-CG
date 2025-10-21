@@ -141,17 +141,17 @@ class Card extends \Magento\Payment\Block\Form
     /**
      * Require CVV enable or disable
      *
-     * @return string
+     * @return bool
      */
 
     public function requireCvcEnabled()
     {
-        return $this->worldpayhelper->isCcRequireCVC();
+        return (bool) $this->worldpayhelper->isCcRequireCVC();
     }
     /**
      * Get Saved Card value
      *
-     * @return string
+     * @return array
      */
 
     public function getSavedCards()
@@ -326,7 +326,7 @@ class Card extends \Magento\Payment\Block\Form
     /**
      * Get Json Data
      *
-     * @param json $wpData
+     * @param array $wpData
      * @return string
      */
 
@@ -345,7 +345,7 @@ class Card extends \Magento\Payment\Block\Form
      * @return string
      */
 
-    public function getCheckoutSpecificLabel($labelcode)
+    public function getCheckoutSpecificLabel(string $labelcode)
     {
         $data = $this->configProvider->getCheckoutLabels();
         if (is_array($data) || is_object($data)) {

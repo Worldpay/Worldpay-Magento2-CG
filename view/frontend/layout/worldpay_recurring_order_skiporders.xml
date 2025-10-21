@@ -15,7 +15,7 @@
         </referenceContainer>
         <referenceBlock name="root">
             <action method="setHeaderTitle">
-                <argument translate="true" name="title" xsi:type="string">Subscriptions Related Skip Order</argument>
+                <argument name="title" xsi:type="string" translate="true">Subscriptions Related Skip Order</argument>
             </action>
         </referenceBlock>
     </body>

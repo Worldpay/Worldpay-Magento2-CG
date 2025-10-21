@@ -3,13 +3,14 @@
  * Copyright � 2020 Worldpay, LLC. All rights reserved.
  * See LICENSE.txt for license details.
  */
-
-
-/** @var Sapient\Worldpay\Block\Catalog\Product\SubscriptionPlans $block */
 ?>
+<?php /** @var \Magento\Framework\Escaper $escaper */?>
+<?php /** @var \Sapient\Worldpay\Block\Catalog\Product\SubscriptionPlans $block */?>
 
 <div class="field worldpay-subscriptions">
-    <label class="label"><span><?= /* @noEscape */  $block->getBuyOneTimelabel() ?></span></label>
+    <span class="label">
+        <span><?= /* @noEscape */  $block->getBuyOneTimelabel() ?></span>
+    </span>
     <div>
         <input type="checkbox" id="worldpay-add-plan" name="worldpay_add_plan" onchange="valueChanged()">
         <label for="worldpay-add-plan"><span><?= /* @noEscape */  $block->getSubscribeCheckboxLabel() ?></span></label>
@@ -41,28 +42,28 @@
 </div>
 <?php if ($block->getProduct()->getWorldpayRecurringAllowStart()): ?>
     <div class="field required date worldpay-subscriptions-start-date-container" style="display: none;">
-        <legend class="label">
+        <label class="label" for="subscription_date">
             <span><?= /* @noEscape */  $block->getStartDateLabel() ?></span>
-        </legend>
+        </label>
         <div class="field-control ">
             <input class="control-text" style="width: calc(50% - 33px);" name="subscription_date"
                    id="subscription_date"
-                   type="text" readonly="true"
-                   value="<?= /* @noEscape */  $block->getStartDate();?>">
+                   type="text" readonly="readonly"
+                   value="<?= /* @noEscape */  $block->getStartDate();?>" />
             <?php //echo $block->getDateHtml() ?>
         </div>
     </div>
 <?php endif; ?>
 <?php if ($block->isEndDateEnabled()): ?>
     <div class="field required date worldpay-subscriptions-end-date-container" style="display: none;">
-        <legend class="label">
+        <label class="label" for="subscription_end_date">
             <span><?= /* @noEscape */  $block->getEndDateLabel() ?></span>
-        </legend>
+        </label>
         <div class="field-control ">
             <input class="control-text" style="width: 44%;"
-                   name="subscription_end_date" id="subscription_end_date" type="text" readonly="true"
-                   value="<?= /* @noEscape */  $block->getEndDate();?>">
-            <input type="hidden" id="show_endDate" value="1">
+                   name="subscription_end_date" id="subscription_end_date" type="text" readonly="readonly"
+                   value="<?= /* @noEscape */  $block->getEndDate();?>" />
+            <input type="hidden" id="show_endDate" value="1" />
             <?php //echo $block->getDateHtml() ?>
         </div>
     </div>
