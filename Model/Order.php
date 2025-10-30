@@ -5,7 +5,7 @@
 namespace Sapient\Worldpay\Model;
 
 use Exception;
-use Sapient\Worldpay\Helper\CreditCardException;
+use Magento\Sales\Model\Order\Creditmemo;
 
 class Order
 {
@@ -45,7 +45,7 @@ class Order
     private $CreditmemoService;
 
     /**
-     * @var \Magento\Sales\Model\Order\Creditmemo
+     * @var Creditmemo
      */
     private $creditmemo;
 
@@ -55,7 +55,7 @@ class Order
     private $creditmemoRepository;
 
     /**
-     * @var \Magento\Sales\Model\Order\Creditmemo
+     * @var Creditmemo
      */
     private $ordercreditmemo;
 
@@ -69,7 +69,7 @@ class Order
      * @param \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory
      * @param \Magento\Sales\Model\Order\Invoice $Invoice
      * @param \Magento\Sales\Model\Service\CreditmemoService $CreditmemoService
-     * @param \Magento\Sales\Model\Order\Creditmemo $creditmemo
+     * @param Creditmemo $creditmemo
      * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
      */
     public function __construct(
@@ -80,7 +80,7 @@ class Order
         \Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory,
         \Magento\Sales\Model\Order\Invoice $Invoice,
         \Magento\Sales\Model\Service\CreditmemoService $CreditmemoService,
-        \Magento\Sales\Model\Order\Creditmemo $creditmemo,
+        Creditmemo $creditmemo,
         \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
     ) {
         $this->_order = $args['order'];
@@ -308,9 +308,8 @@ class Order
      * @param string $reference
      * @param string $comment
      */
-    public function refund($reference, $comment)
+    public function refund($reference, $comment): void
     {
-
         if (!$reference) {
             return;
         }
@@ -318,14 +317,20 @@ class Order
         $creditmemo = $this->ordercreditmemo;
         $creditmemo->load($reference, 'increment_id');
 
+        if (!$creditmemo->getId()) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('WorldPay refund ERROR: Credit Memo not found. Reference: ' . $reference)
+            );
+        }
+
         if ($creditmemo->getOrder()->getId() != $this->getOrder()->getId()) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('WorldPay refund ERROR: Credit Memo does not match Order. Reference'. $reference)
             );
         }
 
-        if ($creditmemo->getState() == \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN) {
-            $this->_markRefunded($creditmemo, $comment);
+        if ($creditmemo->getState() == Creditmemo::STATE_OPEN) {
+            $this->_markRefunded($creditmemo, $comment, $reference);
         }
     }
 
@@ -402,34 +407,29 @@ class Order
             $this->_markRefunded($creditmemo, $comment);
         }
     }
-    /**
-     * Create Credit Memos
-     *
-     * @param string $creditmemo
-     * @param string $comment
-     */
 
-    private function _markRefunded($creditmemo, $comment)
-    {
-        $creditmemo->setState(\Magento\Sales\Model\Order\Creditmemo::STATE_REFUNDED);
+    private function _markRefunded(
+        Creditmemo $creditmemo,
+        string|\Magento\Framework\Phrase $comment,
+        string $reference = ''
+    ): void {
+        $creditmemo->setState(Creditmemo::STATE_REFUNDED);
         $order = $creditmemo->getOrder();
-        $order->addStatusHistoryComment($comment);
 
-         $transactionSave = $this->_transaction->addObject(
-             $creditmemo
-         )->addObject(
-             $creditmemo->getOrder()
-         );
+        if ($reference !== '') {
+            $comment .= " Refund ID: $reference";
+        }
+        $order->addCommentToStatusHistory(comment: $comment, isVisibleOnFront: true);
+        $creditmemo->addComment($comment, false, true);
+
+         $transactionSave = $this
+             ->_transaction
+             ->addObject($creditmemo)
+             ->addObject($creditmemo->getOrder());
         $transactionSave->save();
     }
-    /**
-     * Cancel Refund
-     *
-     * @param string $reference
-     * @param string $comment
-     */
 
-    public function cancelRefund($reference, $comment)
+    public function cancelRefund($reference, $comment): void
     {
         if (!$reference) {
             return;
@@ -444,35 +444,51 @@ class Order
             );
         }
 
-        if ($creditmemo->getState() == \Magento\Sales\Model\Order\Creditmemo::STATE_OPEN) {
-            $this->_cancelCreditmemo($creditmemo, $comment);
+        if ($creditmemo->canCancel()) {
+            $this->_cancelCreditmemo($creditmemo, $comment, $reference);
         }
     }
-    /**
-     * Cancel Credit memo
-     *
-     * @param string $creditmemo
-     * @param string $comment
-     */
 
-    private function _cancelCreditmemo($creditmemo, $comment = null)
+    private function _cancelCreditmemo(
+        Creditmemo $creditmemo,
+        $comment = null,
+        string $reference = ''
+    ): void {
+        $creditmemo->setState(Creditmemo::STATE_CANCELED);
+        $order = $creditmemo->getOrder();
+        if ($comment) {
+            $creditmemo->addComment($comment, false, true);
+            $order->addCommentToStatusHistory(comment: $comment . " Refund ID: $reference", isVisibleOnFront: true);
+        }
+        $this->_deductOrderTotals($order, $creditmemo);
+
+        $transactionSave = $this->_transaction->addObject(
+            $creditmemo
+        )->addObject(
+            $creditmemo->getOrder()
+        );
+        $transactionSave->save();
+    }
+
+    public function refundOffline($reference, string|\Magento\Framework\Phrase $comment): void
     {
-        if ($creditmemo && $creditmemo->canCancel()) {
-             $creditmemo->setState(\Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED);
-            $order = $creditmemo->getOrder();
-            if ($comment) {
-                $order->addStatusHistoryComment($comment);
-            }
-            $this->_deductOrderTotals($order, $creditmemo);
+        $creditmemo = $this->ordercreditmemo;
+        $creditmemo->load($reference, 'increment_id');
 
-            $transactionSave = $this->_transaction->addObject(
-                $creditmemo
-            )->addObject(
-                $creditmemo->getOrder()
-            );
-            $transactionSave->save();
+        $creditmemo->setState(Creditmemo::STATE_OPEN);
+        $order = $creditmemo->getOrder();
+        if ($comment) {
+            $creditmemo->addComment($comment, false, true);
+            $order->addCommentToStatusHistory(comment: $comment, isVisibleOnFront: true);
         }
+
+        $transactionSave = $this
+            ->_transaction
+            ->addObject($creditmemo)
+            ->addObject($creditmemo->getOrder());
+        $transactionSave->save();
     }
+
     /**
      * Cancel Magento Credit Memo
      *
@@ -482,8 +498,8 @@ class Order
     {
         try {
             $creditmemo = $this->creditmemoRepository->get($id);
-            $creditmemo->setState(\Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED);
-            $creditmemo->setStatus(\Magento\Sales\Model\Order\Creditmemo::STATE_CANCELED);
+            $creditmemo->setState(Creditmemo::STATE_CANCELED);
+            $creditmemo->setStatus(Creditmemo::STATE_CANCELED);
             foreach ($creditmemo->getAllItems() as $item) {
                 $item->cancel();
             }
@@ -498,13 +514,12 @@ class Order
    /**
     * Deduct Order Totals
     *
-    * @param array $order
-    * @param string $creditmemo
+    * @param \Magento\Sales\Model\Order $order
+    * @param Creditmemo $creditmemo
     */
 
-    private function _deductOrderTotals($order, $creditmemo)
+    private function _deductOrderTotals($order, $creditmemo): void
     {
-
         if (!$order->dataHasChangedFor('total_refunded')) {
             $order->setTotalRefunded($order->getTotalRefunded() - $creditmemo->getGrandTotal());
             foreach ($creditmemo->getAllItems() as $item) {
