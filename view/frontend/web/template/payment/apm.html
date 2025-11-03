@@ -331,7 +331,7 @@
                     </div>
                 </div>
 
-                <!--ko if: isStatementNarrativeEnabled() -->
+                <!-- ko if: isStatementNarrativeEnabled() && paymentMethodSelectedType() != 'OPENBANKING-SSL' -->
                 <div class="field type statment-narrative"
                      data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative_div'},visible: false">
                     <label data-bind="attr: {for: getCode() + '_cc_type_stmt_narrative'}" class="label">
@@ -369,6 +369,13 @@
                     </div>
                 </div>
                 <!-- /ko -->
+
+                <!-- ko if: (paymentMethodSelectedType() == 'OPENBANKING-SSL') -->
+                <div class="field type openbanking disclaimer">
+                    <strong><!-- ko i18n: 'Pay By Bank' --><!-- /ko --></strong>
+                    <p><!-- ko i18n: 'Securely check out directly from your bank account in seconds. Try a better way to pay' --><!-- /ko --></p>
+                </div>
+                <!--/ko -->
 
                 <!-- ko if: (paymentMethodSelectedType() == 'SEPA_DIRECT_DEBIT-SSL') -->
                 <div class="field type sepa_e-mandate">

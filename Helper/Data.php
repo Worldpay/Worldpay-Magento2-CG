@@ -274,18 +274,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 return $merchantCodeValue;
             }
         }
-        if ($storeId) {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/merchant_code',
-                ScopeInterface::SCOPE_STORE,
-                $storeId
-            );
-        } else {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/merchant_code',
-                ScopeInterface::SCOPE_STORE
-            );
-        }
+
+        return $this->_scopeConfig->getValue(
+            'worldpay/general_config/merchant_code',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
     /**
      * Get Xml Username
@@ -297,24 +291,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getXmlUsername($paymentType, $storeId = null)
     {
         if ($paymentType) {
-            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_username']:'';
+            $merchantDetails = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue =  $merchantDetails ? $merchantDetails['merchant_username'] : '';
             if (!empty($merchantCodeValue)) {
                 return $merchantCodeValue;
             }
         }
-        if ($storeId) {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/xml_username',
-                ScopeInterface::SCOPE_STORE,
-                $storeId
-            );
-        } else {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/xml_username',
-                ScopeInterface::SCOPE_STORE
-            );
-        }
+
+        return $this->_scopeConfig->getValue(
+            'worldpay/general_config/xml_username',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
     /**
      * Get Xml Password
@@ -326,24 +314,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getXmlPassword($paymentType, $storeId = null)
     {
         if ($paymentType) {
-            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_password']:'';
+            $merchantDetails = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue = $merchantDetails?$merchantDetails['merchant_password']:'';
             if (!empty($merchantCodeValue)) {
                 return $merchantCodeValue;
             }
         }
-        if ($storeId) {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/xml_password',
-                ScopeInterface::SCOPE_STORE,
-                $storeId
-            );
-        } else {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/xml_password',
-                ScopeInterface::SCOPE_STORE
-            );
-        }
+
+        return $this->_scopeConfig->getValue(
+            'worldpay/general_config/xml_password',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
     /**
      * Check isMacEnabled
@@ -510,6 +492,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'PRZELEWY-SSL'          => 'P24',
             'MISTERCASH-SSL'        => 'Mistercash/Bancontact',
             'ACH_DIRECT_DEBIT-SSL'  => 'ACH Pay',
+            'OPENBANKING-SSL'       => 'Pay By Bank',
         ];
         $configMethods = explode(',', $this->_scopeConfig->getValue(
             'worldpay/apm_config/paymentmethods',

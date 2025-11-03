@@ -46,12 +46,12 @@ class RedirectService extends \Magento\Framework\DataObject
      * @var \Sapient\Worldpay\Model\Utilities\PaymentMethods
      */
     protected $paymentlist;
-          
+
     /**
      * @var \Sapient\Worldpay\Helper\Data
      */
     protected $worldpayhelper;
-    
+
     /**
      * @var \Sapient\Worldpay\Helper\Multishipping
      */

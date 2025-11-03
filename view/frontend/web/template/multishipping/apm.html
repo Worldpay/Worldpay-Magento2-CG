@@ -269,7 +269,7 @@
 
                     </div>
                 </div>
-                <!--ko if: isStatementNarrativeEnabled() -->
+                <!--ko if: isStatementNarrativeEnabled() && paymentMethodSelectedType() != 'OPENBANKING-SSL' -->
                 <div class="field type statment-narrative"
                     data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative_div'},visible: false">
                     <label data-bind="attr: {for: getCode() + '_cc_type_stmt_narrative'}" class="label">
@@ -302,6 +302,12 @@
                         <small>
                             <span data-bind="html: $t('Please adhere to the <strong>Statement Narrative</strong> guidelines of the selected payment method before entering the <strong>Purpose of transaction.</strong>')"></span>
                         </small>
+                    </div>
+                    <!--/ko -->
+                    <!-- ko if: (paymentMethodSelectedType() == 'OPENBANKING-SSL') -->
+                    <div class="field type openbanking disclaimer">
+                        <strong><!-- ko i18n: 'Pay By Bank' --><!-- /ko --></strong>
+                        <p><!-- ko i18n: 'Securely check out directly from your bank account in seconds. Try a better way to pay' --><!-- /ko --></p>
                     </div>
                 </div>
                 <!-- /ko -->
