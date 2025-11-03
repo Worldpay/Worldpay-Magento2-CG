@@ -216,6 +216,13 @@
                 </areas>
                 <capture_request>1</capture_request>
             </ACH_DIRECT_DEBIT-SSL>
+            <OPENBANKING-SSL>
+                <title>Pay By Bank</title>
+                <areas>
+                    <area>US</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </OPENBANKING-SSL>
         </types>
     </worldpay_apm>
     <worldpay_cc>
@@ -839,6 +846,13 @@
                 </areas>
                 <capture_request>1</capture_request>
             </ACH_DIRECT_DEBIT-SSL>
+            <OPENBANKING-SSL>
+                <title>Pay By Bank</title>
+                <areas>
+                    <area>US</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </OPENBANKING-SSL>
         </types>
     </worldpay_paybylink>
 </paymentMethods>
