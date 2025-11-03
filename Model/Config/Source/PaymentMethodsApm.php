@@ -26,7 +26,7 @@ class PaymentMethodsApm extends \Magento\Framework\App\Config\Value
             ['value' => 'PRZELEWY-SSL', 'label' => __('P24')],
             ['value' => 'MISTERCASH-SSL', 'label' => __('Mistercash/Bancontact')],
             ['value' => 'ACH_DIRECT_DEBIT-SSL', 'label' => __('ACH Pay')],
-
+            ['value' => 'OPENBANKING-SSL', 'label' => __('Pay By Bank')],
         ];
     }
 }
