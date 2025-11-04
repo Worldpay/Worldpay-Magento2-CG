@@ -21,7 +21,7 @@ class RedirectOrder extends AbstractXmlBuilder
     protected array $orderParameters;
     protected string $installationId;
     protected string $captureDelay;
-    private string $shopperId;
+    private ?string $shopperId;
     public array $paymentDetails;
     public array $cusDetails;
     public array $thirdPartyData;
