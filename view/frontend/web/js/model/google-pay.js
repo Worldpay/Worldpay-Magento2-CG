@@ -105,7 +105,7 @@ define([
             }else{
                 $("#"+container).css(
                     {
-                        'width': "88%",
+                        'width': "100%",
                         'margin-bottom': "10px"
                     }
                 )
