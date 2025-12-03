@@ -113,7 +113,8 @@ class WorldpayConfigProviderTest extends TestCase
                 'GECAPITAL-SSL' => 'GE Capital',
                 'JCB-SSL' => 'Japanese Credit Bank',
                 'LASER-SSL' => 'Laser Card',
-                'UATP-SSL' => 'UATP'
+                'UATP-SSL' => 'UATP',
+                'ELO-SSL' => 'ELO'
         ];
 
     protected function setUp(): void

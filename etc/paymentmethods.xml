@@ -335,6 +335,13 @@
                 </areas>
                 <capture_request>1</capture_request>
             </MAESTRO-SSL>
+            <ELO-SSL>
+                <title>Elo</title>
+                <areas>
+                    <area>BR</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </ELO-SSL>
         </types>
     </worldpay_cc>
     <worldpay_cc_vault>
@@ -409,6 +416,13 @@
                 </areas>
                 <capture_request>1</capture_request>
             </MAESTRO-SSL>
+            <ELO-SSL>
+                <title>Elo</title>
+                <areas>
+                    <area>BR</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </ELO-SSL>
         </types>
     </worldpay_cc_vault>
     <worldpay_moto>
@@ -483,6 +497,13 @@
                 </areas>
                 <capture_request>1</capture_request>
             </MAESTRO-SSL>
+            <ELO-SSL>
+                <title>Elo</title>
+                <areas>
+                    <area>BR</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </ELO-SSL>
         </types>
     </worldpay_moto>
     <worldpay_wallets>
@@ -929,6 +950,13 @@
                 </areas>
                 <capture_request>1</capture_request>
             </OPENBANKING-SSL>
+            <ELO-SSL>
+                <title>Elo</title>
+                <areas>
+                    <area>BR</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </ELO-SSL>
         </types>
     </worldpay_paybylink>
 </paymentMethods>

@@ -638,6 +638,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $redirectOrderParams['paymentType'] = "ONLINE,PAYPAL-SSL";
         }
 
+        $redirectOrderParams['paymentType'] = "ALL";
+
         $requestConfiguration = [
             'threeDSecureConfig' => $redirectOrderParams['threeDSecureConfig'],
             'tokenRequestConfig' => $redirectOrderParams['tokenRequestConfig'],

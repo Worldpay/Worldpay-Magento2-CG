@@ -941,31 +941,22 @@ abstract class AbstractMethod extends BaseAbstractMethod
      */
     public function getCardTypeFromCreditCardNumber($ccnumber)
     {
-        $visaRegex = '/^4[0-9]{0,20}$/';
-        $mastercardRegex =
-                '/^(?:5[1-5][0-9]{0,2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{0,2}|27[01][0-9]|2720)[0-9]{0,12}$/';
-        $amexRegex = '/^3$|^3[47][0-9]{0,13}$/';
-        $discoverRegex = '/^6[05]$|^601[1]?$|^65[0-9][0-9]?$|^6(?:011|5[0-9]{2})[0-9]{0,12}$/';
-        $jcbRegex = '/^35(2[89]|[3-8][0-9])/';
-        $dinersRegex = '/^36/';
-        $maestroRegex = '/^(5018|5020|5038|6304|679|6759|676[1-3])/';
-        $dankortRegex = '/^(5019)/';
-        if (preg_match($visaRegex, $ccnumber)) {
-            return 'VISA-SSL';
-        } elseif (preg_match($mastercardRegex, $ccnumber)) {
-            return 'ECMC-SSL';
-        } elseif (preg_match($amexRegex, $ccnumber)) {
-            return 'AMEX-SSL';
-        } elseif (preg_match($discoverRegex, $ccnumber)) {
-            return 'DISCOVER-SSL';
-        } elseif (preg_match($jcbRegex, $ccnumber)) {
-            return 'JCB-SSL';
-        } elseif (preg_match($dinersRegex, $ccnumber)) {
-            return 'DINERS-SSL';
-        } elseif (preg_match($maestroRegex, $ccnumber)) {
-            return 'MAESTRO-SSL';
-        } elseif (preg_match($dankortRegex, $ccnumber)) {
-            return 'DANKORT-SSL';
+        $regexMap = [
+            'ELO-SSL' => '/^(401178|401179|431274|438935|451416|457393|457631|457632|504175|627780|636297|636368|655000|655001|651652|651653|651654|650485|650486|650487|650488|506699|5067[0-6][0-9]|50677[0-8]|509\d{3})\d{10}$/',
+            'VISA-SSL' => '/^4[0-9]{0,20}$/',
+            'ECMC-SSL' => '/^(?:5[1-5][0-9]{0,2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{0,2}|27[01][0-9]|2720)[0-9]{0,12}$/',
+            'AMEX-SSL' => '/^3$|^3[47][0-9]{0,13}$/',
+            'DISCOVER-SSL' => '/^6[05]$|^601[1]?$|^65[0-9][0-9]?$|^6(?:011|5[0-9]{2})[0-9]{0,12}$/',
+            'JCB-SSL' => '/^35(2[89]|[3-8][0-9])/',
+            'DINERS-SSL' => '/^36/',
+            'MAESTRO-SSL' => '/^(5018|5020|5038|6304|679|6759|676[1-3])/',
+            'DANKORT-SSL' => '/^(5019)/'
+        ];
+
+        foreach ($regexMap as $type => $regex) {
+            if (preg_match($regex, $ccnumber)) {
+                return $type;
+            }
         }
     }
 

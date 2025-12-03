@@ -460,7 +460,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'AURORE-SSL' => 'Aurore', 'CB-SSL' => 'Carte Bancaire',
             'CARTEBLEUE-SSL' => 'Carte Bleue', 'DANKORT-SSL' => 'Dankort',
             'GECAPITAL-SSL' => 'GE Capital', 'JCB-SSL' => 'Japanese Credit Bank',
-            'LASER-SSL' => 'Laser Card', 'UATP-SSL' => 'UATP',
+            'LASER-SSL' => 'Laser Card', 'UATP-SSL' => 'UATP', 'ELO-SSL' => 'ELO'
         ];
         $configMethods = explode(',', $this->_scopeConfig->getValue('worldpay/' .
                 $paymentconfig . '/paymentmethods', ScopeInterface::SCOPE_STORE));
@@ -536,6 +536,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'CB-SSL' => 'CB',
             'DANKORT-SSL' => 'DANKORT',
             'JCB-SSL' => 'JCB',
+            'ELO-SSL' => 'ELO'
         ];
 
         return $schemes[$paymentType] ?? null;

@@ -107,7 +107,7 @@ class DataTest extends TestCase
      */
     protected $MOTO_TYPES = 'AMEX-SSL,VISA-SSL,ECMC-SSL,DISCOVER-SSL,DINERS-SSL,'
             . 'MAESTRO-SSL,AIRPLUS-SSL,AURORE-SSL,CB-SSL,CARTEBLEUE-SSL,'
-            . 'DANKORT-SSL,GECAPITAL-SSL,JCB-SSL,LASER-SSL,UATP-SSL';
+            . 'DANKORT-SSL,GECAPITAL-SSL,JCB-SSL,LASER-SSL,UATP-SSL,ELO-SSL';
     /**
      * @var array
      */
@@ -145,7 +145,8 @@ class DataTest extends TestCase
                 'GECAPITAL-SSL' => 'GE Capital',
                 'JCB-SSL' => 'Japanese Credit Bank',
                 'LASER-SSL' => 'Laser Card',
-                'UATP-SSL' => 'UATP'
+                'UATP-SSL' => 'UATP',
+                'ELO-SSL' => 'ELO'
         ];
     /**
      * @var string
@@ -160,7 +161,7 @@ class DataTest extends TestCase
      */
     protected $CC_TYPES = 'AMEX-SSL,VISA-SSL,ECMC-SSL,DISCOVER-SSL,DINERS-SSL,'
             . 'MAESTRO-SSL,AIRPLUS-SSL,AURORE-SSL,CB-SSL,CARTEBLEUE-SSL,'
-            . 'DANKORT-SSL,GECAPITAL-SSL,JCB-SSL,LASER-SSL,UATP-SSL';
+            . 'DANKORT-SSL,GECAPITAL-SSL,JCB-SSL,LASER-SSL,UATP-SSL, ELO-SSL';
     /**
      * @var array
      */
@@ -179,7 +180,8 @@ class DataTest extends TestCase
                 'GECAPITAL-SSL' => 'GE Capital',
                 'JCB-SSL' => 'Japanese Credit Bank',
                 'LASER-SSL' => 'Laser Card',
-                'UATP-SSL' => 'UATP'
+                'UATP-SSL' => 'UATP',
+                'ELO-SSL' => 'ELO'
         ];
 
     protected function setUp(): void
@@ -565,7 +567,8 @@ class DataTest extends TestCase
                      ['worldpay_cc','DINERS-SSL'],
                      ['worldpay_cc','DISCOVER-SSL'],
                      ['worldpay_cc','JCB-SSL'],
-                     ['worldpay_cc','MAESTRO-SSL']
+                     ['worldpay_cc','MAESTRO-SSL'],
+                     ['worldpay_cc','ELO-SSL']
                  )
                  ->willReturn(true);
          $this->assertEquals($this->ALL_MOTO_METHODS, $this->dataObj->getCcTypes('moto_config'));
@@ -749,7 +752,8 @@ class DataTest extends TestCase
                      ['worldpay_cc','DINERS-SSL'],
                      ['worldpay_cc','DISCOVER-SSL'],
                      ['worldpay_cc','JCB-SSL'],
-                     ['worldpay_cc','MAESTRO-SSL']
+                     ['worldpay_cc','MAESTRO-SSL'],
+                     ['worldpay_cc','ELO-SSL']
                  )
                  ->willReturn(true);
          $this->assertEquals($this->ALL_CC_METHODS, $this->dataObj->getCcTypes('cc_config'));
