@@ -27,4 +27,7 @@
         <plugin name="sapient_worldpay_checkout_plugin" type="Sapient\Worldpay\Plugin\Checkout\CheckoutIndexPageRender" />
     </type>
      <preference for="Magento\Multishipping\Block\Checkout\Link" type="Sapient\Worldpay\Block\MultishippingCheckoutLink" />
+    <type name="Magento\Multishipping\Controller\Checkout\Addresses">
+        <plugin name="disable_multishipping_plugin" type="Sapient\Worldpay\Plugin\Checkout\DisableMultishipping" />
+    </type>
 </config>

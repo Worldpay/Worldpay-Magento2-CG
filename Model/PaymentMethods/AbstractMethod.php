@@ -2,12 +2,14 @@
 namespace Sapient\Worldpay\Model\PaymentMethods;
 
 use Exception;
+use Magento\Payment\Model\Method\AbstractMethod as BaseAbstractMethod;
 use Magento\Sales\Model\Order\Payment\Transaction;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 
 /**
  * WorldPay Abstract class extended from Magento Abstract Payment class.
  */
-abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMethod
+abstract class AbstractMethod extends BaseAbstractMethod
 {
 
     /**
@@ -70,10 +72,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
      */
     protected $paymentservicerequest;
-    /**
-     * @var \Sapient\Worldpay\Model\Authorisation\RedirectService
-     */
-    protected $redirectservice;
 
     /**
      * @var \Sapient\Worldpay\Model\Authorisation\TokenService
@@ -99,19 +97,10 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @var \Sapient\Worldpay\Helper\Registry
      */
     protected $registryhelper;
-
-    /**
-     * @var \Magento\Framework\UrlInterface
-     */
-    protected $urlbuilder;
     /**
      * @var \Sapient\Worldpay\Model\Worldpayment
      */
     protected $worldpaypaymentmodel;
-    /**
-     * @var \Magento\Framework\Pricing\Helper\Data
-     */
-    protected $pricinghelper;
     /**
      * @var \Sapient\Worldpay\Model\Response\AdminhtmlResponse
      */
@@ -157,15 +146,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      */
     protected $multishippingHelper;
 
-    /**
-     * @var \Sapient\Worldpay\Model\Multishipping\OrderFactory
-     */
-    protected $multishippingOrderFactory;
-
-    /**
-     * @var \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection
-     */
-    protected $multishippingOrderCollection;
+    protected ProductOnDemand $productOnDemandHelper;
 
     /**
      * Availability option
@@ -181,6 +162,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
     public const WORLDPAY_APM_TYPE = 'worldpay_apm';
     public const WORLDPAY_WALLETS_TYPE = 'worldpay_wallets';
     public const WORLDPAY_MOTO_TYPE = 'worldpay_moto';
+
     /**
      * Constructor
      *
@@ -195,19 +177,16 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Magento\Backend\Model\Session\Quote $adminsessionquote
      * @param \Sapient\Worldpay\Model\Authorisation\DirectService $directservice
-     * @param \Sapient\Worldpay\Model\Authorisation\RedirectService $redirectservice
      * @param \Sapient\Worldpay\Model\Authorisation\TokenService $tokenservice
      * @param \Sapient\Worldpay\Model\Authorisation\MotoRedirectService $motoredirectservice
      * @param \Sapient\Worldpay\Model\Authorisation\HostedPaymentPageService $hostedpaymentpageservice
      * @param \Sapient\Worldpay\Model\Authorisation\WalletService $walletService
      * @param \Sapient\Worldpay\Model\Authorisation\PayByLinkService $paybylinkservice
      * @param \Sapient\Worldpay\Helper\Registry $registryhelper
-     * @param \Magento\Framework\UrlInterface $urlBuilder
      * @param \Sapient\Worldpay\Helper\Data $worldpayhelper
      * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaypayment
      * @param \Sapient\Worldpay\Model\SavedTokenFactory $savecard
      * @param \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel
-     * @param \Magento\Framework\Pricing\Helper\Data $pricinghelper
      * @param \Sapient\Worldpay\Model\Response\AdminhtmlResponse $adminhtmlresponse
      * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
      * @param \Sapient\Worldpay\Model\Utilities\PaymentMethods $paymentutils
@@ -215,11 +194,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
      * @param \Magento\Framework\App\RequestInterface $request
      * @param \Magento\Backend\Model\Auth\Session $authSession
      * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
-     * @param \Sapient\Worldpay\Model\Multishipping\OrderFactory $multishippingOrderFactory
-     * @param \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
+     * @param array $data
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb $resourceCollection
-     * @param array $data
      */
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -255,8 +232,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         \Sapient\Worldpay\Helper\Multishipping $multishippingHelper,
         \Sapient\Worldpay\Model\Multishipping\OrderFactory $multishippingOrderFactory,
         \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ProductOnDemand $productOnDemandHelper,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct(
@@ -283,7 +261,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->registryhelper = $registryhelper;
         $this->urlbuilder = $urlBuilder;
         $this->worlpayhelper = $worldpayhelper;
-        $this->worldpaypayment=$worldpaypayment;
+        $this->worldpaypayment = $worldpaypayment;
         $this->worldpaypaymentmodel = $worldpaypaymentmodel;
         $this->pricinghelper = $pricinghelper;
         $this->adminhtmlresponse = $adminhtmlresponse;
@@ -298,7 +276,9 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $this->multishippingHelper = $multishippingHelper;
         $this->multishippingOrderFactory = $multishippingOrderFactory;
         $this->multishippingOrderCollection = $multishippingOrderCollection;
+        $this->productOnDemandHelper = $productOnDemandHelper;
     }
+
     /**
      * Initializer
      *
@@ -359,7 +339,12 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $paymentAdditionalData = $payment->getData('additional_data');
         $orderCode = $this->_generateOrderCode($quote, $increment_id);
 
-        if (!empty($this->worlpayhelper->getOrderCodeFromCheckoutSession())) {
+        if (
+            !empty($this->worlpayhelper->getOrderCodeFromCheckoutSession())
+            && self::$paymentDetails['method'] === self::WORLDPAY_CC_TYPE
+            && $this->worlpayhelper->getCcIntegrationMode() === self::REDIRECT_MODEL
+            && $this->worlpayhelper->isIframeIntegration()
+        ) {
             $orderCode = $this->worlpayhelper->getOrderCodeFromCheckoutSession();
         }
 
@@ -372,7 +357,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             }
             $this->_checkShippingApplicable($quote);
             $this->_createWorldPayPayment($payment, $orderCode, $quote->getStoreId(), $orderId);
-            
+
             $authorisationService = $this->getAuthorisationService($quote->getStoreId());
             $authorisationService->authorizePayment(
                 $mageOrder,
@@ -543,7 +528,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         //      $integrationType = 'redirect'; uncomment to support moto redirect
         }
         $wpp = $this->worldpaypayment->create();
-        
+
         $cardType = $paymentdetails['additional_data']['cc_type'];
         if ($cardType == 'savedcard') {
             $cardType = $this->_getpaymentType();
@@ -600,22 +585,15 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 __('Worldpay Plugin is not available')
             );
         }
-        
+
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
         $autoInvoice = $this->_scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
         $partialCapture = $this->_scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
-          
+
         $mageOrder = $payment->getOrder();
         $orderId = $mageOrder->getIncrementId();
-        /*$quote = $this->quoteRepository->get($mageOrder->getQuoteId());
-        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($quote->getReservedOrderId());
-        $orderId = '';
-        if ($quote->getReservedOrderId()) {
-            $orderId = $quote->getReservedOrderId();
-        } else {
-            $orderId = $mageOrder->getIncrementId();
-        }*/
+
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($orderId);
         $captureArray = '';
         //added Klarna check
@@ -625,11 +603,16 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         } else {
             $paymenttype = $worldPayPayment->getPaymentType();
         }
-        if ($this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype)) {
+
+        $isProductOnDemand = $this->productOnDemandHelper->isProductOnDemandQuoteId($mageOrder->getQuoteId());
+        $captureRequest = $this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype);
+
+        if ($captureRequest && !$isProductOnDemand) {
             //total amount from invoice and order should not be same for partial capture
             if (floatval($amount) != floatval($payment->getOrder()->getGrandTotal())) {
                 // to restrict Partical capture call for AMP's
-                $isAPM = $this->checkAPMforPartialCapture($paymenttype) ? false : true;
+                $isAPM = !$this->checkAPMforPartialCapture($paymenttype);
+
                 if ($partialCapture && $isAPM) {
                     $this->paymentservicerequest->partialCapture(
                         $payment->getOrder(),
@@ -646,7 +629,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 }
             }
             if (floatval($amount) == floatval($payment->getOrder()->getGrandTotal())) {
-            //normal capture
+                //normal capture
                 $this->paymentservicerequest->capture(
                     $payment->getOrder(),
                     $worldPayPayment,
@@ -654,7 +637,6 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                     $captureArray
                 );
             }
-
         }
         $payment->setTransactionId(time());
         return $this;
@@ -675,7 +657,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 __('Worldpay Plugin is not available')
             );
         }
-        
+
         $this->_wplogger->info('refund payment model function executed');
         if ($order = $payment->getOrder()) {
             $mageOrder = $payment->getOrder();
@@ -834,7 +816,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $message = $payment->prependMessage($message);
         $payment->addTransactionCommentsToOrder($transaction, $message);
     }
-    
+
     /**
      * Void the order abstract method
      *
@@ -870,7 +852,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                     . 'Please check Payment Status below for confirmation.'));
         }
     }
-    
+
     /**
      * Update status for void order abstract method
      *
@@ -883,14 +865,14 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $mageOrder = $order->getOrder();
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
         $paymentStatus = $worldPayPayment->getPaymentStatus();
-       
+
         if ($paymentStatus === 'VOIDED') {
             $mageOrder->setState(\Magento\Sales\Model\Order::STATE_CLOSED, true);
             $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_CLOSED);
             $mageOrder->save();
         }
     }
-    
+
     /**
      * Cancel the order abstract method
      *
@@ -918,7 +900,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                 $worldPayPayment,
                 $payment->getMethod()
             );
-         
+
             $payment->setTransactionId(time());
             $this->_response = $this->adminhtmlresponse->parseCancelOrderRespone($xml);
             if ($this->_response->reply->ok) {
@@ -930,7 +912,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
                    . 'Please check Payment Status or Order Status below for confirmation.'));
         }
     }
-    
+
     /**
      * Update status for cancel order abstract method
      *
@@ -943,14 +925,14 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
         $mageOrder = $order->getOrder();
         $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
         $paymentStatus = $worldPayPayment->getPaymentStatus();
-       
+
         if ($paymentStatus === 'CANCELLED') {
             $mageOrder->setState(\Magento\Sales\Model\Order::STATE_CANCELED, true);
             $mageOrder->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
             $mageOrder->save();
         }
     }
-    
+
     /**
      * Get card type from credit card number
      *
@@ -986,7 +968,7 @@ abstract class AbstractMethod extends \Magento\Payment\Model\Method\AbstractMeth
             return 'DANKORT-SSL';
         }
     }
-    
+
     /**
      * Check apm partial capture
      *

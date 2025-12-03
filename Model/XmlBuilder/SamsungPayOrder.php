@@ -69,7 +69,7 @@ EOD;
      * @var string
      */
     private $shopperIpAddress;
-    
+
     /**
      * @var string
      */
@@ -124,7 +124,7 @@ EOD;
         $this->browserFields = $browserFields;
         $this->shopperIpAddress = $shopperIpAddress;
         $this->sessionId = $sessionId;
-        
+
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -191,7 +191,7 @@ EOD;
         $amountElement['exponent'] = $this->exponent;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
     }
-    
+
     /**
      * Add OrderContent tag to xml
      *
@@ -202,7 +202,7 @@ EOD;
         $orderContent = $order->addChild('orderContent');
         $this->_addCDATA($orderContent, $this->orderContent);
     }
-    
+
     /**
      * Add PaymentDetails and its child tag to xml
      *
@@ -250,7 +250,7 @@ EOD;
     {
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($content));
+        $node->appendChild($no->createCDATASection((string)$content));
     }
 
     /**

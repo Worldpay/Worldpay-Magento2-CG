@@ -6,7 +6,7 @@
                 <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
                     <!-- ko if: (getSavedCardsCount() > 0)-->
                     <div class="paymentmethods-radio-wrapper">
-                        <input type="radio" data-bind="click:onSelectCcard.bind(this),event:{ change: loadEventAction }, 
+                        <input type="radio" data-bind="click:onSelectCcard.bind(this),event:{ change: loadEventAction },
                             attr: {'value': 'ONLINE',id: 'redirect_cc_online','data-type':'redirect'}"
                             name="payment[cc_type]"></input>
                         <label data-bind="attr: {for: 'redirect_cc_online'}">
@@ -14,9 +14,9 @@
                             <!-- /ko -->
                         </label>
                     </div>
-                    <div class="paymentmethods-radio-wrapper">                       
-                        <input type="radio" data-bind="click:onSelectCcard.bind(this),event:{ change: loadEventAction }, 
-                            attr: {'value': 'savedcard',id: 'redirect_cc_savedcard','data-type':'redirect'}" 
+                    <div class="paymentmethods-radio-wrapper">
+                        <input type="radio" data-bind="click:onSelectCcard.bind(this),event:{ change: loadEventAction },
+                            attr: {'value': 'savedcard',id: 'redirect_cc_savedcard','data-type':'redirect'}"
                             name="payment[cc_type]"></input>
                         <label data-bind="attr: {for: 'redirect_cc_savedcard'}">
                             <!-- ko i18n: 'Saved Cards'-->
@@ -29,7 +29,7 @@
                         <div class="paymentmethods-radio-wrapper">
                             <input type="radio" checked data-bind="attr: {'value': 'ONLINE',  id:'redirect_cc_gust','data-type':'redirect'}" name="payment[cc_type]">
                         </div>
-                     <!-- /ko --> 
+                     <!-- /ko -->
                 </div>
                 <div class="mage-error message message-error error" id="multishipping-error" style="display:none"></div>
 				<div class="mage-error message message-error error" id="worldpay_cc_multishipping_error" style="display:none"></div>
@@ -59,8 +59,7 @@
                                 <!-- /ko -->
                             </span>
                             <!-- ko if: (isStoredCredentialsEnabled() && isDisclaimerMessageEnabled())-->
-                            <span>(<a class="checkout-disclaimer"
-                                    data-bind="i18n: getCheckoutLabels('CO9'),click: disclaimerPopup"></a>)</span>
+                            <span>(<a class="checkout-disclaimer" data-bind="i18n: getCheckoutLabels('CO9'), click: disclaimerPopup"></a>)</span>
                             <!-- /ko -->
                         </label>
                     </div>
@@ -101,8 +100,8 @@
                     <div class="control" style=" width:225px;align:'center'">
 
                         <select name="payment[instalment]" class="select select-instalment" data-bind="visible: (showInstalmentSection()),
-                                           attr: {id: getCode() + '_instalment', 
-                                           'data-container': getCode() + '-instalment', 
+                                           attr: {id: getCode() + '_instalment',
+                                           'data-container': getCode() + '-instalment',
                                            'data-validate': JSON.stringify({required:true})},
                                            enable: isActive($parents),
                                            options: availableInstalTypes(),
@@ -134,65 +133,17 @@
             <!-- /ko -->
             <!--/ko-->
         </div>
-        <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='iframe')-->
-        <!-- HPP IFRAME -->
-        <style type="text/css">
-            #checkout-payment-worldpay-container {
-                padding-top: 10px;
-            }
 
-            #wp-cl {
-                width: 93%;
-            }
+        <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='iframe') -->
+            <!-- HPP IFRAME -->
+            <!-- ko template: 'Sapient_Worldpay/payment/hpp-iframe' --><!-- /ko -->
+            <!-- HPP IFRAME -->
+        <!-- /ko -->
 
-            .wp-cl-iframe {
-                height: 600px;
-                min-width: 93%;
-            }
-
-            #changePaymentMethod {
-                display: none;
-            }
-
-            #wp-cl-checkout-payment-worldpay-container-iframe #changePaymentMethod {
-                display: none;
-            }
-        </style>
-        <div style="display:none" id="checkout-payment-worldpay-alert-message"
-            data-bind="text: getCheckoutLabels('CO28')"></div>
-        <div id="checkout-payment-worldpay-container"></div>
-        <!-- HPP IFRAME -->
-
-        <!--/ko-->
-        <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() =='full_page')-->
-        <!-- HPP IFRAME -->
-        <style type="text/css">
-            #checkout-payment-worldpay-container {
-                padding-top: 10px;
-            }
-
-            #wp-cl {
-                width: 93%;
-            }
-
-            .wp-cl-iframe {
-                height: 600px;
-                min-width: 93%;
-            }
-
-            #changePaymentMethod {
-                display: none;
-            }
-
-            #wp-cl-checkout-payment-worldpay-container-iframe #changePaymentMethod {
-                display: none;
-            }
-        </style>
-        <div style="display:none" id="checkout-payment-worldpay-alert-message"
-            data-bind="text: getCheckoutLabels('CO28')"></div>
-        <div id="checkout-payment-worldpay-container"></div>
-        <!-- HPP IFRAME -->
-
-        <!--/ko-->
+        <!-- ko if: (getIntigrationMode() == 'redirect' && getHppIntegrationType() == 'full_page') -->
+            <!-- HPP IFRAME -->
+            <!-- ko template: 'Sapient_Worldpay/payment/hpp-iframe' --><!-- /ko -->
+            <!-- HPP IFRAME -->
+        <!-- /ko -->
     </div>
 </div>

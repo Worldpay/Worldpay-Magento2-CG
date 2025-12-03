@@ -45,7 +45,8 @@ class WorldpayConfigProviderTest extends TestCase
         'CHINAUNIONPAY-SSL' => 'Union Pay',
         'IDEAL-SSL' => 'IDEAL',
         //'YANDEXMONEY-SSL' => 'Yandex.Money',
-        'PAYPAL-EXPRESS' => 'PayPal',
+        'PAYPAL-EXPRESS' => 'PayPal Express',
+        'PAYPAL-SSL' => 'PayPal SSL',
         'SOFORT-SSL' => 'SoFort EU',
         'GIROPAY-SSL' => 'GiroPay',
         //'BOLETO-SSL' => 'Boleto Bancairo',
@@ -114,7 +115,7 @@ class WorldpayConfigProviderTest extends TestCase
                 'LASER-SSL' => 'Laser Card',
                 'UATP-SSL' => 'UATP'
         ];
-        
+
     protected function setUp(): void
     {
         $wplogger = $this->getMockBuilder(WorldpayLogger::class)
@@ -221,7 +222,7 @@ class WorldpayConfigProviderTest extends TestCase
                 ->willReturn($this->KLARNA_PAYNOW_COUNTRIES);
         $this->assertEquals($klarnaValues, $this->worldpayConfigObj->getKlarnaTypesAndContries());
     }
-    
+
     public function testGetWalletstitle()
     {
         $this->dataHelper->expects($this->any())
@@ -238,7 +239,7 @@ class WorldpayConfigProviderTest extends TestCase
                 ->willReturn($this->ALL_CC_METHODS);
         $this->assertEquals($this->ALL_CC_METHODS, $this->worldpayConfigObj->getCcTypes('worldpay_cc'));
     }
-    
+
     public function testGetCctitle()
     {
         $this->dataHelper->expects($this->any())

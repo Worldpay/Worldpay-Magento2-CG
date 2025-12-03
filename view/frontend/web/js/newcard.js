@@ -18,8 +18,7 @@ define([
             if (gendata.hasOwnProperty(key)) {
                 var cxData = gendata[key];
                 if (cxData['exception_code'].includes(exceptioncode)) {
-                    return cxData['exception_module_messages'] ?
-                            cxData['exception_module_messages'] : cxData['exception_messages'];
+                    return cxData['exception_module_messages'] || cxData['exception_messages'];
                 }
             }
         }
@@ -32,8 +31,7 @@ define([
             if (gendata.hasOwnProperty(key)) {
                 var cxData = gendata[key];
                 if (cxData['exception_code'].includes(exceptioncode)) {
-                    return cxData['exception_module_messages'] ?
-                            cxData['exception_module_messages'] : cxData['exception_messages'];
+                    return cxData['exception_module_messages'] || cxData['exception_messages'];
                 }
             }
         }
@@ -46,9 +44,9 @@ define([
          * @type {Object}
          */
         options: {
-            confirmMessage: $.mage.__(getMyAccountExceptions('IAVMA1') ?
-                    getMyAccountExceptions('IAVMA1') :
-                    'Please verify the Billing Address in your Address Book before adding new card!')
+            confirmMessage:
+                getMyAccountExceptions('IAVMA1')
+                || $.mage.__('Please verify the Billing Address in your Address Book before adding new card!')
         },
 
         /**

@@ -17,7 +17,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 {
     public const PENDING_RECURRING_PAYMENT_ORDER_STATUS = 'pending_recurring_payment';
     public const RECURRING_ORDER_SKIP_DAYS_UPTO = 9;
-    
+
     /**
      * Product type ids supported to act as subscriptions
      *
@@ -67,24 +67,24 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Framework\Stdlib\DateTime\TimezoneInterface
      */
     private $localeDate;
-    
+
     /**
      * Scope configuration instance.
      *
      * @var ScopeConfigInterface
      */
     protected $scopeConfig = null;
-    
+
     /**
      * @var \Magento\Customer\Model\Session
      */
     protected $_customerSession;
-    
+
     /**
      * @var SerializerInterface
      */
     private $serializer;
-  
+
     /**
      * @var curlHelper
      */
@@ -212,7 +212,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         \Sapient\Worldpay\Helper\CurlHelper $curlHelper,
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\Customer\Model\Address\Config $addressConfig,
-        Transactions $recurringTransactions
+        Transactions $recurringTransactions,
     ) {
         parent::__construct($context);
         $this->plansCollectionFactory = $plansCollectionFactory;
@@ -324,7 +324,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         return ($renderedPrice ? $renderedPrice . ' ' : '')
         . $this->escaper->escapeHtml(__('paid') . ' ' . $planInterval . $trialInfo . $maxPaymentsInfo);
     }
-    
+
     /**
      * Build plan option id
      *
@@ -374,7 +374,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         if ($plan) {
             $planInfo = [
                 [
-                    'label'   => 'Subscription Details',
+                    'label'   => __('Subscription Details'),
                     'value'   => $this->buildPlanOptionTitle($plan),
                     'plan_id' => $plan->getId(),
                 ]
@@ -454,7 +454,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return $planId;
     }
-    
+
     /**
      * Retrieve selected subscription plan from order item
      *
@@ -510,7 +510,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $firstPaymentDate;
     }
-    
+
     /**
      * Retrieve product subscription plans
      *
@@ -529,7 +529,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $product->getWorldpaySubscriptionPlans();
     }
-    
+
     /**
      * Retrieve information from worldpay configuration.
      *
@@ -542,7 +542,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue($field, $scopeType, $storeId);
     }
-    
+
     /**
      * Get array with selected plan start date information
      *
@@ -555,13 +555,13 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
         $startDateOption = $product->getCustomOption('subscription_date');
         if ($startDateOption && $startDateOption->getValue() && $product->getWorldpayRecurringAllowStart()) {
-            
+
                 $startDate = $startDateOption->getValue() ? $startDateOption->getValue() : date('d-m-yy');
-               
+
             if (isset($startDateOption)) {
                 $startDateInfo = [
                     [
-                        'label' => 'Subscription Start Date',
+                        'label' => __('Subscription Start Date'),
                         'value' => $startDate
                     ]
                 ];
@@ -570,7 +570,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $startDateInfo;
     }
-    
+
      /**
       * Get array with selected plan start date information
       *
@@ -583,13 +583,13 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
         $endDateOption = $product->getCustomOption('subscription_end_date');
         if ($endDateOption && $endDateOption->getValue()) {
-            
+
                 $endDate = $endDateOption->getValue() ? $endDateOption->getValue() : date('d-m-yy');
-               
+
             if (isset($endDateOption)) {
                 $endDateInfo = [
                     [
-                        'label' => 'Subscription End Date',
+                        'label' => __('Subscription End Date'),
                         'value' => $endDate
                     ]
                 ];
@@ -598,7 +598,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $endDateInfo;
     }
-    
+
     /**
      * Retrieve subscription options for order item
      *
@@ -625,7 +625,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $result;
     }
-    
+
     /**
      * Retrieve selected subscription start date from order item
      *
@@ -646,7 +646,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $startDate;
     }
-    
+
      /**
       * Retrieve selected subscription start date from order item
       *
@@ -667,7 +667,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $endDate;
     }
-    
+
      /**
       * Create order in magento
       *
@@ -690,6 +690,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $itemData['cartItem'] = ['sku' => $orderData['product_sku'],
             'qty' => $orderData['qty'], 'quote_id' => $quoteId];
         $itemResponse = $this->addItemsToQuote($tokenKey, json_encode($itemData), $quoteId);
+
         $cartId = $quoteId;
         $itemId = $itemResponse['item_id'];
         $price = $orderData['item_price'];
@@ -716,7 +717,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         $orderId = $this->orderPayment($tokenKey, $paymentData);
         return $orderId;
     }
-    
+
     /**
      * Create empty quote
      *
@@ -748,7 +749,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             ]
         );
     }
-    
+
     /**
      * Add items to quote
      *
@@ -785,7 +786,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         );
         return json_decode($response ?? '', true);
     }
-    
+
     /**
      * Update cart items
      *
@@ -807,11 +808,10 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             $quoteItem->getProduct()->setIsSuperMode(true);
             $quoteItem->save();
             $quote->save();
-
         }
         return true;
     }
-    
+
     /**
      * Get list of available shipping methods
      *
@@ -846,7 +846,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         );
         return json_decode($response ?? '', true);
     }
-    
+
     /**
      * Set shipping information
      *
@@ -881,7 +881,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         );
         return json_decode($response ?? '', true);
     }
-    
+
     /**
      * Order payment
      *
@@ -916,7 +916,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         );
         return json_decode($response ?? '', true);
     }
-    
+
     /**
      * Get Buy one time label text
      *
@@ -929,12 +929,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
         if (!$label) {
-            $label = 'Buy one time or select a Payment Plan';
+            $label = __('Buy one time or select a Payment Plan');
         }
-        
+
         return $label;
     }
-    
+
     /**
      * Get subscribe checkbox label text
      *
@@ -947,12 +947,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
         if (!$label) {
-            $label = 'Subscribe this product and save';
+            $label = __('Subscribe this product and save');
         }
-        
+
         return $label;
     }
-    
+
     /**
      * Get start date label text
      *
@@ -962,15 +962,15 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $label = $this->scopeConfig->getValue(
             'worldpay/subscriptions/start_date_label',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
         if (!$label) {
-            $label = 'Subscription Start Date';
+            $label = __('Subscription Start Date');
         }
-        
+
         return $label;
     }
-    
+
     /**
      * Get end date label text
      *
@@ -983,9 +983,9 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
         if (!$label) {
-            $label = 'Subscription End Date';
+            $label = __('Subscription End Date');
         }
-        
+
         return $label;
     }
     /**
@@ -998,58 +998,52 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getAdminLabels($labelCode, $store = null, $scope = null)
     {
+        $customAdminLabel = $this->scopeConfig->getValue(
+            'worldpay_custom_labels/admin_labels/admin_label',
+            $scope === 'website'
+                ? ScopeInterface::SCOPE_WEBSITE
+                : ScopeInterface::SCOPE_STORE,
+            $store
+        );
+
         $adminLabels = '';
-        if ($scope==='website') {
-            $customAdminLabel = $this->scopeConfig->getValue(
-                'worldpay_custom_labels/admin_labels/admin_label',
-                \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE,
-                $store
-            );
-            if (!empty($customAdminLabel)) {
-                $adminLabels = $this->serializer->unserialize($customAdminLabel);
-            }
-        } else {
-            $customAdminLabel = $this->scopeConfig->getValue(
-                'worldpay_custom_labels/admin_labels/admin_label',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-                $store
-            );
-            if (!empty($customAdminLabel)) {
-                $adminLabels = $this->serializer->unserialize($customAdminLabel);
-            }
+        if (!empty($customAdminLabel)) {
+            $adminLabels = $this->serializer->unserialize($customAdminLabel);
         }
+
         if (is_array($adminLabels) || is_object($adminLabels)) {
             foreach ($adminLabels as $key => $valuepair) {
                 if ($key == $labelCode) {
-                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
-                        $valuepair['wpay_label_desc'];
+                    return $valuepair['wpay_custom_label'] ?: $valuepair['wpay_label_desc'];
                 }
             }
         }
+
+        return [];
     }
 
     /**
      * Get account label by code
      *
      * @param string $labelCode
-     * @return array
+     * @return string
      */
     public function getAccountLabelbyCode($labelCode)
     {
         $aLabels = $this->serializer->unserialize($this->scopeConfig->getValue(
             'worldpay_custom_labels/my_account_labels/my_account_label',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         ));
-        if (is_array($aLabels) || is_object($aLabels)) {
-            foreach ($aLabels as $key => $valuepair) {
-                if ($key == $labelCode) {
-                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
-                    $valuepair['wpay_label_desc'];
-                }
+
+        foreach ($aLabels as $key => $valuepair) {
+            if ($key == $labelCode) {
+                return $valuepair['wpay_custom_label'] ?: __($valuepair['wpay_label_desc']);
             }
         }
+
+        return '';
     }
-    
+
     /**
      * Get checkout label by code
      *
@@ -1060,18 +1054,18 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $aLabels = $this->serializer->unserialize($this->scopeConfig->getValue(
             'worldpay_custom_labels/checkout_labels/checkout_label',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         ));
+
         if (is_array($aLabels) || is_object($aLabels)) {
             foreach ($aLabels as $key => $valuepair) {
                 if ($key == $labelCode) {
-                    return $valuepair['wpay_custom_label']?$valuepair['wpay_custom_label']:
-                    $valuepair['wpay_label_desc'];
+                    return $valuepair['wpay_custom_label'] ?: __($valuepair['wpay_label_desc']);
                 }
             }
         }
     }
-    
+
     /**
      * Get the list of my account exceptions
      *
@@ -1080,13 +1074,16 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getMyAccountExceptions($exceptioncode)
     {
-        $accdata = $this->serializer->unserialize($this->scopeConfig->getValue('worldpay_exceptions/'
-                . 'my_account_alert_codes/response_codes', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $accdata = $this->serializer->unserialize(
+            $this->scopeConfig->getValue(
+                'worldpay_exceptions/my_account_alert_codes/response_codes',
+                ScopeInterface::SCOPE_STORE
+            )
+        );
         if (is_array($accdata) || is_object($accdata)) {
             foreach ($accdata as $key => $valuepair) {
                 if ($key == $exceptioncode) {
-                    return $valuepair['exception_module_messages']?$valuepair['exception_module_messages']:
-                        $valuepair['exception_messages'];
+                    return $valuepair['exception_module_messages'] ?: $valuepair['exception_messages'];
                 }
             }
         }
@@ -1102,7 +1099,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $ccdata = $this->serializer->unserialize($this->scopeConfig->getValue('worldpay_exceptions/'
                 . 'ccexceptions/cc_exception', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
-        if (is_array($ccdata) || is_object(accdata)) {
+        if (is_array($ccdata) || is_object($ccdata)) {
             foreach ($ccdata as $key => $valuepair) {
                 if ($key == $exceptioncode) {
                     return $valuepair['exception_module_messages']?$valuepair['exception_module_messages']:
@@ -1163,7 +1160,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             $shippingAddress = $order->getShippingAddress()->getData();
             $formattedShippingAddress = $this->getFormatAddressByCode($shippingAddress);
         }
-        
+
         $paymentMethod = $order->getPayment()->getAdditionalInformation('method_title');
         $orderDetails = [
             'order' => $order,

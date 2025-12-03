@@ -53,8 +53,8 @@ class CurrentPluginVersion extends \Magento\Framework\App\Config\Value
         \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
         \Magento\Framework\Component\ComponentRegistrarInterface $componentRegistrar,
         \Magento\Framework\Filesystem\Directory\ReadFactory $readFactory,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->wplogger = $wplogger;

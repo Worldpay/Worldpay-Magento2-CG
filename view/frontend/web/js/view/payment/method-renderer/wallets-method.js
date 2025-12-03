@@ -22,8 +22,8 @@ define(
     ],
     function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder,  redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, googlePay, samsungPay) {
         'use strict';
-        var ccTypesArr = ko.observableArray([]);        
-        
+        var ccTypesArr = ko.observableArray([]);
+
         var paymentService = false;
         var billingAddressCountryId = "";
         var googleResponse = "";
@@ -33,12 +33,12 @@ define(
         var response = '';
         var response1 = '';
         var dfReferenceId = "";
-  
-        
+
+
         if(window.checkoutConfig.payment.general.environmentMode == 'PRODUCTION'){
             merchantId = "merchantId:"+window.checkoutConfig.payment.ccform.googleMerchantid;
         }
-        
+
         //apple pay validation
         var debug = true;
         if (window.ApplePaySession) {
@@ -62,9 +62,9 @@ define(
                        document.getElementById("wallets_label_APPLEPAY-SSL").style.display = "table-cell";
                     }
                 }
-            }); 
+            });
         }
-        
+
         /***** Google pay Elements Started  */
         const baseRequest = {apiVersion: 2, apiVersionMinor: 0 };
         const allowedCardNetworks = window.checkoutConfig.payment.ccform.googlePaymentMethods.split(",");
@@ -76,7 +76,7 @@ define(
                 'gatewayMerchantId': window.checkoutConfig.payment.ccform.googleGatewayMerchantid
             }
         };
-        
+
         const baseCardPaymentMethod = {
             type: 'CARD',
             parameters: {
@@ -91,7 +91,7 @@ define(
                 tokenizationSpecification: tokenizationSpecification
             }
         );
-        
+
         var paymentDataRequest = null;
         var paymentsClient = null;
         /***** Google pay Elements End  */
@@ -99,7 +99,7 @@ define(
         if (quote.billingAddress()) {
             billingAddressCountryId = quote.billingAddress._latestValue.countryId;
         }
-        
+
         function getGooglePaymentDataRequest(){
             const paymentDataRequest = Object.assign({}, baseRequest);
             paymentDataRequest.allowedPaymentMethods = [cardPaymentMethod];
@@ -107,7 +107,7 @@ define(
             paymentDataRequest.merchantInfo = {
                 // @todo a merchant ID is available for a production environment after approval by Google
                 // See {@link https://developers.google.com/pay/api/web/guides/test-and-deploy/integration-checklist|Integration checklist}
-                
+
                 merchantId,
                 merchantName: window.checkoutConfig.payment.ccform.googleMerchantname
             };
@@ -123,15 +123,15 @@ define(
         }
         function getGooglePaymentsClient() {
             if ( paymentsClient === null ) {
-                    paymentsClient = new google.payments.api.PaymentsClient({environment: window.checkoutConfig.payment.general.environmentMode}); 
+                    paymentsClient = new google.payments.api.PaymentsClient({environment: window.checkoutConfig.payment.general.environmentMode});
                 }
             return paymentsClient;
         }
-        
+
         function getCreditCardExceptions (exceptioncode){
                 var ccData=window.checkoutConfig.payment.ccform.creditcardexceptions;
                   for (var key in ccData) {
-                    if (ccData.hasOwnProperty(key)) {  
+                    if (ccData.hasOwnProperty(key)) {
                         var cxData=ccData[key];
                     if(cxData['exception_code'].includes(exceptioncode)){
                         return cxData['exception_module_messages']?cxData['exception_module_messages']:cxData['exception_messages'];
@@ -139,8 +139,8 @@ define(
                     }
                 }
             }
-        
-        return Component.extend({         
+
+        return Component.extend({
             defaults: {
                 redirectAfterPlaceOrder: false,
                 direcTemplate: 'Sapient_Worldpay/payment/wallets',
@@ -168,7 +168,7 @@ define(
                         that.filterwalletajax(1);
                         paymentService = true;
                     }
-                }); 
+                });
                 return this;
             },
             filterwalletajax: function(statusCheck){
@@ -182,14 +182,14 @@ define(
                 if(this.multishipping){
                     var MultishippingWalletsPreSelected = jQuery('#p_method_worldpay_wallets:checked');
                     if(MultishippingWalletsPreSelected.length){
-                        jQuery('#payment-continue').html("<span>Place Order</span>");
+                        jQuery('#payment-continue').html("<span>" + $t('Place Order') + "</span>");
                         this.selectPaymentMethod();
                     }
                 }
                 var ccavailabletypes = this.getCcAvailableTypes();
                 var filtercclist = {};
 
-                fullScreenLoader.startLoader();                
+                fullScreenLoader.startLoader();
                 filtercclist = ccavailabletypes;
 
                 var ccTypesArr1 = _.map(filtercclist, function (value, key) {
@@ -232,7 +232,7 @@ define(
                 }
                 return this.direcTemplate;
             },
-            
+
             /**
              * Get payment icons
              * @param {String} type
@@ -275,7 +275,7 @@ define(
                     }
                 };
             },
-           
+
             preparePayment:function() {
                 var self = this;
                 var $form = $('#' + this.getCode() + '-form');
@@ -306,20 +306,20 @@ define(
                                         //console.warn('Merchant received a message:', data);
                                         if (data !== undefined) {
                                             if(data.Payload){
-                                                if(data.Payload.ActionCode =="SUCCESS"){ 
+                                                if(data.Payload.ActionCode =="SUCCESS"){
                                                     var sessionId = data.Payload.SessionId;
                                                     if(sessionId){
                                                         this.dfReferenceId = sessionId;
                                                     }
                                                     window.sessionId = this.dfReferenceId;
                                                     //place order with direct CSE method
-                                                    if(window.checkoutConfig.payment.ccform.isMultishipping){                                                        
+                                                    if(window.checkoutConfig.payment.ccform.isMultishipping){
                                                         placeMultishippingOrder(self.getData());
                                                     }
                                                     else{
                                                         fullScreenLoader.stopLoader();
                                                         self.placeOrder();
-                                                    } 
+                                                    }
                                                 }
 
                                             }else if(data.Status){
@@ -330,7 +330,7 @@ define(
                                                 }
                                                 window.sessionId = this.dfReferenceId;
                                                 //place order with direct CSE method
-                                                if(window.checkoutConfig.payment.ccform.isMultishipping){                                                        
+                                                if(window.checkoutConfig.payment.ccform.isMultishipping){
                                                     placeMultishippingOrder(self.getData());
                                                 }
                                                 else{
@@ -342,7 +342,7 @@ define(
                                     }
                                 }, { once: true });
                             } else {
-                                if(window.checkoutConfig.payment.ccform.isMultishipping){                                                        
+                                if(window.checkoutConfig.payment.ccform.isMultishipping){
                                     placeMultishippingOrder(self.getData());
                                 }
                                 else{
@@ -360,16 +360,16 @@ define(
                         console.error(err);
                         return false;
                     });
-                    
+
                 } else if (this.getselectedCCType()=='APPLEPAY-SSL') {
-                    
+
                     //---------------------------------- Apple Pay starts -----------------------
-             
+
                     var baseGrandTotal     = window.checkoutConfig.totalsData.base_subtotal;
                     var runningAmount = (Math.round(baseGrandTotal * 100) / 100).toFixed(2);
                     var subTotal    = window.checkoutConfig.quoteData.base_grand_total;
                     var runningTotal = (Math.round(subTotal * 100) / 100).toFixed(2);
-                    var subTotalDescr    = "Cart Subtotal";
+                    var subTotalDescr    = $t("Cart Subtotal");
                     var currencyCode = window.checkoutConfig.quoteData.quote_currency_code;
                     var countryCode = window.checkoutConfig.defaultCountryId;
                     var paymentRequest = {
@@ -377,7 +377,7 @@ define(
                         countryCode: countryCode,
                         lineItems: [{label: subTotalDescr, amount: runningAmount }],
                         total: {
-                            label: 'Order Total',
+                            label: $t('Order Total'),
                             amount: runningAmount
                         },
                         supportedNetworks: ['amex', 'masterCard', 'visa' ],
@@ -388,24 +388,24 @@ define(
                     var session = new ApplePaySession(1, paymentRequest);
 
                     // Merchant Validation
-                    session.onvalidatemerchant = function (event) {                        
+                    session.onvalidatemerchant = function (event) {
                         var promise = performValidation(event.validationURL);
                         promise.then(function (merchantSession) {
                             session.completeMerchantValidation(merchantSession);
-                        }); 
+                        });
                     }
 
-                    session.onpaymentmethodselected = function(event) {                    
+                    session.onpaymentmethodselected = function(event) {
 
-                        var linkUrl = url.build('worldpay/applepay/index?u=getTotal');                         
+                        var linkUrl = url.build('worldpay/applepay/index?u=getTotal');
                         var xhttp = new XMLHttpRequest();
                         xhttp.open("GET", linkUrl, false);
                          xhttp.setRequestHeader("Content-type", "application/json");
                         xhttp.send();
                         var finalTotal = xhttp.responseText.slice(1, -1); // removing quotes
-                        
+
                         var runningTotal = (Math.round(finalTotal * 100) / 100).toFixed(2);
-                        var newTotal = { type: 'final', label: 'Order Total', amount: runningTotal };
+                        var newTotal = { type: 'final', label: $t('Order Total'), amount: runningTotal };
                         var newLineItems =[{type: 'final',label: subTotalDescr, amount: runningAmount }];
 
                         session.completePaymentMethodSelection( newTotal, newLineItems );
@@ -414,7 +414,7 @@ define(
                     session.onpaymentauthorized = function (event) {
                         var promise = sendPaymentToken(event.payment.token);
 
-                        promise.then(function (success) {    
+                        promise.then(function (success) {
                             var status;
                             if (success){
                                 status = ApplePaySession.STATUS_SUCCESS;
@@ -441,16 +441,16 @@ define(
                     console.log('Initiating Samsung Pay........');
 
                 var quoteId = window.checkoutConfig.quoteData.entity_id;
-                    
-                    var linkUrl = url.build('worldpay/samsungpay/index?quoteId=' + quoteId);                         
+
+                    var linkUrl = url.build('worldpay/samsungpay/index?quoteId=' + quoteId);
                         var xhttp = new XMLHttpRequest();
                         xhttp.open("GET", linkUrl, false);
-                         
-                        xhttp.send(); 
-                        
-                        var response = JSON.parse(xhttp.responseText);                                           
-                         response1 = JSON.parse(response); 
-                         
+
+                        xhttp.send();
+
+                        var response = JSON.parse(xhttp.responseText);
+                         response1 = JSON.parse(response);
+
                          if(response1.resultMessage == 'SUCCESS') {
                             if(window.checkoutConfig.payment.ccform.isMultishipping){
                                 fullScreenLoader.startLoader();
@@ -459,23 +459,23 @@ define(
                             else{
                                 self.placeOrder();
                             }
-                           
+
                          }
 
                 } //else if end
             },
-            afterPlaceOrder: function (data, event) { 
+            afterPlaceOrder: function (data, event) {
               if (this.getselectedCCType()=='SAMSUNGPAY-SSL') {
                 var cancel = url.build('worldpay/samsungpay/CallBack');
                 var serviceId = window.checkoutConfig.payment.ccform.samsungServiceId;
- 
+
                 var callback = url.build('worldpay/samsungpay/CallBack');
                 var countryCode = window.checkoutConfig.defaultCountryId;
                 console.log('Authentication is success, Redirecting to Samsung Payment Page......');
                                   SamsungPay.connect(
                         response1.id, response1.href, serviceId, callback, cancel, countryCode,
                         response1.encInfo.mod, response1.encInfo.exp, response1.encInfo.keyId
-                        ); 
+                        );
             } else if (this.getselectedCCType()=='PAYWITHGOOGLE-SSL') {
                 window.location.replace(url.build('worldpay/savedcard/redirect'));
             } else{
@@ -483,14 +483,14 @@ define(
             }
         }
     }); //return ends
-           
+
     function performValidation(valURL) {
         return new Promise(function(resolve, reject) {
             var xhr = new XMLHttpRequest();
-            xhr.onload = function() {      
+            xhr.onload = function() {
                 var finaldata = this.responseText.slice(1, -1);
                 var finaldata = finaldata.replace(/\\/g, '');
-                
+
                 var data = JSON.parse(finaldata);
                 resolve(data);
             };
@@ -504,12 +504,12 @@ define(
 
     function getRealTotal() {
         var linkUrl = url.build('worldpay/applepay/index?u=getTotal');
-                
+
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET", linkUrl, false);
         xhttp.setRequestHeader("Content-type", "application/json");
         xhttp.send();
-       
+
         var finalTotal = xhttp.responseText;
 
     }
@@ -527,5 +527,5 @@ define(
             else
             reject;
         });
-    }        
+    }
 });

@@ -6,14 +6,16 @@
 
 /** @var \Magento\Multishipping\Block\Checkout\Success $block */
 ?>
-<script>
+<?php $scriptString = <<<script
 require([
      'Magento_Customer/js/customer-data'
  ], function (customerData) {
      var sections = ['cart'];
      customerData.reload(sections, true);
  });
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
 <form action="<?= $escaper->escapeUrl($block->getContinueUrl()); ?>" method="post">
     <div class="multicheckout success">
         <p><?= $escaper->escapeHtml(__('For successfully order items, you\'ll receive a confirmation email including '.

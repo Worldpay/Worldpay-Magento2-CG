@@ -20,6 +20,8 @@
                 <value id="wpay-hpp" type="host">https://payments.worldpay.com/resources/hpp/integrations/embedded/js/hpp-embedded-integration-library.js</value>
                 <value id="stg-ops" type="host">https://d35p4vvdul393k.cloudfront.net/sdk_library/us/stg/ops/pc_gsmpi_web_sdk.js</value>
                 <value id="prd-ops" type="host">https://d16i99j5zwwv51.cloudfront.net/sdk_library/us/prd/ops/pc_gsmpi_web_sdk.js</value>
+                <value id="paypal-sdk" type="host">https://www.paypal.com/sdk/js</value>
+
             </values>
         </policy>
         <policy id="style-src">
@@ -43,6 +45,7 @@
                 <value id="google-pay" type="host">https://pay.google.com</value>
                 <value id="worldpay-pay" type="host">https://secure-test.worldpay.com</value>
                 <value id="hpp-worldpay" type="host">https://hpp.worldpay.com/</value>
+                <value id="paypal-sdk" type="host">https://www.paypal.com/sdk/js</value>
             </values>
         </policy>
         <policy id="form-action">
@@ -52,6 +55,7 @@
                 <value id="secure.worldpay.com" type="host">https://secure.worldpay.com/shopper/3ds/ddc.html</value>
                 <value id="wpg-iframe-test" type="host">https://payments-test.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
                 <value id="wpg-iframe" type="host">https://payments-live.hpp.apps.eu-west-1-7z55k.dev.msp.worldpay.io/app/hpp-iframe/integration/wpg/corporate</value>
+                <value id="payments-wpg-iframe" type="host">https://payments.worldpay.com/app/hpp-iframe/integration/wpg/corporate</value>
             </values>
         </policy>
         <policy id="connect-src">
@@ -61,7 +65,11 @@
                 <value id="google-pay-payment-manifest" type="host">https://pay.google.com/gp/p/payment_method_manifest.json</value>
                 <value id="pay-google" type="host">https://pay.google.com/</value>
                 <value id="google-pay-2" type="host">https://google.com/pay</value>
-                <value id="worldpay-connect" type="host">*.worldpay.com</value>
+		        <value id="worldpay-connect" type="host">*.worldpay.com</value>
+                <value id="telemetry" type="host">https://hpp.worldpay.com/app/hpp/135-0/telemetry</value>
+                <value id="paypal-smart-button" type="host">https://hpp.worldpay.com/app/hpp/135-0/payment/paypalsmartbutton/continue</value>
+                <value id="paypal-sdk" type="host">https://www.paypal.com/sdk/js</value>
+                <value id="telemetry-iframe" type="host">https://payments.worldpay.com/app/hpp/135-0/telemetry/iframe</value>
             </values>
         </policy>
         <policy id="font-src">

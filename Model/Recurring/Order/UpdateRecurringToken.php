@@ -20,7 +20,7 @@ class UpdateRecurringToken implements UpdateRecurringTokenInterface
      * @var \Magento\Sales\Model\OrderFactory $orderFactory
      */
     protected $orderFactory;
-    
+
     /**
      * @var RateRequestFactory $rateRequestFactory
      */
@@ -171,7 +171,7 @@ class UpdateRecurringToken implements UpdateRecurringTokenInterface
             $currenntActiveTransaction = $this->getActiveRecurringTransaction($subscriptionId);
 
             if ($currenntActiveTransaction->getSize()) {
-                
+
                 $transaction = $currenntActiveTransaction->getFirstItem();
                 $this->verifyTokenFromWorldpay($tokenId);
 
@@ -182,7 +182,7 @@ class UpdateRecurringToken implements UpdateRecurringTokenInterface
 
                 $transaction->setData('worldpay_token_id', $tokenId);
                 $transaction->save();
-    
+
                 $this->editSubscriptionRepository
                     ->updateEditHistory(
                         $subscriptionOldInfo,

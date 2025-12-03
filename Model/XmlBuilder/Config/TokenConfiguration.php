@@ -50,7 +50,7 @@ class TokenConfiguration
     {
         return 'To Save Card '.$orderCode;
     }
-    
+
     /**
      * Check if tokenization is enabled?
      *

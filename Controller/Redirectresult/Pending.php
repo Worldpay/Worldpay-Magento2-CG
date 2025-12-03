@@ -47,7 +47,7 @@ class Pending extends \Magento\Framework\App\Action\Action
      * @var \Sapient\Worldpay\Model\Payment\WpResponse
      */
     protected $wpresponse;
-    
+
     /**
      * @var object
      */

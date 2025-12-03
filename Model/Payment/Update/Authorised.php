@@ -4,6 +4,8 @@
  */
 namespace Sapient\Worldpay\Model\Payment\Update;
 
+use Sapient\Worldpay\Helper\ProductOnDemand;
+use Sapient\Worldpay\Model\Payment\StateInterface;
 use \Sapient\Worldpay\Model\Payment\UpdateInterface;
 
 class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements UpdateInterface
@@ -24,7 +26,9 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
      * @var \Sapient\Worldpay\Helper\Multishipping
      */
     public $multishippingHelper;
-    
+
+    private ProductOnDemand $productOnDemandHelper;
+
     /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Payment\StateInterface $paymentState
@@ -36,12 +40,14 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
         \Sapient\Worldpay\Model\Payment\StateInterface $paymentState,
         \Sapient\Worldpay\Model\Payment\WorldPayPayment $worldPayPayment,
         \Sapient\Worldpay\Helper\Data $configHelper,
-        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper,
+        ProductOnDemand $productOnDemandHelper,
     ) {
         $this->_paymentState = $paymentState;
         $this->_worldPayPayment = $worldPayPayment;
         $this->_configHelper = $configHelper;
         $this->multishippingHelper = $multishippingHelper;
+        $this->productOnDemandHelper = $productOnDemandHelper;
     }
 
     /**
@@ -83,7 +89,7 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
         $payment->setTransactionId(time());
         $payment->setIsTransactionClosed(0);
         if (!empty($order) &&
-        ($order->getPaymentStatus() == \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION)
+        ($order->getPaymentStatus() == StateInterface::STATUS_SENT_FOR_AUTHORISATION)
         ) {
             $currencycode = $this->_paymentState->getCurrency();
             $currencysymbol = $this->_configHelper->getCurrencySymbol($currencycode);
@@ -111,27 +117,20 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
      */
     private function _getAllowedPaymentStatuses(\Sapient\Worldpay\Model\Order $order)
     {
-        if ($this->_isDirectIntegrationMode($order)) {
-             return [
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION,
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_AUTHORISED
-             ];
+        $allowedPaymentStatuses = [
+            StateInterface::STATUS_SENT_FOR_AUTHORISATION,
+            StateInterface::STATUS_WAITING_FOR_SHOPPER,
+        ];
+
+        if ($this->_isDirectIntegrationMode($order) || $this->_isWalletIntegrationMode($order)) {
+            array_push($allowedPaymentStatuses, StateInterface::STATUS_AUTHORISED);
         }
-        if ($this->_isWalletIntegrationMode($order)) {
-             return [
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION,
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_AUTHORISED
-             ];
-        }
+
         if ($this->_isACHIntegrationMode($order) || $this->_isSEPAIntegrationMode($order)) {
-              return [
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION,
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_AUTHORISED,
-                \Sapient\Worldpay\Model\Payment\StateInterface::STATUS_CAPTURED
-              ];
+            array_push($allowedPaymentStatuses, StateInterface::STATUS_AUTHORISED, StateInterface::STATUS_CAPTURED);
         }
-        
-        return [\Sapient\Worldpay\Model\Payment\StateInterface::STATUS_SENT_FOR_AUTHORISATION];
+
+        return $allowedPaymentStatuses;
     }
 
     /**
@@ -143,10 +142,22 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
      */
     private function _captureOrderIfAutoCaptureEnabled(\Sapient\Worldpay\Model\Order $order)
     {
+        if (
+            $this->_configHelper->isAutoCaptureEnabled($order->getStoreId())
+            && $this->productOnDemandHelper->isProductOnDemandQuoteId($order->getQuoteId())
+        ) {
+            return;
+        }
+
         // Capture only if auto-capture enabled
-        if ($this->_configHelper->isAutoCaptureEnabled($order->getStoreId()) &&
-                !$this->_configHelper->checkStopAutoInvoice($order->getPaymentMethodCode(), $order->getPaymentType())) {
-            if (($this->_paymentState->isAsyncNotification() && $this->_isRedirectIntegrationMode($order))
+        if (
+            (
+                $this->_configHelper->isAutoCaptureEnabled($order->getStoreId()) &&
+                !$this->_configHelper->checkStopAutoInvoice($order->getPaymentMethodCode(), $order->getPaymentType())
+            )
+        ) {
+            if (
+                ($this->_paymentState->isAsyncNotification() && $this->_isRedirectIntegrationMode($order))
                 || ($this->_paymentState->isAsyncNotification() && $this->_isDirectIntegrationMode($order))
             ) {
                 $order->capture();
@@ -172,7 +183,7 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
         )
             === \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::DIRECT_MODEL;
     }
-    
+
     /**
      * Check if integration mode is wallet
      *
@@ -202,7 +213,7 @@ class Authorised extends \Sapient\Worldpay\Model\Payment\Update\Base implements 
         )
             === \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod::REDIRECT_MODEL;
     }
-    
+
     /**
      * Check if integration mode is ach
      *

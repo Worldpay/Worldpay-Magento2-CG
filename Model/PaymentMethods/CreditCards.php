@@ -63,7 +63,7 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
     public function getAuthorisationService($storeId)
     {
         $integrationModel = $this->worlpayhelper->getCcIntegrationMode($storeId);
-        
+
         $checkoutpaymentdata = $this->paymentdetailsdata;
         if ((!empty($checkoutpaymentdata['additional_data']['isSavedCardPayment'])
              && !empty($checkoutpaymentdata['additional_data']['tokenCode'])
@@ -99,8 +99,12 @@ class CreditCards extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
      * @param \Magento\Quote\Api\Data\CartInterface $quote
      * @return bool
      */
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
+        if (!parent::isAvailable($quote)) {
+            return false;
+        }
+
         /* Start Multishipping code */
         if ($this->worlpayhelper->isMultiShipping()) {
             if ($this->worlpayhelper->isMultiShippingEnabledInCc()) {

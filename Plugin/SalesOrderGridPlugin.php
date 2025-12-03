@@ -25,8 +25,9 @@ class SalesOrderGridPlugin
             $subject->getSelect()->joinLeft(
                 $tableName,
                 $tableName . '.order_id = main_table.' . $orderIncrementColumnName,
-                $tableName . '.merchant_id'
+                [$tableName . '.merchant_id' => new \Zend_Db_Expr('GROUP_CONCAT(merchant_id)')]
             );
+            $subject->getSelect()->group('main_table.entity_id');
         }
         return [$printQuery, $logQuery];
     }

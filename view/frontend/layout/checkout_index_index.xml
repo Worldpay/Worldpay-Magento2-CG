@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <body> 
+    <body>
         <referenceBlock name="checkout.root" >
             <arguments>
                 <argument name="jsLayout" xsi:type="array">
@@ -32,26 +32,30 @@
                                                                     </item>
                                                                 </item>
                                                             </item>
-                                                        </item>                                                        
+                                                        </item>
                                                         <item name="payments-list" xsi:type="array">
-                                                                <item name="children" xsi:type="array">                                                                    
+                                                                <item name="children" xsi:type="array">
                                                                     <item name="googlepayCheckout" xsi:type="array">
-                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/googlepay-checkout</item>  
+                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/googlepay-checkout</item>
                                                                         <item name="displayArea" xsi:type="string">googlepayCheckout</item>
                                                                     </item>
                                                                     <item name="applepayCheckout" xsi:type="array">
-                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/applepay-checkout</item>  
+                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/applepay-checkout</item>
                                                                         <item name="displayArea" xsi:type="string">applepayCheckout</item>
                                                                     </item>
                                                                     <item name="samsungpayCheckout" xsi:type="array">
-                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/samsungpay-checkout</item>  
+                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/samsungpay-checkout</item>
                                                                         <item name="displayArea" xsi:type="string">samsungpayCheckout</item>
                                                                     </item>
                                                                     <item name="paybylinkCheckout" xsi:type="array">
-                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/paybylink-checkout</item>  
+                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/paybylink-checkout</item>
                                                                         <item name="displayArea" xsi:type="string">paybylinkCheckout</item>
                                                                     </item>
-                                                                </item>                                                          
+                                                                    <item name="paypalCheckout" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/paypal</item>
+                                                                        <item name="displayArea" xsi:type="string">paypalCheckout</item>
+                                                                    </item>
+                                                                </item>
                                                         </item>
                                                     </item>
                                                 </item>

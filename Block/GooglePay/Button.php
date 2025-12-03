@@ -5,8 +5,10 @@
  */
 namespace Sapient\Worldpay\Block\GooglePay;
 
+use Magento\Catalog\Block\Product\View as ProductView;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\View\Element\Template;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 
 /**
  * Configuration for JavaScript instant purchase button component.
@@ -16,44 +18,29 @@ use Magento\Framework\View\Element\Template;
  */
 class Button extends Template
 {
-    
-    /**
-     * @var GOOGLE_PAY_DEFAULT_LOGO_PATH
-     */
-    private const GOOGLE_PAY_DEFAULT_LOGO_PATH = 'googlepay/logo/';
-    /**
-     * @var Config
-     */
-    private $instantPurchaseConfig;
-    /**
-     * @var scopeConfig
-     */
-    protected $_scopeConfig;
-    /**
-     * @var SessionManagerInterface
-     */
-    protected $session;
-    
-    /**
-     * @var \Sapient\Worldpay\Helper\Data
-     */
-    protected $worldpayHelper;
+    protected \Sapient\Worldpay\Helper\Data $worldpayHelper;
+
+    protected ProductView $productView;
+
+    protected ProductOnDemand $productOnDemand;
 
     /**
      * Button constructor.
      * @param Context $context
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Helper\Data $helper
      * @param array $data
      */
     public function __construct(
         Context $context,
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Helper\Data $helper,
+        ProductView $productView,
+        ProductOnDemand $productOnDemand,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->worldpayHelper = $helper;
+        $this->productView = $productView;
+        $this->productOnDemand = $productOnDemand;
     }
 
     /**
@@ -64,7 +51,7 @@ class Button extends Template
      */
     public function isEnabled(): bool
     {
-        return $this->worldpayHelper->isGooglePayEnable();
+        return $this->worldpayHelper->isGooglePayEnable() && !$this->isProductOnDemand();
     }
 
     /**
@@ -72,6 +59,17 @@ class Button extends Template
      */
     public function isGooglePayEnableonPdp()
     {
-        return $this->worldpayHelper->isGooglePayEnableonPdp();
+        return $this->worldpayHelper->isGooglePayEnableonPdp() && !$this->isProductOnDemand();
+    }
+
+    private function isProductOnDemand(): bool
+    {
+        $product = $this->productView->getProduct();
+
+        if ($product) {
+            return $this->productOnDemand->isProductOnDemand($product);
+        }
+
+        return false;
     }
 }

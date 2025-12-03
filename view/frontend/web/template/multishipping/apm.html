@@ -4,60 +4,63 @@
         <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
             <fieldset data-bind="attr: {class: 'fieldset payment items ccard ' + getCode()}">
                 <div class="field type required" data-bind="attr: {id: getCode() + '_cc_type_div'}">
-                    <!-- ko if: (paymentMethodSelection()=='radio')-->
 
+                    <!-- ko if: (paymentMethodSelection() == 'radio')-->
                     <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
                     <div class="paymentmethods-radio-wrapper">
-                        <input type="radio" data-bind="event:{ change: $parent.checkPaymentTypes.bind($parent,item) },attr: {'value': item.ccValue, 'data-validate': JSON.stringify({
-                                        'validate-one-required-by-name':true
-                                                }),id: 'apm_' + item.ccValue}" name="apm_type"></input>
-                        <!--ko if: $parent.getIcons(item.ccValue) -->
-                        <label data-bind="attr: {for: 'apm_' + item.ccValue}"><img data-bind="attr: {
-                                        'src': $parent.getIcons(item.ccValue).url,
-                                        'alt': item.ccLabel,
-                                        'width': $parent.getIcons(item.ccValue).width,
-                                        'height': $parent.getIcons(item.ccValue).height
-                                        }"></label>
-                        <!--/ko-->
-                        <!--ko ifnot: $parent.getIcons(item.ccValue) -->
-                        <!-- ko if: (item.ccLabel=='KLARNA')-->
-                        <label data-bind="attr: {for: 'apm_' + item.ccValue}"><img data-bind="attr: {
-                                        'src': require.toUrl('Sapient_Worldpay/images/cc/klarna-ssl.png'),
-                                        'alt': item.ccLabel
-                                        }"></label>
-                        <!--/ko-->
-                        <!--ko ifnot: (item.ccLabel=='KLARNA')-->
-                        <label data-bind="attr: {for: 'apm_' + item.ccValue}">
-                            <!-- ko text: item.ccLabel -->
-                            <!-- /ko -->
-                        </label>
-                        <!--/ko-->
-                        <!--/ko-->
-                    </div>
-                    <!--/ko-->
+                        <input type="radio"
+                               name="apm_type"
+                               data-bind="
+                                event:{ change: $parent.checkPaymentTypes.bind($parent,item) },
+                                attr: {
+                                    'value': item.ccValue,
+                                    'data-validate': JSON.stringify({'validate-one-required-by-name':true}),
+                                    id: 'apm_' + item.ccValue}"
+                            />
 
+                        <!-- ko if: $parent.getIcons(item.ccValue) -->
+                        <label data-bind="attr: {for: 'apm_' + item.ccValue}">
+                            <img data-bind="attr: {
+                                'src': $parent.getIcons(item.ccValue).url,
+                                'alt': item.ccLabel,
+                                'width': $parent.getIcons(item.ccValue).width,
+                                'height': $parent.getIcons(item.ccValue).height
+                                }">
+                        </label>
+                        <!-- /ko -->
+
+                        <!-- ko ifnot: $parent.getIcons(item.ccValue) -->
+                        <!-- ko if: (item.ccLabel == 'KLARNA') -->
+                        <label data-bind="attr: {for: 'apm_' + item.ccValue}">
+                            <img data-bind="attr: {
+                                'src': require.toUrl('Sapient_Worldpay/images/cc/klarna-ssl.png'),
+                                'alt': item.ccLabel
+                                }">
+                        </label>
+                        <!-- /ko -->
+                        <!-- ko ifnot: (item.ccLabel == 'KLARNA') -->
+                        <label data-bind="attr: {for: 'apm_' + item.ccValue}">
+                            <!-- ko text: item.ccLabel --><!-- /ko -->
+                        </label>
+                        <!-- /ko -->
+                        <!-- /ko -->
+                    </div>
                     <!-- /ko -->
-                    <!-- ko if: (paymentMethodSelection()=='dropdown')-->
-                    <select name="apm_type" class="select select-ccytpe" data-bind="
-                                           attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type', 'data-validate': JSON.stringify({required:true})},
-                                           options: availableCCTypes(),
-                                           optionsText: 'ccLabel',
-                                           value: selectedCCType,
-                                            optionsValue: 'ccValue',
-                                           optionsCaption: 'Select Your Payment Method',
-                                           event:{ change: checkPaymentTypes }"></select>
-                    <!--/ko-->
+                    <!-- /ko -->
+
+                    <!-- ko if: (paymentMethodSelection() == 'dropdown') -->
+                    <select name="apm_type" class="select select-ccytpe"
+                            data-bind="
+                                attr: {id: getCode() + '_cc_type', 'data-container': getCode() + '-cc-type', 'data-validate': JSON.stringify({required:true})},
+                                options: availableCCTypes(),
+                                optionsText: 'ccLabel',
+                                value: selectedCCType,
+                                optionsValue: 'ccValue',
+                                optionsCaption: $t('Select Your Payment Method'),
+                                event:{ change: checkPaymentTypes }"></select>
+                    <!-- /ko -->
 
                 </div>
-                <!-- <div class="field type required ideal-block" data-bind="visible: false">
-                    <select name="ideal_bank" class="select select-ccytpe" disabled data-bind="attr: {id: 'ideal_bank', 'data-validate': JSON.stringify({required:true})},
-                               options: getIdealBankList(),
-                               optionsText: 'bankText',
-                               value: selectedIdealBank,
-                               optionsValue: 'bankCode',
-                               optionsCaption: 'Select Your Bank'">
-                    </select>
-                </div> -->
 
                 <div class="field type required klarna-block" data-bind="visible: false">
                     <select name="klarna_types" class="select select-ccytpe" id="klarna_types" data-bind="
@@ -66,23 +69,27 @@
                             optionsText: 'klarnaCode',
                             value: selectedKlarnaType,
                             optionsValue: 'klarnaLabel',
-                            optionsCaption: 'Select Your Payment Method'">
+                            optionsCaption: $t('Select Your Payment Method')">
                     </select>
                     <div id="klarna-msg" data-bind="visible: isKlarnaPayLater()">
-                        <div><small><strong>US/UK - </strong>You need to make the payment within 30 days for the
-                                selected billing country.</small></div>
-                        <div><small><strong>ALL Other Eurpoe - </strong>You need to make the payment within 14 days for
-                                the selected billing country.</small></div>
+                        <div>
+                            <small>
+                                <strong><!-- ko i18n: 'US/UK - ' --><!-- /ko --></strong>
+                                <!-- ko i18n: 'You need to make the payment within 30 days for the selected billing country. --><!-- /ko -->
+                            </small>
+                        </div>
+                        <div>
+                            <small>
+                                <strong><!-- ko i18n: 'ALL Other Europe - ' --><!-- /ko --></strong>
+                                <!-- ko i18n: 'You need to make the payment within 14 days for the selected billing country.' --><!-- /ko -->
+                            </small>
+                        </div>
                     </div>
                 </div>
 
                 <div class="control field type required ach-block" data-bind="visible: false">
                     <label data-bind="attr: {for: getCode() + '_ach_account_type'}" class="label">
-                        <span>
-                            <!-- ko i18n: getCheckoutLabels('CO15')-->
-                            <!-- /ko -->
-                        </span>
-                        <!--            <span> ko i18n: 'Bank Account Types' /ko </span>-->
+                        <span><!-- ko i18n: getCheckoutLabels('CO15') --><!-- /ko --></span>
                     </label>
                     <div class="field type required ach-account-type" style="margin-bottom:10px;">
                         <select name="ach_pay" class="select select-ccytpe" disabled data-bind="attr: {id: 'ach_pay', 'data-validate': JSON.stringify({required:true})},
@@ -91,7 +98,7 @@
                                value: selectedACHAccountType,
                                enable: isActive($parents),
                                optionsValue: 'accountCode',
-                               optionsCaption: 'Select Account Type'">
+                               optionsCaption: $t('Select Account Type')">
                         </select>
                     </div>
 
@@ -286,7 +293,7 @@
                         <!--  <span> ko i18n: 'Purpose of transaction' /ko </span>-->
                     </label>
                     <div>
-                        <textarea name="stmt_narrative" maxlength="255" cols="20" rows="3" data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative', 
+                        <textarea name="stmt_narrative" maxlength="255" cols="20" rows="3" data-bind="attr: {id: getCode() + '_cc_type_stmt_narrative',
                        'data-container': getCode() + '-cc-type-narrative',
                                     'data-validate': JSON.stringify({
                                       'validate-no-html-tags': true
@@ -296,15 +303,23 @@
             </textarea>
                     </div>
                     <div>
-                        <small><strong>Purpose of transaction</strong> will reflect on your statement,
-                            only if it is supported by the selected payment method.</small>
+                        <small>
+                            <!-- ko i18n: '<strong>Purpose of transaction</strong> will reflect on your statement,
+                            only if it is supported by the selected payment method.' --><!-- /ko -->
+                        </small>
                     </div>
-                    <div><small><strong>Purpose of transaction</strong> will be validated
-                            by the payment method before processing.</small></div>
-                    <div><small>Please adhere to the
-                            <strong>Statement Narrative</strong> guidelines of the selected payment method
-                            before entering the <strong>Purpose of transaction.</strong></small></div>
-                </div>
+                    <div>
+                        <small>
+                            <!-- ko i18n: '<strong>Purpose of transaction</strong> will be validated
+                            by the payment method before processing.' --><!-- /ko -->
+                        </small>
+                    </div>
+                    <div>
+                        <small>
+                            <!-- ko i18n: 'Please adhere to the <strong>Statement Narrative</strong> guidelines of the
+                            selected payment method before entering the <strong>Purpose of transaction.</strong>' --><!-- /ko -->
+                        </small>
+                    </div>
                 <!--/ko -->
                  <!-- ko if: (paymentMethodSelectedType() == 'SEPA_DIRECT_DEBIT-SSL')-->
                     <div class="field type sepa_e-mandate">
@@ -315,7 +330,7 @@
                                     'value': 'sepa_e_mandate_condition_true'
                                     }" ></input>
                         <label class="label sepa_e-mandate-label" for="sepa_e_mandate_condition">
-                            <span data-bind="html: getSepaEmandateTerms()"></span>            
+                            <span data-bind="html: getSepaEmandateTerms()"></span>
                         </label>
                     </div>
                  <!--/ko -->

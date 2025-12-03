@@ -8,8 +8,8 @@
  */
 define([
     'jquery',
-    'ko',  
-    'underscore',  
+    'ko',
+    'underscore',
     'mage/storage',
     'mage/url',
     'mage/translate',
@@ -17,7 +17,7 @@ define([
     'Magento_Catalog/js/price-utils',
     'googlePay'
 ], function ($, ko,_,storage,urlBuilder,$t,customerData,priceUtils) {
-    'use strict';  
+    'use strict';
     return {
         paymentsClient : null,
         getCardPaymentObj : function(initData){
@@ -56,7 +56,7 @@ define([
             }
 
             return paymentObj;
-        },     
+        },
         getGoogleBillingAddressParameters: function(){
             return  {
                  "format": "FULL",
@@ -84,24 +84,24 @@ define([
                         buttonType : initData.google_btn_customisation.buttonType,
                         buttonLocale : initData.google_btn_customisation.buttonLocale,
 						buttonSizeMode : initData.google_btn_customisation.buttonSizeMode,
-                        onClick: callback
+                        onClick: () => callback('googlepay')
                     });
                     document.getElementById(container).appendChild(button);
                     self.addStyling(container);
                 }
-            }).catch(function(err) {                
-                console.error(err);                
+            }).catch(function(err) {
+                console.error(err);
             });
         },
         addStyling : function(container){
-           
+
             if((window.screen.width <=768) || (window.screen.width > 768 && window.screen.width<=820)){
                 $("#"+container).css(
                     {
                         'width': "100%",
                         'margin-bottom': "10px"
                     }
-                )   
+                )
             }else{
                 $("#"+container).css(
                     {
@@ -112,11 +112,11 @@ define([
             }
         },
         getGooglePaymentDataRequest : function(initData){
-            var self = this;            
+            var self = this;
             const paymentDataRequest = Object.assign({}, initData.baseRequest);
              paymentDataRequest.allowedPaymentMethods = [self.getCardPaymentObj(initData)];
              paymentDataRequest.merchantInfo = {
-                merchantName: initData.merchantName
+                 merchantName: initData.merchantName
              };
 
              if(window.walletpayObj){
@@ -129,7 +129,7 @@ define([
                     paymentDataRequest.callbackIntents = ["PAYMENT_AUTHORIZATION"];
 
                 }
-                
+
                 paymentDataRequest.emailRequired = true;
             }
              return paymentDataRequest;
@@ -139,9 +139,9 @@ define([
                 phoneNumberRequired: true
               };
         },
-        initGooglePay: function (initData) {           
+        initGooglePay: function (initData) {
             var self= this;
-            
+
             if(window.walletpayObj){
                 if(window.walletpayObj.isRequiredShipping() == false){
                     var paymentsClientObj = self.getGooglePaymentsClientNS(initData);
@@ -152,31 +152,27 @@ define([
                 const paymentDataRequest = self.getGooglePaymentDataRequest(initData);
                 paymentDataRequest.transactionInfo = self.getGoogleTransactionInfo(initData);
                 return  paymentsClient.loadPaymentData(paymentDataRequest);
-
             }else{
                 var paymentsClientObj = self.getGooglePaymentsClient(initData);
                 const paymentsClient = paymentsClientObj;
                 const paymentDataRequest = self.getGooglePaymentDataRequest(initData);
                 paymentDataRequest.transactionInfo = self.getGoogleTransactionInfoCheckout(initData);
-                console.log(paymentDataRequest);
                 return  paymentsClient.loadPaymentData(paymentDataRequest);
-
-            }           
-           
+            }
         },
         getGooglePaymentsClientNS: function(initData){
             window.gpayLib = this;
-            return new google.payments.api.PaymentsClient({ 
+            return new google.payments.api.PaymentsClient({
                         environment: initData.env_mode,
                         paymentDataCallbacks: {
                             onPaymentAuthorized: window.gpayLib.onPaymentAuthorized
                           }
-                    });       
+                    });
         },
         getGooglePaymentsClient : function(initData){
             window.gpayLib = this;
             if(window.walletpayObj){
-                return new google.payments.api.PaymentsClient({ 
+                return new google.payments.api.PaymentsClient({
                     environment: initData.env_mode,
                     paymentDataCallbacks: {
                         onPaymentAuthorized: window.gpayLib.onPaymentAuthorized,
@@ -184,12 +180,12 @@ define([
                       }
                 });
             }else{
-                return new google.payments.api.PaymentsClient({ 
+                return new google.payments.api.PaymentsClient({
                     environment: initData.env_mode
                 });
             }
 
-            
+
         },
         reloadShippingOptions : function(shippingaddress,PaymentDataRequestUpdate,resolve){
             var self = window.gpayLib;
@@ -261,9 +257,9 @@ define([
                 let shippingAddress = intermediatePaymentData.shippingAddress;
                 let shippingOptionData = intermediatePaymentData.shippingOptionData;
                 let PaymentDataRequestUpdate = {};
-            
+
                 if (intermediatePaymentData.callbackTrigger == "INITIALIZE") {
-                    PaymentDataRequestUpdate.newShippingOptionParameters = self.getGoogleDefaultShippingOptions();                    
+                    PaymentDataRequestUpdate.newShippingOptionParameters = self.getGoogleDefaultShippingOptions();
                     let selectedShippingOptionId = PaymentDataRequestUpdate.newShippingOptionParameters.defaultSelectedOptionId;
                     PaymentDataRequestUpdate.newTransactionInfo = self.calculateNewTransactionInfo(selectedShippingOptionId);
                     resolve(PaymentDataRequestUpdate);
@@ -274,11 +270,11 @@ define([
                 else if (intermediatePaymentData.callbackTrigger == "SHIPPING_OPTION") {
                     PaymentDataRequestUpdate.newTransactionInfo = self.calculateNewTransactionInfo(shippingOptionData.id);
                   resolve(PaymentDataRequestUpdate);
-                }                
+                }
               });
         },
         getGoogleDefaultShippingOptions: function(){
-            var defaultShippingMethods = $.localStorage.get('wp-default-shipping-method');
+            var defaultShippingMethods = window.walletpayObj.availableShippingMethods();
             var shippingMethodList = [];
             _.each(defaultShippingMethods,function(value){
                 var titledesc = priceUtils.formatPrice(value.amount, window.walletpayObj.priceFormat)+' '+value.carrier_title+' - '+ value.method_title;
@@ -293,12 +289,12 @@ define([
                 shippingOptions: shippingMethodList
               };
         },
-        
+
         getShippingCosts: function() {
             var defaultShippingMethods = $.localStorage.get('wp-default-shipping-method');
             var shippingMethodPrice = {};
             _.each(defaultShippingMethods,function(value){
-                shippingMethodPrice[value.id] = value.amount; 
+                shippingMethodPrice[value.id] = value.amount;
             });
             return shippingMethodPrice;
         },
@@ -361,8 +357,8 @@ define([
         formattedGpayAddress: function(address){
             var self= window.gpayLib;
             var name = address.name;
-            var firstname = name.substring(0, name.indexOf(' ')); 
-            var lastname = name.substring(name.indexOf(' ') + 1);             
+            var firstname = name.substring(0, name.indexOf(' '));
+            var lastname = name.substring(name.indexOf(' ') + 1);
             var formattedAdress = {
                 'firstname' : firstname,
                 'lastname' : lastname,
@@ -389,7 +385,7 @@ define([
                     paymentData.formattedBillingAddress = self.formattedGpayAddress(paymentData.paymentMethodData.info.billingAddress);
                     if(typeof paymentData.shippingAddress !='undefined'){
                         paymentData.formattedShippingAddress = self.formattedGpayAddress(paymentData.shippingAddress);
-                        window.walletpayObj.selectedShippingAddress(paymentData.formattedShippingAddress); 
+                        window.walletpayObj.selectedShippingAddress(paymentData.formattedShippingAddress);
                     }
 
                     if(typeof paymentData.shippingOptionData != 'undefined'){
@@ -403,13 +399,13 @@ define([
                     }
 
                     window.walletpayObj.selectedBillingAddress(paymentData.formattedBillingAddress);
-                    
+
 
                 resolve({paymentData:paymentData});
             }, 3000);
          });
         },
-        onPaymentAuthorized : function(paymentData){  
+        onPaymentAuthorized : function(paymentData){
             var self= window.gpayLib;
             return new Promise(function(resolve, reject){
                 // handle the response
@@ -426,9 +422,9 @@ define([
                         reason: 'PAYMENT_DATA_INVALID'
                       }
                     });
-                  });              
+                  });
                 });
-        }, 
-    
+        },
+
     };
 });

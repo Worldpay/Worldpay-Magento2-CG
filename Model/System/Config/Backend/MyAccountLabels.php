@@ -52,8 +52,8 @@ class MyAccountLabels extends \Magento\Framework\App\Config\Value
         \Sapient\Worldpay\Helper\MyAccountLabels $myAccountLabels,
         \Sapient\Worldpay\Helper\GeneralException $generalexception,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->myAccountLabels = $myAccountLabels;

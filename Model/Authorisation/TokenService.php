@@ -4,7 +4,7 @@
  */
 namespace Sapient\Worldpay\Model\Authorisation;
 
-use Exception;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 
 class TokenService extends \Magento\Framework\DataObject
 {
@@ -21,12 +21,12 @@ class TokenService extends \Magento\Framework\DataObject
        * @var \Sapient\Worldpay\Logger\WorldpayLogger
        */
     protected $wplogger;
-     
+
     /**
      * @var \Sapient\Worldpay\Model\Response\DirectResponse
      */
     protected $directResponse;
-    
+
      /**
       * @var \Sapient\Worldpay\Model\Payment\Service
       */
@@ -45,7 +45,7 @@ class TokenService extends \Magento\Framework\DataObject
      * @var \Sapient\Worldpay\Helper\Data
      */
     protected $worldpayHelper;
-    
+
     /**
      * @var \Sapient\Worldpay\Helper\Multishipping
      */
@@ -79,7 +79,8 @@ class TokenService extends \Magento\Framework\DataObject
         \Magento\Checkout\Model\Session $checkoutSession,
         \Sapient\Worldpay\Helper\Data $worldpayHelper,
         \Sapient\Worldpay\Helper\Registry $registryhelper,
-        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper,
+        ProductOnDemand $productOnDemandHelper,
     ) {
         $this->mappingservice = $mappingservice;
         $this->paymentservicerequest = $paymentservicerequest;
@@ -91,6 +92,7 @@ class TokenService extends \Magento\Framework\DataObject
         $this->worldpayHelper = $worldpayHelper;
         $this->registryhelper = $registryhelper;
         $this->multishippingHelper = $multishippingHelper;
+        $this->productOnDemandHelper = $productOnDemandHelper;
     }
 
     /**
@@ -141,6 +143,10 @@ class TokenService extends \Magento\Framework\DataObject
             $orderStoreId,
             $paymentDetails
         );
+        if ($this->productOnDemandHelper->isProductOnDemandQuote()) {
+            $tokenId = isset($tokenOrderParams['paymentDetails']['id'])? $tokenOrderParams['paymentDetails']['id'] : '';
+            $this->productOnDemandHelper->_createWorldpayPayOnDemand($mageOrder->getIncrementId(), $orderCode, $tokenId);
+        }
 
         $response = $this->paymentservicerequest->orderToken($tokenOrderParams);
         $directResponse = $this->directResponse->setResponse($response);
@@ -172,7 +178,7 @@ class TokenService extends \Magento\Framework\DataObject
             $threeDSecureConfig = $this->get3DS2ConfigValues();
             $this->_handle3Ds2($threeDSecureChallengeParams, $tokenOrderParams, $orderCode, $threeDSecureConfig);
         } else {
-            
+
             // Normal order goes here.(without 3DS).
             $tokenId = isset($tokenOrderParams['id'])? $tokenOrderParams['id'] : '';
             $this->updateWorldPayPayment->create()->updateWorldpayPayment($directResponse, $payment, $tokenId);
@@ -195,7 +201,7 @@ class TokenService extends \Magento\Framework\DataObject
         $this->checkoutSession->setDirectOrderParams($directOrderParams);
         $this->checkoutSession->setAuthOrderId($mageOrderId);
     }
-    
+
     /**
      * Handles 3ds2 secure for direct
      *
@@ -213,7 +219,7 @@ class TokenService extends \Magento\Framework\DataObject
         $this->checkoutSession->setAuthOrderId($mageOrderId);
         $this->checkoutSession->set3DS2Config($threeDSecureConfig);
     }
-    
+
     /**
      * Apply payment update
      *
@@ -253,7 +259,7 @@ class TokenService extends \Magento\Framework\DataObject
             );
         }
     }
-    
+
     /**
      * Get 3ds2 params from the configuration and set to checkout session
      *
@@ -266,14 +272,14 @@ class TokenService extends \Magento\Framework\DataObject
         $data['jwtIssuer'] =  $this->worldpayHelper->isJwtIssuer();
         $data['organisationalUnitId'] = $this->worldpayHelper->isOrganisationalUnitId();
         $data['challengeWindowType'] = $this->worldpayHelper->getChallengeWindowSize();
-    
+
         $mode = $this->worldpayHelper->getEnvironmentMode();
         if ($mode == 'Test Mode') {
             $data['challengeurl'] =  $this->worldpayHelper->isTestChallengeUrl();
         } else {
             $data['challengeurl'] =  $this->worldpayHelper->isProductionChallengeUrl();
         }
-        
+
         return $data;
     }
 }

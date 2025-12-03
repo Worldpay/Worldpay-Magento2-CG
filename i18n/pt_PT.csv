@@ -1,0 +1,345 @@
+You have not set a default billing address.,Você não definiu um endereço de cobrança padrão.
+Month,Mês
+Year,Ano
+Please verify the Billing Address in your Address Book before adding new card!,"Por favor, verifique o endereço de cobrança em seu catálogo de endereços antes de adicionar um novo cartão!"
+Important Disclaimer!,Aviso importante!
+Default Billing Address,Endereço de cobrança padrão
+Card Information,Informações do cartão
+Credit Card Type,Tipo de cartão de crédito
+Card type,Tipo de cartão
+Card Holder Name,Nome do titular do cartão
+Card Number,Número do cartão
+Expiry Month/Year,Mês/Ano de expiração
+Card Brand #,Bandeira do cartão
+Card Expiry Month,Mês de validade do cartão
+Card Expiry Year,Ano de validade do cartão
+CVV,CVV
+Save,Salvar
+"Please, Enter 3 digit valid Card Verification Number","Por favor, digite o número de verificação do cartão válido de 3 dígitos"
+"Please, Enter 4 digit valid Card Verification Number","Por favor, digite o número de verificação do cartão válido de 4 dígitos"
+Please enter a valid number in this field,"Por favor, digite um número válido neste campo"
+Card number entered does not match with card type selected,O número do cartão inserido não corresponde ao tipo de cartão selecionado
+This field is required,Este campo é obrigatório
+"Please, Verify the disclaimer! before saving",Verifique o termo  de responsabilidade! antes de salvar
+Disclaimer!,Termo de responsabilidade!
+Agree,Concordo
+Disagree,Não concordo
+"<strong>Purpose of transaction</strong> will reflect on your statement, only if it is supported by the selected payment method.","<strong>A finalidade da transação</strong> será refletida em seu extrato somente se for compatível com a forma de pagamento selecionada."
+<strong>Purpose of transaction</strong> will be validated by the payment method before processing.,<strong>A finalidade da transação</strong> será validada pela forma de pagamento antes do processamento.
+Please adhere to the <strong>Statement Narrative</strong> guidelines of the selected payment method before entering the <strong>Purpose of transaction.</strong>,Por favor siga as instruções do <strong>Resumo da conta</strong> da forma de pagamento selecionada antes de inserir a <strong>finalidade da transação.</strong>
+"US/UK - ","US/UK - "
+You need to make the payment within 30 days for the selected billing country.,Você precisa efetuar o pagamento dentro de 30 dias para o país de cobrança selecionado.
+"ALL Other Europe - ","TODOS os outros países da Europa - "
+You need to make the payment within 14 days for the selected billing country.,Você precisa efetuar o pagamento em até 14 dias para o país de cobrança selecionado.
+Place Order,Fazer pedido
+Instalment,Parcelamento
+What is this?,O que é isso?
+Card Verification Number,Número de verificação do cartão
+Purpose of transaction,Objetivo da transação
+CPF/CNPJ,CPF/CNPJ
+Payment Methods,Formas de pagamento
+Other Payment Methods,Outras formas de pagamento
+Enter discount code,Inserir código de desconto
+Apply Discount,Aplicar desconto
+Cancel,Cancelar
+"Please select a region, state or province.","Selecione uma região, estado ou província."
+Country,País
+Payment Method,Forma de pagamento
+Expired,Vencido
+Expiring this month,Vence este mês
+Change Payment Method,Alterar forma de pagamento
+Add New Card,Adicionar novo cartão
+Please select shipping method,Selecione o método de envio
+Complete payment,Concluir pagamento
+The payment request is cancelled by user,A solicitação de pagamento foi cancelada pelo usuário
+Qty,Quantidade
+Place Order with GooglePay,Fazer pedido com o GooglePay
+Place Order with ApplePay,Fazer pedido com o ApplePay
+All transactions are secure and encrypted...,Todas as transações são seguras e criptografadas...
+Please choose a payment method.,Escolha uma forma de pagamento.
+We can't complete your order because you don't have a payment method set up.,Não é possível concluir seu pedido porque você não tem uma forma de pagamento configurada.
+Close,Fechar
+Add New Address,Adicionar novo endereço
+Change Shipping Address,Alterar endereço de entrega
+Delete,Excluir
+Update,Atualizar
+Actions,Ações
+"Are you sure you want to delete the card? <br>Once the card is deleted, subscriptions associated with it will be cancelled","Tem certeza de que deseja excluir o cartão? <br>Quando o cartão for excluído, as assinaturas associadas a ele serão canceladas"
+You have no Saved Card.,Você não tem nenhum cartão salvo.
+Add to Cart,Adicionar ao carrinho
+My Cart,Meu carrinho
+Checkout Now,Finalizar compra agora
+Your order number is:,Seu número de pedido é:
+An email has been sent to your email id with the payment link. Please do the payment.,"Um e-mail foi enviado para sua identidade de e-mail com o link de pagamento. Por favor, efetue o pagamento."
+Continue Shopping,Continuar comprando
+Thank you for your purchase!,Obrigado por sua compra!
+Your payment has been successfully regarding the order #: <span>%1</span>.,"Seu pagamento foi efetuado com sucesso, número do pedido: <span>%1</span>."
+You can check your order details after loggedin: ,Você pode verificar os detalhes do seu pedido depois de fazer o login:
+We'll email you an order confirmation with details and tracking info.,Enviaremos a você um e-mail de confirmação do pedido com detalhes e informações de rastreamento.
+Click here,Clique aqui
+Shipping Address,Endereço para envio
+Billing Address,Endereço de cobrança
+Shipping Method,Método de envio
+Please accept all Terms & Conditions,Favor aceitar todos os Termos e Condições
+Subtotal,Subtotal
+Grand Total:,Total geral:
+Go to Review Your Order,Ir para revisar seu pedido
+Back to Shipping Information,Voltar às informações de envio
+Change,Alterar
+Shipping Information,Informações de envio
+Address of,Endereço de
+Shipping To,Envio para
+Edit,Editar
+Order Review,Revisão do pedido
+Price Info,Informações sobre preço
+Other items in your order,Outros itens em seu pedido
+Subscription Addresses,Endereços de assinatura
+No shipping information available,Não há informações de envio disponíveis
+Your Saved Card,Seu cartão salvo
+Original Order #,Número do Pedido original
+Original Order Date,Data do pedido original
+Product,Produto
+Interval,Intervalo
+Start Date,Data de início
+End Date,Data final
+Amount,Valor
+Status,Status
+Upcoming Delivery,Próximas entregas
+Subscriptions,Assinaturas
+Order Id#,Número do pedido
+Subscription Item,Item de assinatura
+Plan,Plano
+Sheduled At,Programado em
+N/A,N/A
+Skipped,Ignorado
+created_at,created_at
+You have not any skipped reccurring order.,Você não tem nenhum pedido recorrente omitido.
+Cancelled,Cancelado
+View,Exibir
+You have not any reccurring order yet.,Você ainda não tem nenhum pedido recorrente.
+Saved Cards,Cartões salvos
+Your order # is: ,Seu pedido # é:
+We\'ll email you an order confirmation with details and tracking info.,Enviaremos um e-mail de confirmação do pedido com detalhes e informações de rastreamento.
+Please note this order is still awaiting confirmation of the funds transfer.,Observe que este pedido ainda está aguardando a confirmação da transferência de fundos.
+Successfully ordered,Pedido realizado com sucesso
+No shipping required.,Não é necessário envio.
+Ship to:,Enviar para:
+Something went wrong while processing your order. Please try again later.,Algo deu errado ao processar seu pedido. Tente novamente mais tarde.
+Order Cancelled,Pedido cancelado
+Order # Cancelled,Pedido # cancelado
+Order # Failed,Pedido # falhou
+Required length should be 8 or 9,O comprimento necessário deve ser 8 ou 9
+Maximum allowed length of 15 exceeded,O comprimento máximo permitido de 15 foi excedido
+Maximum allowed length of 17 exceeded,O comprimento máximo permitido de 17 foi excedido
+Maximum allowed length of 40 exceeded,O comprimento máximo permitido de 40 foi excedido
+Card number entered does not match with card type selected,O número do cartão inserido não corresponde ao tipo de cartão selecionado
+Items in Cart,Itens no carrinho
+Item in Cart,Item no carrinho
+Proceed to Checkout,Prosseguir para o checkout
+Instant Purchase,Compra instantânea
+Instant Purchase Confirmation,Confirmação de compra instantânea
+Are you sure you want to place order and pay?,Tem certeza de que deseja fazer o pedido e pagar?
+Shipping,Envio
+Your coupon was successfully applied.,Seu cupom foi aplicado com sucesso.
+Your coupon was successfully removed.,Seu cupom foi removido com sucesso.
+ESTIMATED,ESTIMADO
+Total,Total
+Credit Card Form,Formulário de cartão de crédito
+Google Pay,Google Pay
+Account Number,Número da conta
+Routing Number,Número de registro
+Check Number,Número do cheque
+Company Name,Nome da empresa
+Email Address,Endereço de e-mail
+IBAN,IBAN
+Account Holder Name,Nome do titular da conta
+Credit Card Number,Número do cartão de crédito
+Save This Card,Salvar este cartão
+Share Order,Compartilhar pedido
+Samsung Pay,Samsung Pay
+* Required Fields,* Campos obrigatórios
+Cart Subtotal,Subtotal do carrinho
+Order Total,Total do pedido
+"Hi,","Oi,"
+"Hi %billing_name,",Oi %billing_name
+There has been an error while sending request to Worldpay. Details are given below,Ocorreu um erro no envio da solicitação para Worldpay. Os detalhes são fornecidos abaixo
+Error Code:,Código do Erro:
+Error Message:,Mensagem de Erro:
+More details are attached in the attachment,Mais detalhes estão anexados no anexo
+Note: You are receiving this email because you have enabled the error alert configuration in admin,Observação: Você está recebendo este e-mail porque ativou a configuração de alerta de erro no admin
+Thank you for your order from %store_name.,Obrigado por seu pedido da %store_name.
+Your payment has been confirmed with the bank and order has been processed successfully,Seu pagamento foi confirmado pelo banco e o pedido foi processado com sucesso
+Once your package ships we will send you a tracking number.,"Assim que seu pacote for enviado, enviaremos um número de rastreamento."
+Your payment has been declined by the bank and order has been cancelled,Seu pagamento foi recusado pelo banco e o pedido foi cancelado
+"If you have questions about your order, you can email us at <a href=""mailto:%store_email"">%store_email</a>","Se tiver dúvidas sobre seu pedido, envie-nos um e-mail para <a href=""mailto:%store_email"">%store_email</a>"
+" or call us at <a href=""tel:%store_phone"">%store_phone</a>."," ou ligue para <a href=""tel:%store_phone"">%store_phone</a>."
+Our hours are %store_hours.,Nosso horário de funcionamento é %store_hours.
+Your Order #%increment_id,Seu pedido #%increment_id
+Placed on %created_at,Foi feito em %created_at
+Billing Info,Informações de cobrança
+Shipping Info,Informações de envio
+You can check the status of your order by logging into your account.,Você pode verificar o status do seu pedido fazendo login na sua conta.
+This is to inform you that your payment can be made by clicking below secure link.,Isso é para informá-lo de que seu pagamento pode ser feito clicando no link seguro abaixo.
+"Dear %customerName,","Prezado %customerName,"
+Thanks for your business. Your order has been successfully generated orderId,Obrigado por seu negócio. Seu pedido foi gerado com sucesso orderId
+Pay Now,Pagar agora
+Please note that the link will get expired <strong>%pblexpirytime</strong>,Observe que o link será expirado <strong>%pblexpirytime</strong>
+"Here are the details of your generated order,","Aqui estão os detalhes do seu pedido,"
+"If you have queries about this payment, or would you like to chat, feel free to contact us.","Se tiver dúvidas sobre esse pagamento ou quiser conversar, entre em contato conosco."
+Thanks for your business. Your multishipping order has been successfully generated %orderId,Obrigado por seu negócio. Seu pedido de múltiplos envios foi gerado com sucesso %orderId
+We hope this email finds you well.,Esperamos que este e-mail lhe traga boas notícias.
+"Your next subscription order is scheduled for <strong style=""color: red;"">%recurring_date</strong>, and we want to ensure a seamless experience for you.","Seu próximo pedido de assinatura está programado para <strong style=""color: red;"">%recurring_date</strong>, e queremos lhe garantir uma experiência perfeita."
+Please review the order details below:,Consulte os detalhes do pedido abaixo:
+Order Information,Informações do pedido
+Actions You Can Take,Ações que você pode realizar
+Change Shipment,Alterar envio
+Skip This Order,Ignorar este pedido
+"Please ensure that any changes are made before the scheduled date to avoid any inconvenience. If you have any questions or encounter any issues, feel free to reach out to our customer support.","Certifique-se de que todas as alterações sejam feitas antes da data programada para evitar qualquer inconveniente. Se tiver alguma dúvida ou encontrar algum problema, sinta-se à vontade para entrar em contato com nosso suporte ao cliente."
+Note: You are receiving this email because you have a recurring order in your account.,Observação: Você está recebendo este e-mail porque tem um pedido recorrente em sua conta.
+We are confirming your payment with the bank and will let you know the status soon.,Estamos confirmando seu pagamento com o banco e informaremos o status em breve.
+Order has been placed and we are confirming your payment with the bank,O pedido foi feito e estamos confirmando seu pagamento com o banco
+"If you have any questions or encounter any issues, feel free to reach out to our customer support.","Se tiver alguma dúvida ou encontrar algum problema, sinta-se à vontade para entrar em contato com nosso suporte ao cliente."
+WORLDPAY: ,WORLDPAY:
+Pay by Link for Order %orderId,Pagar por link o pedido %orderId
+Pay by Link for Multishipping Order %orderId,Pagar por link o pedido de múltiplos envios %orderId
+Resend Pay by Link for Order %orderId,Reenviar link de pagamento para pedido %orderId
+Skipped Order %orderId,Pedido ignorado %orderId
+Reminder - Recurring order,Lembrete - Pedido recorrente
+Payment link has been generated! Please check your email,"O link de pagamento foi gerado! Por favor, verifique seu e-mail"
+Success Page,Página de sucesso
+Paybylink order place,Local do pedido do Paybylink
+My Subscriptions,Minhas Assinaturas
+Subscriptions Related Skip Order,Ordem omitidas relacionadas a assinaturas
+Subscriptions Related Order,Ordem relacionada a assinaturas
+Pending Page,Página pendente
+ORDER PENDING!,PEDIDO PENDENTE!
+Order Success Additional Info,Informações adicionais sobre o sucesso do pedido
+WP Paybylink Multishipping Email addresses,Endereços de e-mail do WP Paybylink Múltiplo envio
+"Back of card, last 3 digits","Verso do cartão, últimos 3 dígitos"
+Security code,Código de segurança
+$1.00 paid weekly,"US$ 1,00 pago semanalmente"
+$1.00 paid monthly,"US$ 1,00 pago mensalmente"
+$3.00 paid quarterly,"US$ 3,00 pagos trimestralmente"
+$4.00 paid semiannually,"US$ 4,00 pagos semestralmente"
+$5.00 paid annually,"US$ 5,00 pagos anualmente"
+"Please verify subscription data, before placing the order",Verifique os dados da assinatura antes de fazer o pedido
+Subscription Details,Detalhes da assinatura
+Subscription Start Date,Data de início da assinatura
+Subscription End Date,Data de término da assinatura
+Buy one time or select a Payment Plan,Compre uma vez ou selecione um plano de pagamento
+Subscribe this product and save,Assine este produto e economize
+
+We Accept,Nós aceitamos
+Use Saved Card,Usar Cartão Salvo
+Bank Account Types,Tipos de conta bancária
+Saved Card feature will be available only if enabled by Merchant.,O recurso Cartão salvo estará disponível somente se ativado pelo comerciante.
+Expiration Date,Data de expiração
+Saved cards,Cartões salvos
+Save this card for future usage and recurring payments,Salvar esse cartão para uso futuro e pagamentos recorrentes
+Continue to Worldpay,Continuar na Worldpay
+Please do not navigate away or refresh this page before completing the payment or else this order will be cancelled,"Não navegue para fora ou atualize esta página antes de concluir o pagamento, caso contrário, este pedido será cancelado"
+Mandate Type,Tipo de obrigação
+You have no items in your shopping cart.,Não há itens em seu carrinho de compras.
+View and Edit Cart,Ver e editar carrinho
+Recently added item(s),Item(ns) adicionado(s) recentemente
+Select Your Payment Method,Selecione seu método de pagamento
+Select Account Type,Selecione o tipo de conta
+Order Summary,Resumo do pedido
+Shipping Methods,Métodos de envio
+No Payment Methods,Nenhum método de pagamento
+Apply Discount Code,Aplicar código de desconto
+Ship To:,Enviar para:
+Shipping Method:,Método de envio:
+First Name,Primeiro nome
+Last Name,Sobrenome
+Company,Empresa
+City,Cidade
+State/Province,Estado/Província
+Zip/Postal Code,CEP/Código Postal
+Street Address,Endereço
+Street Address: Line 1,Endereço: Linha 1
+Street Address: Line 2,Endereço: Linha 2
+Street Address: Line 3,Endereço: Linha 3
+Phone Number,Telefone
+Select Your Credit Card,Selecione seu cartão de crédito
+Completed,Concluído
+Saved Card,Cartão salvo
+Success Page,Página de sucesso
+Pending Page,Página pendente
+Skip Next Order,Ignorar próximo pedido
+Scheduled on,Programado em
+View All Recurring Order,Exibir todos os pedidos recorrentes
+Shipping method is not available,O método de envio não está disponível
+%1 Order placed in,%1 Pedido feito em
+View:,Ver:
+Sync status action not possible for this Partial Capture Order.,A ação de status de sincronização não é possível para esse Pedido de Captura Parcial.
+"For successfully order items, you'll receive a confirmation email including order numbers, tracking information and more details.","Para itens de pedidos bem-sucedidos, você receberá um e-mail de confirmação incluindo números de pedidos, informações de rastreamento e mais detalhes."
+"Order with id ""%1"" does not exist.","O pedido com id ““%1”“ não existe."
+" has been created but not confirmed."," foi criado, mas não confirmado."
+
+Update Saved Card,Atualizar cartão salvo
+Edit Subscription,Editar subscrição
+Subscription Information,Informações sobre a subscrição
+Product Name,Nome do produto
+Payment Plan,Plano de pagamento
+Save Subscription,Guardar subscrição
+My Saved Card,O meu cartão salvo
+Billing Information,Informações de faturação
+Address,Endereço
+
+You should login or register to buy a subscription.,Você deve fazer login ou registrar-se para comprar uma assinatura.
+Choose any of the plan!,Escolha qualquer um dos planos!
+Choose plan start date!,Escolha a data de início do plano!
+Are you sure you would like to remove this item from the shopping cart?,Tem certeza de que deseja remover este item do carrinho de compras?
+An error has occurred. Please try again.,"Ocorreu um erro. Por favor, tente novamente."
+Item is deleted successfully,O item foi excluído com sucesso
+Please try after some time,Tente novamente após algum tempo
+Error: the card has not been updated.,Erro: o cartão não foi atualizado.
+"Error occurred, please check your card details.","Ocorreu um erro, verifique os detalhes do seu cartão."
+The card has been updated.,O cartão foi atualizado.
+Subscription has been updated.,A assinatura foi atualizada.
+Failed to update subscription.,Falha ao atualizar a assinatura.
+Are you sure you want to cancel this subscription?,Tem certeza de que deseja cancelar essa assinatura?
+You have not purchased any subscriptions yet.,Você ainda não adquiriu nenhuma assinatura.
+Subscription has been cancelled.,A assinatura foi cancelada.
+Subscription no longer exists.,A assinatura não existe mais.
+Subscription is no longer active.,A assinatura não está mais ativa.
+Subscription is not found,A assinatura não foi encontrada
+Failed to cancel subscription.,Falha ao cancelar a assinatura.
+"Subscriptions can be bought only separately, one subscription at a time.","As assinaturas só podem ser compradas separadamente, uma assinatura de cada vez."
+Selected subscription plan is not available.,O plano de assinatura selecionado não está disponível.
+Subscription already in the cart,A assinatura já está no carrinho
+Choose plan end date!,Escolha a data final do plano!
+
+Credit Card Information,Informações do cartão de crédito
+
+The card number entered is invalid.,O número do cartão inserido é inválido.
+Card number should contain between 12 and 20 numeric characters.,O número do cartão deve conter entre 12 e 20 caracteres numéricos.
+"This card number cannot be used to place 3DS2 order now, please go and update this from My account first.",Esse número de cartão não pode ser usado para fazer um pedido de 3DS2 agora. Atualize-o primeiro em Minha conta.
+"Please, enter valid Card Verification Number",Digite um número de verificação de cartão válido
+"Please, Save the card before placing subscription order",Salve o cartão antes de fazer o pedido de assinatura
+"Please, Verify the disclaimer! before saving the card",Verifique o aviso de isenção de responsabilidade antes de salvar o cartão
+Please select one of the options,Selecione uma das opções
+Failed due to unrecoverable error,Falhou devido a um erro irrecuperável
+3DS Failed,3DS Falhou
+Unfortunately the order could not be processed. Please contact us or try again later.,"Infelizmente, não foi possível processar a encomenda. Por favor, contate-nos ou tente novamente mais tarde."
+An error occurred,Ocorreu um erro
+An error occurred on the server. Please try to place the order again.,Ocorreu um erro no servidor. Tente efetuar a encomenda novamente.
+"3DS2 services are disabled, please contact system administrator.","Os serviços 3DS2 estão desactivados, contacte o administrador do sistema."
+Invalid Payment Type. Please Refresh and check again,Tipo de pagamento inválido. Atualize e verifique novamente
+WorldPay refund ERROR: Credit Memo does not match Order. Reference,Erro de reembolso na Worldpay: A nota de crédito não corresponde à encomenda. Referência
+Unfortunately the order could not be processed. Please contact us or try again later,"Infelizmente, o pedido não pôde ser processado. Entre em contato conosco ou tente novamente mais tarde"
+"Duplicate Entry, This card number is already saved.","Duplicate Entry, This card number is already saved."
+"Order %s has been declined, please check your details and try again","O pedido %s foi recusado, verifique seus detalhes e tente novamente"
+"An unexpected error occurred, Please try to place the order again","Ocorreu um erro inesperado, tente fazer o pedido novamente"
+"There appears to be an issue with your stored data, please review in your account and update details as applicable.","Parece haver um problema com seus dados armazenados, revise sua conta e atualize os detalhes conforme aplicável."
+CPF is 11 digits and CNPJ is 14 digits.,O CPF tem 11 dígitos e o CNPJ tem 14 dígitos.
+"Only alphabet,number or space is allowed","Somente alfabeto, número ou espaço são permitidos"
+"You already seem to have this card number stored, If your card details have changed, you can update them via My Account -> Saved Card","Parece que você já tem esse número de cartão armazenado. Se os detalhes do seu cartão foram alterados, você pode atualizá-los em Minha Conta -> Cartão Salvo"
+Parse error with PaRes: Error parsing pARes,Erro de análise com PaRes: Erro ao analisar pARes
+Invalid Configuration. Please Refresh and check again,Configuração inválida. Atualize e verifique novamente
+Invalid Expiry Year. Please Refresh and check again,Ano de validade inválido. Atualize e verifique novamente
+Invalid Expiry Month. Please Refresh and check again,Mês de validade inválido. Atualize e verifique novamente
+Invalid Card Number. Please Refresh and check again,"Número de cartão inválido. Por favor, atualize e verifique novamente"
+Invalid Card Holder Name.Please Refresh and check again,"Nome do titular do cartão inválido. Por favor, atualize e verifique novamente"
+Order has already been paid,A Ordem já foi paga

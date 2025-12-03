@@ -17,8 +17,9 @@ class SalesQuoteCollectTotalsBeforeObserver implements ObserverInterface
     /**
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      */
-    public function __construct(\Sapient\Worldpay\Helper\Recurring $recurringHelper)
-    {
+    public function __construct(
+        \Sapient\Worldpay\Helper\Recurring $recurringHelper,
+    ) {
         $this->recurringHelper = $recurringHelper;
     }
 

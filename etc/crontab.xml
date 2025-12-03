@@ -12,13 +12,16 @@
         <job name="recurring_order_transactions" instance="Sapient\Worldpay\Cron\RecurringOrders" method="execute">
             <schedule>* * * * *</schedule>
         </job>
+        <job name="worldpay_authorised_order_emails" instance="Sapient\Worldpay\Cron\SendAuthorisedOrderEmails" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
     </group>
     <group id="worldpay_paybylink">
         <job name="paybylink_orders" instance="Sapient\Worldpay\Cron\PayByLinkOrders" method="execute">
             <schedule>* * * * *</schedule>
         </job>
     </group>
-    <group id="defalut">
+    <group id="default">
         <job name="pending_order_cleanup" instance="Sapient\Worldpay\Cron\PendingOrderCleanup" method="execute">
             <schedule>0 0 * * *</schedule>
         </job>

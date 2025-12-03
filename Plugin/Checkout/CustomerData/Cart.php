@@ -7,6 +7,7 @@
 namespace Sapient\Worldpay\Plugin\Checkout\CustomerData;
 
 use Magento\Quote\Model\QuoteIdToMaskedQuoteIdInterface;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 
 /**
  * Process quote items price, considering tax configuration.
@@ -20,15 +21,10 @@ class Cart
     protected $checkoutSession;
 
     /**
-     * @var \Magento\Checkout\Helper\Data
-     */
-    protected $checkoutHelper;
-
-    /**
      * @var \Magento\Quote\Model\Quote|null
      */
     protected $quote = null;
-    
+
     /**
      * @var wplogger
      */
@@ -44,27 +40,28 @@ class Cart
      */
     protected $quoteIdToMaskedQuoteId;
 
+    private ProductOnDemand $productOnDemandHelper;
+
     /**
      * Constructor function
      *
      * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\Checkout\Helper\Data $checkoutHelper
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Sapient\Worldpay\Helper\Data $wpHelper
      * @param QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId
      */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Checkout\Helper\Data $checkoutHelper,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Helper\Data $wpHelper,
-        QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId
+        QuoteIdToMaskedQuoteIdInterface $quoteIdToMaskedQuoteId,
+        ProductOnDemand $productOnDemandHelper,
     ) {
         $this->checkoutSession = $checkoutSession;
-        $this->checkoutHelper = $checkoutHelper;
         $this->wplogger = $wplogger;
         $this->quoteIdToMaskedQuoteId = $quoteIdToMaskedQuoteId;
         $this->wpHelper = $wpHelper;
+        $this->productOnDemandHelper = $productOnDemandHelper;
     }
 
     /**
@@ -83,6 +80,25 @@ class Cart
                 if ($quote->getId()) {
                     $result['quote_id'] = $quote->getId();
                     $result['quote_masked_id'] = $this->getQuoteMaskId($quote->getId());
+                }
+            }
+        }
+        if (
+            $this->productOnDemandHelper->isProductOnDemandGeneralConfigActive()
+            && isset($result['items'])
+            && is_array($result['items'])
+        ) {
+            foreach ($result['items'] as &$item) {
+                $quoteItem = $this->getQuote()->getItemById($item['item_id']);
+                if ($quoteItem) {
+                    $product = $quoteItem->getProduct();
+                    $product->load($product->getId());
+                    if (
+                        $product->getProductOnDemand()
+                        || $product->getData('product_on_demand')
+                    ) {
+                        $item['message'] = $this->productOnDemandHelper->getMiniCartLabel();
+                    }
                 }
             }
         }
@@ -115,7 +131,7 @@ class Cart
         } catch (NoSuchEntityException $exception) {
             $this->wplogger->info(__('Current user does not have an active cart.'));
         }
- 
+
         return $maskedId;
     }
 }

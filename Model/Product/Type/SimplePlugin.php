@@ -75,7 +75,6 @@ class SimplePlugin
         $product,
         $processMode = null
     ) {
-       
         if (!(in_array($product->getTypeId(), $this->recurringHelper->getAllowedProductTypeIds())
             && $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/active')
             && $product->getWorldpayRecurringEnabled()
@@ -83,7 +82,7 @@ class SimplePlugin
         ) {
             return $proceed($buyRequest, $product, $processMode);
         }
-        
+
         $product->addCustomOption('worldpay_subscription_plan_id', $planId);
         $startDateDisplay='';
         $displayToday = '';
@@ -97,7 +96,7 @@ class SimplePlugin
             $modifyStartdate = date_create($startDate);
             $modifyTodaydate = date_create($today);
             $displayToday = date('d-m-Y', strtotime("+ 1 day"));
-            
+
             $startDateDisplay = $this->modifyStartDate($startDate, $modifyStartdate, $modifyTodaydate)?
                     $startDate:$displayToday;
 
@@ -106,15 +105,15 @@ class SimplePlugin
                 $startDateDisplay
             );
         }
-        
+
         $endDateEnabled = $this->recurringHelper->getSubscriptionValue('worldpay/subscriptions/endDate');
-        
+
         if ($endDateEnabled) {
             $endDate = '';
             if ($buyRequest->getSubscriptionEndDate()) {
                 $endDate = ($buyRequest->getSubscriptionEndDate())
                 ? $buyRequest->getSubscriptionEndDate() : date('d-m-yy');
-            
+
             }
             $endDateDisplay = $this->showModifiedEndDate($startDateDisplay, $displayToday, $endDate) ?
                     date('d-m-Y', strtotime("+1 year", strtotime($displayToday))) : $endDate;
@@ -122,9 +121,9 @@ class SimplePlugin
                 'subscription_end_date',
                 $endDateDisplay
             );
-        
+
         }
-            
+
         $result = $proceed($buyRequest, $product, $processMode);
 
         if (!$buyRequest->getResetCount() && ($item = $this->checkoutSession->getQuote()->getItemByProduct($product))) {
@@ -175,7 +174,7 @@ class SimplePlugin
         }
 
         $quoteItem = $planOption->getItem();
-        $subcriptionCodeMessage = 'Please verify subscription data, before placing the order';
+        $subcriptionCodeMessage = __('Please verify subscription data, before placing the order');
         $subscriptionCamMessage = $this->recurringHelper->getCheckoutExceptions('CSUB01');
         $subscriptionDisplayMessage = $subscriptionCamMessage?$subscriptionCamMessage:$subcriptionCodeMessage;
         $quoteItem->setHasError(false)->setMessage(
@@ -224,7 +223,7 @@ class SimplePlugin
         if ($planEndDate) {
             $subscriptionOptions['subscription_end_date'] = $planEndDate;
         }
-        
+
         return array_merge($subscriptionOptions, $result);
     }
 
@@ -276,7 +275,7 @@ class SimplePlugin
                         = $this->recurringHelper->getSelectedPlanEndDateOptionInfo($product);
             }
         }
-        
+
         return array_merge($result, $subscriptionOptions);
     }
 
@@ -306,6 +305,7 @@ class SimplePlugin
 
         return $product->getWorldpayRecurringEnabled() && $this->recurringHelper->getProductSubscriptionPlans($product);
     }
+
     /**
      * Plugin for:
      *
@@ -324,7 +324,7 @@ class SimplePlugin
                 $result = true;
             }
         }
-        
+
         return $result;
     }
     /**
