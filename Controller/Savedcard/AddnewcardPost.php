@@ -213,7 +213,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
       * @param string $differenceFormat
       * @return string
       */
-   
+
     public function getShopperAccountChangeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -238,7 +238,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      * @param string $differenceFormat
      * @return string
      */
-    
+
     public function getShopperAccountPasswordChangeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -293,7 +293,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      * @param string $differenceFormat
      * @return string
      */
-    
+
     public function getShopperAccountPaymentAccountIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
         $datetime1 = date_create($fromDate);
@@ -327,7 +327,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      *
      * @return string
      */
-    
+
     public function getReservedOrderId()
     {
         return $this->sequenceManager->getSequence(
@@ -336,7 +336,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         )
         ->getNextValue();
     }
-    
+
     /**
      * GenerateOrderCode
      *
@@ -540,13 +540,13 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
             }
         }
     }
-    
+
      /**
       * Get order id column value
       *
       * @return string
       */
-   
+
     public function isIAVEnabled()
     {
         return $this->worldpayHelper->isIAVEnabled();
@@ -559,7 +559,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      * @param Int $mageOrderId
      * @return string
      */
-    
+
     private function _handle3DSecure($threeDSecureParams, $directOrderParams, $mageOrderId)
     {
         $this->registryhelper->setworldpayRedirectUrl($threeDSecureParams);
@@ -576,7 +576,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      * @param string $threeDSecureConfig
      * @return string
      */
-    
+
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)
     {
         $this->registryhelper->setworldpayRedirectUrl($threeDSecureChallengeParams);
@@ -597,14 +597,14 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
         $data['jwtIssuer'] =  $this->worldpayHelper->isJwtIssuer();
         $data['organisationalUnitId'] = $this->worldpayHelper->isOrganisationalUnitId();
         $data['challengeWindowType'] = $this->worldpayHelper->getChallengeWindowSize();
-    
+
         $mode = $this->worldpayHelper->getEnvironmentMode();
         if ($mode == 'Test Mode') {
             $data['challengeurl'] =  $this->worldpayHelper->isTestChallengeUrl();
         } else {
             $data['challengeurl'] =  $this->worldpayHelper->isProductionChallengeUrl();
         }
-        
+
         return $data;
     }
     /**
@@ -626,7 +626,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                 return $details;
             } elseif ($this->worldpayHelper->isPrimeRoutingEnabled()) {
                 $details['primerouting'] = $this->worldpayHelper->isPrimeRoutingEnabled();
-            
+
                 return $details;
             }
         }
@@ -636,7 +636,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      *
      * @return string
      */
-    
+
     private function _getClientIPAddress()
     {
         $REMOTE_ADDR = filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_VALIDATE_IP);
@@ -648,7 +648,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      *
      * @return string
      */
-    
+
     private function _getThreeDSecureConfig()
     {
             return [
@@ -661,7 +661,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      *
      * @return string
      */
-    
+
     public function getCustomerDetailsfor3DS2()
     {
         $cusDetails = [];
@@ -680,14 +680,14 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
                ? $orderDetails['updated_at'] : $now->format('Y-m-d H:i:s');
         $orderDetails['previous_purchase'] = !empty($orderDetails['updated_at'])
                ? 'true' : 'false';
-        
+
         $orderCount = $this->worldpayHelper->getOrdersCountByEmailId($customer->getEmail());
         if ($customer->getId()) {
             $savedCardCount = $this->worldpayHelper->getSavedCardsCount($customer->getId());
         } else {
             $savedCardCount = 0;
         }
-        
+
         $cusDetails['shopperAccountAgeIndicator'] = $this->
                getshopperAccountAgeIndicator($cusDetails['created_at'], $now->format('Y-m-d H:i:s'));
         $cusDetails['shopperAccountChangeIndicator'] = $this->
@@ -698,7 +698,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
           getShopperAccountShippingAddressUsageIndicator($orderDetails['created_at'], $now->format('Y-m-d H:i:s'));
         $cusDetails['shopperAccountPaymentAccountIndicator'] = $this->
           getShopperAccountPaymentAccountIndicator($orderDetails['created_at'], $now->format('Y-m-d H:i:s'));
-        
+
         $cusDetails['order_details'] = $orderDetails;
         $cusDetails['order_count'] = $orderCount;
         $cusDetails['card_count'] = $savedCardCount;
@@ -746,7 +746,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      */
     private function getAddress($addressDetails)
     {
-        
+
         $address = [
                         'firstName'     => $addressDetails->getFirstName(),
                         'lastName'      => $addressDetails->getLastName(),
@@ -762,7 +762,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      *
      * @return string
      */
-    
+
     public function getExemptionEngineDetails()
     {
         $exemptionEngine = [];
@@ -791,7 +791,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
     protected function _getPaymentModel()
     {
         $paymentData = $this->getRequest()->getContent();
-        
+
         return $paymentData;
     }
 }

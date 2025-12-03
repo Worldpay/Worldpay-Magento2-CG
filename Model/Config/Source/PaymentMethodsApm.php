@@ -15,7 +15,7 @@ class PaymentMethodsApm extends \Magento\Framework\App\Config\Value
     {
         return [
             ['value' => 'CHINAUNIONPAY-SSL', 'label' => __('Union Pay')],
-            ['value' => 'IDEAL-SSL', 'label' => __('IDEAL')],
+            ['value' => 'IDEAL-SSL', 'label' => __('iDEAL | Wero')],
             //['value' => 'YANDEXMONEY-SSL', 'label' => __('Yandex.Money')],
             ['value' => 'PAYPAL-EXPRESS', 'label' => __('PayPal')],
             ['value' => 'SOFORT-SSL', 'label' => __('SoFort EU')],

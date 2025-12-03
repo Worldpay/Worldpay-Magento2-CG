@@ -96,6 +96,8 @@ define(
                     return true;
                 } else if (cc_type_selected === 'DANKORT-SSL' && typeclasslist.contains('is_dankort')) {
                     return true;
+                } else if (cc_type_selected === 'ELO-SSL' && typeclasslist.contains('is_elo')) {
+                    return true;
                 } else {
                     return false;
                 }
@@ -130,7 +132,7 @@ define(
         }
         function getCreditCardExceptions (exceptioncode){
             var ccData=window.checkoutConfig.payment.ccform.creditcardexceptions;
-              for (var key in ccData) {
+            for (var key in ccData) {
                 if (ccData.hasOwnProperty(key)) {
                     var cxData=ccData[key];
                     if(cxData['exception_code'].includes(exceptioncode)){
@@ -301,7 +303,7 @@ define(
                     serviceUrl, JSON.stringify(payload)
                 ).done(
                     function (apiresponse) {
-                       var response = JSON.parse(apiresponse);
+                        var response = JSON.parse(apiresponse);
                         if(response.length){
                             if(quote.isVirtual()){
                                 setBillingAddressAction(globalMessageList);
@@ -390,7 +392,7 @@ define(
             },
             savethiscard : function(obj,event){
                 if($(event.target).is(":checked")){
-                    if (this.isDisclaimerMessageMandatory() && this.isDisclaimerMessageEnabled() && (window.disclaimerDialogue === null || window.disclaimerDialogue === false)) {
+                    if(this.isDisclaimerMessageMandatory() && this.isDisclaimerMessageEnabled() && (window.disclaimerDialogue === null || window.disclaimerDialogue === false) ){
                         $('#disclaimer-error').css('display', 'block');
                         $('#disclaimer-error').html(getCreditCardExceptions('CCAM5'));
                         return false;
@@ -502,14 +504,14 @@ define(
                     $('#cc_type-error').html("<div>" + getCreditCardExceptions('CCAM6') + "</div>");
                     return false;
                 }
-               if(!this.validateForms(paymentDetails)){
-                   console.log("Validation error");
-                   return false;
-               }
-               if(!additionalValidators.validate()){
+                if(!this.validateForms(paymentDetails)){
+                    console.log("Validation error");
+                    return false;
+                }
+                if(!additionalValidators.validate()){
                     console.log("Validation Failed");
                     return false;
-               }
+                }
                 var serviceUrl = urlBuilder.createUrl('/worldpay/payment/hostedurl', {});
                 var payload = {
                     quoteId: quote.getQuoteId(),
@@ -723,107 +725,28 @@ define(
             },
 
             loadCCKeyDownEventAction: function(el, event){
-                var curVal = $(el).val();
-
+                var curVal = $(el).val().replace(/ /g, '').replace(/-/g, '');
                 var $ccNumberContain = $(el).parents('.ccnumber_withcardtype');
-                var piCardType = '';
 
-                var visaRegex = new RegExp('^4[0-9]{0,20}$'),
-                mastercardRegex = new RegExp(
-                '^(?:5[1-5][0-9]{0,2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{0,2}|27[01][0-9]|2720)[0-9]{0,12}$'
-                ),
-                amexRegex = new RegExp('^3$|^3[47][0-9]{0,13}$'),
-                discoverRegex = new RegExp('^6[05]$|^601[1]?$|^65[0-9][0-9]?$|^6(?:011|5[0-9]{2})[0-9]{0,12}$'),
-                jcbRegex = new RegExp('^35(2[89]|[3-8][0-9])'),
-                dinersRegex = new RegExp('^36'),
-                maestroRegex = new RegExp('^(5018|5020|5038|6304|679|6759|676[1-3])'),
-                unionpayRegex = new RegExp('^62[0-9]{0,14}$|^645[0-9]{0,13}$|^65[0-9]{0,14}$'),
-                dankortRegex = new RegExp('^(5019)');
+                const cardTypes = [
+                    { regex: /^(401178|401179|431274|438935|451416|457393|457631|457632|504175|627780|636297|636368|655000|655001|651652|651653|651654|650485|650486|650487|650488|506699|5067[0-6][0-9]|50677[0-8]|509\d{3})\d{10}$/, className: 'is_elo' },
+                    { regex: /^(5019)/, className: 'is_dankort' },
+                    { regex: /^4[0-9]{0,20}$/, className: 'is_visa' },
+                    { regex: /^(?:5[1-5][0-9]{0,2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{0,2}|27[01][0-9]|2720)[0-9]{0,12}$/, className: 'is_mastercard' },
+                    { regex: /^3$|^3[47][0-9]{0,13}$/, className: 'is_amex' },
+                    { regex: /^6[05]$|^601[1]?$|^65[0-9][0-9]?$|^6(?:011|5[0-9]{2})[0-9]{0,12}$/, className: 'is_discover' },
+                    { regex: /^35(2[89]|[3-8][0-9])/, className: 'is_jcb' },
+                    { regex: /^36/, className: 'is_diners' },
+                    { regex: /^(5018|5020|5038|6304|679|6759|676[1-3])/, className: 'is_maestro' },
+                    { regex: /^62[0-9]{0,14}$|^645[0-9]{0,13}$|^65[0-9]{0,14}$/, className: 'is_unionpay' }
+                ];
 
-                // get rid of spaces and dashes before using the regular expression
-                curVal = curVal.replace(/ /g, '').replace(/-/g, '');
-
-                // checks per each, as their could be multiple hits
-                if (curVal.match(dankortRegex)) {
-                    //console.log("enetered dankort");
-                    piCardType = 'dankort';
-                    $ccNumberContain.addClass('is_dankort');
-                } else {
-                    $ccNumberContain.removeClass('is_dankort');
-                }
-
-                if (curVal.match(visaRegex)) {
-                    piCardType = 'visa';
-                    $ccNumberContain.addClass('is_visa');
-                } else {
-                    $ccNumberContain.removeClass('is_visa');
-                }
-
-                if (curVal.match(mastercardRegex)) {
-                    piCardType = 'mastercard';
-                    $ccNumberContain.addClass('is_mastercard');
-                } else {
-                    $ccNumberContain.removeClass('is_mastercard');
-                }
-
-                if (curVal.match(amexRegex)) {
-                    piCardType = 'amex';
-                    $ccNumberContain.addClass('is_amex');
-                } else {
-                    $ccNumberContain.removeClass('is_amex');
-                }
-
-                if (curVal.match(discoverRegex)) {
-                    piCardType = 'discover';
-                    $ccNumberContain.addClass('is_discover');
-                } else {
-                    $ccNumberContain.removeClass('is_discover');
-                }
-
-                if (curVal.match(unionpayRegex)) {
-                    piCardType = 'unionpay';
-                    $ccNumberContain.addClass('is_unionpay');
-                } else {
-                    $ccNumberContain.removeClass('is_unionpay');
-                }
-
-                if (curVal.match(jcbRegex)) {
-                    piCardType = 'jcb';
-                    $ccNumberContain.addClass('is_jcb');
-                } else {
-                    $ccNumberContain.removeClass('is_jcb');
-                }
-
-                if (curVal.match(dinersRegex)) {
-                    piCardType = 'diners';
-                    $ccNumberContain.addClass('is_diners');
-                } else {
-                    $ccNumberContain.removeClass('is_diners');
-                }
-
-                if (curVal.match(maestroRegex)) {
-                    piCardType = 'maestro';
-                    $ccNumberContain.addClass('is_maestro');
-                } else {
-                    $ccNumberContain.removeClass('is_maestro');
-                }
-
-                // if nothing is a hit we add a class to fade them all out
-                if (
-                    curVal !== '' &&
-                    !curVal.match(visaRegex) &&
-                    !curVal.match(mastercardRegex) &&
-                    !curVal.match(amexRegex) &&
-                    !curVal.match(discoverRegex) &&
-                    !curVal.match(jcbRegex) &&
-                    !curVal.match(dinersRegex) &&
-                    !curVal.match(maestroRegex) &&
-                    !curVal.match(unionpayRegex) &&
-                    !curVal.match(dankortRegex)
-                ) {
-                    $ccNumberContain.addClass('is_nothing');
-                } else {
-                    $ccNumberContain.removeClass('is_nothing');
+                for (const card of cardTypes) {
+                    if (curVal.match(card.regex)) {
+                        $ccNumberContain.addClass(card.className);
+                    } else {
+                        $ccNumberContain.removeClass(card.className);
+                    }
                 }
             },
 
@@ -905,9 +828,9 @@ define(
                 return window.checkoutConfig.payment.ccform.paymentMethodSelection;
             },
             getselectedCCType : function(inputName){
-                if (this.paymentMethodSelection()=='radio') {
+                if(this.paymentMethodSelection()=='radio'){
                     return $("input[name='"+inputName+"']:checked").val();
-                } else {
+                } else{
                     return  this.selectedCCType();
                 }
             },
@@ -1190,7 +1113,7 @@ define(
                             }
                         }
                     }
-                } else if($form.validation() && $form.validation('isValid')) {
+                }else if($form.validation() && $form.validation('isValid')){
                     // Subscription check
                     if(this.isSubscribed()){
                         if(cc_type_selected !== 'savedcard'){

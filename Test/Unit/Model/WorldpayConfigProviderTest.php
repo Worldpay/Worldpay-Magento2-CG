@@ -43,7 +43,7 @@ class WorldpayConfigProviderTest extends TestCase
      */
     protected $ALL_APM_METHODS = [
         'CHINAUNIONPAY-SSL' => 'Union Pay',
-        'IDEAL-SSL' => 'IDEAL',
+        'IDEAL-SSL' => 'iDEAL | Wero',
         //'YANDEXMONEY-SSL' => 'Yandex.Money',
         'PAYPAL-EXPRESS' => 'PayPal',
         'SOFORT-SSL' => 'SoFort EU',
@@ -112,7 +112,8 @@ class WorldpayConfigProviderTest extends TestCase
                 'GECAPITAL-SSL' => 'GE Capital',
                 'JCB-SSL' => 'Japanese Credit Bank',
                 'LASER-SSL' => 'Laser Card',
-                'UATP-SSL' => 'UATP'
+                'UATP-SSL' => 'UATP',
+                'ELO-SSL' => 'ELO'
         ];
         
     protected function setUp(): void
