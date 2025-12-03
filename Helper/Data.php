@@ -3684,6 +3684,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         );
     }
 
+    public function shouldRestoreCart($storeId = null): bool
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/restore_cart/restore_cart_enable',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
     /**
      * Get Default country code of Magento store
      *

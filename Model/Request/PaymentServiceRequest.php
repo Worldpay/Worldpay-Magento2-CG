@@ -2001,19 +2001,23 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     {
         $items = $this->getItemDetails($capturedItems);
 
-        if ($items['is_bundle_item_present'] > 0 ||
+        if (
+            $items['is_bundle_item_present'] > 0 ||
             (count($items['invoicedItems']) == 1 &&
                 (in_array("downloadable", $items['invoicedItems']['0']) ||
-                    in_array("giftcard", $items['invoicedItems']['0'])))) {
+                    in_array("giftcard", $items['invoicedItems']['0'])))
+        ) {
             $items['trackingId'] = '';
             return $items;
         } elseif (!empty($instorePickup)) {
             $items['trackingId'] = $instorePickup;
             return $items;
         } else {
-            if (array_key_exists('tracking', $capturedItems)
+            if (
+                array_key_exists('tracking', $capturedItems)
                 && count($capturedItems['tracking']) < 2
-                && !empty($capturedItems['tracking']['1']['number'])) {
+                && !empty($capturedItems['tracking']['1']['number'])
+            ) {
                 $items['trackingId'] = $capturedItems['tracking']['1']['number'];
                 return $items;
             } else {

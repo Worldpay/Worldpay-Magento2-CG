@@ -4,6 +4,7 @@ namespace Sapient\Worldpay\Model\PaymentMethods;
 use Exception;
 use Magento\Payment\Model\Method\AbstractMethod as BaseAbstractMethod;
 use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Store\Model\ScopeInterface;
 use Sapient\Worldpay\Helper\ProductOnDemand;
 
 /**
@@ -586,10 +587,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
             );
         }
 
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-
-        $autoInvoice = $this->_scopeConfig->getValue('worldpay/general_config/capture_automatically', $storeScope);
-        $partialCapture = $this->_scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', $storeScope);
+        $partialCapture = $this->_scopeConfig->getValue('worldpay/partial_capture_config/partial_capture', ScopeInterface::SCOPE_STORE);
 
         $mageOrder = $payment->getOrder();
         $orderId = $mageOrder->getIncrementId();
