@@ -36,7 +36,7 @@ class PaymentMethodsApmTest extends TestCase
     {
         $expectedResult = [
             ['value' => 'CHINAUNIONPAY-SSL', 'label' => __('Union Pay')],
-            ['value' => 'IDEAL-SSL', 'label' => __('IDEAL')],
+            ['value' => 'IDEAL-SSL', 'label' => __('iDEAL | Wero')],
            // ['value' => 'YANDEXMONEY-SSL', 'label' => __('Yandex.Money')],
             ['value' => 'PAYPAL-EXPRESS', 'label' => __('PayPal Express')],
             ['value' => 'PAYPAL-SSL', 'label' => __('PayPal SSL')],

@@ -24,7 +24,8 @@ class PaymentMethodsCC extends \Magento\Framework\App\Config\Value
             ['value' => 'DINERS-SSL', 'label' => __('Diners')],
             ['value' => 'DISCOVER-SSL', 'label' => __('Discover')],
             ['value' => 'JCB-SSL', 'label' => __('Japanese Credit Bank')],
-            ['value' => 'MAESTRO-SSL', 'label' => __('Maestro')]
+            ['value' => 'MAESTRO-SSL', 'label' => __('Maestro')],
+            ['value' => 'ELO-SSL', 'label' => __('ELO')]
         ];
     }
 }

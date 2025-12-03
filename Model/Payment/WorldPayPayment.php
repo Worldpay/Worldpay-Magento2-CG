@@ -146,23 +146,20 @@ class WorldPayPayment
         $wpp->save();
     }
 
-    /**
-     * Get prime routing enabled
-     *
-     * @param InfoInterface $paymentObject
-     * @return bool
-     */
-    private function getPrimeRoutingEnabled(InfoInterface $paymentObject)
+    private function getPrimeRoutingEnabled(InfoInterface $paymentObject): bool
     {
-        $paymentAditionalInformation = $paymentObject->getAdditionalInformation();
-        if (!empty($paymentAditionalInformation)
-                && array_key_exists('worldpay_primerouting_enabled', $paymentAditionalInformation)) {
-            $wpPrimeRoutingEnabled=$paymentAditionalInformation['worldpay_primerouting_enabled'];
-            return $wpPrimeRoutingEnabled;
+        $paymentAdditionalInformation = $paymentObject->getAdditionalInformation();
+        if (
+            !empty($paymentAdditionalInformation)
+            && array_key_exists('worldpay_primerouting_enabled', $paymentAdditionalInformation)
+        ) {
+            return $paymentAdditionalInformation['worldpay_primerouting_enabled'];
         }
+
+        return false;
     }
 
-    public function getIsOrderOnDemand(InfoInterface $paymentObject)
+    public function getIsOrderOnDemand(InfoInterface $paymentObject): bool
     {
         $paymentAdditionalInformation = $paymentObject->getAdditionalInformation();
         if (
