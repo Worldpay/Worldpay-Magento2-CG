@@ -4,69 +4,53 @@
  */
 namespace Sapient\Worldpay\Model\Observer;
 
+use Magento\Checkout\Model\Session;
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Sapient\Worldpay\Helper\Data;
 use Sapient\Worldpay\Helper\ProductOnDemand;
+use Sapient\Worldpay\Logger\WorldpayLogger;
+use Sapient\Worldpay\Model\Checkout\Service as CheckoutService;
+use Sapient\Worldpay\Model\Order\Service as OrderService;
 
 class Cart implements ObserverInterface
 {
-    /**
-     * @var \Sapient\Worldpay\Logger\WorldpayLogger
-     */
-    private $wplogger;
-    /**
-     * @var \Sapient\Worldpay\Model\Order\Service
-     */
-    private $orderservice;
-
-    /**
-     * @var \Sapient\Worldpay\Model\Checkout\Service
-     */
-    private $checkoutservice;
-
-    /**
-     * @var \Magento\Checkout\Model\Session
-     */
-    private $checkoutsession;
-
+    private WorldpayLogger $wpLogger;
+    private OrderService $orderService;
+    private CheckoutService $checkoutService;
+    private Session $checkoutSession;
     private ProductOnDemand $productOnDemandHelper;
+    private Data $dataHelper;
 
-    /**
-     * Constructor
-     *
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-     * @param \Sapient\Worldpay\Model\Order\Service $orderservice
-     * @param \Sapient\Worldpay\Model\Checkout\Service $checkoutservice
-     * @param \Magento\Checkout\Model\Session $checkoutsession
-     */
     public function __construct(
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
-        \Sapient\Worldpay\Model\Order\Service $orderservice,
-        \Sapient\Worldpay\Model\Checkout\Service $checkoutservice,
-        \Magento\Checkout\Model\Session $checkoutsession,
+        WorldpayLogger  $wpLogger,
+        OrderService    $orderService,
+        CheckoutService $checkoutService,
+        Session         $checkoutSession,
         ProductOnDemand $productOnDemandHelper,
+        Data            $dataHelper
     ) {
-        $this->orderservice = $orderservice;
-        $this->wplogger = $wplogger;
-        $this->checkoutservice = $checkoutservice;
-        $this->checkoutsession = $checkoutsession;
+        $this->orderService = $orderService;
+        $this->wpLogger = $wpLogger;
+        $this->checkoutService = $checkoutService;
+        $this->checkoutSession = $checkoutSession;
         $this->productOnDemandHelper = $productOnDemandHelper;
+        $this->dataHelper = $dataHelper;
     }
 
    /**
     * Load the shopping cart from the latest authorized, but not completed order
-    *
-    * @param \Magento\Framework\Event\Observer $observer
     */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(Observer $observer)
     {
-        if ($this->checkoutsession->getauthenticatedOrderId()) {
-            $order = $this->orderservice->getAuthorisedOrder();
-            $this->checkoutservice->reactivateQuoteForOrder($order);
-            $this->orderservice->removeAuthorisedOrder();
+        if ($this->checkoutSession->getauthenticatedOrderId() && $this->dataHelper->shouldRestoreCart()) {
+            $order = $this->orderService->getAuthorisedOrder();
+            $this->checkoutService->reactivateQuoteForOrder($order);
+            $this->orderService->removeAuthorisedOrder();
         }
 
         if ($this->productOnDemandHelper->isProductOnDemandGeneralConfigActive()) {
-            $quote = $this->checkoutsession->getQuote();
+            $quote = $this->checkoutSession->getQuote();
             $items = $quote->getAllItems();
             /** @var \Magento\Quote\Model\Quote\Item $item */
             foreach ($items as $item) {

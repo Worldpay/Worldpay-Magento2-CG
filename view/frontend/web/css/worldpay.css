@@ -199,6 +199,12 @@ span.cc-card-type {
     background-position-x: -256px;
 }
 
+.is_elo .cc-card-type:before {
+    background: url('../images/cc/elo-ssl.png') no-repeat center center;
+    display: inline-block;
+    background-size: 44px 21px;
+}
+
 .payment-titlelogo-wrapper {
     display: flex;
     padding:10px;

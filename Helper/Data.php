@@ -454,13 +454,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getCcTypes($paymentconfig = "cc_config")
     {
         $allCcMethods = [
-            'AMEX-SSL' => 'American Express', 'VISA-SSL' => 'Visa',
-            'ECMC-SSL' => 'MasterCard', 'DISCOVER-SSL' => 'Discover',
-            'DINERS-SSL' => 'Diners', 'MAESTRO-SSL' => 'Maestro', 'AIRPLUS-SSL' => 'AirPlus',
-            'AURORE-SSL' => 'Aurore', 'CB-SSL' => 'Carte Bancaire',
-            'CARTEBLEUE-SSL' => 'Carte Bleue', 'DANKORT-SSL' => 'Dankort',
-            'GECAPITAL-SSL' => 'GE Capital', 'JCB-SSL' => 'Japanese Credit Bank',
-            'LASER-SSL' => 'Laser Card', 'UATP-SSL' => 'UATP',
+            'AMEX-SSL' => 'American Express',
+            'VISA-SSL' => 'Visa',
+            'ECMC-SSL' => 'MasterCard',
+            'DISCOVER-SSL' => 'Discover',
+            'DINERS-SSL' => 'Diners',
+            'MAESTRO-SSL' => 'Maestro',
+            'AIRPLUS-SSL' => 'AirPlus',
+            'AURORE-SSL' => 'Aurore',
+            'CB-SSL' => 'Carte Bancaire',
+            'CARTEBLEUE-SSL' => 'Carte Bleue',
+            'DANKORT-SSL' => 'Dankort',
+            'GECAPITAL-SSL' => 'GE Capital',
+            'JCB-SSL' => 'Japanese Credit Bank',
+            'LASER-SSL' => 'Laser Card',
+            'UATP-SSL' => 'UATP',
+            'ELO-SSL' => 'ELO'
         ];
         $configMethods = explode(',', $this->_scopeConfig->getValue('worldpay/' .
                 $paymentconfig . '/paymentmethods', ScopeInterface::SCOPE_STORE));
@@ -481,7 +490,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $allApmMethods = [
             'CHINAUNIONPAY-SSL'     => 'Union Pay',
-            'IDEAL-SSL'             => 'IDEAL',
+            'IDEAL-SSL'             => 'iDEAL | Wero',
             //'YANDEXMONEY-SSL'       => 'Yandex.Money',
             'PAYPAL-EXPRESS'        => 'PayPal',
             'SOFORT-SSL'            => 'SoFort EU',
@@ -536,6 +545,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'CB-SSL' => 'CB',
             'DANKORT-SSL' => 'DANKORT',
             'JCB-SSL' => 'JCB',
+            'ELO-SSL' => 'ELO'
         ];
 
         return $schemes[$paymentType] ?? null;
@@ -3678,6 +3688,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/order_cleanup_cron/order_cleanup_enable',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    public function shouldRestoreCart($storeId = null): bool
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/restore_cart/restore_cart_enable',
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
