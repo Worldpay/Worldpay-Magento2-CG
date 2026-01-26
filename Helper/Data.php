@@ -481,7 +481,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $allApmMethods = [
             'CHINAUNIONPAY-SSL'     => 'Union Pay',
-            'IDEAL-SSL'             => 'IDEAL',
+            'IDEAL-SSL'             => 'iDEAL | Wero',
             //'YANDEXMONEY-SSL'       => 'Yandex.Money',
             'PAYPAL-EXPRESS'        => 'PayPal',
             'SOFORT-SSL'            => 'SoFort EU',

@@ -43,7 +43,7 @@ class WorldpayConfigProviderTest extends TestCase
      */
     protected $ALL_APM_METHODS = [
         'CHINAUNIONPAY-SSL' => 'Union Pay',
-        'IDEAL-SSL' => 'IDEAL',
+        'IDEAL-SSL' => 'iDEAL | Wero',
         //'YANDEXMONEY-SSL' => 'Yandex.Money',
         'PAYPAL-EXPRESS' => 'PayPal Express',
         'PAYPAL-SSL' => 'PayPal SSL',
