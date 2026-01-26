@@ -454,13 +454,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getCcTypes($paymentconfig = "cc_config")
     {
         $allCcMethods = [
-            'AMEX-SSL' => 'American Express', 'VISA-SSL' => 'Visa',
-            'ECMC-SSL' => 'MasterCard', 'DISCOVER-SSL' => 'Discover',
-            'DINERS-SSL' => 'Diners', 'MAESTRO-SSL' => 'Maestro', 'AIRPLUS-SSL' => 'AirPlus',
-            'AURORE-SSL' => 'Aurore', 'CB-SSL' => 'Carte Bancaire',
-            'CARTEBLEUE-SSL' => 'Carte Bleue', 'DANKORT-SSL' => 'Dankort',
-            'GECAPITAL-SSL' => 'GE Capital', 'JCB-SSL' => 'Japanese Credit Bank',
-            'LASER-SSL' => 'Laser Card', 'UATP-SSL' => 'UATP', 'ELO-SSL' => 'ELO'
+            'AMEX-SSL' => 'American Express',
+            'VISA-SSL' => 'Visa',
+            'ECMC-SSL' => 'MasterCard',
+            'DISCOVER-SSL' => 'Discover',
+            'DINERS-SSL' => 'Diners',
+            'MAESTRO-SSL' => 'Maestro',
+            'AIRPLUS-SSL' => 'AirPlus',
+            'AURORE-SSL' => 'Aurore',
+            'CB-SSL' => 'Carte Bancaire',
+            'CARTEBLEUE-SSL' => 'Carte Bleue',
+            'DANKORT-SSL' => 'Dankort',
+            'GECAPITAL-SSL' => 'GE Capital',
+            'JCB-SSL' => 'Japanese Credit Bank',
+            'LASER-SSL' => 'Laser Card',
+            'UATP-SSL' => 'UATP',
+            'ELO-SSL' => 'ELO'
         ];
         $configMethods = explode(',', $this->_scopeConfig->getValue('worldpay/' .
                 $paymentconfig . '/paymentmethods', ScopeInterface::SCOPE_STORE));
