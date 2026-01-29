@@ -637,9 +637,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         if (
             $this->worldpayhelper->isHppPaypalSmartButtonEnabled()
             && $this->worldpayhelper->isApmEnabled()
-            && $redirectOrderParams['paymentType'] == "ONLINE"
+            && strpos($redirectOrderParams['paymentType'], "ONLINE") === 0
         ) {
-            $redirectOrderParams['paymentType'] = "ONLINE,PAYPAL-SSL";
+            $redirectOrderParams['paymentType'] .= ",PAYPAL-SSL";
         }
 
         $requestConfiguration = [
