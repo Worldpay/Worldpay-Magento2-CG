@@ -630,6 +630,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $redirectOrderParams['billingAddress']['countryCode'];
         }
 
+        if($redirectOrderParams['paymentType'] == "ONLINE") {
+            $redirectOrderParams['paymentType'] = "ONLINE,ELO-SSL";
+        }
+
         if (
             $this->worldpayhelper->isHppPaypalSmartButtonEnabled()
             && $this->worldpayhelper->isApmEnabled()
