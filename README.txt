@@ -2,6 +2,12 @@ Latest releases for all supported version:
 
 For Magento 2.4.6
 
+Worldpay Plugin version: 2.4.6-p130126
+1. Magento 2.4.6-p130126 compatible
+2. PHP 8.2 compatibility
+3. Added Pay By Bank (Openbanking) payment method
+4. Added ELO for Brazil
+
 Worldpay Plugin version: 2.4.6-p120925
 1. Magento 2.4.6-p12 compatible
 2. PHP 8.2 compatibility
