@@ -2,6 +2,12 @@ Latest releases for all supported version:
 
 For Magento 2.4.8
 
+Worldpay Plugin version: 2.4.8-p30126
+1. Magento 2.4.8-p3 compatible
+2. PHP 8.4 & 8.3 compatibility
+3. Added Pay by Bank (Open Banking) payment method
+4. Added ELO for Brazil
+
 Worldpay Plugin version: 2.4.8-p20925
 1. Magento 2.4.8-p2 compatible
 2. PHP 8.4 & 8.3 compatibility
