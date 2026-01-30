@@ -48,6 +48,7 @@ class TokenFormatter implements PaymentTokenFormatterInterface
         'DANKORT-SSL' => 'Dankort',
         'CB-SSL' => 'Carte Bancaire',
         'DINERS-SSL' => 'Diners',
+        'ELO-SSL' => 'ELO',
     ];
     /**
      * Constructor

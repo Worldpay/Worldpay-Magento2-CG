@@ -274,18 +274,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 return $merchantCodeValue;
             }
         }
-        if ($storeId) {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/merchant_code',
-                ScopeInterface::SCOPE_STORE,
-                $storeId
-            );
-        } else {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/merchant_code',
-                ScopeInterface::SCOPE_STORE
-            );
-        }
+
+        return $this->_scopeConfig->getValue(
+            'worldpay/general_config/merchant_code',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
     /**
      * Get Xml Username
@@ -297,24 +291,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getXmlUsername($paymentType, $storeId = null)
     {
         if ($paymentType) {
-            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_username']:'';
+            $merchantDetails = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue =  $merchantDetails ? $merchantDetails['merchant_username'] : '';
             if (!empty($merchantCodeValue)) {
                 return $merchantCodeValue;
             }
         }
-        if ($storeId) {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/xml_username',
-                ScopeInterface::SCOPE_STORE,
-                $storeId
-            );
-        } else {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/xml_username',
-                ScopeInterface::SCOPE_STORE
-            );
-        }
+
+        return $this->_scopeConfig->getValue(
+            'worldpay/general_config/xml_username',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
     /**
      * Get Xml Password
@@ -326,24 +314,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getXmlPassword($paymentType, $storeId = null)
     {
         if ($paymentType) {
-            $merchat_detail = $this->merchantprofile->getConfigValue($paymentType);
-            $merchantCodeValue = $merchat_detail?$merchat_detail['merchant_password']:'';
+            $merchantDetails = $this->merchantprofile->getConfigValue($paymentType);
+            $merchantCodeValue = $merchantDetails?$merchantDetails['merchant_password']:'';
             if (!empty($merchantCodeValue)) {
                 return $merchantCodeValue;
             }
         }
-        if ($storeId) {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/xml_password',
-                ScopeInterface::SCOPE_STORE,
-                $storeId
-            );
-        } else {
-            return $this->_scopeConfig->getValue(
-                'worldpay/general_config/xml_password',
-                ScopeInterface::SCOPE_STORE
-            );
-        }
+
+        return $this->_scopeConfig->getValue(
+            'worldpay/general_config/xml_password',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
     }
     /**
      * Check isMacEnabled
@@ -472,13 +454,22 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function getCcTypes($paymentconfig = "cc_config")
     {
         $allCcMethods = [
-            'AMEX-SSL' => 'American Express', 'VISA-SSL' => 'Visa',
-            'ECMC-SSL' => 'MasterCard', 'DISCOVER-SSL' => 'Discover',
-            'DINERS-SSL' => 'Diners', 'MAESTRO-SSL' => 'Maestro', 'AIRPLUS-SSL' => 'AirPlus',
-            'AURORE-SSL' => 'Aurore', 'CB-SSL' => 'Carte Bancaire',
-            'CARTEBLEUE-SSL' => 'Carte Bleue', 'DANKORT-SSL' => 'Dankort',
-            'GECAPITAL-SSL' => 'GE Capital', 'JCB-SSL' => 'Japanese Credit Bank',
-            'LASER-SSL' => 'Laser Card', 'UATP-SSL' => 'UATP',
+            'AMEX-SSL' => 'American Express',
+            'VISA-SSL' => 'Visa',
+            'ECMC-SSL' => 'MasterCard',
+            'DISCOVER-SSL' => 'Discover',
+            'DINERS-SSL' => 'Diners',
+            'MAESTRO-SSL' => 'Maestro',
+            'AIRPLUS-SSL' => 'AirPlus',
+            'AURORE-SSL' => 'Aurore',
+            'CB-SSL' => 'Carte Bancaire',
+            'CARTEBLEUE-SSL' => 'Carte Bleue',
+            'DANKORT-SSL' => 'Dankort',
+            'GECAPITAL-SSL' => 'GE Capital',
+            'JCB-SSL' => 'Japanese Credit Bank',
+            'LASER-SSL' => 'Laser Card',
+            'UATP-SSL' => 'UATP',
+            'ELO-SSL' => 'ELO'
         ];
         $configMethods = explode(',', $this->_scopeConfig->getValue('worldpay/' .
                 $paymentconfig . '/paymentmethods', ScopeInterface::SCOPE_STORE));
@@ -499,7 +490,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $allApmMethods = [
             'CHINAUNIONPAY-SSL'     => 'Union Pay',
-            'IDEAL-SSL'             => 'IDEAL',
+            'IDEAL-SSL'             => 'iDEAL | Wero',
             //'YANDEXMONEY-SSL'       => 'Yandex.Money',
             'PAYPAL-EXPRESS'        => 'PayPal',
             'SOFORT-SSL'            => 'SoFort EU',
@@ -510,6 +501,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'PRZELEWY-SSL'          => 'P24',
             'MISTERCASH-SSL'        => 'Mistercash/Bancontact',
             'ACH_DIRECT_DEBIT-SSL'  => 'ACH Pay',
+            'OPENBANKING-SSL'       => 'Pay By Bank',
         ];
         $configMethods = explode(',', $this->_scopeConfig->getValue(
             'worldpay/apm_config/paymentmethods',
@@ -553,6 +545,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'CB-SSL' => 'CB',
             'DANKORT-SSL' => 'DANKORT',
             'JCB-SSL' => 'JCB',
+            'ELO-SSL' => 'ELO'
         ];
 
         return $schemes[$paymentType] ?? null;
@@ -1101,7 +1094,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             //Klarna sliceit check
             if (strpos($item->getPaymentType(), "KLARNA_SLICEIT-SSL") !== false
                && strlen($item->getPaymentType()) > 18) {
-                return $apmTitle . "\n" . $item->getPaymentType() . "\r\n" . "Installments: "
+                return $this->getApmTitle() . "\n" . $item->getPaymentType() . "\r\n" . "Installments: "
                     . rtrim(rtrim(substr($item->getPaymentType(), 15, 5), '_'), 'MOS') . " months";
             } else {
                 return $this->getApmTitle() . "\n" . $item->getPaymentType();
@@ -3539,7 +3532,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Calculate Pay By Link Resend expiry time
      *
      * @param int $expiryTime
-     * @retrun int
+     * @return int
      */
     public function calculatePblResendExpiryTime($expiryTime)
     {
@@ -3551,11 +3544,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param string $currentDate
      * @param string $orderDate
-     * @retrun int
+     * @return int
      */
-    public function findPblOrderIntervalTime($currentDate, $orderDate)
+    public function findPblOrderIntervalTime(string $currentDate, string $orderDate): int
     {
-        return round(abs(strtotime($currentDate) - strtotime($orderDate))/3600, 0);
+        return round(abs((int)strtotime($currentDate) - (int)strtotime($orderDate))/3600, 0);
     }
 
     /**
@@ -3563,7 +3556,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @param string $currentDate
      * @param string $expiryTime
-     * @retrun int
+     * @return int
      */
     public function findPblOrderExpiryTime($currentDate, $expiryTime)
     {
@@ -3574,7 +3567,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * Find Pay By Link expiry date and time
      *
      * @param string $minDate
-     * @retrun array
+     * @return array
      */
     public function findFromToPblDateAndTime($minDate)
     {
@@ -3695,6 +3688,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->_scopeConfig->getValue(
             'worldpay/order_cleanup_cron/order_cleanup_enable',
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    public function shouldRestoreCart($storeId = null): bool
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/restore_cart/restore_cart_enable',
             ScopeInterface::SCOPE_STORE,
             $storeId
         );

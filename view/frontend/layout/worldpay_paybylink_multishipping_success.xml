@@ -12,7 +12,7 @@
     <body>
         <referenceBlock name="page.main.title">
             <action method="setPageTitle">
-                <argument translate="true" name="title" xsi:type="string">Thank you for your purchase!</argument>
+                <argument name="title" xsi:type="string" translate="true">Thank you for your purchase!</argument>
             </action>
         </referenceBlock>
         <referenceContainer name="content">

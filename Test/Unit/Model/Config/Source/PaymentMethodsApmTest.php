@@ -36,7 +36,7 @@ class PaymentMethodsApmTest extends TestCase
     {
         $expectedResult = [
             ['value' => 'CHINAUNIONPAY-SSL', 'label' => __('Union Pay')],
-            ['value' => 'IDEAL-SSL', 'label' => __('IDEAL')],
+            ['value' => 'IDEAL-SSL', 'label' => __('iDEAL | Wero')],
            // ['value' => 'YANDEXMONEY-SSL', 'label' => __('Yandex.Money')],
             ['value' => 'PAYPAL-EXPRESS', 'label' => __('PayPal Express')],
             ['value' => 'PAYPAL-SSL', 'label' => __('PayPal SSL')],
@@ -49,6 +49,7 @@ class PaymentMethodsApmTest extends TestCase
             ['value' => 'PRZELEWY-SSL', 'label' => __('P24')],
             ['value' => 'MISTERCASH-SSL', 'label' => __('Mistercash/Bancontact')],
             ['value' => 'ACH_DIRECT_DEBIT-SSL', 'label' => __('ACH Pay')],
+            ['value' => 'OPENBANKING-SSL', 'label' => __('Pay By Bank')],
         ];
         $this->assertEquals($expectedResult, $this->model->toOptionArray());
     }

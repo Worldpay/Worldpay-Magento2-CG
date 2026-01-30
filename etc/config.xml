@@ -142,6 +142,9 @@
             <order_cleanup_cron>
                 <order_cleanup_option>1</order_cleanup_option>
             </order_cleanup_cron>
+            <restore_cart>
+                <restore_cart_enable>1</restore_cart_enable>
+            </restore_cart>
         </worldpay>
         <payment>
             <worldpay_cc>

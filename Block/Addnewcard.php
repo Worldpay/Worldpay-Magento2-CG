@@ -100,12 +100,12 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
     /**
      * Get Cvc Enabled
      *
-     * @return string
+     * @return bool
      */
 
     public function requireCvcEnabled()
     {
-        return $this->worldpayHelper->isCcRequireCVC();
+        return (bool) $this->worldpayHelper->isCcRequireCVC();
     }
 
     /**
@@ -170,13 +170,13 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
         return $cctypes;
     }
     /**
-     * Get Checkout Specific Label
+     * Get Checkout specific Label
      *
-     * @param Specific $labelcode
+     * @param string $labelcode
      * @return string
      */
 
-    public function getCheckoutSpecificLabel($labelcode)
+    public function getCheckoutSpecificLabel(string $labelcode)
     {
         return $this->worldpayHelper->getCheckoutLabelbyCode($labelcode);
     }
@@ -241,7 +241,7 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
     /**
      * Get Disclaimer Message Enable
      *
-     * @return string
+     * @return bool
      */
 
     public function getDisclaimerMessageEnable()
@@ -267,7 +267,7 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
     /**
      * Get Disclaimer Message Mandatory
      *
-     * @return string
+     * @return bool
      */
 
     public function getDisclaimerMessageMandatory()
@@ -280,7 +280,7 @@ class Addnewcard extends \Magento\Framework\View\Element\Template
     /**
      * Get Stored Credentials Enabled Value
      *
-     * @return string
+     * @return bool
      */
 
     public function getStoredCredentialsEnabledValue()

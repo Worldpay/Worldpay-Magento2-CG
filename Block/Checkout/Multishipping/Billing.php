@@ -160,6 +160,15 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
     {
         return $this->getCheckout()->getQuote()->getAllShippingAddresses();
     }
+
+    /**
+     * @return int
+     */
+    public function getShippingAddressCount(): int
+    {
+        return count($this->getShippingAddresses());
+    }
+
     /**
      * Render total block
      *
@@ -433,7 +442,7 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
         }
         return $otherPaymentMethods;
     }
-    
+
     /**
      * Get EFTPos Enable
      *

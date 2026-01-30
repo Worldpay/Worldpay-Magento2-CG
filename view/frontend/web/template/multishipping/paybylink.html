@@ -1,13 +1,13 @@
-<!-- ko if: ( isActive())-->
+<!-- ko if: (isActive())-->
 <div class = "wp-pay-by-link">
-        <button class="action primary checkout multishipping-paybylink-button"
-                name = "Share Order"
-                type="submit"
-                data-bind="
-                        click: performPlaceOrder,
-                        css: {disabled: !isPlaceOrderActionAllowed()},
-                        attr: {title: $t('Share Order')} ">
-                <span data-bind="text: $t(getpaybylinkText())"></span>
-        </button>
+    <button class="action primary checkout multishipping-paybylink-button"
+            name="Share Order"
+            type="submit"
+            data-bind="
+                    click: performPlaceOrder,
+                    css: {disabled: !isPlaceOrderActionAllowed()},
+                    attr: {title: $t('Share Order')} ">
+            <span data-bind="i18n: getpaybylinkText()"></span>
+    </button>
 </div>
 <!-- /ko -->

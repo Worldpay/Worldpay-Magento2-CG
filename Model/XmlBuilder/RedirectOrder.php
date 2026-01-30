@@ -4,286 +4,82 @@
  */
 namespace Sapient\Worldpay\Model\XmlBuilder;
 
-use Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecureConfig;
+use Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration;
+use SimpleXMLElement;
+use Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure;
 
 /**
  * Build xml for RedirectOrder request
  */
-class RedirectOrder
+class RedirectOrder extends AbstractXmlBuilder
 {
     public const DYNAMIC3DS_DO3DS = 'do3DS';
     public const DYNAMIC3DS_NO3DS = 'no3DS';
     public const TOKEN_SCOPE = 'shopper';
-    public const ROOT_ELEMENT = <<<EOD
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
-        'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
-EOD;
 
-    /**
-     * @var string
-     */
-    private $merchantCode;
-    /**
-     * @var string
-     */
-    private $orderCode;
-    /**
-     * @var string
-     */
-    private $orderDescription;
-    /**
-     * @var string
-     */
-    private $currencyCode;
-    /**
-     * @var float
-     */
-    private $amount;
-    /**
-     * @var string
-     */
-    private $orderContent;
-    /**
-     * @var string
-     */
-    private $paymentType;
-    /**
-     * @var string
-     */
-    private $shopperEmail;
-    /**
-     * @var string
-     */
-    private $statementNarrative;
-    /**
-     * @var string
-     */
-    private $acceptHeader;
-    /**
-     * @var string
-     */
-    private $userAgentHeader;
-    /**
-     * @var array
-     */
-    private $shippingAddress;
-    /**
-     * @var array
-     */
-    private $billingAddress;
-    /**
-     * @var float
-     */
-    private $paymentPagesEnabled;
-    /**
-     * @var string
-     */
-    private $installationId;
-    /**
-     * @var string
-     */
-    private $hideAddress;
-    /**
-     * @var string
-     */
-    private $thirdparty;
-    /**
-     * @var mixed
-     */
-    private $shippingfee;
-    /**
-     * @var mixed
-     */
-    private $exponent;
-    /**
-     * @var string
-     */
-    private $cusDetails;
-    /**
-     * @var array
-     */
-    private $orderLineItems;
+    protected string $merchantCode;
+    protected array $orderParameters;
+    protected string $installationId;
+    protected string $captureDelay;
+    private ?string $shopperId;
+    public array $paymentDetails;
+    public array $cusDetails;
+    public array $thirdPartyData;
+    private ThreeDSecure $threeDSecureConfig;
+    private TokenConfiguration $tokenRequestConfig;
 
-    /**
-     * @var Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure
-     */
-    private $threeDSecureConfig;
-
-    /**
-     * @var Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration
-     */
-    private $tokenRequestConfig;
-
-    /**
-     * @var array
-     */
-    private $saveCardEnabled;
-
-     /**
-      * @var array
-      */
-    private $storedCredentialsEnabled;
-    /**
-     * @var string
-     */
-    private $captureDelay;
-
-    /**
-     * @var string
-     */
-    private $shopperId;
-    /**
-     * @var array
-     */
-    public $paymentDetails;
-
-    /**
-     * Constructor
-     *
-     * @param array $args
-     */
-    public function __construct(array $args = [])
+    public function __construct()
     {
-        $this->threeDSecureConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\ThreeDSecure();
-        $this->tokenRequestConfig = new \Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration(
-            $args['tokenRequestConfig']
-        );
-        $this->shopperId = $args['shopperId'];
+        $this->threeDSecureConfig = new ThreeDSecure();
     }
 
-    /**
-     * Build xml for processing Request
-     *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param string $orderDescription
-     * @param string $currencyCode
-     * @param float $amount
-     * @param string $orderContent
-     * @param string $paymentType
-     * @param string $shopperEmail
-     * @param string $statementNarrative
-     * @param string $acceptHeader
-     * @param string $userAgentHeader
-     * @param string $shippingAddress
-     * @param string $billingAddress
-     * @param float $paymentPagesEnabled
-     * @param string $installationId
-     * @param string $hideAddress
-     * @param array $paymentDetails
-     * @param string $thirdparty
-     * @param mixed $shippingfee
-     * @param mixed $exponent
-     * @param string $cusDetails
-     * @param array $orderLineItems
-     * @param string $captureDelay
-     * @param string $savemyCard
-     * @param string $storedCredentialsEnabled = null
-     * @return SimpleXMLElement $xml
-     */
     public function build(
         $merchantCode,
-        $orderCode,
-        $orderDescription,
-        $currencyCode,
-        $amount,
-        $orderContent,
-        $paymentType,
-        $shopperEmail,
-        $statementNarrative,
-        $acceptHeader,
-        $userAgentHeader,
-        $shippingAddress,
-        $billingAddress,
-        $paymentPagesEnabled,
+        $orderParameters,
         $installationId,
-        $hideAddress,
-        $paymentDetails,
-        $thirdparty,
-        $shippingfee,
-        $exponent,
-        $cusDetails,
-        $orderLineItems,
         $captureDelay,
-        $savemyCard = null,
-        $storedCredentialsEnabled = null
-    ) {
+        array $tokenRequestConfigArgs = [],
+    ): SimpleXMLElement
+    {
         $this->merchantCode = $merchantCode;
-        $this->orderCode = $orderCode;
-        $this->orderDescription = $orderDescription;
-        $this->currencyCode = $currencyCode;
-        $this->amount = $amount;
-        $this->orderContent = $orderContent;
-        $this->paymentType = explode(",", $paymentType);
-        $this->shopperEmail = $shopperEmail;
-        $this->statementNarrative = $statementNarrative;
-        $this->acceptHeader = $acceptHeader;
-        $this->userAgentHeader = $userAgentHeader;
-        $this->shippingAddress = $shippingAddress;
-        $this->billingAddress = $billingAddress;
-        $this->paymentPagesEnabled = $paymentPagesEnabled;
         $this->installationId = $installationId;
-        $this->hideAddress = $hideAddress;
-        $this->paymentDetails = $paymentDetails;
-        $this->thirdparty = $thirdparty;
-        $this->shippingfee = $shippingfee;
-        $this->exponent = $exponent;
-        $this->cusDetails = $cusDetails;
-        $this->orderLineItems = $orderLineItems;
+        $this->orderParameters = $orderParameters;
         $this->captureDelay = $captureDelay;
+        $this->paymentDetails = $orderParameters['paymentDetails'];
+        $this->cusDetails = $orderParameters['cusDetails'];
+        $this->thirdPartyData = !empty($orderParameters['thirdPartyData']) && $orderParameters['thirdPartyData'] !== ''
+            ? $orderParameters['thirdPartyData'] : [];
 
-        $this->saveCardEnabled = $savemyCard;
-        $this->storedCredentialsEnabled = $storedCredentialsEnabled;
-
+        if(!empty($tokenRequestConfigArgs)) {
+            $this->tokenRequestConfig = new TokenConfiguration($tokenRequestConfigArgs['tokenRequestConfig']);
+            $this->shopperId = $tokenRequestConfigArgs['shopperId'];
+        }
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
 
-        $submit = $this->_addSubmitElement($xml);
+        $submit = $xml->addChild('submit');
         $this->_addOrderElement($submit);
 
         return $xml;
     }
 
-    /**
-     * Add submit tag to xml
-     *
-     * @param SimpleXMLElement $xml
-     * @return SimpleXMLElement
-     */
-    private function _addSubmitElement($xml)
-    {
-        return $xml->addChild('submit');
-    }
-
-    /**
-     * Add order tag to xml
-     *
-     * @param SimpleXMLElement $submit
-     * @return SimpleXMLElement $order
-     */
-    private function _addOrderElement($submit)
+    protected function _addOrderElement(SimpleXMLElement $submit): void
     {
         $order = $submit->addChild('order');
-        $order['orderCode'] = $this->orderCode;
+        $order['orderCode'] = $this->orderParameters['orderCode'];
 
-        if ($this->paymentPagesEnabled) {
+        if ($this->orderParameters['paymentPagesEnabled']) {
             $order['installationId'] = $this->installationId;
-
-            $order['fixContact'] = 'true';
-            $order['hideContact'] = 'true';
-
-            if ($this->hideAddress) {
-                $order['fixContact'] = 'false';
-                $order['hideContact'] = 'false';
-            }
+            $order['fixContact'] = $this->orderParameters['hideAddress'] ? 'false' : 'true';
+            $order['hideContact'] = $this->orderParameters['hideAddress'] ? 'false' : 'true';
         }
+
         if ($this->captureDelay!="") {
             $order['captureDelay'] = $this->captureDelay;
         }
         $this->_addDescriptionElement($order);
-        $amountElement = $order->addChild('amount');
-        $this->_addAmountElement($amountElement, $this->currencyCode, $this->exponent, $this->amount);
+        $this->_addAmountElement($order, $this->orderParameters['amount']);
         $this->_addOrderContentElement($order);
         if (isset($this->paymentDetails['paymentType']) && $this->paymentDetails['paymentType'] == "TOKEN-SSL") {
             $this->_addPaymentDetailsElement($order);
@@ -299,9 +95,11 @@ EOD;
             && ($this->paymentDetails['cardType'] === 'ECMC-SSL' || $this->paymentDetails['cardType'] === 'VISA-SSL')
            && ($this->paymentDetails['countryCode'] === 'US' || $this->paymentDetails['countryCode'] === 'CA')) {
             $this->_addBranchSpecificExtension($order);
+        } elseif (!empty($redirectOrderParams['is_paybylink_order'])) {
+            $this->addOrderLineItemsXML($order);
         }
 
-        if (!empty($this->thirdparty)) {
+        if (!empty($this->thirdPartyData)) {
             $this->_addThirdPartyData($order);
         }
         $this->_addDynamic3DSElement($order);
@@ -310,57 +108,32 @@ EOD;
             $this->_addStatementNarrativeElement($order);
         }
         $this->_addFraudSightData($order);
-
-        return $order;
     }
 
-    /**
-     * Add OrderContent tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addOrderContentElement($order)
-    {
-        $orderContent = $order->addChild('orderContent');
-        $this->_addCDATA($orderContent, $this->orderContent);
-    }
-
-    /**
-     * Add description tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addDescriptionElement($order)
+    protected function _addDescriptionElement(SimpleXMLElement $order): void
     {
         $description = $order->addChild('description');
-        if (!empty($this->thirdparty['statement'])) {
-            $this->_addCDATA($description, $this->thirdparty['statement']);
+        if (!empty($this->thirdPartyData['statement'])) {
+            $this->_addCDATA($description, $this->thirdPartyData['statement']);
         } else {
-            $this->_addCDATA($description, $this->orderDescription);
+            $this->_addCDATA($description, $this->orderParameters['orderDescription']);
         }
     }
 
-    /**
-     * Add amount tag to xml
-     *
-     * @param SimpleXMLElement $amountElement
-     * @param string $currencyCode
-     * @param mixed $exponent
-     * @param float $amount
-     */
-    private function _addAmountElement($amountElement, $currencyCode, $exponent, $amount)
+    protected function _addAmountElement(SimpleXMLElement $order, float $value): void
     {
-        $amountElement['currencyCode'] = $currencyCode;
-        $amountElement['exponent'] = $exponent;
-        $amountElement['value'] = $this->_amountAsInt($amount);
+        $amountElement = $order->addChild('amount');
+        $amountElement['currencyCode'] = $this->orderParameters['currencyCode'];
+        $amountElement['exponent'] = $this->orderParameters['exponent'];
+        $amountElement['value'] = $this->_amountAsInt($value);
     }
 
-    /**
-     * Add dynamicInteractionType and its attribute tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addDynamic3DSElement($order)
+    protected function _addStatementNarrativeElement(SimpleXMLElement $order): void
+    {
+        $order->addChild('statementNarrative', $this->orderParameters['statementNarrative']);
+    }
+
+    private function _addDynamic3DSElement(SimpleXMLElement $order): void
     {
         if (isset($this->paymentDetails['PaymentMethod'])
             && $this->paymentDetails['PaymentMethod'] == 'worldpay_moto') {
@@ -382,12 +155,7 @@ EOD;
         }
     }
 
-    /**
-     * Add createToken and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addCreateTokenElement($order)
+    private function _addCreateTokenElement(SimpleXMLElement $order): void
     {
         if (! $this->tokenRequestConfig->istokenizationIsEnabled()) {
             return;
@@ -402,50 +170,33 @@ EOD;
                 time().'_'.random_int(0, 99999)
             );
         }
-        if ($this->tokenRequestConfig->getTokenReason($this->orderCode)) {
+        if ($this->tokenRequestConfig->getTokenReason($this->orderParameters['orderCode'])) {
             $createTokenElement->addChild(
                 'tokenReason',
-                $this->tokenRequestConfig->getTokenReason($this->orderCode)
+                $this->tokenRequestConfig->getTokenReason($this->orderParameters['orderCode'])
             );
         }
     }
 
-    /**
-     * Add paymentMethodMask and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addPaymentMethodMaskElement($order)
+    protected function _addPaymentMethodMaskElement(SimpleXMLElement $order): void
     {
         $paymentMethodMask = $order->addChild('paymentMethodMask');
-        if ($this->saveCardEnabled && $this->storedCredentialsEnabled) {
+        if ($this->orderParameters['saveCardEnabled'] && $this->orderParameters['storedCredentialsEnabled']) {
             $this->_addStoredCredentials($paymentMethodMask);
         }
 
-        foreach ($this->paymentType as $paymentType) {
+        $paymentTypes = explode(",", $this->orderParameters['paymentType']);
+
+        foreach ($paymentTypes as $paymentType) {
             $include = $paymentMethodMask->addChild('include');
             $include['code'] = $paymentType;
         }
     }
 
-     /**
-      * Add _addStatementNarrativeElement to xml
-      *
-      * @param SimpleXMLElement $order
-      */
-    private function _addStatementNarrativeElement($order)
-    {
-        $order->addChild('statementNarrative', $this->statementNarrative);
-    }
-    /**
-     * Add shopper and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addShopperElement($order)
+    protected function _addShopperElement(SimpleXMLElement $order): void
     {
         $shopper = $order->addChild('shopper');
-        $shopper->addChild('shopperEmailAddress', $this->shopperEmail);
+        $shopper->addChild('shopperEmailAddress', $this->orderParameters['shopperEmail']);
         if (!$this->paymentDetails['token_type']) {
             if ($this->tokenRequestConfig->istokenizationIsEnabled()) {
                 $shopper->addChild('authenticatedShopperID', $this->shopperId);
@@ -457,127 +208,13 @@ EOD;
         $browser = $shopper->addChild('browser');
 
         $acceptHeader = $browser->addChild('acceptHeader');
-        $this->_addCDATA($acceptHeader, $this->acceptHeader);
+        $this->_addCDATA($acceptHeader, $this->orderParameters['acceptHeader']);
 
         $userAgentHeader = $browser->addChild('userAgentHeader');
-        $this->_addCDATA($userAgentHeader, $this->userAgentHeader);
+        $this->_addCDATA($userAgentHeader, $this->orderParameters['userAgentHeader']);
     }
 
-    /**
-     * Add shippingAddress and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addShippingElement($order)
-    {
-        $shippingAddress = $order->addChild('shippingAddress');
-        $this->_addAddressElement(
-            $shippingAddress,
-            $this->shippingAddress['firstName'],
-            $this->shippingAddress['lastName'],
-            $this->shippingAddress['street'],
-            $this->shippingAddress['postalCode'],
-            $this->shippingAddress['city'],
-            $this->shippingAddress['countryCode']
-        );
-    }
-
-    /**
-     * Add billing and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addBillingElement($order)
-    {
-        $billingAddress = $order->addChild('billingAddress');
-        $this->_addAddressElement(
-            $billingAddress,
-            $this->billingAddress['firstName'],
-            $this->billingAddress['lastName'],
-            $this->billingAddress['street'],
-            $this->billingAddress['postalCode'],
-            $this->billingAddress['city'],
-            $this->billingAddress['countryCode']
-        );
-    }
-
-    /**
-     * Add address and its child tag to xml
-     *
-     * @param SimpleXMLElement $parentElement
-     * @param string $firstName
-     * @param string $lastName
-     * @param string $street
-     * @param string $postalCode
-     * @param string $city
-     * @param string $countryCode
-     */
-    private function _addAddressElement(
-        $parentElement,
-        $firstName,
-        $lastName,
-        $street,
-        $postalCode,
-        $city,
-        $countryCode
-    ) {
-        $address = $parentElement->addChild('address');
-
-        $firstNameElement = $address->addChild('firstName');
-        $this->_addCDATA($firstNameElement, $firstName);
-
-        $lastNameElement = $address->addChild('lastName');
-        $this->_addCDATA($lastNameElement, $lastName);
-
-        $streetElement = $address->addChild('street');
-        $this->_addCDATA($streetElement, $street);
-
-        $postalCodeElement = $address->addChild('postalCode');
-        //Zip code mandatory for worldpay, if not provided by customer we will pass manually
-        $zipCode = '00000';
-        //If Zip code provided by customer
-        if ($postalCode) {
-            $zipCode = $postalCode;
-        }
-        $this->_addCDATA($postalCodeElement, $zipCode);
-
-        $cityElement = $address->addChild('city');
-        $this->_addCDATA($cityElement, $city);
-
-        $countryCodeElement = $address->addChild('countryCode');
-        $this->_addCDATA($countryCodeElement, $countryCode);
-    }
-
-    /**
-     * Add cdata to xml
-     *
-     * @param SimpleXMLElement $element
-     * @param string $content
-     */
-    private function _addCDATA($element, $content)
-    {
-        $node = dom_import_simplexml($element);
-        $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection((string)$content));
-    }
-
-    /**
-     * Returns the rounded value of num to specified precision
-     *
-     * @param float $amount
-     * @return int
-     */
-    private function _amountAsInt($amount)
-    {
-        return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
-    }
-
-    /**
-     * Add paymentDetails and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    protected function _addPaymentDetailsElement($order)
+    protected function _addPaymentDetailsElement(SimpleXMLElement $order): void
     {
         $paymentDetailsElement = $order->addChild('paymentDetails');
         $this->_addPaymentDetailsForTokenOrder($paymentDetailsElement);
@@ -586,13 +223,8 @@ EOD;
         $session['id'] = $this->paymentDetails['sessionId'];
         $session['shopperIPAddress'] = $this->paymentDetails['shopperIpAddress'];
     }
-     /**
-      * Add stored credentials data and its child tag to xml
-      *
-      * @param element $paymentDetailsElement
-      * @return string
-      */
-    protected function _addStoredCredentials($paymentDetailsElement)
+
+    protected function _addStoredCredentials(SimpleXMLElement $paymentDetailsElement): void
     {
         $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
         $storedCredentials['usage'] = "FIRST";
@@ -600,26 +232,15 @@ EOD;
         if ($isSubscriptionOrder) {
             $storedCredentials['customerInitiatedReason'] = "RECURRING";
         }
-        return $storedCredentials;
     }
-     /**
-      * Add payment details for stored credentials data and its child tag to xml
-      *
-      * @param element $paymentDetailsElement
-      * @return string
-      */
-    protected function _addPaymentDetailsForStoredCredentialsOrder($paymentDetailsElement)
+
+    protected function _addPaymentDetailsForStoredCredentialsOrder(SimpleXMLElement $paymentDetailsElement): void
     {
         $storedCredentials  = $paymentDetailsElement->addChild('storedCredentials');
         $storedCredentials['usage'] = "USED";
-        return $storedCredentials;
     }
-    /**
-     * Add encryptedData and its child tag to xml
-     *
-     * @param SimpleXMLElement $paymentDetailsElement
-     */
-    protected function _addPaymentDetailsForTokenOrder($paymentDetailsElement)
+
+    protected function _addPaymentDetailsForTokenOrder(SimpleXMLElement $paymentDetailsElement): void
     {
         if (isset($this->paymentDetails['encryptedData'])) {
             $cseElement = $this->_addCseElement($paymentDetailsElement);
@@ -637,68 +258,24 @@ EOD;
         $tokenNode->addChild('paymentTokenID', $this->paymentDetails['tokenCode']);
     }
 
-    /**
-     * Add third party data and its child tag to xml
-     *
-     * @param element $order
-     * @return string
-     */
-    protected function _addThirdPartyData($order)
+    protected function _addThirdPartyData(SimpleXMLElement $order): void
     {
-        $thirdparty = $order->addChild('thirdPartyData');
-        if (!empty($this->thirdparty['instalment'])) {
-            $thirdparty->addChild('instalments', $this->thirdparty['instalment']);
+        $thirdParty = $order->addChild('thirdPartyData');
+        if (!empty($this->thirdPartyData['instalment'])) {
+            $thirdParty->addChild('instalments', $this->thirdPartyData['instalment']);
         }
-        if ($this->billingAddress['countryCode']=='BR' && !empty($this->shippingfee['shippingfee'])) {
-            $firstinstalment = $thirdparty->addChild('firstInstalment');
-            $firstinstalment = $firstinstalment->addChild('amountNoCurrency');
-            $firstinstalment['value'] =$this->_amountAsInt($this->shippingfee['shippingfee']);
+        if ($this->orderParameters['billingAddress']['countryCode'] == 'BR' &&
+            !empty($this->orderParameters['shippingfee']['shippingfee'])) {
+            $firstInstallment = $thirdParty->addChild('firstInstalment');
+            $firstInstallment = $firstInstallment->addChild('amountNoCurrency');
+            $firstInstallment['value'] =$this->_amountAsInt($this->orderParameters['shippingfee']['shippingfee']);
         }
-        if (!empty($this->thirdparty['cpf'])) {
-            $thirdparty->addChild('cpf', $this->thirdparty['cpf']);
+        if (!empty($this->thirdPartyData['cpf'])) {
+            $thirdParty->addChild('cpf', $this->thirdPartyData['cpf']);
         }
-        return $thirdparty;
     }
 
-    /**
-     * Add fraud sight data and its child tag to xml
-     *
-     * @param element $order
-     * @return string
-     */
-    private function _addFraudSightData($order)
-    {
-        $fraudsightData = $order->addChild('FraudSightData');
-        $shopperFields = $fraudsightData->addChild('shopperFields');
-        $shopperFields->addChild('shopperName', $this->cusDetails['shopperName']);
-        if (isset($this->cusDetails['shopperId'])) {
-            $shopperFields->addChild('shopperId', $this->cusDetails['shopperId']);
-        }
-        if (isset($this->cusDetails['birthDate'])) {
-            $shopperDOB = $shopperFields->addChild('birthDate');
-            $dateElement= $shopperDOB->addChild('date');
-            $dateElement['dayOfMonth'] = date("d", strtotime($this->cusDetails['birthDate']));
-            $dateElement['month'] = date("m", strtotime($this->cusDetails['birthDate']));
-            $dateElement['year'] = date("Y", strtotime($this->cusDetails['birthDate']));
-        }
-        $shopperAddress = $shopperFields->addChild('shopperAddress');
-        $this->_addAddressElement(
-            $shopperAddress,
-            $this->billingAddress['firstName'],
-            $this->billingAddress['lastName'],
-            $this->billingAddress['street'],
-            $this->billingAddress['postalCode'],
-            $this->billingAddress['city'],
-            $this->billingAddress['countryCode']
-        );
-    }
-
-    /**
-     * Add branchSpecificExtension and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addBranchSpecificExtension($order)
+    private function _addBranchSpecificExtension(SimpleXMLElement $order): void
     {
         $order_details = $this->cusDetails['order_details'];
         $branchSpecificExtension = $order->addChild('branchSpecificExtension');
@@ -712,48 +289,27 @@ EOD;
 
         $salesTax = $purchase->addChild('salesTax');
         $salesTaxElement = $salesTax->addChild('amount');
-        $this->_addAmountElement(
-            $salesTaxElement,
-            $this->currencyCode,
-            $this->exponent,
-            $this->paymentDetails['salesTax']
-        );
+        $this->_addAmountElement($salesTaxElement, $this->paymentDetails['salesTax']);
 
         if (isset($this->cusDetails['discount_amount'])) {
             $discountAmount = $purchase->addChild('discountAmount');
             $discountAmountElement = $discountAmount->addChild('amount');
-            $this->_addAmountElement(
-                $discountAmountElement,
-                $this->currencyCode,
-                $this->exponent,
-                $this->cusDetails['discount_amount']
-            );
+            $this->_addAmountElement($discountAmountElement, $this->cusDetails['discount_amount']);
         }
         if (isset($this->cusDetails['shipping_amount'])) {
             $shippingAmount = $purchase->addChild('shippingAmount');
             $shippingAmountElement = $shippingAmount->addChild('amount');
-            $this->_addAmountElement(
-                $shippingAmountElement,
-                $this->currencyCode,
-                $this->exponent,
-                $this->cusDetails['shipping_amount']
-            );
+            $this->_addAmountElement($shippingAmountElement, $this->cusDetails['shipping_amount']);
         }
 
         if (isset($this->paymentDetails['dutyAmount'])) {
             $dutyAmount = $purchase->addChild('dutyAmount');
             $dutyAmountElement = $dutyAmount->addChild('amount');
-            $this->_addAmountElement(
-                $dutyAmountElement,
-                $this->currencyCode,
-                $this->exponent,
-                $this->paymentDetails['dutyAmount']
-            );
+            $this->_addAmountElement($dutyAmountElement, $this->paymentDetails['dutyAmount']);
         }
 
-        //$purchase->addChild('shipFromPostalCode', '');
-        $purchase->addChild('destinationPostalCode', $this->shippingAddress['postalCode']);
-        $purchase->addChild('destinationCountryCode', $this->shippingAddress['countryCode']);
+        $purchase->addChild('destinationPostalCode', $this->orderParameters['shippingAddress']['postalCode']);
+        $purchase->addChild('destinationCountryCode', $this->orderParameters['shippingAddress']['countryCode']);
 
         $orderDate = $purchase->addChild('orderDate');
         $dateElement = $orderDate->addChild('date');
@@ -764,108 +320,131 @@ EOD;
 
         $purchase->addChild('taxExempt', $this->paymentDetails['salesTax'] > 0 ? 'false' : 'true');
 
-        $this->_addL23OrderLineItemElement($order, $purchase);
+        $this->_addL23OrderLineItemElement($purchase);
     }
 
-    /**
-     * Add all order line item element values to xml
-     *
-     * @param Order $order
-     * @param mixed $purchase
-     */
-    private function _addL23OrderLineItemElement($order, $purchase)
+    private function _addL23OrderLineItemElement(SimpleXMLElement $purchase): void
     {
+        $orderLineItems = $this->orderParameters['orderLineItems'];
 
-        $orderLineItems = $this->orderLineItems;
-
-        foreach ($orderLineItems['lineItem'] as $lineitem) {
-            $this->_addLineItemElement(
-                $purchase,
-                $lineitem['description'],
-                $lineitem['productCode'],
-                $lineitem['commodityCode'],
-                $lineitem['quantity'],
-                $lineitem['unitCost'],
-                $lineitem['unitOfMeasure'],
-                $lineitem['itemTotal'],
-                $lineitem['itemTotalWithTax'],
-                $lineitem['itemDiscountAmount'],
-                $lineitem['taxAmount']
-            );
+        foreach ($orderLineItems['lineItem'] as $lineItem) {
+            $this->_addLineItemElement($purchase, $lineItem);
         }
     }
 
-    /**
-     * Add order line item element values to xml
-     *
-     * @param SimpleXMLElement $parentElement
-     * @param string $description
-     * @param string $productCode
-     * @param string $commodityCode
-     * @param string $quantity
-     * @param float $unitCost
-     * @param string $unitOfMeasure
-     * @param float $itemTotal
-     * @param float $itemTotalWithTax
-     * @param float $itemDiscountAmount
-     * @param float $taxAmount
-     */
-    private function _addLineItemElement(
-        $parentElement,
-        $description,
-        $productCode,
-        $commodityCode,
-        $quantity,
-        $unitCost,
-        $unitOfMeasure,
-        $itemTotal,
-        $itemTotalWithTax,
-        $itemDiscountAmount,
-        $taxAmount
-    ) {
+    private function _addLineItemElement(SimpleXMLElement $parentElement, array $lineItem): void
+    {
         $item = $parentElement->addChild('item');
 
         $descriptionElement = $item->addChild('description');
-        $this->_addCDATA($descriptionElement, $description);
+        $this->_addCDATA($descriptionElement, $lineItem['description']);
 
         $productCodeElement = $item->addChild('productCode');
-        $this->_addCDATA($productCodeElement, $productCode);
+        $this->_addCDATA($productCodeElement, $lineItem['productCode']);
 
-        if ($commodityCode) {
+        if ($lineItem['commodityCode']) {
             $commodityCodeElement = $item->addChild('commodityCode');
-            $this->_addCDATA($commodityCodeElement, $commodityCode);
+            $this->_addCDATA($commodityCodeElement, $lineItem['commodityCode']);
         }
         $quantityElement = $item->addChild('quantity');
-        $this->_addCDATA($quantityElement, $quantity);
+        $this->_addCDATA($quantityElement, $lineItem['quantity']);
 
         $unitCostElement = $item->addChild('unitCost');
         $unitCostAmount = $unitCostElement->addChild('amount');
-        $this->_addAmountElement($unitCostAmount, $this->currencyCode, $this->exponent, $unitCost);
+        $this->_addAmountElement($unitCostAmount, $lineItem['unitCost']);
 
-        if ($unitOfMeasure) {
+        if ($lineItem['unitOfMeasure']) {
             $unitOfMeasureElement = $item->addChild('unitOfMeasure');
-            $this->_addCDATA($unitOfMeasureElement, $unitOfMeasure);
+            $this->_addCDATA($unitOfMeasureElement, $lineItem['unitOfMeasure']);
         }
 
         $itemTotalElement = $item->addChild('itemTotal');
         $itemTotalElementAmount = $itemTotalElement->addChild('amount');
-        $this->_addAmountElement($itemTotalElementAmount, $this->currencyCode, $this->exponent, $itemTotal);
+        $this->_addAmountElement($itemTotalElementAmount, $lineItem['itemTotal']);
 
         $itemTotalWithTaxElement = $item->addChild('itemTotalWithTax');
         $itemTotalWithTaxElementAmount = $itemTotalWithTaxElement->addChild('amount');
-        $this->_addAmountElement(
-            $itemTotalWithTaxElementAmount,
-            $this->currencyCode,
-            $this->exponent,
-            $itemTotalWithTax
-        );
+        $this->_addAmountElement($itemTotalWithTaxElementAmount, $lineItem['itemTotalWithTax']);
 
         $itemDiscountAmountElement = $item->addChild('itemDiscountAmount');
         $itemDiscountElementAmount = $itemDiscountAmountElement->addChild('amount');
-        $this->_addAmountElement($itemDiscountElementAmount, $this->currencyCode, $this->exponent, $itemDiscountAmount);
+        $this->_addAmountElement($itemDiscountElementAmount, $lineItem['itemDiscountAmount']);
 
         $taxAmountElement = $item->addChild('taxAmount');
         $taxAmountElementAmount = $taxAmountElement->addChild('amount');
-        $this->_addAmountElement($taxAmountElementAmount, $this->currencyCode, $this->exponent, $taxAmount);
+        $this->_addAmountElement($taxAmountElementAmount, $lineItem['taxAmount']);
+    }
+
+    private function addOrderLineItemsXML(SimpleXMLElement $order):void
+    {
+        $orderLinesElement = $order->addChild('orderLines');
+
+        $orderLineItems = $this->orderParameters['orderLineItems'];
+
+        $orderTaxAmountElement = $orderLinesElement->addChild('orderTaxAmount');
+        $this->_addCDATA($orderTaxAmountElement, $this->_amountAsInt($orderLineItems['orderTaxAmount']));
+
+        $termsURLElement = $orderLinesElement->addChild('termsURL');
+        $this->_addCDATA($termsURLElement, $orderLineItems['termsURL']);
+
+        foreach ($orderLineItems['lineItem'] as $lineItem) {
+            $this->_addOrderLineItemElement($orderLinesElement, $lineItem, $lineItem['totalDiscountAmount'] ?? 0);
+        }
+    }
+
+    private function _addOrderLineItemElement($parentElement, $lineItem, $totalDiscountAmount = 0) {
+        $unitPrice = sprintf('%0.2f', $lineItem['unitPrice']);
+
+        $lineItemElement = $parentElement->addChild('lineItem');
+
+        $productType = $lineItem['productType'];
+
+        if ($productType === 'shipping') {
+            $lineItemElement->addChild('shippingFee');
+        } elseif ($productType === 'downloadable' || $productType === 'virtual' || $productType === 'giftcard') {
+            $lineItemElement->addChild('digital');
+        } elseif ($productType === 'Store Credit') {
+            $lineItemElement->addChild('storeCredit');
+        } elseif ($productType === 'Gift Card') {
+            $lineItemElement->addChild('giftCard');
+        } else {
+            $lineItemElement->addChild('physical');
+        }
+        $referenceElement = $lineItemElement->addChild('reference');
+        $this->_addCDATA($referenceElement, $lineItem['reference']);
+
+        $nameElement = $lineItemElement->addChild('name');
+        $this->_addCDATA($nameElement, $lineItem['name']);
+
+        $quantityElement = $lineItemElement->addChild('quantity');
+        $this->_addCDATA($quantityElement, $lineItem['quantity']);
+
+        $quantityUnitElement = $lineItemElement->addChild('quantityUnit');
+        $this->_addCDATA($quantityUnitElement, $lineItem['quantityUnit']);
+
+        $unitPriceElement = $lineItemElement->addChild('unitPrice');
+        $this->_addCDATA($unitPriceElement, $this->_amountAsInt($unitPrice));
+
+        $taxRateElement = $lineItemElement->addChild('taxRate');
+        $this->_addCDATA($taxRateElement, $this->_amountAsInt($lineItem['taxRate']));
+
+        $totalAmountElement = $lineItemElement->addChild('totalAmount');
+        $this->_addCDATA($totalAmountElement, $this->_amountAsInt($lineItem['totalAmount']));
+
+        $totalTaxAmountElement = $lineItemElement->addChild('totalTaxAmount');
+        $this->_addCDATA($totalTaxAmountElement, $this->_amountAsInt($lineItem['totalTaxAmount']));
+
+        if ($totalDiscountAmount > 0) {
+            $totalDiscountAmountElement = $lineItemElement->addChild('totalDiscountAmount');
+            $this->_addCDATA($totalDiscountAmountElement, $this->_amountAsInt($totalDiscountAmount));
+        }
+    }
+
+    protected function _addCseElement($paymentDetailsElement)
+    {
+        $cseElement = $paymentDetailsElement->addChild('CSE-DATA');
+        $cseElement->addChild('encryptedData', $this->paymentDetails['encryptedData']);
+
+        return $cseElement;
     }
 }

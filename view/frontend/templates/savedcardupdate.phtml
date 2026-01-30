@@ -11,32 +11,39 @@
             <span>
                 <?= /* @noEscape */ $block->getAccountLabelbyCode('AC8')
                     ?: $escaper->escapeHtml(__('Card Information')) ?>
-            </span></legend><br>
+            </span>
+        </legend><br>
 
         <input type="hidden" name="token[id]" value="<?= /* @noEscape */ $carddeatils->getTokenCode() ?>" />
         <input type="hidden" name="wp_token_id" value="<?= /* @noEscape */ $carddeatils->getId() ?>" />
 
-        <div class="field card Number">
-            <label class="label" for="card number">
+        <div class="field">
+            <label class="label" for="card_number">
                 <span>
                     <?= /* @noEscape */ $block->getAccountLabelbyCode('AC3')
                         ?: $escaper->escapeHtml(__('Card Number')) ?>
                 </span>
             </label>
-            <div class="control">
-                <span><?= /* @noEscape */ $escaper->escapeHtml($carddeatils->getCardNumber()) ?></span>
+            <div class="control" >
+                <input type="text"
+                       id="card_number"
+                       disabled="disabled"
+                       style="border: 1px solid transparent; background: transparent; padding: 0; opacity: 1;"
+                       value="<?= /* @noEscape */ $escaper->escapeHtml($carddeatils->getCardNumber()) ?>"
+                />
             </div>
+
         </div>
 
-        <div class="field card holder name">
-            <label class="label" for="card holder name">
+        <div class="field">
+            <label class="label" for="card_holder_name">
                 <span>
                     <?= /* @noEscape */ $block->getCheckoutLabelbyCode('CO4')
                         ?: $escaper->escapeHtml(__('Card Holder Name')) ?>
                 </span>
             </label>
             <div class="control">
-                <input type="text" name="token[cardholder_name]" required='true' id="card-holder-name"
+                <input type="text" name="token[cardholder_name]" required="required" id="card_holder_name"
                        title="<?= /* @noEscape */
                     $block->getCheckoutLabelbyCode('CO4') ?: $escaper->escapeHtml(__('Card Holder Name')) ?>"
                 value="<?= /* @noEscape */ $escaper->escapeHtml($carddeatils->getCardholderName()) ?>"
@@ -44,8 +51,8 @@
             </div>
         </div>
 
-        <div class="field card expiry month">
-            <label class="label" for="card holder name">
+        <div class="field">
+            <label class="label" for="expiry_month" id="expiry_month_year">
                 <span>
                     <?= /* @noEscape */
                     $block->getAccountLabelbyCode('AC10') ?: $escaper->escapeHtml(__('Expiry Month/Year')) ?>
@@ -54,12 +61,12 @@
             <div class="fields group group-2">
                 <div class="field no-label month">
                     <div class="control">
-                        <select id="expiry_month" name="token[card_expiry_month]"
+                        <select id="expiry_month" name="token[card_expiry_month]" aria-labelledby="expiry_month_year"
                         class="month required-entry worldpay-month-included worldpay-month-length worldpay-month-range">
                         <?php foreach ($block->getMonths() as $k => $v): ?>
                             <option value="<?= /* @noEscape */ $escaper->escapeHtml($k) ?>"
                                 <?php if ($k == $carddeatils->getCardExpiryMonth()): ?>
-                                selected<?php endif ?>>
+                                selected="selected"<?php endif ?>>
                                 <?= /* @noEscape */ $escaper->escapeHtml($v) ?></option>
                         <?php endforeach; ?>
                         </select>
@@ -67,15 +74,15 @@
                 </div>
                 <div class="field no-label year">
                     <div class="control">
-                        <select id="expiry_month" name="token[card_expiry_year]"
-                              class="month required-entry
-                              worldpay-month-included
-                              worldpay-month-length
-                              worldpay-month-range">
+                        <select id="expiry_year" name="token[card_expiry_year]" aria-labelledby="expiry_month_year"
+                              class="year required-entry
+                              worldpay-year-included
+                              worldpay-year-length
+                              worldpay-year-range">
                         <?php foreach ($block->getExpiryYears() as $k => $v): ?>
                             <option value="<?= /* @noEscape */$escaper->escapeHtml($k) ?>"
                                 <?php if ($k == $carddeatils->getCardExpiryYear()): ?>
-                                selected<?php endif ?>>
+                                selected="selected"<?php endif ?>>
                                 <?= /* @noEscape */ $escaper->escapeHtml($v) ?></option>
                         <?php endforeach; ?>
                         </select>
@@ -85,7 +92,7 @@
         </div>
         <div class="actions-toolbar">
             <div class="primary">
-                <button type="submit" class="action save primary"
+                <button type="submit" class="action save primary" role="button"
                         title="<?= /* @noEscape */
                         $block->getAccountLabelbyCode('AC39') ?: $escaper->escapeHtml(__('Save')) ?>">
                     <span>

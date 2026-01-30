@@ -4,11 +4,8 @@
  * See LICENSE.txt for license details.
  */
 ?>
-<?php
-/**
- * @var $block \Sapient\Worldpay\Block\Recurring\Customer\Subscriptions\Edit
- */
-?>
+<?php /** @var \Magento\Framework\Escaper $escaper */ ?>
+<?php /** @var \Sapient\Worldpay\Block\Recurring\Customer\Subscriptions\Edit $block */ ?>
 
 <form class="worldpay-subscription-edit" action="<?= /* @noEscape */  $block->getSaveUrl() ?>"
       method="post" id="worldpay-subscription-edit" enctype="multipart/form-data"
@@ -45,40 +42,35 @@
     </div>
     <fieldset class="fieldset subscription">
         <?= /* @noEscape */  $block->getBlockHtml('formkey')?>
-        <div class="">
-            <legend class="legend">
-                <span><?= /* @noEscape */  $block->getMyAccountLabels('AC25') ?></span>
-                <?php if ($block->getRecurringOrderCollection() > 0): ?>
-                    <a href="<?= /* @noEscape */  $block->getViewAllRecurringOrder() ?>"
-                        class="action all-recurring-order-desktop"
-                        rel="noopener">
-                    <span><?= /* @noEscape */ __('View All Recurring Order') ?></span>
-                </a>
-                <?php endif; ?>
-                <?php if (!empty($nextOrder)): ?>
-                    <span class="upcoming-delivery desktop">
-                        <?= /* @noEscape */ __('Upcoming Delivery') ?>
-                    </span>
-                <?php endif; ?>
-            </legend>
-        </div>
+        <legend class="legend">
+            <span><?= /* @noEscape */  $block->getMyAccountLabels('AC25') ?></span>
+            <?php if ($block->getRecurringOrderCollection() > 0): ?>
+                <a href="<?= /* @noEscape */  $block->getViewAllRecurringOrder() ?>"
+                    class="action all-recurring-order-desktop"
+                    rel="noopener">
+                <span><?= /* @noEscape */ __('View All Recurring Order') ?></span>
+            </a>
+            <?php endif; ?>
+            <?php if (!empty($nextOrder)): ?>
+                <span class="upcoming-delivery desktop">
+                    <?= /* @noEscape */ __('Upcoming Delivery') ?>
+                </span>
+            <?php endif; ?>
+        </legend>
 
         <div class="field product-name">
-            <label class="label" for="product_name">
-                <span>
-        <?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC26')) ?>
-                </span></label>
+            <span class="label">
+                <span><?= /* @noEscape */  $escaper->escapeHtml($block->getMyAccountLabels('AC26')) ?></span>
+            </span>
             <div class="control">
                 <span><?= $escaper->escapeHtml(__($block->getSubscription()->getProductName())); ?></span>
             </div>
         </div>
         <?php if ($block->getPlans()): ?>
             <div class="field plan">
-                <label class="label" for="plan">
-                    <span>
-            <?= /* @noEscape */ $escaper->escapeHtml($block->getMyAccountLabels('AC27')) ?>
-                    </span>
-                </label>
+                <span class="label">
+                    <span><?= /* @noEscape */ $escaper->escapeHtml($block->getMyAccountLabels('AC27')) ?></span>
+                </span>
                 <?php foreach ($block->getPlans() as $plan): ?>
                     <div class="field choice">
                         <?php if ($block->isPlanSelected($plan)): ?>
@@ -99,8 +91,7 @@
     </fieldset>
 </form>
 <?php
-$optionalRegionAllowed = /* @noEscape */($block->getConfig('general/region/display_all')
-    ? 'true' : 'false');
+$optionalRegionAllowed = /* @noEscape */($block->getConfig('general/region/display_all') ? 'true' : 'false');
 $regionJson = /* @noEscape */ $block->getRegionJson();
 $defaultRegion = /* @noEscape */ $block->getSubscription()->getBillingAddress()->getRegionId();
 $countriesWithOptionalZip = /* @noEscape */ $block->getCountriesWithOptionalZip(true);

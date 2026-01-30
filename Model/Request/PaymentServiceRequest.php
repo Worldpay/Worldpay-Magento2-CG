@@ -7,6 +7,8 @@ namespace Sapient\Worldpay\Model\Request;
 use Exception;
 use Sapient\Worldpay\Helper\ProductOnDemand;
 use Sapient\Worldpay\Model\SavedToken;
+use Sapient\Worldpay\Model\XmlBuilder\PaypalOrder;
+use Sapient\Worldpay\Model\XmlBuilder\RedirectOrder;
 
 /**
  * Prepare the request and process them
@@ -124,8 +126,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         if (isset($directOrderParams['tokenRequestConfig'])) {
             $requestConfiguration = [
-            'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
-            'tokenRequestConfig' => $directOrderParams['tokenRequestConfig']
+                'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
+                'tokenRequestConfig' => $directOrderParams['tokenRequestConfig']
             ];
 
             $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder(
@@ -144,7 +146,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             );
         } else {
             $requestConfiguration = [
-            'threeDSecureConfig' => $directOrderParams['threeDSecureConfig']
+                'threeDSecureConfig' => $directOrderParams['threeDSecureConfig']
             ];
             $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\WalletOrder($requestConfiguration);
             $paymentType = $directOrderParams['paymentType'];
@@ -201,7 +203,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         if ($this->worldpayhelper->isLevel23Enabled() && isset($directOrderParams['paymentDetails']['cardType'])
             && ($directOrderParams['paymentDetails']['cardType'] === 'ECMC-SSL'
                 || $directOrderParams['paymentDetails']['cardType'] === 'VISA-SSL')
-           && ($directOrderParams['billingAddress']['countryCode'] === 'US'
+            && ($directOrderParams['billingAddress']['countryCode'] === 'US'
                 || $directOrderParams['billingAddress']['countryCode'] === 'CA')) {
             $directOrderParams['paymentDetails']['isLevel23Enabled'] = true;
             $directOrderParams['paymentDetails']['cardAcceptorTaxId'] = $this->worldpayhelper->getCardAcceptorTaxId();
@@ -214,7 +216,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $merchantCode = $directOrderParams['merchantCode'];
 
         if ($directOrderParams['method'] == 'worldpay_moto'
-           && $directOrderParams['paymentDetails']['dynamicInteractionType'] == 'MOTO') {
+            && $directOrderParams['paymentDetails']['dynamicInteractionType'] == 'MOTO') {
 
             #### Get General Configuration by store id ######
             $motoStoreId = $this->worldpayhelper->getStoreIdFromQuoteForAdminOrder();
@@ -353,7 +355,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     public function achOrder($directOrderParams)
     {
         $this->_wplogger->info('########## Submitting ACH order request. OrderCode: ' .
-        $directOrderParams['orderCode'] . ' ##########');
+            $directOrderParams['orderCode'] . ' ##########');
 
         $xmlUsername = $this->worldpayhelper->getXmlUsername($directOrderParams['paymentDetails']['paymentType']);
         $xmlPassword = $this->worldpayhelper->getXmlPassword($directOrderParams['paymentDetails']['paymentType']);
@@ -410,7 +412,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     public function sepaOrder($directOrderParams)
     {
         $this->_wplogger->info('########## Submitting SEPA order request. OrderCode: ' .
-        $directOrderParams['orderCode'] . ' ##########');
+            $directOrderParams['orderCode'] . ' ##########');
 
         $xmlUsername = $this->worldpayhelper->getXmlUsername($directOrderParams['paymentDetails']['paymentType']);
         $xmlPassword = $this->worldpayhelper->getXmlPassword($directOrderParams['paymentDetails']['paymentType']);
@@ -470,15 +472,15 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $this->_wplogger->info($loggerMsg . $tokenOrderParams['orderCode'] . ' ##########');
 
         if ($this->worldpayhelper->isLevel23Enabled()
-           && isset($tokenOrderParams['paymentDetails']['cardType'])
-           && ($tokenOrderParams['paymentDetails']['cardType'] === 'ECMC-SSL'
-              || $tokenOrderParams['paymentDetails']['cardType'] === 'VISA-SSL')
-           && ($tokenOrderParams['billingAddress']['countryCode'] === 'US'
-              || $tokenOrderParams['billingAddress']['countryCode'] === 'CA')) {
-             $tokenOrderParams['paymentDetails']['isLevel23Enabled'] = true;
-             $tokenOrderParams['paymentDetails']['cardAcceptorTaxId'] = $this->worldpayhelper->getCardAcceptorTaxId();
-             $tokenOrderParams['paymentDetails']['dutyAmount'] = $this->worldpayhelper->getDutyAmount();
-             $tokenOrderParams['paymentDetails']['countryCode'] = $tokenOrderParams['billingAddress']['countryCode'];
+            && isset($tokenOrderParams['paymentDetails']['cardType'])
+            && ($tokenOrderParams['paymentDetails']['cardType'] === 'ECMC-SSL'
+                || $tokenOrderParams['paymentDetails']['cardType'] === 'VISA-SSL')
+            && ($tokenOrderParams['billingAddress']['countryCode'] === 'US'
+                || $tokenOrderParams['billingAddress']['countryCode'] === 'CA')) {
+            $tokenOrderParams['paymentDetails']['isLevel23Enabled'] = true;
+            $tokenOrderParams['paymentDetails']['cardAcceptorTaxId'] = $this->worldpayhelper->getCardAcceptorTaxId();
+            $tokenOrderParams['paymentDetails']['dutyAmount'] = $this->worldpayhelper->getDutyAmount();
+            $tokenOrderParams['paymentDetails']['countryCode'] = $tokenOrderParams['billingAddress']['countryCode'];
         }
 
         $requestConfiguration = [
@@ -488,20 +490,20 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         $methodCode = $tokenOrderParams['paymentDetails']['brand'];
         if (isset($tokenOrderParams['paymentDetails']['methodCode'])) {
-                $methodCode = $tokenOrderParams['paymentDetails']['methodCode'];
+            $methodCode = $tokenOrderParams['paymentDetails']['methodCode'];
         }
         $xmlUsername = $this->worldpayhelper->getXmlUsername($methodCode);
         $xmlPassword = $this->worldpayhelper->getXmlPassword($methodCode);
         $merchantCode = $tokenOrderParams['merchantCode'];
 
         if ($tokenOrderParams['method'] == 'worldpay_moto'
-           && $tokenOrderParams['paymentDetails']['dynamicInteractionType'] == 'MOTO') {
+            && $tokenOrderParams['paymentDetails']['dynamicInteractionType'] == 'MOTO') {
             $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
-                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+                ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
             $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
-                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+                ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
             $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
-                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+                ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
         }
 
         // Different Merchant code for Recurring Orders
@@ -555,9 +557,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         }
 
         if ($this->worldpayhelper->isEnabledEFTPOS()
-        && !empty($this->worldpayhelper->getEFTPOSRoutingMid())) {
+            && !empty($this->worldpayhelper->getEFTPOSRoutingMid())) {
             $tokenOrderParams['paymentDetails']['routingMID'] =
-            $this->worldpayhelper->getEFTPOSRoutingMid();
+                $this->worldpayhelper->getEFTPOSRoutingMid();
         }
 
         $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
@@ -617,10 +619,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         //Level 23 data validation
         if ($this->worldpayhelper->isLevel23Enabled()
-           && ($redirectOrderParams['paymentType'] === 'ECMC-SSL'
-               || $redirectOrderParams['paymentType'] === 'VISA-SSL')
-           && ($redirectOrderParams['billingAddress']['countryCode'] === 'US'
-               || $redirectOrderParams['billingAddress']['countryCode'] === 'CA')) {
+            && ($redirectOrderParams['paymentType'] === 'ECMC-SSL'
+                || $redirectOrderParams['paymentType'] === 'VISA-SSL')
+            && ($redirectOrderParams['billingAddress']['countryCode'] === 'US'
+                || $redirectOrderParams['billingAddress']['countryCode'] === 'CA')) {
             $redirectOrderParams['paymentDetails']['isLevel23Enabled'] = true;
             $redirectOrderParams['paymentDetails']['cardAcceptorTaxId'] = $this->worldpayhelper->getCardAcceptorTaxId();
             $redirectOrderParams['paymentDetails']['dutyAmount'] = $this->worldpayhelper->getDutyAmount();
@@ -628,12 +630,16 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $redirectOrderParams['billingAddress']['countryCode'];
         }
 
+        if ($redirectOrderParams['paymentType'] == "ONLINE") {
+            $redirectOrderParams['paymentType'] = "ONLINE,ELO-SSL";
+        }
+
         if (
             $this->worldpayhelper->isHppPaypalSmartButtonEnabled()
             && $this->worldpayhelper->isApmEnabled()
-            && $redirectOrderParams['paymentType'] == "ONLINE"
+            && strpos($redirectOrderParams['paymentType'], "ONLINE") === 0
         ) {
-            $redirectOrderParams['paymentType'] = "ONLINE,PAYPAL-SSL";
+            $redirectOrderParams['paymentType'] .= ",PAYPAL-SSL";
         }
 
         $requestConfiguration = [
@@ -650,11 +656,11 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         if ($redirectOrderParams['method'] == 'worldpay_moto') {
             $redirectOrderParams['paymentDetails']['PaymentMethod'] = $redirectOrderParams['method'];
             $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
-                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+                ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
             $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
-                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+                ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
             $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
-                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+                ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
         }
 
         if (!empty($redirectOrderParams['isMultishippingOrder'])) {
@@ -682,62 +688,19 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $redirectOrderParams['paymentDetails']['cardType']
         );
 
-        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectOrder($requestConfiguration);
-
-        if (!empty($redirectOrderParams['is_paybylink_order'])) {
-            $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\RedirectPayByLinkOrder(
-                $requestConfiguration
-            );
-        }
+        $this->xmlredirectorder = new RedirectOrder();
 
         if ($this->worldpayhelper->getsubscriptionStatus()) {
             $redirectOrderParams['paymentDetails']['subscription_order'] = 1;
         }
 
-        if (empty($redirectOrderParams['thirdPartyData']) && empty($redirectOrderParams['shippingfee'])) {
-            $redirectOrderParams['thirdPartyData']='';
-            $redirectOrderParams['shippingfee']='';
-        }
-        if (empty($redirectOrderParams['statementNarrative'])) {
-            $redirectOrderParams['statementNarrative']='';
-        }
-        if (empty($redirectOrderParams['orderLineItems'])) {
-            $redirectOrderParams['orderLineItems'] = '';
-        }
-
-        if (empty($redirectOrderParams['saveCardEnabled'])) {
-            $redirectOrderParams['saveCardEnabled']='';
-        }
-        if (empty($redirectOrderParams['storedCredentialsEnabled'])) {
-            $redirectOrderParams['storedCredentialsEnabled']='';
-        }
         $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
         $redirectSimpleXml = $this->xmlredirectorder->build(
             $merchantCode,
-            $redirectOrderParams['orderCode'],
-            $redirectOrderParams['orderDescription'],
-            $redirectOrderParams['currencyCode'],
-            $redirectOrderParams['amount'],
-            $redirectOrderParams['orderContent'],
-            $redirectOrderParams['paymentType'],
-            $redirectOrderParams['shopperEmail'],
-            $redirectOrderParams['statementNarrative'],
-            $redirectOrderParams['acceptHeader'],
-            $redirectOrderParams['userAgentHeader'],
-            $redirectOrderParams['shippingAddress'],
-            $redirectOrderParams['billingAddress'],
-            $redirectOrderParams['paymentPagesEnabled'],
+            $redirectOrderParams,
             $installationId,
-            $redirectOrderParams['hideAddress'],
-            $redirectOrderParams['paymentDetails'],
-            $redirectOrderParams['thirdPartyData'],
-            $redirectOrderParams['shippingfee'],
-            $redirectOrderParams['exponent'],
-            $redirectOrderParams['cusDetails'],
-            $redirectOrderParams['orderLineItems'],
             $captureDelay,
-            $redirectOrderParams['saveCardEnabled'],
-            $redirectOrderParams['storedCredentialsEnabled']
+            $requestConfiguration
         );
         return $this->_sendRequest(
             dom_import_simplexml($redirectSimpleXml)->ownerDocument,
@@ -823,10 +786,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         } catch (Exception $ex) {
             $this->_wplogger->error($ex->getMessage());
             if ($ex->getMessage() == 'Payment Method KLARNA_PAYNOW-SSL is unknown; The Payment Method is not available.'
-               || $ex->getMessage() == 'Payment Method KLARNA_SLICEIT-SSL is unknown; '
-                    . 'The Payment Method is not available.'
-               || $ex->getMessage() == 'Payment Method KLARNA_PAYLATER-SSL is unknown; '
-                    . 'The Payment Method is not available.') {
+                || $ex->getMessage() == 'Payment Method KLARNA_SLICEIT-SSL is unknown; '
+                . 'The Payment Method is not available.'
+                || $ex->getMessage() == 'Payment Method KLARNA_PAYLATER-SSL is unknown; '
+                . 'The Payment Method is not available.') {
                 $codeErrorMessage = 'Klarna payment method is currently not available for this country.';
                 $camErrorMessage = $this->getCreditCardSpecificException('AKLR01');
                 $errorMessage = $camErrorMessage? $camErrorMessage : $codeErrorMessage;
@@ -943,11 +906,11 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $merchantCode = $this->worldpayhelper->getMerchantCode($wp->getPaymentType(), $storeId);
             if ($wp->getInteractionType() === 'MOTO') {
                 $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
-                        ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
                 $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
-                        ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
                 $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
-                        ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
             }
 
             if ($wp->getIsMultishippingOrder()) {
@@ -1016,10 +979,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      */
     public function partialCapture(
         \Magento\Sales\Model\Order $order,
-        $wp,
-        $grandTotal,
-        $capturedItems = null,
-        $paymentMethodCode = null
+                                   $wp,
+                                   $grandTotal,
+                                   $capturedItems = null,
+                                   $paymentMethodCode = null
     ) {
         try {
             $orderCode = $wp->getWorldpayOrderId();
@@ -1050,11 +1013,11 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
             if ($wp->getInteractionType() === 'MOTO') {
                 $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
-                        ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
                 $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
-                        ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
                 $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
-                        ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
             }
             if ($wp->getIsMultishippingOrder()) {
                 $msMerchantCode = $this->worldpayhelper->getMultishippingMerchantCode($storeId);
@@ -1200,10 +1163,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      */
     public function refund(
         \Magento\Sales\Model\Order $order,
-        $wp,
-        $paymentMethodCode,
-        $amount,
-        $reference
+                                   $wp,
+                                   $paymentMethodCode,
+                                   $amount,
+                                   $reference
     ) {
         $orderCode = $wp->getWorldpayOrderId();
         $loggerMsg = '########## Submitting refund request. OrderCode: ';
@@ -1219,11 +1182,11 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $merchantCode = $this->worldpayhelper->getMerchantCode($wp->getPaymentType(), $storeId);
         if ($wp->getInteractionType() === 'MOTO') {
             $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
-                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+                ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
             $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
-                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+                ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
             $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
-                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+                ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
         }
         if ($wp->getIsMultishippingOrder()) {
             $msMerchantCode = $this->worldpayhelper->getMultishippingMerchantCode($storeId);
@@ -1297,11 +1260,11 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         if ($interactionType === 'MOTO') {
             $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
-                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+                ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
             $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
-                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+                ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
             $merchantcode = !empty($this->worldpayhelper->getMotoMerchantCode())
-                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantcode;
+                ? $this->worldpayhelper->getMotoMerchantCode() : $merchantcode;
         }
 
         if ($interactionType == \Sapient\Worldpay\Model\Payment\Service::INTERACTION_TYPE_MS) {
@@ -1502,29 +1465,29 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $walletOrderParams['orderContent'] = $this->collectPluginTrackerDetails($walletOrderParams['paymentType']);
 
         $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\WalletOrder($requestConfiguration);
-            $walletSimpleXml = $this->xmlredirectorder->build(
-                $merchantCode,
-                $walletOrderParams['orderCode'],
-                $walletOrderParams['orderDescription'],
-                $walletOrderParams['currencyCode'],
-                $walletOrderParams['amount'],
-                $walletOrderParams['orderContent'],
-                $walletOrderParams['paymentType'],
-                $walletOrderParams['shopperEmail'],
-                $walletOrderParams['acceptHeader'],
-                $walletOrderParams['userAgentHeader'],
-                $walletOrderParams['protocolVersion'],
-                $walletOrderParams['signature'],
-                $walletOrderParams['signedMessage'],
-                $walletOrderParams['shippingAddress'],
-                $walletOrderParams['billingAddress'],
-                $walletOrderParams['cusDetails'],
-                $walletOrderParams['shopperIpAddress'],
-                $walletOrderParams['paymentDetails'],
-                $walletOrderParams['exponent'],
-                $captureDelay,
-                $walletOrderParams['browserFields']
-            );
+        $walletSimpleXml = $this->xmlredirectorder->build(
+            $merchantCode,
+            $walletOrderParams['orderCode'],
+            $walletOrderParams['orderDescription'],
+            $walletOrderParams['currencyCode'],
+            $walletOrderParams['amount'],
+            $walletOrderParams['orderContent'],
+            $walletOrderParams['paymentType'],
+            $walletOrderParams['shopperEmail'],
+            $walletOrderParams['acceptHeader'],
+            $walletOrderParams['userAgentHeader'],
+            $walletOrderParams['protocolVersion'],
+            $walletOrderParams['signature'],
+            $walletOrderParams['signedMessage'],
+            $walletOrderParams['shippingAddress'],
+            $walletOrderParams['billingAddress'],
+            $walletOrderParams['cusDetails'],
+            $walletOrderParams['shopperIpAddress'],
+            $walletOrderParams['paymentDetails'],
+            $walletOrderParams['exponent'],
+            $captureDelay,
+            $walletOrderParams['browserFields']
+        );
 
         return $this->_sendRequest(
             dom_import_simplexml($walletSimpleXml)->ownerDocument,
@@ -1533,12 +1496,12 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
     }
 
-     /**
-      * Send Apple Pay order XML to Worldpay server
-      *
-      * @param array $applePayOrderParams
-      * @return mixed
-      */
+    /**
+     * Send Apple Pay order XML to Worldpay server
+     *
+     * @param array $applePayOrderParams
+     * @return mixed
+     */
     public function applePayOrder($applePayOrderParams)
     {
         $loggerMsg = '########## Submitting apple pay order request. OrderCode: ';
@@ -1648,10 +1611,6 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $loggerMsg = '########## Submitting PayPal order request. OrderCode: ';
         $this->_wplogger->info($loggerMsg . $directOrderParams['orderCode'] . ' ##########');
 
-
-        //Level 23 data validation necesarry for paypal???
-
-
         $xmlUsername = $this->worldpayhelper->getXmlUsername($directOrderParams['paymentDetails']['paymentType']);
         $xmlPassword = $this->worldpayhelper->getXmlPassword($directOrderParams['paymentDetails']['paymentType']);
         $merchantCode = $directOrderParams['merchantCode'];
@@ -1671,72 +1630,16 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $directOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
             $directOrderParams['paymentDetails']['paymentType']
         );
-        $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
-        $this->xmlPaypalOrder = new \Sapient\Worldpay\Model\XmlBuilder\PaypalOrder(
-            $this->_urlBuilder,
-            $this->customerSession,
-            $this->worldpayhelper
-        );
+
+        $this->xmlPaypalOrder = new PaypalOrder($this->_urlBuilder);
+
         if ($this->worldpayhelper->getsubscriptionStatus()) {
             $directOrderParams['paymentDetails']['subscription_order'] = 1;
         }
 
-        if (empty($directOrderParams['thirdPartyData']) && empty($directOrderParams['shippingfee'])) {
-            $directOrderParams['thirdPartyData']='';
-            $directOrderParams['shippingfee']='';
-        }
-        if (empty($directOrderParams['shippingAddress'])) {
-            $directOrderParams['shippingAddress']='';
-        }
-        if (empty($directOrderParams['saveCardEnabled'])) {
-            $directOrderParams['saveCardEnabled']='';
-        }
-        if (empty($directOrderParams['tokenizationEnabled'])) {
-            $directOrderParams['tokenizationEnabled']='';
-        }
-        if (empty($directOrderParams['storedCredentialsEnabled'])) {
-            $directOrderParams['storedCredentialsEnabled']='';
-        }
-        if (empty($directOrderParams['exemptionEngine'])) {
-            $directOrderParams['exemptionEngine']='';
-        }
-        if (empty($directOrderParams['cusDetails'])) {
-            $directOrderParams['cusDetails']='';
-        }
-        if (empty($directOrderParams['primeRoutingData'])) {
-            $directOrderParams['primeRoutingData'] = '';
-        }
-        if (empty($directOrderParams['orderLineItems'])) {
-            $directOrderParams['orderLineItems'] = '';
-        }
+        $directOrderParams['captureDelay'] = $this->worldpayhelper->getCaptureDelayValues();
 
-        $orderSimpleXml = $this->xmlPaypalOrder->build(
-            $merchantCode,
-            $directOrderParams['orderCode'],
-            $directOrderParams['orderDescription'],
-            $directOrderParams['currencyCode'],
-            $directOrderParams['amount'],
-            $directOrderParams['orderContent'],
-            $directOrderParams['paymentDetails'],
-            $directOrderParams['cardAddress'],
-            $directOrderParams['shopperEmail'],
-            $directOrderParams['acceptHeader'],
-            $directOrderParams['userAgentHeader'],
-            $directOrderParams['shippingAddress'],
-            $directOrderParams['billingAddress'],
-            $directOrderParams['shopperId'],
-            $directOrderParams['saveCardEnabled'],
-            $directOrderParams['tokenizationEnabled'],
-            $directOrderParams['storedCredentialsEnabled'],
-            $directOrderParams['cusDetails'],
-            $directOrderParams['shippingfee'],
-            $directOrderParams['exponent'],
-            $directOrderParams['primeRoutingData'],
-            $directOrderParams['orderLineItems'],
-            $captureDelay,
-            $directOrderParams['browserFields'],
-            $directOrderParams['telephoneNumber']
-        );
+        $orderSimpleXml = $this->xmlPaypalOrder->build($merchantCode, $directOrderParams);
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
             $xmlUsername,
@@ -1803,8 +1706,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         if (isset($directOrderParams['tokenRequestConfig'])) {
             $requestConfiguration = [
-            'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
-            'tokenRequestConfig' => $directOrderParams['tokenRequestConfig']
+                'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
+                'tokenRequestConfig' => $directOrderParams['tokenRequestConfig']
             ];
             $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder(
                 $this->customerSession,
@@ -1821,7 +1724,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             );
         } else {
             $requestConfiguration = [
-            'threeDSecureConfig' => $directOrderParams['threeDSecureConfig']
+                'threeDSecureConfig' => $directOrderParams['threeDSecureConfig']
             ];
             $this->xmldirectorder = new \Sapient\Worldpay\Model\XmlBuilder\WalletOrder($requestConfiguration);
             $paymentType = $directOrderParams['paymentType'];
@@ -1922,7 +1825,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     {
         $orderCode = $wp->getWorldpayOrderId();
         $this->_wplogger->info('########## Submitting void sale request. Order: '
-        . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
+            . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
         $this->xmlvoidsale = new \Sapient\Worldpay\Model\XmlBuilder\VoidSale();
         $currencyCode = $order->getOrderCurrencyCode();
         $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
@@ -1932,11 +1835,11 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $merchantCode = $this->worldpayhelper->getMerchantCode($wp->getPaymentType());
         if ($wp->getInteractionType() === 'MOTO') {
             $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
-                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+                ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
             $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
-                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+                ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
             $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
-                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+                ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
         }
         if ($wp->getIsMultishippingOrder()) {
             $msMerchantCode = $this->worldpayhelper->getMultishippingMerchantCode();
@@ -1984,7 +1887,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     {
         $orderCode = $wp->getWorldpayOrderId();
         $this->_wplogger->info('########## Submitting cancel order request. Order: '
-        . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
+            . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
         $this->xmlcancel = new \Sapient\Worldpay\Model\XmlBuilder\CancelOrder();
         $currencyCode = $order->getOrderCurrencyCode();
         $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
@@ -1994,11 +1897,11 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $merchantCode = $this->worldpayhelper->getMerchantCode($wp->getPaymentType(), $storeId);
         if ($wp->getInteractionType() === 'MOTO') {
             $xmlUsername = !empty($this->worldpayhelper->getMotoUsername())
-                    ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
+                ? $this->worldpayhelper->getMotoUsername() : $xmlUsername;
             $xmlPassword = !empty($this->worldpayhelper->getMotoPassword())
-                    ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
+                ? $this->worldpayhelper->getMotoPassword() : $xmlPassword;
             $merchantCode = !empty($this->worldpayhelper->getMotoMerchantCode())
-                    ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
+                ? $this->worldpayhelper->getMotoMerchantCode() : $merchantCode;
         }
         if ($wp->getIsMultishippingOrder()) {
             $msMerchantCode = $this->worldpayhelper->getMultishippingMerchantCode($storeId);
@@ -2100,19 +2003,23 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
     {
         $items = $this->getItemDetails($capturedItems);
 
-        if ($items['is_bundle_item_present'] > 0 ||
-           (count($items['invoicedItems']) == 1 &&
+        if (
+            $items['is_bundle_item_present'] > 0 ||
+            (count($items['invoicedItems']) == 1 &&
                 (in_array("downloadable", $items['invoicedItems']['0']) ||
-                 in_array("giftcard", $items['invoicedItems']['0'])))) {
+                    in_array("giftcard", $items['invoicedItems']['0'])))
+        ) {
             $items['trackingId'] = '';
             return $items;
         } elseif (!empty($instorePickup)) {
             $items['trackingId'] = $instorePickup;
             return $items;
         } else {
-            if (array_key_exists('tracking', $capturedItems)
+            if (
+                array_key_exists('tracking', $capturedItems)
                 && count($capturedItems['tracking']) < 2
-                && !empty($capturedItems['tracking']['1']['number'])) {
+                && !empty($capturedItems['tracking']['1']['number'])
+            ) {
                 $items['trackingId'] = $capturedItems['tracking']['1']['number'];
                 return $items;
             } else {
@@ -2122,7 +2029,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                     $codeErrorMessage = 'Multi shipping is currently not available, please add single tracking number.';
                     $camErrorMessage = $this->exceptionHelper->getConfigValue('AAKL02');
                 } elseif (array_key_exists('tracking', $capturedItems)
-                        && empty($capturedItems['tracking']['1']['number'])) {
+                    && empty($capturedItems['tracking']['1']['number'])) {
                     $codeErrorMessage = 'Tracking number can not be blank, please add.';
                     $camErrorMessage = $this->exceptionHelper->getConfigValue('AAKL03');
                 }
@@ -2168,18 +2075,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
 
         return json_encode($pluginTrackerDetails);
     }
-    /**
-     * Check Send Shooper IP Address or not
-     */
-    public function isSendShopperIpAddress()
+
+    public function isSendShopperIpAddress(): bool
     {
-        $sendShopperIp = true;
-        if ($this->worldpayhelper->isEnabledEFTPOS()) {
-            if ($this->worldpayhelper->getEFTPOSDebugging()) {
-                $sendShopperIp = false;
-            }
-            return $sendShopperIp;
-        }
-        return $sendShopperIp;
+        return !($this->worldpayhelper->isEnabledEFTPOS() && $this->worldpayhelper->getEFTPOSDebugging());
     }
 }

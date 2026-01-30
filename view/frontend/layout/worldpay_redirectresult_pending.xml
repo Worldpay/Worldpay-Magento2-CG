@@ -7,7 +7,7 @@
         <referenceBlock name="page.main.title">
             <block class="Magento\Checkout\Block\Onepage\Success" name="checkout.success.print.button" template="button.phtml"/>
             <action method="setPageTitle">
-                <argument translate="true" name="title" xsi:type="string">ORDER PENDING!</argument>
+                <argument name="title" xsi:type="string" translate="true">ORDER PENDING!</argument>
             </action>
         </referenceBlock>
         <referenceContainer name="content">

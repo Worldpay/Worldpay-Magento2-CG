@@ -15,7 +15,7 @@ class PaymentMethodsApm extends \Magento\Framework\App\Config\Value
     {
         return [
             ['value' => 'CHINAUNIONPAY-SSL', 'label' => __('Union Pay')],
-            ['value' => 'IDEAL-SSL', 'label' => __('IDEAL')],
+            ['value' => 'IDEAL-SSL', 'label' => __('iDEAL | Wero')],
             //['value' => 'YANDEXMONEY-SSL', 'label' => __('Yandex.Money')],
             ['value' => 'PAYPAL-EXPRESS', 'label' => __('PayPal Express')],
             ['value' => 'SOFORT-SSL', 'label' => __('SoFort EU')],
@@ -26,7 +26,7 @@ class PaymentMethodsApm extends \Magento\Framework\App\Config\Value
             ['value' => 'PRZELEWY-SSL', 'label' => __('P24')],
             ['value' => 'MISTERCASH-SSL', 'label' => __('Mistercash/Bancontact')],
             ['value' => 'ACH_DIRECT_DEBIT-SSL', 'label' => __('ACH Pay')],
-
+            ['value' => 'OPENBANKING-SSL', 'label' => __('Pay By Bank')],
         ];
     }
 }

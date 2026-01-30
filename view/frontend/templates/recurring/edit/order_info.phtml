@@ -4,17 +4,19 @@
  * See COPYING.txt for license details.
  */
 ?>
-<?php /** @var $block \Magento\Sales\Block\Order\Info */ ?>
+<?php /** @var \Magento\Framework\Escaper $escaper */ ?>
+<?php /** @var \Magento\Sales\Block\Order\Info $block */ ?>
+
 <?php $_order = $block->getCurrentSubscriptionOrder() ?>
 
 <div class="block block-order-details-view" data-bind="scope: 'worldpay_subscription'">
     <div class="block-title">
-        <strong><?= $escaper->escapeHtml(__('Subscription Addresses')) ?></strong>
+        <strong><?= /* @noEscape */ $escaper->escapeHtml(__('Subscription Addresses')) ?></strong>
     </div>
     <div class="block-content">
      <div class="box box-order-billing-address">
             <strong class="box-title">
-                <span><?= $escaper->escapeHtml(__('Billing Address')) ?></span>
+                <span><?= /* @noEscape */ $escaper->escapeHtml(__('Billing Address')) ?></span>
             </strong>
             <div class="box-content">
                 <address>
@@ -24,11 +26,15 @@
         </div>
         <?php if (!$_order->getIsVirtual()): ?>
             <div class="box box-order-shipping-address">
-                <strong class="box-title"><span><?= $escaper->escapeHtml(__('Shipping Address')) ?></span></strong>
+                <strong class="box-title">
+                    <span><?= /* @noEscape */ $escaper->escapeHtml(__('Shipping Address')) ?></span>
+                </strong>
                 <div class="box-content">
                     <address><?= /* @noEscape */ $block->getFormattedAddress($_order->getShippingAddress()) ?></address>
-                    <span><a data-bind="click: openShippingPopup" id="change-shipping-address">
-                        <?= $escaper->escapeHtml(__('Change Shipping Address')) ?></a>
+                    <span>
+                        <a href="#" data-bind="click: openShippingPopup" id="change-shipping-address">
+                            <?= /* @noEscape */ $escaper->escapeHtml(__('Change Shipping Address')) ?>
+                        </a>
                     </span>
                 </div>
             </div>
@@ -36,13 +42,13 @@
     </div>
     <?php if (!$_order->getIsVirtual()): ?>
     <div class="block-title">
-        <strong><?= $escaper->escapeHtml(__('Shipping Method')) ?></strong>
+        <strong><?= /* @noEscape */ $escaper->escapeHtml(__('Shipping Method')) ?></strong>
     </div>
     <div class="block-content mb-30">
         <?php if ($_order->getShippingDescription()): ?>
-            <span><?= $escaper->escapeHtml($_order->getShippingDescription()) ?></span>
+            <span><?= /* @noEscape */ $escaper->escapeHtml($_order->getShippingDescription()) ?></span>
         <?php else: ?>
-            <?= $escaper->escapeHtml(__('No shipping information available')) ?>
+            <?= /* @noEscape */ $escaper->escapeHtml(__('No shipping information available')) ?>
         <?php endif; ?>
     </div>
     <?php endif; ?>
@@ -51,20 +57,24 @@
     </div>
     <div class="block-content payment-method">
         <?php $transactionData = $block->getTransactionData($_order); ?>
-        <p><?= $escaper->escapeHtml(__($transactionData->getCardNumber())) ?> -
-            <?= $escaper->escapeHtml(__($transactionData->getCardBrand())); ?> </p>
-        <span><a  id="change-payment-method" data-bind="click: openPaymentPopup">
-            <?= $escaper->escapeHtml(__('Change Payment Method')) ?></a>
+        <p><?= /* @noEscape */ $escaper->escapeHtml(__($transactionData->getCardNumber())) ?> -
+            <?= /* @noEscape */ $escaper->escapeHtml(__($transactionData->getCardBrand())); ?> </p>
+        <span>
+            <a href="#" id="change-payment-method" data-bind="click: openPaymentPopup">
+                <?= /* @noEscape */ $escaper->escapeHtml(__('Change Payment Method')) ?>
+            </a>
         </span>
     </div>
 
 <?= $block->getChildHtml('recurring_additional_info') ?>
 </div>
 <?php
-$orderIncrementId = $escaper->escapeHtml(__($block->getCurrentSubscriptionOrder()
-    ->getOriginalOrderIncrementId()));
-$currentSubscriptionId = $escaper->escapeHtml(__($block->getCurrentSubscriptionOrder()
-    ->getId()));
+$orderIncrementId = /* @noEscape */ $escaper->escapeHtml(
+    __($block->getCurrentSubscriptionOrder()->getOriginalOrderIncrementId())
+);
+$currentSubscriptionId = /* @noEscape */ $escaper->escapeHtml(
+    __($block->getCurrentSubscriptionOrder()->getId())
+);
 $scriptString = <<<script
     {
         "*": {
