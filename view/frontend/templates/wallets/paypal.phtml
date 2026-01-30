@@ -3,6 +3,6 @@
 <?php } ?>
 
 <script type="text/javascript">
-    window.paypalClientId = '<?= $block->getPaypalClientId(); ?>';
+    window.paypalClientId = '<?= $block->escapeJs($block->getPaypalClientId()); ?>';
 </script>
 

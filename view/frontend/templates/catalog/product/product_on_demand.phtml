@@ -3,6 +3,6 @@
 ?>
 <?php if ($block->canShowProductOnDemandTextField()): ?>
     <div class="product_on_demand message notice">
-        <label for="product_on_demand_text"><?= $block->getCustomLabel() ?></label>
+        <label for="product_on_demand_text"><?= $block->escapeHtml($block->getCustomLabel()) ?></label>
     </div>
 <?php endif; ?>
