@@ -150,7 +150,7 @@ class Service
     public function getPaymentUpdateXmlForOrder(\Sapient\Worldpay\Model\Order $order)
     {
         $worldPayPayment = $order->getWorldPayPayment();
-        
+
         if (!$worldPayPayment) {
             return false;
         }
@@ -167,17 +167,17 @@ class Service
             $worldPayPayment->getPaymentType(),
             $interactionType
         );
-        
+
         $paymentService = new \SimpleXmlElement($rawXml);
         $lastEvent = $paymentService->xpath('//lastEvent');
         $partialCaptureReference = $paymentService->xpath('//reference');
         $ordercodenode = $paymentService->xpath('//orderStatus');
         $ordercode = (array)$ordercodenode[0]->attributes()['orderCode'][0];
-    
+
         $nodes = $paymentService->xpath('//payment/balance');
         $getNodeValue ='';
         $getAttibute = '';
-        
+
         if (isset($nodes, $lastEvent[0], $partialCaptureReference[0])) {
             /** Start Multishipping Code */
             if ($lastEvent[0] == 'CAPTURED' && $worldPayPayment->getIsMultishippingOrder()
@@ -209,7 +209,7 @@ class Service
                 $gatewayError = 'Sync status action not possible for this Partial Capture Order.';
                 throw new \Magento\Framework\Exception\CouldNotDeleteException(__($gatewayError));
             }
-            
+
         }
         return simplexml_load_string($rawXml);
     }

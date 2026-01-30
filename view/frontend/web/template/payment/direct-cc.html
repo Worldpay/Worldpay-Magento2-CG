@@ -3,65 +3,77 @@
         <input type="radio"
                name="payment[method]"
                class="radio"
-               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"></input>
+               data-bind="attr: {'id': getCode()},
+                value: getCode(),
+                checked: isChecked,
+                click: selectPaymentMethod,
+                visible: isRadioButtonVisible()"
+            />
         <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
-        
-         <!-- ko if: ( getCode()=='worldpay_cc')-->
-         <div   class='accepted_cc'>            
-             <span data-bind="if: isPlaceOrderActionAllowed()" class='worldpay_cc_we_accept'><!-- ko i18n: getCheckoutLabels('CO2')--><!-- /ko --></span>
-             
-             <div class="paymentoptions-icon-wrapper">
-         <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
-         <!--ko if: $parent.getIcons(item.ccValue) -->
-                        <div data-bind="attr: {for: 'direct_cc_' + item.ccValue}"><img data-bind="attr: {
-                                    'src': $parent.getIcons(item.ccValue).url,
-                                    'alt': item.ccLabel,
-                                    'width': $parent.getIcons(item.ccValue).width,
-                                    'height': $parent.getIcons(item.ccValue).height
-                                    }"></div>
-                    <!--/ko-->
-         <!--/ko-->
-          </div>
-        </div>
-          <!--/ko-->
-          
-          
-    </div>
-    <div class="payment-method-content">
-            <!-- Credit Card Form-->        
-            <div  class="payment-method-cc-form">
-                <!-- ko template: 'Sapient_Worldpay/payment/cc-form' --><!-- /ko -->
-            </div>       
-            <div data-bind="if: isPlaceOrderActionAllowed()" style="width: 100%; height:100%;display:inline-block;margin-bottom:20px;margin-top:10px">
-            <span style="color:red;"><i>*<!-- ko i18n: getCheckoutLabels('CO21')--><!-- /ko -->
-                    </i></span>
+
+        <!-- ko if: (getCode() == 'worldpay_cc') -->
+        <div class='accepted_cc'>
+            <span data-bind="if: isPlaceOrderActionAllowed()" class='worldpay_cc_we_accept'>
+                <!-- ko i18n: getCheckoutLabels('CO2') --><!-- /ko -->
+            </span>
+
+            <div class="paymentoptions-icon-wrapper">
+                <!-- ko foreach: {data: getCcAvailableTypesValues(), as: 'item'} -->
+                <!-- ko if: $parent.getIcons(item.ccValue) -->
+                <div data-bind="attr: {for: 'direct_cc_' + item.ccValue}">
+                    <img data-bind="
+                        attr: {
+                            'src': $parent.getIcons(item.ccValue).url,
+                            'alt': item.ccLabel,
+                            'width': $parent.getIcons(item.ccValue).width,
+                            'height': $parent.getIcons(item.ccValue).height
+                        }">
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
             </div>
+        </div>
+        <!-- /ko -->
+    </div>
+
+    <div class="payment-method-content">
+        <!-- Credit Card Form-->
+        <div  class="payment-method-cc-form">
+            <!-- ko template: 'Sapient_Worldpay/payment/cc-form' --><!-- /ko -->
+        </div>
+
+        <div data-bind="if: isPlaceOrderActionAllowed()" style="width: 100%; height:100%;display:inline-block;margin-bottom:20px;margin-top:10px">
+            <span style="color:red;"><i>*<!-- ko i18n: getCheckoutLabels('CO21') --><!-- /ko --></i></span>
+        </div>
+
         <!-- ko foreach: getRegion('messages') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
-        <!--/ko-->
+        <!-- /ko -->
+
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-            <!--/ko-->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- /ko -->
         </div>
-    </form>
+
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-            <!--/ko-->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- /ko -->
         </div>
         <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"
                         type="submit"
+                        disabled="disabled"
                         data-bind="
                             click: preparePayment,
-                            attr: {title: $t('Place Order')},
+                            attr: {title: getCheckoutLabels('CO14')},
                             css: {disabled: !isPlaceOrderActionAllowed()},
                             enable: (getCode() == isChecked())
                             "
-                        disabled>
-                    <span><!-- ko i18n: getCheckoutLabels('CO14')--><!-- /ko --></span> 
+                        >
+                    <span><!-- ko i18n: getCheckoutLabels('CO14') --><!-- /ko --></span>
                 </button>
             </div>
         </div>

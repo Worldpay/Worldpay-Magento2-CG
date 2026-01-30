@@ -18,12 +18,12 @@ class Failure extends \Magento\Framework\App\Action\Action
      * @var Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;
-    
+
     /**
      * @var SubscriptionFactory
      */
     private $subscriptionFactory;
-    
+
     /**
      * @var TransactionsFactory
      */
@@ -96,11 +96,11 @@ class Failure extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $this->wplogger->info('worldpay returned failure url');
-        
+
         if (!$this->orderservice->getAuthorisedOrder()) {
             return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
         }
-        
+
         $order = $this->orderservice->getAuthorisedOrder();
         $magentoorder = $order->getOrder();
         $notice = $this->_getFailureNoticeForOrder($magentoorder);

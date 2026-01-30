@@ -4,9 +4,6 @@
  */
 namespace Sapient\Worldpay\Block;
 
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use Magento\Checkout\Block\Cart\AbstractCart;
 use Sapient\Worldpay\Helper\Data;
@@ -15,6 +12,8 @@ use Magento\Framework\Message\ManagerInterface;
 use Sapient\Worldpay\Helper\Recurring;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Session\SessionManagerInterface;
+use Magento\Catalog\Block\Product\View as ProductView;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 
 /**
  * Webpayment block
@@ -26,39 +25,39 @@ class Webpayment extends Template
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $scopeConfig;
-   
+
     /**
      * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
-    
+
     /**
      * @var $cart
      */
     protected $cart;
-    
+
     /**
      * @var Sapient\Worldpay\Helper\Data;
      */
-    
+
     protected $helper;
-    
+
     /**
      * @var Magento\Framework\Message\ManagerInterface
      */
-    
+
     public $_messageManager;
 
     /**
      * @var Magento\Store\Model\StoreManagerInterface $storeManager
      */
     protected $_storeManager;
-    
+
     /**
      * @var \Sapient\Worldpay\Helper\Recurring
      */
     protected $recurringHelper;
-    
+
     /**
      * @var SerializerInterface
      */
@@ -93,7 +92,11 @@ class Webpayment extends Template
       * @var \Magento\Framework\App\Request\Http
       */
     protected $httpRequest;
-    
+
+    protected ProductView $productView;
+
+    protected ProductOnDemand $productOnDemand;
+
     /**
      * Webpayment constructor
      *
@@ -126,6 +129,8 @@ class Webpayment extends Template
         SerializerInterface $serializer,
         \Magento\Framework\View\Asset\Repository $assetRepo,
         \Magento\Framework\App\Request\Http $httpRequest,
+        ProductView $productView,
+        ProductOnDemand $productOnDemand,
         array $data = []
     ) {
 
@@ -145,8 +150,10 @@ class Webpayment extends Template
         $this->session = $session;
         $this->_assetRepo = $assetRepo;
         $this->httpRequest = $httpRequest;
+        $this->productView = $productView;
+        $this->productOnDemand = $productOnDemand;
     }
-    
+
     /**
      * Get Store code
      *
@@ -164,8 +171,7 @@ class Webpayment extends Template
 
     public function getCurrency()
     {
-        $currency = $this->_cart->getQuote()->getQuoteCurrencyCode();
-        return $currency;
+        return $this->_cart->getQuote()->getQuoteCurrencyCode() ?? $this->_storeManager->getStore()->getCurrentCurrencyCode();
     }
     /**
      * Get All Items
@@ -264,12 +270,12 @@ class Webpayment extends Template
                 }
 
                 $count = count($allItems);
-              
+
             // remove duplicates in array
                 $productType = array_unique($productType);
             // remove downloadable product types in array
                 $productType = array_diff($productType, ['downloadable']);
-        
+
              // remove virtual product types in array
                 $productType = array_diff($productType, ['virtual']);
 
@@ -278,9 +284,9 @@ class Webpayment extends Template
                      $shippingReq = false;
                 }
             }
-       
+
             return $shippingReq;
-      
+
         }
     }
     /**
@@ -298,18 +304,18 @@ class Webpayment extends Template
             foreach ($allItems as $item) {
                 $productType[] = $item->getProductType();
             }
- 
+
             $productType = array_unique($productType);
-       
+
             $isDownloadable = 'false';
-        
+
             if (in_array("downloadable", $productType)) {
                 $isDownloadable = 'true';
             }
             if (in_array("virtual", $productType)) {
                 $isDownloadable = 'true';
             }
-               
+
             return $isDownloadable;
         }
         return 'false';
@@ -347,12 +353,11 @@ class Webpayment extends Template
     {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $wpayEnabled = (bool)$this->_scopeConfig->getValue('worldpay/general_config/enable_worldpay', $storeScope);
+        $chromePayEnabled = (bool)$this->scopeConfig->getValue('worldpay/chromepay_config/chromepay', $storeScope);
 
-        if ($wpayEnabled) {
-            return $this->scopeConfig->getValue('worldpay/chromepay_config/chromepay', $storeScope);
-        }
-        return false;
+        return $wpayEnabled && $chromePayEnabled && !$this->productOnDemand->isProductOnDemandQuote();
     }
+
     /**
      * Get Payment Mode
      *
@@ -405,7 +410,7 @@ class Webpayment extends Template
                 $result['exception_messages'] = $value['exception_messages'];
                 $result['exception_module_messages'] = $value['exception_module_messages'];
                 array_push($data, $result);
-            
+
             }
         }
         //$output=implode(',', $data);
@@ -429,7 +434,7 @@ class Webpayment extends Template
                 $result['exception_messages'] = $value['exception_messages'];
                 $result['exception_module_messages'] = $value['exception_module_messages'];
                 array_push($data, $result);
-            
+
             }
         }
         //$output=implode(',', $data);
@@ -453,7 +458,7 @@ class Webpayment extends Template
                 $result['exception_messages'] = $value['exception_messages'];
                 $result['exception_module_messages'] = $value['exception_module_messages'];
                 array_push($data, $result);
-            
+
             }
         }
         //$output=implode(',', $data);
@@ -501,7 +506,7 @@ class Webpayment extends Template
         if (isset($quote['discount'])) {
             $discountamount =  $quote['discount']->getData('value');
         }
-        
+
         return $discountamount;
     }
     /**

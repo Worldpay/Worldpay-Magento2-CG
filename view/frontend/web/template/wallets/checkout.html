@@ -8,14 +8,61 @@
 <div class="checkout-information">
     <div class="product-info" data-bind="html: getPDPcartInfo"></div>
 </div>
+
+<div role="alert" class="message notice" data-bind="visible: noCustomerAddresses() && paymentType() === 'paypal'">
+    <span data-bind="i18n: 'Please add a shipping address to continue.'"></span>
+</div>
+
+<div data-bind="visible: !noCustomerAddresses() && paymentType() === 'paypal'">
+    <h3 data-bind="i18n: 'Shipping Address'"></h3>
+    <select id="address-select"
+            data-bind="options: Object.values(window.walletpayObj.customeraddresses()),
+                   optionsText: function(item) {
+                       return item.firstname + ' ' + item.lastname + ', ' +
+                              item.street.join(', ') + ', ' +
+                              item.city + ', ' + item.postcode;
+                   },
+                   optionsCaption: 'Select an address',
+                   value: dropdownSelectionShippingAddress,
+                   event: { change: onAddressChange }">
+    </select>
+</div>
+
+<div role="alert" class="message notice" data-bind="visible: showNoShippingAddressError">
+    <span data-bind="i18n: 'Select the shipping address and try again.'"></span>
+</div>
+
+<div data-bind="visible: paymentType() === 'paypal'">
+    <h3 data-bind="i18n: 'Shipping Method'"></h3>
+    <div data-bind="foreach: availableShippingMethods">
+        <div>
+            <label>
+                <input type="radio"
+                       name="shipping_method_group"
+                       data-bind="value: $data,
+                       checked: $parent.selectedShippingMethod,
+                       event: { change: $parent.onShippingMethodChange.bind($parent, $data) }"
+                />
+                <span data-bind="text: carrier_title + ' - ' + method_title"></span>
+                (<span data-bind="text: amount + ' ' + $parent.currencyCode()"></span>)
+            </label>
+        </div>
+    </div>
+</div>
+
+<div role="alert" class="message notice" data-bind="visible: showNoShippingMethodError">
+    <span data-bind="i18n: 'The shipping method is missing. Select the shipping method and try again.'"></span>
+</div>
+
+
 <div class="checkout-totals" data-bind="blockLoader: isLoadingCheckoutActions">
     <div class="totals-information">
         <div class="totals-segments" data-bind="html: totalsegments"></div>
-    </div>    
+    </div>
     <!-- ko template: 'Sapient_Worldpay/wallets/discount.html' --><!-- /ko -->
 </div>
 <!--div class="checkout-actions">
      <button class="gpay-checkout" data-bind="click: preparePayment" type="button" data-role="action">
         <span  data-bind="i18n: 'Place Order'"></span>
     </button>
-</div -->    
+</div -->

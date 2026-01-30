@@ -16,10 +16,10 @@ define(
 'Magento_Checkout/js/model/full-screen-loader'
 ], function ($, ko, Component, _, $t, quote, customerData, checkoutUtils, samsungPay, urlBuilder, url,customer, placeMultishippingOrder, fullScreenLoader) {
 'use strict';
-      
-    
+
+
     var paymentService = false;
-    var billingAddressCountryId = "";    
+    var billingAddressCountryId = "";
     var paymentToken = "";
     var merchantId = '';
     var response = '';
@@ -41,17 +41,17 @@ return Component.extend({
         return this;
     },
     performPlaceOrder:  function () {
-        var quoteId = window.checkoutConfig.quoteData.entity_id; 
+        var quoteId = window.checkoutConfig.quoteData.entity_id;
         var height = window.screen.height;
         var width = window.screen.width;
         var color = window.screen.colorDepth;
-        var linkUrl = url.build('worldpay/samsungpay/index?quoteId=' + quoteId+'&browserHeight='+height+'&browserWidth='+width+'&browserColor='+color);                         
+        var linkUrl = url.build('worldpay/samsungpay/index?quoteId=' + quoteId+'&browserHeight='+height+'&browserWidth='+width+'&browserColor='+color);
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET", linkUrl, false);
-        xhttp.send();   
-        var response = JSON.parse(xhttp.responseText);                                           
+        xhttp.send();
+        var response = JSON.parse(xhttp.responseText);
         response1 = JSON.parse(response);
-        if(response1.resultMessage == 'SUCCESS') {            
+        if(response1.resultMessage == 'SUCCESS') {
             var maskedQuoteId = "";
             if(!customer.isLoggedIn()){
                 maskedQuoteId = quote.getQuoteId();
@@ -66,7 +66,7 @@ return Component.extend({
                 'additional_data': {
                     'cc_type': 'SAMSUNGPAY-SSL',
                     'dfReferenceId':  window.checkoutConfig.payment.ccform.sessionId
-                }  
+                }
             }
             var checkoutData = {
                 billingAddress : quote.billingAddress(),
@@ -79,8 +79,8 @@ return Component.extend({
                 isCustomerLoggedIn : customer.isLoggedIn(),
                 isRequiredShipping : shippingrequired
             }
-            if(window.checkoutConfig.payment.ccform.isMultishipping){        
-                fullScreenLoader.startLoader();                                                   
+            if(window.checkoutConfig.payment.ccform.isMultishipping){
+                fullScreenLoader.startLoader();
                 placeMultishippingOrder(paymentData, response1);
             }
             else{
@@ -88,14 +88,17 @@ return Component.extend({
             }
         }
     },
-    isActive: function() {  
+    isActive: function() {
         if(!window.checkoutConfig.payment.ccform.isWalletsEnabled){
             return false;
         }
         if(window.checkoutConfig.payment.ccform.isSubscribed){
             return false;
         }
-        if(window.checkoutConfig.payment.ccform.isMultishipping){  
+        if(window.checkoutConfig.payment.ccform.isProductOnDemand){
+            return false;
+        }
+        if(window.checkoutConfig.payment.ccform.isMultishipping){
             if(!window.checkoutConfig.payment.ccform.isMsSamsungPayEnable){
                 return false;
             }

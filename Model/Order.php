@@ -58,7 +58,7 @@ class Order
      * @var \Magento\Sales\Model\Order\Creditmemo
      */
     private $ordercreditmemo;
-    
+
     /**
      * Constructor
      *
@@ -143,7 +143,7 @@ class Order
     {
         return $this->getOrder()->getId();
     }
-    
+
     /**
      * Retrieve payment Method
      *
@@ -280,7 +280,7 @@ class Order
     {
         if ($this->getOrder()->isObjectNew()) {
             throw new \Magento\Framework\Exception\LocalizedException(
-                __(sprintf('Order with id "%s" does not exist.', $this->getOrder()->getId()))
+                __('Order with id "%1" does not exist.', $this->getOrder()->getId())
             );
         }
 

@@ -9,7 +9,7 @@ var sdkJs;
 //var environmentMode = window.checkoutConfig.payment.ccform.environmentMode;
 
  var cookieArr = document.cookie.split(";");
- 
+
  if(cookieArr != '') {
      try {
             // Loop through the array elements
@@ -28,10 +28,10 @@ var sdkJs;
     console.log(err.message);
     }
  }
-   
-       
+
+
 var sdkJs = 'https://d35p4vvdul393k.cloudfront.net/sdk_library/us/stg/ops/pc_gsmpi_web_sdk.js';
-        
+
 if(environmentMode == 'Test Mode') {
     var sdkJs = 'https://d35p4vvdul393k.cloudfront.net/sdk_library/us/stg/ops/pc_gsmpi_web_sdk.js';
 }else{

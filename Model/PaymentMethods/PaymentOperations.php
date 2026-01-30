@@ -20,7 +20,7 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
             $payment = $order->getPayment();
             $mageOrder = $order->getOrder();
             $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($mageOrder->getIncrementId());
-        
+
             if (isset($worldPayPayment)) {
                 $paymentStatus = $worldPayPayment->getPaymentStatus();
                 if ($paymentStatus === 'VOIDED') {
@@ -99,7 +99,7 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
                 $worldPayPayment,
                 $payment->getMethod()
             );
-         
+
             $payment->setTransactionId(time());
             $this->_response = $this->adminhtmlresponse->parseCancelOrderRespone($xml);
             if ($this->_response->reply->ok) {
@@ -111,7 +111,7 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
                    . 'Please check Payment Status or Order Status below for confirmation.'));
         }
     }
-    
+
     /**
      * Update status for cancel order abstract method
      *
@@ -138,6 +138,44 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
         } else {
             $this->_wplogger->info('No Payment');
             throw new \Magento\Framework\Exception\LocalizedException(__('No Payment'));
+        }
+    }
+
+    /**
+     * Cancel the order abstract method
+     *
+     * @param array $order
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function approveOrder($order)
+    {
+        $payment = $order->getPayment();
+        $worldPayPayment = $this->worldpaypaymentmodel->loadByPaymentId($order->getIncrementId());
+        $orderStatus = $order->getStatus();
+        $paymentStatus = $worldPayPayment->getPaymentStatus();
+
+        if (strtoupper($orderStatus) !== 'APPROVED') {
+            if ($this->worlpayhelper->isMultishippingOrder($order->getQuoteId())) {
+                throw new \Magento\Framework\Exception\LocalizedException(__(
+                    $this->multishippingHelper->getConfigValue($order, 'ACAM14')
+                ));
+            }
+            $xml = $this->paymentservicerequest->approveOrder(
+                $order,
+                $worldPayPayment,
+                $payment->getMethod()
+            );
+
+            $payment->setTransactionId(time());
+            $this->_response = $this->adminhtmlresponse->parseCancelOrderRespone($xml);
+            if ($this->_response->reply->ok) {
+                return $this;
+            }
+        } else {
+            throw new \Magento\Framework\Exception\LocalizedException(__('Approve operation was already executed on '
+                . 'this order. '
+                . 'Please check Payment Status or Order Status below for confirmation.'));
         }
     }
 }

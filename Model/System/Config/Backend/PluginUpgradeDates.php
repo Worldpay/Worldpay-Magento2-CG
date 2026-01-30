@@ -76,8 +76,8 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
         \Magento\Framework\App\Cache\Manager $cacheManager,
         \Sapient\Worldpay\Model\System\Config\Backend\PluginVersionHistory $versionhistory,
         \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->wplogger = $wplogger;

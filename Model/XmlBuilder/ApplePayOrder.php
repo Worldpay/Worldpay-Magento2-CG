@@ -235,13 +235,13 @@ EOD;
         $paymentDetails = $order->addChild('paymentDetails');
 
         $paymentType = $paymentDetails->addChild($this->paymentType);
-        
+
         $paymentHeader = $paymentType->addChild('header');
-        
+
         $paymentHeader->addChild('ephemeralPublicKey', $this->ephemeralPublicKey);
         $paymentHeader->addChild('publicKeyHash', $this->publicKeyHash);
         $paymentHeader->addChild('transactionId', $this->transactionId);
-        
+
         $paymentType->addChild('signature', $this->signature);
         $paymentType->addChild('version', $this->protocolVersion);
         $paymentType->addChild('data', $this->data);
@@ -275,7 +275,7 @@ EOD;
     {
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($content));
+        $node->appendChild($no->createCDATASection((string)$content));
     }
 
     /**

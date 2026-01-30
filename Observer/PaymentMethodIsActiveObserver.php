@@ -6,6 +6,7 @@
 namespace Sapient\Worldpay\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 
 class PaymentMethodIsActiveObserver implements ObserverInterface
 {
@@ -24,6 +25,8 @@ class PaymentMethodIsActiveObserver implements ObserverInterface
      */
     private $checkoutSession;
 
+    private ProductOnDemand $productOnDemandHelper;
+
     /**
      * @param \Sapient\Worldpay\Helper\Recurring $recurringHelper
      * @param \Magento\Framework\Registry $registry
@@ -32,11 +35,13 @@ class PaymentMethodIsActiveObserver implements ObserverInterface
     public function __construct(
         \Sapient\Worldpay\Helper\Recurring $recurringHelper,
         \Magento\Framework\Registry $registry,
-        \Magento\Checkout\Model\Session $checkoutSession
+        \Magento\Checkout\Model\Session $checkoutSession,
+        ProductOnDemand $productOnDemandHelper,
     ) {
         $this->recurringHelper = $recurringHelper;
         $this->registry = $registry;
         $this->checkoutSession = $checkoutSession;
+        $this->productOnDemandHelper = $productOnDemandHelper;
     }
 
     /**
@@ -62,6 +67,13 @@ class PaymentMethodIsActiveObserver implements ObserverInterface
             && $this->recurringHelper->quoteContainsSubscription($quote)
         ) {
             $result->setData('is_available', (bool)$paymentMethod->getConfigData('can_use_for_worldpay_subscription'));
+        }
+
+        if (
+            $paymentMethod->getCode() != \Magento\Payment\Model\Method\Free::PAYMENT_METHOD_FREE_CODE
+            && $this->productOnDemandHelper->isProductOnDemandQuote()
+        ) {
+            $result->setData('is_available', (bool)$paymentMethod->getConfigData('can_use_for_worldpay_product_on_demand'));
         }
     }
 }

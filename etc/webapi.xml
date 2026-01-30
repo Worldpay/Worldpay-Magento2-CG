@@ -55,4 +55,16 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route url="/V1/worldpay/paypal/get-order-id" method="POST">
+        <service class="Sapient\Worldpay\Api\PaypalInterface" method="getPaypalOrderId"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/worldpay/paypal/order/approve" method="POST">
+        <service class="Sapient\Worldpay\Api\PaypalInterface" method="approveOrder"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

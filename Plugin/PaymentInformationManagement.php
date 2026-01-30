@@ -68,7 +68,7 @@ class PaymentInformationManagement
         \Closure $proceed,
         $cartId,
         \Magento\Quote\Api\Data\PaymentInterface $paymentMethod,
-        \Magento\Quote\Api\Data\AddressInterface $billingAddress = null
+        ?\Magento\Quote\Api\Data\AddressInterface $billingAddress = null
     ) {
         if ($this->checkMethods && !in_array($paymentMethod->getMethod(), $this->methodList->get())) {
             return $proceed($cartId, $paymentMethod, $billingAddress);

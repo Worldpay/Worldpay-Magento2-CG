@@ -14,13 +14,13 @@ interface MultishippingInterface
      * @api
      * @param int|null $cartId
      * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
-     * @param \Magento\Quote\Api\Data\AddressInterface $billingAddress = null
+     * @param \Magento\Quote\Api\Data\AddressInterface $billingAddress
      *
      * @return mixed|null $result
      */
     public function placeMultishippingOrder(
         $cartId,
         \Magento\Quote\Api\Data\PaymentInterface $paymentMethod,
-        \Magento\Quote\Api\Data\AddressInterface $billingAddress = null
+        ?\Magento\Quote\Api\Data\AddressInterface $billingAddress
     );
 }

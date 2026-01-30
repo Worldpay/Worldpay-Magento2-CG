@@ -24,7 +24,7 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
      * @var \Sapient\Worldpay\Helper\Data
      */
     protected $worldpayhelper;
-   
+
     /**
      * Constructor
      * @param \Sapient\Worldpay\Model\Mapping\Service $mappingservice
@@ -56,7 +56,6 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
         $countryId,
         $paymenttype
     ) {
-
         $isMultishipping = false;
         if ($this->worldpayhelper->isMultiShipping()) {
             $isMultishipping = true;
@@ -69,7 +68,7 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
         $response = $this->paymentservicerequest->paymentOptionsByCountry($paymentOptionParams, $isMultishipping);
         $responsexml = simplexml_load_string($response);
         $paymentoptions =  $this->getPaymentOptions($responsexml);
-        
+
         if ($this->worldpayhelper->isGlobalApmEnable() && !$this->worldpayhelper->isEnabledEFTPOS()) {
             $additionalMerchanPaymentoptions =  $this->getAdditionalMerchantPaymentOptions($countryId, $paymentoptions);
             $paymentoptions = array_merge($paymentoptions, $additionalMerchanPaymentoptions);
@@ -105,14 +104,14 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
         $additionalMerchantConfigurations = $this->worldpayhelper->getAdditionalMerchantProfiles();
         $additonalPaymentMethods = [];
         if (!empty($additionalMerchantConfigurations)) {
-            
+
             foreach ($additionalMerchantConfigurations as $paymentType => $merchant) {
                 $paymentOptionParams = [
                         'merchantCode' => $merchant['merchant_code'],
                         'countryCode' => $countryId,
                         'paymentType'=> $paymentType
                 ];
-               
+
                 $response = $this->paymentservicerequest->paymentOptionsByCountry($paymentOptionParams);
                 $responsexml = simplexml_load_string($response);
                 $paymentMethods =  $this->getPaymentOptions($responsexml);

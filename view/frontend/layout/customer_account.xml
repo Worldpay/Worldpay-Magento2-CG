@@ -5,13 +5,13 @@
             <block class="Sapient\Worldpay\Block\SavedCardLink" name="customer_account_navigation_saved_Card" >
                 <arguments>
                     <argument name="path" xsi:type="string">worldpay/savedcard/index</argument>
-                    <argument name="label" xsi:type="string">Saved Card</argument>
+                    <argument translate="true" name="label" xsi:type="string">Saved Card</argument>
                 </arguments>
             </block>
             <block class="Sapient\Worldpay\Block\SubscriptionsLink" name="customer-account-navigation-worldpay-subscriptions" >
                 <arguments>
                     <argument name="path" xsi:type="string">worldpay/recurring</argument>
-                    <argument name="label" xsi:type="string">My Subscriptions</argument>
+                    <argument translate="true" name="label" xsi:type="string">My Subscriptions</argument>
                 </arguments>
             </block>
         </referenceBlock>

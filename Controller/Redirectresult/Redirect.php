@@ -6,7 +6,7 @@ namespace Sapient\Worldpay\Controller\Redirectresult;
 
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\Context;
- 
+
 /**
  * Redirect to the page return from worldpay
  */
@@ -42,7 +42,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
     /**
      * @var \Sapient\Worldpay\Model\Order\Service
      */
-    
+
       protected $orderservice;
 
     /**

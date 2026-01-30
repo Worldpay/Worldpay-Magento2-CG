@@ -10,7 +10,7 @@ use Magento\Framework\Event\ObserverInterface;
 
 class AfterPlaceOrder implements ObserverInterface
 {
-   
+
     /**
      * @var \Sapient\Worldpay\Helper\Recurring
      */
@@ -30,7 +30,7 @@ class AfterPlaceOrder implements ObserverInterface
       * @var \Magento\Customer\Model\Session
       */
     private $customerSession;
-    
+
     /**
      * @var \Magento\Framework\Controller\ResultFactory
      */
@@ -84,7 +84,7 @@ class AfterPlaceOrder implements ObserverInterface
             $this->checkoutSession->unsPayByLinkRedirecturl();
         }
         $this->wplogger->info("#########################################");
-        $this->wplogger->info($this->customerSession->getActiveQuoteId());
+        $this->wplogger->info($this->customerSession->getActiveQuoteId() ?? '');
         $this->wplogger->info("#########################################");
         if (!empty($this->customerSession->getActiveQuoteId())) {
             if ($order->getId()) {

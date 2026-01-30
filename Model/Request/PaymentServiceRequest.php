@@ -5,6 +5,7 @@ namespace Sapient\Worldpay\Model\Request;
  * @copyright 2017 Sapient
  */
 use Exception;
+use Sapient\Worldpay\Helper\ProductOnDemand;
 use Sapient\Worldpay\Model\SavedToken;
 
 /**
@@ -12,6 +13,10 @@ use Sapient\Worldpay\Model\SavedToken;
  */
 class PaymentServiceRequest extends \Magento\Framework\DataObject
 {
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    public $_urlBuilder;
     /**
      * @var \Sapient\Worldpay\Model\Request $request
      */
@@ -70,6 +75,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      */
     public function __construct(
+        \Magento\Framework\UrlInterface $urlBuilder,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Sapient\Worldpay\Model\Request $request,
         \Sapient\Worldpay\Helper\Data $worldpayhelper,
@@ -78,8 +84,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         \Sapient\Worldpay\Helper\SendErrorReport $emailErrorReportHelper,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        ProductOnDemand $productOnDemand,
     ) {
+        $this->_urlBuilder = $urlBuilder;
         $this->_wplogger = $wplogger;
         $this->_request = $request;
         $this->worldpayhelper = $worldpayhelper;
@@ -89,6 +97,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $this->customerSession = $customerSession;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
+        $this->productOnDemand = $productOnDemand;
     }
 
     /**
@@ -264,6 +273,10 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
         if ($this->worldpayhelper->getsubscriptionStatus()) {
             $directOrderParams['paymentDetails']['subscription_order'] = 1;
+        }
+
+        if ($this->productOnDemand->isProductOnDemandQuote()) {
+            $directOrderParams['paymentDetails']['zero_auth_order'] = 1;
         }
 
         if (empty($directOrderParams['thirdPartyData']) && empty($directOrderParams['shippingfee'])) {
@@ -552,7 +565,9 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $tokenOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
             $tokenOrderParams['paymentDetails']['paymentType']
         );
-
+        if ($this->productOnDemand->isProductOnDemandQuote()) {
+            $tokenOrderParams['paymentDetails']['zero_auth_order'] = 1;
+        }
         $orderSimpleXml = $this->xmltokenorder->build(
             $merchantCode,
             $tokenOrderParams['orderCode'],
@@ -613,7 +628,11 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $redirectOrderParams['billingAddress']['countryCode'];
         }
 
-        if ($this->worldpayhelper->isPaypalSmartButtonEnabled() && $redirectOrderParams['paymentType'] == "ONLINE") {
+        if (
+            $this->worldpayhelper->isHppPaypalSmartButtonEnabled()
+            && $this->worldpayhelper->isApmEnabled()
+            && $redirectOrderParams['paymentType'] == "ONLINE"
+        ) {
             $redirectOrderParams['paymentType'] = "ONLINE,PAYPAL-SSL";
         }
 
@@ -1099,7 +1118,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      * @param string $password
      * @return SimpleXmlElement $response
      */
-    protected function _sendRequest($xml, $username, $password)
+    public function _sendRequest($xml, $username, $password)
     {
         $response = $this->_request->sendRequest($xml, $username, $password);
         $this->_checkForError($response, $xml);
@@ -1411,6 +1430,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         if ($countryCodeSpoofs) {
             $spoofCountryId = $this->getCountryCodeSpoof($countryCodeSpoofs, $paymentOptionsParams['countryCode']);
         }
+
         $countryId = ($spoofCountryId)? $spoofCountryId : $paymentOptionsParams['countryCode'];
         $this->_wplogger->info('########## Submitting payment options request ##########');
         $this->xmlpaymentoptions = new \Sapient\Worldpay\Model\XmlBuilder\PaymentOptions();
@@ -1620,6 +1640,107 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             dom_import_simplexml($samsungPaySimpleXml)->ownerDocument,
             $xmlUsername,
             $xmlPassword
+        );
+    }
+
+    public function paypalOrder($directOrderParams)
+    {
+        $loggerMsg = '########## Submitting PayPal order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $directOrderParams['orderCode'] . ' ##########');
+
+
+        //Level 23 data validation necesarry for paypal???
+
+
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($directOrderParams['paymentDetails']['paymentType']);
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($directOrderParams['paymentDetails']['paymentType']);
+        $merchantCode = $directOrderParams['merchantCode'];
+
+        if (!empty($directOrderParams['isMultishippingOrder'])) {
+            $msMerchantCode = $this->worldpayhelper->getMultishippingMerchantCode();
+            $msMerchantUn = $this->worldpayhelper->getMultishippingMerchantUsername();
+            $msMerchantPw = $this->worldpayhelper->getMultishippingMerchantPassword();
+
+            $xmlUsername = !empty($msMerchantUn) ? $msMerchantUn : $xmlUsername ;
+            $xmlPassword = !empty($msMerchantPw) ? $msMerchantPw : $xmlPassword ;
+            $merchantCode = !empty($msMerchantCode) ? $msMerchantCode : $merchantCode ;
+        }
+
+        $directOrderParams['paymentDetails']['sendShopperIpAddress'] = $this->isSendShopperIpAddress();
+        ##### Added orderContent node for plugin tracker ######
+        $directOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
+            $directOrderParams['paymentDetails']['paymentType']
+        );
+        $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
+        $this->xmlPaypalOrder = new \Sapient\Worldpay\Model\XmlBuilder\PaypalOrder(
+            $this->_urlBuilder,
+            $this->customerSession,
+            $this->worldpayhelper
+        );
+        if ($this->worldpayhelper->getsubscriptionStatus()) {
+            $directOrderParams['paymentDetails']['subscription_order'] = 1;
+        }
+
+        if (empty($directOrderParams['thirdPartyData']) && empty($directOrderParams['shippingfee'])) {
+            $directOrderParams['thirdPartyData']='';
+            $directOrderParams['shippingfee']='';
+        }
+        if (empty($directOrderParams['shippingAddress'])) {
+            $directOrderParams['shippingAddress']='';
+        }
+        if (empty($directOrderParams['saveCardEnabled'])) {
+            $directOrderParams['saveCardEnabled']='';
+        }
+        if (empty($directOrderParams['tokenizationEnabled'])) {
+            $directOrderParams['tokenizationEnabled']='';
+        }
+        if (empty($directOrderParams['storedCredentialsEnabled'])) {
+            $directOrderParams['storedCredentialsEnabled']='';
+        }
+        if (empty($directOrderParams['exemptionEngine'])) {
+            $directOrderParams['exemptionEngine']='';
+        }
+        if (empty($directOrderParams['cusDetails'])) {
+            $directOrderParams['cusDetails']='';
+        }
+        if (empty($directOrderParams['primeRoutingData'])) {
+            $directOrderParams['primeRoutingData'] = '';
+        }
+        if (empty($directOrderParams['orderLineItems'])) {
+            $directOrderParams['orderLineItems'] = '';
+        }
+
+        $orderSimpleXml = $this->xmlPaypalOrder->build(
+            $merchantCode,
+            $directOrderParams['orderCode'],
+            $directOrderParams['orderDescription'],
+            $directOrderParams['currencyCode'],
+            $directOrderParams['amount'],
+            $directOrderParams['orderContent'],
+            $directOrderParams['paymentDetails'],
+            $directOrderParams['cardAddress'],
+            $directOrderParams['shopperEmail'],
+            $directOrderParams['acceptHeader'],
+            $directOrderParams['userAgentHeader'],
+            $directOrderParams['shippingAddress'],
+            $directOrderParams['billingAddress'],
+            $directOrderParams['shopperId'],
+            $directOrderParams['saveCardEnabled'],
+            $directOrderParams['tokenizationEnabled'],
+            $directOrderParams['storedCredentialsEnabled'],
+            $directOrderParams['cusDetails'],
+            $directOrderParams['shippingfee'],
+            $directOrderParams['exponent'],
+            $directOrderParams['primeRoutingData'],
+            $directOrderParams['orderLineItems'],
+            $captureDelay,
+            $directOrderParams['browserFields'],
+            $directOrderParams['telephoneNumber']
+        );
+        return $this->_sendRequest(
+            dom_import_simplexml($orderSimpleXml)->ownerDocument,
+            $xmlUsername,
+            $xmlPassword,
         );
     }
 
@@ -1911,8 +2032,54 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $order->getOrderCurrencyCode(),
             $order->getGrandTotal(),
             $exponent,
-            $wp->getPaymentType(),
-            $order
+            'cancel'
+        );
+
+        return $this->_sendRequest(
+            dom_import_simplexml($cancelSimpleXml)->ownerDocument,
+            $xmlUsername,
+            $xmlPassword
+        );
+    }
+
+    /**
+     * Approve the order
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @param \Magento\Framework\DataObject $wp
+     * @param string $paymentMethodCode
+     * @return mixed
+     */
+    public function approveOrder(\Magento\Sales\Model\Order $order, $wp, $paymentMethodCode)
+    {
+        $orderCode = $wp->getWorldpayOrderId();
+        $this->_wplogger->info('########## Submitting approve order request. Order: '
+            . $orderCode . ' Amount:' . $order->getGrandTotal() . ' ##########');
+        $this->xmlapprove = new \Sapient\Worldpay\Model\XmlBuilder\CancelOrder();
+        $currencyCode = $order->getOrderCurrencyCode();
+        $exponent = $this->worldpayhelper->getCurrencyExponent($currencyCode);
+        $storeId = $order->getStoreId();
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($wp->getPaymentType(), $storeId);
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($wp->getPaymentType(), $storeId);
+        $merchantCode = $this->worldpayhelper->getMerchantCode($wp->getPaymentType(), $storeId);
+
+        if ($wp->getIsMultishippingOrder()) {
+            $msMerchantCode = $this->worldpayhelper->getMultishippingMerchantCode($storeId);
+            $msMerchantUn = $this->worldpayhelper->getMultishippingMerchantUsername($storeId);
+            $msMerchantPw = $this->worldpayhelper->getMultishippingMerchantPassword($storeId);
+
+            $xmlUsername = !empty($msMerchantUn) ? $msMerchantUn : $xmlUsername ;
+            $xmlPassword = !empty($msMerchantPw) ? $msMerchantPw : $xmlPassword ;
+            $merchantCode = !empty($msMerchantCode) ? $msMerchantCode : $merchantCode ;
+        }
+
+        $cancelSimpleXml = $this->xmlapprove->build(
+            $merchantCode,
+            $orderCode,
+            $order->getOrderCurrencyCode(),
+            $order->getGrandTotal(),
+            $exponent,
+            'approve',
         );
 
         return $this->_sendRequest(
@@ -1996,7 +2163,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
      */
     public function collectPluginTrackerDetails($paymentType)
     {
-        $pluginTrackerDetails = $this->worldpayhelper->getPluginTrackerDetails($paymentType);
+        $pluginTrackerDetails = $this->worldpayhelper->getPluginTrackerDetails();
         $pluginTrackerDetails['additional_details']['transaction_method'] = $paymentType;
 
         return json_encode($pluginTrackerDetails);

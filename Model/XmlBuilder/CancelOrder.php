@@ -46,7 +46,7 @@ EOD;
      * @param string $paymentType
      * @return SimpleXMLElement $xml
      */
-    public function build($merchantCode, $orderCode, $currencyCode, $amount, $exponent, $paymentType = null)
+    public function build($merchantCode, $orderCode, $currencyCode, $amount, $exponent, $paymentType)
     {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -60,7 +60,7 @@ EOD;
 
         $modify = $this->_addModifyElement($xml);
         $orderModification = $this->_addOrderModificationElement($modify);
-        $this->_addVoidSale($orderModification);
+        $this->_addVoidSale($orderModification, $paymentType);
 
         return $xml;
     }
@@ -96,8 +96,8 @@ EOD;
      * @param SimpleXMLElement $orderModification
      * @return SimpleXMLElement $capture
      */
-    private function _addVoidSale($orderModification)
+    private function _addVoidSale($orderModification, $paymentType)
     {
-        return $orderModification->addChild('cancel');
+        return $orderModification->addChild($paymentType);
     }
 }

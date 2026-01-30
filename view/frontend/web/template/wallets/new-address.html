@@ -1,31 +1,31 @@
 <div class="new-address-form">
-    <form class="form form-shipping-address" id="new-address-form"  data-bind="visible: !isUserLoggedIn() || (customeraddresses().length == 0),attr: {'data-hasrequired': $t('* Required Fields')}" data-hasrequired="* Required Fields" >     
+    <form class="form form-shipping-address" id="new-address-form"  data-bind="visible: !isUserLoggedIn() || (customeraddresses().length == 0),attr: {'data-hasrequired': $t('* Required Fields')}" data-hasrequired="$t('* Required Fields')" >
         <div id="shipping-new-address-form" class="fieldset address">
-                <div class="field _required"  name="address.firstname">    
-                    <label class="label"><span data-bind="i18n: 'First Name'"></span></label>    
+                <div class="field _required"  name="address.firstname">
+                    <label class="label"><span data-bind="i18n: 'First Name'"></span></label>
                     <div class="control" >
                         <input class="input-text" type="text"  name="firstname"  data-validate='{"required":true}'>
                     </div>
                 </div>
 
-                <div class="field _required"  name="address.lastname">    
-                    <label class="label" ><span  data-bind="i18n: 'Last Name'"></span></label>    
+                <div class="field _required"  name="address.lastname">
+                    <label class="label" ><span  data-bind="i18n: 'Last Name'"></span></label>
                     <div class="control" >
                         <input class="input-text" type="text" name="lastname"  data-validate='{"required":true}' >
                     </div>
                 </div>
 
-                <div class="field"  name="address.company">    
-                    <label class="label" ><span data-bind="i18n: 'Company'"></span></label>    
+                <div class="field"  name="address.company">
+                    <label class="label" ><span data-bind="i18n: 'Company'"></span></label>
                     <div class="control" >
                         <input class="input-text" type="text" name="company">
                     </div>
                 </div>
 
-                <div class="field _required"  name="address.telephone">    
-                    <label class="label"><span data-bind="i18n: 'Phone Number'"></span></label>    
-                    <div class="control _with-tooltip" >        
-                        <input class="input-text" type="text"  name="telephone"  data-validate='{"required":true}' >             
+                <div class="field _required"  name="address.telephone">
+                    <label class="label"><span data-bind="i18n: 'Phone Number'"></span></label>
+                    <div class="control _with-tooltip" >
+                        <input class="input-text" type="text"  name="telephone"  data-validate='{"required":true}' >
                     </div>
                 </div>
 
@@ -33,74 +33,74 @@
                         <legend class="label">
                             <span data-bind="i18n: 'Street Address'"></span>
                         </legend>
-                        
-                        <div class="field _required" name="address.street.0">    
-                                <label class="label"><span data-bind="i18n: 'Street Address: Line 1'"></span></label>    
-                            <div class="control" >      
+
+                        <div class="field _required" name="address.street.0">
+                                <label class="label"><span data-bind="i18n: 'Street Address: Line 1'"></span></label>
+                            <div class="control" >
                                 <input class="input-text" type="text"  name="street[0]"  data-validate='{"required":true}' >
                             </div>
                         </div>
 
-                        <div class="field additional" name="address.street.1">    
-                            <label class="label" ><span data-bind="i18n: 'Street Address: Line 2'"></span></label>    
-                            <div class="control" >        
+                        <div class="field additional" name="address.street.1">
+                            <label class="label" ><span data-bind="i18n: 'Street Address: Line 2'"></span></label>
+                            <div class="control" >
                                 <input class="input-text" type="text"  name="street[1]" aria-invalid="false">
                             </div>
                         </div>
 
-                        <div class="field additional"  name="address.street.2">    
-                            <label class="label"  ><span data-bind="i18n: 'Street Address: Line 3'"></span></label>    
-                            <div class="control" >         
+                        <div class="field additional"  name="address.street.2">
+                            <label class="label"  ><span data-bind="i18n: 'Street Address: Line 3'"></span></label>
+                            <div class="control" >
                                 <input class="input-text" type="text"  name="street[2]" aria-invalid="false">
                             </div>
-                        </div>        
+                        </div>
                     </fieldset>
 
-                   
 
-                    <div class="field _required"  name="address.city">    
-                        <label class="label"><span data-bind="i18n: 'City'"></span></label>    
-                        <div class="control" >          
+
+                    <div class="field _required"  name="address.city">
+                        <label class="label"><span data-bind="i18n: 'City'"></span></label>
+                        <div class="control" >
                             <input class="input-text" type="text"  name="city" aria-required="true"  data-validate='{"required":true}'>
                         </div>
                     </div>
 
-                    <div class="field _required"  name="address.postcode">    
-                        <label class="label"><span data-bind="i18n: 'Zip/Postal Code'"></span></label>    
-                        <div class="control" >        
+                    <div class="field _required"  name="address.postcode">
+                        <label class="label"><span data-bind="i18n: 'Zip/Postal Code'"></span></label>
+                        <div class="control" >
                             <input class="input-text" type="text"  id="zip" name="postcode" data-bind="event:{ blur:fetchShippingNewAddress }" data-validate='{"required":true}'>
                         </div>
                     </div>
 
-                   
 
-                    <!--div class="field _required"  name="address.region_id">    
-                        <label class="label" ><span >State/Province</span></label>           
+
+                    <!--div class="field _required"  name="address.region_id">
+                        <label class="label" ><span >State/Province</span></label>
                     </div-->
 
-                    
+
 
                     <div class="field region required">
-                        <label class="label"  ><span data-bind="i18n: 'State/Province'"></span></label>  
+                        <label class="label"  ><span data-bind="i18n: 'State/Province'"></span></label>
                         <div class="control">
                             <select id="region_id" name="region_id"  class="validate-select">
-                                <option value="" data-bind="text: 'Please select a region, state or province.'"></option>
+                                <option value="" data-bind="i18n: 'Please select a region, state or province.'"></option>
                             </select>
-                            <input type="text" id="region" name="region" value=""  title="" 
+                            <input type="text" id="region" name="region" value=""  title=""
                             class="input-text required-entry">
                         </div>
                     </div>
 
-                    <div class="field _required" name="address.country_id">    
-                        <label class="label" ><span data-bind="i18n: 'Country'"></span></label>    
-                        <div class="control" data-bind= "html: countriesHtml" >                            
-                            
+                    <div class="field _required" name="address.country_id">
+                        <label class="label" ><span data-bind="i18n: 'Country'"></span></label>
+                        <div class="control" data-bind= "html: countriesHtml" >
+
                             <!--select data-bind="event{ change: fetchShippingNewAddress }" data-validate='{"required":true}' class="select" name="country_id" ><option value=""> </option><option data-title="United States" value="US">United States</option></select -->
                         </div>
                     </div>
 
-                    
+
         </div>
     </form>
-    
+
 </div>

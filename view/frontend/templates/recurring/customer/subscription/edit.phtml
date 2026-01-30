@@ -11,7 +11,7 @@
 ?>
 
 <form class="worldpay-subscription-edit" action="<?= /* @noEscape */  $block->getSaveUrl() ?>"
-      method="post" id="worldpay-subscription-edit" enctype="multipart/form-data" 
+      method="post" id="worldpay-subscription-edit" enctype="multipart/form-data"
       data-hasrequired="<?= /* @noEscape */  __('* Required Fields') ?>">
     <div class="actions-toolbar">
         <div class="skip-next-order">
@@ -59,10 +59,10 @@
                     <span class="upcoming-delivery desktop">
                         <?= /* @noEscape */ __('Upcoming Delivery') ?>
                     </span>
-                <?php endif; ?>    
+                <?php endif; ?>
             </legend>
         </div>
-        
+
         <div class="field product-name">
             <label class="label" for="product_name">
                 <span>
@@ -93,44 +93,54 @@
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
-                
+
             </div>
         <?php endif; ?>
     </fieldset>
 </form>
-<script type="text/x-magento-init">
+<?php
+$optionalRegionAllowed = /* @noEscape */($block->getConfig('general/region/display_all')
+    ? 'true' : 'false');
+$regionJson = /* @noEscape */ $block->getRegionJson();
+$defaultRegion = /* @noEscape */ $block->getSubscription()->getBillingAddress()->getRegionId();
+$countriesWithOptionalZip = /* @noEscape */ $block->getCountriesWithOptionalZip(true);
+$scriptString = <<<script
     {
         "#worldpay-subscription-edit": {
             "validation": {}
         },
         "#country": {
             "regionUpdater": {
-                "optionalRegionAllowed": <?= /* @noEscape */($block->getConfig('general/region/display_all')
-                        ? 'true' : 'false'); ?>,
+                "optionalRegionAllowed": $optionalRegionAllowed,
                 "regionListId": "#region_id",
                 "regionInputId": "#region",
                 "postcodeId": "#zip",
                 "form": "#worldpay-subscription-edit",
-                "regionJson": <?= /* @noEscape */ $block->getRegionJson() ?>,
-                "defaultRegion": "<?= /* @noEscape */ $block->getSubscription()->getBillingAddress()->getRegionId() ?>",
-                "countriesWithOptionalZip": <?= /* @noEscape */ $block->getCountriesWithOptionalZip(true) ?>
+                "regionJson": $regionJson,
+                "defaultRegion": "$defaultRegion",
+                "countriesWithOptionalZip": $countriesWithOptionalZip,
             }
         }
     }
-</script>
-<script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/x-magento-init'], $scriptString, false) ?>
+<?php
+$subscriptionId = $escaper->escapeHtml(__($block->getSubscription()->getSubscriptionId()));
+$nextOrder = $escaper->escapeHtml(__($block->getNextOrderDate()));
+$scriptString = <<<script
     require(['jquery',
         'mage/url',
         'prototype'
-    ], function ($, urlBuilder) { 
+    ], function ($, urlBuilder) {
         $('#skiporder').on("click", function(event) {
             $.ajax({
                 url: urlBuilder.build('worldpay/skiporder/'),
                 type: 'POST',
                 dataType: 'json',
                 data: {
-                    subscriptionId: <?= $escaper->escapeHtml(__($block->getSubscription()->getSubscriptionId())) ?>,
-                    nextOrder: '<?= $escaper->escapeHtml(__($block->getNextOrderDate())) ?>',
+                    subscriptionId: $subscriptionId,
+                    nextOrder: '$nextOrder',
                 },
                 /** Show loader before send */
                     beforeSend: function() {
@@ -147,6 +157,8 @@
                 }).always(function () {
                 $('body').trigger('processStop');
             });
-        });           
+        });
     });
-</script>
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
