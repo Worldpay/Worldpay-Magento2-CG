@@ -109,6 +109,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
              return $this->resultRedirectFactory->create()->setPath('checkout/cart', ['_current' => true]);
         }
         $order = $this->orderservice->getAuthorisedOrder();
+        $order->cancel();
         $magentoorder = $order->getOrder();
         $notice = $this->_getCancellationNoticeForOrder($magentoorder);
         $this->messageManager->addNotice($notice);

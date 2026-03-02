@@ -6,6 +6,7 @@ namespace Sapient\Worldpay\Model;
 
 use Exception;
 use Magento\Sales\Model\Order\Creditmemo;
+use Magento\Sales\Api\OrderManagementInterface;
 
 class Order
 {
@@ -60,6 +61,11 @@ class Order
     private $ordercreditmemo;
 
     /**
+     * @var OrderManagementInterface
+     */
+    private $orderManagement;
+
+    /**
      * Constructor
      *
      * @param array $args
@@ -71,6 +77,7 @@ class Order
      * @param \Magento\Sales\Model\Service\CreditmemoService $CreditmemoService
      * @param Creditmemo $creditmemo
      * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
+     * @param OrderManagementInterface $orderManagement
      */
     public function __construct(
         array $args,
@@ -81,7 +88,8 @@ class Order
         \Magento\Sales\Model\Order\Invoice $Invoice,
         \Magento\Sales\Model\Service\CreditmemoService $CreditmemoService,
         Creditmemo $creditmemo,
-        \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
+        \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository,
+        OrderManagementInterface $orderManagement
     ) {
         $this->_order = $args['order'];
         $this->_invoiceService = $invoiceService;
@@ -92,6 +100,7 @@ class Order
         $this->Invoice = $Invoice;
         $this->ordercreditmemo = $creditmemo;
         $this->creditmemoRepository = $creditmemoRepository;
+        $this->orderManagement = $orderManagement;
     }
 
     /**
@@ -195,11 +204,7 @@ class Order
       */
     public function cancel()
     {
-        $mageOrder = $this->getOrder();
-
-        if ($mageOrder->canCancel()) {
-            $mageOrder->cancel()->save();
-        }
+        $this->orderManagement->cancel( $this->getId());
     }
 
     /**

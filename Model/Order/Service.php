@@ -56,6 +56,10 @@ class Service
      */
     protected $multishippingOrderCollection;
     /**
+     * @var \Magento\Sales\Api\OrderManagementInterface
+     */
+    protected $orderManagement;
+    /**
      * Constructor
      *
      * @param \Magento\Sales\Model\Order $mageOrder
@@ -70,6 +74,7 @@ class Service
      * @param \Magento\Sales\Model\Order\Creditmemo $creditmemo
      * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
      * @param \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
+     * @param \Magento\Sales\Api\OrderManagementInterface $orderManagement
      */
     public function __construct(
         \Magento\Sales\Model\Order $mageOrder,
@@ -83,7 +88,8 @@ class Service
         \Magento\Sales\Model\Service\CreditmemoService $CreditmemoService,
         \Magento\Sales\Model\Order\Creditmemo $creditmemo,
         \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository,
-        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
+        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection,
+        \Magento\Sales\Api\OrderManagementInterface $orderManagement
     ) {
 
         $this->checkoutsession = $checkoutsession;
@@ -98,6 +104,7 @@ class Service
         $this->ordercreditmemo = $creditmemo;
         $this->creditmemoRepository = $creditmemoRepository;
         $this->multishippingOrderCollection = $multishippingOrderCollection;
+        $this->orderManagement = $orderManagement;
     }
 
     /**
@@ -120,7 +127,8 @@ class Service
              $this->Invoice,
              $this->CreditmemoService,
              $this->ordercreditmemo,
-             $this->creditmemoRepository
+             $this->creditmemoRepository,
+             $this->orderManagement
          );
     }
 
@@ -144,7 +152,8 @@ class Service
             $this->Invoice,
             $this->CreditmemoService,
             $this->ordercreditmemo,
-            $this->creditmemoRepository
+            $this->creditmemoRepository,
+            $this->orderManagement
         );
     }
 
