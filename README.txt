@@ -1,5 +1,11 @@
 Latest releases for all supported version:
 
+For Magento 2.4.9
+
+Worldpay Plugin version: 2.4.9-beta10426
+1. Magento 2.4.9-beta1 compatible
+2. PHP 8.4 & 8.5 compatibility
+
 For Magento 2.4.8
 
 Worldpay Plugin version: 2.4.8-p30126
