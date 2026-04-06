@@ -621,8 +621,19 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $placeholder = $this->assetSource->findSource($asset);
 
                 if ($placeholder) {
-                    //list($width, $height) = getimagesize($asset->getSourceFile());
-                    list($width, $height) = getimagesizefromstring($asset->getUrl());
+                    try {
+                        $imageContent = file_get_contents($asset->getSourceFile());
+                        if ($imageContent !== false) {
+                            $imageSize = getimagesizefromstring($imageContent);
+                            if (is_array($imageSize)) {
+                                $width = $imageSize[0];
+                                $height = $imageSize[1];
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        $width = 50;
+                        $height = 30;
+                    }
                     $this->icons[$code] = [
                         'url' => $asset->getUrl(),
                         'width' => $width,
