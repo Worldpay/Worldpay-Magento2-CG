@@ -921,6 +921,7 @@ class Service
      */
     private function _getOrderLineItems($quote, $paymentType = null)
     {
+        dd('dsds');
         $isMultiShipping = (bool)$quote->getIsMultiShipping();
         $orderitems = [];
         $orderitems['orderTaxAmount'] = $quote->getShippingAddress()->getData('tax_amount');
@@ -1024,9 +1025,9 @@ class Service
             $storelineitem['productType'] = 'Store Credit';
             $storelineitem['quantity'] = 1;
             $storelineitem['quantityUnit'] = 'credit';
-            $storelineitem['unitPrice'] = 0 - (double) $quote->getBaseCustomerBalAmountUsed();
+            $storelineitem['unitPrice'] = 0 - (float) $quote->getBaseCustomerBalAmountUsed();
             $storelineitem['taxRate'] = 0;
-            $storelineitem['totalAmount'] = 0 - (double) $quote->getBaseCustomerBalAmountUsed();
+            $storelineitem['totalAmount'] = 0 - (float) $quote->getBaseCustomerBalAmountUsed();
             $storelineitem['totalTaxAmount'] = 0;
             $orderitems['lineItem'][] = $storelineitem;
         }
