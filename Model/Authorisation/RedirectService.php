@@ -191,17 +191,15 @@ class RedirectService extends \Magento\Framework\DataObject
      */
     private function _buildRedirectUrl($redirect, $paymentType, $countryCode, $languageCode)
     {
-        if ($paymentType == "SEPA_DIRECT_DEBIT-SSL") {
-           //$redirect .= '&preferredPaymentMethod=' . $paymentType;
-            $redirect .= '&country=' . $countryCode;
-            $redirect .= '&language=' . $languageCode;
-        } else {
-            $redirect .= '&preferredPaymentMethod=' . $paymentType;
-               $redirect .= '&country=' . $countryCode;
-               $redirect .= '&language=' . $languageCode;
+        $separator = (strpos($redirect, '?') !== false) ? '&' : '?';
 
+        $params = ['country' => $countryCode, 'language' => $languageCode];
+
+        if ($paymentType !== "SEPA_DIRECT_DEBIT-SSL") {
+            $params = ['preferredPaymentMethod' => $paymentType] + $params;
         }
-        return $redirect;
+
+        return $redirect . $separator . http_build_query($params);
     }
 
     /**
