@@ -606,12 +606,8 @@ abstract class AbstractMethod extends BaseAbstractMethod
         $captureRequest = $this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype);
 
         if ($captureRequest && !$isProductOnDemand) {
-            //total amount from invoice and order should not be same for partial capture
-            if (floatval($amount) != floatval($payment->getOrder()->getGrandTotal())) {
-                // to restrict Partical capture call for AMP's
-                $isAPM = !$this->checkAPMforPartialCapture($paymenttype);
-
-                if ($partialCapture && $isAPM) {
+            if (floatval($amount) != floatval($payment->getOrder()->getBaseGrandTotal())) {
+                if ($partialCapture && !$this->checkAPMforPartialCapture($paymenttype)) {
                     $this->paymentservicerequest->partialCapture(
                         $payment->getOrder(),
                         $worldPayPayment,
@@ -625,9 +621,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
                         __("Partial Capture is disabled or not supported.")
                     );
                 }
-            }
-            if (floatval($amount) == floatval($payment->getOrder()->getGrandTotal())) {
-                //normal capture
+            } else {
                 $this->paymentservicerequest->capture(
                     $payment->getOrder(),
                     $worldPayPayment,
