@@ -21,10 +21,10 @@ define([
                 location.href = config.checkoutUrl;
             } else {
 
-                if(window.PaymentRequest && window.ChromepayEnabled == 1 && window.ChromePaymentMode == 'direct') {
+                if(window.PaymentRequest && window.chromepayEnabled == 1 && window.chromePaymentMode == 'direct') {
                     var request = initPaymentRequest();
                     onBuyClicked(request);
-                    request = initPaymentRequest();                
+                    request = initPaymentRequest();
                 }
             }
         });
