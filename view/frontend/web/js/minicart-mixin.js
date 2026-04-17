@@ -13,10 +13,14 @@ define([
         return Component.extend({
             checkoutNowUrl: window.checkout.shoppingCartUrl + '?chromepay=1',
             proceedToCheckoutUrl: window.checkout.checkoutUrl,
-            checkoutNowTitle: window.ChromepayButtonName,
-            chromepayEnabled: window.ChromepayEnabled,
-            chromePaymentMode: window.ChromePaymentMode,
-            isChromium: window.ChromepayAvailable,
+            checkoutNowTitle: window.chromepayButtonName,
+            chromepayEnabled: window.chromepayEnabled,
+            chromePaymentMode: window.chromePaymentMode,
+            isChromium: window.chromepayAvailable,
+            initChromePayment: function () {
+                var request = initPaymentRequest();
+                onBuyClicked(request);
+            },
 
             /**
              * Returns subscription status of cart item
