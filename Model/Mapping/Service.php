@@ -921,7 +921,6 @@ class Service
      */
     private function _getOrderLineItems($quote, $paymentType = null)
     {
-        dd('dsds');
         $isMultiShipping = (bool)$quote->getIsMultiShipping();
         $orderitems = [];
         $orderitems['orderTaxAmount'] = $quote->getShippingAddress()->getData('tax_amount');
