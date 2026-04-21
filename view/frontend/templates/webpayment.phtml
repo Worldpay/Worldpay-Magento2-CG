@@ -54,17 +54,25 @@ $config = [
     'sessionId' => (string)$block->getSessionId(),
     'displayItems' => $displayItems
 ];
-?>
 
+/** @var \Magento\Framework\View\Element\Template $block */
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$secureRenderer = $objectManager->get(\Magento\Framework\View\Helper\SecureHtmlRenderer::class);
+
+$jsonConfig = json_encode([
+    "#worldpay-chromepay-init" => [
+        "Sapient_Worldpay/js/view/payment/chromepay" => $config
+    ]
+], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+?>
 <div id="worldpay-chromepay-init"></div>
 
-<script type="text/x-magento-init">
-    {
-        "#worldpay-chromepay-init": {
-            "Sapient_Worldpay/js/view/payment/chromepay": <?= /* @noEscape */ json_encode(
-        $config,
-        JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
-    ) ?>
-    }
-}
-</script>
+<?php
+echo $secureRenderer->renderTag(
+    'script',
+    ['type' => 'text/x-magento-init'],
+    $jsonConfig,
+    false
+);
+?>
