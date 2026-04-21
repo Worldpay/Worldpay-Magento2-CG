@@ -1,7 +1,6 @@
 define([
-    'jquery',
-    'mage/storage'
-], function ($, storage) {
+    'jquery'
+], function ($) {
     'use strict';
 
     return function (config) {
