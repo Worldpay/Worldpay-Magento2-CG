@@ -68,11 +68,4 @@ $jsonConfig = json_encode([
 ?>
 <div id="worldpay-chromepay-init"></div>
 
-<?php
-echo $secureRenderer->renderTag(
-    'script',
-    ['type' => 'text/x-magento-init'],
-    $jsonConfig,
-    false
-);
-?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', ['type' => 'text/x-magento-init'], $jsonConfig, false); ?>

@@ -219,9 +219,9 @@ class Webpayment extends Template
     public function getTaxRate()
     {
         $quote = $this->_cart->getTotalsCache();
-        $getShippingRate = $quote['tax']->getData('value');
+        $taxValue = $quote['tax']->getData('value');
 
-        return $getShippingRate;
+        return $taxValue;
     }
     /**
      * Get Sub Total
