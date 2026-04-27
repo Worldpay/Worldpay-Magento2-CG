@@ -176,7 +176,7 @@ define([
 
             carrierCode = details.shippingOptions[selectedOptIndex].carrier;
             newShippingAmount = Number(details.shippingOptions[selectedOptIndex].amount.value);
-            newTotal = Number(config.subtotal) + newShippingAmount;
+            newTotal = Number(config.subtotal) + Number(config.taxRate) + newShippingAmount;
             selectedShippingOption = details.shippingOptions[selectedOptIndex];
 
             details.total.amount.value = newTotal;
