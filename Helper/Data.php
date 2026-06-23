@@ -4,10 +4,12 @@
  */
 namespace Sapient\Worldpay\Helper;
 
+use Magento\Quote\Model\Quote;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Session\SessionManagerInterface;
+use Sapient\Worldpay\Model\Config\Source\CaptureDelay;
 use Sapient\Worldpay\Model\Config\Source\HppIntegration as HPPI;
 use Sapient\Worldpay\Model\PaymentMethods\AbstractMethod;
 
@@ -234,6 +236,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             ScopeInterface::SCOPE_STORE
         );
     }
+
+    public function isTestMode(): bool
+    {
+        return $this->getEnvironmentMode() === 'Test Mode';
+    }
+
+
     /**
      * Get Test mode url
      *
@@ -502,6 +511,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'MISTERCASH-SSL'        => 'Mistercash/Bancontact',
             'ACH_DIRECT_DEBIT-SSL'  => 'ACH Pay',
             'OPENBANKING-SSL'       => 'Pay By Bank',
+            'CLICKTOPAY-SSL'       => 'Click to Pay',
         ];
         $configMethods = explode(',', $this->_scopeConfig->getValue(
             'worldpay/apm_config/paymentmethods',
@@ -3589,7 +3599,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             'worldpay/dynamic_capture_delay/capture_delay',
             ScopeInterface::SCOPE_STORE
         );
-        if ($captureDelay == \Sapient\Worldpay\Model\Config\Source\CaptureDelay::CUSTOM_CAPTURE_DELAY_KEY) {
+        if ($captureDelay == CaptureDelay::CUSTOM_CAPTURE_DELAY_KEY) {
             $captureDelay = $this->_scopeConfig->getValue(
                 'worldpay/dynamic_capture_delay/capture_delay_custom_value',
                 ScopeInterface::SCOPE_STORE
@@ -3840,5 +3850,46 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $isStorePickup = true;
         }
         return $isStorePickup;
+    }
+
+    public function getCyberSourceMerchantId(): ?string
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/click_to_pay_config/merchant_id',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    public function getCyberSourceKeyId(): ?string
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/click_to_pay_config/merchant_key_id',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    public function getMerchantSecretKey(): ?string
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/click_to_pay_config/merchant_secret_key',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    public function getLocaleFromQuote(Quote $quote): string
+    {
+        $locale = $this->_scopeConfig->getValue(
+            'general/locale/code',
+            ScopeInterface::SCOPE_STORE,
+            $quote->getStoreId()
+        );
+        return str_replace('-', '_', $locale ?? 'en_US');
+    }
+
+    public function getCyberSourceBaseUrl(): string
+    {
+        return  $this->isTestMode()
+            ? 'https://apitest.cybersource.com'
+            : 'https://api.cybersource.com';
     }
 }

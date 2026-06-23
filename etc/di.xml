@@ -51,6 +51,7 @@
     <preference for="Sapient\Worldpay\Api\Data\EditSubscriptionHistoryInterface" type="Sapient\Worldpay\Model\EditSubscriptionHistory" />
     <preference for="Sapient\Worldpay\Api\EditSubscriptionHistoryRepositoryInterface" type="Sapient\Worldpay\Model\EditSubscriptionHistory" />
     <preference for="Sapient\Worldpay\Api\PaypalInterface" type="Sapient\Worldpay\Model\Paypal\Paypal" />
+    <preference for="Sapient\Worldpay\Api\CaptureContextInterface" type="Sapient\Worldpay\Model\Clicktopay\CaptureContext" />
 
     <preference for="Sapient\Worldpay\Api\Data\SkipSubscriptionOrderInterface"
                 type="Sapient\Worldpay\Model\SkipSubscriptionOrder"/>

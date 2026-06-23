@@ -55,6 +55,10 @@
                                                                         <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/paypal</item>
                                                                         <item name="displayArea" xsi:type="string">paypalCheckout</item>
                                                                     </item>
+                                                                    <item name="clicktopayCheckout" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">Sapient_Worldpay/js/view/payment/click-to-pay</item>
+                                                                        <item name="displayArea" xsi:type="string">clicktopayCheckout</item>
+                                                                    </item>
                                                                 </item>
                                                         </item>
                                                     </item>

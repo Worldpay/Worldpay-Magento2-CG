@@ -271,11 +271,6 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                         ->getCheckoutApplePayBtnType();
                 $config['payment']['ccform']['applePayButtonLocale'] = $this->worldpayHelper
                         ->getCheckoutApplePayBtnLocale();
-                $config['payment']['ccform']['paypalSmartButton'] =
-                    $this->worldpayHelper->isCheckoutPaypalSmartButtonEnabled() && $this->worldpayHelper->isApmEnabled();
-                $config['payment']['ccform']['paypalClientId'] = $this->worldpayHelper->getPaypalClientId();
-                $config['payment']['ccform']['paypalCurrency'] = $this->worldpayHelper->getPaypalCurrency();
-
 
                 // Multishipping Apple Pay configuration
                 $config['payment']['ccform']['msAppleMerchantid'] = $this->worldpayHelper->msAppleMerchantId();
@@ -312,10 +307,6 @@ class WorldpayConfigProvider implements ConfigProviderInterface
 
                 // Subscription Status
                 $config['payment']['ccform']['isSubscribed'] = $this->worldpayHelper->getsubscriptionStatus();
-
-                // Product on Demand
-                $config['payment']['ccform']['isProductOnDemand'] = $this->productOnDemandHelper->isProductOnDemandQuote();
-
                 $config['payment']['ccform']['myaccountexceptions'] = $this->getMyAccountException();
 
                 $config['payment']['ccform']['creditcardexceptions'] = $this->getCreditCardException();
@@ -363,6 +354,14 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $config['payment']['ccform']['isEnabledEFTPOS'] = $this->worldpayHelper->isEnabledEFTPOS();
             }
         }
+
+        $activeMethods = $this->worldpayHelper->getApmTypes('worldpay_apm');
+        $config['payment']['ccform']['clickToPayEnabled'] = isset($activeMethods['CLICKTOPAY-SSL']);
+        $config['payment']['ccform']['paypalSmartButton'] =
+            $this->worldpayHelper->isCheckoutPaypalSmartButtonEnabled() && $this->worldpayHelper->isApmEnabled();
+        $config['payment']['ccform']['paypalClientId'] = $this->worldpayHelper->getPaypalClientId();
+        $config['payment']['ccform']['paypalCurrency'] = $this->worldpayHelper->getPaypalCurrency();
+        $config['payment']['ccform']['isProductOnDemand'] = $this->productOnDemandHelper->isProductOnDemandQuote();
         return $config;
     }
 
@@ -621,6 +620,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
                 $placeholder = $this->assetSource->findSource($asset);
 
                 if ($placeholder) {
+                    $width = 50;
+                    $height = 30;
                     try {
                         $imageContent = file_get_contents($asset->getSourceFile());
                         if ($imageContent !== false) {

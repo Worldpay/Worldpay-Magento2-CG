@@ -72,7 +72,6 @@ EOD;
         $this->_addAddressElement($shopperAddress, $this->orderParameters['billingAddress']);
     }
 
-
     protected function _amountAsInt(float $amount): int
     {
         $multiplier = pow(10, $this->orderParameters['exponent']);

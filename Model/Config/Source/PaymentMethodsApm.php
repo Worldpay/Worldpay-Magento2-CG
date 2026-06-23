@@ -27,6 +27,7 @@ class PaymentMethodsApm extends \Magento\Framework\App\Config\Value
             ['value' => 'MISTERCASH-SSL', 'label' => __('Mistercash/Bancontact')],
             ['value' => 'ACH_DIRECT_DEBIT-SSL', 'label' => __('ACH Pay')],
             ['value' => 'OPENBANKING-SSL', 'label' => __('Pay By Bank')],
+            ['value' => 'CLICKTOPAY-SSL', 'label' => __('Click to Pay')],
         ];
     }
 }
