@@ -67,4 +67,10 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route url="/V1/worldpay/clicktopay/capturecontext" method="POST">
+        <service class="Sapient\Worldpay\Api\CaptureContextInterface" method="captureContext"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

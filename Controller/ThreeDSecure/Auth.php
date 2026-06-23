@@ -107,77 +107,41 @@ class Auth extends \Magento\Framework\App\Action\Action
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
         $orderId = $this->checkoutSession->getAuthOrderId();
         $iframe = false;
-        // Chrome 84 releted updates for 3DS
-        $skipSameSiteForIOs = $this->worldpayHelper->shouldSkipSameSiteNone($directOrderParams);
-        $mhost = $this->request->getHttpHost();
 
         $cookieValue = $this->_cookieManager->getCookie('PHPSESSID');
-        if ($skipSameSiteForIOs) {
-            $this->wplogger->info("Inside skip same site block");
-            if (isset($cookieValue)) {
 
-                $phpsessId = $cookieValue;
-                $domain = $mhost;
-                $expires = time() + 3600;
-                $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata();
-                $metadata->setPath('/');
-                $metadata->setDomain($domain);
-                $metadata->setDuration($expires);
-                $metadata->setSecure(true);
-                $metadata->setHttpOnly(true);
-                /*setcookie("PHPSESSID", $phpsessId, [
-                'expires' => time() + 3600,
-                'path' => '/',
-                'domain' => $domain,
-                'secure' => true,
-                'httponly' => true,
-                ]);*/
-                $this->_cookieManager->setPublicCookie(
-                    "PHPSESSID",
-                    $phpsessId,
-                    $metadata
-                );
-            }
-        } else {
-            $this->wplogger->info("Outside skip same site block");
-            if (isset($cookieValue)) {
-                $phpsessId = $cookieValue;
-                $domain = $mhost;
-                $expires = time() + 3600;
-                /*setcookie("PHPSESSID", $phpsessId, [
-                'expires' => time() + 3600,
-                'path' => '/',
-                'domain' => $domain,
-                'secure' => true,
-                'httponly' => true,
-                'samesite' => 'None',
-                ]);*/
-                $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata();
-                $metadata->setPath('/');
-                $metadata->setDomain($domain);
-                $metadata->setDuration($expires);
-                $metadata->setSecure(true);
-                $metadata->setHttpOnly(true);
+        if (isset($cookieValue)) {
+            $phpsessId = $cookieValue;
+            $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata();
+            $metadata->setPath('/');
+            $metadata->setDomain( $this->request->getHttpHost());
+            $metadata->setDuration(time() + 3600);
+            $metadata->setSecure(true);
+            $metadata->setHttpOnly(true);
+
+            $skipSameSiteForIOs = $this->worldpayHelper->shouldSkipSameSiteNone($directOrderParams);
+
+            if (!$skipSameSiteForIOs) {
                 $metadata->setSameSite("None");
-                $this->_cookieManager->setPublicCookie(
-                    "PHPSESSID",
-                    $phpsessId,
-                    $metadata
-                );
+                $this->wplogger->info("Outside skip same site block");
+            } else {
+                $this->wplogger->info("Inside skip same site block");
             }
+
+            $this->_cookieManager->setPublicCookie(
+                "PHPSESSID",
+                $phpsessId,
+                $metadata
+            );
         }
-        //setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
 
         if (!$threeDSecureChallengeConfig == null) {
-
             if ($threeDSecureChallengeConfig['challengeWindowType'] == 'iframe') {
                 $iframe = true;
             }
         }
+
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
-            // Chrome 84 releted updates for 3DS
-//            $phpsessId = $_COOKIE['PHPSESSID'];
-//          setcookie("PHPSESSID", $phpsessId, time() + 3600, "/; SameSite=None; Secure;");
             $responseUrl = $this->_url->getUrl('worldpay/threedsecure/authresponse', ['_secure' => true]);
 
             $resContent = '

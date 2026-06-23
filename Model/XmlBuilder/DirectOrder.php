@@ -980,11 +980,11 @@ EOD;
         }
         $dfReferenceId = isset($this->paymentDetails['dfReferenceId']) ? $this->paymentDetails['dfReferenceId'] : '';
         if ($dfReferenceId) {
-            $addisional3DsElement = $order->addChild('additional3DSData');
-            $addisional3DsElement['dfReferenceId'] = $this->paymentDetails['dfReferenceId'];
-            $addisional3DsElement['challengeWindowSize'] = "600x400";
-            $addisional3DsElement['challengePreference'] = "challengeMandated";
-            return $addisional3DsElement;
+            $additional3DsElement = $order->addChild('additional3DSData');
+            $additional3DsElement['dfReferenceId'] = $this->paymentDetails['dfReferenceId'];
+            $additional3DsElement['challengeWindowSize'] = "600x400";
+            $additional3DsElement['challengePreference'] = "challengeMandated";
+            return $additional3DsElement;
         }
     }
 
@@ -1029,7 +1029,7 @@ EOD;
             return 0;
         }
 
-        return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
+        return round((float)$amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
     }
 
     /**
@@ -1189,41 +1189,21 @@ EOD;
 
         $salesTax = $purchase->addChild('salesTax');
 
-        $this->_addAmountElementDirect(
-            $salesTax,
-            $this->currencyCode,
-            $this->exponent,
-            $this->paymentDetails['salesTax']
-        );
+        $this->_addAmountElementDirect($salesTax, $this->paymentDetails['salesTax']);
 
         if (isset($this->cusDetails['discount_amount'])) {
             $discountAmount = $purchase->addChild('discountAmount');
-            $this->_addAmountElementDirect(
-                $discountAmount,
-                $this->currencyCode,
-                $this->exponent,
-                $this->cusDetails['discount_amount']
-            );
+            $this->_addAmountElementDirect($discountAmount, $this->cusDetails['discount_amount']);
         }
 
         if (isset($this->cusDetails['shipping_amount'])) {
             $shippingAmount = $purchase->addChild('shippingAmount');
-            $this->_addAmountElementDirect(
-                $shippingAmount,
-                $this->currencyCode,
-                $this->exponent,
-                $this->cusDetails['shipping_amount']
-            );
+            $this->_addAmountElementDirect($shippingAmount, $this->cusDetails['shipping_amount']);
         }
 
         if (isset($this->paymentDetails['dutyAmount'])) {
             $dutyAmount = $purchase->addChild('dutyAmount');
-            $this->_addAmountElementDirect(
-                $dutyAmount,
-                $this->currencyCode,
-                $this->exponent,
-                $this->paymentDetails['dutyAmount']
-            );
+            $this->_addAmountElementDirect($dutyAmount, $this->paymentDetails['dutyAmount']);
         }
 
         //$purchase->addChild('shipFromPostalCode', '');
@@ -1315,7 +1295,7 @@ EOD;
         $this->_addCDATA($quantityElement, $quantity);
 
         $unitCostElement = $item->addChild('unitCost');
-        $this->_addAmountElementDirect($unitCostElement, $this->currencyCode, $this->exponent, $unitCost);
+        $this->_addAmountElementDirect($unitCostElement, $unitCost);
 
         if ($unitOfMeasure) {
             $unitOfMeasureElement = $item->addChild('unitOfMeasure');
@@ -1323,36 +1303,24 @@ EOD;
         }
 
         $itemTotalElement = $item->addChild('itemTotal');
-        $this->_addAmountElementDirect($itemTotalElement, $this->currencyCode, $this->exponent, $itemTotal);
+        $this->_addAmountElementDirect($itemTotalElement, $itemTotal);
 
         $itemTotalWithTaxElement = $item->addChild('itemTotalWithTax');
-        $this->_addAmountElementDirect(
-            $itemTotalWithTaxElement,
-            $this->currencyCode,
-            $this->exponent,
-            $itemTotalWithTax
-        );
+        $this->_addAmountElementDirect($itemTotalWithTaxElement, $itemTotalWithTax);
 
         $itemDiscountAmountElement = $item->addChild('itemDiscountAmount');
-        $this->_addAmountElementDirect(
-            $itemDiscountAmountElement,
-            $this->currencyCode,
-            $this->exponent,
-            $itemDiscountAmount
-        );
+        $this->_addAmountElementDirect($itemDiscountAmountElement, $itemDiscountAmount);
 
         $taxAmountElement = $item->addChild('taxAmount');
-        $this->_addAmountElementDirect($taxAmountElement, $this->currencyCode, $this->exponent, $taxAmount);
+        $this->_addAmountElementDirect($taxAmountElement, $taxAmount);
     }
     /**
      * Add amount and its child tag to xml
      *
      * @param SimpleXMLElement $orderXml
-     * @param string $currencyCode
-     * @param bool $exponent
      * @param float $amount
      */
-    private function _addAmountElementDirect($orderXml, $currencyCode, $exponent, $amount)
+    private function _addAmountElementDirect($orderXml, $amount)
     {
         $amountElement = $orderXml->addChild('amount');
         $amountElement['currencyCode'] = $this->currencyCode;

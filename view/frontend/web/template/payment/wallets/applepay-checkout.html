@@ -1,12 +1,12 @@
 <!-- ko if: ( isActive())-->
-<div class="payment-applepay-checkout">
-  <apple-pay-button 
+<div class="payment-applepay-checkout wallet-button">
+  <apple-pay-button
   data-bind="
     click: initApplePay,
     attr: {
           type: applepayConfig()['type'],
           buttonstyle: applepayConfig()['color'],
-          locale: applepayConfig()['locale'] 
+          locale: applepayConfig()['locale']
         }"
   >
   </apple-pay-button>

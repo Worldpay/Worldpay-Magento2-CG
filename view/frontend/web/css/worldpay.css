@@ -211,12 +211,7 @@ span.cc-card-type {
 }
 .payment-applepay-checkout {
     width: 30%;
- /*   float: left;
-    display: inline;*/
  }
-.payment-method-outer-content .payment-applepay-checkout {
-    width: 30%!important;
-}
 .payment-title-wrapper .step-title {
     margin: 0;
     padding-bottom: 5px;
@@ -315,21 +310,15 @@ span.cc-card-type {
 .payment-method .payment-method-content [type="radio"]:focus + label:before {
     outline: 1px dotted #ed0b02;
 }
-
 #wp-google-pay {
     width: 100%;
     margin-bottom : 10px;
 }
-#gpay-checkout-container{
-    width: 36%;
-}
-#paypal-button-container{
-    width: 33%;
-    padding-left: 15px;
-    margin-left: 15px;
+.wallet-button {
+    width: 48%;
+    margin-right: 2%;
 }
 #wp-google-pay-btn{
-    width: 94% !important;
     margin-bottom: 10px;
 }
 .gpay-card-info-container{
@@ -337,8 +326,10 @@ span.cc-card-type {
 }
 .payment-method-outer-content .wp-payment-method-wallets{
     display: inline-flex;
+    flex-wrap: wrap;
     width: 100%;
 }
+
 .gpay-card-info-container{
     min-width:140px;
 }
@@ -363,8 +354,7 @@ button.gpay-button:active{
 }
 .payment-samsungpay-checkout fieldset{
     border:0;
-    padding-top: 0;
-    padding-bottom: 15px;
+    padding: 0 0 15px 0;
 }
 .wp-pay-by-link {
     width: 100%;
@@ -377,9 +367,6 @@ button.gpay-button:active{
 }
 .multishipping-paybylink-button{
     padding: 7px 15px !important;
-}
-.payment-samsungpay-checkout{
-    width: 30%;
 }
 .payment-samsungpay-checkout fieldset{
     width: 100%
@@ -425,12 +412,7 @@ li#payment.checkout-payment-method {
 .multicheckout .box-billing-method .fieldset .legend.box-title{
 	display:flex;
 }
-/* Custom select */
-@media only screen and (max-width: 600px) {
-    .wp-pay-by-link button{
-        margin-left: 0px !important;
-    }
-  }
+
 @media only screen and (max-width: 768px) {
     .multicheckout .box-billing-method .fieldset .legend.box-title {
         display: block !important;
@@ -516,16 +498,9 @@ li#payment.checkout-payment-method {
     .payment-method-outer-content .wp-payment-method-wallets{
         display: unset;
     }
-    .payment-method-outer-content .wp-payment-method-wallets div{
-        margin-left: 0;
-    }
-    #gpay-checkout-container{
-       width: 100%;
-    }
-    #paypal-button-container{
-        width: 100%;
-        padding-left: 0;
-        margin-left: 0;
+    .wallet-button {
+        width: 70%;
+        margin: 0;
     }
     #wp-google-pay-btn, .payment-applepay-checkout, .payment-samsungpay-checkout{
         clear:both;
@@ -534,15 +509,8 @@ li#payment.checkout-payment-method {
         width: 100% !important;
     }
     .samsungpay-payment{
-        width: 100% !important;
-        height: 40px !important;
-    }
-
-   .payment-method-outer-content .payment-applepay-checkout{
-        width: 100%!important;
-    }
-    .payment-method-outer-content .payment-samsungpay-checkout{
-        width: 100%!important;
+        padding: 0px 20%;
+        width: 60%;
     }
     .payment-method-outer-content #wp-samsung-pay-btn fieldset{
         padding-right: 0;
@@ -613,10 +581,6 @@ li#payment.checkout-payment-method {
     #wp-google-pay-btn, .payment-applepay-checkout, .payment-samsungpay-checkout{
         clear:both;
     }
-    .samsungpay-payment{
-        width: 100% !important;
-        height: 40px !important;
-    }
     .payment-samsungpay-checkout{
         padding-top:0px;
     }
@@ -636,19 +600,19 @@ li#payment.checkout-payment-method {
     .payment-method-outer-content .wp-payment-method-wallets{
         flex-wrap: wrap;
     }
-    .payment-method-outer-content .wp-payment-method-wallets div{
+
+    .wallet-button {
+        width: 70%;
         margin-left: 0;
     }
+
     .wp-payment-method-wallets > * {
         padding-left: 7px;
         padding-top: 10px;
     }
-    #gpay-checkout-container {
-        width: 48%;
-    }
 
     #paypal-button-container{
-        width: 48%;
+        width: 70%;
         padding-left: 0;
         margin-left: 7px;
     }
@@ -656,12 +620,7 @@ li#payment.checkout-payment-method {
     .payment-method-outer-content #wp-google-pay-btn {
         width: 100% !important;
     }
-   .payment-method-outer-content .payment-applepay-checkout{
-        width: 48%!important;
-    }
-    .payment-method-outer-content .payment-samsungpay-checkout{
-        width: 48%!important;
-    }
+
     .payment-method-outer-content #wp-samsung-pay-btn fieldset{
         padding-right: 0;
     }
@@ -745,9 +704,6 @@ li#payment.checkout-payment-method {
     #wp-samsung-pay-btn a{
         padding-left: 0 !important;
     }
-    .samsungpay-payment{
-        padding: 0 !important;
-    }
     .payment-titlelogo-wrapper {
         display: flex;
         margin: 0 10px;
@@ -794,9 +750,6 @@ li#payment.checkout-payment-method {
     }
 }
 
-.payment-samsungpay-checkout{
-    width: 30%;
-}
 .payment-samsungpay-checkout fieldset{
     width: 100%
 }
@@ -1039,8 +992,8 @@ div.scroll {
     background-color: #000;
     box-shadow: none;
     border-radius: 4px;
-    padding: 0px 10px;
-    width: 90%;
+    padding: 0px 10%;
+    width: 80%;
 	height: 40px;
 }
 #wp-samsung-pay-btn a{
@@ -1187,3 +1140,15 @@ div.scroll {
  .payment-method-content.redirect-form .cpf {
     margin: 20px 0;
  }
+@media only screen and (max-width: 600px) {
+    .wp-pay-by-link button{
+        margin-left: 0px !important;
+    }
+    .payment-method-outer-content .wp-payment-method-wallets div {
+        width: 100%;
+    }
+
+    #payment-clicktopay-container {
+        width: 100%
+    }
+}

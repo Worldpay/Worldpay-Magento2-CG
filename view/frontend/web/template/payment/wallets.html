@@ -34,8 +34,14 @@
             <!-- ko template: getTemplate() -->
             <!-- /ko -->
             <!-- /ko -->
+            <!-- clicktopay-->
+            <!-- ko foreach: $parent.getRegion('clicktopayCheckout') -->
+            <!-- ko template: getTemplate() -->
+            <!-- /ko -->
+            <!-- /ko -->
 
         </div>
+
         <!-- ko foreach: getRegion('messages') -->
         <!-- ko template: getTemplate() -->
         <!-- /ko -->

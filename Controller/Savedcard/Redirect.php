@@ -43,7 +43,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $threeDSecureChallengeParams = $this->checkoutSession->get3Ds2Params();
-                
+
         if ($redirectData = $this->checkoutSession->get3DSecureParams()) {
             return $this->resultRedirectFactory->create()->setPath('worldpay/threedsecure/auth', ['_current' => true]);
         } elseif ($threeDSecureChallengeParams) {
