@@ -73,4 +73,10 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route url="/V1/worldpay/clicktopay/validatetoken" method="POST">
+        <service class="Sapient\Worldpay\Api\TransientTokenInterface" method="validateToken"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

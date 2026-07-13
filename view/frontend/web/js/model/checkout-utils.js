@@ -303,7 +303,7 @@ define([
                 JSON.stringify({'orderId': orderResponse})
             );
         },
-        createCheckoutData: function(quote, customer, paymentMethod, cc_type) {
+        createCheckoutData: function(quote, customer, paymentMethod, cc_type, dfReferenceId) {
             if (!additionalValidators.validate()) {
                 throw new Error('Checkout validation failed');
             }
@@ -315,17 +315,24 @@ define([
                 quote.billingAddress().email = quote.guestEmail;
             }
 
+            var additionalData = {
+                'cc_type': cc_type,
+                'cse_enabled': false
+            };
+
+            if (dfReferenceId) {
+                additionalData['dfReferenceId'] = dfReferenceId;
+            } else if (window.checkoutConfig.payment.ccform.sessionId) {
+                additionalData['dfReferenceId'] = window.checkoutConfig.payment.ccform.sessionId;
+            }
+
             return {
                 billingAddress: quote.billingAddress(),
                 shippingAddress: quote.shippingAddress(),
                 shippingMethod: quote.shippingMethod(),
                 paymentDetails: {
                     'method': paymentMethod,
-                    'additional_data': {
-                        'cc_type': cc_type,
-                        'dfReferenceId': window.checkoutConfig.payment.ccform.sessionId,
-                        'cse_enabled': false
-                    }
+                    'additional_data': additionalData
                 },
                 storecode: window.checkoutConfig.storeCode,
                 quote_id: quote.getQuoteId(),

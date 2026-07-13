@@ -3852,15 +3852,23 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $isStorePickup;
     }
 
-    public function getCyberSourceMerchantId(): ?string
+    public function getMerchantOrganisationId(): ?string
     {
         return $this->_scopeConfig->getValue(
-            'worldpay/click_to_pay_config/merchant_id',
+            'worldpay/click_to_pay_config/merchant_organisation_id',
             ScopeInterface::SCOPE_STORE
         );
     }
 
-    public function getCyberSourceKeyId(): ?string
+    public function getTransactionOrganisationId(): ?string
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/click_to_pay_config/transaction_organisation_id',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    public function getKeyId(): ?string
     {
         return $this->_scopeConfig->getValue(
             'worldpay/click_to_pay_config/merchant_key_id',

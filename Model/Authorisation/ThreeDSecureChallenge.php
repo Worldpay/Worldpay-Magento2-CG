@@ -16,17 +16,17 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
       * @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory
       */
     protected $paymentservicerequest;
-    
+
      /**
       * @var \Sapient\Worldpay\Logger\WorldpayLogger
       */
     protected $wplogger;
-    
+
     /**
      * @var \Sapient\Worldpay\Model\Response\DirectResponse
      */
     protected $directResponse;
-    
+
      /**
       * @var \Sapient\Worldpay\Model\Payment\Service
       */
@@ -57,7 +57,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
      * @var \Sapient\Worldpay\Helper\Data
      */
     protected $worldpayHelper;
-    
+
     /**
      * @var \Sapient\Worldpay\Helper\Multishipping
      */
@@ -117,7 +117,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
       *
       * @return string
       */
-   
+
     public function isIAVEnabled()
     {
         return $this->worldpayHelper->isIAVEnabled();
@@ -131,10 +131,6 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
      */
     public function continuePost3dSecure2AuthorizationProcess($directOrderParams, $threeDSecureParams)
     {
-        //$directOrderParams['response'] = $responseParams;
-        //$directOrderParams['echoData'] = $threeDSecureParams->getEchoData();
-        // @setIs3DSRequest flag set to ensure whether it is 3DS request or not.
-        // To add cookie for 3DS second request.
         $this->checkoutSession->setIs3DS2Request(true);
         try {
             $response = $this->paymentservicerequest->order3Ds2Secure($directOrderParams);
@@ -178,7 +174,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
                         ['_secure' => true]
                     ));
                 }
-                    
+
             } else {
                     $this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
                     $worldpaypayment = $this->_order->getWorldPayPayment();
@@ -208,7 +204,7 @@ class ThreeDSecureChallenge extends \Magento\Framework\DataObject
                     /** End Multishipping Code */
                     $this->_abortIfPaymentError($this->_paymentUpdate, $orderIncrementId, $isMultishipping);
             }
-            
+
         } catch (Exception $e) {
             $this->wplogger->info($e->getMessage());
             if ($e->getMessage() === 'Asymmetric transaction rollback.') {

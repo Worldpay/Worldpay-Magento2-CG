@@ -553,13 +553,16 @@
             <!--Click to Pay-->
             <group id="click_to_pay_config" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Click to Pay</label>
-                <field id="merchant_id" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Visa Merchant ID</label>
+                <field id="merchant_organisation_id" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Organisation ID</label>
                 </field>
-                <field id="merchant_key_id" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="transaction_organisation_id" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Transaction Organisation ID</label>
+                </field>
+                <field id="merchant_key_id" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Merchant Key ID</label>
                 </field>
-                <field id="merchant_secret_key" translate="label" type="password" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="merchant_secret_key" translate="label" type="password" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Merchant Secret Key</label>
                 </field>
             </group>
@@ -1518,7 +1521,7 @@
                 <field id="paybylink_expiry_time" translate="label" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Pay By Link Expiry Time</label>
                     <depends><field id="enable">1</field></depends>
-                    <validate>validate-no-empty validate-digits validate-digits-range digits-range-1-48</validate>
+                    <validate>validate-no-empty validate-digits validate-not-negative-number validate-digits-range digits-range-1-48</validate>
                     <comment>Pay By Link will be expired based on the above entered value. The value must be entered in the range between 1 to 48 hours.</comment>
                 </field>
                 <field id="paybylink_resend_link" translate="label" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">

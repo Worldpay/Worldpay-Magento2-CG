@@ -108,7 +108,6 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
         $this->checkoutSession->unsDirectOrderParams();
         $this->checkoutSession->uns3Ds2Params();
         try {
-             
             $this->threedscredirectresponse->continuePost3dSecure2AuthorizationProcess(
                 $directOrderParams,
                 $threeDSecureParams
