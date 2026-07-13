@@ -163,6 +163,9 @@ class Service
     public function redirectOrderSuccess()
     {
         $order = $this->getAuthorisedOrder();
+        if (!$order || !$order->getOrder()) {
+            return;
+        }
         $magentoorder = $order->getOrder();
         $this->emailsender->authorisedEmailSend($magentoorder, true);
         // Start multishipping code

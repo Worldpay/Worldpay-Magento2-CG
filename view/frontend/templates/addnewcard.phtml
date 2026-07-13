@@ -394,7 +394,6 @@
                 window.sessionId = '';
                 window.addEventListener("message", function (event) {
                     console.log("inside listener");
-                    var data = JSON.parse(event.data);
                     var envUrl;
                     if (window.jwtEventUrl !== '') {
                         envUrl = window.jwtEventUrl;

@@ -55,35 +55,8 @@ define(
                                 },
 
                                 createOrder: async function() {
-                                    var maskedQuoteId = "";
-                                    const isCustomerLoggedIn = customer.isLoggedIn();
-                                    if (!isCustomerLoggedIn) {
-                                        maskedQuoteId = quote.getQuoteId();
-                                        quote.billingAddress().email = quote.guestEmail;
-                                    }
-                                    var shippingrequired = false;
-                                    if (quote.shippingMethod()) {
-                                        shippingrequired = true;
-                                    }
-                                    var checkoutData = {
-                                        billingAddress: quote.billingAddress(),
-                                        shippingAddress: quote.shippingAddress(),
-                                        shippingMethod: quote.shippingMethod(),
-                                        paymentDetails: {
-                                            'method': "worldpay_apm", //TBD
-                                            'additional_data': {
-                                                'cc_type': 'PAYPAL-SSL',
-                                                'paypal_smart': true,
-                                                'cse_enabled': false
-                                            }
-                                        },
-                                        storecode: window.checkoutConfig.storeCode,
-                                        quote_id: quote.getQuoteId(),
-                                        guest_masked_quote_id: maskedQuoteId,
-                                        isCustomerLoggedIn: isCustomerLoggedIn,
-                                        isRequiredShipping: shippingrequired
-                                    }
-
+                                    var checkoutData = checkoutUtils.createCheckoutData(quote, customer, 'worldpay_apm', 'PAYPAL-SSL');
+                                    checkoutData.paymentDetails.additional_data.paypal_smart = true;
                                     var data = await checkoutUtils.setPaymentInformationAndPlaceOrder(checkoutData);
 
                                     if(data.error){

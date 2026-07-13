@@ -3,46 +3,46 @@
 namespace Sapient\Worldpay\Helper;
 
 use Magento\Framework\HTTP\Client\Curl;
-use Magento\Marketplace\Helper\Cache;
-use Magento\Backend\Model\UrlInterface;
+use Magento\Framework\HTTP\Client\CurlFactory;
+use Sapient\Worldpay\Logger\WorldpayLogger;
 
-class CurlHelper extends \Magento\Framework\App\Helper\AbstractHelper
+class CurlHelper
 {
     /**
-     * @var Magento\Framework\HTTP\Client\Curl $curl
+     * @var Curl $curlFactory
      */
-    public $curl;
+    public $curlFactory;
     /**
-     * @var Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @var WorldpayLogger $wplogger
      */
     public $wplogger;
 
     /**
      * Constructor
      *
-     * @param \Magento\Framework\HTTP\Client\Curl $curl
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
+     * @param CurlFactory $curlFactory
+     * @param WorldpayLogger $wplogger
      */
-    
-    public function __construct(
-        \Magento\Framework\HTTP\Client\Curl $curl,
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-    ) {
-        $this->curl = $curl;
+    public function __construct(CurlFactory $curlFactory, WorldpayLogger $wplogger)
+    {
+        $this->curlFactory = $curlFactory;
         $this->wplogger = $wplogger;
     }
+
     /**
      * Send curl request
      *
      * @param string $url
      * @param array $curlOptionArray
      */
-    public function sendCurlRequest($url, $curlOptionArray)
+    public function sendCurlRequest(string $url, array $curlOptionArray)
     {
+        $curl = $this->curlFactory->create();
+
         try {
-            $this->curl->setOptions($curlOptionArray);
-            $this->curl->post($url, []);
-            $response = $this->curl->getBody();
+            $curl->setOptions($curlOptionArray);
+            $curl->post($url, []);
+            $response = $curl->getBody();
             return $response;
         } catch (\Exception $e) {
             $this->wplogger->info(__("Error while sending curl request".$e->getMessage()));
@@ -56,14 +56,16 @@ class CurlHelper extends \Magento\Framework\App\Helper\AbstractHelper
       * @param array $curlOptionArray
       * @param array $headers
       */
-    public function sendGetCurlRequest($url, $curlOptionArray, $headers)
+    public function sendGetCurlRequest(string $url, array $curlOptionArray, array $headers)
     {
+        $curl = $this->curlFactory->create();
+
         try {
-            $this->curl->setOptions($curlOptionArray);
-            $this->curl->setTimeout(0);
-            $this->curl->setHeaders($headers);
-            $this->curl->get($url);
-            $response = $this->curl->getBody();
+            $curl->setOptions($curlOptionArray);
+            $curl->setTimeout(0);
+            $curl->setHeaders($headers);
+            $curl->get($url);
+            $response = $curl->getBody();
             return $response;
         } catch (\Exception $e) {
             $this->wplogger->info(__("Error while sending curl request".$e->getMessage()));

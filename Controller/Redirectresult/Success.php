@@ -68,6 +68,12 @@ class Success extends \Magento\Framework\App\Action\Action
         $this->wplogger->info('worldpay returned success url');
         $this->orderservice->redirectOrderSuccess();
         $order = $this->orderservice->getAuthorisedOrder();
+
+        if (!$order || !$order->getOrder()) {
+            $this->wplogger->info('Order not found in session - likely a duplicate redirect');
+            return $resultRedirect->setPath('checkout/onepage/success', ['_current' => true]);
+        }
+
         $worldpaypayment = $order->getWorldPayPayment();
         $this->orderservice->removeAuthorisedOrder();
         if ($worldpaypayment->getIsMultishippingOrder()) {

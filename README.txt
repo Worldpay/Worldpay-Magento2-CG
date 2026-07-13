@@ -1,6 +1,11 @@
 Latest releases for all supported version:
 For Magento 2.4.7
 
+Worldpay Plugin version: 2.4.7-p100626
+1. Magento 2.4.7-p10 compatible
+2. PHP 8.3 & 8.2 compatibility
+3. Added Click To Pay payment method
+
 Worldpay Plugin version: 2.4.7-p90426
 1. Magento 2.4.7-p9 compatible
 2. PHP 8.3 & 8.2 compatibility

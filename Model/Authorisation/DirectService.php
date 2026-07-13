@@ -6,6 +6,9 @@ namespace Sapient\Worldpay\Model\Authorisation;
 
 use Magento\Framework\Exception\PaymentException;
 use Magento\Framework\Phrase;
+use Sapient\Worldpay\Model\Payment\Update\Cancelled;
+use Sapient\Worldpay\Model\Payment\Update\Error;
+use Sapient\Worldpay\Model\Payment\Update\Refused;
 
 class DirectService extends \Magento\Framework\DataObject
 {
@@ -156,7 +159,16 @@ class DirectService extends \Magento\Framework\DataObject
         }
         /** End Multishipping Code */
 
-        if ($paymentDetails['additional_data']['cc_type'] == 'PAYPAL-SSL' && isset($paymentDetails['additional_data']['paypal_smart'])) {
+        if ($paymentDetails['additional_data']['cc_type'] == 'CLICKTOPAY-SSL' ) {
+            $directOrderParams = $this->mappingservice->collectDirectOrderParameters(
+                $orderCode,
+                $quote,
+                $orderStoreId,
+                $paymentDetails
+            );
+
+            $response = $this->paymentservicerequest->clickToPayOrder($directOrderParams);
+        } elseif ($paymentDetails['additional_data']['cc_type'] == 'PAYPAL-SSL' && isset($paymentDetails['additional_data']['paypal_smart'])) {
             $directOrderParams = $this->mappingservice->collectDirectOrderParameters(
                 $orderCode,
                 $quote,
@@ -293,17 +305,17 @@ class DirectService extends \Magento\Framework\DataObject
         $orderStatus = $responseXml->reply->orderStatus;
         $payment = $orderStatus->payment;
         $wpayCode = $payment->ISO8583ReturnCode['code'] ? $payment->ISO8583ReturnCode['code'] : 'Payment REFUSED';
-        if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Refused) {
+        if ($paymentUpdate instanceof Refused) {
             $msg =  new Phrase($wpayCode);
             throw new PaymentException($msg);
         }
 
-        if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Cancelled) {
+        if ($paymentUpdate instanceof Cancelled) {
             $msg =  new Phrase('Payment CANCELLED');
             throw new PaymentException($msg);
         }
 
-        if ($paymentUpdate instanceof \Sapient\WorldPay\Model\Payment\Update\Error) {
+        if ($paymentUpdate instanceof Error) {
             $msg =  new Phrase('Payment ERROR');
             throw new PaymentException($msg);
         }

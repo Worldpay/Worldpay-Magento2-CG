@@ -27,11 +27,9 @@ define(
 
     function (Component, $, quote, customer,validator, url, placeOrderAction, placeMultishippingOrder, redirectOnSuccessAction,ko, setPaymentInformationAction, errorProcessor, urlBuilder, storage, fullScreenLoader, additionalValidators,setBillingAddressAction,globalMessageList,disclaimerConfirm) {
         'use strict';
-        //Valid card number or not.
         var ccTypesArr = ko.observableArray([]);
         var filtersavedcardLists = ko.observableArray([]);
         var isInstalment = ko.observableArray([]);
-        var checkInstal = ko.observable();
         var paymentService = false;
         var billingAddressCountryId = "";
         var dfReferenceId = "";
@@ -879,10 +877,6 @@ define(
             isCalculated: function () {
                 return this.totals() && quote.shippingMethod() != null; //eslint-disable-line eqeqeq
             },
-//            getInstalmentValues : function(billingAddressCountryId){
-//                return window.checkoutConfig.payment.ccform.instalmentvalues.billingAddressCountryId;
-//
-//            },
             isCPF: ko.observable(),
             /**
              * @override
@@ -930,7 +924,6 @@ define(
                             'browser_colordepth': window.screen.colorDepth
                         }
                     };
-
                 }else{
                     return {
                         'method': "worldpay_cc",
@@ -966,8 +959,6 @@ define(
                         }
                     };
                 }
-
-
             },
             isClientSideEncryptionEnabled:function(){
                 if (this.getCsePublicKey()) {
@@ -993,7 +984,6 @@ define(
                 var $form = $('#' + this.getCode() + '-form');
                 var $savedCardForm = $('#' + this.getCode() + '-savedcard-form');
                 var selectedSavedCardToken = $("input[name='payment[token_to_use]']:checked").val();
-                var $cpfForm = $('#' + this.getCode() + '-cpf-form');
                 var cc_type_selected = this.getselectedCCType('payment[cc_type]');
                 this.statement = $('#' + this.getCode() + '_statement').val();
 
@@ -1038,10 +1028,10 @@ define(
                 this.dfReferenceId = null;
 
                 if(cc_type_selected == 'savedcard'){
-
-                    //Saved card handle
-                    if((this.intigrationmode == 'direct' && $savedCardForm.validation() && $savedCardForm.validation('isValid') && selectedSavedCardToken) ||
-                        (this.intigrationmode == 'redirect' && $form.validation() && $form.validation('isValid') && selectedSavedCardToken)){
+                    if((
+                        this.intigrationmode == 'direct' && $savedCardForm.validation() && $savedCardForm.validation('isValid') && selectedSavedCardToken) ||
+                        (this.intigrationmode == 'redirect' && $form.validation() && $form.validation('isValid') && selectedSavedCardToken))
+                    {
                         var cardType = $("input[name='payment[token_to_use]']:checked").next().next().val();
                         this.isSavedCardPayment=true;
                         this.paymentToken = selectedSavedCardToken;
@@ -1055,54 +1045,7 @@ define(
                             fullScreenLoader.startLoader();
                             this.redirectAfterPlaceOrder = false;
                             if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled && this.intigrationmode == 'direct'){
-                                window.addEventListener("message", function(event) {
-                                    var data = JSON.parse(event.data);
-                                    var envUrl;
-                                    if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
-                                        envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
-                                    }
-                                    if (event.origin === envUrl) {
-                                        var data = JSON.parse(event.data);
-                                        //console.warn('Merchant received a message:', data);
-                                        if(data !== undefined){
-                                            if(data.Payload){
-                                                // for cardinal
-                                                if(data.Payload.ActionCode =="SUCCESS"){
-                                                    var sessionId = data.Payload.SessionId;
-                                                    //place order with direct CSE method
-                                                    if(sessionId){
-                                                        this.dfReferenceId = sessionId;
-                                                    }
-                                                    window.sessionId = this.dfReferenceId;
-                                                    if(window.checkoutConfig.payment.ccform.isMultishipping){
-                                                        placeMultishippingOrder(self.getData());
-                                                    }
-                                                    else{
-                                                        fullScreenLoader.stopLoader();
-                                                        self.placeOrder();
-                                                    }
-                                                }
-
-                                            }else if(data.Status){
-                                                //window.sessionId = data.SessionId;
-                                                var sessionId = data.SessionId;
-                                                if(sessionId){
-                                                    this.dfReferenceId = sessionId;
-                                                }
-                                                window.sessionId = this.dfReferenceId;
-                                                //place order with direct CSE method
-                                                if(window.checkoutConfig.payment.ccform.isMultishipping){
-                                                    placeMultishippingOrder(self.getData());
-                                                }
-                                                else{
-                                                    fullScreenLoader.stopLoader();
-                                                    self.placeOrder();
-                                                }
-                                            }
-
-                                        }
-                                    }
-                                }, { once: true });
+                                self.registerCardinalListener(self);
                             } else {
                                 if(window.checkoutConfig.payment.ccform.isMultishipping){
                                     placeMultishippingOrder(self.getData());
@@ -1165,8 +1108,6 @@ define(
                     if (this.intigrationmode == 'direct') {
                         fullScreenLoader.startLoader();
                         var that = this;
-                        // Need to check for 3ds2 enable or not
-                        //jwtCreate(that.creditCardNumber());
                         var sessionId = window.sessionId;
                         that.dfReferenceId = sessionId;
 
@@ -1189,44 +1130,7 @@ define(
                                 //place order with direct CSE method
                                 that.dfReferenceId = null;
                                 if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
-                                    window.addEventListener("message", function(event) {
-                                        var data = JSON.parse(event.data);
-                                        var envUrl;
-                                        if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
-                                            envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
-                                        }
-                                        if (event.origin === envUrl) {
-                                            var data = JSON.parse(event.data);
-                                            //console.warn('Merchant received a message:', data);
-                                            if(data !== undefined){
-                                                if(data.Payload){
-                                                    // for cardinal
-                                                    if(data.Payload.ActionCode =="SUCCESS"){
-                                                        window.sessionId = data.Payload.SessionId;
-                                                        //place order with direct CSE method
-                                                        if(window.checkoutConfig.payment.ccform.isMultishipping){
-                                                            placeMultishippingOrder(self.getData());
-                                                        }
-                                                        else{
-                                                            fullScreenLoader.stopLoader();
-                                                            self.placeOrder();
-                                                        }
-                                                    }
-                                                }else if(data.Status){
-                                                    //window.sessionId = data.SessionId;
-                                                    window.sessionId = data.SessionId;
-                                                    //place order with direct CSE method
-                                                    if(window.checkoutConfig.payment.ccform.isMultishipping){
-                                                        placeMultishippingOrder(self.getData());
-                                                    }
-                                                    else{
-                                                        fullScreenLoader.stopLoader();
-                                                        self.placeOrder();
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }, { once: true });
+                                    self.registerCardinalListener(self);
                                 } else {
                                     if(window.checkoutConfig.payment.ccform.isMultishipping){
                                         placeMultishippingOrder(self.getData());
@@ -1239,45 +1143,7 @@ define(
                             });
                         } else{
                             if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
-                                window.addEventListener("message", function(event) {
-                                    var data = JSON.parse(event.data);
-                                    var envUrl;
-                                    if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
-                                        envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
-                                    }
-                                    if (event.origin === envUrl) {
-                                        var data = JSON.parse(event.data);
-                                        console.warn('Merchant received a message:', data);
-
-                                        if(data !== undefined){
-                                            if(data.Payload){
-                                                // for cardinal
-                                                if(data.Payload.ActionCode =="SUCCESS"){
-                                                    window.sessionId = data.Payload.SessionId;
-                                                    //place order with direct CSE method
-                                                    if(window.checkoutConfig.payment.ccform.isMultishipping){
-                                                        placeMultishippingOrder(self.getData());
-                                                    }
-                                                    else{
-                                                        fullScreenLoader.stopLoader();
-                                                        self.placeOrder();
-                                                    }
-                                                }
-                                            }else if(data.Status){
-                                                //window.sessionId = data.SessionId;
-                                                window.sessionId = data.SessionId;
-                                                //place order with direct CSE method
-                                                if(window.checkoutConfig.payment.ccform.isMultishipping){
-                                                    placeMultishippingOrder(self.getData());
-                                                }
-                                                else{
-                                                    fullScreenLoader.stopLoader();
-                                                    self.placeOrder();
-                                                }
-                                            }
-                                        }
-                                    }
-                                }, { once: true });
+                                self.registerCardinalListener(self);
                             } else {
                                 if(window.checkoutConfig.payment.ccform.isMultishipping){
                                     placeMultishippingOrder(self.getData());
@@ -1289,11 +1155,9 @@ define(
                             }
                         }
                     }else if(this.intigrationmode == 'redirect'){
-                        //place order with Redirect CSE Method
                         if(this.multishipping){
                             fullScreenLoader.startLoader();
                             placeMultishippingOrder(self.getData());
-
                         }
                         else{
                             self.placeOrder();
@@ -1326,7 +1190,45 @@ define(
             },
             getHppIntegrationType: function(){
                 return window.checkoutConfig.payment.ccform.hpp_integration_type;
-            }
+            },
+
+            registerCardinalListener: function(self) {
+                const handler = function(event) {
+                    if (event.origin !== window.checkoutConfig.payment.ccform.jwtEventUrl) {
+                        return;
+                    }
+
+                    let data;
+
+                    try {
+                        data = JSON.parse(event.data);
+                    } catch (e) {
+                        return;
+                    }
+
+                    let sessionId = null;
+
+                    if (data?.Payload?.ActionCode === "SUCCESS") {
+                        sessionId = data.Payload.SessionId;
+                    } else if (data?.Status) {
+                        sessionId = data.SessionId;
+                    } else {
+                        return;
+                    }
+
+                    window.removeEventListener("message", handler);
+                    window.sessionId = sessionId;
+
+                    if (window.checkoutConfig.payment.ccform.isMultishipping) {
+                        placeMultishippingOrder(self.getData());
+                    } else {
+                        fullScreenLoader.stopLoader();
+                        self.placeOrder();
+                    }
+                };
+
+                window.addEventListener("message", handler);
+             }
         });
     }
 );

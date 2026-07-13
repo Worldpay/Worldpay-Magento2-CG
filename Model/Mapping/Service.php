@@ -842,17 +842,12 @@ class Service
                 'isDynamic3D' => false,
                 'is3DSecure' => false
             ];
-        } elseif ($method == 'worldpay_cc_vault') {
-            return [
-                'isDynamic3D' => (bool) $this->worldpayHelper->isDynamic3DEnabled(),
-                'is3DSecure' => (bool) $this->worldpayHelper->is3DSecureEnabled()
-            ];
-        } else {
-            return [
-                'isDynamic3D' => (bool) $this->worldpayHelper->isDynamic3DEnabled(),
-                'is3DSecure' => (bool) $this->worldpayHelper->is3DSecureEnabled()
-            ];
         }
+
+        return [
+            'isDynamic3D' => (bool) $this->worldpayHelper->isDynamic3DEnabled(),
+            'is3DSecure' => (bool) $this->worldpayHelper->is3DSecureEnabled()
+        ];
     }
     /**
      * Collect ShippingAddress
@@ -1024,9 +1019,9 @@ class Service
             $storelineitem['productType'] = 'Store Credit';
             $storelineitem['quantity'] = 1;
             $storelineitem['quantityUnit'] = 'credit';
-            $storelineitem['unitPrice'] = 0 - (double) $quote->getBaseCustomerBalAmountUsed();
+            $storelineitem['unitPrice'] = 0 - (float) $quote->getBaseCustomerBalAmountUsed();
             $storelineitem['taxRate'] = 0;
-            $storelineitem['totalAmount'] = 0 - (double) $quote->getBaseCustomerBalAmountUsed();
+            $storelineitem['totalAmount'] = 0 - (float) $quote->getBaseCustomerBalAmountUsed();
             $storelineitem['totalTaxAmount'] = 0;
             $orderitems['lineItem'][] = $storelineitem;
         }
@@ -1139,6 +1134,21 @@ class Service
                 'sessionId' => $this->session->getSessionId(),
                 'shopperIpAddress' => $this->_getClientIPAddress()
             ];
+
+            return $details;
+        }
+
+        if($paymentDetails['additional_data']['cc_type'] == "CLICKTOPAY-SSL") {
+            $details = [
+                'paymentType' => $paymentDetails['additional_data']['cc_type'],
+                'encryptedPayload' => $paymentDetails['additional_data']['transientToken'],
+                'sessionId' => $this->session->getSessionId(),
+                'shopperIpAddress' => $this->_getClientIPAddress()
+            ];
+
+            if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
+                $details['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
+            }
 
             return $details;
         }
@@ -1390,12 +1400,6 @@ class Service
                             'worldpay/general_config/environment_mode',
                             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
                         );
-//                    if ($environmentMode == 'Test Mode') {
-//                        $orderDescription =   $this->_scopeConfig->getValue(
-//                            'worldpay/wallets_config/google_pay_wallets_config/test_cardholdername',
-//                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-//                        );
-//                    }
                 } else {
                     $orderDescription = $this->_getOrderDescription($reservedOrderId);
                 }
