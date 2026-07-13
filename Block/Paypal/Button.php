@@ -52,7 +52,7 @@ class Button extends Template
         return $this->worldpayHelper->getPaypalClientId();
     }
 
-    public function getCurrencyCode(): string
+    public function getCurrencyCode(): ?string
     {
         return $this->worldpayHelper->getPaypalCurrency();
     }

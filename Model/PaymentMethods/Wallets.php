@@ -7,7 +7,7 @@ namespace Sapient\Worldpay\Model\PaymentMethods;
 /**
  * WorldPay CreditCards class extended from WorldPay Abstract Payment Method.
  */
-class Wallets extends \Sapient\Worldpay\Model\PaymentMethods\AbstractMethod
+class Wallets extends AbstractMethod
 {
     /**
      * Payment code

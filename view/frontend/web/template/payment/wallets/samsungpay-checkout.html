@@ -1,13 +1,13 @@
 <!-- ko if: ( isActive())-->
-<div class="payment-samsungpay-checkout">
+<div class="payment-samsungpay-checkout wallet-button">
     <form class="form" id="wp-samsung-pay-btn">
         <fieldset>
-            <a href="javascript:void(0)" 
+            <a href="javascript:void(0)"
                     data-bind="
                             click: performPlaceOrder,
                             attr: {title: $t('Samsung Pay')}
                             ">
-            <img data-bind="attr: { src: samsungPayButton() }" 
+            <img data-bind="attr: { src: samsungPayButton() }"
             alt="Samsung Pay" class="samsungpay-payment responsive"></a>
         </fieldset>
     </form>

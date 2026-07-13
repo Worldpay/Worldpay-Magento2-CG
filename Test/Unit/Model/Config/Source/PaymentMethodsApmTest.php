@@ -50,6 +50,7 @@ class PaymentMethodsApmTest extends TestCase
             ['value' => 'MISTERCASH-SSL', 'label' => __('Mistercash/Bancontact')],
             ['value' => 'ACH_DIRECT_DEBIT-SSL', 'label' => __('ACH Pay')],
             ['value' => 'OPENBANKING-SSL', 'label' => __('Pay By Bank')],
+            ['value' => 'CLICKTOPAY-SSL', 'label' => __('Click to Pay')],
         ];
         $this->assertEquals($expectedResult, $this->model->toOptionArray());
     }

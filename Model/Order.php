@@ -5,6 +5,7 @@
 namespace Sapient\Worldpay\Model;
 
 use Exception;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Api\OrderManagementInterface;
 
@@ -109,6 +110,16 @@ class Order
      * @return string
      */
     public function getOrder()
+    {
+        return $this->_order;
+    }
+
+    /**
+     * Retrieve Order data
+     *
+     * @return OrderInterface
+     */
+    public function getOrderInterface()
     {
         return $this->_order;
     }

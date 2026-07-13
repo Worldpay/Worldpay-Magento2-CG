@@ -145,24 +145,6 @@
                 </areas>
                 <capture_request>1</capture_request>
             </PAYPAL-SSL>
-<!--            <YANDEXMONEY-SSL>
-                <title>Yandex.Money</title>
-                <areas>
-                    <area>AM</area>
-                    <area>AZ</area>
-                    <area>BY</area>
-                    <area>GE</area>
-                    <area>KZ</area>
-                    <area>KG</area>
-                    <area>MD</area>
-                    <area>RU</area>
-                    <area>TJ</area>
-                    <area>TM</area>
-                    <area>UA</area>
-                    <area>UZ</area>
-                </areas>
-                <capture_request>0</capture_request>
-            </YANDEXMONEY-SSL>-->
             <SOFORT-SSL>
                 <title>SoFort EU</title>
                 <areas>
@@ -174,14 +156,6 @@
                 </areas>
                 <capture_request>1</capture_request>
             </SOFORT-SSL>
-<!--            <BOLETO-SSL>
-                <title>Boleto Bancairo</title>
-                <areas>
-                    <area>BR</area>
-                </areas>
-                <capture_request>0</capture_request>
-                <stop_auto_invoice>1</stop_auto_invoice>
-            </BOLETO-SSL>-->
             <ALIPAY-SSL>
                 <title>AliPay</title>
                 <areas>
@@ -261,6 +235,13 @@
                 </areas>
                 <capture_request>1</capture_request>
             </OPENBANKING-SSL>
+            <CLICKTOPAY-SSL>
+                <title>Click to Pay</title>
+                <areas>
+                    <area>GLOBAL</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </CLICKTOPAY-SSL>
         </types>
     </worldpay_apm>
     <worldpay_cc>
@@ -950,6 +931,13 @@
                 </areas>
                 <capture_request>1</capture_request>
             </OPENBANKING-SSL>
+            <CLICKTOPAY-SSL>
+                <title>Click to Pay</title>
+                <areas>
+                    <area>GLOBAL</area>
+                </areas>
+                <capture_request>1</capture_request>
+            </CLICKTOPAY-SSL>
             <ELO-SSL>
                 <title>Elo</title>
                 <areas>

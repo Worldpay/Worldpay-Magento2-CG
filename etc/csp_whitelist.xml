@@ -21,7 +21,7 @@
                 <value id="stg-ops" type="host">https://d35p4vvdul393k.cloudfront.net/sdk_library/us/stg/ops/pc_gsmpi_web_sdk.js</value>
                 <value id="prd-ops" type="host">https://d16i99j5zwwv51.cloudfront.net/sdk_library/us/prd/ops/pc_gsmpi_web_sdk.js</value>
                 <value id="paypal-sdk" type="host">https://www.paypal.com/sdk/js</value>
-
+                <value id="cybersource" type="host">*.cybersource.com</value>
             </values>
         </policy>
         <policy id="style-src">

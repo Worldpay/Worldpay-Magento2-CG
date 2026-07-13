@@ -7,6 +7,7 @@ namespace Sapient\Worldpay\Model\Request;
 use Exception;
 use Sapient\Worldpay\Helper\ProductOnDemand;
 use Sapient\Worldpay\Model\SavedToken;
+use Sapient\Worldpay\Model\XmlBuilder\ClickToPayOrder;
 use Sapient\Worldpay\Model\XmlBuilder\PaypalOrder;
 use Sapient\Worldpay\Model\XmlBuilder\RedirectOrder;
 
@@ -1647,6 +1648,47 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         );
     }
 
+    public function clickToPayOrder($directOrderParams)
+    {
+        $loggerMsg = '########## Submitting Click to Pay order request. OrderCode: ';
+        $this->_wplogger->info($loggerMsg . $directOrderParams['orderCode'] . ' ##########');
+
+        $xmlUsername = $this->worldpayhelper->getXmlUsername($directOrderParams['paymentDetails']['paymentType']);
+        $xmlPassword = $this->worldpayhelper->getXmlPassword($directOrderParams['paymentDetails']['paymentType']);
+        $merchantCode = $directOrderParams['merchantCode'];
+
+        if (!empty($directOrderParams['isMultishippingOrder'])) {
+            $msMerchantCode = $this->worldpayhelper->getMultishippingMerchantCode();
+            $msMerchantUn = $this->worldpayhelper->getMultishippingMerchantUsername();
+            $msMerchantPw = $this->worldpayhelper->getMultishippingMerchantPassword();
+
+            $xmlUsername = !empty($msMerchantUn) ? $msMerchantUn : $xmlUsername ;
+            $xmlPassword = !empty($msMerchantPw) ? $msMerchantPw : $xmlPassword ;
+            $merchantCode = !empty($msMerchantCode) ? $msMerchantCode : $merchantCode ;
+        }
+
+        $directOrderParams['paymentDetails']['sendShopperIpAddress'] = $this->isSendShopperIpAddress();
+        ##### Added orderContent node for plugin tracker ######
+        $directOrderParams['orderContent'] = $this->collectPluginTrackerDetails(
+            $directOrderParams['paymentDetails']['paymentType']
+        );
+
+        $this->xmlClickToPayOrder = new ClickToPayOrder();
+
+        if ($this->worldpayhelper->getsubscriptionStatus()) {
+            $directOrderParams['paymentDetails']['subscription_order'] = 1;
+        }
+
+        $directOrderParams['captureDelay'] = $this->worldpayhelper->getCaptureDelayValues();
+
+        $orderSimpleXml = $this->xmlClickToPayOrder->build($merchantCode, $directOrderParams);
+        return $this->_sendRequest(
+            dom_import_simplexml($orderSimpleXml)->ownerDocument,
+            $xmlUsername,
+            $xmlPassword,
+        );
+    }
+
     /**
      * Send chromepay order XML to Worldpay server
      *
@@ -1679,7 +1721,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $captureDelay,
             $chromeOrderParams['browserFields']
         );
-        //echo $this->worldpayhelper->getXmlUsername($paymentType);exit;
+
         return $this->_sendRequest(
             dom_import_simplexml($chromepaySimpleXml)->ownerDocument,
             $this->worldpayhelper->getXmlUsername($paymentType),

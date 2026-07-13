@@ -20,7 +20,7 @@ define([
                 var data=window.CreditCardException;
                 var gendata=JSON.parse(data);
                 for (var key in gendata) {
-                    if (gendata.hasOwnProperty(key)) {  
+                    if (gendata.hasOwnProperty(key)) {
                         var cxData=gendata[key];
                     if(cxData['exception_code'].includes(exceptioncode)){
                         return cxData['exception_module_messages']?cxData['exception_module_messages']:cxData['exception_messages'];
@@ -93,8 +93,6 @@ define([
 
                 window.addEventListener("message", function(event) {
 
-                var data = JSON.parse(event.data);
-
                 var envUrl;
 
                 if(window.jwtEventUrl !== '') {
@@ -132,7 +130,7 @@ define([
                 this.dfreference(window.sessionId);
             } else {
                 alert(getCreditCardExceptions('CCAM2'));
-                return; 
+                return;
             }
             } else {
                  this.paymentToken(data.paymentToken);
