@@ -6,7 +6,7 @@ class SignatureGenerator
     public function generate(
         string $keyId,
         string $secretKey,
-        string $merchantId,
+        string $merchantOrganisationId,
         string $endpoint,
         string $httpMethod,
         string $date,
@@ -20,7 +20,7 @@ class SignatureGenerator
             'host: ' . $host,
             'date: ' . $date,
             'digest: ' . $digest,
-            'v-c-merchant-id: ' . $merchantId
+            'v-c-merchant-id: ' . $merchantOrganisationId
         ];
         $stringToSign = implode("\n", $signatureHeaders);
         $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));

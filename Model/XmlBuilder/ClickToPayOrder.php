@@ -24,7 +24,6 @@ class ClickToPayOrder extends AbstractXmlBuilder
 
     public function __construct()
     {
-
     }
 
     public function build(string $merchantCode, array $orderParameters): SimpleXMLElement

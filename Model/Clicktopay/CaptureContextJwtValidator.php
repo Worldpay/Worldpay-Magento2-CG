@@ -74,16 +74,10 @@ class CaptureContextJwtValidator
         $now = time();
 
         if (isset($payload['exp']) && $now > ($payload['exp'] + self::JWT_CLOCK_SKEW)) {
-            $this->wplogger->warning(CaptureContext::LOG_PREFIX . ' JWT has expired', [
-                'exp' => $payload['exp'],
-                'now' => $now
-            ]);
             throw new Exception('Capture Context JWT has expired');
         }
 
         $this->verifySignature($header['kid'], $jwtParts);
-
-        $this->wplogger->info(CaptureContext::LOG_PREFIX . ' JWT validation passed', ['kid' => $header['kid']]);
     }
 
     private function verifySignature(string $kid, array $jwtParts): void
