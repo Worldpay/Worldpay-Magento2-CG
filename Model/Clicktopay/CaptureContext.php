@@ -85,11 +85,12 @@ class CaptureContext implements CaptureContextInterface
             return json_encode(['error' => 'No active quote found.']);
         }
 
-        $merchantId = $this->worldpayHelper->getCyberSourceMerchantId();
-        $merchantKeyId = $this->worldpayHelper->getCyberSourceKeyId();
+        $merchantOrganisationId = $this->worldpayHelper->getMerchantOrganisationId();
+        $transactionOrganisationId = $this->worldpayHelper->getTransactionOrganisationId();
+        $merchantKeyId = $this->worldpayHelper->getKeyId();
         $merchantSecretKey = $this->worldpayHelper->getMerchantSecretKey();
 
-        if (!$merchantId || !$merchantKeyId || !$merchantSecretKey) {
+        if (!$transactionOrganisationId || !$merchantKeyId || !$merchantSecretKey || !$merchantOrganisationId) {
             return json_encode(['error' => 'Click To Pay credentials are not configured.']);
         }
 
@@ -101,27 +102,29 @@ class CaptureContext implements CaptureContextInterface
 
         $endpoint = $this->worldpayHelper->getCyberSourceBaseUrl() . '/up/v1/capture-contexts';
 
-        $this->wplogger->info(self::LOG_PREFIX . ' Requesting CyberSource Capture Context with JWT authentication', [
-            'merchant_id' => $merchantId,
-            'endpoint' => $endpoint
-        ]);
-
-        $date = gmdate('D, d M Y H:i:s', time()) . ' GMT';
+        $date = gmdate('D, d M Y H:i:s') . ' GMT';
         $digest = 'SHA-256=' . base64_encode(hash('sha256', json_encode($payload), true));
 
         $signature = $this->signatureGenerator->generate(
             $merchantKeyId,
             $merchantSecretKey,
-            $merchantId,
+            $merchantOrganisationId,
             $endpoint,
-            'post',
+            'POST',
             $date,
             $digest
         );
+
+        $this->wplogger->info(self::LOG_PREFIX . ' Requesting CyberSource Capture Context', [
+            'merchant_id' => $merchantOrganisationId,
+            'endpoint' => $endpoint,
+            'payload' => $payload
+        ]);
+
         $headers = [
             'Content-Type: application/json',
-            'Accept: application/json',
-            'v-c-merchant-id: ' . $merchantId,
+            'Accept: application/jwt',
+            'v-c-merchant-id: ' . $transactionOrganisationId,
             'date: ' . $date,
             'digest: ' . $digest,
             'signature: ' . $signature

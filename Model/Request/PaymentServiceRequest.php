@@ -1746,7 +1746,7 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $merchantCode = !empty($msMerchantCode) ? $msMerchantCode : $merchantCode ;
         }
 
-        if (isset($directOrderParams['tokenRequestConfig'])) {
+        if (isset($directOrderParams['tokenRequestConfig']) || $directOrderParams['paymentDetails']['paymentType'] == 'CLICKTOPAY-SSL') {
             $requestConfiguration = [
                 'threeDSecureConfig' => $directOrderParams['threeDSecureConfig'],
                 'tokenRequestConfig' => $directOrderParams['tokenRequestConfig']
