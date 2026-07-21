@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
 <body>
         <referenceContainer name="header-wrapper">
-     <block class="Sapient\Worldpay\Block\Webpayment" name="sapient.web.payment" template="Sapient_Worldpay::webpayment.phtml"/>
+     <block class="Sapient\Worldpay\Block\Webpayment" name="sapient.web.payment" template="Sapient_Worldpay::webpayment.phtml" ifconfig="worldpay/chromepay_config/chromepay"/>
         </referenceContainer>
     </body>
 </page>
