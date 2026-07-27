@@ -518,15 +518,16 @@ abstract class AbstractMethod extends BaseAbstractMethod
         if ($paymentdetails['method'] == self::WORLDPAY_WALLETS_TYPE) {
             $integrationType = 'direct';
         }
-        if ($paymentdetails['additional_data']['cc_type'] === 'ACH_DIRECT_DEBIT-SSL' ||
-        $paymentdetails['additional_data']['cc_type'] === 'SEPA_DIRECT_DEBIT-SSL') {
+        if (in_array(
+            $paymentdetails['additional_data']['cc_type'],
+            ['ACH_DIRECT_DEBIT-SSL', 'SEPA_DIRECT_DEBIT-SSL', 'CLICKTOPAY-SSL']
+        )) {
             $integrationType = 'direct';
         }
         $mode = $this->worlpayhelper->getCcIntegrationMode();
         $method = $paymentdetails['method'];
         if (($mode == 'redirect') && $method == self::WORLDPAY_MOTO_TYPE) {
              $integrationType = 'direct';
-        //      $integrationType = 'redirect'; uncomment to support moto redirect
         }
         $wpp = $this->worldpaypayment->create();
 
