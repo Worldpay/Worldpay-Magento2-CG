@@ -70,12 +70,6 @@ define([
 
                 element.prop('disabled', true);
                 location.href = this.options.url.checkout;
-                if(window.PaymentRequest && window.chromepayEnabled == 1 && window.chromePaymentMode == 'direct') {
-                    var request = initPaymentRequest();
-                    onBuyClicked(request);
-                } else {
-                    location.href = this.options.url.checkout;
-                }
             }, this);
 
             /**
