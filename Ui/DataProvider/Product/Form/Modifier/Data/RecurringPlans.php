@@ -7,6 +7,7 @@ namespace Sapient\Worldpay\Ui\DataProvider\Product\Form\Modifier\Data;
 
 use Magento\Framework\Escaper;
 use Magento\Catalog\Model\Locator\LocatorInterface;
+use Sapient\Worldpay\Model\Recurring\Plan;
 
 class RecurringPlans
 {
@@ -75,7 +76,7 @@ class RecurringPlans
      * @param \Sapient\Worldpay\Model\Recurring\Plan $plan
      * @return array
      */
-    public function preparePlanData(\Sapient\Worldpay\Model\Recurring\Plan $plan)
+    public function preparePlanData(Plan $plan)
     {
         return [
             'plan_id' => $plan->getId(),

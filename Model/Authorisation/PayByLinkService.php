@@ -47,7 +47,7 @@ class PayByLinkService extends \Magento\Framework\DataObject
      * @var \Sapient\Worldpay\Model\Payment\Service
      */
     protected $paymentservice;
-    
+
     /**
      * @var \Sapient\Worldpay\Model\Response\RedirectResponse
      */
@@ -65,7 +65,7 @@ class PayByLinkService extends \Magento\Framework\DataObject
      * @var \Magento\Framework\UrlInterface
      */
     protected $_urlBuilder;
-         
+
     /**
      * @var \Sapient\Worldpay\Helper\Data
      */
@@ -342,7 +342,7 @@ class PayByLinkService extends \Magento\Framework\DataObject
             $merchantPassword = !empty($pblMerchantPw) ? $pblMerchantPw : $merchantPassword ;
             $merchantCode = !empty($pblMerchantCode) ? $pblMerchantCode : $merchantCode ;
             $installationId = !empty($pblInstallationId) ? $pblInstallationId : $installationId ;
-           
+
             $inquirySimpleXml = $this->xmlinquiry->build(
                 $merchantCode,
                 $orderCode
@@ -406,7 +406,7 @@ class PayByLinkService extends \Magento\Framework\DataObject
         $redirectUrl = $this->_getUrlFromResponse($responseXml);
         $parts = UriFactory::factory($redirectUrl);
         $orderParams = $parts->getQueryAsArray();
-        $redirectUrl = $this->_addOutcomeRoutes($redirectUrl, $orderCode, $orderParams);
+        $redirectUrl = $this->_addOutcomeRoutes($redirectUrl, $orderParams);
         $redirectUrl = $this->_addExtraUrlParameters($redirectUrl, $paymentType, $countryCode);
         return $redirectUrl;
     }
@@ -429,20 +429,21 @@ class PayByLinkService extends \Magento\Framework\DataObject
      * Add outcome routes
      *
      * @param string $redirectUrl
-     * @param string $orderCode
-     * @param string $orderParams
+     * @param array $orderParams
      * @return string
      */
-    private function _addOutcomeRoutes($redirectUrl, $orderCode, $orderParams)
+    private function _addOutcomeRoutes($redirectUrl, $orderParams)
     {
-        $redirectUrl .= '&successURL=' . $this->_encodeUrl('worldpay/paybylink/success').
-        '?orderKey='.$orderParams['OrderKey'];
-        $redirectUrl .= '&cancelURL=' . $this->_encodeUrl('worldpay/paybylink/cancel').
-        '?orderKey='.$orderParams['OrderKey'];
-        $redirectUrl .= '&failureURL=' . $this->_encodeUrl('worldpay/paybylink/failure').
-        '?orderKey='.$orderParams['OrderKey'];
+        $separator = (strpos($redirectUrl, '?') !== false) ? '&' : '?';
+        $orderKey = $orderParams['OrderKey'] ?? '';
 
-        return $redirectUrl;
+        $params = [
+            'successURL' => $this->_encodeUrl('worldpay/paybylink/success') . '?orderKey=' . $orderKey,
+            'cancelURL' => $this->_encodeUrl('worldpay/paybylink/cancel') . '?orderKey=' . $orderKey,
+            'failureURL' => $this->_encodeUrl('worldpay/paybylink/failure') . '?orderKey=' . $orderKey
+        ];
+
+        return $redirectUrl . $separator . http_build_query($params);
     }
 
     /**
@@ -455,11 +456,15 @@ class PayByLinkService extends \Magento\Framework\DataObject
      */
     private function _addExtraUrlParameters($redirectUrl, $paymentType, $countryCode)
     {
-        $redirectUrl .= '&preferredPaymentMethod=' . $paymentType;
-        $redirectUrl .= '&country=' . $countryCode;
-        $redirectUrl .= '&language=' . $this->_getLanguageForLocale();
+        $separator = (strpos($redirectUrl, '?') !== false) ? '&' : '?';
 
-        return $redirectUrl;
+        $params = [
+            'preferredPaymentMethod' => $paymentType,
+            'country' => $countryCode,
+            'language' => $this->_getLanguageForLocale()
+        ];
+
+        return $redirectUrl . $separator . http_build_query($params);
     }
 
     /**

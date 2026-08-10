@@ -12,8 +12,9 @@ define([
     'mage/storage',
     'mage/url',
     'mage/translate',
-    'samsungPay'
-], function ($, ko,storage,urlBuilder,$t, samsungPay){
+    'samsungPay',
+    'Magento_Checkout/js/model/payment/additional-validators'
+], function ($, ko,storage,urlBuilder,$t, samsungPay, additionalValidators) {
     'use strict';
 
     return {
@@ -140,7 +141,6 @@ define([
             });
         },
 
-
         setPaymentInformationAndPlaceOrder : function(checkoutObj, samsungResponse = null){
             var self = this;
             return new Promise(function (resolve, reject) {
@@ -152,10 +152,10 @@ define([
                 var guestMaskedQuoteId = checkoutObj.guest_masked_quote_id;
                 var orderApiUrl;
                 var cc_type = checkoutObj.paymentDetails.additional_data.cc_type;
-                if (checkoutObj.isCustomerLoggedIn) { //Api for logged in customer
+                if (checkoutObj.isCustomerLoggedIn) {
                     orderApiUrl = BASE_URL + 'rest/' + checkoutObj.storecode + '/V1/carts/mine/payment-information';
                     type = 'POST';
-                } else { // Api for guest customer
+                } else {
                     orderApiUrl = BASE_URL + 'rest/' + checkoutObj.storecode + '/V1/guest-carts/' + guestMaskedQuoteId + '/payment-information';
                     paymentDetails.cartId = checkoutObj.guest_masked_quote_id;
                     paymentDetails.email = checkoutObj.billingAddress.email;
@@ -168,10 +168,8 @@ define([
                 ).done(
                     function (apiresponse) {
                         var orderResponse = (apiresponse);
-                        //$("body").trigger('processStop');
                         if (isNaN(orderResponse)) {
                             if (orderResponse.hasOwnProperty("message") && orderResponse['message'].indexOf('3DS2') !== -1) {
-                                //window.location.href = baseUrl + 'checkout/cart?error=true&message=error';
                                 $(".error-message").html(orderResponse['message']);
                             }
                             window.location.href = BASE_URL + 'checkout/cart?error=true';
@@ -200,20 +198,16 @@ define([
                             return false;
                         }
                         if (orderResponse) {
-
                             if (typeof checkoutObj.paymentDetails.method != 'undefined') {
-
                                 if (checkoutObj.paymentDetails.method == 'worldpay_paybylink') {
                                     window.location.href = BASE_URL + 'worldpay/paybylink/orderplaced';
                                     return;
                                 }
                             }
 
-                            // window.location.href = baseUrl + 'checkout/onepage/success';
                             window.location.href = BASE_URL + 'worldpay/savedcard/redirect';
                         } else {
                             window.location.href = BASE_URL + 'checkout/cart?error=true&message=error';
-                            //$(".error-message").html(orderResponse['message']);
                         }
                         $("body").trigger('processStop');
                         resolve({});
@@ -229,42 +223,21 @@ define([
                 )
             });
         },
-        applyCoupon : function(quoteObj,couponCode){
-            var apiUrl = "",self=this,
-                message = $t('Your coupon was successfully applied.'),
-                data = {},
-                headers = {};
+        applyCoupon : function(quoteObj, couponCode){
+            var basePath = BASE_URL + 'rest/' + quoteObj.storecode;
+            var apiUrl = quoteObj.isCustomerLoggedIn
+                ? basePath + '/V1/carts/mine/coupons/' + encodeURIComponent(couponCode)
+                : basePath + '/V1/guest-carts/' + quoteObj.quoteId + '/coupons/' + encodeURIComponent(couponCode);
 
-            if (quoteObj.isCustomerLoggedIn) {
-                apiUrl = BASE_URL+'rest/'+quoteObj.storecode+'/V1/carts/mine/coupons/' + encodeURIComponent(couponCode)
-            } else { // Api for guest customer
-                apiUrl = BASE_URL+'rest/'+quoteObj.storecode+'/V1/guest-carts/' + quoteObj.quoteId + '/coupons/' + encodeURIComponent(couponCode);
-
-            }
-
-            return storage.put(
-                apiUrl,
-                data,
-                false,
-                null,
-                headers
-            )
+            return storage.put(apiUrl, {}, false, null, {});
         },
         cancelCoupon : function(quoteObj){
-            var apiUrl = "",self=this,
-                message = $t('Your coupon was successfully removed.');
+            var basePath = BASE_URL + 'rest/' + quoteObj.storecode;
+            var apiUrl = quoteObj.isCustomerLoggedIn
+                ? basePath + '/V1/carts/mine/coupons/'
+                : basePath + '/V1/guest-carts/' + quoteObj.quoteId + '/coupons/';
 
-            if (quoteObj.isCustomerLoggedIn) {
-                apiUrl = BASE_URL+'rest/'+quoteObj.storecode+'/V1/carts/mine/coupons/';
-            } else { // Api for guest customer
-                apiUrl = BASE_URL+'rest/'+quoteObj.storecode+'/V1/guest-carts/' + quoteObj.quoteId + '/coupons/';
-
-            }
-
-            return storage.delete(
-                apiUrl,
-                false
-            )
+            return storage.delete(apiUrl, false);
         },
         sendRequest : function(type, url, data, global, contentType, headers){
             headers = headers || {};
@@ -329,6 +302,44 @@ define([
                 getOrderUrl,
                 JSON.stringify({'orderId': orderResponse})
             );
+        },
+        createCheckoutData: function(quote, customer, paymentMethod, cc_type, dfReferenceId) {
+            if (!additionalValidators.validate()) {
+                throw new Error('Checkout validation failed');
+            }
+
+            var isLoggedIn = customer.isLoggedIn();
+            var maskedQuoteId = isLoggedIn ? "" : quote.getQuoteId();
+
+            if (!isLoggedIn) {
+                quote.billingAddress().email = quote.guestEmail;
+            }
+
+            var additionalData = {
+                'cc_type': cc_type,
+                'cse_enabled': false
+            };
+
+            if (dfReferenceId) {
+                additionalData['dfReferenceId'] = dfReferenceId;
+            } else if (window.checkoutConfig.payment.ccform.sessionId) {
+                additionalData['dfReferenceId'] = window.checkoutConfig.payment.ccform.sessionId;
+            }
+
+            return {
+                billingAddress: quote.billingAddress(),
+                shippingAddress: quote.shippingAddress(),
+                shippingMethod: quote.shippingMethod(),
+                paymentDetails: {
+                    'method': paymentMethod,
+                    'additional_data': additionalData
+                },
+                storecode: window.checkoutConfig.storeCode,
+                quote_id: quote.getQuoteId(),
+                guest_masked_quote_id: maskedQuoteId,
+                isCustomerLoggedIn: isLoggedIn,
+                isRequiredShipping: !!quote.shippingMethod()
+            };
         }
     };
 });

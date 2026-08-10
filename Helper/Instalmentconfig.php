@@ -31,7 +31,7 @@ class Instalmentconfig
       * @var instalmentTypes
       */
     protected $instalmentTypes;
-    
+
     /**
      * @var SerializerInterface
      */
@@ -41,7 +41,7 @@ class Instalmentconfig
      * @var \Magento\Framework\Serialize\Serializer\Json
      */
     protected $json;
-    
+
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\Math\Random $mathRandom
@@ -317,7 +317,7 @@ class Instalmentconfig
      */
     private function isSerialized($value)
     {
-        return (boolean) preg_match('/^((s|i|d|b|a|O|C):|N;)/', $value);
+        return (bool) preg_match('/^((s|i|d|b|a|O|C):|N;)/', $value);
     }
 
     /**

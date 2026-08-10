@@ -23,7 +23,7 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
     {
         $this->_urlBuilder = $urlBuilder;
     }
-    
+
     /**
      * Return succeess, pending, cancel and failure redirect URLs
      *
@@ -33,13 +33,16 @@ class RedirectResponse extends \Sapient\Worldpay\Model\Response\ResponseAbstract
     public function getRedirectLocation($xml)
     {
         $url = $this->getRedirectUrl($xml);
+        $separator = (strpos($url, '?') !== false) ? '&' : '?';
 
-        $url .= '&successURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/success');
-        $url .= '&pendingURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/pending');
-        $url .= '&cancelURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/cancel');
-        $url .= '&failureURL=' . $this->_urlBuilder->getUrl('worldpay/redirectresult/failure');
+        $params = [
+            'successURL' => $this->_urlBuilder->getUrl('worldpay/redirectresult/success'),
+            'pendingURL' => $this->_urlBuilder->getUrl('worldpay/redirectresult/pending'),
+            'cancelURL' => $this->_urlBuilder->getUrl('worldpay/redirectresult/cancel'),
+            'failureURL' => $this->_urlBuilder->getUrl('worldpay/redirectresult/failure')
+        ];
 
-        return $url;
+        return $url . $separator . http_build_query($params);
     }
 
     /**

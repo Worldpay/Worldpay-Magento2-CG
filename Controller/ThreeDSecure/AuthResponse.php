@@ -122,60 +122,23 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
         $directOrderParams = $this->checkoutSession->getDirectOrderParams();
         $threeDSecureParams = $this->checkoutSession->get3DSecureParams();
         $skipSameSiteForIOs = $this->shouldSkipSameSiteNone($directOrderParams);
-        $mhost = $this->request->getHttpHost();
         $cookieValue = $this->_cookieManager->getCookie('PHPSESSID');
-        if ($skipSameSiteForIOs) {
-            if (isset($cookieValue)) {
-                $phpsessId = $cookieValue;
-                $domain = $mhost;
-                $expires = time() + 3600;
-                /*setcookie("PHPSESSID", $phpsessId, [
-                'expires' => time() + 3600,
-                'path' => '/',
-                'domain' => $domain,
-                'secure' => true,
-                'httponly' => true,
-                ]);*/
-                $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata();
-                $metadata->setPath('/');
-                $metadata->setDomain($domain);
-                $metadata->setDuration($expires);
-                $metadata->setSecure(true);
-                $metadata->setHttpOnly(true);
-                $this->_cookieManager->setPublicCookie(
-                    "PHPSESSID",
-                    $phpsessId,
-                    $metadata
-                );
-            }
-            
-        } else {
-            if (isset($cookieValue)) {
-                $phpsessId = $cookieValue;
-                $domain = $mhost;
-                $expires = time() + 3600;
-                /*setcookie("PHPSESSID", $phpsessId, [
-                'expires' => time() + 3600,
-                'path' => '/',
-                'domain' => $domain,
-                'secure' => true,
-                'httponly' => true,
-                'samesite' => 'None',
-                ]);*/
-                $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata();
-                $metadata->setPath('/');
-                $metadata->setDomain($domain);
-                $metadata->setDuration($expires);
-                $metadata->setSecure(true);
-                $metadata->setHttpOnly(true);
+
+        if (isset($cookieValue)) {
+            $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata();
+            $metadata->setPath('/');
+            $metadata->setDomain($this->request->getHttpHost());
+            $metadata->setDuration(3600);
+            $metadata->setSecure(true);
+            $metadata->setHttpOnly(true);
+
+            if (!$skipSameSiteForIOs) {
                 $metadata->setSameSite("None");
-                $this->_cookieManager->setPublicCookie(
-                    "PHPSESSID",
-                    $phpsessId,
-                    $metadata
-                );
             }
+
+            $this->_cookieManager->setPublicCookie("PHPSESSID", $cookieValue, $metadata);
         }
+
         $this->checkoutSession->unsDirectOrderParams();
         $this->checkoutSession->uns3DSecureParams();
         try {

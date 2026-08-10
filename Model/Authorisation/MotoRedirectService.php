@@ -35,32 +35,32 @@ class MotoRedirectService extends \Magento\Framework\DataObject
      * @var \Sapient\Worldpay\Helper\Registry
      */
     protected $registryhelper;
-    
+
     /**
      * @var \Magento\Checkout\Model\Session
      */
     protected $checkoutsession;
-    
+
     /**
      * @var \Sapient\Worldpay\Model\Payment\Service
      */
     protected $paymentservice;
-    
+
     /**
      * @var \Sapient\Worldpay\Model\Response\RedirectResponse
      */
     protected $redirectresponse;
-    
+
     /**
      * @var \Sapient\Worldpay\Model\Utilities\PaymentMethods
      */
     protected $paymentlist;
-       
+
     /**
      * @var \Magento\Framework\UrlInterface
      */
     protected $_urlBuilder;
-         
+
     /**
      * @var \Sapient\Worldpay\Helper\Data
      */
@@ -184,11 +184,15 @@ class MotoRedirectService extends \Magento\Framework\DataObject
      */
     private function _addOutcomeRoutes($redirectUrl)
     {
-        $redirectUrl .= '&successURL=' . $this->_encodeUrl('worldpay/motoRedirectResult/success');
-        $redirectUrl .= '&cancelURL=' . $this->_encodeUrl('worldpay/motoRedirectResult/cancel');
-        $redirectUrl .= '&failureURL=' . $this->_encodeUrl('worldpay/motoRedirectResult/failure');
+        $separator = (strpos($redirectUrl, '?') !== false) ? '&' : '?';
 
-        return $redirectUrl;
+        $params = [
+            'successURL' => $this->_encodeUrl('worldpay/motoRedirectResult/success'),
+            'cancelURL' => $this->_encodeUrl('worldpay/motoRedirectResult/cancel'),
+            'failureURL' => $this->_encodeUrl('worldpay/motoRedirectResult/failure')
+        ];
+
+        return $redirectUrl . $separator . http_build_query($params);
     }
 
     /**
@@ -201,11 +205,15 @@ class MotoRedirectService extends \Magento\Framework\DataObject
      */
     private function _addExtraUrlParameters($redirectUrl, $paymentType, $countryCode)
     {
-        $redirectUrl .= '&preferredPaymentMethod=' . $paymentType;
-        $redirectUrl .= '&country=' . $countryCode;
-        $redirectUrl .= '&language=' . $this->_getLanguageForLocale();
+        $separator = (strpos($redirectUrl, '?') !== false) ? '&' : '?';
 
-        return $redirectUrl;
+        $params = [
+            'preferredPaymentMethod' => $paymentType,
+            'country' => $countryCode,
+            'language' => $this->_getLanguageForLocale()
+        ];
+
+        return $redirectUrl . $separator . http_build_query($params);
     }
 
     /**

@@ -297,6 +297,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     public function getPlanTrialIntervalLabel($trialIntervalCode)
     {
         $trialIntervals = $this->getTrialIntervals();
+        $trialIntervalCode = $trialIntervalCode ?? "";
         return isset($trialIntervals[$trialIntervalCode]) ? $trialIntervals[$trialIntervalCode] : '';
     }
 

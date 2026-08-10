@@ -518,15 +518,16 @@ abstract class AbstractMethod extends BaseAbstractMethod
         if ($paymentdetails['method'] == self::WORLDPAY_WALLETS_TYPE) {
             $integrationType = 'direct';
         }
-        if ($paymentdetails['additional_data']['cc_type'] === 'ACH_DIRECT_DEBIT-SSL' ||
-        $paymentdetails['additional_data']['cc_type'] === 'SEPA_DIRECT_DEBIT-SSL') {
+        if (in_array(
+            $paymentdetails['additional_data']['cc_type'],
+            ['ACH_DIRECT_DEBIT-SSL', 'SEPA_DIRECT_DEBIT-SSL', 'CLICKTOPAY-SSL']
+        )) {
             $integrationType = 'direct';
         }
         $mode = $this->worlpayhelper->getCcIntegrationMode();
         $method = $paymentdetails['method'];
         if (($mode == 'redirect') && $method == self::WORLDPAY_MOTO_TYPE) {
              $integrationType = 'direct';
-        //      $integrationType = 'redirect'; uncomment to support moto redirect
         }
         $wpp = $this->worldpaypayment->create();
 
@@ -606,12 +607,8 @@ abstract class AbstractMethod extends BaseAbstractMethod
         $captureRequest = $this->paymentutils->checkCaptureRequest($payment->getMethod(), $paymenttype);
 
         if ($captureRequest && !$isProductOnDemand) {
-            //total amount from invoice and order should not be same for partial capture
-            if (floatval($amount) != floatval($payment->getOrder()->getGrandTotal())) {
-                // to restrict Partical capture call for AMP's
-                $isAPM = !$this->checkAPMforPartialCapture($paymenttype);
-
-                if ($partialCapture && $isAPM) {
+            if (floatval($amount) != floatval($payment->getOrder()->getBaseGrandTotal())) {
+                if ($partialCapture && !$this->checkAPMforPartialCapture($paymenttype)) {
                     $this->paymentservicerequest->partialCapture(
                         $payment->getOrder(),
                         $worldPayPayment,
@@ -625,9 +622,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
                         __("Partial Capture is disabled or not supported.")
                     );
                 }
-            }
-            if (floatval($amount) == floatval($payment->getOrder()->getGrandTotal())) {
-                //normal capture
+            } else {
                 $this->paymentservicerequest->capture(
                     $payment->getOrder(),
                     $worldPayPayment,

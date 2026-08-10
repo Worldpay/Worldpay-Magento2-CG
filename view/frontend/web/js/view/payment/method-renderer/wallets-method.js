@@ -296,7 +296,6 @@ define(
                             if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                                 createJwt();
                                 window.addEventListener("message", function(event) {
-                                    var data = JSON.parse(event.data);
                                     var envUrl;
                                     if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
                                         envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;

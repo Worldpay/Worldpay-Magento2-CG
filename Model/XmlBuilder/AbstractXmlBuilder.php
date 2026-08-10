@@ -72,10 +72,10 @@ EOD;
         $this->_addAddressElement($shopperAddress, $this->orderParameters['billingAddress']);
     }
 
-
     protected function _amountAsInt(float $amount): int
     {
-        return round($amount, $this->orderParameters['exponent'], PHP_ROUND_HALF_EVEN) * pow(10, $this->orderParameters['exponent']);
+        $multiplier = pow(10, $this->orderParameters['exponent']);
+        return (int) round($amount * $multiplier, 0, PHP_ROUND_HALF_EVEN);
     }
 
     protected function _addCDATA(SimpleXMLElement $element, ?string $content): void

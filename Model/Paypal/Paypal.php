@@ -6,17 +6,7 @@ namespace Sapient\Worldpay\Model\Paypal;
 
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Sapient\Worldpay\Api\PaypalInterface;
-use Sapient\Worldpay\Api\UpdateRecurringTokenInterface;
-
-use Magento\Framework\Registry;
 use Sapient\Worldpay\Model\PaymentMethods\PaymentOperations;
-use Sapient\Worldpay\Model\Recurring\Order\EditSubscriptionHistoryRepository;
-use Sapient\Worldpay\Model\Recurring\Order\Magento;
-use Sapient\Worldpay\Model\Recurring\Order\RateCollectorInterfaceFactory;
-use Sapient\Worldpay\Model\Recurring\Order\RateRequestFactory;
-use Sapient\Worldpay\Model\Recurring\Order\StoreManagerInterface;
-use Sapient\Worldpay\Model\Recurring\Order\Subscription;
-use Sapient\Worldpay\Model\Recurring\Order\Transactions;
 
 class Paypal implements PaypalInterface
 {
