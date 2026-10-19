@@ -321,7 +321,6 @@ select {
           document.getElementById('cc-csc').setAttribute('maxlength','4');
           document.getElementById('cc-csc').setAttribute('minlength','4');
         }else{
-
           document.getElementById('cc-csc').removeAttribute('maxlength')
           document.getElementById('cc-csc').removeAttribute('minlength')
           document.getElementById('cc-csc').setAttribute('maxlength','3');
@@ -347,16 +346,30 @@ select {
         window.close();
       }
 
-      navigator.serviceWorker.addEventListener('message', e => {
-        paymentRequestClient = e.source;
+      function initializeMessageListener() {
+          navigator.serviceWorker.addEventListener('message', handlePaymentMessage);
+      }
 
-        methodData = e.data["methodData"];
-        //document.getElementById('details').innerHTML = JSON.stringify(e.data, undefined, 2);
+      function handlePaymentMessage(event) {
+          if (event.origin !== window.location.origin) {
+              return;
+          }
 
-        //populatePaymentInstrumentsList();
-      });
+          try {
+              paymentRequestClient = event.source;
+              if (event.data && event.data['methodData']) {
+                  methodData = event.data['methodData'];
+              }
+          } catch (error) {
+              console.error('Error processing payment message:', error);
+          }
+      }
 
-      navigator.serviceWorker.controller.postMessage('payment_app_window_ready');
+      initializeMessageListener();
+
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage('payment_app_window_ready');
+      }
 
       function cancel() {
         if(!paymentRequestClient) return;

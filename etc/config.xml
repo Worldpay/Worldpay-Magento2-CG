@@ -43,6 +43,7 @@
             </tokenization>
             <hpp_config>
                 <hpp_integration>iframe</hpp_integration>
+                <send_authorize_email>1</send_authorize_email>
             </hpp_config>
             <wallets_config>
                 <title>Wallets</title>

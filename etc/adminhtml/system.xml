@@ -280,6 +280,11 @@
                     <label>Hosted Payment page Integration</label>
                     <source_model>Sapient\Worldpay\Model\Config\Source\HppIntegration</source_model>
                 </field>
+                <field id="send_authorize_email" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Authorize Order Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If Hosted payment page Integration is "Full page" an authorisation email will be sent before redirect</comment>
+                </field>
             </group>
             <!-- MOTO -->
             <group id="moto_config" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">

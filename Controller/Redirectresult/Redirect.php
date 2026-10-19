@@ -85,9 +85,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
             $resultRedirect->setPath('noroute');
             return $resultRedirect;
         }
-        if ($this->worldpayHelper->getRedirectIntegrationMode() == 'full_page') {
-            $order = $this->getAuthorisedOrder();
-            $magentoorder = $order->getOrder();
+        if ($this->worldpayHelper->getRedirectIntegrationMode() == 'full_page' && $this->worldpayHelper->isSendAuthorizeEmail()) {
             $order = $this->getAuthorisedOrder();
             $magentoorder = $order->getOrder();
             $this->emailsender->fullPageRedirectOrderEmail($magentoorder);
