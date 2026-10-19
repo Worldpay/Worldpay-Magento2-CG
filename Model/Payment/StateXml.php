@@ -18,7 +18,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
      *
      * @param SimpleXMLElement $xml
      */
-    public function __construct($xml)
+    public function __construct(\SimpleXMLElement $xml)
     {
         $this->_xml = $xml;
     }

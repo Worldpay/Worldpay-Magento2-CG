@@ -54,11 +54,11 @@ class Worldpayment extends \Magento\Framework\Model\AbstractModel
      * @param string $orderId
      * @return Sapient\Worldpay\Model\Worldpayment
      */
-    public function loadByPaymentId($orderId)
+    public function loadByPaymentId($orderId): ?Worldpayment
     {
 
         if (!$orderId) {
-            return;
+            return null;
         }
         $id = $this->getResource()->loadByPaymentId($orderId);
         return $this->load($id);
@@ -105,5 +105,5 @@ class Worldpayment extends \Magento\Framework\Model\AbstractModel
             ->order('id DESC');
 
         return $this->sentforAuthOrderCollection;
-    } 
+    }
 }

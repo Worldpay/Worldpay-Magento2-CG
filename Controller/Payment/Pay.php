@@ -56,7 +56,7 @@ class Pay extends \Magento\Framework\App\Action\Action
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     public $scopeConfig;
-    
+
     /**
      * @var \Magento\Framework\App\Request\Http
      */
@@ -81,7 +81,7 @@ class Pay extends \Magento\Framework\App\Action\Action
      * @var \Magento\Framework\Filesystem\Io\File
      */
     public $file;
-   
+
     /**
      * Constructor
      *
@@ -112,7 +112,7 @@ class Pay extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Helper\Data $wpHelper,
         \Magento\Framework\Filesystem\Io\File $file
     ) {
-        
+
         parent::__construct($context);
         $this->wplogger = $wplogger;
         $this->paymentservice = $paymentservice;
@@ -133,7 +133,7 @@ class Pay extends \Magento\Framework\App\Action\Action
      */
     public function execute()
     {
-        
+
         $result = $this->resultFactory->create(ResultFactory::TYPE_RAW);
         $mediPathPaymentManifest = $this->wpHelper->getBaseUrlMedia('sapient_worldpay/'.self::PAYMENT_MANIFEST_JSON);
         $mediPathManifest = $this->wpHelper->getBaseUrlMedia('sapient_worldpay/'.self::MANIFEST_JSON);
@@ -152,7 +152,7 @@ class Pay extends \Magento\Framework\App\Action\Action
             'description'=>'Worldpay Payments',
             'icons'=> [
                     [
-                        'src' => $this->_assetRepo->getUrl("Sapient_Worldpay::images/cc/worldpay_logo.png"),
+                        'src' => $this->_assetRepo->getUrl("Sapient_Worldpay::images/cc/worldpay_monogram.png"),
                         'sizes' => '48x48',
                         'type' => 'image/png'
                     ]
@@ -191,7 +191,7 @@ class Pay extends \Magento\Framework\App\Action\Action
         if ($this->file->fileExists($filePath)) {
             return;
         }
-        
+
         try {
             $this->file->checkAndCreateFolder($mediaPath);
             $this->jsonPersistor->persist($content, $filePath);

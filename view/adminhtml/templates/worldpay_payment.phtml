@@ -172,7 +172,7 @@ if ($isworldpayment):
                 <td class="label"><label>Account Range Id</label></td>
                 <td class="value"><strong><?= /* @noEscape */ $payment->getAccountRangeId() ?></strong></td>
             </tr>
-            
+
             <tr>
                 <td style="padding-top: .5em;">
                     <span style="font-weight:600;font-size:1.7rem;">Fraudsight Data</span>
@@ -193,7 +193,7 @@ if ($isworldpayment):
                             <b><?= /* @noEscape */ $payment->getFraudsightReasoncode() ?></b>
                         </div>
                     </td>
-            </tr> 
+            </tr>
             <tr>
                 <td style="padding-top: .5em;" colspan="2">
                     <span style="font-weight:600;font-size:1.7rem;">Worldpay Merchant Information</span>
@@ -213,8 +213,72 @@ if ($isworldpayment):
                         ) ?>
                     </strong>
                 </td>
-            </tr>            
-            </table>
+            </tr>
+    <?php if ($payment->getDccOfferAmount() !== null && $payment->getDccOfferAmount() !== ''): ?>
+        <tr>
+            <td style="padding-top: .5em;">
+                <span style="font-weight:600;font-size:1.7rem;">EDCC Data</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="label"><label>Amount Value</label></td>
+            <td class="value">
+                <strong>
+                <?php
+                    $dccAmount = $payment->getDccOfferAmount();
+                    $dccCurrency = $payment->getDccOfferCurrencyCode();
+                    if ($dccAmount !== null && $dccAmount !== '') {
+                        $formattedAmount = number_format($dccAmount / 100, 2, '.', ',');
+                        $currencyDisplay = $dccCurrency ? $dccCurrency : '';
+                        echo /* @noEscape */ $formattedAmount . ' ' . $currencyDisplay;
+                    } else {
+                        echo /* @noEscape */ $dccAmount;
+                    }
+                ?>
+                </strong>
+            </td>
+        </tr>
+        <tr>
+            <td class="label"><label>Currency Chosen</label></td>
+            <td class="value"><strong><?= /* @noEscape */ $payment->getDccOfferCurrencyCode() ?></strong></td>
+        </tr>
+        <tr>
+            <td class="label"><label>Exchange Provider</label></td>
+            <td class="value"><strong><?= $block->escapeHtml($payment->getDccOfferRateProvider()) ?></strong></td>
+        </tr>
+        <tr>
+            <td class="label"><label>Exchange rate</label></td>
+            <td class="value"><strong><?= /* @noEscape */ $payment->getDccOfferRate() ?></strong></td>
+        </tr>
+        <tr>
+            <td class="label"><label>Markup Rate</label></td>
+            <td class="value"><strong><?= /* @noEscape */ number_format($payment->getDccOfferMarkupRate(), 2) , "%"?></strong></td>
+        </tr>
+        <tr>
+            <td class="label"><label>Chosen Date</label></td>
+            <td class="value">
+                <strong>
+                <?php
+                    $acceptanceDate = $payment->getDccOfferAcceptanceDate();
+                    if ($acceptanceDate && strlen($acceptanceDate) === 8) {
+                        try {
+                            $dateObj = \DateTime::createFromFormat('Ymd', $acceptanceDate);
+                            if ($dateObj === false) {
+                                echo $block->escapeHtml($acceptanceDate);
+                            } else {
+                                echo /* @noEscape */ $dateObj->format('M d, Y');
+                            }
+                        } catch (\Exception $e) {
+                            echo /* @noEscape */ $acceptanceDate;
+                        }
+                    } else {
+                        echo /* @noEscape */ $acceptanceDate;
+                    }
+                ?>
+                </strong>
+            </td>
+        </tr>
+    <?php endif; ?>
+</table>
 
 <?php endif; ?>
-

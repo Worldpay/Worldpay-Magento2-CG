@@ -45,6 +45,12 @@
     <column xsi:type="varchar" name="fraudsight_message" nullable="true" length="25" comment="Fraudsight Message"/>
     <column xsi:type="decimal" name="fraudsight_score" scale="4" precision="8" unsigned="false" nullable="true" comment="Fraudsight Score"/>
     <column xsi:type="varchar" name="fraudsight_reasoncode" nullable="true" length="255" comment="Fraudsight reasoncode"/>
+    <column xsi:type="int" name="dcc_offer_amount" padding="11" unsigned="false" nullable="true" identity="false" comment="DCC Offer Amount in shopper currency"/>
+    <column xsi:type="varchar" name="dcc_offer_currency_code" nullable="true" length="3" comment="DCC Offer Currency Code (ISO currency code)"/>
+    <column xsi:type="decimal" name="dcc_offer_rate" scale="4" precision="12" unsigned="false" nullable="true" comment="DCC Offer Rate for conversion from merchant to DCC currency"/>
+    <column xsi:type="varchar" name="dcc_offer_acceptance_date" nullable="true" length="8" comment="DCC Offer Acceptance Date"/>
+    <column xsi:type="varchar" name="dcc_offer_rate_provider" nullable="true" length="50" comment="DCC Offer Rate Provider name"/>
+    <column xsi:type="decimal" name="dcc_offer_markup_rate" scale="4" precision="8" unsigned="false" nullable="true" comment="DCC Offer Markup Rate percentage"/>
     <constraint xsi:type="primary" referenceId="PRIMARY">
       <column name="id"/>
     </constraint>
