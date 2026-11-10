@@ -298,4 +298,6 @@ interface StateInterface
     public function getFraudsightReasonCode();
 
     public function getJournalReferenceDescription($paymentStatus);
+
+    public function getTlid();
 }

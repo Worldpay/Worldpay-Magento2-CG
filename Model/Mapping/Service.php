@@ -1263,6 +1263,8 @@ class Service
     private function _getPaymentDetailsUsingToken($paymentDetails, $quote)
     {
         $savedCardData = $this->savedtoken->loadByTokenCode($paymentDetails['additional_data']['tokenCode']);
+        $parentOrderTlid = $paymentDetails['additional_data']['parent_order_tlid'] ?? null;
+        $transactionIdentifier = $parentOrderTlid ?: ($savedCardData->getTlid() ?: $savedCardData->getTransactionIdentifier());
         if (isset($paymentDetails['encryptedData'])) {
             $details = [
                 'encryptedData' => $paymentDetails['encryptedData'],
@@ -1274,7 +1276,7 @@ class Service
                 'paymentType' => 'TOKEN-SSL',
                 'customerId' => $quote->getCustomerId(),
                 'tokenCode' => $savedCardData->getTokenCode(),
-                'transactionIdentifier' => $savedCardData->getTransactionIdentifier(),
+                'transactionIdentifier' => $transactionIdentifier,
                 'cardMethod' => $savedCardData->getMethod()
             ];
             if (isset($paymentDetails['additional_data']['saved_cc_cid'])

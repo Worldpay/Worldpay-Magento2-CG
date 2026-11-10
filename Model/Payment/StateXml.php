@@ -535,4 +535,16 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
             return ltrim($savereasoncode, ",");
         }
     }
+
+    public function getTlid()
+    {
+        $statusNode = $this->_getStatusNode();
+        if (!empty($statusNode->payment->schemeResponse)) {
+            $transactionIdentifier = $statusNode->payment->schemeResponse->transactionIdentifier;
+            if (!empty($transactionIdentifier)) {
+                return (string)$transactionIdentifier;
+            }
+        }
+        return '';
+    }
 }

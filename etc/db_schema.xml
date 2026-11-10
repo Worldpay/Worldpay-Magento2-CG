@@ -51,6 +51,7 @@
     <column xsi:type="varchar" name="dcc_offer_acceptance_date" nullable="true" length="8" comment="DCC Offer Acceptance Date"/>
     <column xsi:type="varchar" name="dcc_offer_rate_provider" nullable="true" length="50" comment="DCC Offer Rate Provider name"/>
     <column xsi:type="decimal" name="dcc_offer_markup_rate" scale="4" precision="8" unsigned="false" nullable="true" comment="DCC Offer Markup Rate percentage"/>
+    <column xsi:type="varchar" name="tlid" nullable="true" length="255" comment="Transaction Identifier from supplementaryID"/>
     <constraint xsi:type="primary" referenceId="PRIMARY">
       <column name="id"/>
     </constraint>
@@ -89,6 +90,7 @@
     <column xsi:type="text" name="authenticated_shopper_id" nullable="true" comment="Authenticated Shopper ID"/>
     <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
     <column xsi:type="varchar" name="transaction_identifier" nullable="true" length="255" comment="Transaction Indentifier"/>
+    <column xsi:type="varchar" name="tlid" nullable="true" length="255" comment="Transaction Identifier from supplementaryID"/>
     <column xsi:type="varchar" name="bin_number" nullable="true" length="25" comment="Bin Number"/>
     <column xsi:type="boolean" name="disclaimer_flag" nullable="false" comment="Disclaimer Flag"/>
     <column xsi:type="text" name="token_type" nullable="true" comment="Token type"/>

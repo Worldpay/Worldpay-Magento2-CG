@@ -501,4 +501,9 @@ class StateResponse implements \Sapient\Worldpay\Model\Payment\StateInterface
     {
         return null;
     }
+
+    public function getTlid()
+    {
+        return null;
+    }
 }

@@ -568,7 +568,6 @@ abstract class AbstractMethod extends BaseAbstractMethod
             $wpp->setData('client_side_encryption', true);
         }
         $wpp->setData('interaction_type', $interactionType);
-        // Check for Merchant Token
         $wpp->setData('token_type', $this->worlpayhelper->getMerchantTokenization());
         $wpp->save();
     }
