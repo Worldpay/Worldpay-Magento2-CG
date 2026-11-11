@@ -2,13 +2,8 @@
    "name":"sapient/module-worldpay",
    "description":"Sapient WorldPay Payment Module",
    "type":"magento2-module",
-   "require":{
-      "magento/module-sales": ">=100.0.0",
-      "magento/module-payment": ">=100.0.0",
-      "magento/module-quote": ">=100.0.0",
-      "magento/module-vault": ">=100.0.0"
-   },
-   "version": "2.4.9-alpha0626",
+   "require":{},
+   "version": "2.4.10-alpha11026",
    "license":"proprietary",
    "autoload":{
       "files":[
