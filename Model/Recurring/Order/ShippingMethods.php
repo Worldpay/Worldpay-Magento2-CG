@@ -103,10 +103,11 @@ class ShippingMethods implements RecurringShippingMethodInterface
       *
       * @param int $addressId
       *
-      * @return \Magento\Customer\Api\Data\AddressInterface
+      * @return \Magento\Customer\Api\Data\AddressInterface|null
       */
     public function getAddressData($addressId)
     {
+        $addressData = null;
         try {
             $addressData = $this->addressRepository->getById($addressId);
         } catch (\Exception $e) {

@@ -1131,7 +1131,7 @@ EOD;
      * Add fraud sight data and its child tag to xml
      *
      * @param element $order
-     * @return string
+     * @return void
      */
     private function _addFraudSightData($order)
     {

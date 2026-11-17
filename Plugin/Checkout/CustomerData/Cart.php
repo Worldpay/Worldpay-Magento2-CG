@@ -128,7 +128,7 @@ class Cart
         $maskedId = null;
         try {
             $maskedId = $this->quoteIdToMaskedQuoteId->execute($quoteId);
-        } catch (NoSuchEntityException $exception) {
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
             $this->wplogger->info(__('Current user does not have an active cart.'));
         }
 

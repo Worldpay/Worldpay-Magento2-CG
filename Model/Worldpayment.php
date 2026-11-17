@@ -11,6 +11,9 @@ use Sapient\Worldpay\Model\ResourceModel\Worldpayment\CollectionFactory;
  */
 class Worldpayment extends \Magento\Framework\Model\AbstractModel
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Worldpayment */
+    private $entityResource;
+
     /**
      * @var \Sapient\Worldpay\Model\ResourceModel\SubscriptionOrder
      */
@@ -30,10 +33,12 @@ class Worldpayment extends \Magento\Framework\Model\AbstractModel
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         CollectionFactory $sentforAuthOrderCollection,
+        \Sapient\Worldpay\Model\ResourceModel\Worldpayment $entityResource,
         ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
+        $this->entityResource = $entityResource;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
         $this->sentforAuthOrderCollection = $sentforAuthOrderCollection;
     }
@@ -52,7 +57,7 @@ class Worldpayment extends \Magento\Framework\Model\AbstractModel
      * Retrieve worldpay payment Details
      *
      * @param string $orderId
-     * @return Sapient\Worldpay\Model\Worldpayment
+     * @return $this|null
      */
     public function loadByPaymentId($orderId)
     {
@@ -60,23 +65,25 @@ class Worldpayment extends \Magento\Framework\Model\AbstractModel
         if (!$orderId) {
             return;
         }
-        $id = $this->getResource()->loadByPaymentId($orderId);
-        return $this->load($id);
+        $id = $this->entityResource->loadByPaymentId($orderId);
+        $this->entityResource->load($this, $id);
+        return $this;
     }
 
     /**
      * Load worldpay payment Details
      *
      * @param string $order_id
-     * @return Sapient\Worldpay\Model\Worldpayment
+     * @return $this|null
      */
     public function loadByWorldpayOrderId($order_id)
     {
         if (!$order_id) {
             return;
         }
-        $id = $this->getResource()->loadByWorldpayOrderId($order_id);
-        return $this->load($id);
+        $id = $this->entityResource->loadByWorldpayOrderId($order_id);
+        $this->entityResource->load($this, $id);
+        return $this;
     }
 
     /**

@@ -176,7 +176,7 @@ class Pay extends \Magento\Framework\App\Action\Action
      *
      * @param array $content
      * @param file $filename
-     * @return string
+     * @return void
      */
     public function jsonGenerator(array $content, $filename)
     {

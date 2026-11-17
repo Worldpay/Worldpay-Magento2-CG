@@ -236,7 +236,7 @@ class PayByLinkOrders
      *
      * @param string $paymentState
      * @param array $order
-     * @return string
+     * @return void
      */
     private function _applyPaymentUpdate($paymentState, $order)
     {
@@ -252,7 +252,7 @@ class PayByLinkOrders
      * Format Grand Total
      *
      * @param \Magento\Sales\Model\Order $mageOrder
-     * @return string
+     * @return string|null
      */
     public function getFormatGrandTotal($mageOrder)
     {

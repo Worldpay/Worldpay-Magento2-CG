@@ -15,6 +15,9 @@ use Sapient\Worldpay\Model\Order\Service as OrderService;
 
 class Cart implements ObserverInterface
 {
+    /** @var \Magento\Catalog\Model\ResourceModel\Product */
+    private $productResource;
+
     private WorldpayLogger $wpLogger;
     private OrderService $orderService;
     private CheckoutService $checkoutService;
@@ -28,8 +31,10 @@ class Cart implements ObserverInterface
         CheckoutService $checkoutService,
         Session         $checkoutSession,
         ProductOnDemand $productOnDemandHelper,
-        Data            $dataHelper
+        Data            $dataHelper,
+        \Magento\Catalog\Model\ResourceModel\Product $productResource
     ) {
+        $this->productResource = $productResource;
         $this->orderService = $orderService;
         $this->wpLogger = $wpLogger;
         $this->checkoutService = $checkoutService;
@@ -56,7 +61,7 @@ class Cart implements ObserverInterface
             foreach ($items as $item) {
                 if ($item) {
                     $product = $item->getProduct();
-                    $product->load($product->getId());
+                    $this->productResource->load($product, $product->getId());
                     if ($product->getProductOnDemand() || $product->getData('product_on_demand')) {
                         $item->addMessage($this->productOnDemandHelper->getCartLabel());
                     }

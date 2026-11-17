@@ -116,6 +116,8 @@ class AuthResponse extends \Magento\Framework\App\Action\Action
 
     /**
      * Accepts callback from worldpay's 3D Secure page authorised
+     *
+     * @return \Magento\Framework\Controller\ResultInterface|\Magento\Framework\App\ResponseInterface|null
      */
     public function execute()
     {

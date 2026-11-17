@@ -40,6 +40,24 @@ use Magento\Framework\Exception\LocalizedException;
  */
 class Plan extends \Magento\Framework\Model\AbstractModel
 {
+    /**
+     * Constructor
+     */
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan $entityResource,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        $this->entityResource = $entityResource;
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+    }
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan */
+    private $entityResource;
+
 
     /**
      * Plan constructor
@@ -55,14 +73,15 @@ class Plan extends \Magento\Framework\Model\AbstractModel
      * Load plan Details
      *
      * @param int $planId
-     * @return array
+     * @return $this|null
      */
     public function loadById($planId)
     {
         if (!$planId) {
             return;
         }
-        $id = $this->getResource()->loadById($planId);
-            return $this->load($id);
+        $id = $this->entityResource->loadById($planId);
+        $this->entityResource->load($this, $id);
+        return $this;
     }
 }

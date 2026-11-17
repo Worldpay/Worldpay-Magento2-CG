@@ -7,6 +7,11 @@ namespace Sapient\Worldpay\Block;
 class Edit extends \Magento\Framework\View\Element\Template
 {
     /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\SavedToken
+     */
+    private $savedTokenResource;
+
+    /**
      * @var \Sapient\Worldpay\Model\SavedTokenFactory
      */
     protected $_savecard;
@@ -35,14 +40,17 @@ class Edit extends \Magento\Framework\View\Element\Template
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
      * @param array $data
+     * @param \Sapient\Worldpay\Model\ResourceModel\SavedToken $savedTokenResource
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Sapient\Worldpay\Model\SavedTokenFactory $savecard,
         \Magento\Customer\Model\Session $customerSession,
         \Sapient\Worldpay\Helper\Data $worldpayHelper,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken $savedTokenResource,
         array $data = []
     ) {
+        $this->savedTokenResource = $savedTokenResource;
         $this->_savecard = $savecard;
         $this->_customerSession = $customerSession;
         $this->worldpayHelper = $worldpayHelper;
@@ -52,7 +60,7 @@ class Edit extends \Magento\Framework\View\Element\Template
     /**
      * Retrive savecard Deatil
      *
-     * @return object
+     * @return \Sapient\Worldpay\Model\SavedToken|false|null
      */
     public function getTokenData()
     {
@@ -61,7 +69,9 @@ class Edit extends \Magento\Framework\View\Element\Template
         }
         $id = $this->getRequest()->getParam('id');
         if ($id) {
-            return $this->_savecard->create()->load($id);
+            $token = $this->_savecard->create();
+            $this->savedTokenResource->load($token, $id);
+            return $token;
         }
     }
 

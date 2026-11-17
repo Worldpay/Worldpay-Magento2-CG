@@ -18,6 +18,16 @@ use Sapient\Worldpay\Helper\MyAccountException;
 class Cancel extends \Magento\Framework\App\Action\Action
 {
     /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions
+     */
+    private $transactionsResource;
+
+    /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription
+     */
+    private $subscriptionResource;
+
+    /**
      * @var SubscriptionFactory
      */
     private $subscriptionFactory;
@@ -51,6 +61,8 @@ class Cancel extends \Magento\Framework\App\Action\Action
      * @param TransactionsFactory $transactionFactory
      * @param MyAccountException $helper
      * @param \Magento\Customer\Model\Url $customerUrl
+     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription $subscriptionResource
+     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions $transactionsResource
      */
     public function __construct(
         Context $context,
@@ -58,8 +70,12 @@ class Cancel extends \Magento\Framework\App\Action\Action
         SubscriptionFactory $subscriptionFactory,
         TransactionsFactory $transactionFactory,
         MyAccountException $helper,
-        \Magento\Customer\Model\Url $customerUrl
+        \Magento\Customer\Model\Url $customerUrl,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription $subscriptionResource,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions $transactionsResource
     ) {
+        $this->transactionsResource = $transactionsResource;
+        $this->subscriptionResource = $subscriptionResource;
         parent::__construct($context);
         $this->customerSession = $customerSession;
         $this->subscriptionFactory = $subscriptionFactory;
@@ -94,9 +110,8 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $data = $this->getRequest()->getParams();
 
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
-        $subscription = $this->subscriptionFactory
-            ->create()
-            ->load($subscriptionId);
+        $subscription = $this->subscriptionFactory->create();
+        $this->subscriptionResource->load($subscription, $subscriptionId);
         $recurring = $this->transactionFactory
             ->create()
             ->loadBySubscriptionId($subscriptionId);
@@ -122,10 +137,10 @@ class Cancel extends \Magento\Framework\App\Action\Action
         }
 
         try {
-            $subscription->setStatus(SubscriptionStatus::CANCELLED)
-                ->save();
-            $recurring->setStatus(SubscriptionStatus::CANCELLED)
-                ->save();
+            $subscription->setStatus(SubscriptionStatus::CANCELLED);
+            $this->subscriptionResource->save($subscription);
+            $recurring->setStatus(SubscriptionStatus::CANCELLED);
+            $this->transactionsResource->save($recurring);
 
             $this->messageManager->addSuccessMessage(__($this->helper->getConfigValue('MCAM14')));
         } catch (\Exception $e) {

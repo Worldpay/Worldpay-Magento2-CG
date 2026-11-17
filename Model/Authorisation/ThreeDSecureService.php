@@ -224,7 +224,10 @@ class ThreeDSecureService extends \Magento\Framework\DataObject
             } else {
                 $errormessage = $this->paymentservicerequest->getCreditCardSpecificException('CCAM15');
                 $this->wplogger->info($errormessage);
-                $this->_messageManager->addErrorMessage(__($errormessage?$errormessage:$e->getMessage()));
+                $this->_messageManager->addErrorMessage(__(
+                    $errormessage ?: 'Unfortunately the order could not be processed.'
+                    . ' Please contact us or try again later'
+                ));
                 if ($this->checkoutSession->getInstantPurchaseOrder()) {
                     $redirectUrl = $this->checkoutSession->getInstantPurchaseRedirectUrl();
                     $this->checkoutSession->unsInstantPurchaseMessage();

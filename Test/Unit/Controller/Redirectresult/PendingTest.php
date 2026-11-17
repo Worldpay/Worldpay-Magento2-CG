@@ -17,6 +17,7 @@ use Sapient\Worldpay\Controller\Redirectresult\Pending;
 
 class PendingTest extends TestCase
 {
+    use \Sapient\Worldpay\Test\Unit\ObjectFactory;
     
     /**
      * @var Pending
@@ -24,26 +25,23 @@ class PendingTest extends TestCase
     protected $pendingObj;
     protected function setUp(): void
     {
-        $context = $this->getMockBuilder(Context::class)
-                        ->disableOriginalConstructor()->getMock();
-        $page = $this->getMockBuilder(PageFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $orderservice = $this->getMockBuilder(OrderService::class)
-                        ->disableOriginalConstructor()->getMock();
-        $checkoutservice = $this->getMockBuilder(CheckoutService::class)
-                        ->disableOriginalConstructor()->getMock();
-        $paymentservice = $this->getMockBuilder(PaymentService::class)
-                        ->disableOriginalConstructor()->getMock();
-        $wplogger = $this->getMockBuilder(WorldpayLogger::class)
-                        ->disableOriginalConstructor()->getMock();
+        $context = $this->createStub(Context::class);
+        $page = $this->createStub(PageFactory::class);
+        $orderservice = $this->createStub(OrderService::class);
+        $checkoutservice = $this->createStub(CheckoutService::class);
+        $paymentservice = $this->createStub(PaymentService::class);
+        $wplogger = $this->createStub(WorldpayLogger::class);
 
-        $this->pendingObj = new Pending(
-            $context,
-            $page,
-            $orderservice,
-            $checkoutservice,
-            $paymentservice,
-            $wplogger
+        $this->pendingObj = $this->createObject(
+            Pending::class,
+            [
+                'context' => $context,
+                'pageFactory' => $page,
+                'orderservice' => $orderservice,
+                'checkoutservice' => $checkoutservice,
+                'paymentservice' => $paymentservice,
+                'wplogger' => $wplogger,
+            ]
         );
     }
     

@@ -26,6 +26,7 @@ use Sapient\Worldpay\Model\WorldpayConfigProvider;
 
 class WorldpayConfigProviderTest extends TestCase
 {
+    use \Sapient\Worldpay\Test\Unit\ObjectFactory;
     /**
      * @var /Sapient\Worldpay\Model\WorldpayConfigProvider
      */
@@ -119,59 +120,47 @@ class WorldpayConfigProviderTest extends TestCase
 
     protected function setUp(): void
     {
-        $wplogger = $this->getMockBuilder(WorldpayLogger::class)
-                        ->disableOriginalConstructor()->getMock();
-        $this->dataHelper = $this->getMockBuilder(Data::class)
-                        ->disableOriginalConstructor()->getMock();
-        $paymentHelper = $this->getMockBuilder(PaymentHelper::class)
-                        ->disableOriginalConstructor()->getMock();
-        $payment = $this->getMockBuilder(WorldPayCCPayment::class)
-                        ->disableOriginalConstructor()->getMock();
-        $cart = $this->getMockBuilder(Cart::class)
-                        ->disableOriginalConstructor()->getMock();
-        $customerSession = $this->getMockBuilder(CustomerSession::class)
-                        ->disableOriginalConstructor()->getMock();
-        $adminquotesession = $this->getMockBuilder(Quote::class)
-                        ->disableOriginalConstructor()->getMock();
-        $savedTokenFactory = $this->getMockBuilder(SavedTokenFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $this->paymentmethodutils = $this->getMockBuilder(PaymentMethods::class)
-                        ->disableOriginalConstructor()->getMock();
-        $backendAuthSession = $this->getMockBuilder(AuthSession::class)
-                        ->disableOriginalConstructor()->getMock();
-        $assetRepo = $this->getMockBuilder(Repository::class)
-                        ->disableOriginalConstructor()->getMock();
-        $request = $this->getMockBuilder(RequestInterface::class)
-                        ->disableOriginalConstructor()->getMock();
-        $assetSource = $this->getMockBuilder(Source::class)
-                        ->disableOriginalConstructor()->getMock();
-        $localeResolver = $this->getMockBuilder(ResolverInterface::class)
-                        ->disableOriginalConstructor()->getMock();
-        $serializer = $this->getMockBuilder(SerializerInterface::class)
-                        ->disableOriginalConstructor()->getMock();
+        $wplogger = $this->createStub(WorldpayLogger::class);
+        $this->dataHelper = $this->createMock(Data::class);
+        $paymentHelper = $this->createStub(PaymentHelper::class);
+        $payment = $this->createStub(WorldPayCCPayment::class);
+        $cart = $this->createStub(Cart::class);
+        $customerSession = $this->createStub(CustomerSession::class);
+        $adminquotesession = $this->createStub(Quote::class);
+        $savedTokenFactory = $this->createStub(SavedTokenFactory::class);
+        $this->paymentmethodutils = $this->createStub(PaymentMethods::class);
+        $backendAuthSession = $this->createStub(AuthSession::class);
+        $assetRepo = $this->createStub(Repository::class);
+        $request = $this->createStub(RequestInterface::class);
+        $assetSource = $this->createStub(Source::class);
+        $localeResolver = $this->createStub(ResolverInterface::class);
+        $serializer = $this->createStub(SerializerInterface::class);
 
-        $this->worldpayConfigObj = new WorldpayConfigProvider(
-            $wplogger,
-            $this->dataHelper,
-            $paymentHelper,
-            $payment,
-            $cart,
-            $customerSession,
-            $adminquotesession,
-            $savedTokenFactory,
-            $this->paymentmethodutils,
-            $backendAuthSession,
-            $assetRepo,
-            $request,
-            $assetSource,
-            $localeResolver,
-            $serializer
+        $this->worldpayConfigObj = $this->createObject(
+            WorldpayConfigProvider::class,
+            [
+                'wplogger' => $wplogger,
+                'helper' => $this->dataHelper,
+                'paymentHelper' => $paymentHelper,
+                'payment' => $payment,
+                'cart' => $cart,
+                'customerSession' => $customerSession,
+                'adminquotesession' => $adminquotesession,
+                'savedTokenFactory' => $savedTokenFactory,
+                'paymentmethodutils' => $this->paymentmethodutils,
+                'backendAuthSession' => $backendAuthSession,
+                'assetRepo' => $assetRepo,
+                'request' => $request,
+                'assetSource' => $assetSource,
+                'localeResolver' => $localeResolver,
+                'serializer' => $serializer,
+            ]
         );
     }
 
     public function testGetApmTypes()
     {
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getApmTypes')
                 ->with('worldpay_apm')
                 ->willReturn($this->ALL_APM_METHODS);
@@ -180,7 +169,7 @@ class WorldpayConfigProviderTest extends TestCase
 
     public function testGetApmtitle()
     {
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getApmTitle')
                 ->willReturn('Alternative Payment Methods');
         $this->assertEquals('Alternative Payment Methods', $this->worldpayConfigObj->getApmtitle());
@@ -188,11 +177,11 @@ class WorldpayConfigProviderTest extends TestCase
 
     public function testGetApmIdealBankList()
     {
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getApmTypes')
                 ->with('worldpay_apm')
                 ->willReturn($this->ALL_APM_METHODS);
-        $this->paymentmethodutils->expects($this->any())
+        $this->paymentmethodutils
                 ->method('idealBanks')
                 ->willReturn($this->IDEAL_BANKS_INFO);
         $this->assertEquals($this->IDEAL_BANKS_INFO, $this->worldpayConfigObj->getApmIdealBankList());
@@ -203,22 +192,22 @@ class WorldpayConfigProviderTest extends TestCase
         $klarnaValues = [$this->KLARNA_SLICEIT_TYPE => $this->KLARNA_SLICEIT_COUNTRIES,
             $this->KLARNA_PAYLATER_TYPE => $this->KLARNA_PAYLATER_COUNTRIES,
             $this->KLARNA_PAYNOW_TYPE => $this->KLARNA_PAYNOW_COUNTRIES];
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getKlarnaSliceitType')
                 ->willReturn($this->KLARNA_SLICEIT_TYPE);
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getKlarnaPayLaterType')
                 ->willReturn($this->KLARNA_PAYLATER_TYPE);
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getKlarnaPayNowType')
                 ->willReturn($this->KLARNA_PAYNOW_TYPE);
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getKlarnaSliceitContries')
                 ->willReturn($this->KLARNA_SLICEIT_COUNTRIES);
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getKlarnaPayLaterContries')
                 ->willReturn($this->KLARNA_PAYLATER_COUNTRIES);
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getKlarnaPayNowContries')
                 ->willReturn($this->KLARNA_PAYNOW_COUNTRIES);
         $this->assertEquals($klarnaValues, $this->worldpayConfigObj->getKlarnaTypesAndContries());
@@ -226,7 +215,7 @@ class WorldpayConfigProviderTest extends TestCase
 
     public function testGetWalletstitle()
     {
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getWalletstitle')
                 ->willReturn('wallet');
         $this->assertEquals('wallet', $this->worldpayConfigObj->getWalletstitle());
@@ -234,7 +223,7 @@ class WorldpayConfigProviderTest extends TestCase
 
     public function testGetCcTypes()
     {
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getCcTypes')
                 ->with('worldpay_cc')
                 ->willReturn($this->ALL_CC_METHODS);
@@ -243,7 +232,7 @@ class WorldpayConfigProviderTest extends TestCase
 
     public function testGetCctitle()
     {
-        $this->dataHelper->expects($this->any())
+        $this->dataHelper->expects($this->once())
                 ->method('getCcTitle')
                 ->willReturn('Credit Cards');
         $this->assertEquals('Credit Cards', $this->worldpayConfigObj->getCctitle());

@@ -92,7 +92,7 @@ class TokenFormatter implements PaymentTokenFormatterInterface
             $tokenCode = $paymentToken->getGatewayToken();
             $savedCardDataId = $this->savedtoken->loadByTokenCode($tokenCode);
             $model = $this->savecard->create();
-            $model->load($savedCardDataId);
+            $this->savedtoken->load($model, $savedCardDataId);
             $formatted = sprintf(
                 '%s: %s, %s: %s ,%s: %s, %s: %s',
                 __('Credit Card'),

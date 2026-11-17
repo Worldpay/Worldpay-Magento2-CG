@@ -51,7 +51,7 @@ class SavedCardLink extends \Magento\Framework\View\Element\Html\Link\Current
         DefaultPathInterface $defaultPath,
         array $data = []
     ) {
-        parent::__construct($context, $defaultPath);
+        parent::__construct($context, $defaultPath, $data);
         $this->config = $config;
         $this->helper = $helper;
     }
@@ -73,7 +73,7 @@ class SavedCardLink extends \Magento\Framework\View\Element\Html\Link\Current
     /**
      * Check Save Card TabTo Be Enabled
      *
-     * @return string
+     * @return bool|null
      */
 
     public function checkSaveCardTabToBeEnabled()

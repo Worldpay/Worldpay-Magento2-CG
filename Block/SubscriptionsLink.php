@@ -60,7 +60,7 @@ class SubscriptionsLink extends \Magento\Framework\View\Element\Html\Link\Curren
         Data $worldpayHelper,
         array $data = []
     ) {
-        parent::__construct($context, $defaultPath);
+        parent::__construct($context, $defaultPath, $data);
         $this->subscriptionconfig = $subscriptionconfig;
         $this->helper = $helper;
         $this->worldpayHelper = $worldpayHelper;
@@ -83,7 +83,7 @@ class SubscriptionsLink extends \Magento\Framework\View\Element\Html\Link\Curren
     /**
      * Check Subscription Tab To Be Enabled
      *
-     * @return true|false
+     * @return true|false|null
      */
 
     public function checkSubscriptionTabToBeEnabled()

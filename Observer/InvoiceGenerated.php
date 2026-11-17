@@ -9,6 +9,12 @@ use Magento\Customer\Api\CustomerRepositoryInterface;
 
 class InvoiceGenerated implements ObserverInterface
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\CollectionFactory */
+    private $subscriptionAddressCollectionFactory;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory */
+    private $savedTokenCollectionFactory;
+
     public const LESS_THAN_THIRTY_DAYS = 'lessThanThirtyDays';
     public const THIRTY_TO_SIXTY_DAYS = 'thirtyToSixtyDays';
     public const MORE_THAN_SIXTY_DAYS = 'moreThanSixtyDays';
@@ -49,7 +55,11 @@ class InvoiceGenerated implements ObserverInterface
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
         \Magento\Framework\Session\SessionManagerInterface $session,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory $savedTokenCollectionFactory,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address\CollectionFactory $subscriptionAddressCollectionFactory
     ) {
+        $this->subscriptionAddressCollectionFactory = $subscriptionAddressCollectionFactory;
+        $this->savedTokenCollectionFactory = $savedTokenCollectionFactory;
         $this->worldpayhelper = $worldpayhelper;
         $this->worldpaySavedToken = $worldpaytoken;
         $this->addressCollectionFactory = $subscriptionAddress;
@@ -75,7 +85,7 @@ class InvoiceGenerated implements ObserverInterface
     {
         $today = date("Y-m-d");
         if ($tokenId) {
-            return $this->worldpaySavedToken->getCollection()
+            return $this->savedTokenCollectionFactory->create()
                 ->addFieldToFilter('id', ['eq' => trim($tokenId)])
                 ->addFieldToFilter('customer_id', ['eq' => trim($customerId)])
                 ->addFieldToFilter('token_expiry_date', ['gteq' => $today])->getData();
@@ -91,7 +101,7 @@ class InvoiceGenerated implements ObserverInterface
     public function getAddressInfo($subscriptionId)
     {
         if ($subscriptionId) {
-            $result = $this->addressCollectionFactory->getCollection()
+            $result = $this->subscriptionAddressCollectionFactory->create()
                 ->addFieldToFilter('subscription_id', ['eq' => trim($subscriptionId)])->getData();
             return $result;
         }

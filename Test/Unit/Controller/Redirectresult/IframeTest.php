@@ -15,6 +15,7 @@ use Sapient\Worldpay\Controller\Redirectresult\Iframe;
 
 class IframeTest extends TestCase
 {
+    use \Sapient\Worldpay\Test\Unit\ObjectFactory;
     
     /**
      * @var Iframe
@@ -22,16 +23,20 @@ class IframeTest extends TestCase
     protected $iframeObj;
     protected function setUp(): void
     {
-        $context = $this->getMockBuilder(Context::class)
-                        ->disableOriginalConstructor()->getMock();
-        $page = $this->getMockBuilder(PageFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $hppstate = $this->getMockBuilder(State::class)
-                        ->disableOriginalConstructor()->getMock();
-        $wplogger = $this->getMockBuilder(WorldpayLogger::class)
-                        ->disableOriginalConstructor()->getMock();
+        $context = $this->createStub(Context::class);
+        $page = $this->createStub(PageFactory::class);
+        $hppstate = $this->createStub(State::class);
+        $wplogger = $this->createStub(WorldpayLogger::class);
 
-        $this->iframeObj = new Iframe($context, $page, $hppstate, $wplogger);
+        $this->iframeObj = $this->createObject(
+            Iframe::class,
+            [
+                'context' => $context,
+                'pageFactory' => $page,
+                'hppstate' => $hppstate,
+                'wplogger' => $wplogger,
+            ]
+        );
     }
     
     public function testExecute()

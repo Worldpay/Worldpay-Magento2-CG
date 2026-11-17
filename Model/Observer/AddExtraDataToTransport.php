@@ -34,7 +34,7 @@ class AddExtraDataToTransport implements ObserverInterface
     * Execute
     *
     * @param \Magento\Framework\Event\Observer $observer
-    * @return string
+    * @return void
     */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {

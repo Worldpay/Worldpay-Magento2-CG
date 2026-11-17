@@ -146,7 +146,7 @@ class SimplePlugin
      *
      * @param \Magento\Catalog\Model\Product\Type\AbstractType $subject
      * @param Product $product
-     * @return \Magento\Catalog\Model\Product\Type\AbstractType
+     * @return \Magento\Catalog\Model\Product\Type\AbstractType|null
      * @throws \Magento\Framework\Exception\LocalizedException
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)

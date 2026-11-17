@@ -25,6 +25,9 @@ use Magento\Framework\DataObject\Copy;
 
 class DirectServiceTest extends TestCase
 {
+    use \Sapient\Worldpay\Test\Unit\ObjectFactory;
+    /** @var Data */
+    protected $datahelper;
 
     /**
      *
@@ -58,111 +61,43 @@ class DirectServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mappingservice = $this->getMockBuilder(Service::class)
-                ->disableOriginalConstructor()
-                ->setMethods(['collectDirectOrderParameters'])
-                ->getMock();
-        $this->paymentservicerequest = $this->getMockBuilder(PaymentServiceRequest::class)
-                ->disableOriginalConstructor()
-                ->getMock();
-        $wplogger = $this->getMockBuilder(WorldpayLogger::class)
-                        ->disableOriginalConstructor()->getMock();
+        $this->mappingservice = $this->createStub(Service::class);
+        $this->paymentservicerequest = $this->createStub(PaymentServiceRequest::class);
+        $wplogger = $this->createStub(WorldpayLogger::class);
         
-        $directresponse = $this->getMockBuilder(DirectResponse::class)
-                        ->disableOriginalConstructor()->setMethods(['checkCurrency'])->getMock();
+        $directresponse = $this->createStub(DirectResponse::class);
         
-        $updateWorldPayPayment = $this->getMockBuilder(UpdateWorldpaymentFactory::class)
-                        ->disableOriginalConstructor()->getMock();
+        $updateWorldPayPayment = $this->createStub(UpdateWorldpaymentFactory::class);
         
-        $paymentService = $this->getMockBuilder(PaymentService::class)
-                        ->disableOriginalConstructor()->getMock();
+        $paymentService = $this->createStub(PaymentService::class);
         
-        $this->registryhelper = $this->getMockBuilder(Registry::class)
-                        ->disableOriginalConstructor()
-                        ->getMock();
-        $this->datahelper = $this->getMockBuilder(Data::class)
-                        ->disableOriginalConstructor()->getMock();
-        $checkoutSession = $this->checkoutsession = $this->getMockBuilder(Session::class)
-                ->disableOriginalConstructor()
-                ->getMock();
-        $urlInterface = $this->getMockBuilder(UrlInterface::class)
-                        ->disableOriginalConstructor()->getMock();
+        $this->registryhelper = $this->createStub(Registry::class);
+        $this->datahelper = $this->createStub(Data::class);
+        $checkoutSession = $this->checkoutsession = $this->createStub(Session::class);
+        $urlInterface = $this->createStub(UrlInterface::class);
            
-        $objectCopyService = $this->getMockBuilder(Copy::class)
-                        ->disableOriginalConstructor()->getMock();
+        $objectCopyService = $this->createStub(Copy::class);
 
-        $this->dirctccObj = new DirectService(
-            $this->mappingservice,
-            $this->paymentservicerequest,
-            $wplogger,
-            $directresponse,
-            $updateWorldPayPayment,
-            $paymentService,
-            $this->registryhelper,
-            $urlInterface,
-            $checkoutSession,
-            $this->datahelper,
-            $objectCopyService
+        $this->dirctccObj = $this->createObject(
+            DirectService::class,
+            [
+                'mappingservice' => $this->mappingservice,
+                'paymentservicerequest' => $this->paymentservicerequest,
+                'wplogger' => $wplogger,
+                'directResponse' => $directresponse,
+                'updateWorldPayPayment' => $updateWorldPayPayment,
+                'paymentservice' => $paymentService,
+                'registryhelper' => $this->registryhelper,
+                'urlBuilder' => $urlInterface,
+                'checkoutSession' => $checkoutSession,
+                'worldpayHelper' => $this->datahelper,
+                'objectCopyService' => $objectCopyService,
+            ]
         );
     }
 
     public function testAuthorizePayment()
     {
-
-        $payment = $this->getMockBuilder(InfoInterface::class)
-                ->disableOriginalConstructor()->setMethods(['setIsTransactionPending', 'getOrder'])
-                ->getMockForAbstractClass();
-        $mageOrder = $payment->expects($this->any())
-                ->method('getOrder')
-                ->willReturn(180);
-        $payment->expects($this->any())
-                ->method('setIsTransactionPending')
-                ->with(1)
-                ->willReturn(true);
-
-        $quoteRepository = $this->getMockBuilder(CartRepositoryInterface::class)
-                ->disableOriginalConstructor()->setMethods(['get'])
-                ->getMockForAbstractClass();
-        $response = [
-            'orderCode' => '000000180-1601543787',
-            'merchantCode' => 'SAPIENTNITROECOMMERCEV1',
-            'orderDescription' => 'WorldPay Order',
-            'currencyCode' => 'EUR',
-            'amount' => 8335,
-            'paymentType' => 'AMEX-SSL',
-            'shopperEmail' => 'roni_cost@example.com',
-            'statementNarrative' => '',
-            'threeDSecureConfig' => '',
-            'tokenRequestConfig' => '',
-            'acceptHeader' => '',
-            'userAgentHeader' => '',
-            'shippingAddress' => 'Veronica Costello,
-                                  6146 Honey Bluff Parkway
-                                  Calder, Michigan, 49628-7978,
-                                  United States,
-                                  T: (555) 229-3326',
-            'billingAddress' => 'Veronica Costello,
-                                  6146 Honey Bluff Parkway
-                                  Calder, Michigan, 49628-7978,
-                                  United States,
-                                  T: (555) 229-3326',
-            'method' => 'AMEX-SSL',
-            'paymentPagesEnabled' => 'true',
-            'installationId' => '1074624',
-            'hideAddress' => 'true',
-            'shopperId' => '',
-            'orderStoreId' => '000000180-1601543787',
-            'paymentDetails' => 'SENT_FOR_AUTHORISATION',
-            'thirdPartyData' => '',
-            'shippingfee' => '0',
-            'exponent' => '2'
-        ];
-
-        $this->mappingservice->expects($this->any())
-                ->method('collectDirectOrderParameters')
-                ->with('ORDER_CODE', $quoteRepository, '', [])
-                ->willReturn($response);
-
         $this->assertInstanceOf(DirectService::class, $this->dirctccObj);
     }
 }

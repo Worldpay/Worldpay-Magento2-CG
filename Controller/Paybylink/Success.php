@@ -13,6 +13,11 @@ use Magento\Framework\App\Action\Context;
 class Success extends \Magento\Framework\App\Action\Action
 {
     /**
+     * @var \Magento\Quote\Model\ResourceModel\Quote
+     */
+    private $quoteResource;
+
+    /**
      * @var Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;
@@ -52,6 +57,7 @@ class Success extends \Magento\Framework\App\Action\Action
      * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+     * @param \Magento\Quote\Model\ResourceModel\Quote $quoteResource
      */
     public function __construct(
         Context $context,
@@ -60,15 +66,17 @@ class Success extends \Magento\Framework\App\Action\Action
         \Magento\Sales\Model\Order $orderItemsDetails,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Quote\Model\QuoteFactory $quoteFactory
+        \Magento\Quote\Model\QuoteFactory $quoteFactory,
+        \Magento\Quote\Model\ResourceModel\Quote $quoteResource
     ) {
+        $this->quoteResource = $quoteResource;
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
         $this->wplogger = $wplogger;
         $this->orderItemsDetails = $orderItemsDetails;
         $this->_checkoutSession = $checkoutSession;
         $this->quoteFactory = $quoteFactory;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
 
     /**
@@ -87,7 +95,8 @@ class Success extends \Magento\Framework\App\Action\Action
                 $this->setOrderSessionData($order);
                 $this->orderservice->redirectOrderSuccess();
                 $this->orderservice->removeAuthorisedOrder();
-                $quote = $this->quoteFactory->create()->load($order->getQuoteId());
+                $quote = $this->quoteFactory->create();
+                $this->quoteResource->load($quote, $order->getQuoteId());
                 $isMultiShipping = $quote->getIsMultiShipping();
                 if ($isMultiShipping) {
                     $url = 'worldpay/paybylink_multishipping/success?orderKey='.$params['orderKey'];

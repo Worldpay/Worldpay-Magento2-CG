@@ -21,6 +21,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 
 class HostedPaymentPageServiceTest extends TestCase
 {
+    use \Sapient\Worldpay\Test\Unit\ObjectFactory;
 
     /**
      *
@@ -46,117 +47,32 @@ class HostedPaymentPageServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->mappingservice = $this->getMockBuilder(Service::class)
-                ->disableOriginalConstructor()
-                ->setMethods(['collectRedirectOrderParameters'])
-                ->getMock();
-        $this->paymentservicerequest = $this->getMockBuilder(PaymentServiceRequest::class)
-                ->disableOriginalConstructor()
-                ->getMock();
-        $wplogger = $this->getMockBuilder(WorldpayLogger::class)
-                        ->disableOriginalConstructor()->getMock();
-        $redirectresponse = $this->getMockBuilder(RedirectResponse::class)
-                        ->disableOriginalConstructor()->setMethods(['checkCurrency'])->getMock();
-        $this->registryhelper = $this->getMockBuilder(Registry::class)
-                        ->disableOriginalConstructor()
-                        ->setMethods(['setworldpayRedirectUrl'])->getMock();
-        $hppstate = $this->getMockBuilder(State::class)
-                        ->disableOriginalConstructor()->getMock();
-        $this->checkoutsession = $this->getMockBuilder(Session::class)
-                ->disableOriginalConstructor()
-                ->setMethods(['setauthenticatedOrderId', 'setWpRedirecturl'])
-                ->getMock();
-        $urlInterface = $this->getMockBuilder(UrlInterface::class)
-                        ->disableOriginalConstructor()->getMock();
+        $this->mappingservice = $this->createStub(Service::class);
+        $this->paymentservicerequest = $this->createStub(PaymentServiceRequest::class);
+        $wplogger = $this->createStub(WorldpayLogger::class);
+        $redirectresponse = $this->createStub(RedirectResponse::class);
+        $this->registryhelper = $this->createStub(Registry::class);
+        $hppstate = $this->createStub(State::class);
+        $this->checkoutsession = $this->createStub(Session::class);
+        $urlInterface = $this->createStub(UrlInterface::class);
 
-        $this->hppObj = new HostedPaymentPageService(
-            $this->mappingservice,
-            $this->paymentservicerequest,
-            $wplogger,
-            $redirectresponse,
-            $this->registryhelper,
-            $hppstate,
-            $this->checkoutsession,
-            $urlInterface
+        $this->hppObj = $this->createObject(
+            HostedPaymentPageService::class,
+            [
+                'mappingservice' => $this->mappingservice,
+                'paymentservicerequest' => $this->paymentservicerequest,
+                'wplogger' => $wplogger,
+                'redirectresponse' => $redirectresponse,
+                'registryhelper' => $this->registryhelper,
+                'hppstate' => $hppstate,
+                'checkoutsession' => $this->checkoutsession,
+                'urlInterface' => $urlInterface,
+            ]
         );
     }
 
     public function testAuthorizePayment()
     {
-
-        $payment = $this->getMockBuilder(InfoInterface::class)
-                ->disableOriginalConstructor()->setMethods(['setIsTransactionPending', 'getOrder'])
-                ->getMockForAbstractClass();
-        $mageOrder = $payment->expects($this->any())
-                ->method('getOrder')
-                ->willReturn(190);
-        $payment->expects($this->any())
-                ->method('setIsTransactionPending')
-                ->with(1)
-                ->willReturn(true);
-        $this->checkoutsession->expects($this->any())
-                ->method('setauthenticatedOrderId')
-                ->with($mageOrder)
-                ->willReturn(true);
-
-        $quoteRepository = $this->getMockBuilder(CartRepositoryInterface::class)
-                ->disableOriginalConstructor()->setMethods(['get'])
-                ->getMockForAbstractClass();
-        $response = [
-            'orderCode' => '000000177-1601543787',
-            'merchantCode' => 'SAPIENTNITROECOMMERCEV1',
-            'orderDescription' => 'WorldPay Order',
-            'currencyCode' => 'EUR',
-            'amount' => 8335,
-            'paymentType' => 'ECMC-SSL',
-            'shopperEmail' => 'roni_cost@example.com',
-            'statementNarrative' => '',
-            'threeDSecureConfig' => '',
-            'tokenRequestConfig' => '',
-            'acceptHeader' => '',
-            'userAgentHeader' => '',
-            'shippingAddress' => 'Veronica Costello,
-                                  6146 Honey Bluff Parkway
-                                  Calder, Michigan, 49628-7978,
-                                  United States,
-                                  T: (555) 229-3326',
-            'billingAddress' => 'Veronica Costello,
-                                  6146 Honey Bluff Parkway
-                                  Calder, Michigan, 49628-7978,
-                                  United States,
-                                  T: (555) 229-3326',
-            'method' => 'ECMC-SSL',
-            'paymentPagesEnabled' => 'true',
-            'installationId' => '1074624',
-            'hideAddress' => 'true',
-            'shopperId' => '',
-            'orderStoreId' => '	000000177-1601543787',
-            'paymentDetails' => 'SENT_FOR_AUTHORISATION',
-            'thirdPartyData' => '',
-            'shippingfee' => '0',
-            'exponent' => '2'
-        ];
-
-        $this->mappingservice->expects($this->any())
-                ->method('collectRedirectOrderParameters')
-                ->with('ORDER_CODE', $quoteRepository, '', [])
-                ->willReturn($response);
-
-        $this->paymentservicerequest->expects($this->any())
-                ->method('redirectOrder')
-                ->with($response)
-                ->willReturn($response);
-
-        $this->registryhelper->expects($this->any())
-                ->method('setworldpayRedirectUrl')
-                ->with('https://hpp-sandbox.worldpay.com/app/hpp/61-0/payment/start')
-                ->willReturn(true);
-
-        $this->checkoutsession->expects($this->any())
-                ->method('setWpRedirecturl')
-                ->with('https://hpp-sandbox.worldpay.com/app/hpp/61-0/payment/start')
-                ->willReturn(true);
-
         $this->assertInstanceOf(HostedPaymentPageService::class, $this->hppObj);
     }
 }

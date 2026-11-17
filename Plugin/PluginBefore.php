@@ -15,6 +15,9 @@ use Sapient\Worldpay\Helper\Data;
  */
 class PluginBefore
 {
+    /** @var \Magento\Sales\Model\ResourceModel\Order */
+    private $orderResource;
+
     /**
      * @var \Magento\Framework\UrlInterface
      */
@@ -73,8 +76,10 @@ class PluginBefore
         \Magento\Framework\Stdlib\DateTime\DateTime $objDate,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timeobj,
         \Sapient\Worldpay\Model\Worldpayment $worldpaymodel,
-        Data $worldpayHelper
+        Data $worldpayHelper,
+        \Magento\Sales\Model\ResourceModel\Order $orderResource
     ) {
+        $this->orderResource = $orderResource;
         $this->_urlBuilder = $urlBuilder;
         $this->order = $order;
         $this->request = $request;
@@ -103,7 +108,8 @@ class PluginBefore
             $requestdata = $this->request->getParams();
             $orderId = $requestdata['order_id'];
             $syncurl = $this->_urlBuilder->getUrl("worldpay/syncstatus/index", ['order_id' => $orderId]);
-            $order = $this->order->load($orderId);
+            $order = $this->order;
+            $this->orderResource->load($order, $orderId);
             if ($order->getPayment()->getMethod()=='worldpay_cc'
                 || $order->getPayment()->getMethod()=='worldpay_apm'
                 || $order->getPayment()->getMethod()=='worldpay_moto'
@@ -194,7 +200,7 @@ class PluginBefore
      * Check eligibility for void sale
      *
      * @param Order $order
-     * @return bool
+     * @return bool|null
      */
     public function checkEligibilityForVoidSale($order)
     {

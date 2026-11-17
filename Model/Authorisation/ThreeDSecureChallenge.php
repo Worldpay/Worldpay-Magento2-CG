@@ -8,6 +8,21 @@ use Exception;
 
 class ThreeDSecureChallenge extends \Magento\Framework\DataObject
 {
+    /**
+     * @var \Sapient\Worldpay\Model\Order
+     */
+    protected $_order;
+
+    /**
+     * @var object
+     */
+    protected $_paymentUpdate;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Response\DirectResponse
+     */
+    protected $response;
+
     /** @var \Sapient\Worldpay\Model\Payment\UpdateWorldpaymentFactory */
     protected $updateWorldPayPayment;
 

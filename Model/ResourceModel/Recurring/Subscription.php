@@ -8,6 +8,9 @@ namespace Sapient\Worldpay\Model\ResourceModel\Recurring;
 
 class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
+    /** @var \Magento\Sales\Model\ResourceModel\Order */
+    private $orderResource;
+
     /**
      * @var \Magento\Sales\Model\OrderFactory
      */
@@ -31,8 +34,10 @@ class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     public function __construct(
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \Magento\Sales\Model\OrderFactory $orderFactory,
+        \Magento\Sales\Model\ResourceModel\Order $orderResource,
         $connectionName = null
     ) {
+        $this->orderResource = $orderResource;
         parent::__construct($context, $connectionName);
         $this->orderFactory = $orderFactory;
     }
@@ -56,7 +61,7 @@ class Subscription extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     public function updateOrderRelation($orderId, $subscriptionId)
     {
-        $orderResource = $this->orderFactory->create()->getResource();
+        $orderResource = $this->orderResource;
         
         $orderResource->getConnection()->update(
             $orderResource->getMainTable(),

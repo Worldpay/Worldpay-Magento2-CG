@@ -15,6 +15,11 @@ use \Magento\Customer\Model\Session;
 class Edit extends \Magento\Framework\App\Action\Action
 {
     /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\SavedToken
+     */
+    private $savedTokenResource;
+
+    /**
      * @var \Magento\Framework\View\Result\PageFactory
      */
     protected $_resultPageFactory;
@@ -42,14 +47,17 @@ class Edit extends \Magento\Framework\App\Action\Action
      * @param SavedTokenFactory $savecard
      * @param Session $customerSession
      * @param \Sapient\Worldpay\Helper\Data $worldpayHelper
+     * @param \Sapient\Worldpay\Model\ResourceModel\SavedToken $savedTokenResource
      */
     public function __construct(
         Context $context,
         PageFactory $resultPageFactory,
         SavedTokenFactory $savecard,
         Session $customerSession,
-        \Sapient\Worldpay\Helper\Data $worldpayHelper
+        \Sapient\Worldpay\Helper\Data $worldpayHelper,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken $savedTokenResource
     ) {
+        $this->savedTokenResource = $savedTokenResource;
         parent::__construct($context);
         $this->_resultPageFactory = $resultPageFactory;
         $this->savecard = $savecard;
@@ -76,7 +84,8 @@ class Edit extends \Magento\Framework\App\Action\Action
         $id = $this->getRequest()->getParam('id');
         $customerId = $this->customerSession->getCustomer()->getId();
         if ($id) {
-            $cardDetails = $this->savecard->create()->load($id);
+            $cardDetails = $this->savecard->create();
+            $this->savedTokenResource->load($cardDetails, $id);
             if ($cardDetails->getCustomerId() != $customerId) {
                 $resultRedirect->setPath('404notfound');
                 return $resultRedirect;

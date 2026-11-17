@@ -87,7 +87,7 @@ class Error extends \Magento\Framework\App\Action\Action
         $this->checkoutSession = $checkoutSession;
         $this->helper = $helper;
         $this->multishippingHelper = $multishippingHelper;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
     /**
      * Execute

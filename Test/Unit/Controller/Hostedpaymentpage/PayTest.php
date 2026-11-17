@@ -63,8 +63,7 @@ class PayTest extends TestCase
 
     public function testExecuteIsIframe()
     {
-        $this->dataHelper->expects($this->any())
-                ->method('isIframeIntegration')
+        $this->dataHelper->method('isIframeIntegration')
                 ->willReturn(true);
 
         $ObjectManager = $this->getMockBuilder(ObjectManagerInterface::class)
@@ -75,13 +74,11 @@ class PayTest extends TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
-        $ObjectManager->expects($this->any())
-                ->method('create')
+        $ObjectManager->method('create')
                 ->with($page, [])
                 ->willReturn($page);
 
-        $this->pageFactory->expects($this->any())
-                ->method('create')
+        $this->pageFactory->method('create')
                 ->willReturn($page);
         $this->assertInstanceOf(Pay::class, $this->payObj);
     }

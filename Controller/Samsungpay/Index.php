@@ -117,7 +117,7 @@ class Index extends \Magento\Framework\App\Action\Action
     /**
      * Execute
      *
-     * @return string
+     * @return \Magento\Framework\Controller\ResultInterface|\Magento\Framework\App\ResponseInterface|null
      */
     public function execute()
     {

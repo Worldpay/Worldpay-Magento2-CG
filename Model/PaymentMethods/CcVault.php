@@ -232,6 +232,7 @@ class CcVault extends \Magento\Vault\Model\Method\Vault
         $stateObject->setStatus('pending');
         $stateObject->setState(\Magento\Sales\Model\Order::STATE_NEW);
         $stateObject->setIsNotified(false);
+        return $this;
     }
 
     /**

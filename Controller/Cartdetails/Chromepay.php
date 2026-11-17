@@ -48,7 +48,7 @@ class Chromepay extends \Magento\Framework\App\Action\Action
         $this->_paymentservicerequest = $paymentservicerequest;
         $this->_authSession = $authSession;
                 $this->worldpayHelper = $worldpayHelper;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
     /**
      * Execute

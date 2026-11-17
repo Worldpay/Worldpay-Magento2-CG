@@ -11,6 +11,11 @@ use Sapient\Worldpay\Helper\GeneralException;
 class Validate extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
 {
     /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan
+     */
+    private $planResource;
+
+    /**
      * @var $helper
      */
     protected $helper;
@@ -25,14 +30,17 @@ class Validate extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
      * @param \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param \Sapient\Worldpay\Helper\GeneralException $helper
+     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan $planResource
      */
 
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Sapient\Worldpay\Helper\GeneralException $helper
+        \Sapient\Worldpay\Helper\GeneralException $helper,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan $planResource
     ) {
+        $this->planResource = $planResource;
         $this->helper = $helper;
         $this->storeManager =$storeManager;
         parent::__construct($context, $planFactory);
@@ -57,7 +65,8 @@ class Validate extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
             return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($response);
         }
 
-        $plan = $this->planFactory->create()->load($planCode, 'code');
+        $plan = $this->planFactory->create();
+        $this->planResource->load($plan, $planCode, 'code');
         if ($plan->getId()) {
             $response['error'] = true;
             $response['messages'][] = __($this->helper->getConfigValue('ACAM2', $store, 'website'));

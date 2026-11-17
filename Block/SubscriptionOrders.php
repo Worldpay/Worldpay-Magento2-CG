@@ -10,6 +10,16 @@ use Sapient\Worldpay\Model\SubscriptionOrder;
 class SubscriptionOrders extends \Magento\Framework\View\Element\Template
 {
     /**
+     * @var \Magento\Customer\Model\Session
+     */
+    protected $customerSession;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
+    protected $recurringhelper;
+
+    /**
      * @var SubscriptionOrder
      */
     protected $subscriptionOrder;
@@ -50,6 +60,7 @@ class SubscriptionOrders extends \Magento\Framework\View\Element\Template
     ) {
         $this->subscriptionOrder = $subscriptionOrder;
         $this->recurringhelper = $recurringhelper;
+        $this->customerSession = $customerSession;
         $this->orderRepository = $orderRepository;
         $this->urlInterface = $urlInterface;
         parent::__construct($context, $data);

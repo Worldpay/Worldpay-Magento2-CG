@@ -9,6 +9,11 @@ use Magento\Framework\Serialize\SerializerInterface;
 class Savedcard extends \Magento\Framework\View\Element\Template
 {
     /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory
+     */
+    private $savedTokenCollectionFactory;
+
+    /**
      * @var \Sapient\Worldpay\Model\SavedTokenFactory
      */
     protected $_savecard;
@@ -57,6 +62,7 @@ class Savedcard extends \Magento\Framework\View\Element\Template
      * @param \Magento\Customer\Model\Address\Mapper $addressMapper
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
      * @param array $data
+     * @param \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory $savedTokenCollectionFactory
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
@@ -68,8 +74,10 @@ class Savedcard extends \Magento\Framework\View\Element\Template
         \Magento\Customer\Model\Address\Config $addressConfig,
         \Magento\Customer\Model\Address\Mapper $addressMapper,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory $savedTokenCollectionFactory,
         array $data = []
     ) {
+        $this->savedTokenCollectionFactory = $savedTokenCollectionFactory;
         $this->_savecard = $savecard;
         $this->_customerSession = $customerSession;
         $this->worlpayhelper = $worldpayhelper;
@@ -149,7 +157,7 @@ class Savedcard extends \Magento\Framework\View\Element\Template
         $storeId = $this->getStoreId();
         $merchantTokenEnabled = $this->worlpayhelper->getMerchantTokenization();
         $tokenType = $merchantTokenEnabled ? 'merchant' : 'shopper';
-        return $savedCardCollection = $this->_savecard->create()->getCollection()
+        return $savedCardCollection = $this->savedTokenCollectionFactory->create()
                                     ->addFieldToSelect(['id','card_brand','card_number',
                                         'cardholder_name','card_expiry_month','card_expiry_year',
                                         'transaction_identifier', 'token_code'])
@@ -162,7 +170,7 @@ class Savedcard extends \Magento\Framework\View\Element\Template
      * Check Account Label
      *
      * @param string $labelCode
-     * @return string
+     * @return string|null
      */
     public function getMyAccountLabels($labelCode)
     {
@@ -180,7 +188,7 @@ class Savedcard extends \Magento\Framework\View\Element\Template
      * Check checkout label
      *
      * @param string $labelCode
-     * @return string
+     * @return string|null
      */
     public function getCheckoutLabels($labelCode)
     {

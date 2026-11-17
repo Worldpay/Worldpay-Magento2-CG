@@ -37,15 +37,8 @@ class KlarnaCountriesTest extends TestCase
 
     protected function setUp(): void
     {
-        $countryCollectionFactory = $this->getMockBuilder(CollectionFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $this->collection = $this->getMockBuilder(Collection::class)
-                        ->disableOriginalConstructor()
-                ->setMethods(['loadByStore'])->getMock();
-        $this->scopeConfig = $this->getMockBuilder(ScopeConfigInterface::class)
-                        ->disableOriginalConstructor()->getMock();
-        $this->abstractCollection = $this->getMockBuilder(AbstractCollection::class)
-                        ->disableOriginalConstructor()->getMock();
+        $countryCollectionFactory = $this->createStub(CollectionFactory::class);
+        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $this->model = new KlarnaCountries($countryCollectionFactory, $this->scopeConfig);
     }
     

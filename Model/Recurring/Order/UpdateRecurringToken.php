@@ -11,6 +11,12 @@ use Sapient\Worldpay\Model\Recurring\SubscriptionFactory;
 
 class UpdateRecurringToken implements UpdateRecurringTokenInterface
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions */
+    private $transactionsResource;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\SavedToken */
+    private $savedTokenResource;
+
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
@@ -94,8 +100,12 @@ class UpdateRecurringToken implements UpdateRecurringTokenInterface
         \Magento\Customer\Model\Session $customerSession,
         \Sapient\Worldpay\Model\Token\Service $savedTokenService,
         \Sapient\Worldpay\Model\SavedToken $savedToken,
-        \Sapient\Worldpay\Model\EditSubscriptionHistoryRepository $editSubscriptionRepository
+        \Sapient\Worldpay\Model\EditSubscriptionHistoryRepository $editSubscriptionRepository,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken $savedTokenResource,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions $transactionsResource
     ) {
+        $this->transactionsResource = $transactionsResource;
+        $this->savedTokenResource = $savedTokenResource;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->coreRegistry = $registry;
@@ -125,7 +135,8 @@ class UpdateRecurringToken implements UpdateRecurringTokenInterface
      */
     public function getToken($id)
     {
-        return $this->savedToken->load($id);
+        $this->savedTokenResource->load($this->savedToken, $id);
+        return $this->savedToken;
     }
 
     /**
@@ -181,7 +192,7 @@ class UpdateRecurringToken implements UpdateRecurringTokenInterface
                 $paymentMethod = $transactionData->getMethod();
 
                 $transaction->setData('worldpay_token_id', $tokenId);
-                $transaction->save();
+                $this->transactionsResource->save($transaction);
 
                 $this->editSubscriptionRepository
                     ->updateEditHistory(

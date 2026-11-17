@@ -84,8 +84,11 @@ class ChallengeRedirectResponse extends \Magento\Framework\App\Action\Action
     {
         $resultPage = $this->_resultPageFactory->create();
                 $block = $resultPage->getLayout()
-                ->createBlock(\Sapient\Worldpay\Block\Checkout\Hpp\ChallengeIframe::class)
-                ->setTemplate('Sapient_Worldpay::checkout/hpp/challengeiframe.phtml')
+                ->createBlock(
+                    \Sapient\Worldpay\Block\Checkout\Hpp\ChallengeIframe::class,
+                    '',
+                    ['data' => ['template' => 'Sapient_Worldpay::checkout/hpp/challengeiframe.phtml']]
+                )
                 ->toHtml();
                 return $this->getResponse()->setBody($block);
     }

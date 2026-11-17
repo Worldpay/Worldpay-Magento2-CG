@@ -14,6 +14,7 @@ use Sapient\Worldpay\Controller\Redirectresult\Redirect;
 
 class RedirectTest extends TestCase
 {
+    use \Sapient\Worldpay\Test\Unit\ObjectFactory;
 
     /**
      * @var Redirect
@@ -22,16 +23,20 @@ class RedirectTest extends TestCase
 
     protected function setUp(): void
     {
-        $context = $this->getMockBuilder(Context::class)
-                        ->disableOriginalConstructor()->getMock();
-        $page = $this->getMockBuilder(PageFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $checkoutsession = $this->getMockBuilder(Session::class)
-                        ->disableOriginalConstructor()->getMock();
-        $mageOrder = $this->getMockBuilder(Order::class)
-                        ->disableOriginalConstructor()->getMock();
+        $context = $this->createStub(Context::class);
+        $page = $this->createStub(PageFactory::class);
+        $checkoutsession = $this->createStub(Session::class);
+        $mageOrder = $this->createStub(Order::class);
 
-        $this->redirectObj = new Redirect($context, $page, $checkoutsession, $mageOrder);
+        $this->redirectObj = $this->createObject(
+            Redirect::class,
+            [
+                'context' => $context,
+                'pageFactory' => $page,
+                'checkoutsession' => $checkoutsession,
+                'mageOrder' => $mageOrder,
+            ]
+        );
     }
 
     public function testExecute()

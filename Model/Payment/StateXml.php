@@ -105,7 +105,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
     /**
      * Retrive card number from xml
      *
-     * @return string
+     * @return string|null
      */
     public function getCardNumber()
     {
@@ -399,7 +399,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
     /**
      * Retrieve source type from xml
      *
-     * @return string
+     * @return string|null
      */
     public function getSourceType()
     {
@@ -411,7 +411,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
     /**
      * Retrieve available balance from xml
      *
-     * @return string
+     * @return string|null
      */
     public function getAvailableBalance()
     {
@@ -423,7 +423,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
     /**
      * Retrieve prepaid card type from xml
      *
-     * @return string
+     * @return string|null
      */
     public function getPrepaidCardType()
     {
@@ -435,7 +435,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
     /**
      * Retrieve status node from xml
      *
-     * @return string
+     * @return string|null
      */
     public function getReloadable()
     {
@@ -497,7 +497,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
     /**
      * Retrieve fraud sight message from xml
      *
-     * @return string
+     * @return string|null
      */
     public function getFraudsightMessage()
     {
@@ -509,7 +509,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
     /**
      * Retrieve fraud sight score from xml
      *
-     * @return string
+     * @return string|null
      */
     public function getFraudsightScore()
     {
@@ -521,7 +521,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
     /**
      * Retrieve fraud sight reason code from xml
      *
-     * @return string
+     * @return string|null
      */
     public function getFraudsightReasonCode()
     {

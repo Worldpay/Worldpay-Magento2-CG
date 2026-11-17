@@ -11,6 +11,15 @@ use Magento\Sales\Api\OrderManagementInterface;
 
 class Order
 {
+    /** @var \Magento\Sales\Model\ResourceModel\Order\Item */
+    private $orderItemResource;
+
+    /** @var \Magento\Sales\Model\ResourceModel\Order\Creditmemo */
+    private $creditmemoResource;
+
+    /** @var \Magento\Sales\Model\ResourceModel\Order\Invoice */
+    private $invoiceResource;
+
     /**
      * @var order
      */
@@ -90,8 +99,14 @@ class Order
         \Magento\Sales\Model\Service\CreditmemoService $CreditmemoService,
         Creditmemo $creditmemo,
         \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository,
-        OrderManagementInterface $orderManagement
+        OrderManagementInterface $orderManagement,
+        \Magento\Sales\Model\ResourceModel\Order\Invoice $invoiceResource,
+        \Magento\Sales\Model\ResourceModel\Order\Creditmemo $creditmemoResource,
+        \Magento\Sales\Model\ResourceModel\Order\Item $orderItemResource
     ) {
+        $this->orderItemResource = $orderItemResource;
+        $this->creditmemoResource = $creditmemoResource;
+        $this->invoiceResource = $invoiceResource;
         $this->_order = $args['order'];
         $this->_invoiceService = $invoiceService;
         $this->_transaction = $transaction;
@@ -199,7 +214,7 @@ class Order
     /**
      * Retrieve capture
      *
-     * @return string
+     * @return string|null
      */
     public function capture()
     {
@@ -263,7 +278,7 @@ class Order
         $invoice = $this->_invoiceService->prepareInvoice($order);
         $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
         $invoice->register();
-        $invoice->save();
+        $this->invoiceResource->save($invoice);
 
         $transactionSave = $this->_transaction->addObject(
             $invoice
@@ -331,7 +346,7 @@ class Order
         }
 
         $creditmemo = $this->ordercreditmemo;
-        $creditmemo->load($reference, 'increment_id');
+        $this->creditmemoResource->load($creditmemo, $reference, 'increment_id');
 
         if (!$creditmemo->getId()) {
             throw new \Magento\Framework\Exception\LocalizedException(
@@ -406,7 +421,7 @@ class Order
      * Create Credit Memos
      *
      * @param string $comment
-     * @return boolean
+     * @return boolean|null
      */
 
     private function _createCreditMemos($comment)
@@ -452,7 +467,7 @@ class Order
         }
 
         $creditmemo = $this->ordercreditmemo;
-        $creditmemo->load($reference, 'increment_id');
+        $this->creditmemoResource->load($creditmemo, $reference, 'increment_id');
 
         if ($creditmemo->getOrder()->getId() != $this->getOrder()->getId()) {
             throw new \Magento\Framework\Exception\LocalizedException(
@@ -489,7 +504,7 @@ class Order
     public function refundOffline($reference, string|\Magento\Framework\Phrase $comment): void
     {
         $creditmemo = $this->ordercreditmemo;
-        $creditmemo->load($reference, 'increment_id');
+        $this->creditmemoResource->load($creditmemo, $reference, 'increment_id');
 
         $creditmemo->setState(Creditmemo::STATE_OPEN);
         $order = $creditmemo->getOrder();
@@ -543,7 +558,7 @@ class Order
                 if ($orderItem->getBaseAmountRefunded() > 0) {
                     $orderItem->setAmountRefunded($orderItem->getAmountRefunded() - $item->getRowTotal());
                     $orderItem->setBaseAmountRefunded($orderItem->getBaseAmountRefunded() - $item->getBaseRowTotal());
-                    $orderItem->save();
+                    $this->orderItemResource->save($orderItem);
                 }
             }
         }

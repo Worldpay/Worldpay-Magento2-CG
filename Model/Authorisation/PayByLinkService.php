@@ -11,6 +11,16 @@ use Laminas\Uri\UriFactory;
 class PayByLinkService extends \Magento\Framework\DataObject
 {
     /**
+     * @var \Magento\Framework\Controller\Result\RedirectFactory
+     */
+    protected $resultRedirectFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\Inquiry
+     */
+    protected $xmlinquiry;
+
+    /**
      * @var \Magento\Backend\Model\Auth\Session
      */
     protected $_session;
@@ -145,7 +155,8 @@ class PayByLinkService extends \Magento\Framework\DataObject
         \Magento\Checkout\Model\Cart $cart,
         \Magento\Customer\Model\Address\Config $addressConfig,
         \Magento\Framework\Pricing\Helper\Data $pricingHelper,
-        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper,
+        \Magento\Framework\Controller\Result\RedirectFactory $resultRedirectFactory
     ) {
         $this->mappingservice = $mappingservice;
         $this->paymentservicerequest = $paymentservicerequest;
@@ -165,6 +176,7 @@ class PayByLinkService extends \Magento\Framework\DataObject
         $this->_addressConfig = $addressConfig;
         $this->pricingHelper = $pricingHelper;
         $this->multishippingHelper = $multishippingHelper;
+        $this->resultRedirectFactory = $resultRedirectFactory;
     }
 
     /**
@@ -286,7 +298,7 @@ class PayByLinkService extends \Magento\Framework\DataObject
      * Format Grand Total
      *
      * @param \Magento\Sales\Model\Order $mageOrder
-     * @return string
+     * @return string|null
      */
     public function getFormatGrandTotal($mageOrder)
     {

@@ -109,7 +109,7 @@ class Service
      * Get Payment Update Xml For Notification
      *
      * @param string $xml
-     * @return array
+     * @return array|null
      */
     public function getPaymentUpdateXmlForNotification($xml)
     {
@@ -217,7 +217,7 @@ class Service
      * Set Payment Global Payment By Payment Update
      *
      * @param string $paymentUpdate
-     * @return array
+     * @return array|null
      */
     public function setGlobalPaymentByPaymentUpdate($paymentUpdate)
     {

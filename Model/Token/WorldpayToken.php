@@ -20,6 +20,12 @@ use Magento\Framework\Serialize\Serializer\Json;
  */
 class WorldpayToken
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions */
+    private $transactionsResource;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\SavedToken */
+    private $savedTokenResource;
+
     /**
      * @var PaymentTokenManagementInterface
      */
@@ -87,8 +93,12 @@ class WorldpayToken
         PaymentTokenManagementInterface $paymentTokenManagement,
         EncryptorInterface $encryptor,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
-        Json $serializer
+        Json $serializer,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken $savedTokenResource,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions $transactionsResource
     ) {
+        $this->transactionsResource = $transactionsResource;
+        $this->savedTokenResource = $savedTokenResource;
         $this->savedtoken = $savedtoken;
         $this->wplogger = $wplogger;
         $this->paymentTokenFactory = $paymentTokenFactory;
@@ -110,7 +120,7 @@ class WorldpayToken
     public function updateTokenByCustomer(SavedToken $token, \Magento\Customer\Model\Customer $customer)
     {
         $this->_assertAccessForToken($token, $customer);
-        $token->save();
+        $this->savedTokenResource->save($token);
     }
 
     /**
@@ -156,7 +166,7 @@ class WorldpayToken
     public function deleteTokenByCustomer(SavedToken $token, \Magento\Customer\Model\Customer $customer)
     {
         $this->_assertAccessForToken($token, $customer);
-        $token->delete();
+        $this->savedTokenResource->delete($token);
     }
 
     /**
@@ -175,7 +185,7 @@ class WorldpayToken
 
         $tokenModel = $this->savedtoken;
         $tokenModel->loadByTokenCode($tokenState->getTokenCode());
-        $tokenModel->getResource()->beginTransaction();
+        $this->savedTokenResource->beginTransaction();
         $authenticatedShopperId = $tokenState->getAuthenticatedShopperId();
         $tokenScope = 'shopper';
         if (!$authenticatedShopperId) {
@@ -209,8 +219,8 @@ class WorldpayToken
                 $tokenModel->setBinNumber($tokenState->getBin());
             }
             $tokenModel->setTokenType($tokenScope);
-            $tokenModel->save();
-            $tokenModel->getResource()->commit();
+            $this->savedTokenResource->save($tokenModel);
+            $this->savedTokenResource->commit();
             $this->saveTokenDataToTransactions($tokenState->getOrderCode(), $tokenState->getTokenCode());
             if ('worldpay_cc' == $paymentObject->getMethod()) {
                 // vault and instant purchase configuration goes here
@@ -223,7 +233,7 @@ class WorldpayToken
             } else {
                 $this->wplogger->error($e->getMessage());
             }
-            $tokenModel->getResource()->rollBack();
+            $this->savedTokenResource->rollBack();
             throw $e;
         }
     }
@@ -242,11 +252,12 @@ class WorldpayToken
         $tokenId = $tokenModel->getId();
         $orderId = explode('-', $worldpayOrderId);
         $order_increment_id = $orderId[0];
-        $transactions = $this->transactionFactory->create()->load($order_increment_id, 'original_order_increment_id');
+        $transactions = $this->transactionFactory->create();
+        $this->transactionsResource->load($transactions, $order_increment_id, 'original_order_increment_id');
         $transactions->setData('worldpay_order_id', $worldpayOrderId);
         $transactions->setData('worldpay_token_id', $tokenId);
         $transactions->setData('original_order_increment_id', $orderId[0]);
-        $transactions->save();
+        $this->transactionsResource->save($transactions);
     }
 
     /**

@@ -348,6 +348,8 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
     }
     /**
      * Receive http post request to update saved card details
+     *
+     * @return \Magento\Framework\Controller\ResultInterface|\Magento\Framework\App\ResponseInterface|null
      */
     public function execute()
     {
@@ -557,7 +559,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      * @param string $threeDSecureParams
      * @param string $directOrderParams
      * @param Int $mageOrderId
-     * @return string
+     * @return void
      */
 
     private function _handle3DSecure($threeDSecureParams, $directOrderParams, $mageOrderId)
@@ -574,7 +576,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      * @param string $directOrderParams
      * @param Int $mageOrderId
      * @param string $threeDSecureConfig
-     * @return string
+     * @return void
      */
 
     private function _handle3Ds2($threeDSecureChallengeParams, $directOrderParams, $mageOrderId, $threeDSecureConfig)
@@ -611,7 +613,7 @@ class AddnewcardPost extends \Magento\Customer\Controller\AbstractAccount
      * Get Prime Routing Details
      *
      * @param string $countryCode
-     * @return string
+     * @return array|null
      */
 
     public function getPrimeRoutingDetails($countryCode)

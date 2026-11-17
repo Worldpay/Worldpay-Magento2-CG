@@ -19,6 +19,11 @@ use Sapient\Worldpay\Helper\MyAccountException;
 class Delete extends \Magento\Framework\App\Action\Action
 {
     /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\SavedToken
+     */
+    private $savedTokenResource;
+
+    /**
      * @var \Magento\Framework\View\Result\PageFactory
      */
     protected $_resultPageFactory;
@@ -99,6 +104,7 @@ class Delete extends \Magento\Framework\App\Action\Action
      * @param MyAccountException $helper
      * @param \Magento\Vault\Model\PaymentToken $vaultPaymentToken
      * @param \Magento\Backend\Model\View\Result\Redirect $resultRedirect
+     * @param \Sapient\Worldpay\Model\ResourceModel\SavedToken $savedTokenResource
      */
     public function __construct(
         StoreManagerInterface $storeManager,
@@ -114,8 +120,10 @@ class Delete extends \Magento\Framework\App\Action\Action
         PaymentTokenManagement $paymentTokenManagement,
         MyAccountException $helper,
         \Magento\Vault\Model\PaymentToken $vaultPaymentToken,
-        \Magento\Backend\Model\View\Result\Redirect $resultRedirect
+        \Magento\Backend\Model\View\Result\Redirect $resultRedirect,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken $savedTokenResource
     ) {
+        $this->savedTokenResource = $savedTokenResource;
         parent::__construct($context);
         $this->_storeManager = $storeManager;
         $this->_resultPageFactory = $resultPageFactory;
@@ -154,9 +162,10 @@ class Delete extends \Magento\Framework\App\Action\Action
         }
         $id = $this->getRequest()->getParam('id');
         if ($id) {
+            $model = null;
             try {
                 $model = $this->savecard->create();
-                $model->load($id);
+                $this->savedTokenResource->load($model, $id);
                 if ($this->customerSession->getId() == $model->getCustomerId()) {
                     if ($model->getTokenCode()) {
                         $tokenDeleteResponse = $this->_tokenService->getTokenDelete(
@@ -171,7 +180,7 @@ class Delete extends \Magento\Framework\App\Action\Action
                             $this->_applyVaultTokenDelete($model, $this->customerSession->getCustomer());
                         }
                     } else {
-                        $model->delete($id);
+                        $this->savedTokenResource->delete($model);
                     }
                     $this->messageManager->addSuccess(__($this->helper->getConfigValue('MCAM5')));
                 } else {
@@ -179,7 +188,7 @@ class Delete extends \Magento\Framework\App\Action\Action
                 }
             } catch (\Exception $e) {
                 $this->wplogger->error($e->getMessage());
-                if ($this->_tokenNotExistOnWorldpay($e->getMessage())) {
+                if ($model && $this->_tokenNotExistOnWorldpay($e->getMessage())) {
                     $this->_applyTokenDelete($model, $this->customerSession->getCustomer());
                     $this->_applyVaultTokenDelete($model, $this->customerSession->getCustomer());
 

@@ -82,7 +82,7 @@ class Pending extends \Magento\Framework\App\Action\Action
         $this->paymentservice = $paymentservice;
         $this->paymentStateResponse = $paymentStateResponse;
         $this->wpresponse = $wpresponse;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
    /**
     * Execute
@@ -128,7 +128,7 @@ class Pending extends \Magento\Framework\App\Action\Action
     *
     * @param array $paymentState
     * @param array $order
-    * @return string
+    * @return void
     */
     private function _applyPaymentUpdate($paymentState, $order)
     {

@@ -12,6 +12,11 @@ use Laminas\Uri\Uri;
 class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
 {
     /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan
+     */
+    private $planResource;
+
+    /**
      * @var \Sapient\Payment\Ui\DataProvider\Product\Form\Modifier\Data\RecurringPlans
      */
     private $planGridDataProvider;
@@ -49,6 +54,7 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
      * @param \Sapient\Worldpay\Helper\GeneralException $helper
      * @param \Laminas\Uri\Uri $uri
      * @param \Magento\Framework\App\Response\RedirectInterface $redirect
+     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan $planResource
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -58,8 +64,10 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Sapient\Worldpay\Helper\GeneralException $helper,
         \Laminas\Uri\Uri $uri,
-        \Magento\Framework\App\Response\RedirectInterface $redirect
+        \Magento\Framework\App\Response\RedirectInterface $redirect,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan $planResource
     ) {
+        $this->planResource = $planResource;
         parent::__construct($context, $planFactory);
         $this->planGridDataProvider = $planGridDataProvider;
         $this->localeFormat = $localeFormat;
@@ -77,7 +85,7 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
     public function execute()
     {
         $data = $this->getRequest()->getPostValue();
-        //$productId = $this->getRequest()->getParam('product_id');
+        $productId = null;
 
         //$url = parse_url($this->redirect->getRefererUrl());
         $parsedUrl = $this->uri->parse($this->redirect->getRefererUrl());
@@ -110,7 +118,7 @@ class Save extends \Sapient\Worldpay\Controller\Adminhtml\Recurring\Plan
             $model->setProductId($productId);
 
             try {
-                $model->save();
+                $this->planResource->save($model);
                 return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData([
                     'error' => false,
                     'plan_data' => $this->planGridDataProvider->preparePlanData($model)

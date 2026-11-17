@@ -20,6 +20,9 @@ use Magento\Framework\Serialize\SerializerInterface;
  */
 class WorldpayConfigProvider implements ConfigProviderInterface
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory */
+    private $savedTokenCollectionFactory;
+
     public const CC_VAULT_CODE = "worldpay_cc_vault";
     /**
      * @var string[]
@@ -163,7 +166,9 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Filesystem\Driver\File $fileDriver,
         ProductOnDemand $productOnDemandHelper,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory $savedTokenCollectionFactory
     ) {
+        $this->savedTokenCollectionFactory = $savedTokenCollectionFactory;
 
             $this->wplogger = $wplogger;
         foreach ($this->methodCodes as $code) {
@@ -374,7 +379,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         $isSavedCardEnabled = $this->getIsSaveCardAllowed();
         $tokenType = $this->worldpayHelper->getMerchantTokenization() ? 'merchant' : 'shopper';
         if ($isSavedCardEnabled && ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn())) {
-            $savedCardsList = $this->savedTokenFactory->create()->getCollection()
+            $savedCardsList = $this->savedTokenCollectionFactory->create()
             ->addFieldToFilter('customer_id', $this->customerSession->getCustomerId())
             ->addFieldToFilter('store_id', $this->storeManager->getStore()->getId())
             ->addFieldToFilter('token_type', $tokenType)
@@ -566,7 +571,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         $savedCardsList = [];
         if ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn()) {
             $tokenType = $this->worldpayHelper->getMerchantTokenization() ? 'merchant' : 'shopper';
-            $savedCardsList = $this->savedTokenFactory->create()->getCollection()
+            $savedCardsList = $this->savedTokenCollectionFactory->create()
                 ->addFieldToFilter('customer_id', $customer)
                 ->addFieldToFilter('store_id', $this->storeManager->getStore()->getId())
                 ->addFieldToFilter('token_type', $tokenType)
@@ -822,7 +827,7 @@ class WorldpayConfigProvider implements ConfigProviderInterface
         $savedCardsList = [];
         $tokenType = $this->worldpayHelper->getMerchantTokenization() ? 'merchant' : 'shopper';
         if ($this->customerSession->isLoggedIn() || $this->backendAuthSession->isLoggedIn()) {
-            $savedCardsList = $this->savedTokenFactory->create()->getCollection()
+            $savedCardsList = $this->savedTokenCollectionFactory->create()
             ->addFieldToFilter('customer_id', $this->customerSession->getCustomerId())
             ->addFieldToFilter('store_id', $this->storeManager->getStore()->getId())
             ->addFieldToFilter('token_type', $tokenType)->getData();

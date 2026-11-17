@@ -16,6 +16,15 @@ use Exception;
  */
 class RecurringOrders
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions */
+    private $transactionsResource;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription */
+    private $subscriptionResource;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory */
+    private $savedTokenCollectionFactory;
+
 
     /**
      * @var SubscriptionFactory
@@ -142,8 +151,14 @@ class RecurringOrders
         \Sapient\Worldpay\Helper\Recurring $recurringhelper,
         SubscriptionFactory $subscriptionFactory,
         \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
-        \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
+        \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory $savedTokenCollectionFactory,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription $subscriptionResource,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions $transactionsResource
     ) {
+        $this->transactionsResource = $transactionsResource;
+        $this->subscriptionResource = $subscriptionResource;
+        $this->savedTokenCollectionFactory = $savedTokenCollectionFactory;
         $this->_logger = $wplogger;
         $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->worldpayhelper = $worldpayhelper;
@@ -230,7 +245,8 @@ class RecurringOrders
     {
         $transactionDetails = $this->transactionFactory->create()->loadById($recurringId);
         if ($transactionDetails) {
-               $transactionDetails->setOriginalOrderId($orderId)->save();
+               $transactionDetails->setOriginalOrderId($orderId);
+                $this->transactionsResource->save($transactionDetails);
         }
     }
 
@@ -280,7 +296,7 @@ class RecurringOrders
     {
         $curdate = date("Y-m-d");
         if ($tokenId) {
-            $result = $this->worldpaytoken->getCollection()
+            $result = $this->savedTokenCollectionFactory->create()
                 ->addFieldToFilter('id', ['eq' => trim($tokenId)])
                 ->addFieldToFilter('customer_id', ['eq' => trim($customerId)])
                 ->addFieldToFilter('token_expiry_date', ['gteq' => $curdate])->getData();
@@ -451,6 +467,7 @@ class RecurringOrders
 
             $plan = $this->planFactory->create()->loadById($transactionDetails->getPlanId());
             $planInterval = $plan->getInterval();
+            $recurringDate = null;
 
             $recurringOrderId = $transactionDetails->getRecurringOrderId();
 
@@ -483,14 +500,18 @@ class RecurringOrders
                 $transactions->setRecurringOrderId($recurringOrderId);
                 $transactions->setWorldpayTokenId($transactionDetails->getWorldpayTokenId());
                 $transactions->setWorldpayOrderId($transactionDetails->getWorldpayOrderId());
-                $transactions->save();
+                $this->transactionsResource->save($transactions);
                 $this->_newEntityId = $transactions->getEntityId();
-                $transactionDetails->setStatus('completed')->save();
+                $transactionDetails->setStatus('completed');
+                $this->transactionsResource->save($transactionDetails);
                 return 'completed';
             } else {
-                $subscription = $this->subscriptionFactory->create()->load($transactionDetails->getSubscriptionId());
-                $subscription->setStatus(SubscriptionStatus::EXPIRED)->save();
-                $transactionDetails->setStatus('expired')->save();
+                $subscription = $this->subscriptionFactory->create();
+                $this->subscriptionResource->load($subscription, $transactionDetails->getSubscriptionId());
+                $subscription->setStatus(SubscriptionStatus::EXPIRED);
+                $this->subscriptionResource->save($subscription);
+                $transactionDetails->setStatus('expired');
+                $this->transactionsResource->save($transactionDetails);
                 return 'expired';
 
             }

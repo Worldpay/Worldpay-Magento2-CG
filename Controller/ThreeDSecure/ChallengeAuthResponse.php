@@ -100,6 +100,8 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
 
     /**
      * Accepts callback from worldpay's 3DS2 Secure page
+     *
+     * @return \Magento\Framework\Controller\ResultInterface|\Magento\Framework\App\ResponseInterface|null
      */
     public function execute()
     {
@@ -117,8 +119,7 @@ class ChallengeAuthResponse extends \Magento\Framework\App\Action\Action
             $this->wplogger->error('3DS2 Failed');
             if ($e->getMessage()=== 'Unique constraint violation found') {
                 $this->messageManager
-                        ->addErrorMessage(__($this->paymentservicerequest
-                                ->getCreditCardSpecificException('CCAM22')));
+                        ->addErrorMessage(__($this->helper->getConfigValue('CCAM22')));
             } else {
                 $this->messageManager->addErrorMessage(__($this->helper->getConfigValue('CCAM9')));
             }

@@ -17,6 +17,12 @@ use Sapient\Worldpay\Model\Recurring\SubscriptionFactory;
  */
 class SkipSubscriptionOrderRepository implements SkipSubscriptionOrderRepositoryInterface
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions */
+    private $transactionsResource;
+
+    /** @var \Magento\Customer\Model\Address\Config */
+    private $addressConfig;
+
     /**
      * @var  SkipSubscriptionOrderFactory
      */
@@ -103,9 +109,12 @@ class SkipSubscriptionOrderRepository implements SkipSubscriptionOrderRepository
         \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory,
         \Sapient\Worldpay\Helper\SkipOrderEmail $skipOrderEmail,
         \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
-        \Sapient\Worldpay\Helper\Recurring $recurringhelper
+        \Sapient\Worldpay\Helper\Recurring $recurringhelper,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions $transactionsResource
     ) {
+        $this->transactionsResource = $transactionsResource;
         $this->skipOrderFactory = $skipOrderFactory;
+        $this->addressConfig = $addressConfig;
         $this->skipOrderResource = $skipOrderResource;
         $this->skipOrderCollectionFactory = $skipOrderCollectionFactory;
         $this->subscriptionCollectionFactory = $subscriptionCollectionFactory;
@@ -178,12 +187,12 @@ class SkipSubscriptionOrderRepository implements SkipSubscriptionOrderRepository
             $skipOrderHistory->setCustomerId($customerId);
             $skipOrderHistory->setNewRecurringDate($newrecucceringDate);
             $skipOrderHistory->setOldRecurringDate($recurringDate);
-            $skipOrderHistory->save();
+            $this->skipOrderResource->save($skipOrderHistory);
             $this->skipOrderEmail->sendSkipOrderEmail($skipOrderParams);
 
             $this->wplogger->info(__('Skipped and next order date is: '). $newrecucceringDate);
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
     }
@@ -214,7 +223,7 @@ class SkipSubscriptionOrderRepository implements SkipSubscriptionOrderRepository
      *
      * @param int $id
      * @param string $oldRecurringDate
-     * @return string
+     * @return string|null
      */
     public function updateSkipOrderDate($id, $oldRecurringDate)
     {
@@ -231,6 +240,7 @@ class SkipSubscriptionOrderRepository implements SkipSubscriptionOrderRepository
             
             $plan = $this->planFactory->create()->loadById($transactionDetails->getPlanId());
             $planInterval = $plan->getInterval();
+            $recurringDate = null;
 
             if ($planInterval == 'WEEKLY') {
                 $recurringDate = date('Y-m-d', $week);
@@ -248,14 +258,14 @@ class SkipSubscriptionOrderRepository implements SkipSubscriptionOrderRepository
                     $this->wplogger->info(__('Next order date is greater then End date: '). $recurringDate);
                     $transactionDetails->setRecurringDate($recurringEndDate);
                     $transactionDetails->setStatus('completed');
-                    $transactionDetails->save();
+                    $this->transactionsResource->save($transactionDetails);
                     return $oldRecurringDate;
                 }
                 $transactionDetails->setRecurringDate($recurringDate);
-                $transactionDetails->save();
+                $this->transactionsResource->save($transactionDetails);
                 return $recurringDate;
 
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->wplogger
                     ->info(__('Skipped order date not updated: '). $e->getMessage());
             }

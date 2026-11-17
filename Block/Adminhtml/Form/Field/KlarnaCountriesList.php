@@ -6,6 +6,11 @@ namespace Sapient\Worldpay\Block\Adminhtml\Form\Field;
 
 class KlarnaCountriesList extends \Magento\Framework\View\Element\Html\Select
 {
+    /**
+     * @var \Sapient\Worldpay\Model\Config\Source\KlarnaCountries
+     */
+    protected $klarnaCountries;
+
     
     /**
      * Paymentmethod constructor.

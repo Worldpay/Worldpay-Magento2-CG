@@ -161,7 +161,7 @@ class OrderSyncStatus
      * LoadOrder
      *
      * @param Int $orderId
-     * @return CollectionFactoryInterface
+     * @return void
      */
 
     private function _loadOrder($orderId)
@@ -195,7 +195,7 @@ class OrderSyncStatus
     /**
      * Fetch PaymentUpdate
      *
-     * @return CollectionFactoryInterface
+     * @return void
      */
 
     private function _fetchPaymentUpdate()
@@ -207,7 +207,7 @@ class OrderSyncStatus
     /**
      * RegistercWorldPaycModel
      *
-     * @return CollectionFactoryInterface
+     * @return void
      */
 
     private function _registerWorldPayModel()
@@ -217,7 +217,7 @@ class OrderSyncStatus
     /**
      * Apply Payment Update
      *
-     * @return CollectionFactoryInterface
+     * @return void
      */
 
     private function _applyPaymentUpdate()
@@ -231,7 +231,7 @@ class OrderSyncStatus
     /**
      * Apply Token Update
      *
-     * @return CollectionFactoryInterface
+     * @return void
      */
 
     private function _applyTokenUpdate()

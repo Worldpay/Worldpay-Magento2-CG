@@ -17,6 +17,9 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class PendingOrderCleanup
 {
+    /** @var \Magento\Sales\Model\ResourceModel\Order */
+    private $orderResource;
+
     /**
      * @var CollectionFactory
      */
@@ -88,8 +91,10 @@ class PendingOrderCleanup
         Service $orderservice,
         Data $worldpayhelper,
         WorldpayLogger $wplogger,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        \Magento\Sales\Model\ResourceModel\Order $orderResource
     ) {
+        $this->orderResource = $orderResource;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->orderFactory = $orderFactory;
         $this->worldpaypayment = $worldpaypayment;
@@ -143,7 +148,7 @@ class PendingOrderCleanup
      * Get Payment Details Xml For Order
      *
      * @param Sapient\Worldpay\Model\Order $order
-     * @return array
+     * @return array|null
      */
     public function _getPaymentDetailsXmlForOrder(\Sapient\Worldpay\Model\Order $order)
     {
@@ -218,7 +223,8 @@ class PendingOrderCleanup
                 'Order has been canceled because could not find payment'
             )
                 ->setIsVisibleOnFront(true);
-            $order->cancel()->save();
+            $order->cancel();
+            $this->orderResource->save($order);
             $this->_logger->info('update oder: '.$orderId);
         } catch (\Exception $e) {
             $this->_logger->info('Unable to cancel order id - '.$orderId.' Exception message:'.$e->getMessage());

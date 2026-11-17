@@ -78,7 +78,7 @@ class Failure extends \Magento\Framework\App\Action\Action
         $this->transactionsFactory = $transactionsFactory;
         $this->checkoutSession = $checkoutSession;
         $this->emailsender = $emailsender;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
     /**
      * Execute

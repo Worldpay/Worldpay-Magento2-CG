@@ -254,7 +254,7 @@ class Webpayment extends Template
     /**
      * Get Shipping
      *
-     * @return string
+     * @return string|null
      */
 
     public function getshippingRequired()
@@ -468,7 +468,7 @@ class Webpayment extends Template
      * Get Account Specific Exception
      *
      * @param array $exceptioncode
-     * @return string
+     * @return string|null
      */
 
     public function getMyAccountSpecificException($exceptioncode)

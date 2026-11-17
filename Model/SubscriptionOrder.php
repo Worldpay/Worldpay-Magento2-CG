@@ -11,6 +11,11 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 class SubscriptionOrder extends \Magento\Framework\Model\AbstractModel
 {
     /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
+    protected $recurringhelper;
+
+    /**
      * @var \Sapient\Worldpay\Model\ResourceModel\SubscriptionOrder
      */
     private $subscriptionOrderCollection;
