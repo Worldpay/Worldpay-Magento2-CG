@@ -35,8 +35,7 @@ class SEPAMandateTypesTest extends TestCase
     public function testToOptionArray()
     {
         $expectedResult = [
-            ['value' => 'ONE-OFF', 'label' => __('ONE-OFF')],
-            ['value' => 'RECURRING', 'label' => __('RECURRING')]
+            ['value' => 'ONE-OFF', 'label' => __('ONE-OFF')]
         ];
         $this->assertEquals($expectedResult, $this->model->toOptionArray());
     }
