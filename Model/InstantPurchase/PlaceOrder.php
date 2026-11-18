@@ -5,6 +5,7 @@ namespace Sapient\Worldpay\Model\InstantPurchase;
 use Magento\Catalog\Model\Product;
 use Magento\Customer\Model\Customer;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\InstantPurchase\Model\InstantPurchaseOption;
 use Magento\InstantPurchase\Model\QuoteManagement\PaymentConfiguration;
 use Magento\InstantPurchase\Model\QuoteManagement\Purchase;
 use Magento\InstantPurchase\Model\QuoteManagement\QuoteCreation;

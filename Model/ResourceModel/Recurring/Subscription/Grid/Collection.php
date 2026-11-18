@@ -76,6 +76,7 @@ class Collection extends SubscriptionCollection implements SearchResultInterface
     public function setAggregations($aggregations)
     {
         $this->aggregations = $aggregations;
+        return $this;
     }
 
     /**

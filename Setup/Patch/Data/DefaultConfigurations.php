@@ -2375,50 +2375,6 @@ class DefaultConfigurations implements DataPatchInterface
             'website' => null,
             'store'   => null,
         'groups'  => [
-                'klarna_config'=>['klarna_countries_config' => [
-                    'fields' => [
-                        'klarna_contries' => [
-                        'value' => [
-                                $index.'_0' => "AT,CH,NO,DE,DK,US,FI,GB,NL,SE",
-                            ]
-
-                        ],
-                    ],
-                    ]
-                ],
-                'klarna_config' =>['sliceit_config' => [
-                    'fields' => [
-                        'sliceit_contries' => [
-                            'value' => [
-                                $index.'_0' => "SE,NO,FI,DE,AT,GB,DK,US",
-                            ]
-
-                        ],
-                    ],
-                    ]
-                ],
-                'klarna_config' =>['paylater_config' => [
-                    'fields' => [
-                        'paylater_contries' => [
-                            'value' => [
-                                $index.'_0' => "SE,NO,FI,DE,NL,AT,CH,GB,DK,US",
-                            ]
-
-                        ],
-                    ],
-                    ]
-                ],
-                'klarna_config'=>['paynow_config' => [
-                    'fields' => [
-                        'paynow_contries' => [
-                            'value' => [
-                                $index.'_0' => "SE,DE,NL,AT",
-                            ]
-
-                        ],
-                    ],
-                    ]
-                ],
                 'klarna_config'=>['paylater_config'=>['paylater_days_config' => [
                     'fields' => [
                         'subscription_days' => [

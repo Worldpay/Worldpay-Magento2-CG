@@ -167,7 +167,7 @@ class Cancel extends \Magento\Backend\App\Action
      *
      * @param Int $paymentState
      * @param Ayyay $order
-     * @return string
+     * @return void
      */
 
     private function _applyPaymentUpdate($paymentState, $order)

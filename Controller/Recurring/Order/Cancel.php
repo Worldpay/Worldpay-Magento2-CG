@@ -17,6 +17,11 @@ use Sapient\Worldpay\Helper\MyAccountException;
 class Cancel extends \Magento\Framework\App\Action\Action
 {
     /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription
+     */
+    private $subscriptionResource;
+
+    /**
      * @var Session
      */
     private $customerSession;
@@ -49,6 +54,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
      * @param SubscriptionOrder $subscriptionOrder
      * @param SubscriptionFactory $subscriptionFactory
      * @param MyAccountException $exceptionhelper
+     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription $subscriptionResource
      */
     public function __construct(
         Context $context,
@@ -56,8 +62,10 @@ class Cancel extends \Magento\Framework\App\Action\Action
         \Magento\Customer\Model\Url $customerUrl,
         SubscriptionOrder $subscriptionOrder,
         SubscriptionFactory $subscriptionFactory,
-        MyAccountException $exceptionhelper
+        MyAccountException $exceptionhelper,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription $subscriptionResource
     ) {
+        $this->subscriptionResource = $subscriptionResource;
         parent::__construct($context);
         $this->customerSession = $customerSession;
         $this->exceptionhelper = $exceptionhelper;
@@ -92,9 +100,8 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $redirectResult = $this->resultRedirectFactory->create();
         $orderId = $this->getRequest()->getParam('id');
         $order = $this->subscriptionOrder->getOrderbyOriginalId($orderId);
-        $subscription = $this->subscriptionFactory
-                        ->create()
-                        ->load($order->getWorldpaySubscriptionId());
+        $subscription = $this->subscriptionFactory->create();
+        $this->subscriptionResource->load($subscription, $order->getWorldpaySubscriptionId());
         if ($subscription->getCustomerId() != $this->customerSession->getCustomerId()) {
             $redirectResult->setPath('noroute');
             $this->messageManager

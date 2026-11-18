@@ -13,6 +13,16 @@ use Magento\Framework\App\Action\Context;
 class Process extends \Magento\Framework\App\Action\Action
 {
     /**
+     * @var object
+     */
+    protected $_paymentUpdate;
+
+    /**
+     * @var \Magento\Quote\Model\ResourceModel\Quote
+     */
+    private $quoteResource;
+
+    /**
      * @var \Sapient\Worldpay\Model\PaymentMethods\PayByLink
      */
     protected $paybylink;
@@ -93,6 +103,7 @@ class Process extends \Magento\Framework\App\Action\Action
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $wpMultishippingCollection
      * @param \Sapient\Worldpay\Model\Payment\MultishippingStateResponse $multishippingStateResponse
+     * @param \Magento\Quote\Model\ResourceModel\Quote $quoteResource
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -109,8 +120,10 @@ class Process extends \Magento\Framework\App\Action\Action
         \Sapient\Worldpay\Model\Payment\WpResponse $wpresponse,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $wpMultishippingCollection,
-        \Sapient\Worldpay\Model\Payment\MultishippingStateResponse $multishippingStateResponse
+        \Sapient\Worldpay\Model\Payment\MultishippingStateResponse $multishippingStateResponse,
+        \Magento\Quote\Model\ResourceModel\Quote $quoteResource
     ) {
+        $this->quoteResource = $quoteResource;
         $this->request = $request;
         $this->orderservice = $orderservice;
         $this->quoteFactory = $quoteFactory;
@@ -126,7 +139,7 @@ class Process extends \Magento\Framework\App\Action\Action
         $this->wpMultishippingCollection = $wpMultishippingCollection;
         $this->multishippingStateResponse = $multishippingStateResponse;
 
-        return parent::__construct($context);
+        parent::__construct($context);
     }
 
     /**
@@ -240,7 +253,7 @@ class Process extends \Magento\Framework\App\Action\Action
      *
      * @param string $paymentState
      * @param array $order
-     * @return string
+     * @return void
      */
     private function _applyPaymentUpdate($paymentState, $order)
     {
@@ -268,11 +281,13 @@ class Process extends \Magento\Framework\App\Action\Action
      * Get Pay by link quote
      *
      * @param int $quoteId
-     * @return \Magento\Quote\Model\QuoteFactory
+     * @return \Magento\Quote\Model\Quote
      */
     protected function getPaybylinkquote($quoteId)
     {
-        return $this->quoteFactory->create()->load($quoteId);
+        $quote = $this->quoteFactory->create();
+        $this->quoteResource->load($quote, $quoteId);
+        return $quote;
     }
     
     /**

@@ -21,14 +21,10 @@ class PaymentMethodsApmTest extends TestCase
 
     protected function setUp(): void
     {
-        $contextMock = $this->getMockBuilder(Context::class)
-                        ->disableOriginalConstructor()->getMock();
-        $registryMock = $this->getMockBuilder(Registry::class)
-                        ->disableOriginalConstructor()->getMock();
-        $configMock = $this->getMockBuilder(ScopeConfigInterface::class)
-                        ->disableOriginalConstructor()->getMock();
-        $cacheTypeListMock = $this->getMockBuilder(TypeListInterface::class)
-                        ->disableOriginalConstructor()->getMock();
+        $contextMock = $this->createStub(Context::class);
+        $registryMock = $this->createStub(Registry::class);
+        $configMock = $this->createStub(ScopeConfigInterface::class);
+        $cacheTypeListMock = $this->createStub(TypeListInterface::class);
         $this->model = new PaymentMethodsApm($contextMock, $registryMock, $configMock, $cacheTypeListMock);
     }
 
@@ -39,9 +35,7 @@ class PaymentMethodsApmTest extends TestCase
             ['value' => 'IDEAL-SSL', 'label' => __('iDEAL | Wero')],
            // ['value' => 'YANDEXMONEY-SSL', 'label' => __('Yandex.Money')],
             ['value' => 'PAYPAL-EXPRESS', 'label' => __('PayPal Express')],
-            ['value' => 'PAYPAL-SSL', 'label' => __('PayPal SSL')],
             ['value' => 'SOFORT-SSL', 'label' => __('SoFort EU')],
-            ['value' => 'GIROPAY-SSL', 'label' => __('GiroPay')],
             //['value' => 'BOLETO-SSL', 'label' => __('Boleto Bancairo')],
             ['value' => 'ALIPAY-SSL', 'label' => __('AliPay')],
             ['value' => 'SEPA_DIRECT_DEBIT-SSL', 'label' =>

@@ -126,6 +126,8 @@ class EditPost extends \Magento\Customer\Controller\AbstractAccount
 
     /**
      * Receive http post request to update saved card details
+     *
+     * @return \Magento\Framework\Controller\ResultInterface|\Magento\Framework\App\ResponseInterface|null
      */
     public function execute()
     {

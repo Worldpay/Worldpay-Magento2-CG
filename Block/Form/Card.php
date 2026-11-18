@@ -290,6 +290,7 @@ class Card extends \Magento\Payment\Block\Form
     public function getMonths()
     {
         $currentMonth = (int)date('m');
+        $months = [];
         for ($x = $currentMonth; $x < $currentMonth + 12; $x++) {
             $monthnumber = ($x <= 12) ? $x : $x-12;
             $months[$monthnumber] = date('F', mktime(0, 0, 0, $x, 1));
@@ -342,7 +343,7 @@ class Card extends \Magento\Payment\Block\Form
      * Get Checkout Specific Label
      *
      * @param string $labelcode
-     * @return string
+     * @return string|null
      */
 
     public function getCheckoutSpecificLabel(string $labelcode)

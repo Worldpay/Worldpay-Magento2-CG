@@ -66,7 +66,7 @@ class Iframe extends \Magento\Framework\App\Action\Action
         $this->hppstate = $hppstate;
         $this->resultPageFactory = $resultPageFactory;
         $this->checkoutsession = $checkoutsession;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
     /**
      * Execute

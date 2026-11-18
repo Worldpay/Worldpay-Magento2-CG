@@ -19,6 +19,16 @@ use Magento\Framework\App\ObjectManager;
 class Multishipping extends \Magento\Multishipping\Model\Checkout\Type\Multishipping
 {
     /**
+     * @var AllowedCountries
+     */
+    protected $allowedCountryReader;
+
+    /**
+     * @var \Magento\Quote\Api\Data\CartExtensionFactory
+     */
+    protected $cartExtensionFactory;
+
+    /**
      * @var \Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderFactory
      */
     protected $placeOrderFactory = null;

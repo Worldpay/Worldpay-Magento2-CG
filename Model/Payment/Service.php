@@ -6,6 +6,11 @@ namespace Sapient\Worldpay\Model\Payment;
 
 class Service
 {
+    /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Worldpayment
+     */
+    private $worldpaymentResource;
+
     public const INTERACTION_TYPE_MS = "ECOM_MULTISHIPPING";
     /**
      * @var \Sapient\Worldpay\Model\Request\PaymentServiceRequest
@@ -58,17 +63,20 @@ class Service
      * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
      * @param \Sapient\Worldpay\Model\Worldpayment $worldpayPayment
      * @param \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
+     * @param \Sapient\Worldpay\Model\ResourceModel\Worldpayment $worldpaymentResource
      */
     public function __construct(
         \Sapient\Worldpay\Model\Payment\Update\Factory $paymentupdatefactory,
         \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
         \Sapient\Worldpay\Model\Worldpayment $worldpayPayment,
-        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
+        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection,
+        \Sapient\Worldpay\Model\ResourceModel\Worldpayment $worldpaymentResource
     ) {
         $this->paymentupdatefactory = $paymentupdatefactory;
         $this->paymentservicerequest = $paymentservicerequest;
         $this->worldpayPayment = $worldpayPayment;
         $this->multishippingOrderCollection = $multishippingOrderCollection;
+        $this->worldpaymentResource = $worldpaymentResource;
     }
     /**
      * Create Payment Update From WorldPay Xml
@@ -109,7 +117,7 @@ class Service
      * Get Payment Update Xml For Notification
      *
      * @param string $xml
-     * @return array
+     * @return array|null
      */
     public function getPaymentUpdateXmlForNotification($xml)
     {
@@ -133,7 +141,7 @@ class Service
                     $worldpaypayment = $this->worldpayPayment->loadByWorldpayOrderId($ordercode[0]);
                     if (isset($worldpaypayment)) {
                         $worldpaypayment->setData('payment_status', $lastEvent[0]);
-                        $worldpaypayment->save();
+                        $this->worldpaymentResource->save($worldpaypayment);
                     }
                     $gatewayError = 'Notification received for Partial Captutre';
                     throw new \Magento\Framework\Exception\CouldNotDeleteException(__($gatewayError));
@@ -186,7 +194,7 @@ class Service
                 $worldpaypayment = $this->worldpayPayment->loadByPaymentId($worldPayPayment->getOrderId());
                 if (isset($worldpaypayment)) {
                     $worldpaypayment->setData('payment_status', $lastEvent[0]);
-                    $worldpaypayment->save();
+                    $this->worldpaymentResource->save($worldpaypayment);
                 }
                 $magentoorder = $order->getOrder();
                 if ($magentoorder->hasInvoices() && $magentoorder->getBaseTotalDue() != 0) {
@@ -204,7 +212,7 @@ class Service
                 $worldpaypayment= $this->worldpayPayment->loadByWorldpayOrderId($ordercode[0]);
                 if (isset($worldpaypayment)) {
                     $worldpaypayment->setData('payment_status', $lastEvent[0]);
-                    $worldpaypayment->save();
+                    $this->worldpaymentResource->save($worldpaypayment);
                 }
                 $gatewayError = 'Sync status action not possible for this Partial Capture Order.';
                 throw new \Magento\Framework\Exception\CouldNotDeleteException(__($gatewayError));
@@ -217,7 +225,7 @@ class Service
      * Set Payment Global Payment By Payment Update
      *
      * @param string $paymentUpdate
-     * @return array
+     * @return array|null
      */
     public function setGlobalPaymentByPaymentUpdate($paymentUpdate)
     {

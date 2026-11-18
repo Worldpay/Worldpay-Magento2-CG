@@ -28,14 +28,10 @@ class KlarnaCountriesTest extends TestCase
     
     protected function setUp(): void
     {
-        $this->scopeConfig = $this->getMockBuilder(ScopeConfigInterface::class)
-                        ->disableOriginalConstructor()->getMock();
-        $mathRandom = $this->getMockBuilder(Random::class)
-                        ->disableOriginalConstructor()->getMock();
-        $serializer = $this->getMockBuilder(SerializerInterface::class)
-                        ->disableOriginalConstructor()->getMock();
-        $klarnaCountries = $this->getMockBuilder(KlarnaSourceCountries::class)
-                        ->disableOriginalConstructor()->getMock();
+        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
+        $mathRandom = $this->createStub(Random::class);
+        $serializer = $this->createStub(SerializerInterface::class);
+        $klarnaCountries = $this->createStub(KlarnaSourceCountries::class);
         $this->model = new KlarnaCountries($this->scopeConfig, $mathRandom, $serializer, $klarnaCountries);
     }
     

@@ -6,6 +6,11 @@ namespace Sapient\Worldpay\Block\Adminhtml\Form\Field;
 
 class Instalmenttype extends \Magento\Framework\View\Element\Html\Select
 {
+    /**
+     * @var \Sapient\Worldpay\Model\Config\Source\InstalmentCountryType
+     */
+    protected $instalmentutils;
+
     
     /**
      * Instalmenttype constructor.

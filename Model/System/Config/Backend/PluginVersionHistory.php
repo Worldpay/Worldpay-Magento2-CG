@@ -127,7 +127,7 @@ class PluginVersionHistory extends \Magento\Framework\App\Config\Value
                 $data
             );
         } elseif (isset($value['newData'])) {
-            $this->setValue(trim($value['newData']), ',');
+            $this->setValue(trim($value['newData']));
             $this->configWriter->save(
                 'worldpay/general_config/plugin_tracker/wopay_plugin_version_history',
                 $value['newData']

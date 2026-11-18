@@ -11,6 +11,12 @@ use Sapient\Worldpay\Model\Authorisation\MageOrder;
 
 class ProductOnDemand extends AbstractHelper
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\ProductOnDemand\Order */
+    private $productOnDemandOrderResource;
+
+    /** @var \Magento\Catalog\Model\ResourceModel\Product */
+    private $productResource;
+
     private \Sapient\Worldpay\Model\ProductOnDemand\OrderFactory $productOnDemandOrderFactory;
     private \Magento\Quote\Api\CartRepositoryInterface $quoteRepository;
     private \Magento\Checkout\Model\Session $_checkoutSession;
@@ -21,8 +27,11 @@ class ProductOnDemand extends AbstractHelper
         \Sapient\Worldpay\Model\ProductOnDemand\OrderFactory $productOnDemandOrderFactory,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Checkout\Model\Session $checkoutSession,
-    )
-    {
+        \Magento\Catalog\Model\ResourceModel\Product $productResource,
+        \Sapient\Worldpay\Model\ResourceModel\ProductOnDemand\Order $productOnDemandOrderResource
+    ) {
+        $this->productOnDemandOrderResource = $productOnDemandOrderResource;
+        $this->productResource = $productResource;
         parent::__construct($context);
         $this->scopeConfig = $scopeConfig;
         $this->productOnDemandOrderFactory = $productOnDemandOrderFactory;
@@ -70,7 +79,7 @@ class ProductOnDemand extends AbstractHelper
 
     public function isProductOnDemand(Product $product): bool
     {
-        $product->load($product->getId());
+        $this->productResource->load($product, $product->getId());
         return (
             $product->getProductOnDemand()
             || $product->getData('product_on_demand')
@@ -95,7 +104,7 @@ class ProductOnDemand extends AbstractHelper
         $model->setWorldpayTokenId($tokenId);
         $model->setIsZeroAuthOrder($isZeroAuthOrder);
 
-        $model->save();
+        $this->productOnDemandOrderResource->save($model);
     }
 
     public function getPdpLabel()

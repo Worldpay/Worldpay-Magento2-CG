@@ -148,7 +148,7 @@ class Index extends \Magento\Backend\App\Action
     /**
      * Load Order by order id
      *
-     * @return string
+     * @return void
      */
     private function _loadOrder()
     {
@@ -158,7 +158,7 @@ class Index extends \Magento\Backend\App\Action
     /**
      * FetchPaymentUpdate
      *
-     * @return string
+     * @return void
      */
     private function _fetchPaymentUpdate()
     {
@@ -169,7 +169,7 @@ class Index extends \Magento\Backend\App\Action
     /**
      * Register WorldPay Model
      *
-     * @return string
+     * @return void
      */
 
     private function _registerWorldPayModel()
@@ -180,7 +180,7 @@ class Index extends \Magento\Backend\App\Action
     /**
      * Apply Payment Update
      *
-     * @return string
+     * @return void
      */
     private function _applyPaymentUpdate()
     {
@@ -196,7 +196,7 @@ class Index extends \Magento\Backend\App\Action
     /**
      * Apply Token Update
      *
-     * @return string
+     * @return void
      */
 
     private function _applyTokenUpdate()
@@ -224,7 +224,7 @@ class Index extends \Magento\Backend\App\Action
     /**
      * Update Order Status
      *
-     * @return string
+     * @return void
      */
 
     private function _updateOrderStatus()

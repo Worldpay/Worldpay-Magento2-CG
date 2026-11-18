@@ -23,6 +23,16 @@ use Magento\Directory\Helper\Data;
 
 class Edit extends Template
 {
+    /**
+     * @var \Magento\Catalog\Model\ResourceModel\Product
+     */
+    private $productResource;
+
+    /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription
+     */
+    private $subscriptionResource;
+
     public const RECURRING_ORDER_SKIP_DAYS_UPTO = 9;
     /**
      * @var \Sapient\Worldpay\Model\Recurring\Subscription|null
@@ -76,6 +86,8 @@ class Edit extends Template
      * @param Session $customerSession
      * @param Data $helper
      * @param array $data
+     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription $subscriptionResource
+     * @param \Magento\Catalog\Model\ResourceModel\Product $productResource
      */
     public function __construct(
         Template\Context $context,
@@ -87,8 +99,12 @@ class Edit extends Template
         PaymentTokenManagementInterface $tokenManager,
         Session $customerSession,
         Data $helper,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription $subscriptionResource,
+        \Magento\Catalog\Model\ResourceModel\Product $productResource,
         array $data = []
     ) {
+        $this->productResource = $productResource;
+        $this->subscriptionResource = $subscriptionResource;
         parent::__construct($context, $data);
         $this->subscriptionFactory = $subscriptionFactory;
         $this->transactionCollectionFactory = $recurringTransactions;
@@ -135,7 +151,7 @@ class Edit extends Template
         $subscriptionId = $this->getRequest()->getParam('subscription_id');
         if (!$this->subscription && $subscriptionId) {
             $subscription = $this->subscriptionFactory->create();
-            $subscription->load($subscriptionId);
+            $this->subscriptionResource->load($subscription, $subscriptionId);
 
             if ($subscription->getId() && $subscription->getId() == $subscriptionId) {
                 $this->subscription = $subscription;
@@ -255,9 +271,8 @@ class Edit extends Template
     public function getProduct()
     {
         if (!$this->product && $this->getSubscription()->getProductId()) {
-            $product = $this->productFactory
-                ->create()
-                ->load($this->getSubscription()->getProductId());
+            $product = $this->productFactory->create();
+            $this->productResource->load($product, $this->getSubscription()->getProductId());
 
             if ($product->getId() == $this->getSubscription()->getProductId()) {
                 $this->product = $product;
@@ -274,7 +289,7 @@ class Edit extends Template
      */
     public function getCcFormMageInitJson()
     {
-        //$config = $this->ccConfigProvider->getEprotectConfig();
+        $config = [];
         //$config['scriptUrl'] = $this->ccConfigProvider->getScriptUrl();
 
         $data = [

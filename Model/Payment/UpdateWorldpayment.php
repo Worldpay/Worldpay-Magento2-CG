@@ -19,6 +19,15 @@ use Magento\Framework\Serialize\Serializer\Json;
  */
 class UpdateWorldpayment
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions */
+    private $transactionsResource;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\SavedToken */
+    private $savedTokenResource;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory */
+    private $savedTokenCollectionFactory;
+
     /**
      * @var \Sapient\Worldpay\Model\WorldpaymentFactory
      */
@@ -143,7 +152,13 @@ class UpdateWorldpayment
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         Json $serializer,
         ProductOnDemand $productOnDemandHelper,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory $savedTokenCollectionFactory,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken $savedTokenResource,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions $transactionsResource
     ) {
+        $this->transactionsResource = $transactionsResource;
+        $this->savedTokenResource = $savedTokenResource;
+        $this->savedTokenCollectionFactory = $savedTokenCollectionFactory;
         $this->wplogger = $wplogger;
         $this->savedTokenFactory = $savedTokenFactory;
         $this->worldpaypayment = $worldpaypayment;
@@ -400,13 +415,13 @@ class UpdateWorldpayment
             $customerId = $this->customerSession->getCustomerId();
             $tokenScope = 'merchant';
         }
-            $tokenDataExist = $savedTokenFactory->getCollection()
+            $tokenDataExist = $this->savedTokenCollectionFactory->create()
                 ->addFieldToFilter('customer_id', $customerId)
                 ->addFieldToFilter('token_code', $tokenElement[0]->tokenDetails[0]->paymentTokenID[0])
                 ->getFirstItem()->getData();
         // checking storedcredentials exist or not
 //        if($storedCredentialsElement){
-//            $storedCredentialsDataExist = $savedTokenFactory->getCollection()
+//            $storedCredentialsDataExist = $this->savedTokenCollectionFactory->create()
 //                ->addFieldToFilter('customer_id', $customerId)
 //                ->addFieldToFilter('transaction_identifier', $storedCredentialsElement[0]->transactionIdentifier[0])
 //                ->getFirstItem()->getData();
@@ -449,7 +464,7 @@ class UpdateWorldpayment
             }
             $savedTokenFactory->setTokenType($tokenScope);
             $savedTokenFactory->setStoreId($this->storeManager->getStore()->getId());
-            $savedTokenFactory->save();
+            $this->savedTokenResource->save($savedTokenFactory);
             $tokenId = $savedTokenFactory->getId();
             $this->saveTokenDataToTransactions($tokenId, $orderCode);
         } else {
@@ -658,14 +673,14 @@ class UpdateWorldpayment
         $transactions->setWorldpayTokenId($tokenId);
         $transactions->setWorldpayOrderId($worldpayOrderCode);
         $transactions->setOriginalOrderIncrementId($orderId[0]);
-        $transactions->save();
+        $this->transactionsResource->save($transactions);
     }
 
     /**
      * Get prime routing enabled
      *
      * @param InfoInterface $paymentObject
-     * @return bool
+     * @return bool|null
      */
     private function getPrimeRoutingEnabled(InfoInterface $paymentObject)
     {
@@ -681,7 +696,7 @@ class UpdateWorldpayment
      * Get issue insight response data
      *
      * @param Payment $payment
-     * @return array
+     * @return array|null
      */
     private function getIssuerInsightResponseData($payment)
     {
@@ -706,7 +721,7 @@ class UpdateWorldpayment
      * Get fraud sight data
      *
      * @param Payment $payment
-     * @return array
+     * @return array|null
      */
     private function getFraudsightData($payment)
     {

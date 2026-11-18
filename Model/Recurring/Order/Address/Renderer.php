@@ -24,6 +24,16 @@ use Magento\Store\Model\StoreManagerInterface;
 class Renderer
 {
     /**
+     * @var StoreManagerInterface|null
+     */
+    protected $storeManager;
+
+    /**
+     * @var ScopeConfigInterface|null
+     */
+    protected $scopeConfig;
+
+    /**
      * @var AddressConfig
      */
     protected $addressConfig;
@@ -47,6 +57,8 @@ class Renderer
     ) {
         $this->addressConfig = $addressConfig;
         $this->eventManager = $eventManager;
+        $this->scopeConfig = $scopeConfig;
+        $this->storeManager = $storeManager;
     }
 
     /**

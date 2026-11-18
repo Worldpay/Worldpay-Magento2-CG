@@ -95,7 +95,7 @@ class RedirectOrder extends AbstractXmlBuilder
             && ($this->paymentDetails['cardType'] === 'ECMC-SSL' || $this->paymentDetails['cardType'] === 'VISA-SSL')
            && ($this->paymentDetails['countryCode'] === 'US' || $this->paymentDetails['countryCode'] === 'CA')) {
             $this->_addBranchSpecificExtension($order);
-        } elseif (!empty($redirectOrderParams['is_paybylink_order'])) {
+        } elseif (!empty($this->orderParameters['is_paybylink_order'])) {
             $this->addOrderLineItemsXML($order);
         }
 

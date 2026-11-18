@@ -10,6 +10,9 @@ use Magento\Multishipping\Model\Checkout\Type\Multishipping\State;
 
 class Multishipping
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order */
+    private $multishippingOrderResource;
+
     /**
      * @var \Magento\Multishipping\Model\Checkout\Type\Multishipping
      */
@@ -151,8 +154,10 @@ class Multishipping
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender,
         \Sapient\Worldpay\Helper\CreditCardException $exceptionHelper,
-        \Sapient\Worldpay\Helper\GeneralException $generalexception
+        \Sapient\Worldpay\Helper\GeneralException $generalexception,
+        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order $multishippingOrderResource
     ) {
+        $this->multishippingOrderResource = $multishippingOrderResource;
         $this->state = $state;
         $this->session = $session;
         $this->checkoutSession = $checkoutSession;
@@ -347,7 +352,7 @@ class Multishipping
         $model->setQuoteId($mageOrder->getQuoteId());
         $model->setOrderId($mageOrder->getIncrementId());
         $model->setWorldpayOrderId($orderCode);
-        $model->save();
+        $this->multishippingOrderResource->save($model);
     }
     
     /**
@@ -402,7 +407,7 @@ class Multishipping
      *
      * @param Payment $payment
      * @param Order $order
-     * @return bool
+     * @return bool|null
      */
     public function _addTransaction($payment, $order)
     {
@@ -657,6 +662,7 @@ class Multishipping
     private function _getNoticeForOrder($order, $type)
     {
         $incrementId = $order->getIncrementId();
+        $message = null;
         if ($type == 'cancel') {
             $message = $incrementId === null
             ? __('Order Cancelled')

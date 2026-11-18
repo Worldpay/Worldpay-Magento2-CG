@@ -10,6 +10,16 @@ use Sapient\Worldpay\Model\SkipSubscriptionOrder;
 class SubscriptionSkipOrders extends \Magento\Framework\View\Element\Template
 {
     /**
+     * @var \Magento\Customer\Model\Session
+     */
+    protected $customerSession;
+
+    /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
+    protected $recurringhelper;
+
+    /**
      * @var skipSubscriptionOrder
      */
     protected $skipSubscriptionOrder;
@@ -50,6 +60,7 @@ class SubscriptionSkipOrders extends \Magento\Framework\View\Element\Template
     ) {
         $this->skipSubscriptionOrder = $skipSubscriptionOrder;
         $this->recurringhelper = $recurringhelper;
+        $this->customerSession = $customerSession;
         $this->orderRepository = $orderRepository;
         $this->urlInterface = $urlInterface;
         parent::__construct($context, $data);
@@ -193,7 +204,7 @@ class SubscriptionSkipOrders extends \Magento\Framework\View\Element\Template
      * @param Subscription $subscription
      * @return bool
      */
-    public function checkOrderShipment(SubscriptionOrder $subscription)
+    public function checkOrderShipment(\Sapient\Worldpay\Model\SubscriptionOrder $subscription)
     {
         $orderId = $subscription->getOriginalOrderId();
         $order = $this->skipSubscriptionOrder->getOrderbyOriginalId($orderId);
@@ -207,7 +218,7 @@ class SubscriptionSkipOrders extends \Magento\Framework\View\Element\Template
      * @param Subscription $subscription
      * @return bool
      */
-    public function checkOrderBufferTime(SubscriptionOrder $subscription)
+    public function checkOrderBufferTime(\Sapient\Worldpay\Model\SubscriptionOrder $subscription)
     {
         $createdAt = new \DateTime($subscription->getCreatedAt());
         $current = new \DateTime();
@@ -224,7 +235,7 @@ class SubscriptionSkipOrders extends \Magento\Framework\View\Element\Template
      * @param Subscription $subscription
      * @return bool
      */
-    public function getNotAlreadyCanceled(SubscriptionOrder $subscription)
+    public function getNotAlreadyCanceled(\Sapient\Worldpay\Model\SubscriptionOrder $subscription)
     {
         $orderId = $subscription->getOriginalOrderId();
         $order = $this->skipSubscriptionOrder->getOrderbyOriginalId($orderId);

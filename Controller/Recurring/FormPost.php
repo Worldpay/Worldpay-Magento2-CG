@@ -19,6 +19,11 @@ use Sapient\Worldpay\Helper\MyAccountException;
 class FormPost extends \Magento\Framework\App\Action\Action
 {
     /**
+     * @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription
+     */
+    private $subscriptionResource;
+
+    /**
      * @var Session
      */
     private $customerSession;
@@ -62,6 +67,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
      * @param CollectionFactory $regionCollectionFactory
      * @param MyAccountException $helper
      * @param \Magento\Customer\Model\Url $customerUrl
+     * @param \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription $subscriptionResource
      */
     public function __construct(
         Context $context,
@@ -71,8 +77,10 @@ class FormPost extends \Magento\Framework\App\Action\Action
         PaymentTokenFactory $tokenFactory,
         CollectionFactory $regionCollectionFactory,
         MyAccountException $helper,
-        \Magento\Customer\Model\Url $customerUrl
+        \Magento\Customer\Model\Url $customerUrl,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription $subscriptionResource
     ) {
+        $this->subscriptionResource = $subscriptionResource;
         parent::__construct($context);
         $this->customerSession = $customerSession;
         $this->validator = $validator;
@@ -125,9 +133,8 @@ class FormPost extends \Magento\Framework\App\Action\Action
             return $resultRedirect;
         }
 
-        $subscription = $this->subscriptionFactory
-            ->create()
-            ->load($subscriptionId);
+        $subscription = $this->subscriptionFactory->create();
+        $this->subscriptionResource->load($subscription, $subscriptionId);
 
         $customerId = $this->customerSession->getCustomerId();
 
@@ -157,7 +164,7 @@ class FormPost extends \Magento\Framework\App\Action\Action
 
             /* Only update if changes exist */
             if ($subscription->hasDataChanges()) {
-                $subscription->save();
+                $this->subscriptionResource->save($subscription);
             }
 
             $this->messageManager->addSuccessMessage($this->helper->getConfigValue('MCAM10'));

@@ -56,7 +56,7 @@ class Challenge extends \Magento\Framework\App\Action\Action
         $this->request = $request;
         $this->_cookieManager = $cookieManager;
         $this->cookieMetadataFactory = $cookieMetadataFactory;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
     /**
      * Execute

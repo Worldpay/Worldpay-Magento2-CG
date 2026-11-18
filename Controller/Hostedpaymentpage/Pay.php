@@ -58,7 +58,7 @@ class Pay extends \Magento\Framework\App\Action\Action
         $this->wplogger = $wplogger;
         $this->hppstate = $hppstate;
         $this->worldpayhelper = $worldpayhelper;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
     /**
      * Execute

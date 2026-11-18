@@ -67,7 +67,7 @@ class Token
     {
         $this->wplogger->info("*** TOKEN Method called [befor order place]");
         $xmlTokenParams =  [
-            'merchantCode'     => $this->worldpayhelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
+            'merchantCode'     => $this->worldpayhelper->getMerchantCode($paymentData['additional_data']['cc_type']),
             'authenticatedShopperID'        => $customerData['id'],
             'tokenScope'     => "shopper",
             'tokenEventReference' => 'jkd',
@@ -86,24 +86,12 @@ class Token
         ];
         $this->xmlDirectOrderToken = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrderToken();
 
-        $orderSimpleXml = $this->xmlDirectOrderToken->build(
-            $xmlTokenParams['merchantCode'],
-            $xmlTokenParams['authenticatedShopperID'],
-            $xmlTokenParams['tokenScope'],
-            $xmlTokenParams['tokenEventReference'],
-            $xmlTokenParams['tokenReason'],
-            $xmlTokenParams['paymentDetails'],
-            $xmlTokenParams['customerAddress'],
-            $xmlTokenParams['acceptHeader'],
-            $xmlTokenParams['userAgentHeader'],
-            $xmlTokenParams['method'],
-            $xmlTokenParams['orderStoreId']
-        );
+        $orderSimpleXml = $this->xmlDirectOrderToken->build($xmlTokenParams);
         //default return remove it
         return $this->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
-            $this->worldpayhelper->getXmlUsername($paymentDetails['additional_data']['cc_type']),
-            $this->worldpayhelper->getXmlPassword($paymentDetails['additional_data']['cc_type'])
+            $this->worldpayhelper->getXmlUsername($paymentData['additional_data']['cc_type']),
+            $this->worldpayhelper->getXmlPassword($paymentData['additional_data']['cc_type'])
         );
     }
 
@@ -161,9 +149,9 @@ class Token
         $paymentService = new \SimpleXmlElement($response);
         $error = $paymentService->xpath('//error');
         if ($error) {
-            $this->_wplogger->error('An error occurred while sending the request');
-            $this->_wplogger->error('Error (code ' . $error[0]['code'] . '): ' . $error[0]);
-            throw new \Magento\Framework\Exception\LocalizedException();
+            $this->wplogger->error('An error occurred while sending the request');
+            $this->wplogger->error('Error (code ' . $error[0]['code'] . '): ' . $error[0]);
+            throw new \Magento\Framework\Exception\LocalizedException(__('An error occurred while sending the request'));
         }
     }
 }

@@ -51,7 +51,7 @@ class Success extends \Magento\Framework\App\Action\Action
         $this->orderservice = $orderservice;
         $this->wplogger = $wplogger;
         $this->worldpayHelper = $worldpayHelper;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
    /**
     * Execute

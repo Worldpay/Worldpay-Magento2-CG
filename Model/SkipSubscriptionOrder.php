@@ -13,6 +13,11 @@ use Sapient\Worldpay\Api\Data\SkipSubscriptionOrderInterface;
 class SkipSubscriptionOrder extends AbstractModel implements SkipSubscriptionOrderInterface
 {
     /**
+     * @var \Sapient\Worldpay\Helper\Recurring
+     */
+    protected $recurringhelper;
+
+    /**
      * @var \Sapient\Worldpay\Model\ResourceModel\SubscriptionOrder
      */
     private $skipSubscriptionOrderCollection;

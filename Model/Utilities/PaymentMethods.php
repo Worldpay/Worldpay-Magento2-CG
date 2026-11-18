@@ -88,7 +88,7 @@ class PaymentMethods
      * Get Title of paymentMethod
      *
      * @param \SimpleXmlElement $methodNode
-     * @return String
+     * @return String|null
      */
     protected function _getMethod(\SimpleXmlElement $methodNode)
     {
@@ -508,7 +508,7 @@ class PaymentMethods
     /**
      * Get ideal banks details
      *
-     * @return array
+     * @return array|null
      */
     public function idealBanks()
     {
@@ -538,11 +538,12 @@ class PaymentMethods
         $codes = ['worldpay_cc','worldpay_apm','worldpay_moto', 'worldpay_cc_vault'];
         $paymenttypecountries = [];
         foreach ($codes as $code) {
+            $nodes = [];
             if ($xml = $this->_readXML()) {
                  $nodes = $xml->xpath('/paymentMethods/' . $code . '/types');
             }
              $typearray =  [];
-            foreach ($nodes[0] as $key => $value) {
+            foreach (($nodes[0] ?? []) as $key => $value) {
                 $key = (string) $key;
                 $area =  (array) $value->areas[0]->area;
                 $typearray[$key] = $area;

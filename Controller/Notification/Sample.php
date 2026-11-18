@@ -12,6 +12,31 @@ use Exception;
 class Sample extends \Magento\Framework\App\Action\Action
 {
     /**
+     * @var \Sapient\Worldpay\Model\Token\WorldpayToken
+     */
+    protected $worldpaytoken;
+
+    /**
+     * @var JsonFactory
+     */
+    protected $resultJsonFactory;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Order\Service
+     */
+    protected $orderservice;
+
+    /**
+     * @var \Sapient\Worldpay\Logger\WorldpayLogger
+     */
+    protected $wplogger;
+
+    /**
+     * @var \Sapient\Worldpay\Model\Payment\Service
+     */
+    protected $paymentservice;
+
+    /**
      * @var Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;

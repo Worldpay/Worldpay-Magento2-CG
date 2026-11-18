@@ -15,6 +15,18 @@ use Magento\Framework\Serialize\SerializerInterface;
 
 class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 {
+    /** @var \Magento\Framework\Data\Form\FormKey */
+    private $formkey;
+
+    /** @var \Magento\Catalog\Model\Product */
+    private $product;
+
+    /** @var \Magento\Quote\Model\ResourceModel\Quote */
+    private $quoteResource;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan */
+    private $planResource;
+
     public const PENDING_RECURRING_PAYMENT_ORDER_STATUS = 'pending_recurring_payment';
     public const RECURRING_ORDER_SKIP_DAYS_UPTO = 9;
 
@@ -213,10 +225,17 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\Customer\Model\Address\Config $addressConfig,
         Transactions $recurringTransactions,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan $planResource,
+        \Magento\Quote\Model\ResourceModel\Quote $quoteResource
     ) {
+        $this->quoteResource = $quoteResource;
+        $this->planResource = $planResource;
         parent::__construct($context);
         $this->plansCollectionFactory = $plansCollectionFactory;
         $this->planFactory = $planFactory;
+        $this->product = $product;
+        $this->formkey = $formkey;
+        $this->cart = $cart;
         $this->intervalSource = $intervalSource;
         $this->trialIntervalSource = $trialIntervalSource;
         $this->escaper = $escaper;
@@ -353,7 +372,8 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
         $planId = $planOption->getValue();
         if ($product->getWorldpaySubscriptionPlansCache($planId) === null) {
-            $plan = $this->planFactory->create()->load($planId);
+            $plan = $this->planFactory->create();
+            $this->planResource->load($plan, $planId);
             $plansCache = $product->getWorldpaySubscriptionPlansCache() ?: [];
             $plansCache[$planId] = $plan->getId() ? $plan : false;
             $product->setWorldpaySubscriptionPlansCache($plansCache);
@@ -468,7 +488,8 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             $item->setWorldpaySubscriptionPlan(false);
             $planId = $this->getOrderItemPlanId($item);
             if ($planId) {
-                $plan = $this->planFactory->create()->load($planId);
+                $plan = $this->planFactory->create();
+                $this->planResource->load($plan, $planId);
                 if ($plan->getId()) {
                     $item->setWorldpaySubscriptionPlan($plan);
                 }
@@ -559,14 +580,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
                 $startDate = $startDateOption->getValue() ? $startDateOption->getValue() : date('d-m-yy');
 
-            if (isset($startDateOption)) {
-                $startDateInfo = [
-                    [
-                        'label' => __('Subscription Start Date'),
-                        'value' => $startDate
-                    ]
-                ];
-            }
+            $startDateInfo = [
+                [
+                    'label' => __('Subscription Start Date'),
+                    'value' => $startDate
+                ]
+            ];
         }
 
         return $startDateInfo;
@@ -587,14 +606,12 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
 
                 $endDate = $endDateOption->getValue() ? $endDateOption->getValue() : date('d-m-yy');
 
-            if (isset($endDateOption)) {
-                $endDateInfo = [
-                    [
-                        'label' => __('Subscription End Date'),
-                        'value' => $endDate
-                    ]
-                ];
-            }
+            $endDateInfo = [
+                [
+                    'label' => __('Subscription End Date'),
+                    'value' => $endDate
+                ]
+            ];
         }
 
         return $endDateInfo;
@@ -707,6 +724,8 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
                     $shippingMethodCode = $shippingMethod['method_code'];
                 }
             }
+            $shippingCarrierCode = $shippingCarrierCode ?? null;
+            $shippingMethodCode = $shippingMethodCode ?? null;
             $shippingInformation = [];
             $shippingInformation['addressInformation']['shipping_address'] = $orderData['shipping_address'];
             $shippingInformation['addressInformation']['billing_address'] = $orderData['billing_address'];
@@ -800,7 +819,8 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     public function updateCartItem($cartId, $itemId, $price, $qty)
     {
         if ($price) {
-            $quote = $this->quote->create()->load($cartId);
+            $quote = $this->quote->create();
+            $this->quoteResource->load($quote, $cartId);
             $quoteItem = $quote->getItemById($itemId);
             $quoteItem->setQty($qty);
             $quoteItem->setCustomPrice($price);
@@ -808,7 +828,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
             $quoteItem->setOriginalCustomPrice($price);
             $quoteItem->getProduct()->setIsSuperMode(true);
             $quoteItem->save();
-            $quote->save();
+            $this->quoteResource->save($quote);
         }
         return true;
     }
@@ -1049,7 +1069,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * Get checkout label by code
      *
      * @param string $labelCode
-     * @return array
+     * @return array|null
      */
     public function getCheckoutLabelbyCode($labelCode)
     {
@@ -1071,7 +1091,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * Get the list of my account exceptions
      *
      * @param string $exceptioncode
-     * @return array
+     * @return array|null
      */
     public function getMyAccountExceptions($exceptioncode)
     {
@@ -1094,7 +1114,7 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
      * Get the list of checkout exceptions
      *
      * @param string $exceptioncode
-     * @return array
+     * @return array|null
      */
     public function getCheckoutExceptions($exceptioncode)
     {

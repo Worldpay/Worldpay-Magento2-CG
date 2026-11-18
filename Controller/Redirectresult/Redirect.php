@@ -71,7 +71,7 @@ class Redirect extends \Magento\Framework\App\Action\Action
         $this->worldpayHelper = $worldpayHelper;
         $this->emailsender = $emailsender;
         $this->orderservice = $orderservice;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
    /**
     * Execute

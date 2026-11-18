@@ -15,6 +15,11 @@
 class Cancel extends \Magento\Framework\App\Action\Action
 {
     /**
+     * @var object
+     */
+    protected $_paymentUpdate;
+
+    /**
      * @var Magento\Framework\View\Result\PageFactory
      */
     protected $pageFactory;
@@ -116,7 +121,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
         $this->multishippingStateResponse = $multishippingStateResponse;
         $this->quoteRepository = $quoteRepository;
         $this->wpMultishippingCollection = $wpMultishippingCollection;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
     /**
      * Execute
@@ -195,7 +200,7 @@ class Cancel extends \Magento\Framework\App\Action\Action
      *
      * @param string $paymentState
      * @param array $order
-     * @return string
+     * @return void
      */
     private function _applyPaymentUpdate($paymentState, $order)
     {

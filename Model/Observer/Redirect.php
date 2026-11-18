@@ -11,11 +11,11 @@ use Exception;
 class Redirect implements ObserverInterface
 {
     /**
-     * @var _responseFactory
+     * @var \Magento\Framework\App\ResponseFactory
      */
     protected $_responseFactory;
     /**
-     * @var _url
+     * @var \Magento\Framework\UrlInterface
      */
     protected $_url;
 
@@ -53,7 +53,7 @@ class Redirect implements ObserverInterface
      * Execute
      *
      * @param \Magento\Framework\Event\Observer $observer
-     * @return string
+     * @return void
      */
 
     public function execute(\Magento\Framework\Event\Observer $observer)
@@ -62,8 +62,9 @@ class Redirect implements ObserverInterface
         if ($this->checkoutsession->getAdminWpRedirecturl()) {
             $redirecturl = $this->checkoutsession->getAdminWpRedirecturl();
             $this->checkoutsession->unsAdminWpRedirecturl();
-            $this->_responseFactory->create()->setRedirect($redirecturl)->sendResponse();
-            $this->getResponse()->setBody();
+            $response = $this->_responseFactory->create();
+            $response->setRedirect($redirecturl)->sendResponse();
+            $response->setBody('');
         }
     }
 }

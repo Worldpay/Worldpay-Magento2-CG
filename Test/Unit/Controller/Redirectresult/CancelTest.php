@@ -19,6 +19,7 @@ use Sapient\Worldpay\Controller\Redirectresult\Cancel;
 
 class CancelTest extends TestCase
 {
+    use \Sapient\Worldpay\Test\Unit\ObjectFactory;
 
     /**
      *
@@ -28,28 +29,24 @@ class CancelTest extends TestCase
 
     protected function setUp(): void
     {
-        $context = $this->getMockBuilder(Context::class)
-                        ->disableOriginalConstructor()->getMock();
-        $page = $this->getMockBuilder(PageFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $orderservice = $this->getMockBuilder(OrderService::class)
-                        ->disableOriginalConstructor()->getMock();
-        $checkoutservice = $this->getMockBuilder(CheckoutService::class)
-                        ->disableOriginalConstructor()->getMock();
-        $paymentservice = $this->getMockBuilder(PaymentService::class)
-                        ->disableOriginalConstructor()->getMock();
-        $authenticatinservice = $this->getMockBuilder(AuthenticationService::class)
-                        ->disableOriginalConstructor()->getMock();
-        $wplogger = $this->getMockBuilder(WorldpayLogger::class)
-                        ->disableOriginalConstructor()->getMock();
-        $this->cancelObj = new Cancel(
-            $context,
-            $page,
-            $orderservice,
-            $checkoutservice,
-            $paymentservice,
-            $authenticatinservice,
-            $wplogger
+        $context = $this->createStub(Context::class);
+        $page = $this->createStub(PageFactory::class);
+        $orderservice = $this->createStub(OrderService::class);
+        $checkoutservice = $this->createStub(CheckoutService::class);
+        $paymentservice = $this->createStub(PaymentService::class);
+        $authenticatinservice = $this->createStub(AuthenticationService::class);
+        $wplogger = $this->createStub(WorldpayLogger::class);
+        $this->cancelObj = $this->createObject(
+            Cancel::class,
+            [
+                'context' => $context,
+                'pageFactory' => $page,
+                'orderservice' => $orderservice,
+                'checkoutservice' => $checkoutservice,
+                'paymentservice' => $paymentservice,
+                'authenticatinservice' => $authenticatinservice,
+                'wplogger' => $wplogger,
+            ]
         );
     }
 

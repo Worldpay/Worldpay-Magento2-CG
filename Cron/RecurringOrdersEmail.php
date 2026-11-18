@@ -13,6 +13,9 @@ use Exception;
  */
 class RecurringOrdersEmail
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory */
+    private $savedTokenCollectionFactory;
+
     public const EMAIL_NOTIFICATION_DAYS = 9;
     /**
      * @var \Sapient\Worldpay\Logger\WorldpayLogger
@@ -69,8 +72,10 @@ class RecurringOrdersEmail
         \Magento\Store\Model\StoreManagerInterface $_storeManager,
         \Sapient\Worldpay\Model\SavedToken $worldpaytoken,
         \Sapient\Worldpay\Helper\Recurring $recurringhelper,
-        \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
+        \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory $savedTokenCollectionFactory
     ) {
+        $this->savedTokenCollectionFactory = $savedTokenCollectionFactory;
         $this->_logger = $wplogger;
         $this->subscriptionCollectionFactory = $subscriptions;
         $this->transactionCollectionFactory = $recurringTransactions;
@@ -168,7 +173,7 @@ class RecurringOrdersEmail
     {
         $curdate = date("Y-m-d");
         if ($tokenId) {
-            $result = $this->worldpaytoken->getCollection()
+            $result = $this->savedTokenCollectionFactory->create()
                 ->addFieldToFilter('id', ['eq' => trim($tokenId)])
                 ->addFieldToFilter('customer_id', ['eq' => trim($customerId)])
                 ->addFieldToFilter('token_expiry_date', ['gteq' => $curdate])->getData();

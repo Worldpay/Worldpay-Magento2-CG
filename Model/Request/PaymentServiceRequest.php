@@ -17,6 +17,91 @@ use Sapient\Worldpay\Model\XmlBuilder\RedirectOrder;
 class PaymentServiceRequest extends \Magento\Framework\DataObject
 {
     /**
+     * @var ProductOnDemand
+     */
+    protected $productOnDemand;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\TokenDelete
+     */
+    protected $tokenDeleteXml;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\TokenInquiry
+     */
+    protected $tokenInquiryXml;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\TokenUpdate
+     */
+    protected $tokenUpdateXml;
+
+    /**
+     * @var ClickToPayOrder
+     */
+    protected $xmlClickToPayOrder;
+
+    /**
+     * @var PaypalOrder
+     */
+    protected $xmlPaypalOrder;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\CancelOrder
+     */
+    protected $xmlapprove;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\CancelOrder
+     */
+    protected $xmlcancel;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\Capture
+     */
+    protected $xmlcapture;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\DirectIdealOrder
+     */
+    protected $xmldirectidealorder;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\DirectOrder|\Sapient\Worldpay\Model\XmlBuilder\ACHOrder|\Sapient\Worldpay\Model\XmlBuilder\SEPAOrder
+     */
+    protected $xmldirectorder;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\Inquiry
+     */
+    protected $xmlinquiry;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\PaymentOptions
+     */
+    protected $xmlpaymentoptions;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\RedirectOrder|\Sapient\Worldpay\Model\XmlBuilder\RedirectKlarnaOrder
+     */
+    protected $xmlredirectorder;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\Refund
+     */
+    protected $xmlrefund;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\DirectOrder
+     */
+    protected $xmltokenorder;
+
+    /**
+     * @var \Sapient\Worldpay\Model\XmlBuilder\VoidSale
+     */
+    protected $xmlvoidsale;
+
+    /**
      * @var \Magento\Framework\UrlInterface
      */
     public $_urlBuilder;

@@ -14,6 +14,9 @@ use Sapient\Worldpay\Model\Recurring\SubscriptionFactory;
 
 class UpdateRecurringShipment implements UpdateRecurringShipmentInterface
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription */
+    private $subscriptionResource;
+
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
@@ -89,8 +92,10 @@ class UpdateRecurringShipment implements UpdateRecurringShipmentInterface
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
         RegionCollectionFactory $regionCollectionFactory,
         SubscriptionFactory $subscriptionFactory,
-        \Sapient\Worldpay\Model\EditSubscriptionHistoryRepository $editSubscriptionRepository
+        \Sapient\Worldpay\Model\EditSubscriptionHistoryRepository $editSubscriptionRepository,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription $subscriptionResource
     ) {
+        $this->subscriptionResource = $subscriptionResource;
         $this->scopeConfig = $scopeConfig;
         $this->orderFactory = $orderFactory;
         $this->rateRequestFactory = $rateRequestFactory;
@@ -152,9 +157,9 @@ class UpdateRecurringShipment implements UpdateRecurringShipmentInterface
      */
     public function getSubscription($subscriptionId)
     {
-        return $this->subscriptionFactory
-            ->create()
-            ->load($subscriptionId);
+        $model = $this->subscriptionFactory->create();
+        $this->subscriptionResource->load($model, $subscriptionId);
+        return $model;
     }
 
     /**

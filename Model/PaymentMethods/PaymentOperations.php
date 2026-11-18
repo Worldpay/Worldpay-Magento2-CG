@@ -42,7 +42,7 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
      * Void the order abstract method
      *
      * @param array $order
-     * @return $this
+     * @return $this|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function canVoidSale($order)
@@ -78,7 +78,7 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
      * Cancel the order abstract method
      *
      * @param array $order
-     * @return $this
+     * @return $this|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function canCancel($order)
@@ -145,7 +145,7 @@ class PaymentOperations extends \Sapient\Worldpay\Model\PaymentMethods\AbstractM
      * Cancel the order abstract method
      *
      * @param array $order
-     * @return $this
+     * @return $this|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function approveOrder($order)

@@ -19,6 +19,7 @@ use Sapient\Worldpay\Controller\Redirectresult\Error;
 
 class ErrorTest extends TestCase
 {
+    use \Sapient\Worldpay\Test\Unit\ObjectFactory;
     
     /**
      * @var Error
@@ -26,32 +27,27 @@ class ErrorTest extends TestCase
     protected $errorObj;
     protected function setUp(): void
     {
-        $context = $this->getMockBuilder(Context::class)
-                        ->disableOriginalConstructor()->getMock();
-        $page = $this->getMockBuilder(PageFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $orderservice = $this->getMockBuilder(OrderService::class)
-                        ->disableOriginalConstructor()->getMock();
-        $subscriptionFactory = $this->getMockBuilder(SubscriptionFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $transactionsFactory = $this->getMockBuilder(TransactionsFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $helper = $this->getMockBuilder(CreditCardException::class)
-                        ->disableOriginalConstructor()->getMock();
-        $checkoutSession = $this->getMockBuilder(Session::class)
-                        ->disableOriginalConstructor()->getMock();
-        $wplogger = $this->getMockBuilder(WorldpayLogger::class)
-                        ->disableOriginalConstructor()->getMock();
+        $context = $this->createStub(Context::class);
+        $page = $this->createStub(PageFactory::class);
+        $orderservice = $this->createStub(OrderService::class);
+        $subscriptionFactory = $this->createStub(SubscriptionFactory::class);
+        $transactionsFactory = $this->createStub(TransactionsFactory::class);
+        $helper = $this->createStub(CreditCardException::class);
+        $checkoutSession = $this->createStub(Session::class);
+        $wplogger = $this->createStub(WorldpayLogger::class);
 
-        $this->errorObj = new Error(
-            $context,
-            $page,
-            $orderservice,
-            $wplogger,
-            $subscriptionFactory,
-            $transactionsFactory,
-            $checkoutSession,
-            $helper
+        $this->errorObj = $this->createObject(
+            Error::class,
+            [
+                'context' => $context,
+                'pageFactory' => $page,
+                'orderservice' => $orderservice,
+                'wplogger' => $wplogger,
+                'subscriptionFactory' => $subscriptionFactory,
+                'transactionsFactory' => $transactionsFactory,
+                'checkoutSession' => $checkoutSession,
+                'helper' => $helper,
+            ]
         );
     }
     

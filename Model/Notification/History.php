@@ -8,6 +8,9 @@ use Sapient\Worldpay\Api\HistoryInterface;
 
 class History implements HistoryInterface
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\HistoryNotification\CollectionFactory */
+    private $historyCollectionFactory;
+
     /**
      * @var \Sapient\Worldpay\Model\HistoryNotification
      */
@@ -18,8 +21,10 @@ class History implements HistoryInterface
      * @param \Sapient\Worldpay\Model\HistoryNotification $historyNotification
      */
     public function __construct(
-        \Sapient\Worldpay\Model\HistoryNotification $historyNotification
+        \Sapient\Worldpay\Model\HistoryNotification $historyNotification,
+        \Sapient\Worldpay\Model\ResourceModel\HistoryNotification\CollectionFactory $historyCollectionFactory
     ) {
+        $this->historyCollectionFactory = $historyCollectionFactory;
         $this->historyNotification = $historyNotification;
     }
     /**
@@ -33,7 +38,7 @@ class History implements HistoryInterface
     {
         $result="";
         if (isset($order)) {
-                $result = $this->historyNotification->getCollection()
+                $result = $this->historyCollectionFactory->create()
                         ->addFieldToFilter('order_id', ['eq' => trim($order)])->getData();
         } else {
                 $result = 'Order Id is null';

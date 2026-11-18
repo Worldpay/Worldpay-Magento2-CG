@@ -66,7 +66,7 @@ class Index extends \Magento\Framework\App\Action\Action
      * @param \Magento\Framework\App\Request\Http $request
      * @param \Magento\Checkout\Model\Cart $cart
      * @param \Sapient\Worldpay\Helper\CurlHelper $curlHelper
-     * @param \Magento\Framework\Filesystem\Driver\file $fileDriver
+     * @param \Magento\Framework\Filesystem\Driver\File $fileDriver
      */
 
     public function __construct(
@@ -78,7 +78,7 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Request\Http $request,
         \Magento\Checkout\Model\Cart $cart,
         \Sapient\Worldpay\Helper\CurlHelper $curlHelper,
-        \Magento\Framework\Filesystem\Driver\file $fileDriver
+        \Magento\Framework\Filesystem\Driver\File $fileDriver
     ) {
         parent::__construct($context);
         $this->wplogger = $wplogger;
@@ -93,7 +93,7 @@ class Index extends \Magento\Framework\App\Action\Action
     /**
      * Execute
      *
-     * @return string
+     * @return \Magento\Framework\Controller\ResultInterface|\Magento\Framework\App\ResponseInterface|null
      */
 
     public function execute()

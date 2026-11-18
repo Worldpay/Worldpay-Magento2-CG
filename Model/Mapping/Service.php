@@ -821,7 +821,7 @@ class Service
      * Collect TokenRequest Config
      *
      * @param array $paymentDetails
-     * @return array
+     * @return array|null
      */
     private function _getTokenRequestConfig($paymentDetails)
     {
@@ -917,6 +917,7 @@ class Service
     private function _getOrderLineItems($quote, $paymentType = null)
     {
         $isMultiShipping = (bool)$quote->getIsMultiShipping();
+        $msTax = 0;
         $orderitems = [];
         $orderitems['orderTaxAmount'] = $quote->getShippingAddress()->getData('tax_amount');
         if ($paymentType == 'KLARNA-SSL' && $isMultiShipping) {
@@ -970,7 +971,7 @@ class Service
                     $rate = $address->getShippingRateByCode($shippingMethodCode);
                     $shippingPrice += $rate->getPrice();
                 } else {
-                    $shippingPrice += $order->getShippingAmount();
+                    $shippingPrice += $address->getShippingAmount();
                 }
             }
             $lineitem['reference'] = 'Shipid';
@@ -1358,7 +1359,7 @@ class Service
      * @param int $quote
      * @param string $orderStoreId
      * @param array $paymentDetails
-     * @return array
+     * @return array|null
      */
     public function collectWalletOrderParameters(
         $orderCode,
@@ -1490,10 +1491,11 @@ class Service
      *
      * @param array $paymentDetails
      * @param int $quote
-     * @return array
+     * @return array|null
      */
     public function getThirdPartyDetails($paymentDetails, $quote)
     {
+        $details = [];
 
         //Latin America Payment
         if ($this->belongsToLACountries($paymentDetails, $quote)) {
@@ -1517,7 +1519,7 @@ class Service
      *
      * @param array $paymentDetails
      * @param int $quote
-     * @return array
+     * @return array|null
      */
     public function getShippingFeeForBrazil($paymentDetails, $quote)
     {
@@ -1708,7 +1710,7 @@ class Service
      *
      * @param array $paymentDetails
      * @param int $quote
-     * @return array
+     * @return array|null
      */
     public function getPrimeRoutingDetails($paymentDetails, $quote)
     {
@@ -1769,7 +1771,7 @@ class Service
      * Collect Third Party Details
      *
      * @param string $customer
-     * @return array
+     * @return array|null
      */
     public function getCustomerDOB($customer)
     {

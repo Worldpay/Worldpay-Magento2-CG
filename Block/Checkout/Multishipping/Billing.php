@@ -17,6 +17,11 @@ use Magento\Store\Model\ScopeInterface;
 class Billing extends \Magento\Multishipping\Block\Checkout\Billing
 {
     /**
+     * @var mixed
+     */
+    protected $addressErrors;
+
+    /**
      * @var \Magento\Multishipping\Model\Checkout\Type\Multishipping
      */
     protected $_multishipping;
@@ -108,6 +113,7 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
         $this->_taxHelper = $taxHelper;
         $data['taxHelper'] = $this->_taxHelper;
         $this->wpHelper = $wpHelper;
+        $data['template'] = 'Sapient_Worldpay::multishipping/billing/billing.phtml';
         parent::__construct(
             $context,
             $paymentHelper,
@@ -129,7 +135,6 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
      */
     protected function _prepareLayout()
     {
-        $this->setTemplate('Sapient_Worldpay::multishipping/billing/billing.phtml');
         $this->pageConfig->addBodyClass('worldpay-multishipping');
         return parent::_prepareLayout();
     }
@@ -312,6 +317,62 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
         return $renderer->toHtml();
     }
     /**
+     * Resolve the product type for a rendered quote or order item.
+     *
+     * @param \Magento\Framework\DataObject $item
+     * @return string
+     */
+    protected function _getItemType(\Magento\Framework\DataObject $item)
+    {
+        if ($item->getOrderItem()) {
+            return $item->getOrderItem()->getProductType();
+        }
+        if ($item instanceof \Magento\Quote\Model\Quote\Address\Item) {
+            return $item->getQuoteItem()->getProductType();
+        }
+        return $item->getProductType();
+    }
+
+    /**
+     * Prepare the row renderer before output.
+     *
+     * @param \Magento\Framework\View\Element\AbstractBlock $renderer
+     * @return $this
+     */
+    protected function _prepareItem(\Magento\Framework\View\Element\AbstractBlock $renderer)
+    {
+        return $this;
+    }
+
+    /**
+     * Retrieve the item renderer from the configured renderer list.
+     *
+     * @param string $type
+     * @return \Magento\Framework\View\Element\AbstractBlock
+     */
+    public function getItemRenderer($type)
+    {
+        $rendererList = $this->getRendererListName()
+            ? $this->getLayout()->getBlock($this->getRendererListName())
+            : $this->getChildBlock('renderer.list');
+        if (!$rendererList) {
+            $rendererList = $this->getLayout()->createBlock(\Magento\Framework\View\Element\RendererList::class);
+            $rendererList->setChild(self::DEFAULT_TYPE, $this->getLayout()->createBlock(
+                \Magento\Checkout\Block\Cart\Item\Renderer::class,
+                '',
+                ['data' => ['template' => 'Magento_Multishipping::checkout/overview/item.phtml']]
+            ));
+            $this->setChild('renderer.list', $rendererList);
+        }
+        $overriddenTemplates = $this->getOverriddenTemplates() ?: [];
+        $type = $type ?? '';
+        $template = $overriddenTemplates[$type] ?? $this->getRendererTemplate();
+        $renderer = $rendererList->getRenderer($type, self::DEFAULT_TYPE, $template);
+        $renderer->setRenderedBlock($this);
+        return $renderer;
+    }
+
+    /**
      * Retrieve renderer block for row-level item output
      *
      * @param  string $type
@@ -353,7 +414,7 @@ class Billing extends \Magento\Multishipping\Block\Checkout\Billing
     public function getAddressErrors(): array
     {
         if (empty($this->addressErrors)) {
-            $this->addressErrors = $this->session->getAddressErrors(true);
+            $this->addressErrors = $this->_checkoutSession->getAddressErrors(true);
         }
 
         return $this->addressErrors ?? [];

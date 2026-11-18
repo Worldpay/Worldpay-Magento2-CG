@@ -12,7 +12,7 @@ class AddWorldpayPaymentJoin implements ObserverInterface
         $collection = $observer->getEvent()->getCollection();
         if ($collection->getMainTable() === 'sales_order_grid') {
             $collection->getSelect()->joinLeft(
-                ['wp' => $this->getTableName('worldpay_payment')],
+                ['wp' => $collection->getTable('worldpay_payment')],
                 'main_table.entity_id = wp.order_id',
                 ['custom_column' => 'wp.custom_column']
             );

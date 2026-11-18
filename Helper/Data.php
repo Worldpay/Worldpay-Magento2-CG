@@ -15,6 +15,18 @@ use Sapient\Worldpay\Model\PaymentMethods\AbstractMethod;
 
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
+    /** @var \Magento\Quote\Model\ResourceModel\Quote */
+    private $quoteResource;
+
+    /** @var \Magento\Sales\Model\ResourceModel\Order */
+    private $orderResource;
+
+    /** @var \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory */
+    private $orderItemCollectionFactory;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory */
+    private $savedTokenCollectionFactory;
+
     /**
      * @var _scopeConfig
      */
@@ -188,7 +200,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\App\ProductMetadataInterface $productMetaData,
         \Magento\Quote\Model\QuoteFactory $quoteFactory,
         \Sapient\Worldpay\Model\Worldpayment $worldpaypaymentmodel,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory $savedTokenCollectionFactory,
+        \Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory $orderItemCollectionFactory,
+        \Magento\Sales\Model\ResourceModel\Order $orderResource,
+        \Magento\Quote\Model\ResourceModel\Quote $quoteResource
     ) {
+        $this->quoteResource = $quoteResource;
+        $this->orderResource = $orderResource;
+        $this->orderItemCollectionFactory = $orderItemCollectionFactory;
+        $this->savedTokenCollectionFactory = $savedTokenCollectionFactory;
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
         $this->_filesystem = $filesystem;
@@ -1088,7 +1108,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param array $order
      * @param string $paymentCode
      * @param object $worldpaypayment
-     * @return string
+     * @return string|null
      */
     public function getPaymentTitleForOrders(
         $order,
@@ -1123,7 +1143,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getOrderByOrderId($orderId)
     {
-        return $this->orderFactory->create()->load($orderId);
+        $model = $this->orderFactory->create();
+        $this->orderResource->load($model, $orderId);
+        return $model;
     }
     /**
      * Get Wallets Enabled
@@ -1853,7 +1875,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $now = new \DateTime();
         $lastDay = new  \DateInterval(sprintf('P%dD', 1));
-        $savedCards = $this->_savecard->create()->getCollection()
+        $savedCards = $this->savedTokenCollectionFactory->create()
                         ->addFieldToSelect(['id'])
                         ->addFieldToFilter('customer_id', ['eq' => $customerId])
                         ->addFieldToFilter('created_at', ['lteq' => $now->format('Y-m-d H:i:s')])
@@ -1948,7 +1970,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get Prime Routing Enabled
      *
-     * @return string
+     * @return string|null
      */
     public function isPrimeRoutingEnabled()
     {
@@ -1963,7 +1985,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get Advanced Prime Routing Enabled
      *
-     * @return string
+     * @return string|null
      */
     public function isAdvancedPrimeRoutingEnabled()
     {
@@ -1979,7 +2001,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * Get Routing Preference
      *
-     * @return string
+     * @return string|null
      */
     public function getRoutingPreference()
     {
@@ -2121,7 +2143,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
    /**
     * Get Klarna Sliceit Type
     *
-    * @return string
+    * @return string|null
     */
     public function getKlarnaSliceitType()
     {
@@ -2136,7 +2158,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
    /**
     * Get Klarna Sliceit Contries
     *
-    * @return string
+    * @return string|null
     */
     public function getKlarnaSliceitContries()
     {
@@ -2154,7 +2176,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
    /**
     * Get Klarna Pay Later Type
     *
-    * @return string
+    * @return string|null
     */
     public function getKlarnaPayLaterType()
     {
@@ -2169,7 +2191,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
    /**
     * Get Klarna Pay Later Contries
     *
-    * @return string
+    * @return string|null
     */
     public function getKlarnaPayLaterContries()
     {
@@ -2187,7 +2209,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
    /**
     * Get Klarna Pay PayNow Type
     *
-    * @return string
+    * @return string|null
     */
     public function getKlarnaPayNowType()
     {
@@ -2202,7 +2224,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
    /**
     * Get Klarna Pay PayNow Contries
     *
-    * @return string
+    * @return string|null
     */
     public function getKlarnaPayNowContries()
     {
@@ -2336,7 +2358,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     */
     public function getInvoicedItemsData($itemId)
     {
-        $invoicedItems = $this->_itemFactory->create()->getCollection()
+        $invoicedItems = $this->orderItemCollectionFactory->create()
                 ->addFieldToSelect(['product_id', 'name', 'product_type', 'tax_amount',
                     'parent_item_id', 'discount_amount', 'row_total', 'qty_ordered',
                     'row_total_incl_tax', 'weee_tax_applied_row_amount'])
@@ -3143,7 +3165,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return $this->quotes[$quoteId];
         }
 
-        $this->quotes[$quoteId] = $this->quoteFactory->create()->load($quoteId);
+        $this->quotes[$quoteId] = $this->quoteFactory->create();
+        $this->quoteResource->load($this->quotes[$quoteId], $quoteId);
 
         return $this->quotes[$quoteId];
     }

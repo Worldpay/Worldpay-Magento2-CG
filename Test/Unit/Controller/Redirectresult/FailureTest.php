@@ -18,6 +18,7 @@ use Sapient\Worldpay\Controller\Redirectresult\Failure;
 
 class FailureTest extends TestCase
 {
+    use \Sapient\Worldpay\Test\Unit\ObjectFactory;
     
     /**
      * @var Failure
@@ -25,29 +26,25 @@ class FailureTest extends TestCase
     protected $failureObj;
     protected function setUp(): void
     {
-        $context = $this->getMockBuilder(Context::class)
-                        ->disableOriginalConstructor()->getMock();
-        $page = $this->getMockBuilder(PageFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $orderservice = $this->getMockBuilder(OrderService::class)
-                        ->disableOriginalConstructor()->getMock();
-        $subscriptionFactory = $this->getMockBuilder(SubscriptionFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $transactionsFactory = $this->getMockBuilder(TransactionsFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $checkoutSession = $this->getMockBuilder(Session::class)
-                        ->disableOriginalConstructor()->getMock();
-        $wplogger = $this->getMockBuilder(WorldpayLogger::class)
-                        ->disableOriginalConstructor()->getMock();
+        $context = $this->createStub(Context::class);
+        $page = $this->createStub(PageFactory::class);
+        $orderservice = $this->createStub(OrderService::class);
+        $subscriptionFactory = $this->createStub(SubscriptionFactory::class);
+        $transactionsFactory = $this->createStub(TransactionsFactory::class);
+        $checkoutSession = $this->createStub(Session::class);
+        $wplogger = $this->createStub(WorldpayLogger::class);
 
-        $this->failureObj = new Failure(
-            $context,
-            $page,
-            $orderservice,
-            $wplogger,
-            $subscriptionFactory,
-            $transactionsFactory,
-            $checkoutSession
+        $this->failureObj = $this->createObject(
+            Failure::class,
+            [
+                'context' => $context,
+                'pageFactory' => $page,
+                'orderservice' => $orderservice,
+                'wplogger' => $wplogger,
+                'subscriptionFactory' => $subscriptionFactory,
+                'transactionsFactory' => $transactionsFactory,
+                'checkoutSession' => $checkoutSession,
+            ]
         );
     }
     

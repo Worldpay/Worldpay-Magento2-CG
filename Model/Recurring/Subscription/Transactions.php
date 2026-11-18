@@ -16,6 +16,34 @@ use Sapient\Worldpay\Model\Recurring\Subscription;
 class Transactions extends AbstractModel
 {
     /**
+     * Constructor
+     */
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
+        \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions $entityResource,
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        $this->entityResource = $entityResource;
+        parent::__construct(
+            $context,
+            $registry,
+            $extensionFactory,
+            $customAttributeFactory,
+            $resource,
+            $resourceCollection,
+            $data
+        );
+    }
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions */
+    private $entityResource;
+
+    /**
      * @var Subscription
      */
     private $subscription;
@@ -70,73 +98,78 @@ class Transactions extends AbstractModel
      * Load order Details
      *
      * @param int $order_increment_id
-     * @return array
+     * @return $this|null
      */
     public function loadByOrderIncrementId($order_increment_id)
     {
         if (!$order_increment_id) {
             return;
         }
-        $id = $this->getResource()->loadByOriginalOrderIncrementId($order_increment_id);
-        return $this->load($id);
+        $id = $this->entityResource->loadByOriginalOrderIncrementId($order_increment_id);
+        $this->entityResource->load($this, $id);
+        return $this;
     }
     /**
      * Load order Details
      *
      * @param int $order_id
-     * @return array
+     * @return $this|null
      */
     public function loadByWorldpayOrderId($order_id)
     {
         if (!$order_id) {
             return;
         }
-        $id = $this->getResource()->loadByWorldpayOrderId($order_id);
-            return $this->load($id);
+        $id = $this->entityResource->loadByWorldpayOrderId($order_id);
+        $this->entityResource->load($this, $id);
+        return $this;
     }
     
     /**
      * Load order Details
      *
      * @param int $subscriptionId
-     * @return array
+     * @return $this|null
      */
     public function loadBySubscriptionId($subscriptionId)
     {
         if (!$subscriptionId) {
             return;
         }
-        $id = $this->getResource()->loadBySubscriptionId($subscriptionId);
-            return $this->load($id);
+        $id = $this->entityResource->loadBySubscriptionId($subscriptionId);
+        $this->entityResource->load($this, $id);
+        return $this;
     }
     
     /**
      * Load order Details
      *
      * @param int $entityId
-     * @return array
+     * @return $this|null
      */
     public function loadById($entityId)
     {
         if (!$entityId) {
             return;
         }
-        $id = $this->getResource()->loadById($entityId);
-            return $this->load($id);
+        $id = $this->entityResource->loadById($entityId);
+        $this->entityResource->load($this, $id);
+        return $this;
     }
 
     /**
      * Load Subscription Active order Details
      *
      * @param int $subscriptionId
-     * @return array
+     * @return $this|null
      */
     public function loadBySubscriptionIdActive($subscriptionId)
     {
         if (!$subscriptionId) {
             return;
         }
-        $id = $this->getResource()->loadBySubscriptionIdActive($subscriptionId);
-           return $this->load($id);
+        $id = $this->entityResource->loadBySubscriptionIdActive($subscriptionId);
+        $this->entityResource->load($this, $id);
+        return $this;
     }
 }

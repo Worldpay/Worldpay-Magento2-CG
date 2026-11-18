@@ -30,7 +30,7 @@ class AddressInfo extends \Sapient\Worldpay\Block\Recurring\Customer\Subscriptio
                 $addresses = $this->customerRepository->getById($currentCustomer->getId())->getAddresses();
             } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
                 /** Customer does not exist */
-                throw new NoSuchEntityException(__('Customer does not exist'));
+                throw new \Magento\Framework\Exception\NoSuchEntityException(__('Customer does not exist'));
             }
             /** @var \Magento\Customer\Api\Data\AddressInterface $address */
             foreach ($addresses as $address) {

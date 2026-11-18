@@ -95,7 +95,7 @@ class CronConfig extends \Magento\Framework\App\Config\Value
                 self::CRON_MODEL_PATH
             )->save();
         } catch (\Exception $e) {
-            throw new SpecificException($e->getMessage());
+            throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
         }
 
         return parent::afterSave();

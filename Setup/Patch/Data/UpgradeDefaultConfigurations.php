@@ -95,6 +95,7 @@ class UpgradeDefaultConfigurations implements DataPatchInterface
         $this->moduleDataSetup->startSetup();
         $this->updateExistingData();
         $this->moduleDataSetup->endSetup();
+        return $this;
     }
 
     /**

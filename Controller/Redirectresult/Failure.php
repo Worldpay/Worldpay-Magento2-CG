@@ -8,6 +8,7 @@ use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\Context;
 use Sapient\Worldpay\Model\Recurring\SubscriptionFactory;
 use Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory;
+use Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions as TransactionsResource;
 
 /**
  * Redirect to the cart Page if order is failed
@@ -28,6 +29,11 @@ class Failure extends \Magento\Framework\App\Action\Action
      * @var TransactionsFactory
      */
     private $transactionsFactory;
+
+    /**
+     * @var TransactionsResource
+     */
+    private $transactionsResource;
 
      /**
       * @var \Sapient\Worldpay\Model\Order\Service
@@ -66,6 +72,7 @@ class Failure extends \Magento\Framework\App\Action\Action
      * @param \Magento\Checkout\Model\Session $checkoutSession
      * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender
      * @param \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
+     * @param TransactionsResource $transactionsResource
      */
     public function __construct(
         Context $context,
@@ -76,17 +83,19 @@ class Failure extends \Magento\Framework\App\Action\Action
         TransactionsFactory $transactionsFactory,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $emailsender,
-        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper
+        \Sapient\Worldpay\Helper\Multishipping $multishippingHelper,
+        TransactionsResource $transactionsResource
     ) {
         $this->pageFactory = $pageFactory;
         $this->orderservice = $orderservice;
         $this->wplogger = $wplogger;
         $this->subscriptionFactory = $subscriptionFactory;
         $this->transactionsFactory = $transactionsFactory;
+        $this->transactionsResource = $transactionsResource;
         $this->checkoutSession = $checkoutSession;
         $this->emailsender = $emailsender;
         $this->multishippingHelper = $multishippingHelper;
-        return parent::__construct($context);
+        parent::__construct($context);
     }
     /**
      * Execute
@@ -117,7 +126,7 @@ class Failure extends \Magento\Framework\App\Action\Action
                 ->create()
                 ->loadByOrderIncrementId($reservedOrder->getIncrementId());
             if ($transactions) {
-                $transactions->delete();
+                $this->transactionsResource->delete($transactions);
             }
         }
         // send Payment Fail Email

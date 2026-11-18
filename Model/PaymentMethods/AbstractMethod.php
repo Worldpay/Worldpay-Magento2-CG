@@ -12,6 +12,30 @@ use Sapient\Worldpay\Helper\ProductOnDemand;
  */
 abstract class AbstractMethod extends BaseAbstractMethod
 {
+    /** @var \SimpleXMLElement */
+    protected $_response;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection */
+    protected $multishippingOrderCollection;
+
+    /** @var \Sapient\Worldpay\Model\Multishipping\OrderFactory */
+    protected $multishippingOrderFactory;
+
+    /** @var \Magento\Framework\Pricing\Helper\Data */
+    protected $pricinghelper;
+
+    /** @var \Magento\Framework\UrlInterface */
+    protected $urlbuilder;
+
+    /** @var \Sapient\Worldpay\Model\Authorisation\RedirectService */
+    protected $redirectservice;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Worldpayment */
+    private $worldpaymentResource;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory */
+    private $savedTokenCollectionFactory;
+
 
     /**
      * Availability option
@@ -234,10 +258,14 @@ abstract class AbstractMethod extends BaseAbstractMethod
         \Sapient\Worldpay\Model\Multishipping\OrderFactory $multishippingOrderFactory,
         \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection,
         ProductOnDemand $productOnDemandHelper,
+        \Sapient\Worldpay\Model\ResourceModel\SavedToken\CollectionFactory $savedTokenCollectionFactory,
+        \Sapient\Worldpay\Model\ResourceModel\Worldpayment $worldpaymentResource,
         ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
+        $this->worldpaymentResource = $worldpaymentResource;
+        $this->savedTokenCollectionFactory = $savedTokenCollectionFactory;
         parent::__construct(
             $context,
             $registry,
@@ -285,6 +313,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
      *
      * @param string $paymentAction
      * @param Object $stateObject
+     * @return void
      */
     public function initialize($paymentAction, $stateObject)
     {
@@ -319,7 +348,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @param float $amount
-     * @return $this
+     * @return $this|null
      */
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
@@ -570,7 +599,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
         $wpp->setData('interaction_type', $interactionType);
         // Check for Merchant Token
         $wpp->setData('token_type', $this->worlpayhelper->getMerchantTokenization());
-        $wpp->save();
+        $this->worldpaymentResource->save($wpp);
     }
 
     /**
@@ -722,7 +751,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
      * Check paymentmethod is available for billing country
      *
      * @param Quote $quote
-     * @return bool
+     * @return bool|null
      * @throw Exception
      */
     protected function _checkpaymentapplicable($quote)
@@ -739,7 +768,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
      * No shipping country was mentioned in config it will be applicable for all shipping country
      *
      * @param Quote $quote
-     * @return bool
+     * @return bool|null
      * @throw Exception
      */
     protected function _checkShippingApplicable($quote)
@@ -771,7 +800,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
         } else {
             $merchantTokenEnabled = $this->worlpayhelper->getMerchantTokenization();
             $tokenType = $merchantTokenEnabled ? 'merchant' : 'shopper';
-            $savedCard= $this->_savecard->create()->getCollection()
+            $savedCard= $this->savedTokenCollectionFactory->create()
                 ->addFieldToSelect(['method'])
                 ->addFieldToFilter('token_code', ['eq' => $this->paymentdetailsdata['additional_data']['tokenCode']])
                 ->addFieldToFilter('token_type', ['eq' => $tokenType])
@@ -814,7 +843,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
      * Void the order abstract method
      *
      * @param array $order
-     * @return $this
+     * @return $this|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function canVoidSale($order)
@@ -870,7 +899,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
      * Cancel the order abstract method
      *
      * @param array $order
-     * @return $this
+     * @return $this|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function canCancel($order)
@@ -930,7 +959,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
      * Get card type from credit card number
      *
      * @param string $ccnumber
-     * @return string
+     * @return string|null
      */
     public function getCardTypeFromCreditCardNumber($ccnumber)
     {
@@ -980,7 +1009,7 @@ abstract class AbstractMethod extends BaseAbstractMethod
     {
         $merchantTokenEnabled = $this->worlpayhelper->getMerchantTokenization();
         $tokenType = $merchantTokenEnabled ? 'merchant' : 'shopper';
-        $savedCard= $this->_savecard->create()->getCollection()
+        $savedCard= $this->savedTokenCollectionFactory->create()
                 ->addFieldToSelect(['method'])
                 ->addFieldToFilter('token_code', ['eq' => $tokenCode])
                 ->addFieldToFilter('token_type', ['eq' => $tokenType])

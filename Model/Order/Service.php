@@ -6,6 +6,18 @@ namespace Sapient\Worldpay\Model\Order;
 
 class Service
 {
+    /** @var \Magento\Sales\Model\ResourceModel\Order\Item */
+    private $orderItemResource;
+
+    /** @var \Magento\Sales\Model\ResourceModel\Order\Creditmemo */
+    private $creditmemoResource;
+
+    /** @var \Magento\Sales\Model\ResourceModel\Order\Invoice */
+    private $invoiceResource;
+
+    /** @var \Magento\Sales\Model\ResourceModel\Order */
+    private $orderResource;
+
 
     /**
      * @var \Magento\Checkout\Model\Session
@@ -89,8 +101,16 @@ class Service
         \Magento\Sales\Model\Order\Creditmemo $creditmemo,
         \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository,
         \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection,
-        \Magento\Sales\Api\OrderManagementInterface $orderManagement
+        \Magento\Sales\Api\OrderManagementInterface $orderManagement,
+        \Magento\Sales\Model\ResourceModel\Order $orderResource,
+        \Magento\Sales\Model\ResourceModel\Order\Invoice $invoiceResource,
+        \Magento\Sales\Model\ResourceModel\Order\Creditmemo $creditmemoResource,
+        \Magento\Sales\Model\ResourceModel\Order\Item $orderItemResource
     ) {
+        $this->orderItemResource = $orderItemResource;
+        $this->creditmemoResource = $creditmemoResource;
+        $this->invoiceResource = $invoiceResource;
+        $this->orderResource = $orderResource;
 
         $this->checkoutsession = $checkoutsession;
         $this->mageorder = $mageOrder;
@@ -116,9 +136,10 @@ class Service
     public function getById($orderId)
     {
 
+         $this->orderResource->load($this->mageorder, $orderId);
          return new \Sapient\Worldpay\Model\Order(
              [
-                'order' => $this->mageorder->load($orderId)
+                'order' => $this->mageorder
              ],
              $this->_invoiceService,
              $this->_transaction,
@@ -128,7 +149,10 @@ class Service
              $this->CreditmemoService,
              $this->ordercreditmemo,
              $this->creditmemoRepository,
-             $this->orderManagement
+             $this->orderManagement,
+             $this->invoiceResource,
+             $this->creditmemoResource,
+             $this->orderItemResource
          );
     }
 
@@ -153,7 +177,10 @@ class Service
             $this->CreditmemoService,
             $this->ordercreditmemo,
             $this->creditmemoRepository,
-            $this->orderManagement
+            $this->orderManagement,
+            $this->invoiceResource,
+            $this->creditmemoResource,
+            $this->orderItemResource
         );
     }
 

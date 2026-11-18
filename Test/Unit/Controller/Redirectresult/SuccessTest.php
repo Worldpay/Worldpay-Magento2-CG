@@ -17,6 +17,7 @@ use Sapient\Worldpay\Controller\Redirectresult\Success;
 
 class SuccessTest extends TestCase
 {
+    use \Sapient\Worldpay\Test\Unit\ObjectFactory;
 
     /**
      * @var Success
@@ -25,15 +26,19 @@ class SuccessTest extends TestCase
 
     protected function setUp(): void
     {
-        $context = $this->getMockBuilder(Context::class)
-                        ->disableOriginalConstructor()->getMock();
-        $page = $this->getMockBuilder(PageFactory::class)
-                        ->disableOriginalConstructor()->getMock();
-        $orderservice = $this->getMockBuilder(OrderService::class)
-                        ->disableOriginalConstructor()->getMock();
-        $wplogger = $this->getMockBuilder(WorldpayLogger::class)
-                        ->disableOriginalConstructor()->getMock();
-        $this->successObj = new Success($context, $page, $orderservice, $wplogger);
+        $context = $this->createStub(Context::class);
+        $page = $this->createStub(PageFactory::class);
+        $orderservice = $this->createStub(OrderService::class);
+        $wplogger = $this->createStub(WorldpayLogger::class);
+        $this->successObj = $this->createObject(
+            Success::class,
+            [
+                'context' => $context,
+                'pageFactory' => $page,
+                'orderservice' => $orderservice,
+                'wplogger' => $wplogger,
+            ]
+        );
     }
 
     public function testExecute()

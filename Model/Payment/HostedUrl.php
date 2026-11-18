@@ -118,6 +118,7 @@ class HostedUrl implements HostedUrlInterface
      */
     public function getHostedUrl($quoteId, array $paymentdetails)
     {
+        $quote = null;
         try {
             if (is_numeric($quoteId)) {
                 $quoteId = $quoteId;
@@ -166,7 +167,7 @@ class HostedUrl implements HostedUrlInterface
         
         } catch (Exception $e) {
             $this->wplogger->error('Failed while getting Iframe payment url. Error:'.$e->getMessage());
-            $errormessage = $this->worldpayhelper->updateErrorMessage($e->getMessage(), $quote->getReservedOrderId());
+            $errormessage = $this->worldpayhelper->updateErrorMessage($e->getMessage(), $quote ? $quote->getReservedOrderId() : null);
             throw new \Magento\Framework\Exception\LocalizedException(
                 __($errormessage)
             );

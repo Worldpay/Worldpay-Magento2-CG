@@ -7,7 +7,7 @@ namespace Sapient\Worldpay\Logger;
 use DateTimeZone;
 use Monolog\Handler\HandlerInterface;
 
-class WorldpayLogger extends \Monolog\Logger
+class WorldpayLogger extends \Magento\Framework\Logger\Monolog
 {
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface

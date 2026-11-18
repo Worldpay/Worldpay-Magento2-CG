@@ -200,9 +200,7 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
         
         $pastversions =  $this->getVersionHistoryDetails()!=null? $this->getVersionHistoryDetails()
                 :$currentVersionHistoryData;
-        if (isset($pastversions)) {
-            $versionHistoryData = explode(',', $pastversions);
-        }
+        $versionHistoryData = explode(',', (string) $pastversions);
         
         if (empty($currentHistoryData)) {
             $value['newData'] = date("d-m-Y").' - ('.$pastversions.')';
@@ -212,7 +210,7 @@ class PluginUpgradeDates extends \Magento\Framework\App\Config\Value
             $datesHistoryData = explode(',', $currentHistoryData);
         }
         if (empty($currentPluginData) ||
-                (!empty($currentPluginData) && empty($currentVersionHistoryData)
+                (empty($currentVersionHistoryData)
                 && (empty($value['oldData']))) || (count($versionHistoryData) != count($datesHistoryData))
                 ) {
                     

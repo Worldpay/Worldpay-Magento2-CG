@@ -8,6 +8,11 @@ use Sapient\Worldpay\Helper\ProductOnDemand;
 
 class TokenService extends \Magento\Framework\DataObject
 {
+    /**
+     * @var ProductOnDemand
+     */
+    protected $productOnDemandHelper;
+
      /**
       * @var \Sapient\Worldpay\Model\Mapping\Service
       */

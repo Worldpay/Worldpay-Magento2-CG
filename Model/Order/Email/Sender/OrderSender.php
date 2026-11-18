@@ -19,6 +19,9 @@ use Sapient\Worldpay\Model\Worldpayment;
 
 class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
 {
+    /** @var \Sapient\Worldpay\Model\ResourceModel\AuthorisedOrderEmail */
+    private $authorisedOrderEmailResource;
+
     public const XML_PATH_EMAIL_GUEST_TEMPLATE = 'wp_sales_email_order_guest_template';
     public const XML_PATH_EMAIL_TEMPLATE = 'wp_sales_email_order_template';
     public const XML_PATH_AUTHORISED_EMAIL_GUEST_TEMPLATE = 'wp_auth_sales_email_order_guest_template';
@@ -48,7 +51,9 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
         \Magento\Framework\App\Config\ScopeConfigInterface $globalConfig,
         ManagerInterface $eventManager,
         AuthorisedOrderEmailFactory $authorisedOrderEmailFactory,
+        \Sapient\Worldpay\Model\ResourceModel\AuthorisedOrderEmail $authorisedOrderEmailResource
     ) {
+        $this->authorisedOrderEmailResource = $authorisedOrderEmailResource;
         parent::__construct(
             $templateContainer,
             $identityContainer,
@@ -215,7 +220,7 @@ class OrderSender extends \Magento\Sales\Model\Order\Email\Sender\OrderSender
                 $authorisedOrderEmailModel->setOrderIncrementId($order->getIncrementId());
                 $authorisedOrderEmailModel->setSuccessFlag($successFlag);
                 $authorisedOrderEmailModel->setAttemptCount(0);
-                $authorisedOrderEmailModel->save();
+                $this->authorisedOrderEmailResource->save($authorisedOrderEmailModel);
             }
         } catch (\Throwable $e) {
             $this->logger->error($e->getMessage());

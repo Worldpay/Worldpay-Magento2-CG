@@ -76,6 +76,21 @@ use Sapient\Worldpay\Model\Config\Source\SubscriptionStatus;
  */
 class Subscription extends \Magento\Framework\Model\AbstractModel
 {
+    /** @var \Magento\Framework\Serialize\SerializerInterface */
+    private $serializer;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address */
+    private $subscriptionAddressResource;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions */
+    private $transactionsResource;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan */
+    private $planResource;
+
+    /** @var \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription */
+    private $entityResource;
+
     public const REGISTRY_NAME = 'current_worldpay_subscription';
 
     /**
@@ -211,10 +226,20 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
         \Sapient\Worldpay\Model\SavedToken $savedToken,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription $entityResource,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Plan $planResource,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Transactions $transactionsResource,
+        \Sapient\Worldpay\Model\ResourceModel\Recurring\Subscription\Address $subscriptionAddressResource,
+        \Magento\Framework\Serialize\SerializerInterface $serializer,
         ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
     ) {
+        $this->serializer = $serializer;
+        $this->subscriptionAddressResource = $subscriptionAddressResource;
+        $this->transactionsResource = $transactionsResource;
+        $this->planResource = $planResource;
+        $this->entityResource = $entityResource;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
         $this->storeManager = $storeManager;
         $this->statusSource = $statusSource;
@@ -248,8 +273,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     {
         if ($this->getAddresses() !== null && is_array($this->getAddresses())) {
             foreach ($this->getAddresses() as $address) {
-                $address->setSubscriptionId($this->getId())
-                    ->save();
+                $address->setSubscriptionId($this->getId());
+                $this->subscriptionAddressResource->save($address);
             }
         }
         return parent::afterSave();
@@ -344,7 +369,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         if ($this->plan === null) {
             $plan = false;
             if ($this->getPlanId()) {
-                $plan = $this->planFactory->create()->load($this->getPlanId());
+                $plan = $this->planFactory->create();
+                $this->planResource->load($plan, $this->getPlanId());
                 if (!$plan->getId()) {
                     $plan = false;
                 }
@@ -378,7 +404,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
             return $this;
         }
         $this->updateTransactionsData();
-        $this->getResource()->updateOrderRelation($this->getOriginalOrderId(), $this->getId());
+        $this->entityResource->updateOrderRelation($this->getOriginalOrderId(), $this->getId());
         return $this;
     }
 
@@ -546,9 +572,9 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     /**
      * Add amount to existing discount amount
      *
-     * @param Subscription\Discount $discount
+     * @param \Magento\Framework\Model\AbstractModel $discount
      */
-    public function addDiscount(Subscription\Discount $discount)
+    public function addDiscount(\Magento\Framework\Model\AbstractModel $discount)
     {
         $discount->setSubscription($this);
         $discountList = $this->getDiscountList();
@@ -593,7 +619,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     {
         $data = $this->_getData('product_options');
         return is_string($data) ?
-        \Magento\Framework\Serialize\SerializerInterface::unserialize($data) : $data;
+        $this->serializer->unserialize($data) : $data;
     }
 
     /**
@@ -609,7 +635,8 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
             return $this;
         }
 
-        $newPlan = $this->planFactory->create()->load($newPlanId);
+        $newPlan = $this->planFactory->create();
+        $this->planResource->load($newPlan, $newPlanId);
         if (!$newPlan->getId()) {
             throw new \InvalidArgumentException('Plan doesn\'t exist.');
         }
@@ -627,6 +654,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
 
         // calculate subscription amounts based on new plan
         if ($this->getIntervalAmount() !== null) {
+            $addonsAmount = 0;
             $originalPriceIncrease = $this->getItemOriginalPrice()
             && (($this->getItemPrice() - $this->getItemOriginalPrice()) > 0.0001)
                 ? ($this->getItemPrice() - $this->getItemOriginalPrice()) : 0;
@@ -687,7 +715,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         if (!isset($changeLogData['subscription_id']) && $this->getId()) {
             $changeLogData['subscription_id'] = $this->getId();
         }
-        $this->getResource()->addAmountChangelog($changeLogData);
+        $this->entityResource->addAmountChangelog($changeLogData);
 
         return $this;
     }
@@ -702,7 +730,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     {
         $cacheKey = $dateTime->getTimestamp();
         if (!isset($this->totalAmountToDate[$cacheKey])) {
-            $this->totalAmountToDate[$cacheKey] = $this->getResource()->getTotalAmountToDate($this, $dateTime);
+            $this->totalAmountToDate[$cacheKey] = $this->entityResource->getTotalAmountToDate($this, $dateTime);
         }
         return $this->totalAmountToDate[$cacheKey];
     }
@@ -780,7 +808,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
     /**
      * Update recurring transactions data
      *
-     * @return $this
+     * @return $this|null
      */
     public function updateTransactionsData()
     {
@@ -812,7 +840,7 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         $transactions->setData('email', $this->getCustomerEmail());
         $transactions->setData('status', 'active');
         $transactions->setData('recurring_order_id', $this->getOriginalOrderId());
-        $transactions->save();
+        $this->transactionsResource->save($transactions);
     }
 
     /**
@@ -838,8 +866,9 @@ class Subscription extends \Magento\Framework\Model\AbstractModel
         if (!$order_id) {
             return;
         }
-        $id = $this->getResource()->loadByOriginalOrderIncrementId($order_id);
-            return $this->load($id);
+        $id = $this->entityResource->loadByOriginalOrderIncrementId($order_id);
+        $this->entityResource->load($this, $id);
+        return $this;
     }
     /**
      * Function to get is virtual column data
