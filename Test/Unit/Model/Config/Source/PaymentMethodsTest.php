@@ -21,14 +21,10 @@ class PaymentMethodsTest extends TestCase
 
     protected function setUp(): void
     {
-        $contextMock = $this->getMockBuilder(Context::class)
-                        ->disableOriginalConstructor()->getMock();
-        $registryMock = $this->getMockBuilder(Registry::class)
-                        ->disableOriginalConstructor()->getMock();
-        $configMock = $this->getMockBuilder(ScopeConfigInterface::class)
-                        ->disableOriginalConstructor()->getMock();
-        $cacheTypeListMock = $this->getMockBuilder(TypeListInterface::class)
-                        ->disableOriginalConstructor()->getMock();
+        $contextMock = $this->createStub(Context::class);
+        $registryMock = $this->createStub(Registry::class);
+        $configMock = $this->createStub(ScopeConfigInterface::class);
+        $cacheTypeListMock = $this->createStub(TypeListInterface::class);
         $this->model = new PaymentMethods($contextMock, $registryMock, $configMock, $cacheTypeListMock);
     }
 

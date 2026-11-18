@@ -21,14 +21,11 @@ class SuccessTest extends TestCase
     protected $successObj;
     protected function setUp(): void
     {
-        $context = $this->getMockBuilder(Context::class)
-                        ->disableOriginalConstructor()->getMock();
+        $context = $this->createStub(Context::class);
         
-        $wplogger = $this->getMockBuilder(WorldpayLogger::class)
-                        ->disableOriginalConstructor()->getMock();
+        $wplogger = $this->createStub(WorldpayLogger::class);
         
-        $page = $this->getMockBuilder(PageFactory::class)
-                        ->disableOriginalConstructor()->getMock();
+        $page = $this->createStub(PageFactory::class);
 
         $this->successObj = new Success($context, $wplogger, $page);
     }

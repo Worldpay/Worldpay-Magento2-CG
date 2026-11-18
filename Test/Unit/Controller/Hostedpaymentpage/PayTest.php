@@ -13,7 +13,6 @@ use Sapient\Worldpay\Helper\Data;
 use Magento\Framework\App\Action\Context;
 use Sapient\Worldpay\Model\Checkout\Hpp\State;
 use Sapient\Worldpay\Logger\WorldpayLogger;
-use Magento\Framework\ObjectManagerInterface;
 use \Magento\Framework\View\Result\Page;
 
 class PayTest extends TestCase
@@ -43,20 +42,11 @@ class PayTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->context = $this->getMockBuilder(Context::class)
-                ->disableOriginalConstructor()
-                ->getMock();
-        $this->pageFactory = $this->getMockBuilder(PageFactory::class)
-                ->disableOriginalConstructor()
-                ->getMock();
-        $wplogger = $this->getMockBuilder(WorldpayLogger::class)
-                        ->disableOriginalConstructor()->getMock();
-        $this->dataHelper = $this->getMockBuilder(Data::class)
-                ->disableOriginalConstructor()
-                ->getMock();
-        $this->hppstate = $this->getMockBuilder(State::class)
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->context = $this->createStub(Context::class);
+        $this->pageFactory = $this->createStub(PageFactory::class);
+        $wplogger = $this->createStub(WorldpayLogger::class);
+        $this->dataHelper = $this->createStub(Data::class);
+        $this->hppstate = $this->createStub(State::class);
 
         $this->payObj = new Pay($this->context, $this->pageFactory, $this->hppstate, $this->dataHelper, $wplogger);
     }
@@ -66,17 +56,7 @@ class PayTest extends TestCase
         $this->dataHelper->method('isIframeIntegration')
                 ->willReturn(true);
 
-        $ObjectManager = $this->getMockBuilder(ObjectManagerInterface::class)
-                ->disableOriginalConstructor()
-                ->getMock();
-
-        $page = $this->getMockBuilder(Page::class)
-                ->disableOriginalConstructor()
-                ->getMock();
-
-        $ObjectManager->method('create')
-                ->with($page, [])
-                ->willReturn($page);
+        $page = $this->createStub(Page::class);
 
         $this->pageFactory->method('create')
                 ->willReturn($page);
