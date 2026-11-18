@@ -3900,4 +3900,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             ? 'https://apitest.cybersource.com'
             : 'https://api.cybersource.com';
     }
+
+    public function isSendAuthorizeEmail()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/hpp_config/send_authorize_email',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    public function isRavelinEnabled(): bool
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/ravelin_config/enabled',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    public function getRavelinPublicKey(): ?string
+    {
+        return $this->_scopeConfig->getValue(
+            'worldpay/ravelin_config/public_key',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
 }

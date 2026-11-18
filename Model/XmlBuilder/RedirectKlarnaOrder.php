@@ -119,6 +119,7 @@ EOD;
      * @var string $storepickUpType
      */
     private $storepickUpType;
+    private array $paymentDetails;
 
     /**
      * RedirectKlarnaOrder constructor
@@ -183,7 +184,8 @@ EOD;
         $isStorePickup,
         $isEnabledStorePickup,
         $storePickUpMethod,
-        $storepickUpType
+        $storepickUpType,
+        $paymentDetails
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -209,6 +211,7 @@ EOD;
         $this->isEnabledStorePickup = $isEnabledStorePickup;
         $this->storePickUpMethod = $storePickUpMethod;
         $this->storepickUpType = $storepickUpType;
+        $this->paymentDetails = $paymentDetails;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -274,6 +277,7 @@ EOD;
         }
         $this->_addOrderLineItemElement($order);
         $this->_addDynamic3DSElement($order);
+        $this->_addRavelinData($order);
         return $order;
     }
 
@@ -299,7 +303,6 @@ EOD;
         $amountElement['currencyCode'] = $this->currencyCode;
         $amountElement['exponent'] = $this->exponent;
         $amountElement['value'] = $this->_amountAsInt($this->amount);
-        //$amountElement['value'] = $this->_amountAsInt($this->_roundOfTotal($order));
     }
 
     /**
@@ -645,10 +648,8 @@ EOD;
         foreach ($orderlineitems['lineItem'] as $lineitem) {
             $totaldiscountamount = (isset($lineitem['totalDiscountAmount']))
                                     ? sprintf('%0.2f', $lineitem['totalDiscountAmount']) : 0;
-            $taxrate = (isset($lineitem['taxRate']))
-                                    ? sprintf('%0.2f', $lineitem['taxRate']) : 0;
             $unitPrice = sprintf('%0.2f', $lineitem['unitPrice']);
-            $accTotalAmt += $taxrate + ($lineitem['quantity'] * $unitPrice) - $totaldiscountamount;
+            $accTotalAmt += ($lineitem['quantity'] * $unitPrice) - $totaldiscountamount;
         }
         return $accTotalAmt;
     }
@@ -744,5 +745,13 @@ EOD;
         $address->addChild('postalCode', $this->shippingAddress['postalCode']);
         $address->addChild('city', $this->shippingAddress['city']);
         $address->addChild('countryCode', $this->shippingAddress['countryCode']);
+    }
+
+    protected function _addRavelinData(\SimpleXMLElement $order): void
+    {
+        if(isset($this->paymentDetails['ravelinDeviceId']) && $this->paymentDetails['ravelinDeviceId']) {
+            $deviceSession = $order->addChild('deviceSession');
+            $deviceSession->addChild('deviceId', $this->paymentDetails['ravelinDeviceId']);
+        }
     }
 }

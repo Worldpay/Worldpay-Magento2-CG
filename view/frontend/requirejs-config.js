@@ -50,7 +50,8 @@ var config = {
             "Magento_Checkout/template/payment.html": "Sapient_Worldpay/template/payment.html",
             newcard:            'Sapient_Worldpay/js/newcard',
             disclaimerPopup:    'Sapient_Worldpay/js/model/disclaimer-popup',
-            "validation": "mage/validation/validation"
+            "validation": "mage/validation/validation",
+            'dompurify': 'https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js'
         }
     },
     config: {
@@ -72,7 +73,26 @@ var config = {
             },
             "Magento_Checkout/js/view/billing-address": {
                 "Sapient_Worldpay/js/view/billing-address": true
+            },
+            'Sapient_Worldpay/js/view/payment/method-renderer/cc-method': {
+                'Sapient_Worldpay/js/ravelin-payment-mixin': true
+            },
+            'Sapient_Worldpay/js/view/payment/method-renderer/apm-method': {
+                'Sapient_Worldpay/js/ravelin-payment-mixin': true
+            },
+            'Sapient_Worldpay/js/view/payment/method-renderer/wallets-method': {
+                'Sapient_Worldpay/js/ravelin-payment-mixin': true
             }
+        }
+    },
+
+    paths: {
+        'ravelin': 'Sapient_Worldpay/js/lib/ravelin-2.3.0-core.min'
+    },
+
+    shim: {
+        'ravelin': {
+            exports: 'Ravelin'
         }
     }
 };

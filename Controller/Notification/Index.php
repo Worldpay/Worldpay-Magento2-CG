@@ -4,106 +4,57 @@
  */
 namespace Sapient\Worldpay\Controller\Notification;
 
+use Magento\Framework\Controller\Result\Json;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Filesystem\Driver\File;
+use Magento\Framework\App\RequestInterface;
 use Exception;
+use Sapient\Worldpay\Logger\WorldpayLogger;
+use Sapient\Worldpay\Model\HistoryNotificationFactory;
+use Sapient\Worldpay\Model\Order\Service as OrderService;
+use Sapient\Worldpay\Model\Payment\Service as PaymentService;
+use Sapient\Worldpay\Model\PaymentMethods\PaymentOperations;
+use Sapient\Worldpay\Model\Token\StateXml;
+use Sapient\Worldpay\Model\Token\WorldpayToken;
 
-class Index extends \Magento\Framework\App\Action\Action
+class Index implements HttpPostActionInterface, HttpGetActionInterface
 {
-    /**
-     * @var Magento\Framework\View\Result\PageFactory
-     */
-
-    protected $pageFactory;
-    /**
-     * @var _rawBody
-     */
-
-    protected $_rawBody;
-    /**
-     * @var historyNotification
-     */
-
-    protected $historyNotification;
-    /**
-     * @var abstractMethod
-     */
-
-    private $abstractMethod;
-    /**
-     * @var RESPONSE_OK
-     */
-
     public const RESPONSE_OK = '[OK]';
-    /**
-     * @var RESPONSE_FAILED
-     */
-
     public const RESPONSE_FAILED = '[FAILED]';
-    /**
-     * @var fileDriver
-     */
 
-    protected $fileDriver;
+    protected PageFactory $pageFactory;
+    protected string|bool|null $_rawBody = null;
+    protected HistoryNotificationFactory $historyNotification;
+    protected PaymentOperations $abstractMethod;
+    protected File $fileDriver;
+    protected WorldpayLogger $wplogger;
+    protected PaymentService $paymentservice;
+    protected OrderService $orderservice;
+    protected JsonFactory $resultJsonFactory;
+    protected WorldpayToken $worldpaytoken;
+    protected mixed $_paymentUpdate;
+    protected mixed $_order;
+    protected Context $context;
+    protected RequestInterface $request;
 
-    /**
-     * @var \Sapient\Worldpay\Logger\WorldpayLogger
-     */
-    public $wplogger;
-    /**
-     * @var \Sapient\Worldpay\Model\Payment\Service
-     */
-    public $paymentservice;
-    /**
-     * @var \Sapient\Worldpay\Model\Order\Service
-     */
-    public $orderservice;
-    /**
-     * @var JsonFactory
-     */
-    public $resultJsonFactory;
-
-    /**
-     * @var \Sapient\Worldpay\Model\Token\WorldpayToken
-     */
-    public $worldpaytoken;
-
-    /**
-     * @var object
-     */
-    public $_paymentUpdate;
-
-    /**
-     * @var object
-     */
-     public $_order;
-
-    /**
-     * Constructor
-     *
-     * @param Context $context
-     * @param JsonFactory $resultJsonFactory
-     * @param \Sapient\Worldpay\Logger\WorldpayLogger $wplogger
-     * @param \Sapient\Worldpay\Model\Payment\Service $paymentservice
-     * @param \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken
-     * @param \Sapient\Worldpay\Model\Order\Service $orderservice
-     * @param \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod
-     * @param \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification
-     * @param \Magento\Framework\Filesystem\Driver\file $fileDriver
-     */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        \Sapient\Worldpay\Logger\WorldpayLogger $wplogger,
-        \Sapient\Worldpay\Model\Payment\Service $paymentservice,
-        \Sapient\Worldpay\Model\Token\WorldpayToken $worldpaytoken,
-        \Sapient\Worldpay\Model\Order\Service $orderservice,
-        \Sapient\Worldpay\Model\PaymentMethods\PaymentOperations $abstractMethod,
-        \Sapient\Worldpay\Model\HistoryNotificationFactory $historyNotification,
-        \Magento\Framework\Filesystem\Driver\file $fileDriver
+        WorldpayLogger $wplogger,
+        PaymentService $paymentservice,
+        WorldpayToken $worldpaytoken,
+        OrderService $orderservice,
+        PaymentOperations $abstractMethod,
+        HistoryNotificationFactory $historyNotification,
+        File $fileDriver
     ) {
-        parent::__construct($context);
+        $this->context = $context;
+        $this->request = $context->getRequest();
         $this->wplogger = $wplogger;
         $this->paymentservice = $paymentservice;
         $this->orderservice = $orderservice;
@@ -113,13 +64,8 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->abstractMethod = $abstractMethod;
         $this->fileDriver = $fileDriver;
     }
-    /**
-     * Execute
-     *
-     * @return string
-     */
 
-    public function execute()
+    public function execute(): Json
     {
         $this->wplogger->info('notification index url hit');
         try {
@@ -135,27 +81,23 @@ class Index extends \Magento\Framework\App\Action\Action
                 return $this->_returnOk();
             } else {
                 $this->wplogger->error('Not a valid xml');
+                return $this->_returnFailure();
             }
         } catch (Exception $e) {
             $this->wplogger->error($e->getMessage());
             if ($e->getMessage() == 'invalid state transition' || $e->getMessage() == 'same state'
-                    || $e->getMessage() == 'Notification received for Partial Captutre') {
+                    || $e->getMessage() == 'Notification received for Partial Capture') {
                 return $this->_returnOk();
             } else {
                 return $this->_returnFailure();
             }
         }
     }
-    /**
-     * Get Raw Body
-     *
-     * @return string
-     */
 
-    public function _getRawBody()
+    public function _getRawBody(): string
     {
         if (null === $this->_rawBody) {
-            $body = $this->fileDriver->fileGetContents('php://input');
+            $body = $this->request->getContent();
             if (strlen(trim($body)) > 0) {
                 $this->_rawBody = $body;
             } else {
@@ -165,93 +107,69 @@ class Index extends \Magento\Framework\App\Action\Action
         return $this->_rawBody;
     }
 
-    /**
-     * Create Payment Update
-     *
-     * @param SimpleXMLElement $xmlRequest
-     */
-    private function _createPaymentUpdate($xmlRequest)
+    private function _createPaymentUpdate(\SimpleXMLElement $xmlRequest): void
     {
         $this->wplogger->info('########## Received notification ##########');
         $this->wplogger->info($this->_getRawBody());
-        $this->paymentservice->getPaymentUpdateXmlForNotification($this->_getRawBody());
+        try {
+            $this->paymentservice->getPaymentUpdateXmlForNotification($this->_getRawBody());
+        } catch (Exception $e) {
+            $this->wplogger->error($e->getMessage());
+            throw new LocalizedException(
+                __($e->getMessage())
+            );
+        }
         $this->_paymentUpdate = $this->paymentservice
             ->createPaymentUpdateFromWorldPayXml($xmlRequest);
 
         $this->_logNotification();
     }
-    /**
-     * Log Notification
-     */
-    private function _logNotification()
+
+    private function _logNotification(): void
     {
-//        $this->wplogger->info('########## Received notification ##########');
-//        $this->wplogger->info($this->_getRawBody());
         $this->wplogger->info('########## Payment update of type: ' .
                 get_class($this->_paymentUpdate). ' created ##########');
     }
 
-    /**
-     * Get order code
-     */
-    private function _loadOrder()
+    private function _loadOrder(): void
     {
         $orderCode = $this->_paymentUpdate->getTargetOrderCode();
         $orderIncrementId = current(explode('-', $orderCode));
 
         $this->_order = $this->orderservice->getByIncrementId($orderIncrementId);
     }
-    /**
-     * Try ToApply Payment Update
-     */
 
-    private function _tryToApplyPaymentUpdate()
+    private function _tryToApplyPaymentUpdate(): void
     {
         try {
             $this->_paymentUpdate->apply($this->_order->getPayment(), $this->_order);
         } catch (Exception $e) {
             $this->wplogger->error($e->getMessage());
-            throw new \Magento\Framework\Exception\LocalizedException(
+            throw new LocalizedException(
                 __($e->getMessage())
             );
         }
     }
 
-    /**
-     * ToApply Payment Update
-     *
-     * @param SimpleXMLElement $xmlRequest
-     */
-
-    private function _applyTokenUpdate($xmlRequest)
+    private function _applyTokenUpdate(\SimpleXMLElement $xmlRequest): void
     {
         $tokenService = $this->worldpaytoken;
         $tokenService->updateOrInsertToken(
-            new \Sapient\Worldpay\Model\Token\StateXml($xmlRequest),
+            new StateXml($xmlRequest),
             $this->_order->getPayment(),
             $this->_order->getOrder()->getCustomerId()
         );
     }
-    /**
-     * Return Ok
-     *
-     * @return json
-     */
 
-    public function _returnOk()
+    public function _returnOk(): Json
     {
         $resultJson = $this->resultJsonFactory->create();
         $resultJson->setHttpResponseCode(200);
         $resultJson->setData(self::RESPONSE_OK);
         return $resultJson;
     }
-    /**
-     * Return Failure
-     *
-     * @return json
-     */
 
-    public function _returnFailure()
+    public function _returnFailure(): Json
     {
         $resultJson = $this->resultJsonFactory->create();
         $resultJson->setHttpResponseCode(500);
@@ -259,12 +177,7 @@ class Index extends \Magento\Framework\App\Action\Action
         return $resultJson;
     }
 
-    /**
-     * Save Notification
-     *
-     * @param xml $xml
-     */
-    private function updateNotification($xml)
+    private function updateNotification(\SimpleXMLElement $xml): void
     {
         $statusNode = $xml->notify->orderStatusEvent;
         $orderCode = "";
@@ -285,10 +198,8 @@ class Index extends \Magento\Framework\App\Action\Action
         $hn->setData('reference', trim($reference));
         $hn->save();
     }
-    /**
-     * Update Order Status
-     */
-    private function _updateOrderStatus()
+
+    private function _updateOrderStatus(): void
     {
         $this->abstractMethod->updateOrderStatusForVoidSale($this->_order);
         $this->abstractMethod->updateOrderStatusForCancelOrder($this->_order);

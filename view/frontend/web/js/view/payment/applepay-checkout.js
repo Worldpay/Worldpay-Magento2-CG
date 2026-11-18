@@ -162,16 +162,24 @@ return Component.extend({
                     if(quote.shippingMethod()){
                         shippingrequired = true;
                     }
+
+                    var additionalData = {
+                        'cc_type': 'APPLEPAY-SSL',
+                        'appleResponse' : appleResponse,
+                        'dfReferenceId':   window.checkoutConfig.payment.ccform.sessionId,
+                        'browser_screenheight': window.screen.height,
+                        'browser_screenwidth': window.screen.width,
+                        'browser_colordepth': window.screen.colorDepth
+                    }
+
+                    let deviceId = window.ravelinDeviceId || null;
+                    if(deviceId) {
+                        additionalData.ravelin_device_id = deviceId;
+                    }
+
                     var paymentData = {
                         'method': "worldpay_wallets",
-                        'additional_data': {
-                            'cc_type': 'APPLEPAY-SSL',
-                            'appleResponse' : appleResponse,
-                            'dfReferenceId':   window.checkoutConfig.payment.ccform.sessionId,
-                            'browser_screenheight': window.screen.height,
-                            'browser_screenwidth': window.screen.width,
-                            'browser_colordepth': window.screen.colorDepth
-                        }
+                        'additional_data': additionalData
                     }
                     var checkoutData = {
                         billingAddress :quote.billingAddress(),
@@ -191,8 +199,6 @@ return Component.extend({
                     else{
                         checkoutUtils.setPaymentInformationAndPlaceOrder(checkoutData);
                     }
-
-                    //self.placeOrder();
                 }
 
                 session.oncancel = function(event) {

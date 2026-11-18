@@ -27,18 +27,24 @@ self.addEventListener('paymentrequest', function(e) {
     })
 });
 
-self.addEventListener('message', listener = function(e) {
-  if (e.data == "payment_app_window_ready") {
+function handlePaymentMessage(e) {
+  if (e.origin && e.origin !== self.location.origin) {
+    return;
+  }
+
+  if (e.data === "payment_app_window_ready") {
     sendPaymentRequest();
     return;
   }
 
-  if(e.data.methodName) {
+  if (e.data.methodName) {
     payment_request_resolver.resolve(e.data);
   } else {
     payment_request_resolver.reject(e.data);
   }
-});
+}
+
+self.addEventListener('message', handlePaymentMessage);
 
 function sendPaymentRequest() {
   // Note that the returned window_client from openWindow is not used since

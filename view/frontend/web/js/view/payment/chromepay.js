@@ -30,7 +30,7 @@ define([
 
         document.cookie = 'envMode=' + encodeURIComponent(
             config.envMode === 'Test Mode' ? 'Test Mode' : 'Live Mode'
-        ) + '; path=/';
+        ) + '; path=/; Secure; SameSite=Strict';
 
         registerServiceWorker();
 

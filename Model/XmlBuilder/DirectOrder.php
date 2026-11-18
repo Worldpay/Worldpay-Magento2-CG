@@ -416,6 +416,9 @@ EOD;
         $this->_addAdditional3DsElement($order);
         $this->_addExemptionEngineElement($order);
         $this->_addFraudSightData($order);
+        if(isset($this->paymentDetails['ravelinDeviceId']) && $this->paymentDetails['ravelinDeviceId']) {
+            $this->_addRavelinData($order);
+        }
 
         return $order;
     }
@@ -1162,6 +1165,12 @@ EOD;
         );
     }
 
+    private function _addRavelinData(\SimpleXMLElement $order)
+    {
+        $deviceSession = $order->addChild('deviceSession');
+        $deviceSession->addChild('deviceId',$this->paymentDetails['ravelinDeviceId']);
+    }
+
      /**
       * Add branchSpecificExtension and its child tag to xml
       *
@@ -1169,8 +1178,6 @@ EOD;
       */
     private function _addBranchSpecificExtension($order)
     {
-        $order_details = $this->cusDetails['order_details'];
-
         $branchSpecificExtension = $order->addChild('branchSpecificExtension');
         $purchase = $branchSpecificExtension->addChild('purchase');
 

@@ -80,6 +80,7 @@ define([
          * @param {Object} data
          */
         setPurchaseData: function (data) {
+            var self = this;
             this.showButton(data.available);
             var fulltoken = data.paymentToken;
             if(window.isDynamic3DS2Enabled && (typeof fulltoken !== 'undefined')){
@@ -87,51 +88,33 @@ define([
                 this.bin = fulltoken['summary'].split(", bin:")[1];
                 fulltoken['summary'] = paymentTok;
                 if(this.bin !== null) {
-                var encryptedBin = btoa(this.bin);
-                window.sessionId = this.sessionId;
-                $('body').append('<iframe src="'+this.jwtUrl+'?instrument='+encryptedBin+'" name="jwt_frm" id="jwt_frm" style="display: none"></iframe>');
+                    var encryptedBin = btoa(this.bin);
+                    window.sessionId = this.sessionId;
 
-                window.addEventListener("message", function(event) {
+                    var jwtUrl = new URL(this.jwtUrl, window.location.origin);
 
-                var envUrl;
-
-                if(window.jwtEventUrl !== '') {
-                    envUrl = window.jwtEventUrl;
-                }
-                if (event.origin === envUrl) {
-                    var data = JSON.parse(event.data);
-                    if (data !== undefined) {
-                        console.warn('Merchant received a message:', data);
-                        if(data.Payload){
-                            if(data.Payload.ActionCode =="SUCCESS"){
-                                var sessionId1 =  data.Payload.SessionId;
-                                if(sessionId1){
-                                    this.dfreference = sessionId1;
-                                } else {
-                                    this.dfreference = this.sessionId;
-                                }
-                                window.sessionId = this.dfreference;
-                                jQuery('[name=instant_purchase_dfreference]').val(this.dfreference);
-                            }
-                        }else if(data.Status){
-                            var sessionId1 = data.SessionId;
-                            if(sessionId1){
-                                this.dfreference = sessionId1;
-                            } else {
-                               this.dfreference = this.sessionId;
-                            }
-                            window.sessionId = this.dfreference;
-                            jQuery('[name=instant_purchase_dfreference]').val(this.dfreference);
-                        }
+                    if (jwtUrl.origin !== window.location.origin) {
+                        return;
                     }
+
+                    jwtUrl.searchParams.set('instrument', encryptedBin);
+
+                    var iframe = document.createElement('iframe');
+                    iframe.setAttribute('src', jwtUrl.href);
+                    iframe.setAttribute('name', 'jwt_frm');
+                    iframe.setAttribute('id', 'jwt_frm');
+                    iframe.style.cssText = 'display:none;';
+
+                    document.body.appendChild(iframe);
+
+                    self.registerCardinalListener(self);
+
+                    this.paymentToken(fulltoken);
+                    this.dfreference(window.sessionId);
+                } else {
+                    alert(getCreditCardExceptions('CCAM2'));
+                    return;
                 }
-            }, false);
-                this.paymentToken(fulltoken);
-                this.dfreference(window.sessionId);
-            } else {
-                alert(getCreditCardExceptions('CCAM2'));
-                return;
-            }
             } else {
                  this.paymentToken(data.paymentToken);
                  this.dfreference("");
@@ -143,6 +126,47 @@ define([
             this.browserScreenWidth();
             this.browserColorDepth();
         },
+
+        registerCardinalListener: function(self) {
+            const handler = function (event) {
+                var expectedOrigin = window.jwtEventUrl;
+                if (!expectedOrigin || event.origin !== expectedOrigin) {
+                    return;
+                }
+
+                var messageData;
+                try {
+                    messageData = JSON.parse(event.data);
+                } catch (e) {
+                    console.error('Failed to parse JWT message data:', e);
+                    return;
+                }
+
+                if (messageData === undefined) {
+                    console.warn('JWT message data is undefined');
+                    return;
+                }
+
+                var sessionId = null;
+
+                if (messageData.Payload && messageData.Payload.ActionCode === "SUCCESS") {
+                    sessionId = messageData.Payload.SessionId || this.sessionId;
+                } else if (messageData.Status) {
+                    sessionId = messageData.SessionId || this.sessionId;
+                }
+
+                window.removeEventListener("message", handler);
+
+                if (sessionId) {
+                    this.dfreference = sessionId;
+                    window.sessionId = sessionId;
+                    jQuery('[name=instant_purchase_dfreference]').val(sessionId);
+                }
+            }
+
+            window.addEventListener("message", handler);
+        },
+
         /**
          * Confirmation method
          */

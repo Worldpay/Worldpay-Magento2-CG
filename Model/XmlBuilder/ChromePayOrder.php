@@ -1,201 +1,46 @@
 <?php
-/**
- * @copyright 2017 Sapient
- */
 namespace Sapient\Worldpay\Model\XmlBuilder;
 
-/**
- * Build xml for Direct Order request
- */
-class ChromePayOrder
+use SimpleXMLElement;
+
+class ChromePayOrder extends AbstractXmlBuilder
 {
 
-    public const ALLOW_INTERACTION_TYPE = 'MOTO';
-    public const DYNAMIC3DS_DO3DS = 'do3DS';
-    public const DYNAMIC3DS_NO3DS = 'no3DS';
     public const TOKEN_SCOPE = 'shopper';
-    public const ROOT_ELEMENT = <<<EOD
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE paymentService PUBLIC '-//WorldPay/DTD WorldPay PaymentService v1//EN'
-        'http://dtd.worldpay.com/paymentService_v1.dtd'> <paymentService/>
-EOD;
 
-    /**
-     * @var string
-     */
-    private $merchantCode;
-    /**
-     * @var string
-     */
-    private $orderCode;
-    /**
-     * @var string
-     */
-    private $orderDescription;
-    /**
-     * @var string
-     */
-    private $currencyCode;
-    /**
-     * @var float
-     */
-    private $amount;
-    /**
-     * @var string
-     */
-    private $orderContent;
-    /**
-     * @var array
-     */
-    protected $paymentDetails;
-    //private $cardAddress;
-    /**
-     * @var string
-     */
-    protected $shopperEmail;
-    /**
-     * @var string
-     */
-    protected $acceptHeader;
-    /**
-     * @var string
-     */
-    protected $userAgentHeader;
-    /**
-     * @var array
-     */
-    private $shippingAddress;
-    /**
-     * @var array
-     */
-    private $billingAddress;
-    /**
-     * @var bool|null
-     */
-    private $echoData = null;
-    /**
-     * @var array|string
-     */
-    private $exponent;
-      /**
-       * @var string
-       */
-    private $paymentType;
+    protected array $orderParameters;
 
-    /**
-     * @var \Sapient\Worldpay\Model\XmlBuilder\Config\TokenConfiguration
-     */
-    protected $tokenRequestConfig;
 
-    /**
-     * @var string $captureDelay
-     */
-    protected $captureDelay;
-
-    /**
-     * @var array $browserFields
-     */
-    protected $browserFields;
-
-    /**
-     * @var string $telephoneNumber
-     */
-    protected $telephoneNumber;
-
-    /**
-     * Build xml for processing Request
-     *
-     * @param string $merchantCode
-     * @param string $orderCode
-     * @param string $orderDescription
-     * @param string $currencyCode
-     * @param float $amount
-     * @param string $orderContent
-     * @param string $paymentType
-     * @param array $paymentDetails
-     * @param string $shippingAddress
-     * @param float $billingAddress
-     * @param string $shopperEmail
-     * @param array|string $exponent
-     * @param string $captureDelay
-     * @param array $browserFields
-     * @param string $telephoneNumber
-     *
-     * @return SimpleXMLElement $xml
-     */
-    public function build(
-        $merchantCode,
-        $orderCode,
-        $orderDescription,
-        $currencyCode,
-        $amount,
-        $orderContent,
-        $paymentType,
-        $paymentDetails,
-        //$cardAddress,
-        //$acceptHeader,
-        //$userAgentHeader,
-        $shippingAddress,
-        $billingAddress,
-        //$shopperId,
-        $shopperEmail,
-        $exponent,
-        $captureDelay,
-        $browserFields,
-        $telephoneNumber
-    ) {
-        $this->merchantCode = $merchantCode;
-        $this->orderCode = $orderCode;
-        $this->orderDescription = $orderDescription;
-        $this->currencyCode = $currencyCode;
-        $this->amount = $amount;
-        $this->orderContent = $orderContent;
-        $this->paymentType = $paymentType;
-        $this->paymentDetails = $paymentDetails;
-        //$this->cardAddress = $cardAddress;
-        $this->shippingAddress = $shippingAddress;
-        $this->billingAddress = $billingAddress;
-        $this->shopperEmail = $shopperEmail;
-        $this->exponent = $exponent;
-        $this->captureDelay = $captureDelay;
-        //$this->acceptHeader = $acceptHeader;
-        //$this->userAgentHeader = $userAgentHeader;
-
-        $this->telephoneNumber = $telephoneNumber;
-        $this->browserFields = $browserFields;
+    public function build(array $orderParameters): \SimpleXMLElement
+    {
+        foreach (['shippingAddress', 'billingAddress'] as $addressKey) {
+            $address = $orderParameters[$addressKey];
+            $orderParameters[$addressKey] = [
+                'firstName' => $address->recipient,
+                'street' => $address->addressLine[0],
+                'postalCode' => $address->postalCode ?: '00000',
+                'city' => $address->city,
+                'countryCode' => $address->country
+            ];
+        }
+        $this->orderParameters = $orderParameters;
 
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
-        $xml['merchantCode'] = $this->merchantCode;
+        $xml['merchantCode'] = $this->orderParameters['merchantCode'];
         $xml['version'] = '1.4';
 
-        $submit = $this->_addSubmitElement($xml);
+        $submit = $xml->addChild('submit');
         $this->_addOrderElement($submit);
 
         return $xml;
     }
 
-    /**
-     * Add submit tag to xml
-     *
-     * @param SimpleXMLElement $xml
-     * @return SimpleXMLElement
-     */
-    private function _addSubmitElement($xml)
-    {
-        return $xml->addChild('submit');
-    }
-
-    /**
-     * Add order and its child tag to xml
-     *
-     * @param SimpleXMLElement $submit
-     * @return SimpleXMLElement $order
-     */
-    private function _addOrderElement($submit)
+    protected function _addOrderElement(SimpleXMLElement $submit): void
     {
         $order = $submit->addChild('order');
-        $order['orderCode'] = $this->orderCode;
-        if ($this->captureDelay!="") {
-            $order['captureDelay'] = $this->captureDelay;
+        $order['orderCode'] = $this->orderParameters['orderCode'];
+        if ($this->orderParameters['captureDelay'] != "") {
+            $order['captureDelay'] = $this->orderParameters['captureDelay'];
         }
         $this->_addDescriptionElement($order);
         $this->_addAmountElement($order);
@@ -204,273 +49,54 @@ EOD;
         $this->_addShopperElement($order);
         $this->_addShippingElement($order);
         $this->_addBillingElement($order);
-
-        if ($this->echoData) {
-            $order->addChild('echoData', $this->echoData);
-        }
-
-        //$this->_addCreateTokenElement($order);
-        //$this->_addDynamicInteractionTypeElement($order);
-
-        return $order;
     }
 
-    /**
-     * Add description  tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addDescriptionElement($order)
-    {
-        $description = $order->addChild('description');
-        $this->_addCDATA($description, $this->orderDescription);
-    }
-
-    /**
-     * Add OrderContent tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addOrderContentElement($order)
-    {
-        $orderContent = $order->addChild('orderContent');
-        $this->_addCDATA($orderContent, $this->orderContent);
-    }
-
-    /**
-     * Add amount and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addAmountElement($order)
+    private function _addAmountElement(SimpleXMLElement $order): void
     {
         $amountElement = $order->addChild('amount');
-        $amountElement['currencyCode'] = $this->currencyCode;
-        $amountElement['exponent'] = $this->exponent;
-        $amountElement['value'] = $this->_amountAsInt($this->amount);
+        $amountElement['currencyCode'] = $this->orderParameters['currencyCode'];
+        $amountElement['exponent'] = $this->orderParameters['exponent'];
+        $amountElement['value'] = $this->_amountAsInt($this->orderParameters['amount']);
     }
 
-    /**
-     * Add paymentDetails and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    protected function _addPaymentDetailsElement($order)
+    protected function _addPaymentDetailsElement(SimpleXMLElement $order): void
     {
         $paymentDetailsElement = $order->addChild('paymentDetails');
 
         $this->_addPaymentDetailsForCreditCardOrder($paymentDetailsElement);
-        //$session = $paymentDetailsElement->addChild('session');
-        //$session['id'] = $this->paymentDetails['sessionId'];
-        //$session['shopperIPAddress'] = $this->paymentDetails['shopperIpAddress'];
     }
 
-    /**
-     * Add dynamicInteractionType and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addDynamicInteractionTypeElement($order)
-    {
-        if (self::ALLOW_INTERACTION_TYPE == $this->paymentDetails['dynamicInteractionType']) {
-            $interactionElement = $order->addChild('dynamicInteractionType');
-            $interactionElement['type'] = $this->paymentDetails['dynamicInteractionType'];
-        }
-    }
-
-    /**
-     * Add createToken and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addCreateTokenElement($order)
-    {
-
-        $createTokenElement = $order->addChild('createToken');
-        $createTokenElement['tokenScope'] = self::TOKEN_SCOPE;
-
-        if ($this->tokenRequestConfig->getTokenReason($this->orderCode)) {
-            $createTokenElement->addChild(
-                'tokenReason',
-                $this->tokenRequestConfig->getTokenReason($this->orderCode)
-            );
-        }
-    }
-
-    /**
-     * Add paymentDetailsElement and its child tag to xml
-     *
-     * @param SimpleXMLElement $paymentDetailsElement
-     */
-    protected function _addPaymentDetailsForCreditCardOrder($paymentDetailsElement)
+    protected function _addPaymentDetailsForCreditCardOrder(SimpleXMLElement $paymentDetailsElement): void
     {
         $paymentTypeElement = $this->_addPaymentTypeElement($paymentDetailsElement);
         $cardAddress = $paymentTypeElement->addChild('cardAddress');
 
-        $this->_addAddressElement(
-            $cardAddress,
-            $this->billingAddress->recipient,
-            $this->billingAddress->addressLine[0],
-            $this->billingAddress->postalCode,
-            $this->billingAddress->city,
-            $this->billingAddress->country
-        );
+        $this->_addAddressElement($cardAddress, $this->orderParameters['billingAddress']);
     }
 
-    /**
-     * Add CSE-DATA and its child tag to xml
-     *
-     * @param SimpleXMLElement $paymentDetailsElement
-     * @return SimpleXMLElement cseElement
-     */
-    protected function _addCseElement($paymentDetailsElement)
+    protected function _addPaymentTypeElement(SimpleXMLElement $paymentDetailsElement): SimpleXMLElement
     {
-        $cseElement = $paymentDetailsElement->addChild('CSE-DATA');
-        $cseElement->addChild('encryptedData', $this->paymentDetails['encryptedData']);
-
-        return $cseElement;
-    }
-
-    /**
-     * Add paymentType and its child tag to xml
-     *
-     * @param SimpleXMLElement $paymentDetailsElement
-     * @return SimpleXMLElement $paymentTypeElement
-     */
-    protected function _addPaymentTypeElement($paymentDetailsElement)
-    {
-        $paymentTypeElement = $paymentDetailsElement->addChild($this->paymentType);
-        $paymentTypeElement->addChild('cardNumber', $this->paymentDetails->cardNumber);
+        $paymentDetails = $this->orderParameters['paymentDetails'];
+        $paymentTypeElement = $paymentDetailsElement->addChild($this->orderParameters['paymentType']);
+        $paymentTypeElement->addChild('cardNumber', $paymentDetails->cardNumber);
 
         $expiryDate = $paymentTypeElement->addChild('expiryDate');
         $date = $expiryDate->addChild('date');
-        $date['month'] = $this->paymentDetails->expiryMonth;
-        $date['year'] = $this->paymentDetails->expiryYear;
+        $date['month'] = $paymentDetails->expiryMonth;
+        $date['year'] = $paymentDetails->expiryYear;
 
-        $paymentTypeElement->addChild('cardHolderName', $this->paymentDetails->cardholderName);
+        $paymentTypeElement->addChild('cardHolderName', $paymentDetails->cardholderName);
 
-        if (isset($this->paymentDetails->cardSecurityCode)) {
-            $paymentTypeElement->addChild('cvc', $this->paymentDetails->cardSecurityCode);
+        if (isset($paymentDetails->cardSecurityCode)) {
+            $paymentTypeElement->addChild('cvc', $paymentDetails->cardSecurityCode);
         }
 
         return $paymentTypeElement;
     }
 
-    /**
-     * Add shopper and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    protected function _addShopperElement($order)
+    protected function _addShopperElement(SimpleXMLElement $order): void
     {
         $shopper = $order->addChild(self::TOKEN_SCOPE);
-        $shopper->addChild('shopperEmailAddress', $this->shopperEmail);
-        //$shopper->addChild('authenticatedShopperID', $this->paymentDetails['customerId']);
-        $browser = $shopper->addChild('browser');
-        // $acceptHeader = $browser->addChild('acceptHeader');
-        // $this->_addCDATA($acceptHeader, $this->acceptHeader);
-        // $userAgentHeader = $browser->addChild('userAgentHeader');
-        // $this->_addCDATA($userAgentHeader, $this->userAgentHeader);
-
-        return $shopper;
-    }
-
-    /**
-     * Add shippingAddress and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addShippingElement($order)
-    {
-        $shippingAddress = $order->addChild('shippingAddress');
-        $this->_addAddressElement(
-            $shippingAddress,
-            $this->shippingAddress->recipient,
-            $this->shippingAddress->addressLine[0],
-            $this->shippingAddress->postalCode,
-            $this->shippingAddress->city,
-            $this->shippingAddress->country
-        );
-    }
-
-    /**
-     * Add billing and its child tag to xml
-     *
-     * @param SimpleXMLElement $order
-     */
-    private function _addBillingElement($order)
-    {
-        $billingAddress = $order->addChild('billingAddress');
-        $this->_addAddressElement(
-            $billingAddress,
-            $this->billingAddress->recipient,
-            $this->billingAddress->addressLine[0],
-            $this->billingAddress->postalCode,
-            $this->billingAddress->city,
-            $this->billingAddress->country
-        );
-    }
-
-    /**
-     * Add address and its child tag to xml
-     *
-     * @param SimpleXMLElement $parentElement
-     * @param string $firstName
-     * @param string $street
-     * @param string $postalCode
-     * @param string $city
-     * @param string $countryCode
-     */
-    private function _addAddressElement($parentElement, $firstName, $street, $postalCode, $city, $countryCode)
-    {
-        $address = $parentElement->addChild('address');
-
-        $firstNameElement = $address->addChild('firstName');
-        $this->_addCDATA($firstNameElement, $firstName);
-
-//        $lastNameElement = $address->addChild('lastName');
-//        $this->_addCDATA($lastNameElement, $lastName);
-
-        $streetElement = $address->addChild('street');
-        $this->_addCDATA($streetElement, $street);
-
-        $postalCodeElement = $address->addChild('postalCode');
-        //Zip code mandatory for worldpay, if not provided by customer we will pass manually
-        $zipCode = '00000';
-        //If Zip code provided by customer
-        if ($postalCode) {
-            $zipCode = $postalCode;
-        }
-        $this->_addCDATA($postalCodeElement, $zipCode);
-
-        $cityElement = $address->addChild('city');
-        $this->_addCDATA($cityElement, $city);
-
-        $countryCodeElement = $address->addChild('countryCode');
-        $this->_addCDATA($countryCodeElement, $countryCode);
-    }
-
-    /**
-     * Add cdata to xml
-     *
-     * @param SimpleXMLElement $element
-     * @param string $content
-     */
-    protected function _addCDATA($element, $content)
-    {
-        $node = dom_import_simplexml($element);
-        $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection((string)$content));
-    }
-
-    /**
-     * Returns the rounded value of num to specified precision
-     *
-     * @param float $amount
-     * @return int
-     */
-    private function _amountAsInt($amount)
-    {
-        return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
+        $shopper->addChild('shopperEmailAddress', $this->orderParameters['shopperEmail']);
     }
 }

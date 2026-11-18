@@ -7,6 +7,9 @@
                     <item name="components" xsi:type="array">
                         <item name="checkout" xsi:type="array">
                             <item name="children" xsi:type="array">
+                                <item name="ravelin-init" xsi:type="array">
+                                    <item name="component" xsi:type="string">Sapient_Worldpay/js/ravelin-integration</item>
+                                </item>
                                 <item name="steps" xsi:type="array">
                                     <item name="children" xsi:type="array">
                                         <item name="billing-step" xsi:type="array">

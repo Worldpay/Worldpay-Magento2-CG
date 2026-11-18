@@ -67,7 +67,7 @@ define([
                 function handleOrderResponse(orderResponse) {
                     if (isNaN(orderResponse)) {
                         if (orderResponse.hasOwnProperty("message") && orderResponse['message'].indexOf('3DS2') !== -1) {
-                            $(".error-message").html(orderResponse['message']);
+                            $(".error-message").text(orderResponse['message']);
                         }
                         window.location.href = BASE_URL + 'checkout/cart?error=true';
                     } else if (cc_type === 'PAYPAL-SSL') {
@@ -89,7 +89,7 @@ define([
                 function handleErrorResponse(response) {
                     var orderResponse = JSON.parse(response.responseText);
                     $("body").trigger('processStop');
-                    $(".error-message").html(orderResponse['message']);
+                    $(".error-message").text(orderResponse['message']);
                     resolve({error: orderResponse['message']});
                 }
 
@@ -170,7 +170,7 @@ define([
                         var orderResponse = (apiresponse);
                         if (isNaN(orderResponse)) {
                             if (orderResponse.hasOwnProperty("message") && orderResponse['message'].indexOf('3DS2') !== -1) {
-                                $(".error-message").html(orderResponse['message']);
+                                $(".error-message").text(orderResponse['message']);
                             }
                             window.location.href = BASE_URL + 'checkout/cart?error=true';
                         }
@@ -216,7 +216,7 @@ define([
                     function (response) {
                         var orderResponse = JSON.parse(response.responseText);
                         $("body").trigger('processStop');
-                        $(".error-message").html(orderResponse['message']);
+                        $(".error-message").text(orderResponse['message']);
                         console.log("Error:", response);
                         resolve({error: response});
                     }
@@ -324,6 +324,11 @@ define([
                 additionalData['dfReferenceId'] = dfReferenceId;
             } else if (window.checkoutConfig.payment.ccform.sessionId) {
                 additionalData['dfReferenceId'] = window.checkoutConfig.payment.ccform.sessionId;
+            }
+
+            let deviceId = window.ravelinDeviceId || null;
+            if(deviceId) {
+                additionalData.ravelin_device_id = deviceId;
             }
 
             return {

@@ -7,6 +7,7 @@ namespace Sapient\Worldpay\Model\Request;
 use Exception;
 use Sapient\Worldpay\Helper\ProductOnDemand;
 use Sapient\Worldpay\Model\SavedToken;
+use Sapient\Worldpay\Model\XmlBuilder\ChromePayOrder;
 use Sapient\Worldpay\Model\XmlBuilder\ClickToPayOrder;
 use Sapient\Worldpay\Model\XmlBuilder\PaypalOrder;
 use Sapient\Worldpay\Model\XmlBuilder\RedirectOrder;
@@ -776,7 +777,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
                 $isStorePickup,
                 $isEnabledStorePickup,
                 $storePickUpMethod,
-                $storepickUpType
+                $storepickUpType,
+                $redirectOrderParams['paymentDetails']
             );
 
             return $this->_sendRequest(
@@ -859,7 +861,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $redirectOrderParams['callbackurl'],
             $redirectOrderParams['cc_bank'],
             $redirectOrderParams['exponent'],
-            $captureDelay
+            $captureDelay,
+            $redirectOrderParams['paymentDetails']
         );
 
         return $this->_sendRequest(
@@ -1544,7 +1547,8 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
             $applePayOrderParams['transactionId'],
             $applePayOrderParams['exponent'],
             $captureDelay,
-            $applePayOrderParams['browserFields']
+            $applePayOrderParams['browserFields'],
+            $applePayOrderParams['paymentDetails']
         );
 
         return $this->_sendRequest(
@@ -1700,27 +1704,12 @@ class PaymentServiceRequest extends \Magento\Framework\DataObject
         $loggerMsg = '########## Submitting chromepay order request. OrderCode: ';
         $this->_wplogger->info($loggerMsg . $chromeOrderParams['orderCode'] . ' ##########');
         $paymentType = 'worldpay_cc';
-        $captureDelay = $this->worldpayhelper->getCaptureDelayValues();
-        $this->xmlredirectorder = new \Sapient\Worldpay\Model\XmlBuilder\ChromePayOrder();
+        $this->xmlredirectorder = new ChromePayOrder();
         ##### Added orderContent node for plugin tracker ######
         $chromeOrderParams['orderContent'] = $this->collectPluginTrackerDetails($paymentType);
+        $chromeOrderParams['captureDelay'] =  $this->worldpayhelper->getCaptureDelayValues();
 
-        $chromepaySimpleXml = $this->xmlredirectorder->build(
-            $chromeOrderParams['merchantCode'],
-            $chromeOrderParams['orderCode'],
-            $chromeOrderParams['orderDescription'],
-            $chromeOrderParams['currencyCode'],
-            $chromeOrderParams['amount'],
-            $chromeOrderParams['orderContent'],
-            $chromeOrderParams['paymentType'],
-            $chromeOrderParams['paymentDetails'],
-            $chromeOrderParams['shippingAddress'],
-            $chromeOrderParams['billingAddress'],
-            $chromeOrderParams['shopperEmail'],
-            $chromeOrderParams['exponent'],
-            $captureDelay,
-            $chromeOrderParams['browserFields']
-        );
+        $chromepaySimpleXml = $this->xmlredirectorder->build($chromeOrderParams);
 
         return $this->_sendRequest(
             dom_import_simplexml($chromepaySimpleXml)->ownerDocument,

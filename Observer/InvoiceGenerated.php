@@ -6,6 +6,22 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Sapient\Worldpay\Helper\ProductOnDemand;
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Sapient\Worldpay\Helper\Data as WorldpayHelper;
+use Sapient\Worldpay\Model\SavedToken;
+use Sapient\Worldpay\Model\Recurring\Subscription\Address as SubscriptionAddress;
+use Magento\Store\Model\StoreManagerInterface;
+use Sapient\Worldpay\Helper\CurlHelper;
+use Sapient\Worldpay\Model\ResourceModel\ProductOnDemand\Order as ProductOnDemandOrderResource;
+use Sapient\Worldpay\Model\Worldpayment;
+use Magento\SalesSequence\Model\Manager as SequenceManager;
+use Magento\Customer\Model\Session as CustomerSession;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Sapient\Worldpay\Model\Request\PaymentServiceRequest;
+use Magento\Framework\Session\SessionManagerInterface;
+use Sapient\Worldpay\Model\Payment\StateXmlFactory;
+use Sapient\Worldpay\Model\XmlBuilder\DirectOrder;
+use Magento\Sales\Model\Order;
+use Magento\Store\Model\ScopeInterface;
 
 class InvoiceGenerated implements ObserverInterface
 {
@@ -19,51 +35,23 @@ class InvoiceGenerated implements ObserverInterface
     public const NO_CHANGE = 'noChange';
     public const THIS_TRANSACTION = 'thisTransaction';
 
-    private $productOnDemandHelper;
-    private \Sapient\Worldpay\Helper\Data $worldpayhelper;
-    private \Sapient\Worldpay\Model\SavedToken $worldpaySavedToken;
-    private \Sapient\Worldpay\Model\Recurring\Subscription\Address $addressCollectionFactory;
-    private \Magento\Store\Model\StoreManagerInterface $_storeManager;
-    private \Sapient\Worldpay\Helper\CurlHelper $curlHelper;
-    private \Sapient\Worldpay\Model\ResourceModel\ProductOnDemand\Order $transactionCollection;
-    private \Sapient\Worldpay\Model\Worldpayment $worldpayPayment;
-    private \Magento\SalesSequence\Model\Manager $sequenceManager;
-    private \Magento\Customer\Model\Session $customerSession;
-    private CustomerRepositoryInterface $customerRepository;
-    private \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig;
-    private \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest;
-    private \Magento\Framework\Session\SessionManagerInterface $session;
-
     public function __construct(
-        \Sapient\Worldpay\Helper\Data $worldpayhelper,
-        \Sapient\Worldpay\Model\SavedToken $worldpaytoken,
-        \Sapient\Worldpay\Model\Recurring\Subscription\Address $subscriptionAddress,
-        ProductOnDemand $productOnDemandHelper,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Sapient\Worldpay\Helper\CurlHelper $curlHelper,
-        \Sapient\Worldpay\Model\ResourceModel\ProductOnDemand\Order $transactionCollection,
-        \Sapient\Worldpay\Model\Worldpayment $worldpayPayment,
-        \Magento\SalesSequence\Model\Manager $sequenceManager,
-        \Magento\Customer\Model\Session $customerSession,
-        CustomerRepositoryInterface $customerRepository,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
-        \Magento\Framework\Session\SessionManagerInterface $session,
+        private WorldpayHelper $worldpayhelper,
+        private SavedToken $worldpaySavedToken,
+        private SubscriptionAddress $addressCollectionFactory,
+        private ProductOnDemand $productOnDemandHelper,
+        private StoreManagerInterface $_storeManager,
+        private CurlHelper $curlHelper,
+        private ProductOnDemandOrderResource $transactionCollection,
+        private Worldpayment $worldpayPayment,
+        private SequenceManager $sequenceManager,
+        private CustomerSession $customerSession,
+        private CustomerRepositoryInterface $customerRepository,
+        private ScopeConfigInterface $scopeConfig,
+        private PaymentServiceRequest $paymentservicerequest,
+        private SessionManagerInterface $session,
+        private StateXmlFactory $stateXmlFactory,
     ) {
-        $this->worldpayhelper = $worldpayhelper;
-        $this->worldpaySavedToken = $worldpaytoken;
-        $this->addressCollectionFactory = $subscriptionAddress;
-        $this->productOnDemandHelper = $productOnDemandHelper;
-        $this->_storeManager = $storeManager;
-        $this->curlHelper = $curlHelper;
-        $this->transactionCollection = $transactionCollection;
-        $this->worldpayPayment = $worldpayPayment;
-        $this->sequenceManager = $sequenceManager;
-        $this->customerSession = $customerSession;
-        $this->customerRepository = $customerRepository;
-        $this->scopeConfig = $scopeConfig;
-        $this->paymentservicerequest = $paymentservicerequest;
-        $this->session = $session;
     }
 
     public function getZeroAuthOrder($incrementId)
@@ -100,8 +88,8 @@ class InvoiceGenerated implements ObserverInterface
     public function getReservedOrderId()
     {
         return $this->sequenceManager->getSequence(
-            \Magento\Sales\Model\Order::ENTITY,
-            \Magento\Sales\Model\Order::ENTITY,
+            Order::ENTITY,
+            Order::ENTITY,
             $this->_storeManager->getStore()->getId()
         )
             ->getNextValue();
@@ -137,10 +125,7 @@ class InvoiceGenerated implements ObserverInterface
 
     public function getShopperAccountAgeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
-        $datetime1 = date_create($fromDate);
-        $datetime2 = date_create($toDate);
-        $interval = date_diff($datetime1, $datetime2);
-        $days = $interval->format($differenceFormat);
+        $days = $this->getDaysBetween($fromDate, $toDate, $differenceFormat);
         if ($days > 0 && $days < 30) {
             return self::LESS_THAN_THIRTY_DAYS;
         } elseif ($days > 30 && $days < 60) {
@@ -148,18 +133,14 @@ class InvoiceGenerated implements ObserverInterface
         } elseif ($days > 60) {
             return self::MORE_THAN_SIXTY_DAYS;
         } else {
-            $indicator = !empty($this->customerSession->getCustomer()->getId())
+            return !empty($this->customerSession->getCustomer()->getId())
                 ? self::CREATED_DURING_TRANSACTION : self::NO_ACCOUNT;
-            return $indicator;
         }
     }
 
     public function getShopperAccountChangeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
-        $datetime1 = date_create($fromDate);
-        $datetime2 = date_create($toDate);
-        $interval = date_diff($datetime1, $datetime2);
-        $days = $interval->format($differenceFormat);
+        $days = $this->getDaysBetween($fromDate, $toDate, $differenceFormat);
         if ($days > 0 && $days < 30) {
             return self::LESS_THAN_THIRTY_DAYS;
         } elseif ($days > 30 && $days < 60) {
@@ -173,10 +154,7 @@ class InvoiceGenerated implements ObserverInterface
 
     public function getShopperAccountPasswordChangeIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
-        $datetime1 = date_create($fromDate);
-        $datetime2 = date_create($toDate);
-        $interval = date_diff($datetime1, $datetime2);
-        $days = $interval->format($differenceFormat);
+        $days = $this->getDaysBetween($fromDate, $toDate, $differenceFormat);
         if ($days > 0 && $days < 30) {
             return self::LESS_THAN_THIRTY_DAYS;
         } elseif ($days > 30 && $days < 60) {
@@ -184,9 +162,8 @@ class InvoiceGenerated implements ObserverInterface
         } elseif ($days > 60) {
             return self::MORE_THAN_SIXTY_DAYS;
         } else {
-            $indicator = !empty($this->customerSession->getCustomer()->getId())
+            return !empty($this->customerSession->getCustomer()->getId())
                 ? self::CHANGED_DURING_TRANSACTION : self::NO_CHANGE;
-            return $indicator;
         }
     }
 
@@ -195,10 +172,7 @@ class InvoiceGenerated implements ObserverInterface
         $toDate,
         $differenceFormat = '%a'
     ) {
-        $datetime1 = date_create($fromDate);
-        $datetime2 = date_create($toDate);
-        $interval = date_diff($datetime1, $datetime2);
-        $days = $interval->format($differenceFormat);
+        $days = $this->getDaysBetween($fromDate, $toDate, $differenceFormat);
         if ($days > 0 && $days < 30) {
             return self::LESS_THAN_THIRTY_DAYS;
         } elseif ($days > 30 && $days < 60) {
@@ -212,10 +186,7 @@ class InvoiceGenerated implements ObserverInterface
 
     public function getShopperAccountPaymentAccountIndicator($fromDate, $toDate, $differenceFormat = '%a')
     {
-        $datetime1 = date_create($fromDate);
-        $datetime2 = date_create($toDate);
-        $interval = date_diff($datetime1, $datetime2);
-        $days = $interval->format($differenceFormat);
+        $days = $this->getDaysBetween($fromDate, $toDate, $differenceFormat);
         if ($days > 0 && $days < 30) {
             return self::LESS_THAN_THIRTY_DAYS;
         } elseif ($days > 30 && $days < 60) {
@@ -223,10 +194,16 @@ class InvoiceGenerated implements ObserverInterface
         } elseif ($days > 60) {
             return self::MORE_THAN_SIXTY_DAYS;
         } else {
-            $indicator = !empty($this->customerSession->getCustomer()->getId())
+            return !empty($this->customerSession->getCustomer()->getId())
                 ? self::DURING_TRANSACTION : self::NO_ACCOUNT;
-            return $indicator;
         }
+    }
+
+    private function getDaysBetween(string $fromDate, string $toDate, string $differenceFormat = '%a'): string
+    {
+        $datetime1 = date_create($fromDate);
+        $datetime2 = date_create($toDate);
+        return date_diff($datetime1, $datetime2)->format($differenceFormat);
     }
 
     private function _getAddress($address)
@@ -274,17 +251,17 @@ class InvoiceGenerated implements ObserverInterface
         $exemptionEngine['enabled'] = $this->scopeConfig->
         getValue(
             'worldpay/exemption_config/exemption_engine',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
         $exemptionEngine['placement'] = $this->scopeConfig->
         getValue(
             'worldpay/exemption_config/exemption_engine_placement',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
         $exemptionEngine['type'] = $this->scopeConfig->
         getValue(
             'worldpay/exemption_config/exemption_engine_type',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
         return $exemptionEngine;
     }
@@ -318,7 +295,7 @@ class InvoiceGenerated implements ObserverInterface
     public function buildProductOnDemandOrder(
         $invoice,
         $worldpayTokenId,
-        \Sapient\Worldpay\Model\Worldpayment $worldPayPayment,
+        Worldpayment $worldPayPayment,
         string $newWorldpayOrderId, $oldWorldpayPaymentId): void
     {
         $order = $invoice->getOrder();
@@ -336,7 +313,7 @@ class InvoiceGenerated implements ObserverInterface
             'shopperIpAddress'=> $shopperIdAddress,
             'isEnabledEFTPOS' => $this->worldpayhelper->isEnabledEFTPOS(),
             'dynamicInteractionType' => $this->worldpayhelper->getDynamicIntegrationType($worldPayPayment->getPaymentType()),
-            'transactionIdentifier' => $data[0]['transaction_identifier'],
+            'transactionIdentifier' => $worldPayPayment->getTlid() ?? $data[0]['transaction_identifier'],
             'customerId' => $order->getCustomerId(),
             'isPaymentForProductOnDemand' => true,
             'zero_auth_payment' => false,
@@ -385,7 +362,7 @@ class InvoiceGenerated implements ObserverInterface
         $pluginTrackerDetails['additional_details']['transaction_method'] = $worldPayPayment->getPaymentType();
         $orderContent = json_encode($pluginTrackerDetails);
 
-        $xmlDirectOrder = new \Sapient\Worldpay\Model\XmlBuilder\DirectOrder(
+        $xmlDirectOrder = new DirectOrder(
             $this->customerSession,
             $this->worldpayhelper,
             $requestConfiguration
@@ -432,10 +409,26 @@ class InvoiceGenerated implements ObserverInterface
             $order->getBillingAddress()->getTelephone()
         );
 
-        $this->paymentservicerequest->_sendRequest(
+        $response = $this->paymentservicerequest->_sendRequest(
             dom_import_simplexml($orderSimpleXml)->ownerDocument,
             $this->worldpayhelper->getXmlUsername($worldPayPayment->getPaymentType()),
             $this->worldpayhelper->getXmlPassword($worldPayPayment->getPaymentType()),
         );
+
+        $this->updatePaymentTlid($worldPayPayment, $response);
+    }
+
+    private function updatePaymentTlid(Worldpayment $worldPayPayment, $response): void
+    {
+        if (empty($response)) {
+            return;
+        }
+
+        $stateXml = $this->stateXmlFactory->create(['xml' => new \SimpleXMLElement($response)]);
+        $tlid = $stateXml->getTlid();
+        if (!empty($tlid)) {
+            $worldPayPayment->setData('tlid', $tlid);
+            $worldPayPayment->save();
+        }
     }
 }

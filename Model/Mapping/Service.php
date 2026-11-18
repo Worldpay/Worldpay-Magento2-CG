@@ -2,6 +2,9 @@
 
 namespace Sapient\Worldpay\Model\Mapping;
 
+use Magento\Catalog\Model\Product;
+use Magento\Framework\App\ObjectManager;
+use Magento\Quote\Model\Quote;
 use Sapient\Worldpay\Helper\ProductOnDemand;
 use Sapient\Worldpay\Model\SavedTokenFactory;
 use Magento\Framework\Session\SessionManagerInterface;
@@ -154,7 +157,7 @@ class Service
         if ($this->worldpayHelper->isLevel23Enabled()
            && ($vaultPaymentDetails['brand'] === 'ECMC' || $vaultPaymentDetails['brand'] === 'VISA')
            && ($billingAddr['countryCode'] === 'US' || $billingAddr['countryCode'] === 'CA')) {
-            $orderLineItems = $this->_getL23OrderLineItems($quote, $vaultPaymentDetails['brand'].'-SSL');
+            $orderLineItems = $this->_getL23OrderLineItems($quote);
             $vaultPaymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
         }
         $isMultiShippingOrder = 0;
@@ -236,7 +239,7 @@ class Service
         if ($this->worldpayHelper->isLevel23Enabled()
            && ($paymentType === 'ECMC-SSL' || $paymentType === 'VISA-SSL')
            && ($billingAddr['countryCode'] === 'US' || $billingAddr['countryCode'] === 'CA')) {
-            $orderLineItems = $this->_getL23OrderLineItems($quote, $paymentType);
+            $orderLineItems = $this->_getL23OrderLineItems($quote);
             $paymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
 
         }
@@ -421,7 +424,7 @@ class Service
         if ($this->worldpayHelper->isLevel23Enabled()
            && ($paymentType === 'ECMC-SSL' || $paymentType === 'VISA-SSL')
            && ($billingAddr['countryCode'] === 'US' || $billingAddr['countryCode'] === 'CA')) {
-            $orderLineItems = $this->_getL23OrderLineItems($quote, $paymentType);
+            $orderLineItems = $this->_getL23OrderLineItems($quote);
             $updatedPaymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
         }
 
@@ -459,10 +462,12 @@ class Service
         if ((bool)$quote->getIsMultiShipping()) {
             $isMultiShippingOrder = 1;
         }
+        if(isset($paymentDetails['additional_data']['ravelin_device_id'])) {
+            $updatedPaymentDetails['ravelinDeviceId'] = $paymentDetails['additional_data']['ravelin_device_id'];
+        }
         return [
                 'orderCode' => $orderCode,
-                'merchantCode' => $this->worldpayHelper->
-                                   getMerchantCode($paymentType),
+                'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentType),
                 'orderDescription' => $this->_getOrderDescription($reservedOrderId),
                 'currencyCode' => $quote->getQuoteCurrencyCode(),
                 'amount' => $this->productOnDemandHelper->isProductOnDemandQuote() ? 0 : $quote->getGrandTotal(),
@@ -518,7 +523,6 @@ class Service
         $stmtNarrative = '';
         $orderContent = '';
 
-        $apmPaymentTypes = $this->worldpayHelper->getApmTypes('worldpay_apm');
         if ($paymentDetails['additional_data']['cc_type'] === "KLARNA-SSL"
                 && (isset($paymentDetails['additional_data']['statementNarrative']))) {
             $stmtNarrative = $paymentDetails['additional_data']['statementNarrative'];
@@ -530,6 +534,10 @@ class Service
         if ((bool)$quote->getIsMultiShipping()) {
             $isMultiShippingOrder = 1;
         }
+
+        $additionalData = [];
+        $additionalData['ravelinDeviceId'] = $paymentDetails['additional_data']['ravelin_device_id'] ?? '';
+
         return [
             'orderCode' => $orderCode,
             'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
@@ -560,7 +568,8 @@ class Service
             'exponent' => $exponent,
             'sessionData' => $this->_getSessionDetails($paymentDetails, $countryCode),
             'orderContent' => $orderContent,
-            'isMultishippingOrder' => $isMultiShippingOrder
+            'isMultishippingOrder' => $isMultiShippingOrder,
+            'paymentDetails' => $additionalData
         ];
     }
     /**
@@ -619,7 +628,7 @@ class Service
         if ($this->worldpayHelper->isLevel23Enabled()
            && ($paymentType === 'ECMC-SSL' || $paymentType === 'VISA-SSL')
            && ($billingAddr['countryCode'] === 'US' || $billingAddr['countryCode'] === 'CA')) {
-            $orderLineItems = $this->_getL23OrderLineItems($quote, $paymentType);
+            $orderLineItems = $this->_getL23OrderLineItems($quote);
             $updatedPaymentDetails['salesTax'] = $quote->getShippingAddress()->getData('tax_amount');
         }
         $merchantCode = $this->worldpayHelper->getMerchantCode($paymentType);
@@ -943,11 +952,22 @@ class Service
                 $lineitem['quantity'] = (int) $_item->getQty();
                 $lineitem['quantityUnit'] = $this->worldpayHelper->getQuantityUnit($_item->getProduct());
                 if ($paymentType == 'KLARNA-SSL' && $isMultiShipping) {
-                        $lineitem['unitPrice'] = $_item->getProduct()->getPrice();
+                    $lineitem['unitPrice'] = (float) $_item->getPriceInclTax();
                 } else {
-                        $lineitem['unitPrice'] = $rowtotal / $_item->getQty();
+                    $lineitem['unitPrice'] = (float) $_item->getRowTotalInclTax() / $_item->getQty();
                 }
-                $lineitem['taxRate'] = $totaltax;
+
+                $taxRate = (float) $_item->getTaxPercent();
+
+                if ($taxRate == 0 && $totaltax > 0) {
+                    foreach ($_item->getChildren() ?: [] as $child) {
+                        $taxRate = (float) $child->getTaxPercent();
+                        break;
+                    }
+                }
+
+                $lineitem['taxRate'] = $taxRate;
+
                 $lineitem['totalAmount'] = $totalamount + $totaltax;
                 $lineitem['totalTaxAmount'] = $totaltax;
                 if ($discountamount > 0) {
@@ -1115,116 +1135,251 @@ class Service
     {
         return $this->_getAddress($quote->getBillingAddress());
     }
-    /**
-     * Collect Payment Details
-     *
-     * @param array $paymentDetails
-     * @return array
-     */
-    private function _getPaymentDetails($paymentDetails)
+//    /**
+//     * Collect Payment Details
+//     *
+//     * @param array $paymentDetails
+//     * @return array
+//     */
+//    private function _getPaymentDetails($paymentDetails)
+//    {
+//        //TODO refactor this stupid method and add ravelin device id to payment details
+//        $method = $paymentDetails['method'];
+//        if ($paymentDetails['additional_data']['cc_type'] == "PAYWITHGOOGLE-SSL") {
+//            return $paymentDetails['additional_data']['cc_type'];
+//        }
+//
+//        if($paymentDetails['additional_data']['cc_type'] == "PAYPAL-SSL") {
+//            $details = [
+//                'paymentType' => $paymentDetails['additional_data']['cc_type'],
+//                'sessionId' => $this->session->getSessionId(),
+//                'shopperIpAddress' => $this->_getClientIPAddress()
+//            ];
+//
+//            return $details;
+//        }
+//
+//        if($paymentDetails['additional_data']['cc_type'] == "CLICKTOPAY-SSL") {
+//            $details = [
+//                'paymentType' => $paymentDetails['additional_data']['cc_type'],
+//                'encryptedPayload' => $paymentDetails['additional_data']['transientToken'],
+//                'sessionId' => $this->session->getSessionId(),
+//                'shopperIpAddress' => $this->_getClientIPAddress()
+//            ];
+//
+//            if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
+//                $details['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
+//            }
+//
+//            return $details;
+//        }
+//
+//        if ($paymentDetails['additional_data']['cc_type'] == "ACH_DIRECT_DEBIT-SSL") {
+//
+//            $details = [
+//               'paymentType' => $paymentDetails['additional_data']['cc_type'],
+//               'achaccount' => $paymentDetails['additional_data']['ach_account'],
+//               'achAccountNumber' => $paymentDetails['additional_data']['ach_accountNumber'],
+//               'achRoutingNumber' => $paymentDetails['additional_data']['ach_routingNumber']
+//            ];
+//            if (isset($paymentDetails['additional_data']['ach_checknumber'])) {
+//                $details['achCheckNumber'] = $paymentDetails['additional_data']['ach_checknumber'];
+//            }
+//            if (isset($paymentDetails['additional_data']['ach_companyname'])) {
+//                $details['achCompanyName'] = $paymentDetails['additional_data']['ach_companyname'];
+//            }
+//            $details['sessionId'] = $this->session->getSessionId();
+//            $details['shopperIpAddress'] = $this->_getClientIPAddress();
+//            return $details;
+//        }
+//
+//        if ($paymentDetails['additional_data']['cc_type'] == "SEPA_DIRECT_DEBIT-SSL") {
+//            $details = [
+//               'paymentType' => $paymentDetails['additional_data']['cc_type'],
+//               'sepaMandateType' => $this->worldpayHelper->getSEPADetails(),
+//               'sepaIban' => $paymentDetails['additional_data']['sepa_iban'],
+//               'sepaAccountHolderName' => $paymentDetails['additional_data']['sepa_accountHolderName']
+//            ];
+//            $details['sepaMerchantNumber'] = $this->worldpayHelper->getSEPAMerchantNo();
+//            return $details;
+//        }
+//
+//        if ($paymentDetails['additional_data']['cse_enabled']) {
+//            $details = [
+//                'cseEnabled' => $paymentDetails['additional_data']['cse_enabled'],
+//                'encryptedData' => $paymentDetails['additional_data']['encryptedData'],
+//                'paymentType' => $paymentDetails['additional_data']['cc_type'],
+//            ];
+//        } else {
+//            $details = [
+//                'paymentType' => $paymentDetails['additional_data']['cc_type'],
+//                'cardNumber' => $paymentDetails['additional_data']['cc_number'],
+//                'expiryMonth' => $paymentDetails['additional_data']['cc_exp_month'],
+//                'expiryYear' => $paymentDetails['additional_data']['cc_exp_year'],
+//                'cardHolderName' => $paymentDetails['additional_data']['cc_name'],
+//                'cseEnabled' => $paymentDetails['additional_data']['cse_enabled'],
+//            ];
+//
+//            if (isset($paymentDetails['additional_data']['cc_cid'])) {
+//                $details['cvc'] = $paymentDetails['additional_data']['cc_cid'];
+//            }
+//        }
+//        $this->customerSession->setIsSavedCardRequested(false);
+//        if (isset($paymentDetails['additional_data']['save_my_card'])
+//                && $paymentDetails['additional_data']['save_my_card']) {
+//            $this->customerSession->setIsSavedCardRequested(true);
+//        }
+//        $details['sessionId'] = $this->session->getSessionId();
+//        $details['shopperIpAddress'] = $this->_getClientIPAddress();
+//        $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($method);
+//        $details['salesTax'] = '';
+//
+//        if (isset($paymentDetails['salesTax'])) {
+//            $details['salesTax'] = $paymentDetails['salesTax'];
+//        }
+//
+//        // 3DS2 value
+//        if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
+//            $details['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
+//        }
+//
+//        $details['ravelinDeviceSessionId'] = $paymentDetails['additional_data']['ravelin_device_session_id'] ?? 'n-avem';
+//
+//        // Check for Merchant Token
+//        $details['token_type'] = $this->worldpayHelper->getMerchantTokenization();
+//        //level23 data
+//        $details['cardType'] = $paymentDetails['additional_data']['cc_type'];
+//        return $details;
+//    }
+
+    private function _getPaymentDetails(array $paymentDetails)
     {
-        $method = $paymentDetails['method'];
-        if ($paymentDetails['additional_data']['cc_type'] == "PAYWITHGOOGLE-SSL") {
-            return $paymentDetails['additional_data']['cc_type'];
+        $additionalData = $paymentDetails['additional_data'];
+        $paymentType = $additionalData['cc_type'];
+
+        switch ($paymentType) {
+            case 'PAYPAL-SSL':
+                $details = [];
+                break;
+
+            case 'CLICKTOPAY-SSL':
+                $details = $this->buildClickToPayDetails($additionalData);
+                break;
+
+            case 'ACH_DIRECT_DEBIT-SSL':
+                $details = $this->buildAchDetails($additionalData);
+                break;
+
+            case 'SEPA_DIRECT_DEBIT-SSL':
+                $details = $this->buildSepaDetails($additionalData);
+                break;
+
+            default:
+                $details = $this->buildCardPaymentDetails(
+                    $paymentDetails,
+                );
+                break;
         }
 
-        if($paymentDetails['additional_data']['cc_type'] == "PAYPAL-SSL") {
-            $details = [
-                'paymentType' => $paymentDetails['additional_data']['cc_type'],
-                'sessionId' => $this->session->getSessionId(),
-                'shopperIpAddress' => $this->_getClientIPAddress()
-            ];
+        return $this->addCommonPaymentDetails($details, $additionalData);
+    }
 
-            return $details;
+    private function buildClickToPayDetails(array $additionalData): array
+    {
+        $details = [
+            'encryptedPayload' => $additionalData['transientToken'],
+        ];
+
+        return $this->addDfReferenceId($details, $additionalData);
+    }
+
+    private function buildAchDetails(array $additionalData): array
+    {
+        $details = [
+            'achaccount' => $additionalData['ach_account'],
+            'achAccountNumber' => $additionalData['ach_accountNumber'],
+            'achRoutingNumber' => $additionalData['ach_routingNumber'],
+        ];
+
+        if (isset($additionalData['ach_checknumber'])) {
+            $details['achCheckNumber'] = $additionalData['ach_checknumber'];
         }
 
-        if($paymentDetails['additional_data']['cc_type'] == "CLICKTOPAY-SSL") {
-            $details = [
-                'paymentType' => $paymentDetails['additional_data']['cc_type'],
-                'encryptedPayload' => $paymentDetails['additional_data']['transientToken'],
-                'sessionId' => $this->session->getSessionId(),
-                'shopperIpAddress' => $this->_getClientIPAddress()
-            ];
-
-            if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
-                $details['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
-            }
-
-            return $details;
+        if (isset($additionalData['ach_companyname'])) {
+            $details['achCompanyName'] = $additionalData['ach_companyname'];
         }
 
-        if ($paymentDetails['additional_data']['cc_type'] == "ACH_DIRECT_DEBIT-SSL") {
+        return $details;
+    }
 
-            $details = [
-               'paymentType' => $paymentDetails['additional_data']['cc_type'],
-               'achaccount' => $paymentDetails['additional_data']['ach_account'],
-               'achAccountNumber' => $paymentDetails['additional_data']['ach_accountNumber'],
-               'achRoutingNumber' => $paymentDetails['additional_data']['ach_routingNumber']
-            ];
-            if (isset($paymentDetails['additional_data']['ach_checknumber'])) {
-                $details['achCheckNumber'] = $paymentDetails['additional_data']['ach_checknumber'];
-            }
-            if (isset($paymentDetails['additional_data']['ach_companyname'])) {
-                $details['achCompanyName'] = $paymentDetails['additional_data']['ach_companyname'];
-            }
-            $details['sessionId'] = $this->session->getSessionId();
-            $details['shopperIpAddress'] = $this->_getClientIPAddress();
-            return $details;
-        }
+    private function buildSepaDetails(array $additionalData): array
+    {
+        return [
+            'sepaMandateType' => $this->worldpayHelper->getSEPADetails(),
+            'sepaIban' => $additionalData['sepa_iban'],
+            'sepaAccountHolderName' => $additionalData['sepa_accountHolderName'],
+            'sepaMerchantNumber' => $this->worldpayHelper->getSEPAMerchantNo(),
+        ];
+    }
 
-        if ($paymentDetails['additional_data']['cc_type'] == "SEPA_DIRECT_DEBIT-SSL") {
-            $details = [
-               'paymentType' => $paymentDetails['additional_data']['cc_type'],
-               'sepaMandateType' => $this->worldpayHelper->getSEPADetails(),
-               'sepaIban' => $paymentDetails['additional_data']['sepa_iban'],
-               'sepaAccountHolderName' => $paymentDetails['additional_data']['sepa_accountHolderName']
-            ];
-            $details['sepaMerchantNumber'] = $this->worldpayHelper->getSEPAMerchantNo();
-            return $details;
-        }
+    private function buildCardPaymentDetails(array $paymentDetails): array
+    {
+        $additionalData = $paymentDetails['additional_data'];
 
-        if ($paymentDetails['additional_data']['cse_enabled']) {
+        if (!empty($additionalData['cse_enabled'])) {
             $details = [
-                'cseEnabled' => $paymentDetails['additional_data']['cse_enabled'],
-                'encryptedData' => $paymentDetails['additional_data']['encryptedData'],
-                'paymentType' => $paymentDetails['additional_data']['cc_type'],
+                'cseEnabled' => $additionalData['cse_enabled'],
+                'encryptedData' => $additionalData['encryptedData'],
+                'paymentType' => $additionalData['cc_type'],
             ];
         } else {
             $details = [
-                'paymentType' => $paymentDetails['additional_data']['cc_type'],
-                'cardNumber' => $paymentDetails['additional_data']['cc_number'],
-                'expiryMonth' => $paymentDetails['additional_data']['cc_exp_month'],
-                'expiryYear' => $paymentDetails['additional_data']['cc_exp_year'],
-                'cardHolderName' => $paymentDetails['additional_data']['cc_name'],
-                'cseEnabled' => $paymentDetails['additional_data']['cse_enabled'],
+                'cardNumber' => $additionalData['cc_number'],
+                'expiryMonth' => $additionalData['cc_exp_month'],
+                'expiryYear' => $additionalData['cc_exp_year'],
+                'cardHolderName' => $additionalData['cc_name'],
+                'cseEnabled' => $additionalData['cse_enabled'],
             ];
 
-            if (isset($paymentDetails['additional_data']['cc_cid'])) {
-                $details['cvc'] = $paymentDetails['additional_data']['cc_cid'];
+            if (isset($additionalData['cc_cid'])) {
+                $details['cvc'] = $additionalData['cc_cid'];
             }
         }
-        $this->customerSession->setIsSavedCardRequested(false);
-        if (isset($paymentDetails['additional_data']['save_my_card'])
-                && $paymentDetails['additional_data']['save_my_card']) {
-            $this->customerSession->setIsSavedCardRequested(true);
-        }
+
+        $this->customerSession->setIsSavedCardRequested(!empty($additionalData['save_my_card']));
+
+        $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($paymentDetails['method']);
+        $details['salesTax'] = $paymentDetails['salesTax'] ?? '';
+
+        $details = $this->addDfReferenceId($details, $additionalData);
+
+        $details['token_type'] = $this->worldpayHelper->getMerchantTokenization();
+        $details['cardType'] = $additionalData['cc_type'];
+
+        return $details;
+    }
+
+    private function addCommonPaymentDetails(
+        array $details,
+        array $additionalData
+    ): array {
+        $details['paymentType'] = $additionalData['cc_type'];
         $details['sessionId'] = $this->session->getSessionId();
         $details['shopperIpAddress'] = $this->_getClientIPAddress();
-        $details['dynamicInteractionType'] = $this->worldpayHelper->getDynamicIntegrationType($method);
-        $details['salesTax'] = '';
 
-        if (isset($paymentDetails['salesTax'])) {
-            $details['salesTax'] = $paymentDetails['salesTax'];
+        if (!empty($additionalData['ravelin_device_id'])) {
+            $details['ravelinDeviceId'] = $additionalData['ravelin_device_id'];
         }
 
-        // 3DS2 value
-        if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
-            $details['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
+        return $details;
+    }
+
+    private function addDfReferenceId(array $details, array $additionalData): array
+    {
+        if (isset($additionalData['dfReferenceId'])) {
+            $details['dfReferenceId'] = $additionalData['dfReferenceId'];
         }
-        // Check for Merchant Token
-        $details['token_type'] = $this->worldpayHelper->getMerchantTokenization();
-        //level23 data
-        $details['cardType'] = $paymentDetails['additional_data']['cc_type'];
+
         return $details;
     }
     /**
@@ -1263,6 +1418,8 @@ class Service
     private function _getPaymentDetailsUsingToken($paymentDetails, $quote)
     {
         $savedCardData = $this->savedtoken->loadByTokenCode($paymentDetails['additional_data']['tokenCode']);
+        $parentOrderTlid = $paymentDetails['additional_data']['parent_order_tlid'] ?? null;
+        $transactionIdentifier = $parentOrderTlid ?: ($savedCardData->getTlid() ?: $savedCardData->getTransactionIdentifier());
         if (isset($paymentDetails['encryptedData'])) {
             $details = [
                 'encryptedData' => $paymentDetails['encryptedData'],
@@ -1274,7 +1431,7 @@ class Service
                 'paymentType' => 'TOKEN-SSL',
                 'customerId' => $quote->getCustomerId(),
                 'tokenCode' => $savedCardData->getTokenCode(),
-                'transactionIdentifier' => $savedCardData->getTransactionIdentifier(),
+                'transactionIdentifier' => $transactionIdentifier,
                 'cardMethod' => $savedCardData->getMethod()
             ];
             if (isset($paymentDetails['additional_data']['saved_cc_cid'])
@@ -1351,67 +1508,67 @@ class Service
         $remoteAddresses = explode(',', $REMOTE_ADDR);
         return trim($remoteAddresses[0]);
     }
-    /**
-     * Collect Wallet Order Parameters
-     *
-     * @param string $orderCode
-     * @param int $quote
-     * @param string $orderStoreId
-     * @param array $paymentDetails
-     * @return array
-     */
+
     public function collectWalletOrderParameters(
         $orderCode,
         $quote,
         $orderStoreId,
         $paymentDetails
     ) {
-        $reservedOrderId = $quote->getReservedOrderId();
-        $currencyCode = $quote->getQuoteCurrencyCode();
-        $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
-        $isMultiShippingOrder = 0;
-        if ((bool)$quote->getIsMultiShipping()) {
-            $isMultiShippingOrder = 1;
+        $additionalData = $paymentDetails['additional_data'];
+        $paymentType = $additionalData['cc_type'];
+
+        if(isset($paymentDetails['additional_data']['ravelin_device_id'])) {
+            $paymentDetails['ravelinDeviceId'] = $paymentDetails['additional_data']['ravelin_device_id'];
         }
-        //Google Pay
-        if ($paymentDetails['additional_data']['cc_type'] == 'PAYWITHGOOGLE-SSL') {
-            if ($paymentDetails['additional_data']['walletResponse']) {
-                $walletResponse = (array) json_decode($paymentDetails['additional_data']['walletResponse']);
-                $paymentMethodData = (array) $walletResponse['paymentMethodData'];
-                $tokenizationData = (array) $paymentMethodData['tokenizationData'];
-                $token = (array) json_decode($tokenizationData['token']);
-                // 3DS2 value
-                $sessionId = $this->session->getSessionId();
-                $paymentDetails['sessionId'] = $sessionId;
-                $dfReferenceId = '';
-                $browserfields = [
-                    'browserScreenHeight' => $paymentDetails['additional_data']
-                        ['browser_screenheight'],
-                    'browserScreenWidth' => $paymentDetails['additional_data']
-                        ['browser_screenwidth'],
-                    'browserColourDepth' => $paymentDetails['additional_data']
-                        ['browser_colordepth']
-                ];
-                $orderDescription = $this->_getOrderDescription($reservedOrderId);
-                if (isset($paymentDetails['additional_data']['dfReferenceId'])) {
-                    $paymentDetails['dfReferenceId'] = $paymentDetails['additional_data']['dfReferenceId'];
-                    $environmentMode = $this->_scopeConfig->getValue(
-                            'worldpay/general_config/environment_mode',
-                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                        );
-                    $this->wplogger->info("Gpay 3Ds value". $orderDescription);
-                } else {
-                    $orderDescription = $this->_getOrderDescription($reservedOrderId);
-                }
-                return [
-                    'orderCode' => $orderCode,
-                    'merchantCode' => $this->worldpayHelper->
-                        getMerchantCode($paymentDetails['additional_data']['cc_type']),
-                    'orderDescription' => $orderDescription,
-                    'currencyCode' => $quote->getQuoteCurrencyCode(),
-                    'amount' => $quote->getGrandTotal(),
-                    'paymentType' => $this->_getRedirectPaymentType($paymentDetails),
-                    'shopperEmail' => $quote->getCustomerEmail(),
+
+        $commonParams = [
+            'orderCode' => $orderCode,
+            'merchantCode' => $this->worldpayHelper->getMerchantCode($paymentType),
+            'orderDescription' => $this->_getOrderDescription($quote->getReservedOrderId()),
+            'currencyCode' => $quote->getQuoteCurrencyCode(),
+            'amount' => $quote->getGrandTotal(),
+            'paymentType' => $this->_getRedirectPaymentType($paymentDetails),
+            'shopperEmail' => $quote->getCustomerEmail(),
+            'method' => $paymentDetails['method'],
+            'orderStoreId' => $orderStoreId,
+            'exponent' => $this->worldpayHelper->getCurrencyExponent($quote->getQuoteCurrencyCode()),
+            'isMultishippingOrder' => (int) $quote->getIsMultiShipping(),
+            'browserFields' => [
+                'browserScreenHeight' => $additionalData['browser_screenheight'],
+                'browserScreenWidth' => $additionalData['browser_screenwidth'],
+                'browserColourDepth' => $additionalData['browser_colordepth'],
+            ],
+        ];
+
+        if ($paymentType === 'PAYWITHGOOGLE-SSL' && !empty($additionalData['walletResponse'])) {
+            $walletResponse = json_decode($additionalData['walletResponse'], true);
+            $token = json_decode(
+                $walletResponse['paymentMethodData']['tokenizationData']['token'],
+                true
+            );
+
+            $paymentDetails['sessionId'] = $this->session->getSessionId();
+
+            if (isset($additionalData['dfReferenceId'])) {
+                $paymentDetails['dfReferenceId'] = $additionalData['dfReferenceId'];
+                $this->wplogger->info(
+                    'Gpay 3Ds value' . $commonParams['orderDescription']
+                );
+            }
+
+            return $commonParams + [
+                    'protocolVersion' => $token['protocolVersion'],
+                    'signature' => $token['signature'],
+                    'signedMessage' => $token['signedMessage'],
+                    'shippingAddress' => $this->_getShippingAddress($quote),
+                    'billingAddress' => $this->_getBillingAddress($quote),
+                    'cusDetails' => $this->getCustomerDetailsfor3DS2($quote),
+                    'threeDSecureConfig' => $this->_getThreeDSecureConfig(
+                        $paymentDetails['method']
+                    ),
+                    'shopperIpAddress' => $this->_getClientIPAddress(),
+                    'paymentDetails' => $paymentDetails,
                     'acceptHeader' => php_sapi_name() !== "cli" ? filter_input(INPUT_SERVER, 'HTTP_ACCEPT') : '',
                     'userAgentHeader' => php_sapi_name() !== "cli" ? filter_input(
                         INPUT_SERVER,
@@ -1419,72 +1576,28 @@ class Service
                         FILTER_SANITIZE_FULL_SPECIAL_CHARS,
                         FILTER_FLAG_STRIP_LOW
                     ) : '',
-                    'method' => $paymentDetails['method'],
-                    'orderStoreId' => $orderStoreId,
-                    'protocolVersion' => $token['protocolVersion'],
-                    'signature' => $token['signature'],
-                    'signedMessage' => $token['signedMessage'],
-                    'shippingAddress' => $this->_getShippingAddress($quote),
-                    'billingAddress' => $this->_getBillingAddress($quote),
-                    'cusDetails' => $this->getCustomerDetailsfor3DS2($quote),
-                    'paymentDetails' => $paymentDetails,
-                    'threeDSecureConfig' => $this->_getThreeDSecureConfig($paymentDetails['method']),
-                    'shopperIpAddress' => $this->_getClientIPAddress(),
-                    'exponent' => $exponent,
-                    'isMultishippingOrder' => $isMultiShippingOrder,
-                    'browserFields'=>$browserfields
                 ];
-            }
         }
 
-        //Apple Pay
-        if ($paymentDetails['additional_data']['cc_type'] == 'APPLEPAY-SSL') {
-            if ($paymentDetails['additional_data']['appleResponse']) {
-                $appleResponse = (array) json_decode($paymentDetails['additional_data']['appleResponse']);
-                $paymentMethodData = (array) $appleResponse['paymentData'];
+        if ($paymentType === 'APPLEPAY-SSL' && !empty($additionalData['appleResponse'])) {
+            $appleResponse = json_decode($additionalData['appleResponse'], true);
+            $paymentData = $appleResponse['paymentData'];
+            $header = $paymentData['header'];
 
-                $version = $paymentMethodData['version'];
-
-                $data = $paymentMethodData['data'];
-                $signature = $paymentMethodData['signature'];
-
-                $headerObject = $paymentMethodData['header'];
-
-                $ephemeralPublicKey = $headerObject->ephemeralPublicKey;
-                $publicKeyHash = $headerObject->publicKeyHash;
-                $transactionId = $headerObject->transactionId;
-                $browserfields = [
-                    'browserScreenHeight' => $paymentDetails['additional_data']
-                        ['browser_screenheight'],
-                    'browserScreenWidth' => $paymentDetails['additional_data']
-                        ['browser_screenwidth'],
-                    'browserColourDepth' => $paymentDetails['additional_data']
-                        ['browser_colordepth'],
+            return $commonParams + [
+                    'protocolVersion' => $paymentData['version'],
+                    'signature' => $paymentData['signature'],
+                    'data' => $paymentData['data'],
+                    'ephemeralPublicKey' => $header['ephemeralPublicKey'],
+                    'publicKeyHash' => $header['publicKeyHash'],
+                    'transactionId' => $header['transactionId'],
+                    'paymentDetails' => $paymentDetails
                 ];
-                return [
-                    'orderCode' => $orderCode,
-                    'merchantCode' =>
-                        $this->worldpayHelper->getMerchantCode($paymentDetails['additional_data']['cc_type']),
-                    'orderDescription' => $this->_getOrderDescription($reservedOrderId),
-                    'currencyCode' => $quote->getQuoteCurrencyCode(),
-                    'amount' => $quote->getGrandTotal(),
-                    'paymentType' => $this->_getRedirectPaymentType($paymentDetails),
-                    'shopperEmail' => $quote->getCustomerEmail(),
-                    'method' => $paymentDetails['method'],
-                    'orderStoreId' => $orderStoreId,
-                    'protocolVersion' => $version,
-                    'signature' => $signature,
-                    'data' => $data,
-                    'ephemeralPublicKey' => $ephemeralPublicKey,
-                    'publicKeyHash' => $publicKeyHash,
-                    'transactionId' => $transactionId,
-                    'exponent' => $exponent,
-                    'isMultishippingOrder' => $isMultiShippingOrder,
-                    'browserFields'=> $browserfields
-                ];
-            }
         }
+
+        return [];
     }
+
     /**
      * Collect Third Party Details
      *
@@ -1780,59 +1893,48 @@ class Service
             return $dob;
         }
     }
-     /**
-      * Collect Third Party Details
-      *
-      * @param int $quote
-      * @param int|bool|null $paymentType
-      * @return array
-      */
-    private function _getL23OrderLineItems($quote, $paymentType = null)
-    {
-        $orderitems = [];
-        $lineitem = [];
-        $orderItems = $quote->getAllItems();
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
-        foreach ($orderItems as $_item) {
-            $lineitem = [];
-            $_product ='';
+    private function _getL23OrderLineItems(Quote $quote): array
+    {
+        $orderItems = [];
+        $objectManager = ObjectManager::getInstance();
+
+        foreach ($quote->getAllItems() as $_item) {
+            $lineItem = [];
 
             if ($_item->getParentItem()) {
                 continue;
             }
 
-            $_product = $objectManager->create(\Magento\Catalog\Model\Product::class)->load($_item->getProductId());
+            $_product = $objectManager->create(Product::class)->load($_item->getProductId());
 
-                $rowtotal = $_item->getRowTotal();
-                $totalamount = $rowtotal - $_item->getDiscountAmount();
-                $totaltax = $_item->getTaxAmount() + $_item->getHiddenTaxAmount()
-                        + $_item->getWeeeTaxAppliedRowAmount();
-                $discountamount = $_item->getDiscountAmount();
+            $rowTotal = $_item->getRowTotal();
+            $totalAmount = $rowTotal - $_item->getDiscountAmount();
+            $totalTax = $_item->getTaxAmount() + $_item->getHiddenTaxAmount()
+                    + $_item->getWeeeTaxAppliedRowAmount();
+            $discountAmount = $_item->getDiscountAmount();
 
-                $unitOfMeasure = $_product->getData('unit_of_measure');
+            $unitOfMeasure = $_product->getData('unit_of_measure');
             if ($unitOfMeasure == '') {
                 $unitOfMeasure = $this->worldpayHelper->getUnitOfMeasure();
             }
-                $lineitem['description'] = substr($_item->getName(), 0, 12);
-                $lineitem['productCode'] = substr($_item->getProductId(), 0, 12);
-                $commodityCode = $_product->getData('commodity_code');
-            if (isset($commodityCode)) {
-                $lineitem['commodityCode'] = substr($commodityCode, 0, 12);
-            } else {
-                $lineitem['commodityCode'] = $commodityCode;
-            }
-                $lineitem['quantity'] = (int) substr($_item->getQty(), 0, 12);
-                $lineitem['unitCost'] = $rowtotal / $_item->getQty();
-                $lineitem['unitOfMeasure'] = substr($unitOfMeasure, 0, 12);
-                $lineitem['itemTotal'] = $totalamount;
-                $lineitem['itemTotalWithTax'] = $totalamount + $totaltax;
-                $lineitem['itemDiscountAmount'] = $discountamount;
-                $lineitem['taxAmount'] = $totaltax;
-                $orderitems['lineItem'][] = $lineitem;
+            $lineItem['description'] = substr($_item->getName(), 0, 12);
+            $lineItem['productCode'] = substr($_item->getProductId(), 0, 12);
+
+            $commodityCode = $_product->getData('commodity_code');
+
+            $lineItem['commodityCode'] = isset($commodityCode) ? substr($commodityCode, 0, 12) : null;
+            $lineItem['quantity'] = (int) substr($_item->getQty(), 0, 12);
+            $lineItem['unitCost'] = $rowTotal / $_item->getQty();
+            $lineItem['unitOfMeasure'] = substr($unitOfMeasure, 0, 12);
+            $lineItem['itemTotal'] = $totalAmount;
+            $lineItem['itemTotalWithTax'] = $totalAmount + $totalTax;
+            $lineItem['itemDiscountAmount'] = $discountAmount;
+            $lineItem['taxAmount'] = $totalTax;
+            $orderItems['lineItem'][] = $lineItem;
 
         }
 
-        return $orderitems;
+        return $orderItems;
     }
 }

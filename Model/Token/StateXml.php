@@ -234,7 +234,7 @@ class StateXml implements \Sapient\Worldpay\Model\Token\StateInterface
     {
         return (int)$this->_cardNode->expiryDate->date['year'];
     }
-    
+
     /**
      * Retrive bin
      *
@@ -244,7 +244,7 @@ class StateXml implements \Sapient\Worldpay\Model\Token\StateInterface
     {
         return (string)$this->_derivedNode->bin;
     }
-    
+
     /**
      * Retrive transaction identifier
      *
@@ -253,5 +253,18 @@ class StateXml implements \Sapient\Worldpay\Model\Token\StateInterface
     public function getTransactionIdentifier()
     {
         return (string)$this->_paymentNode->schemeResponse->transactionIdentifier;
+    }
+
+    /**
+     * Retrive supplementary id from scheme response
+     *
+     * @return string
+     */
+    public function getSupplementaryId()
+    {
+        if (isset($this->_paymentNode->schemeResponse->supplementaryId)) {
+            return (string)$this->_paymentNode->schemeResponse->supplementaryId;
+        }
+        return '';
     }
 }

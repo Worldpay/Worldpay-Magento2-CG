@@ -228,7 +228,6 @@ define([
                         "amount": value.amount,
                         "description": value.method_title,
                     });
-
                 });
                 $.localStorage.set('wp-default-shipping-method',shippingMethodListLS); // set in localstorage
                 PaymentDataRequestUpdate.newShippingOptionParameters = {
@@ -258,13 +257,7 @@ define([
                 let shippingOptionData = intermediatePaymentData.shippingOptionData;
                 let PaymentDataRequestUpdate = {};
 
-                if (intermediatePaymentData.callbackTrigger == "INITIALIZE") {
-                    PaymentDataRequestUpdate.newShippingOptionParameters = self.getGoogleDefaultShippingOptions();
-                    let selectedShippingOptionId = PaymentDataRequestUpdate.newShippingOptionParameters.defaultSelectedOptionId;
-                    PaymentDataRequestUpdate.newTransactionInfo = self.calculateNewTransactionInfo(selectedShippingOptionId);
-                    resolve(PaymentDataRequestUpdate);
-
-                }else if (intermediatePaymentData.callbackTrigger == "SHIPPING_ADDRESS") {
+                if (intermediatePaymentData.callbackTrigger == "INITIALIZE" || intermediatePaymentData.callbackTrigger == "SHIPPING_ADDRESS") {
                     self.reloadShippingOptions(shippingAddress,PaymentDataRequestUpdate,resolve);
                 }
                 else if (intermediatePaymentData.callbackTrigger == "SHIPPING_OPTION") {
@@ -273,23 +266,6 @@ define([
                 }
               });
         },
-        getGoogleDefaultShippingOptions: function(){
-            var defaultShippingMethods = window.walletpayObj.availableShippingMethods();
-            var shippingMethodList = [];
-            _.each(defaultShippingMethods,function(value){
-                var titledesc = priceUtils.formatPrice(value.amount, window.walletpayObj.priceFormat)+' '+value.carrier_title+' - '+ value.method_title;
-                shippingMethodList.push({
-                    "id": value.carrier_code+'_'+value.method_code,
-                    "label": titledesc,
-                    "description": value.method_title,
-                });
-            });
-            return {
-                defaultSelectedOptionId: shippingMethodList[0].id,
-                shippingOptions: shippingMethodList
-              };
-        },
-
         getShippingCosts: function() {
             var defaultShippingMethods = $.localStorage.get('wp-default-shipping-method');
             var shippingMethodPrice = {};
@@ -298,20 +274,16 @@ define([
             });
             return shippingMethodPrice;
         },
-
-        getGoogleUnserviceableAddressError: function(){
-            return {
-                reason: "SHIPPING_ADDRESS_UNSERVICEABLE",
-                message: "Cannot ship to the selected address",
-                intent: "SHIPPING_ADDRESS"
-              };
-        },
         calculateNewTransactionInfo: function(shippingOptionId){
+            let initData = {
+                "currencyCode": window.walletpayObj.currencyCode(),
+                "countryCode": window.walletpayObj.default_country_code,
+            }
             var self = window.gpayLib;
-            let newTransactionInfo = self.getGoogleTransactionInfo();
+
+            let newTransactionInfo = self.getGoogleTransactionInfo(initData);
             let shippingCost = self.getShippingCosts()[shippingOptionId];
 
-            //let shippingCost = 5;
             newTransactionInfo.displayItems.push({
                 type: "LINE_ITEM",
                 label: "Shipping",
@@ -324,13 +296,14 @@ define([
 
             return newTransactionInfo;
         },
-        getGoogleTransactionInfo : function(){
+        getGoogleTransactionInfo : function(initData){
             var cart = customerData.get('cart');
             var totalAmount = cart().subtotalAmount;
             if(window.walletpayObj){
                 totalAmount = window.walletpayObj.grandtotal();
             }
-            return {
+
+            var transactionInfo = {
             displayItems: [
                 {
                   label: "Subtotal",
@@ -338,12 +311,17 @@ define([
                   price: parseFloat(totalAmount).toFixed(2),
                 },
               ],
-              countryCode: 'US',
-              currencyCode: "USD",
               totalPriceStatus: $t('ESTIMATED'),
               totalPrice: parseFloat(totalAmount).toFixed(2),
               totalPriceLabel: $t('Total')
             };
+
+            if(typeof initData !== 'undefined' && initData !== null) {
+              transactionInfo.countryCode = initData.countryCode;
+              transactionInfo.currencyCode = initData.currencyCode;
+            }
+
+            return transactionInfo;
         },
         getGoogleTransactionInfoCheckout: function(initData){
             return {

@@ -16,6 +16,12 @@ EOD;
         $this->_addCDATA($orderContent, $this->orderParameters['orderContent']);
     }
 
+    protected function _addDescriptionElement(SimpleXMLElement $order): void
+    {
+        $description = $order->addChild('description');
+        $this->_addCDATA($description, $this->orderParameters['orderDescription'] );
+    }
+
     protected function _addShippingElement(SimpleXMLElement $order): void
     {
         $shippingAddressElement = $order->addChild('shippingAddress');
@@ -87,5 +93,13 @@ EOD;
         $node = dom_import_simplexml($element);
         $no   = $node->ownerDocument;
         $node->appendChild($no->createCDATASection($content));
+    }
+
+    protected function _addRavelinData(\SimpleXMLElement $order)
+    {
+        if(isset($this->paymentDetails['ravelinDeviceId']) && $this->paymentDetails['ravelinDeviceId']) {
+            $deviceSession = $order->addChild('deviceSession');
+            $deviceSession->addChild('deviceId', $this->paymentDetails['ravelinDeviceId']);
+        }
     }
 }
