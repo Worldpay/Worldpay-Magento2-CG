@@ -2,6 +2,13 @@ Latest releases for all supported version:
 
 For Magento 2.4.8
 
+Worldpay Plugin version: 2.4.8-p51126
+1. Magento 2.4.8-p5 compatible
+2. PHP 8.4 & 8.3 compatibility
+3. Added Ravelin Integration for Fraud Prevention
+4. Added Support for Mastercard TLID
+5. Added Support for eDCC
+
 Worldpay Plugin version: 2.4.8-p50626
 1. Magento 2.4.8-p5 compatible
 2. PHP 8.4 & 8.3 compatibility
