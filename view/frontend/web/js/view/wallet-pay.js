@@ -26,8 +26,9 @@ define([
     'Sapient_Worldpay/js/model/region-updator',
     'Sapient_Worldpay/js/model/apple-pay',
     'Sapient_Worldpay/js/model/paypal-pdp',
-    'mage/validation'
-], function (ko, $, _, Component, confirm, customerData, url, mageTemplate, $t,idsResolver, productInfoResolver,customer,storage,modal,addressList,priceUtils,totalsegmentsTemplate,pdpCartTemplate, GooglePayModel,checkoutUtils,RegionUpdater,ApplePayModel, PaypalModel) {
+    'mage/validation',
+    'dompurify',
+], function (ko, $, _, Component, confirm, customerData, url, mageTemplate, $t,idsResolver, productInfoResolver,customer,storage,modal,addressList,priceUtils,totalsegmentsTemplate,pdpCartTemplate, GooglePayModel,checkoutUtils,RegionUpdater,ApplePayModel, PaypalModel, DOMPurify) {
     'use strict';
 
     var appleResponse = "";
@@ -43,7 +44,7 @@ define([
                     apiVersionMinor: 0
                 }
             },
-
+            currencySymbol: '$',
             productFormSelector: '#product_addtocart_form'
         },
         priceFormat :{
@@ -51,7 +52,7 @@ define([
             groupLength: 3,
             groupSymbol: ",",
             integerRequired: false,
-            pattern: "$%s",
+            pattern: "%s %s",
             precision: 2,
             requiredPrecision: 2
         },
@@ -98,6 +99,8 @@ define([
             this._super();
             window.walletpayObj = this;
             var self = this;
+
+            this.priceFormat.pattern =  (this.currencySymbol || window.currency || '$') + "%s";
 
             var customerObservable = customerData.get('customer');
 
@@ -146,7 +149,7 @@ define([
                     "title" : val.title,
                     "value" : priceUtils.formatPrice(val.value, {
                         ...self.priceFormat,
-                        pattern: "%s " + window.walletpayObj.currencyCode()
+                        pattern: (window.walletpayObj.currencySymbol || window.walletpayObj.currencyCode()) + "%s"
                     }),
                 };
             });
@@ -265,6 +268,7 @@ define([
                 var ginitData = {
                     "env_mode": window.walletpayObj.env_mode,
                     "currencyCode": window.walletpayObj.currencyCode(),
+                    "countryCode": window.walletpayObj.default_country_code,
                     "baseRequest": window.walletpayObj.googlepayOptions.baseRequest,
                     "allowedCardAuthMethods": window.walletpayObj.googlepayOptions.allowedCardAuthMethods,
                     "allowedCardNetworks": window.walletpayObj.googlepayOptions.allowedCardNetworks,
@@ -816,12 +820,14 @@ define([
                     }
 
                     if (res.messages) {
-                        $( window.walletpayObj.messagesSelector).html(res.messages);
+                        $( window.walletpayObj.messagesSelector).text(res.messages);
                     }
 
                     if (res.minicart) {
-                        $( window.walletpayObj.minicartSelector).replaceWith(res.minicart);
-                        $( window.walletpayObj.minicartSelector).trigger('contentUpdated');
+                        var sanitizedMinicart = DOMPurify.sanitize(res.minicart);
+                        var $minicart = $(window.walletpayObj.minicartSelector);
+                        $minicart.html(sanitizedMinicart);
+                        $minicart.trigger('contentUpdated');
                     }
 
                     triggerCheckout = true;

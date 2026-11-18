@@ -1,0 +1,33 @@
+<?php
+    $paymentInfo = $block->getWorldpayPaymentInfo();
+    if ($block->isWorldpayPayment() && !empty($paymentInfo)):
+    ?>
+<div class="worldpay-payment-info">
+    <h3 style="text-align: right"><?php echo __('Dynamic Currency Conversion Information'); ?></h3>
+    <table class="data-table worldpay-payment-details">
+        <tfoot>
+            <tr>
+                <td><?php echo __('Transaction Amount') . ' ' . $this->escapeHtml($paymentInfo['dcc_offer_amount']) . ' ' . $this->escapeHtml($paymentInfo['dcc_offer_currency_code']); ?></td>
+            </tr>
+            <tr>
+                <td><?php echo __('Rate provider:') . ' ' . $this->escapeHtml($paymentInfo['dcc_offer_rate_provider']); ?></td>
+            </tr>
+            <tr>
+                <td><?php echo __('Exchange Rate Used (incl. ') . $this->escapeHtml($paymentInfo['dcc_offer_markup_rate']) . __('% markup): ') .
+                        $this->escapeHtml($paymentInfo['dcc_offer_rate']); ?></td>
+            </tr>
+            <tr>
+                <td><?php echo __('I have been offered a choice of currencies and agreed to pay in dynamic_FX_Currency:') . ' ' . $this->escapeHtml($paymentInfo['dcc_offer_acceptance_date']); ?></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<style>
+    .worldpay-payment-details th,
+    .worldpay-payment-details td {
+        text-align: right;
+        padding: 2px 0;
+    }
+</style>
+<?php endif; ?>

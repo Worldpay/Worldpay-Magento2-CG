@@ -30,13 +30,23 @@
 
             // Tell the parent iframe to redirect to a url
             function redirect() {
-
                 var url = getParam('url'),
                 id = getParam('iframeIntegrationId');
 
-                // This works as our parent's parent is on our domain
-                var obj = parent.parent.window[id];
-                obj.redirect(url);
+                try {
+                    var targetUrl = new URL(url, window.location.href);
+                    if (targetUrl.origin !== window.location.origin) {
+                        return;
+                    }
+
+                    var safeUrl = targetUrl.pathname + targetUrl.search + targetUrl.hash;
+
+                    // This works as our parent's parent is on our domain
+                    var obj = parent.parent.window[id];
+                    obj.redirect(safeUrl);
+                } catch (e) {
+                    return;
+                }
             }
 
             // Tell the parent iframe to scroll to the top of the page

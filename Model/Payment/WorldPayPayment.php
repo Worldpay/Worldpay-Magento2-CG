@@ -64,6 +64,11 @@ class WorldPayPayment
             $wpp = $wpp->loadByWorldpayOrderId($paymentState->getOrderCode());
         }
 
+        $tlid = $paymentState->getTlid();
+        if (!empty($tlid)) {
+            $wpp->setData('tlid', $tlid);
+        }
+
         $wpp->setData('payment_status', $paymentState->getPaymentStatus());
         if (strpos($paymentState->getPaymentMethod(), "KLARNA") !== false) {
             $wpp->setData('payment_type', $paymentState->getPaymentMethod());

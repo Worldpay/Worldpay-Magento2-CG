@@ -8,6 +8,7 @@ use Exception;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Api\OrderManagementInterface;
+use Sapient\Worldpay\Model\Payment\WorldPayPayment;
 
 class Order
 {
@@ -287,12 +288,7 @@ class Order
         return $this->getWorldPayPayment()->getId() !== null;
     }
 
-    /**
-     * Get WorldPayPayment
-     *
-     * @return string
-     */
-    public function getWorldPayPayment()
+    public function getWorldPayPayment(): Worldpayment
     {
         if ($this->getOrder()->isObjectNew()) {
             throw new \Magento\Framework\Exception\LocalizedException(

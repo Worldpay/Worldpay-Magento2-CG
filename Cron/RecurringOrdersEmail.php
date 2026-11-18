@@ -86,7 +86,7 @@ class RecurringOrdersEmail
      */
     public function execute()
     {
-        $this->_logger->info('Recurring Orders Email Notificaion executed on - '.date('Y-m-d H:i:s'));
+        $this->_logger->info('Recurring Orders Email Notification executed on - '.date('Y-m-d H:i:s'));
         $recurringOrderIds = $this->getRecurringOrders();
         if (!empty($recurringOrderIds)) {
             foreach ($recurringOrderIds as $recurringOrder) {
@@ -125,7 +125,7 @@ class RecurringOrdersEmail
     }
 
     /**
-     * Get the list of orders for send Email Notificaion
+     * Get the list of orders for send Email Notification
      *
      * @return array List of orders
      */

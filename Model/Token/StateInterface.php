@@ -126,18 +126,25 @@ interface StateInterface
      * @return string
      */
     public function getTokenEvent();
-    
+
     /**
      * Retrive bin
      *
      * @return string
      */
     public function getBin();
-    
+
     /**
      * Retrive transaction identifier
      *
      * @return string
      */
     public function getTransactionIdentifier();
+
+    /**
+     * Retrive supplementary id from scheme response
+     *
+     * @return string
+     */
+    public function getSupplementaryId();
 }

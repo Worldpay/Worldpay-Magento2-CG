@@ -295,51 +295,7 @@ define(
                             fullScreenLoader.startLoader();
                             if(window.checkoutConfig.payment.ccform.isDynamic3DS2Enabled){
                                 createJwt();
-                                window.addEventListener("message", function(event) {
-                                    var envUrl;
-                                    if(window.checkoutConfig.payment.ccform.jwtEventUrl !== '') {
-                                        envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
-                                    }
-                                    if (event.origin === envUrl) {
-                                        var data = JSON.parse(event.data);
-                                        //console.warn('Merchant received a message:', data);
-                                        if (data !== undefined) {
-                                            if(data.Payload){
-                                                if(data.Payload.ActionCode =="SUCCESS"){
-                                                    var sessionId = data.Payload.SessionId;
-                                                    if(sessionId){
-                                                        this.dfReferenceId = sessionId;
-                                                    }
-                                                    window.sessionId = this.dfReferenceId;
-                                                    //place order with direct CSE method
-                                                    if(window.checkoutConfig.payment.ccform.isMultishipping){
-                                                        placeMultishippingOrder(self.getData());
-                                                    }
-                                                    else{
-                                                        fullScreenLoader.stopLoader();
-                                                        self.placeOrder();
-                                                    }
-                                                }
-
-                                            }else if(data.Status){
-                                                //window.sessionId = data.SessionId;
-                                                var sessionId = data.SessionId;
-                                                if(sessionId){
-                                                    this.dfReferenceId = sessionId;
-                                                }
-                                                window.sessionId = this.dfReferenceId;
-                                                //place order with direct CSE method
-                                                if(window.checkoutConfig.payment.ccform.isMultishipping){
-                                                    placeMultishippingOrder(self.getData());
-                                                }
-                                                else{
-                                                    fullScreenLoader.stopLoader();
-                                                    self.placeOrder();
-                                                }
-                                            }
-                                        }
-                                    }
-                                }, { once: true });
+                                self.registerCardinalListener(self);
                             } else {
                                 if(window.checkoutConfig.payment.ccform.isMultishipping){
                                     placeMultishippingOrder(self.getData());
@@ -349,13 +305,11 @@ define(
                                     self.placeOrder();
                                 }
                             }
-                            //self.placeOrder();
                         }else {
                             return $form.validation() && $form.validation('isValid');
                         }
                     })
                     .catch(function(err) {
-                        // show error in developer console for debugging
                         console.error(err);
                         return false;
                     });
@@ -461,8 +415,52 @@ define(
 
                          }
 
-                } //else if end
+                }
             },
+
+            registerCardinalListener: function(self) {
+                const handler = function (event) {
+                    var envUrl = window.checkoutConfig.payment.ccform.jwtEventUrl;
+
+                    if (!envUrl || event.origin !== envUrl) {
+                        return;
+                    }
+
+                    var data;
+                    try {
+                        data = JSON.parse(event.data);
+                    } catch (e) {
+                        return;
+                    }
+
+                    if (data === undefined) {
+                        return;
+                    }
+
+                    var sessionId = null;
+                    if (data.Payload && data.Payload.ActionCode === "SUCCESS") {
+                        sessionId = data.Payload.SessionId;
+                    } else if (data.Status) {
+                        sessionId = data.SessionId;
+                    } else {
+                        return;
+                    }
+
+                    window.removeEventListener("message", handler);
+
+                    this.dfReferenceId = sessionId;
+                    window.sessionId = sessionId;
+
+                    if (window.checkoutConfig.payment.ccform.isMultishipping) {
+                        placeMultishippingOrder(this.getData());
+                    } else {
+                        fullScreenLoader.stopLoader();
+                        this.placeOrder();
+                    }
+                };
+                window.addEventListener("message", handler);
+            },
+
             afterPlaceOrder: function (data, event) {
               if (this.getselectedCCType()=='SAMSUNGPAY-SSL') {
                 var cancel = url.build('worldpay/samsungpay/CallBack');

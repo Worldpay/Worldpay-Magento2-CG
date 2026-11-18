@@ -4,6 +4,16 @@
  */
 namespace Sapient\Worldpay\Model\Payment;
 
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\LocalizedException;
+use Sapient\Worldpay\Model\Order;
+use Sapient\Worldpay\Model\Payment\Update\Factory;
+use Sapient\Worldpay\Model\Worldpayment;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Sapient\Worldpay\Model\Payment\Update\Factory as PaymentUpdateFactory;
+use Sapient\Worldpay\Model\Request\PaymentServiceRequest;
+use Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection as MultishippingOrderCollection;
+
 class Service
 {
     public const INTERACTION_TYPE_MS = "ECOM_MULTISHIPPING";
@@ -51,42 +61,25 @@ class Service
      * @var \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection
      */
     protected $multishippingOrderCollection;
-    /**
-     * Constructor
-     *
-     * @param \Sapient\Worldpay\Model\Payment\Update\Factory $paymentupdatefactory
-     * @param \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest
-     * @param \Sapient\Worldpay\Model\Worldpayment $worldpayPayment
-     * @param \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
-     */
+
     public function __construct(
-        \Sapient\Worldpay\Model\Payment\Update\Factory $paymentupdatefactory,
-        \Sapient\Worldpay\Model\Request\PaymentServiceRequest $paymentservicerequest,
-        \Sapient\Worldpay\Model\Worldpayment $worldpayPayment,
-        \Sapient\Worldpay\Model\ResourceModel\Multishipping\Order\Collection $multishippingOrderCollection
+        Factory $paymentupdatefactory,
+        PaymentServiceRequest $paymentservicerequest,
+        Worldpayment $worldpayPayment,
+        MultishippingOrderCollection $multishippingOrderCollection
     ) {
         $this->paymentupdatefactory = $paymentupdatefactory;
         $this->paymentservicerequest = $paymentservicerequest;
         $this->worldpayPayment = $worldpayPayment;
         $this->multishippingOrderCollection = $multishippingOrderCollection;
     }
-    /**
-     * Create Payment Update From WorldPay Xml
-     *
-     * @param string $xml
-     * @return array
-     */
-    public function createPaymentUpdateFromWorldPayXml($xml)
+
+    public function createPaymentUpdateFromWorldPayXml(\SimpleXMLElement $xml): object
     {
-        return $this->_getPaymentUpdateFactory()
-            ->create(new \Sapient\Worldpay\Model\Payment\StateXml($xml));
+        return $this->_getPaymentUpdateFactory()->create(new StateXml($xml));
     }
-    /**
-     * Get Payment Update Factory
-     *
-     * @return array
-     */
-    protected function _getPaymentUpdateFactory()
+
+    protected function _getPaymentUpdateFactory(): PaymentUpdateFactory
     {
         if ($this->_paymentUpdateFactory === null) {
             $this->_paymentUpdateFactory = $this->paymentupdatefactory;
@@ -94,71 +87,71 @@ class Service
 
         return $this->_paymentUpdateFactory;
     }
-    /**
-     * Create Payment Update From WorldPay Response
-     *
-     * @param Sapient\Worldpay\Model\Payment\StateInterface $state
-     * @return array
-     */
-    public function createPaymentUpdateFromWorldPayResponse(\Sapient\Worldpay\Model\Payment\StateInterface $state)
+
+    public function createPaymentUpdateFromWorldPayResponse(StateInterface $state): object
     {
-        return $this->_getPaymentUpdateFactory()
-            ->create($state);
+        return $this->_getPaymentUpdateFactory()->create($state);
     }
+
     /**
-     * Get Payment Update Xml For Notification
-     *
-     * @param string $xml
-     * @return array
+     * @throws CouldNotSaveException
      */
-    public function getPaymentUpdateXmlForNotification($xml)
+    public function getPaymentUpdateXmlForNotification(string $xml): void
     {
         $paymentNotifyService = new \SimpleXmlElement($xml);
-        $lastEvent = $paymentNotifyService->xpath('//lastEvent');
+        $lastEvent = (string) $paymentNotifyService->xpath('//lastEvent')[0];
         $journal = $paymentNotifyService->xpath('//journal/journalReference');
-        if (!empty($journal) && $lastEvent[0] == 'CAPTURED') {
-            $partialCaptureReference = (array) $journal[0]->attributes()['reference'][0];
-            $ordercodenode = $paymentNotifyService->xpath('//orderStatusEvent');
-            $ordercode = (array) $ordercodenode[0]->attributes()['orderCode'][0];
-            $nodes = $paymentNotifyService->xpath('//payment/balance');
-            $getNodeValue = '';
-            $getAttibute = '';
-            if (isset($nodes, $lastEvent[0], $partialCaptureReference[0])) {
-                if ($nodes && $lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture') {
-                    $getAttibute = (array) $nodes[0]->attributes()['accountType'];
-                    $getNodeValue = $getAttibute[0];
+        $orderCodeNode = $paymentNotifyService->xpath('//orderStatusEvent');
+        $orderCode =  $orderCodeNode[0]->attributes()['orderCode'][0];
+
+        if ($lastEvent === 'AUTHORISED') {
+            $worldpayPayment = $this->worldpayPayment->loadByWorldpayOrderId($orderCode);
+            if (isset($worldpayPayment)) {
+                try{
+                    $this->updatePaymentDccDataFromXml($worldpayPayment, $xml);
+                } catch (CouldNotSaveException $e) {
+                    throw new CouldNotSaveException(__($e->getMessage()));
                 }
-                if ($lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture'
-                        && $getNodeValue == 'IN_PROCESS_AUTHORISED') {
-                    $worldpaypayment = $this->worldpayPayment->loadByWorldpayOrderId($ordercode[0]);
-                    if (isset($worldpaypayment)) {
-                        $worldpaypayment->setData('payment_status', $lastEvent[0]);
-                        $worldpaypayment->save();
+            }
+        }
+
+        if (!empty($journal) && $lastEvent === 'CAPTURED') {
+            $partialCaptureReference = (array) $journal[0]->attributes()['reference'][0];
+            $nodes = $paymentNotifyService->xpath('//payment/balance');
+
+            if (!empty($nodes) && isset($partialCaptureReference[0]) && $partialCaptureReference[0] === 'Partial Capture')
+            {
+                $attributes = (array) $nodes[0]->attributes()['accountType'];
+                $accountType = $attributes[0] ?? null;
+
+                if ($accountType === 'IN_PROCESS_AUTHORISED') {
+                    $worldpayPayment = $this->worldpayPayment->loadByWorldpayOrderId($orderCode);
+
+                    if ($worldpayPayment) {
+                        $worldpayPayment->setData('payment_status', $lastEvent);
+                        $worldpayPayment->save();
                     }
-                    $gatewayError = 'Notification received for Partial Captutre';
-                    throw new \Magento\Framework\Exception\CouldNotDeleteException(__($gatewayError));
+
+                    throw new CouldNotSaveException(
+                        __('Notification received for Partial Capture')
+                    );
                 }
             }
         }
     }
+
     /**
-     * Get Payment Update Xml For Order
-     *
-     * @param Sapient\Worldpay\Model\Order $order
-     * @return array
+     * @throws CouldNotSaveException
+     * @throws LocalizedException
      */
-    public function getPaymentUpdateXmlForOrder(\Sapient\Worldpay\Model\Order $order)
+    public function getPaymentUpdateXmlForOrder(Order $order): \SimpleXMLElement
     {
         $worldPayPayment = $order->getWorldPayPayment();
 
-        if (!$worldPayPayment) {
-            return false;
-        }
         $interactionType = $worldPayPayment->getInteractionType();
         if ($worldPayPayment->getIsMultishippingOrder()) {
             $interactionType = self::INTERACTION_TYPE_MS;
         }
-        $worldPayOrder = $order->getOrder();
         $rawXml = $this->paymentservicerequest->inquiry(
             $worldPayPayment->getMerchantId(),
             $worldPayPayment->getWorldpayOrderId(),
@@ -171,56 +164,132 @@ class Service
         $paymentService = new \SimpleXmlElement($rawXml);
         $lastEvent = $paymentService->xpath('//lastEvent');
         $partialCaptureReference = $paymentService->xpath('//reference');
-        $ordercodenode = $paymentService->xpath('//orderStatus');
-        $ordercode = (array)$ordercodenode[0]->attributes()['orderCode'][0];
 
-        $nodes = $paymentService->xpath('//payment/balance');
-        $getNodeValue ='';
-        $getAttibute = '';
-
-        if (isset($nodes, $lastEvent[0], $partialCaptureReference[0])) {
+        if(isset($lastEvent[0]) && (string) $lastEvent[0] === 'CAPTURED'){
             /** Start Multishipping Code */
-            if ($lastEvent[0] == 'CAPTURED' && $worldPayPayment->getIsMultishippingOrder()
-                && (strpos($partialCaptureReference[0], "Partial Capture - ") !== false ||
-                strpos($partialCaptureReference[0], "Capture - ") !== false)) {
-                $worldpaypayment = $this->worldpayPayment->loadByPaymentId($worldPayPayment->getOrderId());
-                if (isset($worldpaypayment)) {
-                    $worldpaypayment->setData('payment_status', $lastEvent[0]);
-                    $worldpaypayment->save();
-                }
+            if ($worldPayPayment->getIsMultishippingOrder()
+                && isset($partialCaptureReference[0])
+                && (str_contains((string) $partialCaptureReference[0], "Partial Capture - ") ||
+                    str_contains((string) $partialCaptureReference[0], "Capture - "))) {
+                $worldPayPayment->setData('payment_status', $lastEvent[0]);
+                $worldPayPayment->save();
                 $magentoorder = $order->getOrder();
                 if ($magentoorder->hasInvoices() && $magentoorder->getBaseTotalDue() != 0) {
                     $gatewayError = 'Sync status action not possible for this Partial Capture Order.';
-                    throw new \Magento\Framework\Exception\CouldNotDeleteException(__($gatewayError));
+                    throw new CouldNotSaveException(__($gatewayError));
                 }
             }
             /** End Multishipping Code */
-            if ($nodes && $lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture') {
-                $getAttibute = (array) $nodes[0]->attributes()['accountType'];
-                $getNodeValue = $getAttibute[0];
-            }
-            if ($lastEvent[0] == 'CAPTURED' && $partialCaptureReference[0] == 'Partial Capture'
-            && $getNodeValue == 'IN_PROCESS_AUTHORISED') {
-                $worldpaypayment= $this->worldpayPayment->loadByWorldpayOrderId($ordercode[0]);
-                if (isset($worldpaypayment)) {
-                    $worldpaypayment->setData('payment_status', $lastEvent[0]);
-                    $worldpaypayment->save();
-                }
-                $gatewayError = 'Sync status action not possible for this Partial Capture Order.';
-                throw new \Magento\Framework\Exception\CouldNotDeleteException(__($gatewayError));
-            }
 
+            $nodes = $paymentService->xpath('//payment/balance');
+
+            if (!empty($nodes) && isset($partialCaptureReference[0]) && $partialCaptureReference[0] === 'Partial Capture') {
+                $attributes = (array)$nodes[0]->attributes()['accountType'];
+                $accountType = $attributes[0] ?? null;
+
+                if ($accountType === 'IN_PROCESS_AUTHORISED') {
+                    $worldPayPayment->setData('payment_status', $lastEvent[0]);
+                    $worldPayPayment->save();
+                    $magentoorder = $order->getOrder();
+                    if ($magentoorder->hasInvoices() && $magentoorder->getBaseTotalDue() != 0) {
+                        $gatewayError = 'Sync status action not possible for this Partial Capture Order.';
+                        throw new CouldNotSaveException(__($gatewayError));
+                    }
+                }
+            }
         }
         return simplexml_load_string($rawXml);
     }
-    /**
-     * Set Payment Global Payment By Payment Update
-     *
-     * @param string $paymentUpdate
-     * @return array
-     */
-    public function setGlobalPaymentByPaymentUpdate($paymentUpdate)
+
+    public function setGlobalPaymentByPaymentUpdate(UpdateInterface $paymentUpdate): void
     {
         $this->worldpayPayment->loadByWorldpayOrderId($paymentUpdate->getTargetOrderCode());
+    }
+
+    public function updatePaymentDccData(Worldpayment $worldpayPayment, array $dccOfferParams): void
+    {
+        if (isset($dccOfferParams['dccOfferAmount'])) {
+            $worldpayPayment->setData('dcc_offer_amount', $dccOfferParams['dccOfferAmount']);
+        }
+        if (isset($dccOfferParams['dccOfferCurrencyCode'])) {
+            $worldpayPayment->setData('dcc_offer_currency_code', $dccOfferParams['dccOfferCurrencyCode']);
+        }
+        if (isset($dccOfferParams['dccOfferRate'])) {
+            $worldpayPayment->setData('dcc_offer_rate', $dccOfferParams['dccOfferRate']);
+        }
+        if (isset($dccOfferParams['dccOfferAcceptanceDate'])) {
+            $worldpayPayment->setData('dcc_offer_acceptance_date', $dccOfferParams['dccOfferAcceptanceDate']);
+        }
+        if (isset($dccOfferParams['dccOfferRateProvider'])) {
+            $worldpayPayment->setData('dcc_offer_rate_provider', $dccOfferParams['dccOfferRateProvider']);
+        }
+        if (isset($dccOfferParams['dccOfferMarkupRate'])) {
+            $worldpayPayment->setData('dcc_offer_markup_rate', $dccOfferParams['dccOfferMarkupRate']);
+        }
+
+        try {
+            $worldpayPayment->save();
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(
+                __('Failed to save DCC offer data: %1', $e->getMessage())
+            );
+        }
+    }
+
+    public function updatePaymentDccDataFromXml(Worldpayment $worldpayPayment, string $xml): void
+    {
+        $xmlElement = new \SimpleXmlElement($xml);
+
+        $dccOfferElements = $xmlElement->xpath('//dynamicCurrencyConversionOffer');
+
+        if (empty($dccOfferElements)) {
+            return;
+        }
+
+        $dccOffer = $dccOfferElements[0];
+        $exchangeRateElement = $dccOffer->xpath('exchangeRate');
+        $amountElement = $dccOffer->xpath('amount');
+        $dateElement = $dccOffer->xpath('date');
+
+        if (!empty($exchangeRateElement)) {
+            $exchangeRateAttrs = $exchangeRateElement[0]->attributes();
+            if (isset($exchangeRateAttrs['rate'])) {
+                $worldpayPayment->setData('dcc_offer_rate', (string)$exchangeRateAttrs['rate']);
+            }
+            if (isset($exchangeRateAttrs['rateProvider'])) {
+                $worldpayPayment->setData('dcc_offer_rate_provider', (string)$exchangeRateAttrs['rateProvider']);
+            }
+            if (isset($exchangeRateAttrs['markupRate'])) {
+                $worldpayPayment->setData('dcc_offer_markup_rate', (string)$exchangeRateAttrs['markupRate']);
+            }
+        }
+
+        if (!empty($amountElement)) {
+            $amountAttrs = $amountElement[0]->attributes();
+            if (isset($amountAttrs['value'])) {
+                $worldpayPayment->setData('dcc_offer_amount', (string)$amountAttrs['value']);
+            }
+            if (isset($amountAttrs['currencyCode'])) {
+                $worldpayPayment->setData('dcc_offer_currency_code', (string)$amountAttrs['currencyCode']);
+            }
+        }
+
+        if (!empty($dateElement)) {
+            $dateAttrs = $dateElement[0]->attributes();
+            $dayOfMonth = isset($dateAttrs['dayOfMonth']) ? (string)$dateAttrs['dayOfMonth'] : '01';
+            $month = isset($dateAttrs['month']) ? (string)$dateAttrs['month'] : '01';
+            $year = isset($dateAttrs['year']) ? (string)$dateAttrs['year'] : date('Y');
+
+            $acceptanceDate = sprintf('%04d%02d%02d', $year, $month, $dayOfMonth);
+            $worldpayPayment->setData('dcc_offer_acceptance_date', $acceptanceDate);
+        }
+
+        try {
+            $worldpayPayment->save();
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(
+                __('Failed to save DCC offer data from notification: %1', $e->getMessage())
+            );
+        }
     }
 }

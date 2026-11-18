@@ -18,7 +18,7 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
      *
      * @param SimpleXMLElement $xml
      */
-    public function __construct($xml)
+    public function __construct(\SimpleXMLElement $xml)
     {
         $this->_xml = $xml;
     }
@@ -534,5 +534,17 @@ class StateXml implements \Sapient\Worldpay\Model\Payment\StateInterface
             }
             return ltrim($savereasoncode, ",");
         }
+    }
+
+    public function getTlid()
+    {
+        $statusNode = $this->_getStatusNode();
+        if (!empty($statusNode->payment->schemeResponse)) {
+            $transactionIdentifier = $statusNode->payment->schemeResponse->transactionIdentifier;
+            if (!empty($transactionIdentifier)) {
+                return (string)$transactionIdentifier;
+            }
+        }
+        return '';
     }
 }

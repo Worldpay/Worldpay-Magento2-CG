@@ -548,11 +548,8 @@ define(
                                 }
                             };
                             iframeParams.resultCallback = function(responseData){
-                                var redirectUrl,isredirect=false;
+                                var redirectUrl;
                                 var status = responseData.order.status;
-                                /*var urlParams  = Object.keys(responseData.gateway).map(function(k) {
-                                    return encodeURIComponent(k) + '=' + encodeURIComponent(responseData.gateway[k])
-                                }).join('&');*/
                                 switch (status) {
                                     case "success":
                                         redirectUrl=url.build('worldpay/redirectresult/iframe/status/success/');
@@ -571,44 +568,16 @@ define(
                                         break
                                     default:
                                         redirectUrl=url.build('worldpay/redirectresult/iframe/status/pending');
-
                                 }
                                 window.location = redirectUrl;
-
                             }
                             checkoutWorldPayLibraryObject.setup(iframeParams);
-                            window.addEventListener("message", function(event,s) {
-                                var data = JSON.parse(event.data);
-                                if(data.action == 'resize'){
-                                    $('.hpp-checkout').hide();
-                                    if(paymentDetails.additional_data.save_my_card){
-                                        self.isSaveThisCardVisible(true);
-                                        $("#worldpay_cc_save_card").attr('disabled',"disabled");
-                                    }else{
-                                        self.isSaveThisCardVisible(false);
-                                        $("#worldpay_cc_save_card").removeAttr('disabled');
-                                    }
-                                    $("#wp-cl-checkout-payment-worldpay-container-iframe").attr('scrolling','yes');
-                                    self.afterIframeLoadActions();
-                                    fullScreenLoader.stopLoader();
-                                }
-                            }, { once: true });
+                            self.registerHppIframeListener(self);
                             /******* If addeventlister not working */
                             setTimeout(function () {
                                 if($('.loading-mask:visible').length)
                                 {
-                                    $('.hpp-checkout').hide();
-                                    if(paymentDetails.additional_data.save_my_card){
-                                        self.isSaveThisCardVisible(true);
-                                        $("#worldpay_cc_save_card").attr('disabled',"disabled");
-                                    }else{
-                                        self.isSaveThisCardVisible(false);
-                                        $("#worldpay_cc_save_card").removeAttr('disabled');
-                                    }
-
-                                    $("#wp-cl-checkout-payment-worldpay-container-iframe").attr('scrolling','yes');
-
-                                    self.afterIframeLoadActions();
+                                    self._handleHppResize(paymentDetails, self);
                                     fullScreenLoader.stopLoader();
                                 }
 
@@ -1191,7 +1160,6 @@ define(
             getHppIntegrationType: function(){
                 return window.checkoutConfig.payment.ccform.hpp_integration_type;
             },
-
             registerCardinalListener: function(self) {
                 const handler = function(event) {
                     if (event.origin !== window.checkoutConfig.payment.ccform.jwtEventUrl) {
@@ -1228,7 +1196,42 @@ define(
                 };
 
                 window.addEventListener("message", handler);
-             }
+             },
+            registerHppIframeListener: function (self) {
+                const handler = function (event) {
+                    if (event.origin !== window.checkoutConfig.payment.ccform.jwtEventUrl) {
+                        return;
+                    }
+
+                    let data;
+                    try {
+                        data = JSON.parse(event.data);
+                    } catch (e) {
+                        return;
+                    }
+
+                    if (data.action === 'resize') {
+                        self._handleHppResize(paymentDetails, self);
+                        fullScreenLoader.stopLoader();
+                    }
+                };
+
+                window.addEventListener("message", handler);
+            },
+            _handleHppResize: function(paymentDetails, self) {
+                $('.hpp-checkout').hide();
+
+                if (paymentDetails.additional_data.save_my_card) {
+                    self.isSaveThisCardVisible(true);
+                    $("#worldpay_cc_save_card").attr('disabled', "disabled");
+                } else {
+                    self.isSaveThisCardVisible(false);
+                    $("#worldpay_cc_save_card").removeAttr('disabled');
+                }
+
+                $("#wp-cl-checkout-payment-worldpay-container-iframe").attr('scrolling', 'yes');
+                self.afterIframeLoadActions();
+            },
         });
     }
 );

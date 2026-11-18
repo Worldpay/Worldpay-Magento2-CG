@@ -270,6 +270,10 @@ class UpdateWorldpayment
             }
         }
 
+        if (!empty($payment->schemeResponse[0]->supplementaryId[0])) {
+            $wpp->setData('tlid', (string)$payment->schemeResponse[0]->transactionIdentifier[0]);
+        }
+
         $wpp->save();
 
         if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
@@ -363,6 +367,9 @@ class UpdateWorldpayment
         $wpp->setData('aav_email_result_code', $payment->AAVEmailResultCode['description']);
         $wpp->setData('latam_instalments', $lataminstalments);
         $wpp->setData('store_id', $this->storeManager->getStore()->getId());
+        if (!empty($payment->schemeResponse[0]->supplementaryId[0])) {
+            $wpp->setData('tlid', (string)$payment->schemeResponse[0]->transactionIdentifier[0]);
+        }
         $wpp->save();
         if ($this->customerSession->getIsSavedCardRequested() && $orderStatus->token) {
                 $this->customerSession->unsIsSavedCardRequested();
@@ -404,16 +411,18 @@ class UpdateWorldpayment
                 ->addFieldToFilter('customer_id', $customerId)
                 ->addFieldToFilter('token_code', $tokenElement[0]->tokenDetails[0]->paymentTokenID[0])
                 ->getFirstItem()->getData();
-        // checking storedcredentials exist or not
-//        if($storedCredentialsElement){
-//            $storedCredentialsDataExist = $savedTokenFactory->getCollection()
-//                ->addFieldToFilter('customer_id', $customerId)
-//                ->addFieldToFilter('transaction_identifier', $storedCredentialsElement[0]->transactionIdentifier[0])
-//                ->getFirstItem()->getData();
-//        }
         if (empty($tokenDataExist)) {
             if ($payment->schemeResponse) {
-                $savedTokenFactory->setTransactionIdentifier($payment->schemeResponse[0]->transactionIdentifier[0]);
+                $transactionIdentifier = $payment->schemeResponse[0]->transactionIdentifier[0];
+                $supplementaryId = isset($payment->schemeResponse[0]->supplementaryId)
+                    ? $payment->schemeResponse[0]->supplementaryId[0] : '';
+
+                if ($supplementaryId) {
+                    $savedTokenFactory->setTlid($transactionIdentifier);
+                    $savedTokenFactory->setTransactionIdentifier($supplementaryId);
+                } elseif ($transactionIdentifier) {
+                    $savedTokenFactory->setTransactionIdentifier($transactionIdentifier);
+                }
             }
             $binNumber = $tokenElement[0]->paymentInstrument[0]->cardDetails[0]->derived[0]->bin[0];
             $savedTokenFactory->setTokenCode($tokenElement[0]->tokenDetails[0]->paymentTokenID[0]);
@@ -759,6 +768,7 @@ class UpdateWorldpayment
         } else {
             $wpp = $wpp->loadByWorldpayOrderId($currentOrderCode);
         }
+
         $wpp->setData('payment_status', $worldPayPayment->getData('payment_status'));
         $wpp->setData('payment_model', $worldPayPayment->getData('payment_model'));
         $wpp->setData('payment_type', $worldPayPayment->getData('payment_type'));
@@ -801,6 +811,7 @@ class UpdateWorldpayment
         $wpp->setData('fraudsight_message', $worldPayPayment->getData('fraudsight_message'));
         $wpp->setData('fraudsight_score', $worldPayPayment->getData('fraudsight_score'));
         $wpp->setData('fraudsight_reasoncode', $worldPayPayment->getData('fraudsight_reasoncode'));
+        $wpp->setData('tlid', $worldPayPayment->getData('tlid'));
         $wpp->save();
     }
 }

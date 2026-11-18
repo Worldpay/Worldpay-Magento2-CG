@@ -761,7 +761,6 @@ class Recurring extends \Magento\Framework\App\Helper\AbstractHelper
     public function addItemsToQuote($tokenKey, $itemData, $quoteId)
     {
         $token = 'Bearer '.$tokenKey;
-        $apiUrl = '';
         $apiUrl = $this->_storeManager->getStore()->getUrl('rest/default/V1/carts/mine/', ['_secure' => true]);
         $response = $this->curlHelper->sendCurlRequest(
             $apiUrl,

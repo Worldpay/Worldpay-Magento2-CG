@@ -645,10 +645,8 @@ EOD;
         foreach ($orderlineitems['lineItem'] as $lineitem) {
             $totaldiscountamount = (isset($lineitem['totalDiscountAmount']))
                                     ? sprintf('%0.2f', $lineitem['totalDiscountAmount']) : 0;
-            $taxrate = (isset($lineitem['taxRate']))
-                                    ? sprintf('%0.2f', $lineitem['taxRate']) : 0;
             $unitPrice = sprintf('%0.2f', $lineitem['unitPrice']);
-            $accTotalAmt += $taxrate + ($lineitem['quantity'] * $unitPrice) - $totaldiscountamount;
+            $accTotalAmt += ($lineitem['quantity'] * $unitPrice) - $totaldiscountamount;
         }
         return $accTotalAmt;
     }
