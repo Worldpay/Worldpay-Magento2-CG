@@ -85,9 +85,7 @@ class PaymentOptionsService extends \Magento\Framework\DataObject
     private function getPaymentOptions($xml)
     {
         if (isset($xml->reply->paymentOption)) {
-            $results = (array) $xml->reply->paymentOption;
-            array_push($results, "OPENBANKING-SSL");
-            return $results;
+            return (array) $xml->reply->paymentOption;
         }
         return null;
     }

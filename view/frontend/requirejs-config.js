@@ -50,7 +50,8 @@ var config = {
             "Magento_Checkout/template/payment.html": "Sapient_Worldpay/template/payment.html",
             newcard:            'Sapient_Worldpay/js/newcard',
             disclaimerPopup:    'Sapient_Worldpay/js/model/disclaimer-popup',
-            "validation": "mage/validation/validation"
+            "validation": "mage/validation/validation",
+            'dompurify': 'https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js'
         }
     },
     config: {

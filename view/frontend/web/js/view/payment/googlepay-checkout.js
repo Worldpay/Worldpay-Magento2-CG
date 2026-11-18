@@ -40,11 +40,12 @@ define([
                 baseRequest : {
                      apiVersion: 2,
                      apiVersionMinor: 0
-                 },
-                 currencyCode : window.checkoutConfig.totalsData.base_currency_code,
-                 allowedCardAuthMethods: window.checkoutConfig.payment.ccform.googleAuthMethods.split(","),
-                 allowedCardNetworks : window.checkoutConfig.payment.ccform.googlePaymentMethods.split(","),
-                 tokenizationSpecification : {
+                },
+                currencyCode : window.checkoutConfig.totalsData.quote_currency_code,
+                countryCode: window.checkoutConfig.defaultCountryId,
+                allowedCardAuthMethods: window.checkoutConfig.payment.ccform.googleAuthMethods.split(","),
+                allowedCardNetworks : window.checkoutConfig.payment.ccform.googlePaymentMethods.split(","),
+                tokenizationSpecification : {
                     type: 'PAYMENT_GATEWAY',
                     parameters: {
                         'gateway': window.checkoutConfig.payment.ccform.googleGatewayMerchantname,
@@ -192,6 +193,7 @@ define([
             var ginitData = {
                 "env_mode": window.googleCheckout.googlepayOptions.env_mode,
                 "currencyCode": window.googleCheckout.googlepayOptions.currencyCode,
+                "countryCode": window.googleCheckout.googlepayOptions.countryCode,
                 "baseRequest": window.googleCheckout.googlepayOptions.baseRequest,
                 "allowedCardAuthMethods": window.googleCheckout.gPayCardAuthMethods(),
                 "allowedCardNetworks": window.googleCheckout.gPayPaymentMethods(),

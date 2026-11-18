@@ -3900,4 +3900,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             ? 'https://apitest.cybersource.com'
             : 'https://api.cybersource.com';
     }
+
+    public function isSendAuthorizeEmail()
+    {
+        return (bool) $this->_scopeConfig->getValue(
+            'worldpay/hpp_config/send_authorize_email',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
 }

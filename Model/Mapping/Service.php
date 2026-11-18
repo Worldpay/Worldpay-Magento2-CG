@@ -943,11 +943,22 @@ class Service
                 $lineitem['quantity'] = (int) $_item->getQty();
                 $lineitem['quantityUnit'] = $this->worldpayHelper->getQuantityUnit($_item->getProduct());
                 if ($paymentType == 'KLARNA-SSL' && $isMultiShipping) {
-                        $lineitem['unitPrice'] = $_item->getProduct()->getPrice();
+                    $lineitem['unitPrice'] = (float) $_item->getPriceInclTax();
                 } else {
-                        $lineitem['unitPrice'] = $rowtotal / $_item->getQty();
+                    $lineitem['unitPrice'] = (float) $_item->getRowTotalInclTax() / $_item->getQty();
                 }
-                $lineitem['taxRate'] = $totaltax;
+
+                $taxRate = (float) $_item->getTaxPercent();
+
+                if ($taxRate == 0 && $totaltax > 0) {
+                    foreach ($_item->getChildren() ?: [] as $child) {
+                        $taxRate = (float) $child->getTaxPercent();
+                        break;
+                    }
+                }
+
+                $lineitem['taxRate'] = $taxRate;
+
                 $lineitem['totalAmount'] = $totalamount + $totaltax;
                 $lineitem['totalTaxAmount'] = $totaltax;
                 if ($discountamount > 0) {
@@ -1263,6 +1274,8 @@ class Service
     private function _getPaymentDetailsUsingToken($paymentDetails, $quote)
     {
         $savedCardData = $this->savedtoken->loadByTokenCode($paymentDetails['additional_data']['tokenCode']);
+        $parentOrderTlid = $paymentDetails['additional_data']['parent_order_tlid'] ?? null;
+        $transactionIdentifier = $parentOrderTlid ?: ($savedCardData->getTlid() ?: $savedCardData->getTransactionIdentifier());
         if (isset($paymentDetails['encryptedData'])) {
             $details = [
                 'encryptedData' => $paymentDetails['encryptedData'],
@@ -1274,7 +1287,7 @@ class Service
                 'paymentType' => 'TOKEN-SSL',
                 'customerId' => $quote->getCustomerId(),
                 'tokenCode' => $savedCardData->getTokenCode(),
-                'transactionIdentifier' => $savedCardData->getTransactionIdentifier(),
+                'transactionIdentifier' => $transactionIdentifier,
                 'cardMethod' => $savedCardData->getMethod()
             ];
             if (isset($paymentDetails['additional_data']['saved_cc_cid'])
