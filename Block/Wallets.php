@@ -121,7 +121,7 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
     {
         return $this->worldpayHelper->isGooglePayEnable();
     }
-    
+
     /**
      * @inheritdoc
      * @since 100.2.0
@@ -138,18 +138,10 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
     public function getJsLayout(): string
     {
         $purchaseUrl = $this->getUrl('worldpay/button/placeOrder', ['_secure' => true]);
-        $is3DSEnabled = (bool) $this->_scopeConfig->getValue(
-            'worldpay/3ds_config/do_3Dsecure',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
-        $is3DS2Enabled = (bool) $this->_scopeConfig->getValue(
-            'worldpay/3ds_config/enable_dynamic3DS2',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
         // String data does not require escaping here and handled on transport level and on client side
         $this->jsLayout['components']['wp-wallet-pay']['config']['isGooglePayEnable']  = $this->isEnabled();
         $this->jsLayout['components']['wp-wallet-pay']['config']['env_mode']  = $this->getEnvMode();
-        
+
         $this->jsLayout['components']['wp-wallet-pay']['config']['customerDetails']  = $this->getCustomerData();
 
         $this->jsLayout['components']['wp-wallet-pay']['config']['googlepayOptions']
@@ -168,7 +160,6 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
         $this->jsLayout['components']['wp-wallet-pay']['config']['googlepayOptions']
         ['tokenizationSpecification']['parameters']['gatewayMerchantId']
         = $this->worldpayHelper->googleGatewayMerchantid();
-        
         $this->jsLayout['components']['wp-wallet-pay']['config']['googlepayOptions']
         ['tokenizationSpecification']['parameters']['gateway']  =  $this->worldpayHelper->googleMerchantname();
 
@@ -186,7 +177,6 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
 
         $this->jsLayout['components']['wp-wallet-pay']['config']['googlepayOptions']
         ['gpaybutton_locale']  = $this->worldpayHelper->getGpayButtonLocalePdp();
-        
         $this->jsLayout['components']['wp-wallet-pay']['config']['purchaseUrl'] = $purchaseUrl;
         $this->jsLayout['components']['wp-wallet-pay']['config']
             ['sessionId']   = $this->session->getSessionId();
@@ -226,7 +216,31 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
         $this->jsLayout['components']['wp-wallet-pay']['config']
         ['applepayOptions']['applePayButtonLocale']  =  $this->worldpayHelper->getApplePayButtonLocalePdp();
 
+        $this->jsLayout['components']['wp-wallet-pay']['config']['currencySymbol']  = $this->getCurrencySymbol();
+
         return parent::getJsLayout();
+    }
+
+    private function getCurrencySymbol(): string
+    {
+        try {
+            $currencyCode = $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
+            $currency = $this->_storeManager->getStore()->getCurrentCurrency();
+
+            $symbol = $currency->getCurrencySymbol();
+
+            if ($symbol) {
+                return $symbol;
+            }
+
+            $locale = \Locale::getDefault() ?: 'en_US';
+            $numberFormatter = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
+            $currencySymbol = $numberFormatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
+
+            return $currencySymbol ?: $currencyCode;
+        } catch (\Exception $e) {
+            return $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
+        }
     }
 
     /**
@@ -238,7 +252,7 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
     {
         return $this->_storeManager->getStore()->getId();
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -254,7 +268,7 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
     {
         return $this->session->getSessionId();
     }
-    
+
     /**
      * Get WP mode
      */
@@ -267,7 +281,7 @@ class Wallets extends \Magento\Catalog\Block\Product\AbstractProduct
             return "PRODUCTION";
         }
     }
-    
+
     /**
      * @inheritdoc
      */

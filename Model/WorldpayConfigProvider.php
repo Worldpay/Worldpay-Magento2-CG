@@ -361,6 +361,8 @@ class WorldpayConfigProvider implements ConfigProviderInterface
             $this->worldpayHelper->isCheckoutPaypalSmartButtonEnabled() && $this->worldpayHelper->isApmEnabled();
         $config['payment']['ccform']['paypalClientId'] = $this->worldpayHelper->getPaypalClientId();
         $config['payment']['ccform']['paypalCurrency'] = $this->worldpayHelper->getPaypalCurrency();
+        $config['ravelinConfig']['enabled']= $this->worldpayHelper->isRavelinEnabled();
+        $config['ravelinConfig']['publicKey']= $this->worldpayHelper->getRavelinPublicKey();
         $config['payment']['ccform']['isProductOnDemand'] = $this->productOnDemandHelper->isProductOnDemandQuote();
         return $config;
     }

@@ -325,6 +325,7 @@ EOD;
         $this->_addDynamic3DSElement($order);
         $this->_addCustomerRiskData($order);
         $this->_addAdditional3DsElement($order);
+        $this->_addRavelinData($order);
         return $order;
     }
     /**
@@ -502,7 +503,6 @@ EOD;
         $paymentType->addChild('protocolVersion', $this->protocolVersion);
         $paymentType->addChild('signature', $this->signature);
         $paymentType->addChild('signedMessage', $this->signedMessage);
-        //$paymentType->addChild('session', $this->signedMessage);
         $session = $paymentDetails->addChild('session');
         $session['id'] = $this->paymentDetails['sessionId'];
         $session['shopperIPAddress'] = $this->shopperIpAddress;
@@ -559,5 +559,13 @@ EOD;
     private function _amountAsInt($amount)
     {
         return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
+    }
+
+    protected function _addRavelinData(\SimpleXMLElement $order): void
+    {
+        if(isset($this->paymentDetails['ravelinDeviceId']) && $this->paymentDetails['ravelinDeviceId']) {
+            $deviceSession = $order->addChild('deviceSession');
+            $deviceSession->addChild('deviceId', $this->paymentDetails['ravelinDeviceId']);
+        }
     }
 }

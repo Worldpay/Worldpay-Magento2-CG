@@ -73,12 +73,8 @@ class ClickToPayOrder extends AbstractXmlBuilder
         $this->_addCustomerRiskData($order);
         $this->_addAdditional3DsElement($order);
         $this->_addFraudSightData($order);
-    }
+        $this->_addRavelinData($order);
 
-    private function _addDescriptionElement(SimpleXMLElement $order): void
-    {
-        $description = $order->addChild('description');
-        $this->_addCDATA($description, $this->orderParameters['orderDescription'] );
     }
 
     private function _addAmountElement(SimpleXMLElement $order): void

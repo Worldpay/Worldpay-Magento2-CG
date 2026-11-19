@@ -1,0 +1,30 @@
+<script type="text/javascript">
+    /**
+     * Ravelin Configuration
+     * This script initializes the window.ravelinConfig object
+     * for use by the RavelinJS initialization module
+     */
+    (function() {
+        'use strict';
+
+        // Initialize Ravelin configuration
+        window.ravelinConfig = {
+            enabled: <?php echo (bool)$block->isRavelinEnabled() ? 'true' : 'false'; ?>,
+            publicKey: <?php echo json_encode($block->getRavelinPublicKey()); ?>,
+            baseUrl: <?php echo json_encode($block->getRavelinBaseUrl()); ?>
+        };
+
+        console.log('window.ravelinConfig:', window.ravelinConfig);
+
+        // Log configuration status to console
+        if (typeof console !== 'undefined' && console.log) {
+            if (window.ravelinConfig && window.ravelinConfig.enabled) {
+                console.info('[Ravelin] Configuration loaded - Ravelin is enabled');
+                console.info('[Ravelin] Public Key: ' + (window.ravelinConfig.publicKey ? 'Set' : 'Not set'));
+                console.info('[Ravelin] Base URL: ' + (window.ravelinConfig.baseUrl || 'Not set'));
+            } else {
+                console.info('[Ravelin] Ravelin is disabled or not configured');
+            }
+        }
+    })();
+</script>

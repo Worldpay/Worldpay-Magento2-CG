@@ -22,6 +22,7 @@
                 <value id="prd-ops" type="host">https://d16i99j5zwwv51.cloudfront.net/sdk_library/us/prd/ops/pc_gsmpi_web_sdk.js</value>
                 <value id="paypal-sdk" type="host">https://www.paypal.com/sdk/js</value>
                 <value id="cybersource" type="host">*.cybersource.com</value>
+                <value id="ravelin" type="host">*.ravelin.com</value>
             </values>
         </policy>
         <policy id="style-src">

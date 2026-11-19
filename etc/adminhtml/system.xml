@@ -280,6 +280,11 @@
                     <label>Hosted Payment page Integration</label>
                     <source_model>Sapient\Worldpay\Model\Config\Source\HppIntegration</source_model>
                 </field>
+                <field id="send_authorize_email" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Authorize Order Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If Hosted payment page Integration is "Full page" an authorisation email will be sent before redirect</comment>
+                </field>
             </group>
             <!-- MOTO -->
             <group id="moto_config" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -1574,6 +1579,20 @@
                     <label>Enable</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>If set to "No", after an order failure, shopper will be redirected to an empty cart</comment>
+                </field>
+            </group>
+            <!--Ravelin FraudSight Configuration-->
+            <group id="ravelin_config" translate="label" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Ravelin Fraud Detection</label>
+                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Ravelin</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If set to "Yes", Ravelin device data collection will be enabled for fraud detection.</comment>
+                </field>
+                <field id="public_key" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Ravelin Public Key</label>
+                    <depends><field id="enabled">1</field></depends>
+                    <comment>For this detail, you must connect with your Ravelin/Worldpay contact.</comment>
                 </field>
             </group>
             <!-- Order Cleanup Cron -->

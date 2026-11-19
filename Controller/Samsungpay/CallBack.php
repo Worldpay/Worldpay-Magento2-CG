@@ -184,16 +184,16 @@ class CallBack extends \Magento\Framework\App\Action\Action
         $quote = $this->quoteFactory->create()->load($quoteId);
         /** Multishipping Samsung Pay Configuration */
         if ($quote->getIsMultiShipping()) {
-            
+
             $msServiceId = $this->scopeConfig->
                 getValue(self::SAMSUMG_CONFIG_PATH.'ms_service_id', $storeScope);
-        
+
             $msOrderDescription = $this->scopeConfig->
                     getValue(self::SAMSUMG_CONFIG_PATH.'ms_samsung_order_description', $storeScope);
-        
+
             $msMerchantCode = $this->scopeConfig->
                     getValue('worldpay/multishipping/ms_merchant_code', $storeScope);
-            
+
             $serviceId = !empty($msServiceId) ? $msServiceId : $serviceId;
             $orderDescription = !empty($msOrderDescription) ? $msOrderDescription : $orderDescription;
             $merchantCode = !empty($msMerchantCode) ? $msMerchantCode : $merchantCode;
@@ -236,27 +236,20 @@ class CallBack extends \Magento\Framework\App\Action\Action
                 $response = json_decode($json, true);
 
                 if ($response['resultMessage'] == 'SUCCESS') {
-
-                    //response is success, collect the order details and
-                    //send request to worldpay with this reponse from samsung
-
-                    //$order = $this->orderFactory->create()->loadByIncrementId($orderId);
-                    //$orderDetails = $order->getData();
-
                     $currencyCode = $this->_authSession->getCurrencyCode();
                     $exponent = $this->worldpayHelper->getCurrencyExponent($currencyCode);
                     $grandTotal = $orderDetails['grand_total'];
                     if ($isMultishipping) {
                         $grandTotal = $quote->getGrandTotal();
                     }
-                    
+
                     $browserData = $this->_checkoutSession->getBrowserFields();
                     $browserFields = [
                         'browser_colorDepth' => $browserData['browser_colordepth'],
                         'browser_screenWidth' => $browserData['browser_screenwidth'],
                         'browser_screenHeight' => $browserData['browser_screenheight']
                     ];
-                    
+
                     $samsungPayOrderParams = [];
 
                     $samsungPayOrderParams['orderCode'] = $worldpayOrderId;
@@ -307,7 +300,7 @@ class CallBack extends \Magento\Framework\App\Action\Action
                         $this->_checkoutSession->restoreQuote();
             }
             $resultRedirect->setPath('worldpay/Redirectresult/cancel');
-            
+
             return $resultRedirect;
         }
     }
@@ -328,7 +321,7 @@ class CallBack extends \Magento\Framework\App\Action\Action
      *
      * @return string
      */
-    
+
     private function _getClientIPAddress()
     {
         $REMOTE_ADDR = filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_VALIDATE_IP);

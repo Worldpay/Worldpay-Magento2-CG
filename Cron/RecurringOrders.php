@@ -111,6 +111,11 @@ class RecurringOrders
     protected $_orderCollectionFactory;
 
     /**
+     * @var \Sapient\Worldpay\Model\WorldpaymentFactory
+     */
+    protected $worldpaymentFactory;
+
+    /**
      * Constructor
      *
      * @param JsonFactory $resultJsonFactory
@@ -127,6 +132,7 @@ class RecurringOrders
      * @param SubscriptionFactory $subscriptionFactory
      * @param \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory
      * @param \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
+     * @param \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory
      */
     public function __construct(
         JsonFactory $resultJsonFactory,
@@ -142,7 +148,8 @@ class RecurringOrders
         \Sapient\Worldpay\Helper\Recurring $recurringhelper,
         SubscriptionFactory $subscriptionFactory,
         \Sapient\Worldpay\Model\Recurring\Subscription\TransactionsFactory $transactionsFactory,
-        \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory
+        \Sapient\Worldpay\Model\Recurring\PlanFactory $planFactory,
+        \Sapient\Worldpay\Model\WorldpaymentFactory $worldpaymentFactory
     ) {
         $this->_logger = $wplogger;
         $this->_orderCollectionFactory = $orderCollectionFactory;
@@ -158,6 +165,7 @@ class RecurringOrders
         $this->recurringhelper = $recurringhelper;
         $this->transactionFactory = $transactionsFactory;
         $this->planFactory = $planFactory;
+        $this->worldpaymentFactory = $worldpaymentFactory;
     }
 
     /**
@@ -204,6 +212,13 @@ class RecurringOrders
                     $paymentData['paymentMethod']['method'] = $paymentType;
                     $paymentData['paymentMethod']['additional_data'] = $this->getAdditionalData($tokenDetails);
                     $paymentData['billing_address'] = $this->getBillingAddress($addressDetails['billing']);
+
+                    $parentOrderId = $subscriptionDetails['original_order_id'];
+                    $parentOrderTlid = $parentOrderId ? $this->getParentOrderTlid((int)$parentOrderId) : null;
+                    if ($parentOrderTlid) {
+                        $paymentData['paymentMethod']['additional_data']['parent_order_tlid'] = $parentOrderTlid;
+                    }
+
                     try {
                         $result = $subscriptionDetails['original_order_id'];
                         $currentStatus = $this->updateRecurringTransactions($result, $recurringOrderData['entity_id']);
@@ -495,5 +510,28 @@ class RecurringOrders
 
             }
         }
+    }
+
+    private function getParentOrderTlid(int $parentOrderId): ?string
+    {
+        try {
+            $parentOrder = $this->getOrderCollectionFactory()->create()
+                ->addFieldToFilter('main_table.entity_id', ['eq' => $parentOrderId])
+                ->getFirstItem();
+
+            if (!$parentOrder || !$parentOrder->getId()) {
+                return null;
+            }
+
+            $incrementId = $parentOrder->getIncrementId();
+            $worldpayPayment = $this->worldpaymentFactory->create()->loadByPaymentId($incrementId);
+
+            if ($worldpayPayment && $worldpayPayment->getId() && $worldpayPayment->getTlid()) {
+                return $worldpayPayment->getTlid();
+            }
+        } catch (Exception $e) {
+            $this->_logger->error("Error retrieving parent order TLID: " . $e->getMessage());
+        }
+        return null;
     }
 }

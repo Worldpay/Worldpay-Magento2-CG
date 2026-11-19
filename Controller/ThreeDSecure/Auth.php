@@ -167,7 +167,7 @@ class Auth extends \Magento\Framework\App\Action\Action
                 $resContent = '
                     <div id="challenge_window">
                         <div class="image-content" style="text-align: center;">
-                            <img src=' . $imageurl . ' alt="WorldPay"/>
+                            <img src=' . $imageurl . ' alt="WorldPay" style="width: 15%"/>
                         </div>
                         <div class="iframe-content">
                             <iframe src="' . $challengeUrl . '" name="jwt_frm" id="jwt_frm"

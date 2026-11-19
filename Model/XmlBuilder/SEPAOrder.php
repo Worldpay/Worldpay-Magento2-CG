@@ -177,6 +177,9 @@ EOD;
         $this->_addShopperElement($order);
         $this->_addBillingElement($order);
         $this->_addMandateElement($order);
+        if(isset($this->paymentDetails['ravelinDeviceId']) && $this->paymentDetails['ravelinDeviceId']) {
+            $this->_addRavelinData($order);
+        }
 
         return $order;
     }
@@ -329,5 +332,11 @@ EOD;
     private function _amountAsInt($amount)
     {
         return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
+    }
+
+    private function _addRavelinData(\SimpleXMLElement $order)
+    {
+        $deviceSession = $order->addChild('deviceSession');
+        $deviceSession->addChild('deviceId',$this->paymentDetails['ravelinDeviceId']);
     }
 }

@@ -108,6 +108,7 @@ class RedirectOrder extends AbstractXmlBuilder
             $this->_addStatementNarrativeElement($order);
         }
         $this->_addFraudSightData($order);
+        $this->_addRavelinData($order);
     }
 
     protected function _addDescriptionElement(SimpleXMLElement $order): void

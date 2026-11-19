@@ -87,6 +87,7 @@ EOD;
      * @var array
      */
     protected $browserFields;
+    protected array $paymentDetails;
 
     /**
      * Build xml for processing Request
@@ -128,7 +129,8 @@ EOD;
         $transactionId,
         $exponent,
         $captureDelay,
-        $browserFields
+        $browserFields,
+        $paymentDetails
     ) {
         $this->merchantCode = $merchantCode;
         $this->orderCode = $orderCode;
@@ -147,6 +149,7 @@ EOD;
         $this->exponent = $exponent;
         $this->captureDelay = $captureDelay;
         $this->browserFields = $browserFields;
+        $this->paymentDetails = $paymentDetails;
         $xml = new \SimpleXMLElement(self::ROOT_ELEMENT);
         $xml['merchantCode'] = $this->merchantCode;
         $xml['version'] = '1.4';
@@ -187,6 +190,7 @@ EOD;
         $this->_addOrderContentElement($order);
         $this->_addPaymentDetailsElement($order);
         $this->_addShopperElement($order);
+        $this->_addRavelinData($order);
         return $order;
     }
 
@@ -287,5 +291,13 @@ EOD;
     private function _amountAsInt($amount)
     {
         return round($amount, $this->exponent, PHP_ROUND_HALF_EVEN) * pow(10, $this->exponent);
+    }
+
+    protected function _addRavelinData(\SimpleXMLElement $order): void
+    {
+        if(isset($this->paymentDetails['ravelinDeviceId']) && $this->paymentDetails['ravelinDeviceId']) {
+            $deviceSession = $order->addChild('deviceSession');
+            $deviceSession->addChild('deviceId', $this->paymentDetails['ravelinDeviceId']);
+        }
     }
 }
