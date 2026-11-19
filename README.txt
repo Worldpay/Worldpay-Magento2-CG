@@ -3,12 +3,12 @@ Latest releases for all supported version:
 For Magento 2.4.9
 
 For Magento 2.4.9
-Worldpay Plugin version: 2.4.9-11026
+Worldpay Plugin version: 2.4.9-p01126
 1. Magento 2.4.9 compatible
 2. PHP 8.4 & 8.5 compatibility
 3. Added Ravelin Integration for Fraud Prevention
 4. Added Support for Mastercard TLID
-5 . Added Support for eDCC
+5. Added Support for eDCC
 
 Worldpay Plugin version: 2.4.9-alpha0626
 1. Magento 2.4.9 compatible
