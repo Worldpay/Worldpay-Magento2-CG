@@ -205,10 +205,13 @@ class Webpayment extends Template
 
     public function getShippingRate()
     {
+        $shippingRate = 0;
         $quote = $this->_cart->getTotalsCache();
-        $getShippingRate = $quote['shipping']->getData('value');
+        if (isset($quote['shipping'])) {
+            $shippingRate = $quote['shipping']->getData('value');
+        }
 
-        return $getShippingRate;
+        return $shippingRate;
     }
     /**
      * Get Tax Rate
